@@ -21,4 +21,10 @@ public class CustomCallerIdHook implements PluginHook {
     public String getHookId() {
         return CustomCallerIdMenu.PAGE_ID;
     }
+
+    @Override
+    public String getFeatureId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
