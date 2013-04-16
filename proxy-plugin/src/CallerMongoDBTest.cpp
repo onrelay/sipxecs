@@ -55,13 +55,14 @@ public:
 	}
 
 	void insertTestData(const std::string& collection, const char* number, const char * name) {
-		mongo::ScopedDbConnection conn(connUrl);
+		boost::scoped_ptr<mongo::ScopedDbConnection> conn(mongo::ScopedDbConnection::getScopedDbConnection(connUrl.toString()));
 		std::string where = testNs + "." + collection;
 		conn->remove(where, mongo::Query());
 		mongo::BSONObj data = BSON(
 		    		"from" << std::string(number) <<
 		    		"to" << std::string(name));
 		conn->insert(where, data);
+		conn->done();
 	}
 
 };

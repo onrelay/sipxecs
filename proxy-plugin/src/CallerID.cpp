@@ -114,11 +114,15 @@ std::string CallerMongoDB::getCallerName(const std::string& number) {
 }
 
 std::string CallerMongoDB::getRewrite(const std::string& number, const std::string& collection) {
-	mongo::ScopedDbConnection conn(_connUrl);
-	mongo::Query query = QUERY("from" << number);
+    boost::scoped_ptr<mongo::ScopedDbConnection> conn(mongo::ScopedDbConnection::getScopedDbConnection(_connUrl.toString()));
+
+    mongo::Query query = QUERY("from" << number);
 	std::string ns_col(_ns);
 	ns_col.append(".").append(collection);
-	mongo::BSONObj r = conn->findOne(ns_col, query);
+
+	mongo::BSONObj r = conn->get()->findOne(ns_col, query);
+	conn->done();
+
 	std::string out = r.toString();
 	if (!r.isEmpty() && r.hasField("to")) {
 		return r.getStringField("to");
