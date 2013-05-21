@@ -108,7 +108,7 @@ public:
 			const UtlString& method, AuthResult priorResult,
 			SipMessage& request, bool bSpiralingRequest, UtlString& reason);
 
-	void announceAssociatedSipRouter(SipRouter* sipRouter) {}
+	virtual void announceAssociatedSipRouter(SipRouter* sipRouter);
 
 	void readConfig(OsConfigDb& configDb) {}
 
@@ -119,6 +119,8 @@ private:
 	friend AuthPlugin* getAuthPlugin(const UtlString& name);
 	CallerID(const UtlString& instanceName, boost::shared_ptr<CallerDB> db);
 	boost::shared_ptr<CallerDB> _db;
+
+	SipRouter* mpSipRouter;
 };
 
 #endif // _CALLERID_H_
