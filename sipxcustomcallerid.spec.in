@@ -67,10 +67,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
-%{_libdir}/libsipxcustomcallerid.so*
+%{_libdir}/authplugins/libsipxcustomcallerid.so*
 
 %files config
 %{_datadir}/java/sipXecs/sipXconfig/plugins/sipxcustomcallerid.jar
 
 %files devel
-%{_libdir}/libsipxcustomcallerid.la
+%{_libdir}/authplugins/libsipxcustomcallerid.la

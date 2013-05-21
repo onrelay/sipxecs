@@ -1,6 +1,8 @@
 include $(top_srcdir)/config/utility.am
 
-lib_LTLIBRARIES = libsipxcustomcallerid.la
+AUTHPLUGIN_COMMON_CXX_FLAGS = \
+	-I$(top_builddir)/config \
+	-I$(top_srcdir)/include
 
 ## Libtool version info - update only immediately before a release
 # Current - increment if any interfaces are added, removed, or changed
@@ -14,14 +16,25 @@ version_Revision = 0
 #       increment if any interfaces have been added
 version_Age = 0
 
-libsipxcustomcallerid_la_LDFLAGS = \
-	-module \
-	-version-info ${version_Current}:${version_Revision}:${version_Age}
+AUTHPLUGIN_COMMON_LD_FLAGS = \
+    -module \
+    -version-info ${version_Current}:${version_Revision}:${version_Age}
 
-libsipxcustomcallerid_la_LIBADD = \
-	@SIPXCOMMSERVER_LIBS@
+nobase_lib_LTLIBRARIES = \
+    authplugins/libsipxcustomcallerid.la
 
-libsipxcustomcallerid_la_SOURCES = \
+authplugins_libsipxcustomcallerid_la_CXXFLAGS = \
+    $(AUTHPLUGIN_COMMON_CXX_FLAGS)
+
+authplugins_libsipxcustomcallerid_la_LDFLAGS = \
+    $(AUTHPLUGIN_COMMON_LD_FLAGS)
+
+authplugins_libsipxcustomcallerid_la_LIBADD = \
+	@SIPXCOMMSERVER_LIBS@ \
+    -lmongoclient \
+    -lboost_system-mt
+
+authplugins_libsipxcustomcallerid_la_SOURCES = \
 	CallerID.cpp \
 	CallerID.h
 
