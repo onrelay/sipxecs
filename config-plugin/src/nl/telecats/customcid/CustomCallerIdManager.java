@@ -18,11 +18,15 @@ package nl.telecats.customcid;
 import java.util.Collection;
 
 public interface CustomCallerIdManager {
-    public abstract Collection<CustomCallerAlias> getDnisRewrites();
+    CustomCallerIdSettings getSettings();
 
-    public abstract Collection<CustomCallerAlias> getDdiRewrites();
+    void saveSettings(CustomCallerIdSettings settings);
 
-    public abstract void setDdiRewrites(Collection<CustomCallerAlias> rewrites);
+    Collection<CustomCallerAlias> getDnisRewrites();
 
-    public abstract void setDnisRewrites(Collection<CustomCallerAlias> rewrites);
+    Collection<CustomCallerAlias> getDdiRewrites();
+
+    void setDdiRewrites(Collection<CustomCallerAlias> rewrites);
+
+    void setDnisRewrites(Collection<CustomCallerAlias> rewrites);
 }

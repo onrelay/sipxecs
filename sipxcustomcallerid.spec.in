@@ -71,6 +71,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files config
 %{_datadir}/java/sipXecs/sipXconfig/plugins/sipxcustomcallerid.jar
+%{_sysconfdir}/sipxpbx/ccid/ccid.xml
 
 %files devel
 %{_libdir}/authplugins/libsipxcustomcallerid.la

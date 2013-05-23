@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import com.mongodb.BasicDBObject;
@@ -33,6 +34,17 @@ public class CustomCallerIdManagerImpl implements CustomCallerIdManager {
     public static final String FROM_ATTR = "from";
     public static final String TO_ATTR = "to";
     private MongoTemplate m_db;
+    private BeanWithSettingsDao<CustomCallerIdSettings> m_settingsDao;
+
+    @Override
+    public CustomCallerIdSettings getSettings() {
+        return m_settingsDao.findOrCreateOne();
+    }
+
+    @Override
+    public void saveSettings(CustomCallerIdSettings settings) {
+        m_settingsDao.upsert(settings);
+    }
 
     @Override
     public Collection<CustomCallerAlias> getDnisRewrites() {
@@ -85,5 +97,9 @@ public class CustomCallerIdManagerImpl implements CustomCallerIdManager {
     @Override
     public void setDnisRewrites(Collection<CustomCallerAlias> rewrites) {
         setRewrites(DNIS_COL, rewrites);
+    }
+
+    public void setSettingsDao(BeanWithSettingsDao<CustomCallerIdSettings> settingsDao) {
+        m_settingsDao = settingsDao;
     }
 }

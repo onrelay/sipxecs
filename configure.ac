@@ -20,6 +20,7 @@ AC_PROG_JAVA([java])
 PROG_JAVA_DEP
 AC_CONFIG_FILES([
     Makefile
+    etc/Makefile
     config-plugin/Makefile
     proxy-plugin/Makefile
     proxy-plugin/src/Makefile

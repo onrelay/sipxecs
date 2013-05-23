@@ -1,5 +1,5 @@
 <div jwcid="@common/Border" borderTitle="ognl:borderTitle">
-  <span jwcid="@common/TabNavigation" tabNames="ognl:{'ddiImport', 'dnisImport'}" selectedTab="ognl:tab"/>
+  <span jwcid="@common/TabNavigation" tabNames="ognl:{'settings', 'ddiImport', 'dnisImport'}" selectedTab="ognl:tab"/>
   <div id="settings-content">
     <span jwcid="@common/ErrorMsg"/>
     <span jwcid="@RenderBlock" block="ognl:components.get(tab + 'Tab')" />
@@ -11,6 +11,12 @@
 	  </span>
 	  <input jwcid="@Submit" id="form:ddiImport" type="button" listener="listener:ddiImport" label="message:button.ddiImport"/>
     </form>
+    <a jwcid="exportddi@common/ExportLink" id="ccid:exportddi" listener="listener:export">
+      <span key="link.export"/>
+    </a>
+    <div jwcid="@For" source="ognl:aliases" value="ognl:alias">
+      <span jwcid="@Insert" value="ognl:alias.from"/> =&gt; <span jwcid="@Insert" value="ognl:alias.to"/><br/>
+    </div>
   </div>
   <div jwcid="dnisImportTab@Block">
     <form jwcid="dnisImportForm@Form" id="dnisImportForm" delegate="bean:validator" listener="listener:dnisImport">
@@ -19,11 +25,19 @@
 	  </span>
 	  <input jwcid="@Submit" id="form:dnisImport" type="button" listener="listener:dnisImport" label="message:button.dnisImport"/>
     </form>
-  </div>
-  <a jwcid="export@common/ExportLink" id="ccid:export" listener="listener:export">
+    <a jwcid="exportdnis@common/ExportLink" id="ccid:exportdnis" listener="listener:export">
       <span key="link.export"/>
     </a>
-  <div jwcid="@For" source="ognl:aliases" value="ognl:alias">
-    <span jwcid="@Insert" value="ognl:alias.from"/> =&gt; <span jwcid="@Insert" value="ognl:alias.to"/><br/>
+    <div jwcid="@For" source="ognl:aliases" value="ognl:alias">
+      <span jwcid="@Insert" value="ognl:alias.from"/> =&gt; <span jwcid="@Insert" value="ognl:alias.to"/><br/>
+    </div>
+  </div>
+  <div jwcid="settingsTab@Block">
+    <form jwcid="form@Form" delegate="bean:validator">
+      <fieldset jwcid="@setting/SettingsFieldset"
+        settings="ognl:settings.settings" />
+      <ul jwcid="formActions@common/FormActions" callback="ognl:callback"
+        listener="listener:apply"/>
+    </form>
   </div>
 </div>

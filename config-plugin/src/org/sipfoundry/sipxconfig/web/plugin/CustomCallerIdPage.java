@@ -25,16 +25,20 @@ import java.util.List;
 import nl.telecats.customcid.CustomCallerAlias;
 import nl.telecats.customcid.CustomCallerAliasCsv;
 import nl.telecats.customcid.CustomCallerIdManager;
+import nl.telecats.customcid.CustomCallerIdSettings;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hivemind.Messages;
+import org.apache.tapestry.IRequestCycle;
 import org.apache.tapestry.annotations.Bean;
 import org.apache.tapestry.annotations.InitialValue;
 import org.apache.tapestry.annotations.InjectObject;
 import org.apache.tapestry.annotations.Persist;
+import org.apache.tapestry.event.PageBeginRenderListener;
+import org.apache.tapestry.event.PageEvent;
 import org.apache.tapestry.request.IUploadFile;
 import org.apache.tapestry.valid.ValidationConstraint;
 import org.apache.tapestry.web.WebResponse;
@@ -42,7 +46,7 @@ import org.sipfoundry.sipxconfig.components.SipxBasePage;
 import org.sipfoundry.sipxconfig.components.SipxValidationDelegate;
 import org.sipfoundry.sipxconfig.components.TapestryUtils;
 
-public abstract class CustomCallerIdPage extends SipxBasePage {
+public abstract class CustomCallerIdPage extends SipxBasePage implements PageBeginRenderListener {
     private static final Log LOG = LogFactory.getLog(CustomCallerIdPage.class);
 
     public abstract IUploadFile getUploadFile();
@@ -60,8 +64,22 @@ public abstract class CustomCallerIdPage extends SipxBasePage {
     public abstract void setTab(String tab);
     public abstract String getTab();
 
+    public abstract CustomCallerIdSettings getSettings();
+
+    public abstract void setSettings(CustomCallerIdSettings settings);
+
     @Bean
     public abstract SipxValidationDelegate getValidator();
+
+    public void pageBeginRender(PageEvent event) {
+        if (getSettings() == null) {
+            setSettings(getCustomCallerManager().getSettings());
+        }
+    }
+
+    public void apply(IRequestCycle cycle) {
+        getCustomCallerManager().saveSettings(getSettings());
+    }
 
     public void ddiImport() {
         List<CustomCallerAlias> aliases = loadCsv();
