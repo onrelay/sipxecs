@@ -14,6 +14,7 @@
  * $
  */
 #include <os/OsLogger.h>
+#include "sipdb/MongoDB.h"
 #include <sipxproxy/SipRouter.h>
 #include <boost/shared_ptr.hpp>
 #include <mongo/client/connpool.h>
@@ -21,8 +22,7 @@
 
 extern "C" AuthPlugin* getAuthPlugin(const UtlString& pluginName)
 {
-	mongo::ConnectionString connUrl(std::string("localhost:27017"));
-	boost::shared_ptr<CallerDB> db((CallerDB *)new CallerMongoDB(connUrl, std::string("imdb")));
+	boost::shared_ptr<CallerDB> db((CallerDB *)new CallerMongoDB(MongoDB::ConnectionInfo::connectionStringFromFile(), std::string("imdb")));
 	CallerID* instance = new CallerID(pluginName, db);
 	return instance;
 }
