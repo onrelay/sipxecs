@@ -22,7 +22,8 @@
 
 extern "C" AuthPlugin* getAuthPlugin(const UtlString& pluginName)
 {
-	boost::shared_ptr<CallerDB> db((CallerDB *)new CallerMongoDB(MongoDB::ConnectionInfo::connectionStringFromFile(), std::string("imdb")));
+  MongoDB::ConnectionInfo info = MongoDB::ConnectionInfo::globalInfo();
+	boost::shared_ptr<CallerDB> db((CallerDB *)new CallerMongoDB(info, std::string("imdb")));
 	CallerID* instance = new CallerID(pluginName, db);
 	return instance;
 }
@@ -92,8 +93,8 @@ AuthPlugin::AuthResult CallerID::authorizeAndModify(const UtlString& id,
 	return AuthPlugin::CONTINUE;
 }
 
-CallerMongoDB::CallerMongoDB(const mongo::ConnectionString& connUrl, const std::string& ns)
-: _connUrl(connUrl), _ns(ns) {
+CallerMongoDB::CallerMongoDB(MongoDB::ConnectionInfo& connectionInfo, const std::string& ns)
+: _ns(ns), _connectionInfo(connectionInfo) {
 }
 
 std::string CallerMongoDB::getCalledName(const std::string& number) {
@@ -105,9 +106,10 @@ std::string CallerMongoDB::getCallerName(const std::string& number) {
 }
 
 std::string CallerMongoDB::getRewrite(const std::string& number, const std::string& collection) {
-    boost::scoped_ptr<mongo::ScopedDbConnection> conn(mongo::ScopedDbConnection::getScopedDbConnection(_connUrl.toString()));
+    
+  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_connectionInfo.getConnectionString().toString()));
 
-    mongo::Query query = QUERY("from" << number);
+  mongo::Query query = QUERY("from" << number);
 	std::string ns_col(_ns);
 	ns_col.append(".").append(collection);
 
@@ -119,7 +121,7 @@ std::string CallerMongoDB::getRewrite(const std::string& number, const std::stri
 		return r.getStringField("to");
 	}
 
-    return std::string();
+  return std::string();
 }
 
 void CallerID::announceAssociatedSipRouter(SipRouter* sipRouter)

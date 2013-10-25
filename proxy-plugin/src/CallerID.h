@@ -81,7 +81,7 @@ public:
 	static const std::string COLLECTION_DDI;
 	static const std::string COLLECTION_DNIS;
 
-	CallerMongoDB(const mongo::ConnectionString& connUrl, const std::string& ns);
+	CallerMongoDB(MongoDB::ConnectionInfo& connectionInfo, const std::string& ns);
 	~CallerMongoDB() {};
 	virtual std::string getCallerName(const std::string& number);
 	virtual std::string getCalledName(const std::string& number);
@@ -91,8 +91,8 @@ protected:
 
 private:
 	std::string getRewrite(const std::string& number, const std::string& collection);
-	mongo::ConnectionString _connUrl;
 	std::string _ns;
+  MongoDB::ConnectionInfo& _connectionInfo;
 };
 
 const std::string CallerMongoDB::COLLECTION_DDI = "cci_ddi";
