@@ -9,7 +9,7 @@ bundle agent sipxrecording {
   methods:
     sipxrecording::
       "any" usebundle => sipxrecording_config;
-    apache.sipxconference.!primary::
+    apache.sipxconference.!primary.!admin::
       "any" usebundle => sipxrecording_apache;
     any::
       "any" usebundle => sipxrecording_setup;
