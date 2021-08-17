@@ -12,6 +12,7 @@ package org.sipfoundry.sipxconfig.site.setting;
 import java.text.DecimalFormat;
 import java.util.Collection;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,7 +56,7 @@ public abstract class RegistrationsTable extends BaseComponent {
     }
 
     public String getColumnNames() {
-        StringBuilder columnNames = new StringBuilder("uri,contact,expires,instrument");
+        StringBuilder columnNames = new StringBuilder("uri,contact,expires,server,instrument");
         return columnNames.toString();
     }
 
@@ -66,5 +67,14 @@ public abstract class RegistrationsTable extends BaseComponent {
             return timeToExpire;
         }
         return getMessages().getMessage("status.expired");
+    }
+    
+    public Object getServer() {
+        RegistrationItem item = getCurrentRow();
+        String server = item.getPrimary();
+        if (!StringUtils.isEmpty(server)) {
+            return server;
+        }
+        return getMessages().getMessage("status.server");
     }
 }
