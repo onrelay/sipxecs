@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.commserver.imdb.RegistrationItem;
+import org.sipfoundry.sipxconfig.commserver.imdb.TimeRegistrationStatistics;
 
 import com.mongodb.DBCursor;
 
@@ -54,6 +55,12 @@ public interface RegistrationContext {
     public abstract void dropRegistrationsByServer(String server);
 
     public abstract void dropRegistrationsByCallId(String callId);
+    
+    public abstract void saveTimeRegistrationStatistics(TimeRegistrationStatistics trs);
+    
+    public abstract long getTimeRegStatCount();
+    
+    public List<TimeRegistrationStatistics> getTimeRegStats();
 
     @Deprecated
     DBCursor getMongoDbCursorRegistrationsByLineId(String uid);

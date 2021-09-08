@@ -15,16 +15,20 @@ import static org.sipfoundry.commons.mongo.MongoConstants.INSTRUMENT;
 import static org.sipfoundry.commons.mongo.MongoConstants.REG_CONTACT;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sipfoundry.commons.userdb.profile.UserProfile;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.commserver.imdb.RegistrationItem;
+import org.sipfoundry.sipxconfig.commserver.imdb.TimeRegistrationStatistics;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -38,6 +42,7 @@ import com.mongodb.QueryBuilder;
 public class RegistrationContextImpl implements RegistrationContext {
     public static final Log LOG = LogFactory.getLog(RegistrationContextImpl.class);
     private static final String DB_COLLECTION_NAME = "registrar";
+    private static final String DB_STATISTICS_COLLECTION_NAME = "timeRegistrationStatistics";
     private static final String EXPIRED = "expired";
     private static final String IDENTITY = "identity";
     private static final String URI = "uri";
@@ -158,6 +163,51 @@ public class RegistrationContextImpl implements RegistrationContext {
     public DBCursor getMongoDbCursorRegistrationsByIp(String ip) {
         return getRegistrarCollection().find(getIpQuery(ip));
     }
+    
+    @Override
+    public void saveTimeRegistrationStatistics(TimeRegistrationStatistics trs) {
+        m_nodedb.save(trs);
+    }
+    
+    @Override
+    public long getTimeRegStatCount() {
+        return getTimeRegStatCollection().count();
+    }
+    
+    @Override
+    public List<TimeRegistrationStatistics> getTimeRegStats() {
+        List<DBObject> statsDbObjects = getTimeRegStatCollection().find().toArray();
+        List<TimeRegistrationStatistics> listStats = new ArrayList<TimeRegistrationStatistics>();
+        TimeRegistrationStatistics timeRegStats = null;
+        for (DBObject object : statsDbObjects) {
+            timeRegStats = new TimeRegistrationStatistics();
+            timeRegStats.setActive((Integer)object.get("m_active"));
+            timeRegStats.setTime((Date)object.get("m_time"));
+            timeRegStats.setTotal((Integer)object.get("m_total"));
+            listStats.add(timeRegStats);
+        }
+        return listStats;
+    }
+    
+    
+    public void operateTimeRegistrationStatistics() {
+        LOG.debug("Run registration statistics: ");
+        long startRenderingTime = System.currentTimeMillis() / DateUtils.MILLIS_PER_SECOND;
+        RegistrationMetrics metrics = new RegistrationMetrics();
+        metrics.setRegistrations(getRegistrations());
+        metrics.setStartTime(startRenderingTime);
+        int activeRegistrations = metrics.getActiveRegistrationCount();
+        int totalRegistrations = metrics.getUniqueRegistrations().size();
+        TimeRegistrationStatistics trs = new TimeRegistrationStatistics();
+        trs.setActive(activeRegistrations);
+        trs.setTotal(totalRegistrations);
+        trs.setTime(Calendar.getInstance().getTime());
+        saveTimeRegistrationStatistics(trs);
+        if (getTimeRegStatCount() > 1440) {
+            getTimeRegStatCollection().remove(getTimeRegStatCollection().findOne());
+        }
+        LOG.debug("Finished running registration statistics");
+    }
 
     private static List<RegistrationItem> getItems(DBCursor cursor) {
         List<RegistrationItem> items = new ArrayList<RegistrationItem>(cursor.size());
@@ -217,6 +267,11 @@ public class RegistrationContextImpl implements RegistrationContext {
     private DBCollection getRegistrarCollection() {
         DB datasetDb = m_nodedb.getDb();
         return datasetDb.getCollection(DB_COLLECTION_NAME);
+    }
+    
+    private DBCollection getTimeRegStatCollection() {
+        DB datasetDb = m_nodedb.getDb();
+        return datasetDb.getCollection(DB_STATISTICS_COLLECTION_NAME);
     }
 
     private DBObject getServerQuery(String server) {
