@@ -12,6 +12,7 @@ $cfdatadir = "@SIPX_CFDATA@"
 $confdir = "@SIPX_CONFDIR@"
 $logdir = "@SIPX_LOGDIR@"
 $bindir = "@SIPX_BINDIR@"
+$postgresdir = "/var/lib/pgsql/data"
 $servicedir = "@SIPX_SERVICEDIR@"
 $user = "@SIPXPBXUSER@"
 $group = "@SIPXPBXGROUP@"
@@ -288,6 +289,22 @@ def reset_all
     drop_db_if_exists('openfire')
   end
   cmd_no_die("#{$bindir}/mongodb-admin --obliterate")
+end
+
+def recover_primary
+  return false unless $prompt[:noui] || prompt_confirm("This will recover the primary node. Are you sure?")
+  host = prompt_default("Enter host to recover from", "", :host)
+  Dir.foreach($postgresdir) { |f|
+    next if f == '.' or f == '..'
+    fname = "#{$postgresdir}/#{f}"    
+    if File.directory?(fname)
+      rm_files fname
+      Dir.rmdir(fname)
+    else
+      rm_file fname
+    end
+  }
+  exit 1 unless system("sudo -u postgres /usr/bin/pg_basebackup -h #{host} -D #{$postgresdir} -P -U postgres --xlog-method=stream")
 end
 
 def drop_db_if_exists(db)
@@ -579,6 +596,10 @@ args = OptionParser.new { |opts|
 
   opts.on("--reset-all", "Force reset of all possible settings including ssl keys.") {
     reset_all
+  }
+
+  opts.on("--recover-primary", "Recover from secondary.") {
+    recover_primary
   }
 
   opts.on("--advanced", "Ask advanced questions.") {
