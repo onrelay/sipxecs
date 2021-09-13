@@ -305,6 +305,11 @@ def recover_primary
     end
   }
   exit 1 unless system("sudo -u postgres /usr/bin/pg_basebackup -h #{host} -D #{$postgresdir} -P -U postgres --xlog-method=stream")
+  rm_file "#{$postgresdir}/recovery.conf"
+  puts "mongodump --host='#{host}:27017' --out #{$tmp_dir}/dump"
+  exit 1 unless system("mongodump --host='#{host}:27017' --out #{$tmp_dir}/dump")
+  puts "mongorestore #{$tmp_dir}/dump"
+  exit 1 unless system("mongorestore #{$tmp_dir}/dump")
 end
 
 def drop_db_if_exists(db)
