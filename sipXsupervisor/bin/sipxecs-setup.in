@@ -13,6 +13,8 @@ $confdir = "@SIPX_CONFDIR@"
 $logdir = "@SIPX_LOGDIR@"
 $bindir = "@SIPX_BINDIR@"
 $postgresdir = "/var/lib/pgsql/data"
+$mongodir = "/var/lib/mongo"
+$mongoarbiterdir = "/var/lib/mongod-arbiter"
 $servicedir = "@SIPX_SERVICEDIR@"
 $user = "@SIPXPBXUSER@"
 $group = "@SIPXPBXGROUP@"
@@ -266,6 +268,8 @@ def reset_all
       rm_file fname
     end
   }
+  rm_files($mongodir)
+  rm_files($mongoarbiterdir)
   reset
   cfe = ["#{$root_cfenginedir}/ppkeys/*", "#{$root_cfenginedir}/state/*", "#{$root_cfenginedir}/*.tcdb" ]
   Dir.glob(cfe).each {|f|
