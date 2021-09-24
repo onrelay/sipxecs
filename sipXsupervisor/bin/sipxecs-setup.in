@@ -298,6 +298,7 @@ end
 def recover_primary
   return false unless $prompt[:noui] || prompt_confirm("This will recover the primary node. Are you sure?")
   host = prompt_default("Enter host to recover from", "", :host)
+  exit 1 unless system("/sbin/service mongod restart");
   Dir.foreach($postgresdir) { |f|
     next if f == '.' or f == '..'
     fname = "#{$postgresdir}/#{f}"    
