@@ -110,6 +110,10 @@ public class TempMessage {
     public long getTimestamp() {
         return m_timestamp;
     }
+    
+    public void setTimestamp(long timestamp) {
+        m_timestamp = timestamp;
+    }
 
     public String getTempPath() {
         return m_tempPath;
