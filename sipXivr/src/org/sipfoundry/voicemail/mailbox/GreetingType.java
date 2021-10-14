@@ -12,6 +12,7 @@ package org.sipfoundry.voicemail.mailbox;
 
 public enum GreetingType {
     NONE("none"), 
+    NAME("name"),
     STANDARD("standard"), 
     OUT_OF_OFFICE("outofoffice"), 
     EXTENDED_ABSENCE("extendedabsence");
