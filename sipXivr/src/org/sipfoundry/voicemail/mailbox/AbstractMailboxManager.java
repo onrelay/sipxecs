@@ -337,6 +337,8 @@ public abstract class AbstractMailboxManager implements MailboxManager {
 
     private String getGreetingTypeName(GreetingType type, String audioFormat) {
         switch (type) {
+        case NAME:
+             return String.format("name.%s", audioFormat);
         case STANDARD:
             return String.format("standard.%s", audioFormat);
         case OUT_OF_OFFICE:
