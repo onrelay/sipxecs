@@ -1,5 +1,5 @@
 AC_PREREQ(2.57)
-AC_INIT(sipxlang-pl, 21.04, sipx-dev@list.sipfoundry.org)
+AC_INIT(sipxlang-pl, 22.06, sipx-dev@list.sipfoundry.org)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([sipxpbx/WEB-INF/sipXconfig-web_pl.properties])
 AM_INIT_AUTOMAKE(foreign tar-ustar)
