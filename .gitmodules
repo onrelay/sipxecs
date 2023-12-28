@@ -49,6 +49,9 @@
 [submodule "openfire"]
 	path = openfire
 	url = git@github.com:sipXcom/openfire.git
+[submodule "oss_core"]
+	path = oss_core
+	url = git@github.com:joegen/oss_core.git
 [submodule "sipXcallQueue"]
 	path = sipXcallQueue
 	url = git@github.com:sipXcom/sipXcallQueue.git
