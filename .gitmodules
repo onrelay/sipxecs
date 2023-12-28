@@ -46,6 +46,9 @@
 [submodule "sipXlang-zh"]
 	path = sipXlang-zh
 	url = git@github.com:sipXcom/sipXlang-zh.git
+[submodule "oss_core"]
+	path = oss_core
+	url = git@github.com:joegen/oss_core.git
 [submodule "openfire"]
 	path = openfire
 	url = git@github.com:sipXcom/openfire.git
