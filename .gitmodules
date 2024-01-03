@@ -64,3 +64,6 @@
 [submodule "sipXlang-pt"]
 	path = sipXlang-pt
 	url = git@github.com:sipXcom/sipXlang-pt.git
+[submodule "oss_core"]
+	path = oss_core
+	url = git@github.com:onrelay/oss_core.git
