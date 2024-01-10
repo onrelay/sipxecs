@@ -1,0 +1,250 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Setup Script &#8212; sipxcom 20.04 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="sipXcom webui" href="webui.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="webui.html" title="sipXcom webui"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sipxcom 20.04 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="setup-script">
+<span id="index-0"></span><h1>Setup Script<a class="headerlink" href="#setup-script" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="preparation">
+<span id="setup-preparation"></span><h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
+<p>If you haven’t done so already, update the OS packages first and reboot after:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yum</span> <span class="n">update</span> <span class="o">-</span><span class="n">y</span>
+<span class="n">reboot</span>
+</pre></div>
+</div>
+<p>The script will ask you about the SIP and network domain name to begin with. The server will build a DNS zone and all records required based upon the names inputed.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Use all lower case as you input hostname, network domain, and SIP domain. DNS records are built based upon your inputs. Any whitespace, extra periods, etc will cause the resulting DNS zone to be invalid.
+Additionally SIP URIs are case sensitive. For example, <a class="reference external" href="sip:MATT&#64;example.org">sip:MATT&#64;example.org</a> is not the same as <a class="reference external" href="sip:matt&#64;example.org">sip:matt&#64;example.org</a> or <a class="reference external" href="sip:Matt&#64;EXAMPLE.ORG">sip:Matt&#64;EXAMPLE.ORG</a>.</p>
+</div>
+<p>If you are using external DNS servers then all records for the zone should exist on the external DNS server.</p>
+<p>If you are going to use the internal DNS you should change the server to point to itself for DNS resolution before running the installer script. To do so, use the nmtui utility:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">nmtui</span>
+</pre></div>
+</div>
+<p>Select the interface configuration and set the Primary DNS as the local server IP. Save and quit, then restart the network service:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">service</span> <span class="n">network</span> <span class="n">restart</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-the-script">
+<span id="id1"></span><h2>Running the script<a class="headerlink" href="#running-the-script" title="Permalink to this headline">¶</a></h2>
+<p>To begin the installation run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sipxecs</span><span class="o">-</span><span class="n">setup</span>
+</pre></div>
+</div>
+<p>The script will disable SElinux and reboot automatically. Press any key to initiate the reboot:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Checking</span> <span class="n">SELinux</span><span class="o">...</span>
+<span class="n">Detected</span> <span class="n">SELinux</span> <span class="n">enforcing</span><span class="p">,</span> <span class="n">setting</span> <span class="n">SELinux</span> <span class="n">to</span> <span class="n">disabled</span>
+<span class="n">A</span> <span class="n">reboot</span> <span class="ow">is</span> <span class="n">required</span> <span class="n">to</span> <span class="n">apply</span> <span class="n">SELinux</span> <span class="n">changes</span><span class="o">.</span> <span class="n">Please</span> <span class="n">login</span> <span class="k">as</span> <span class="n">root</span> <span class="ow">and</span> <span class="n">run</span> <span class="n">sipxecs</span><span class="o">-</span><span class="n">setup</span> <span class="n">after</span> <span class="n">the</span> <span class="n">reboot</span> <span class="n">to</span> <span class="k">continue</span> <span class="n">setup</span><span class="o">.</span>
+<span class="n">Press</span> <span class="nb">any</span> <span class="n">key</span> <span class="n">to</span> <span class="n">reboot</span> <span class="n">the</span> <span class="n">system</span> <span class="n">now</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Login as root and run the setup script again:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sipxecs</span><span class="o">-</span><span class="n">setup</span>
+</pre></div>
+</div>
+<p>The first question is if you need to change the network interface configuration. See the <a class="reference internal" href="#setup-preparation"><span class="std std-ref">Preparation</span></a> section above regarding the DNS servers. Press y to enter nmtui and make changes, or n to continue on.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELinux</span> <span class="ow">not</span> <span class="nb">set</span> <span class="n">to</span> <span class="n">enforcing</span>
+<span class="n">Network</span> <span class="n">settings</span><span class="p">:</span>
+<span class="n">IP</span> <span class="n">address</span>   <span class="p">:</span> <span class="mf">192.168</span><span class="o">.</span><span class="mf">1.31</span>
+<span class="n">Would</span> <span class="n">you</span> <span class="n">like</span> <span class="n">to</span> <span class="n">configure</span> <span class="n">your</span> <span class="n">system</span><span class="s1">&#39;s  network settings? [ enter &#39;</span><span class="n">y</span><span class="s1">&#39; or &#39;</span><span class="n">n</span><span class="s1">&#39; ] :</span>
+</pre></div>
+</div>
+<p>The second question is if this is the first server in the cluster. Answer y if it is, n if it is not. Complete the first server before adding secondaries.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Is this the first server in your cluster? [ enter &#39;y&#39; or &#39;n&#39; ] :
+</pre></div>
+</div>
+<p>The third question is the hostname. Press enter if the existing name looks ok.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Configuring as the first server...
+Enter just the host name of this computer?. Example: myhost. [ press enter for &#39;sipxcom1&#39; ] :
+</pre></div>
+</div>
+<p>The fourth question is the network domain name. Press enter if the existing name looks ok.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Enter just the domain name of your network? Example: mydomain.com [ press enter for &#39;home.mattkeys.net&#39; ] :
+</pre></div>
+</div>
+<p>The fifth and sixth question is the SIP domain name and realm. This is the domain the DNS SIP SRV records will be built for.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Tip</span><span class="p">:</span> <span class="n">Use</span> <span class="s1">&#39;sipxcom1.home.mattkeys.net&#39;</span> <span class="k">as</span> <span class="n">your</span> <span class="n">SIP</span> <span class="n">domain</span> <span class="k">if</span> <span class="n">you</span> <span class="n">are</span>
+<span class="n">setting</span> <span class="n">up</span> <span class="k">for</span> <span class="n">the</span> <span class="n">first</span> <span class="n">time</span> <span class="ow">or</span> <span class="k">if</span> <span class="n">you</span> <span class="n">know</span> <span class="n">you</span> <span class="n">are</span> <span class="n">only</span> <span class="n">going</span> <span class="n">to</span> <span class="n">setup</span> <span class="n">one</span>
+<span class="n">server</span><span class="o">.</span> <span class="n">This</span> <span class="n">can</span> <span class="n">make</span> <span class="n">configuration</span> <span class="n">easier</span><span class="o">.</span>  <span class="n">You</span> <span class="n">can</span> <span class="n">always</span> <span class="n">change</span> <span class="n">the</span> <span class="n">value</span>
+<span class="n">later</span><span class="o">.</span>
+<span class="n">Enter</span> <span class="n">SIP</span> <span class="n">domain</span> <span class="n">name</span> <span class="p">[</span> <span class="n">press</span> <span class="n">enter</span> <span class="k">for</span> <span class="s1">&#39;home.mattkeys.net&#39;</span> <span class="p">]</span> <span class="p">:</span>
+<span class="n">Enter</span> <span class="n">SIP</span> <span class="n">realm</span> <span class="p">[</span> <span class="n">press</span> <span class="n">enter</span> <span class="k">for</span> <span class="s1">&#39;home.mattkeys.net&#39;</span> <span class="p">]</span> <span class="p">:</span>
+</pre></div>
+</div>
+<p>The seventh and final question asks if you need to make any changes to your input choices. Press n if everything is correct.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Application settings:
+Primary server : yes
+Host           : sipxcom1
+SIP Domain     : home.mattkeys.net
+Network Domain : home.mattkeys.net
+Would you like to change your application settings? [ enter &#39;y&#39; or &#39;n&#39; ] :
+</pre></div>
+</div>
+</div>
+<div class="section" id="adding-secondary-servers">
+<span id="id2"></span><h2>Adding secondary servers<a class="headerlink" href="#adding-secondary-servers" title="Permalink to this headline">¶</a></h2>
+<p>Once the setup is complete on the primary server you can add secondary servers. To do so navigate to <a class="reference internal" href="webui.html#servers-tab"><span class="std std-ref">Servers</span></a>.</p>
+<blockquote>
+<div><img alt="_images/system_servers_addserver.png" class="align-center" src="_images/system_servers_addserver.png" />
+</div></blockquote>
+<p>Click the ‘Add Server’ link at the top-right of the page. Enter the FQDN, IP, and description of the server you are adding.</p>
+<blockquote>
+<div><img alt="_images/system_servers_addserver1.png" class="align-center" src="_images/system_servers_addserver1.png" />
+</div></blockquote>
+<p>The sipxcom RPMs should be installed on the secondary just as the primary during the <a class="reference internal" href="installation.html#rpm-installation"><span class="std std-ref">Installation</span></a> step.</p>
+<p><a class="reference internal" href="#id1"><span class="std std-ref">Running the script</span></a> on the secondary servers is similar to the primary. The script will first disable SElinux. Press any key to reboot:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Checking</span> <span class="n">SELinux</span><span class="o">...</span>
+<span class="n">Detected</span> <span class="n">SELinux</span> <span class="n">enforcing</span><span class="p">,</span> <span class="n">setting</span> <span class="n">SELinux</span> <span class="n">to</span> <span class="n">disabled</span>
+<span class="n">A</span> <span class="n">reboot</span> <span class="ow">is</span> <span class="n">required</span> <span class="n">to</span> <span class="n">apply</span> <span class="n">SELinux</span> <span class="n">changes</span><span class="o">.</span> <span class="n">Please</span> <span class="n">login</span> <span class="k">as</span> <span class="n">root</span> <span class="ow">and</span> <span class="n">run</span> <span class="n">sipxecs</span><span class="o">-</span><span class="n">setup</span> <span class="n">after</span> <span class="n">the</span> <span class="n">reboot</span> <span class="n">to</span> <span class="k">continue</span> <span class="n">setup</span><span class="o">.</span>
+<span class="n">Press</span> <span class="nb">any</span> <span class="n">key</span> <span class="n">to</span> <span class="n">reboot</span> <span class="n">the</span> <span class="n">system</span> <span class="n">now</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Run the sipxecs-setup script again after reboot. The second question is if the network settings are correct:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SELinux</span> <span class="ow">not</span> <span class="nb">set</span> <span class="n">to</span> <span class="n">enforcing</span>
+<span class="n">Network</span> <span class="n">settings</span><span class="p">:</span>
+<span class="n">IP</span> <span class="n">address</span>   <span class="p">:</span> <span class="mf">192.168</span><span class="o">.</span><span class="mf">1.32</span>
+<span class="n">Would</span> <span class="n">you</span> <span class="n">like</span> <span class="n">to</span> <span class="n">configure</span> <span class="n">your</span> <span class="n">system</span><span class="s1">&#39;s  network settings? [ enter &#39;</span><span class="n">y</span><span class="s1">&#39; or &#39;</span><span class="n">n</span><span class="s1">&#39; ] :</span>
+</pre></div>
+</div>
+<p>Answer Y and point the server to the primary server IP for the primary DNS server entry.</p>
+<blockquote>
+<div><img alt="_images/setup_script_dns.png" class="align-center" src="_images/setup_script_dns.png" />
+</div></blockquote>
+<p>Save, then answer N when prompted again if you want to make network changes.</p>
+<p>The final set of questions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Is this the first server in your cluster? [ enter &#39;y&#39; or &#39;n&#39; ] : n
+Configuring as an additional server...
+Enter ip address or fully qualified host name of the primary server : 192.168.1.31
+Enter the numeric id assigned to this server by the administration server : 2
+Application settings:
+Primary server : no
+Location ID    : 2
+Master         : 192.168.1.31
+Would you like to change your application settings? [ enter &#39;y&#39; or &#39;n&#39; ] : n
+</pre></div>
+</div>
+<p>You should see the “Status” field change from “Uninitialized” to “Configured” after this step.</p>
+<blockquote>
+<div><img alt="_images/system_servers_addserver4.png" class="align-center" src="_images/system_servers_addserver4.png" />
+</div></blockquote>
+<p>Repeat these steps on additional defined secondaries until all servers are listed as “Configured”.</p>
+<blockquote>
+<div><img alt="_images/system_servers_addserver5.png" class="align-center" src="_images/system_servers_addserver5.png" />
+</div></blockquote>
+<p>You may now select services to run on the secondaries. Some services can only run on the primary server.</p>
+<blockquote>
+<div><img alt="_images/system_servers_addserver6.png" class="align-center" src="_images/system_servers_addserver6.png" />
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/sipxcom_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Setup Script</a><ul>
+<li><a class="reference internal" href="#preparation">Preparation</a></li>
+<li><a class="reference internal" href="#running-the-script">Running the script</a></li>
+<li><a class="reference internal" href="#adding-secondary-servers">Adding secondary servers</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="previous chapter">Installation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="webui.html"
+                        title="next chapter">sipXcom webui</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/setupscript.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="webui.html" title="sipXcom webui"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sipxcom 20.04 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Support Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

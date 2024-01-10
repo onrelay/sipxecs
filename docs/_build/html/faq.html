@@ -1,0 +1,123 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>FAQ &#8212; sipxcom 20.04 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Features" href="features.html" />
+    <link rel="prev" title="History" href="history.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="features.html" title="Features"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="history.html" title="History"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sipxcom 20.04 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="faq">
+<h1>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="why-sipxcom-over-asterisk-freepbx-etc">
+<h2>Why sipxcom over asterisk, freepbx, etc?<a class="headerlink" href="#why-sipxcom-over-asterisk-freepbx-etc" title="Permalink to this headline">¶</a></h2>
+<p>The biggest difference is sipxcom proxy is a <a class="reference external" href="https://tools.ietf.org/html/rfc3261#page-116">stateless proxy</a>, where other proxies such as Asterisk are <a class="reference external" href="https://tools.ietf.org/html/rfc7092">B2BUAs</a>.</p>
+<p>This means sipxcom is only involved in the call setup. It is never involved in relaying audio or video (RTP) media unless you’re using a b2bua function, like <a class="reference internal" href="webui.html#conferencing"><span class="std std-ref">Conferencing</span></a> , <a class="reference internal" href="webui.html#voicemail"><span class="std std-ref">Voicemail</span></a>, <a class="reference internal" href="webui.html#auto-attendants"><span class="std std-ref">Auto Attendants</span></a>, or <a class="reference internal" href="webui.html#call-queue"><span class="std std-ref">Call Queue</span></a>.
+Once there is a 200 OK with SDP to a INVITE, and ACK to the 200 OK with SDP, the media (RTP) is direct between phone to phone.</p>
+<p>Because of this sipxcom (on sufficient hardware) can handle 10s of thousands of SIP transactions per second, per proxy instance. Some services such as proxy and registrar can run on multiple servers, increasing capability and reliability.</p>
+<p>Compare against Asterisk where <a class="reference external" href="https://wiki.asterisk.org/wiki/display/~mmichelson/SIP+performance+notes">their wiki</a> indicates the calls per second rate is somewhere between 30 to 40 on a HP DL360, and it is standalone.
+At the time of this writing, that wiki entry was last modified Jan 31st of 2011. In 2011 a (Gen 7) HP DL360 would support a max of two Intel socket FCLGA1366 (Xeon 55xx) processors and 384GB of RAM.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/sipxcom_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">FAQ</a><ul>
+<li><a class="reference internal" href="#why-sipxcom-over-asterisk-freepbx-etc">Why sipxcom over asterisk, freepbx, etc?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="history.html"
+                        title="previous chapter">History</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="features.html"
+                        title="next chapter">Features</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/faq.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="features.html" title="Features"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="history.html" title="History"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sipxcom 20.04 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Support Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>
