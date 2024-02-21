@@ -385,8 +385,8 @@ namespace Os
         struct tm *tm;
         ::gettimeofday(&tv, &tz);
         tm=::gmtime(&tv.tv_sec);
-        char strTime[28];
-        ::memset(strTime, '\0', 28);
+        char strTime[100];
+        ::memset(strTime, '\0', 100);
         ::sprintf(strTime, "%4d-%02d-%02dT%02d:%02d:%02d.%06dZ",
           tm->tm_year + 1900, tm->tm_mon+1, tm->tm_mday,
           tm->tm_hour, tm->tm_min, tm->tm_sec, (int)tv.tv_usec);

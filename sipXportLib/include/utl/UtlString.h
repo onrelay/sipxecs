@@ -415,7 +415,7 @@ public:
     UtlString& append(const char c);
 
     /// Append a string representation of the value to the string
-    UtlString& appendNumber(Int64 value, const char* format = "%"FORMAT_INTLL"d");
+    UtlString& appendNumber(Int64 value, const char* format = "%" FORMAT_INTLL "d");
     UtlString& appendNumber(int value, const char* format = "%d");
     UtlString& appendNumber(size_t value, const char* format = "%zu");
 #if __WORDSIZE == 64
