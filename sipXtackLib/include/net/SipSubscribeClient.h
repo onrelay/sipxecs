@@ -308,7 +308,7 @@ public:
     public:
         typedef boost::shared_ptr<SubscriptionDialogState> Ptr;
         typedef UtlLocker<SubscriptionDialogState::Ptr> WrapPtr;
-        typedef std::auto_ptr<SubscriptionDialogState::WrapPtr> AutoWrapPtr;
+        typedef boost::shared_ptr<SubscriptionDialogState::WrapPtr> AutoWrapPtr;
 
        // The parent UtlString contains the dialogHandle as a key
        // When an initial SUBSCRIBE is sent, a SubscriptionDialogState is

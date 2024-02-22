@@ -42,3 +42,4 @@ pubspec.lock
 /sipXzoiper/bin/
 /sipXverify/target/test-classes/
 extras/translation-tool/classes/
+build/
