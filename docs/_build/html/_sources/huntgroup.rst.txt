@@ -1,0 +1,60 @@
+Hunt Groups
+~~~~~~~~~~~
+
+Get all hunt groups
+^^^^^^^^^^^^^^^^^^^
+
+**Example**::
+
+  curl -v -k -X GET https://superadmin:password@192.168.1.31/sipxconfig/api/callgroups
+
+
+Get all huntgroups that have extension starting with a prefix
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Example**::
+
+  curl -v -k -X GET https://superadmin:Phoenix01@localhost/sipxconfig/api/callgroups/prefix/33
+
+
+Get call group given extension
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Example**::
+
+  curl -v -k -X GET https://superadmin:Phoenix01@localhost/sipxconfig/api/callgroups/3399
+
+Create a hunt group
+^^^^^^^^^^^^^^^^^^^
+
+**Example**::
+
+  curl -v -k -X POST -H "Content-Type: application/json" -d '{"name":"ppp1","extension":"4444","description":"","enabled":true,"did":null,"ringBeans":[],"fallbackDestination":null,"voicemailFallback":true,"userForward":true,"useFwdTimers":false}' https://superadmin:Phoenix01@localhost/sipxconfig/api/callgroups
+
+Duplicate hunt group extension as new hunt group with a different extension
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Example**::
+
+  curl -v -k -X POST  https://superadmin:Phoenix01@localhost/sipxconfig/api/callgroups/3399/duplicate/55665
+
+Rotate rings for hunt group
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Example**::
+
+  curl -v -k -X POST  https://superadmin:Phoenix01@localhost/sipxconfig/api/callgroups/3399/rotate/3
+
+Update hunt group with extension
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Example**::
+
+  curl -v -k -X PUT -H "Content-Type: application/json" -d '{"name":"ppp1","extension":"4444","description":"kkkkk","enabled":true,"did":null,"ringBeans":[],"fallbackDestination":null,"voicemailFallback":true,"userForward":true,"useFwdTimers":false}' https://superadmin:Phoenix01@localhost/sipxconfig/api/callgroups/4444
+
+Delete hunt group
+^^^^^^^^^^^^^^^^^
+
+**Example**::
+
+  curl -v -k -X DELETE https://superadmin:Phoenix01@localhost/sipxconfig/api/callgroups/3399

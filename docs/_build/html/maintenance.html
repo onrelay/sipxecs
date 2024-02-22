@@ -1,0 +1,149 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Maintenance &#8212; sipxcom 20.04 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="apiref.html" />
+    <link rel="prev" title="Monitoring" href="monitoring.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="apiref.html" title="API Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="monitoring.html" title="Monitoring"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sipxcom 20.04 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="maintenance">
+<span id="index-0"></span><h1>Maintenance<a class="headerlink" href="#maintenance" title="Permalink to this headline">¶</a></h1>
+<p>Sipxcom runs so well that it can be easy to become complacent on server maintenance. A common issue we see is lack of free disk space.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If the server runs out of free disk space all services will halt!</p>
+</div>
+<p>If the server has ran out of free disk space, free up some space by deleting files and reboot. The system should recover upon service startup.
+Backup archives and logs usually consume the most space. Both can be safely deleted.</p>
+<div class="section" id="disk-maintenance-and-backup-integrity">
+<h2>Disk Maintenance and Backup Integrity<a class="headerlink" href="#disk-maintenance-and-backup-integrity" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>All sipx logs are beneath /var/log/sipxpbx/. Mongo logs are beneath /var/log/mongodb/.
+Apache logs are beneath /var/log/httpd/. Postgresql logs are beneath /var/lib/pgsql/data/pg_log/.
+Rotated logs are suffixed with a date, or may end with a <a href="#id1"><span class="problematic" id="id2">*</span></a>.gz extension.
+Any rotated logs should be deleted periodically (monthly or yearly recommended) to conserve disk space, reduce snapshot size, etc.</li>
+<li>If using scheduled backups make certain the “Number of backups to keep” option is not set to unlimited. Backups can be very large. That option should be set to a very conservative level (5 or less recommended).</li>
+<li>Periodically verify that the scheduled backup archives are being created and saved correctly to a safe location.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="software-updates">
+<h2>Software updates<a class="headerlink" href="#software-updates" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li>Run a ‘yum update -y’ on a daily, weekly, or monthly schedule to keep the OS patched with the latest security updates.
+This won’t upgrade sipxcom packages unless you’ve changed the sipxcom repo file beneath /etc/yum.repos.d/ to point to a different version.</li>
+<li>Check that your sipxcom version is the latest stable version at least once a year. The footer of the sipxcom webui should indicate what version it is.
+Always check the release notes of the new version for any critical notices prior to upgrading.</li>
+<li>Check annually that your phones are running the latest GA firmware for the model. Phone bugs are mitigated by firmware upgrades.
+Polycom has two firmware pages available, one for <a class="reference external" href="https://downloads.polycom.com/voice/voip/sip_sw_releases_matrix.html">SoundPoint and SoundStation IP models</a>
+and the other for <a class="reference external" href="https://downloads.polycom.com/voice/voip/uc_sw_releases_matrix.html">VVX models</a>.</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/sipxcom_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Maintenance</a><ul>
+<li><a class="reference internal" href="#disk-maintenance-and-backup-integrity">Disk Maintenance and Backup Integrity</a></li>
+<li><a class="reference internal" href="#software-updates">Software updates</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="monitoring.html"
+                        title="previous chapter">Monitoring</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="apiref.html"
+                        title="next chapter">API Reference</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/maintenance.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="apiref.html" title="API Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="monitoring.html" title="Monitoring"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sipxcom 20.04 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Support Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

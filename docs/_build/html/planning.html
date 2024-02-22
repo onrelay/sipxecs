@@ -1,0 +1,157 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Planning &#8212; sipxcom 20.04 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="Features" href="features.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="features.html" title="Features"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sipxcom 20.04 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="planning">
+<span id="index-0"></span><h1>Planning<a class="headerlink" href="#planning" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="gathering-information">
+<h2>Gathering Information<a class="headerlink" href="#gathering-information" title="Permalink to this headline">¶</a></h2>
+<p>You will need to gather a lot of information about the existing infrastructure, physical locations, configuration of equipment, etc. Know who is responsible at the site for any equipment or service configuration changes that may be necessary. Below are a few suggestions to begin with.</p>
+<div class="section" id="network-diagram">
+<h3>Network Diagram<a class="headerlink" href="#network-diagram" title="Permalink to this headline">¶</a></h3>
+<p>Find or create a detailed network diagram that includes the make/model of all switches, routers, firewalls, DNS and DHCP servers. Review the current state of exiting wiring, patch panels, distribution closets, etc.</p>
+</div>
+<div class="section" id="ip-addressing">
+<h3>IP Addressing<a class="headerlink" href="#ip-addressing" title="Permalink to this headline">¶</a></h3>
+<p>Understand and document the existing network IP addressing scheme, VLANs used, routing, etc.</p>
+</div>
+<div class="section" id="internal-external-dns">
+<h3>Internal/External DNS<a class="headerlink" href="#internal-external-dns" title="Permalink to this headline">¶</a></h3>
+<p>The SIP domain name is important to establish up front. The sipXcom DNS service will consider itself authoritative for whatever the domain name is, so be mindful of any conflicts with existing DNS zones. For example if the existing network domain name is the same as your SIP domain name you may need to create MX or important A records manually on the sipXcom side.</p>
+</div>
+<div class="section" id="ssl-certificates">
+<h3>SSL Certificates<a class="headerlink" href="#ssl-certificates" title="Permalink to this headline">¶</a></h3>
+<p>Is there an existing SSL certificate? Who is the provider or technical contact for site certificates?</p>
+</div>
+<div class="section" id="telephony-provider">
+<h3>Telephony Provider<a class="headerlink" href="#telephony-provider" title="Permalink to this headline">¶</a></h3>
+<p>How will the site connect to the PSTN? Will it be through an analog gateway or SIP trunk? Gather technical contact information for the telco provider, make/model of the gateway or SBC, firmware versions, etc.</p>
+</div>
+<div class="section" id="client-requirements">
+<h3>Client Requirements<a class="headerlink" href="#client-requirements" title="Permalink to this headline">¶</a></h3>
+<p>Will users register from inside the private network, outside the private network, or both? What make and model phones will be used? Are any existing phones running current firmware versions? Are there any intercom, interconnect, or custom requirements at the site?</p>
+</div>
+<div class="section" id="security-concerns">
+<h3>Security Concerns<a class="headerlink" href="#security-concerns" title="Permalink to this headline">¶</a></h3>
+<p>If there will be remote workers (users registering across the WAN and outside the servers local network), what security measures are in place to protect the SIP proxies and registrars?
+Who is the technical contact for IT or telecom security at the site?
+Will there be signaling or audio encryption requirements (SIPS/SRTP)?</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/sipxcom_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Planning</a><ul>
+<li><a class="reference internal" href="#gathering-information">Gathering Information</a><ul>
+<li><a class="reference internal" href="#network-diagram">Network Diagram</a></li>
+<li><a class="reference internal" href="#ip-addressing">IP Addressing</a></li>
+<li><a class="reference internal" href="#internal-external-dns">Internal/External DNS</a></li>
+<li><a class="reference internal" href="#ssl-certificates">SSL Certificates</a></li>
+<li><a class="reference internal" href="#telephony-provider">Telephony Provider</a></li>
+<li><a class="reference internal" href="#client-requirements">Client Requirements</a></li>
+<li><a class="reference internal" href="#security-concerns">Security Concerns</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="features.html"
+                        title="previous chapter">Features</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="installation.html"
+                        title="next chapter">Installation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/planning.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="installation.html" title="Installation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="features.html" title="Features"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sipxcom 20.04 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Support Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+\begin{sphinxtheindex}
+\let\bigletter\sphinxstyleindexlettergroup
+\let\spxpagem \sphinxstyleindexpagemain
+\let\spxentry \sphinxstyleindexentry
+\let\spxextra \sphinxstyleindexextra
+
+  \bigletter F
+  \item \spxentry{features}, \hyperpage{3}
+
+  \indexspace
+  \bigletter H
+  \item \spxentry{history}, \hyperpage{1}
+
+  \indexspace
+  \bigletter I
+  \item \spxentry{index}, \hyperpage{1}
+  \item \spxentry{installation}, \hyperpage{26}
+
+  \indexspace
+  \bigletter M
+  \item \spxentry{maintenance}, \hyperpage{120}
+
+  \indexspace
+  \bigletter P
+  \item \spxentry{planning}, \hyperpage{24}
+
+  \indexspace
+  \bigletter R
+  \item \spxentry{REST API Reference}, \hyperpage{131}
+
+  \indexspace
+  \bigletter S
+  \item \spxentry{setupscript}, \hyperpage{28}
+  \item \spxentry{SOAP API Reference}, \hyperpage{210}
+
+  \indexspace
+  \bigletter T
+  \item \spxentry{troubleshooting}, \hyperpage{95}
+
+  \indexspace
+  \bigletter W
+  \item \spxentry{webui}, \hyperpage{33}
+
+\end{sphinxtheindex}

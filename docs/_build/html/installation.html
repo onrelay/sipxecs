@@ -1,0 +1,173 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Installation &#8212; sipxcom 20.04 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Setup Script" href="setupscript.html" />
+    <link rel="prev" title="Planning" href="planning.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="setupscript.html" title="Setup Script"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="planning.html" title="Planning"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sipxcom 20.04 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="installation">
+<span id="rpm-installation"></span><span id="index-0"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>All servers in the cluster should have a static IP address.</li>
+<li>The server(s) must have only one active NIC or IP interface.</li>
+<li>Only IPv4 is supported. Disabling IPv6 on the NIC during OS install is recommended.</li>
+<li>Review the partition sizes if automatic partitioning is used.</li>
+</ul>
+</div>
+<div class="section" id="recommended-specs">
+<h2>Recommended Specs<a class="headerlink" href="#recommended-specs" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>2x CPU/vCPU</li>
+<li>8GB RAM</li>
+<li>50GB or larger disk</li>
+</ul>
+</div>
+<div class="section" id="operating-system">
+<h2>Operating System<a class="headerlink" href="#operating-system" title="Permalink to this headline">¶</a></h2>
+<p>Recent sipXcom RPMs will only install on top of CentOS 7.x with amd64/x86_64 architecture. We recommend using the <a class="reference external" href="http://isoredirect.centos.org/centos/7/isos/x86_64/">CentOS minimal ISO</a>.</p>
+<div class="section" id="disk-partitioning-recommendations">
+<h3>Disk Partitioning Recommendations<a class="headerlink" href="#disk-partitioning-recommendations" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>1GB ext2 for the /boot partition with the boot flag set</li>
+<li>swap partition equal to the system RAM size</li>
+<li>Allocate the rest of the free space for the root (/) partition as a LVM volume, XFS formatted</li>
+</ul>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If the disk is larger than 50G and you use automatic partitioning, most of the space will be allocated to /home rather than /.</p>
+</div>
+</div>
+</div>
+<div class="section" id="downloading-rpms">
+<h2>Downloading RPMs<a class="headerlink" href="#downloading-rpms" title="Permalink to this headline">¶</a></h2>
+<p>Run yum update to update OS packages first. Reboot if you need to after:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yum</span> <span class="n">update</span> <span class="o">-</span><span class="n">y</span>
+<span class="n">reboot</span>
+</pre></div>
+</div>
+<p>Install wget:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yum</span> <span class="n">install</span> <span class="n">wget</span> <span class="o">-</span><span class="n">y</span>
+</pre></div>
+</div>
+<p>Add the sipxcom 20.04 repository file beneath /etc/yum.repos.d, then run yum update to update available packages:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="o">-</span><span class="n">P</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">yum</span><span class="o">.</span><span class="n">repos</span><span class="o">.</span><span class="n">d</span><span class="o">/</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">download</span><span class="o">.</span><span class="n">sipxcom</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">pub</span><span class="o">/</span><span class="n">sipXecs</span><span class="o">/</span><span class="mf">20.04</span><span class="o">-</span><span class="n">centos7</span><span class="o">/</span><span class="n">sipxecs</span><span class="o">-</span><span class="mf">20.04</span><span class="o">.</span><span class="mi">0</span><span class="o">-</span><span class="n">centos</span><span class="o">.</span><span class="n">repo</span>
+<span class="n">yum</span> <span class="n">update</span>
+</pre></div>
+</div>
+<p>Install the sipxcom packages:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yum</span> <span class="n">install</span> <span class="n">sipxcom</span> <span class="o">-</span><span class="n">y</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/sipxcom_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#recommended-specs">Recommended Specs</a></li>
+<li><a class="reference internal" href="#operating-system">Operating System</a><ul>
+<li><a class="reference internal" href="#disk-partitioning-recommendations">Disk Partitioning Recommendations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#downloading-rpms">Downloading RPMs</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="planning.html"
+                        title="previous chapter">Planning</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="setupscript.html"
+                        title="next chapter">Setup Script</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/installation.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="setupscript.html" title="Setup Script"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="planning.html" title="Planning"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sipxcom 20.04 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Support Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.4.
+    </div>
+  </body>
+</html>
