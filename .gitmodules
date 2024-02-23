@@ -52,9 +52,6 @@
 [submodule "sipXcallQueue"]
 	path = sipXcallQueue
 	url = git@github.com:sipXcom/sipXcallQueue.git
-[submodule "sipXresiprocate"]
-	path = sipXresiprocate
-	url = git@github.com:sipXcom/resiprocate.git
 [submodule "sipXAocBilling"]
 	path = sipXAocBilling
 	url = git@github.com:sipXcom/sipXAocBilling.git
