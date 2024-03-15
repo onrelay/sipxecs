@@ -8,7 +8,6 @@
 sipx_core = \
   sipXportLib \
   sipXtackLib \
-  resiprocate \
   oss_core \
   sipXmediaLib \
   sipXmediaAdapterLib \
@@ -40,7 +39,7 @@ sipx_core = \
   sipXecs
 
 #additional configure options for sipXresiprocate package
-resiprocate_OPTIONS = --with-c-ares --with-ssl --with-repro --enable-ipv6 --with-tfm
+# resiprocate_OPTIONS = --with-c-ares --with-ssl --with-repro --enable-ipv6 --with-tfm
 
 # sipxecs projects that are NOT essential for a running communication system
 sipx_extra = \
@@ -170,7 +169,7 @@ sipXsaa_DEPS = sipXsqa sipXcallLib sipXcommserverLib
 sipXcallQueue_DEPS = sipXconfig
 sipXAocBilling_DEPS = sipXconfig
 sipXexample_DEPS = sipXcommserverLib sipXconfig
-sipXsss_DEPS = sipXsqa sipXcommserverLib resiprocate
+sipXsss_DEPS = sipXsqa sipXcommserverLib 
 sipXtools_DEPS = sipXtackLib sipXcommserverLib
 
 all = \
