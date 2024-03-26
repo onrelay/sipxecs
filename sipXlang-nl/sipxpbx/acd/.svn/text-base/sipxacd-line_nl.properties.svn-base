@@ -1,0 +1,16 @@
+## types
+## settings
+#acd-line.label=
+#acd-line.description=
+#acd-line.uri.label=
+#acd-line.uri.description=De AOR voor deze lijn. Dit kenmerk is tevens het indexkenmerk voor deze objectklasse.
+#acd-line.name.label=
+#acd-line.name.description=Een korte beschrijvende naam voor deze lijn. Voornamelijk gebruikt voor weergave. Bijvoorbeeld
+acd-line.extension.label=Extensie
+acd-line.extension.description=De numerieke extensie die wordt gebruikt binnen het PBX-domein als alias om deze lijn aan te spreken. Dit is voor het doorschakelen van een oproep of voor het ophalen van een oproep.
+acd-line.trunk-mode.label=Trunkmodus
+acd-line.trunk-mode.description=Als deze is ingesteld, zal deze lijn als trunk werken waardoor meerdere simultane sessies mogelijk zijn. Anders is per keer slechts \u00E9\u00E9n sessie toegestaan.
+acd-line.publish-line-presence.label=Aanwezigheid lijn tonen
+acd-line.publish-line-presence.description=Als dit staat ingesteld, wordt er informatie over deze lijn beschikbaar gemaakt.
+#acd-line.acd-queue.label=
+acd-line.acd-queue.description=De ACD-wachtrij waaraan deze lijn is toegewezen. Oproepen die op deze lijn terechtkomen, worden door de hier aangegeven ACD-wachtrij afgehandeld. \u00C2\u00A0De ACD-wachtrij wordt herkend aan de hand van ACD-wachtrij-herkenningscode.

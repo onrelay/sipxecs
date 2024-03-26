@@ -1,0 +1,20 @@
+## types
+## settings
+VOIP.label=SIP
+#VOIP.description=
+VOIP.display_name.label=Naam weergeven
+#VOIP.displayname.description=
+VOIP.name.label=Gebruikersnaam
+#VOIP.name.description=
+VOIP.authname.label=Autorisatienaam
+#VOIP.authname.description=
+VOIP.password.label=SIP-wachtwoord
+#VOIP.password.description=
+VOIP.type.label=Type
+VOIP.type.description=Instellen als gedeeld als de lijn wordt gebruikt voor uiterlijk van gedeelde oproep.
+VOIP.type.label.private=Priv\u00E9
+VOIP.type.label.shared=Gedeeld
+VOIP.proxy_address.label=Proxy-adres
+#VOIP.proxy_address.description=Proxy-adres van lijn 1.
+VOIP.proxy_port.label=Proxy-poort
+#VOIP.proxy_port.description=Proxy-poort van lijn 1.

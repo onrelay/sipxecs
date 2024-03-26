@@ -1,0 +1,29 @@
+## types
+## settings
+VOIP.label=SIP
+#VOIP.description=
+VOIP.proxy_address.label=Proxy-adres
+#VOIP.proxy_address.description=
+VOIP.proxy_port.label=Proxy-poort
+#VOIP.proxy_port.description=
+VOIP.displayname.label=Naam weergeven
+#VOIP.displayname.description=
+VOIP.name.label=Gebruikersnaam
+#VOIP.name.description=
+VOIP.authname.label=Autorisatienaam
+#VOIP.authname.description=
+VOIP.password.label=SIP-wachtwoord
+#VOIP.password.description=
+VOIP.type.label=Type
+#VOIP.type.description=
+VOIP.type.label.private=Priv\u00E9
+VOIP.type.label.shared=Gedeeld
+VOIP.type.label.dss=DSS
+VOIP.extension.label=Extensie
+#VOIP.extension.description=
+#VOIP.bla_prim.label=
+#VOIP.bla_prim.description=
+#VOIP.acd_activity.label=
+#VOIP.acd_activity.description=
+#VOIP.acdgroupid.label=
+#VOIP.acdgroupid.description=

@@ -1,0 +1,4 @@
+trunk.label=SIP Firewall
+trunk.description=
+trunk.route.label=Route
+trunk.route.description=IP-adres of naam van de volledig gekwalificeerde host van de Session Border Controller (SBC), firewall of proxy die oproepen verwerkt die worden verzonden aan de provider die door deze SIP-trunk wordt bediend. 

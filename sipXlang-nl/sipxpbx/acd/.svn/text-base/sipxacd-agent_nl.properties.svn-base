@@ -1,0 +1,19 @@
+## types
+## settings
+#acd-agent.label=
+#acd-agent.description=
+#acd-agent.uri.label=
+#acd-agent.uri.description=De AOR voor deze agent. \u00C2\u00A0Dit kenmerk is tevens het indexkenmerk voor deze objectklasse \
+# .
+#acd-agent.name.label=
+#acd-agent.name.description=Een korte beschrijvende naam voor deze agent. \u00C2\u00A0Voornamelijk gebruikt voor weergave \
+# .
+acd-agent.monitor-presence.label=Aanwezigheid bewaken
+acd-agent.monitor-presence.description=Als dit staat ingesteld, verwacht de ACD-server correcte informatie van de agent over zijn/haar beschikbaarheid. Als dit niet staat ingesteld, gaat de ACD-server ervan uit dat de agent beschikbaar is zolang de ACD de agent geen oproep heeft toegewezen.
+acd-agent.always-available.label=Altijd beschikbaar
+acd-agent.always-available.description=Als dit staat ingesteld, gaat de ACD-server ervan uit dat deze agent altijd is aangemeld en oproepen kan beantwoorden vanuit alle wachtrijen waarin de agent is opgenomen. Als dit niet staat ingesteld, moet de agent zich eerst aanmelden voordat de ACD-server oproepen aan de agent toewijst.
+#acd-agent.acd-queue-list.label=
+#acd-agent.acd-queue-list.description=De lijst ACD-wachtrijen waaraan deze agent is toegewezen.\u00C2 De ACD-wachtrijen zijn te herkennen aan een \
+# door komma's gescheiden lijst met ACD-wachtrij-herkenningscodes. \u00C2\u00A0De volgorde is van belang omdat deze de prioriteit aangeeft van\
+# de wachtrijen ten aanzien van de wachtrij die de agent zal bedienen voor het geval meerdere wachtrijen op hetzelfde moment \
+# proberen een oproep naar de agent te sturen. \u00C2\u00A0Het eerste element in de lijst heeft de hoogste prioriteit.

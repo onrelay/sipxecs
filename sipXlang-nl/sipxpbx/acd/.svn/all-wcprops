@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/rep/sipXecs-il8n/!svn/ver/2/nl/sipxpbx/acd
+END
+sipxacd-queue_nl.properties
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/rep/sipXecs-il8n/!svn/ver/2/nl/sipxpbx/acd/sipxacd-queue_nl.properties
+END
+sipxacd-server_nl.properties
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/rep/sipXecs-il8n/!svn/ver/2/nl/sipxpbx/acd/sipxacd-server_nl.properties
+END
+sipxacd-line_nl.properties
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/rep/sipXecs-il8n/!svn/ver/2/nl/sipxpbx/acd/sipxacd-line_nl.properties
+END
+sipxacd-agent_nl.properties
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/rep/sipXecs-il8n/!svn/ver/2/nl/sipxpbx/acd/sipxacd-agent_nl.properties
+END
+sipxacd-audio_nl.properties
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/rep/sipXecs-il8n/!svn/ver/2/nl/sipxpbx/acd/sipxacd-audio_nl.properties
+END

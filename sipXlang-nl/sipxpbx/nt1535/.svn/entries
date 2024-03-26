@@ -1,0 +1,52 @@
+8
+
+dir
+2
+http://sipxecs.sipfoundry.org/rep/sipXecs-il8n/nl/sipxpbx/nt1535
+http://sipxecs.sipfoundry.org/rep/sipXecs-il8n
+
+
+
+2009-11-07T15:39:22.791976Z
+2
+albdam
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+5137fc8e-6557-4d5b-a35d-2b2242d53c51
+
+line_nl.properties
+file
+
+
+
+
+2009-11-07T15:44:24.000000Z
+3661929c11cbbc26408683d8160a7c78
+2009-11-07T15:39:22.791976Z
+2
+albdam
+
+phone_nl.properties
+file
+
+
+
+
+2009-11-07T15:44:24.000000Z
+a39f3f33807838a5498e1f146ce2fc07
+2009-11-07T15:39:22.791976Z
+2
+albdam
+
