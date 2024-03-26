@@ -1,0 +1,130 @@
+<beans xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:websocket="http://www.springframework.org/schema/websocket"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:cxf="http://cxf.apache.org/core"
+	xsi:schemaLocation=" 
+ http://www.springframework.org/schema/beans
+ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+ http://www.springframework.org/schema/util
+ http://www.springframework.org/schema/util/spring-util-2.0.xsd
+ http://cxf.apache.org/core
+ http://cxf.apache.org/schemas/core.xsd
+ http://cxf.apache.org/jaxrs
+ http://cxf.apache.org/schemas/jaxrs.xsd
+ http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+ http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket-4.0.xsd
+ http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+ 
+    <import resource="classpath:META-INF/cxf/cxf.xml" />
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+    <cxf:bus>
+        <cxf:inInterceptors>
+            <ref bean="loggingInInterceptor" />
+        </cxf:inInterceptors>
+        <cxf:outInterceptors>
+            <ref bean="loggingOutInterceptor" />
+        </cxf:outInterceptors>
+        <cxf:inFaultInterceptors>
+            <ref bean="loggingOutInterceptor" />
+        </cxf:inFaultInterceptors>
+    </cxf:bus>
+    <jaxrs:server id="callqueueService" address="/callqueue">
+      <jaxrs:serviceBeans>
+         <ref bean="callqueueApi"/>
+      </jaxrs:serviceBeans>
+      <jaxrs:providers>
+          <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
+          <bean class="org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider"/>
+          <bean class="org.sipfoundry.sipxconfig.api.SipxecsExceptionMapper"/>
+      </jaxrs:providers>
+      <jaxrs:extensionMappings>
+          <entry key="xml" value="application/xml" />
+          <entry key="json" value="application/json" />
+      </jaxrs:extensionMappings>
+   </jaxrs:server>
+
+   <bean id="callQueueHibernate" class="org.sipfoundry.sipxconfig.common.HibernateConfigurationPlugin">
+    <property name="mappingResources">
+      <list>
+        <value>org/sipfoundry/sipxconfig/callqueue/callqueue.hbm.xml</value>
+      </list>
+    </property>
+  </bean>
+
+  <bean id="callQueueI18n"
+	class="org.springframework.context.support.ResourceBundleMessageSource">
+	<property name="basename" value="sipxcallqueue" />
+  </bean>
+  
+  <bean id="freeswitchCallCenterConfig" class="org.sipfoundry.sipxconfig.callqueue.CallCenterConfiguration" parent="freeswitchConfigFile">
+    <property name="callQueueContext" ref="callQueueContext" />
+  </bean>  
+
+  <bean id="callQueueContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+    <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.callqueue.CallQueueContext"/>
+    <property name="target" ref="callQueueContextImpl"/>
+  </bean>
+
+  <bean id="callQueueContextImpl" class="org.sipfoundry.sipxconfig.callqueue.CallQueueContextImpl" parent="abstractDaoImpl">
+    <property name="replicationManager" ref="replicationManagerImpl" />
+    <property name="aliasManager" ref="aliasManager"/>
+    <property name="featureManager" ref="featureManager" />
+    <property name="callQueueDeployer" ref="callQueueDeployer"/>
+    <property name="settingsDao">
+      <bean parent="beanWithSettingsDao">
+        <property name="target">
+          <bean parent="beanWithSettingsDaoImpl">
+            <constructor-arg value="org.sipfoundry.sipxconfig.callqueue.CallQueueSettings"/>
+          </bean>
+        </property>
+      </bean>
+    </property>
+  </bean>
+
+  <bean id="callQueueDeployer" class="org.sipfoundry.sipxconfig.callqueue.CallQueueDeployer">
+    <property name="freeswitchApiProvider" ref="freeswitchApiProvider" />
+    <property name="addressManager" ref="addressManager" />
+    <property name="featureManager" ref="featureManager" />
+  </bean>
+
+  <bean id="callQueueExtension" class="org.sipfoundry.sipxconfig.callqueue.CallQueueExtension" scope="prototype"/>
+
+  <bean id="callQueue" class="org.sipfoundry.sipxconfig.callqueue.CallQueue" scope="prototype">
+    <property name="modelFilesContext" ref="modelFilesContext"/>
+    <property name="addressManager" ref="addressManager"/>
+    <property name="promptsDirectory" value="${sysdir.vxml.prompts}" />
+  </bean>
+
+  <bean id="callQueueCommand" class="org.sipfoundry.sipxconfig.callqueue.CallQueueCommand" scope="prototype">
+    <property name="addressManager" ref="addressManager"/>
+  </bean>
+
+  <bean id="callQueueAgent" class="org.sipfoundry.sipxconfig.callqueue.CallQueueAgent" scope="prototype" parent="beanWithSettings">
+    <property name="domainManager" ref="domainManager" />
+    <property name="callQueueContext" ref="callQueueContext" />
+  </bean>
+
+  <bean id="callQueueSettings" class="org.sipfoundry.sipxconfig.callqueue.CallQueueSettings" parent="settingsBean">
+    <property name="modelFilesContext" ref="modelFilesContext"/>
+  </bean>
+
+  <bean id="callqueueHook" class="org.sipfoundry.sipxconfig.site.SimplePluginHook">
+    <property name="hookId" value="CallAQueueHook"/>
+    <property name="featureId" value="callqueue"/>
+  </bean>
+
+  <bean id="callQueueEditPageProviderPlugin" class="org.sipfoundry.sipxconfig.web.plugin.CallQueueEditPageProviderPlugin"/> 
+
+  <bean id="callQueueSubscribeToPresence" class="org.sipfoundry.sipxconfig.callqueue.CallQueueSubscribeToPresence">
+    <property name="callQueueContext" ref="callQueueContext"/>
+  </bean>
+  
+  <bean class="org.sipfoundry.sipxconfig.callqueue.api.CallQueueApiImpl" id="callqueueApi">
+     <property name="callQueueContext" ref="callQueueContext" />
+     <property name="branchManager" ref="branchManager" />
+  </bean>
+
+</beans>

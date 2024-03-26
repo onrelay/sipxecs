@@ -1,0 +1,53 @@
+<configuration name="callcenter.conf" description="CallCenter">
+
+  <settings>
+      <!--<param name="odbc-dsn" value="dsn:user:pass"/>-->
+      <!--<param name="dbname" value="/dev/shm/callcenter.db"/>-->
+  </settings>
+
+  <queues>
+#foreach($queue in $queues)
+#if(${queue.enabled})
+    <queue name="queue-${queue.extension}">
+        <param name="strategy" value="${queue.strategy}"/>
+        <param name="moh-sound" value="${queue.mohSound}"/>
+#if(${queue.recordEnabled})
+        <param name="record-template" value="${queue.recordTemplate}"/>
+#end
+        <param name="tier-rules-apply" value="${queue.tierRulesApply}"/>
+        <param name="tier-rule-wait-second" value="${queue.tierRuleWaitSecond}"/>
+        <param name="tier-rule-wait-multiply-level" value="${queue.tierRuleWaitMultiplyLevel}"/>
+        <param name="tier-rule-no-agent-no-wait" value="${queue.tierRuleNoAgentNoWait}"/>
+        <param name="max-wait-time" value="${queue.maxWaitTime}"/>
+        <param name="max-wait-time-with-no-agent" value="${queue.maxWaitTimeWithNoAgent}"/>
+        <param name="max-wait-time-with-no-agent-time-reached" value="${queue.maxWaitTimeWithNoAgentTimeReached}"/>
+    </queue>
+#end
+#end
+  </queues>
+
+<!-- WARNING: Configuration of XML Agents will be updated into the DB upon restart. -->
+<!-- WARNING: Configuration of XML Tiers will reset the level and position if those were supplied. -->
+<!-- WARNING: Agents and Tiers XML config shouldn't be used in a multi FS shared DB setup. -->
+
+  <agents>
+#foreach($agent in $agents)
+    <agent name="agent-${agent.Extension}" type="callback" contact="${agent.ContactUri}"
+#foreach($group in ${agent.settings.values})
+#foreach($setting in ${group.values})
+        ${setting.name}="$!{setting.Value}"
+#end
+#end
+        />
+#end
+  </agents>
+
+  <tiers>
+#foreach($agent in $agents)
+#foreach($tier in $agent.tiers.tiers)
+    <tier agent="agent-${agent.Extension}" queue="queue-${agent.getQueueByTier($tier).extension}" level="${tier.level}" position="${tier.position}" />
+#end
+#end
+  </tiers>
+
+</configuration>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE model
+    PUBLIC "-//SIPFoundry//sipXconfig//Model specification 2.0//EN"
+    "sipXconfig/etc/setting_2_0.dtd">
+<model>
+<type id="type_strategy">
+    <enum>
+        <option>
+          <label>Ring all agents simultaneously</label>
+          <value>ring-all</value>
+        </option>
+        <option>
+          <label>Ring agent who has been idle the longest</label>
+          <value>longest-idle-agent</value>
+        </option>
+        <option>
+          <label>Ring agent in position but remember last tried agent</label>
+          <value>round-robin</value>
+        </option>
+        <option>
+          <label>Ring agent in order position starting from 1 for every member</label>
+          <value>top-down</value>
+        </option>
+        <option>
+          <label>Ring agent with least talk time</label>
+          <value>agent-with-least-talk-time</value>
+        </option>
+        <option>
+          <label>Ring agent with fewest calls</label>
+          <value>agent-with-fewest-calls</value>
+        </option>
+        <option>
+          <label>Ring agents sequentially by tier and order</label>
+          <value>sequentially-by-agent-order</value>
+        </option>
+        <option>
+          <label>Ring agents in random order</label>
+          <value>random</value>
+        </option>
+    </enum>
+</type>
+<type id="type_upload-music">
+    <file variable="yes"/>
+</type>
+    <group name="call-queue">
+	<setting name="strategy"><type refid="type_strategy"/><value>ring-all</value></setting>
+    <setting name="bypass-media"><type><boolean/></type><value>0</value></setting>
+	<setting name="welcome-audio"><type refid="type_upload-music"/></setting>
+	<setting name="goodbye-audio"><type refid="type_upload-music"/></setting>
+	<setting name="moh-sound"><type refid="type_upload-music"/></setting>
+	<setting name="breakaway-digit"><type><string maxLen="1"><pattern>[*#0-9]</pattern></string></type></setting>
+	<setting name="transfer-on-timeout"><type><string/></type><value></value></setting>
+	<setting name="record-calls"><type><boolean/></type><value>0</value></setting>
+	<setting name="record-calls-directory"><type><string/></type><value></value></setting>
+	<setting name="tier-rules-apply"><type><boolean/></type><value>1</value></setting>
+	<setting name="tier-rule-wait-second"><type><integer/></type><value>10</value></setting>
+	<setting name="tier-rule-wait-multiply-level"><type><boolean/></type><value>1</value></setting>
+	<setting name="tier-rule-no-agent-no-wait"><type><boolean/></type><value>1</value></setting>
+	<setting name="max-wait-time"><type><integer/></type><value>0</value></setting>
+	<setting name="max-wait-time-with-no-agent"><type><integer/></type><value>0</value></setting>
+	<setting name="max-wait-time-with-no-agent-time-reached"><type><integer/></type><value>5</value></setting>
+    </group>
+</model>

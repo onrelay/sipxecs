@@ -1,0 +1,36 @@
+# Copyright (c) 2012 eZuce, Inc. All rights reserved.
+# Contributed to SIPfoundry under a Contributor Agreement
+
+# This software is free software; you can redistribute it and/or modify it under
+# the terms of the Affero General Public License (AGPL) as published by the
+# Free Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This software is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+
+# Needs to run before sipxfreeswitch.cf so repairs to configs
+# trigger fs to reload
+bundle agent 00_sipxcallqueue {
+  vars:    
+    any::
+      "conf_file" string => "callcenter.conf.xml";
+      "conf_path" string => "$(sipx.SIPX_FSCONFDIR)/sipxpbx/conf/autoload_configs/$(conf_file)";
+
+  files:
+    !callqueue::
+      "$(conf_path)"
+        comment => "uninstall freeswitch call center config $(this.promiser)",
+        delete => unlink,
+        classes => if_repaired("reload_sipxfreeswitch");
+
+    callqueue::
+      "$(conf_path)"
+        comment => "install freeswitch call center config $(this.promiser)",
+        create => "true",
+        perms => m("644"),
+        copy_from => copy_from_cfdata("$(sipx.location_id)/autoload_configs/$(conf_file)"),
+        classes => if_repaired("reload_sipxfreeswitch");
+}

@@ -1,0 +1,50 @@
+Name: @PACKAGE@
+Version: @VERSION@
+Release: @PACKAGE_REVISION@
+
+Summary: sipXcallQueue Call Center for sipXecs
+License: LGPL
+Group: Telcommunications
+Vendor: SIPfoundry
+Packager: Douglas Hubler <dhubler@ezuce.com>
+Url: http://www.sipfoundry.org
+
+%define __jar_repack %{nil}
+
+BuildRequires: automake
+BuildRequires: libxml2
+BuildRequires: java-1.8.0-openjdk-devel
+BuildRequires: sipxcommons >= %version
+BuildRequires: sipxconfig >= %version
+Requires: sipxconfig >= %version
+
+Source: %name-%version.tar.gz
+Prefix: %_prefix
+BuildRoot: %{_tmppath}/%name-%version-root
+
+%description
+Call Center based on freeswitch
+
+%prep
+%setup -q
+
+%build
+%configure --enable-rpmbuild @SIPX_RPM_CONFIGURE_OPTIONS@
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(644,root,root,755)
+%{_sysconfdir}/sipxpbx/sipxcallqueue/*
+%{_sysconfdir}/sipxpbx/freeswitch/*
+%{_sysconfdir}/sipxpbx/database/plugin.d/*
+%{_datadir}/sipxecs/cfinputs/plugin.d/*.cf
+%{_datadir}/java/sipXecs/sipXconfig/plugins/sipxcallqueue-config.jar
+
+%post
