@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+  <bean id="iantAocBilling" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+    <property name="target" ref="iantAocBillingImpl"/>
+    <property name="proxyInterfaces" value="de.iant.iab.IantAocBilling"/>
+  </bean>
+
+  <bean id="iantAocBillingStrings" class="org.springframework.context.support.ResourceBundleMessageSource">
+    <property name="basename">
+      <value>iantaocbilling-plugin</value>
+    </property>
+  </bean>
+
+  <bean id="iantAocBillingImpl" class="de.iant.iab.IantAocBillingImpl">
+  </bean>
+  
+  <bean id="iantAocBillingProxyHooks" class="de.iant.iab.IantAocBillingProxyHook">
+    <property name="featureManager" ref="featureManager" />
+    <property name="proxyHookName" value="SIPX_TRAN_HOOK_LIBRARY.991_iantaocmessagefilter" />
+    <property name="proxyHookValue" value="$(sipx.SIPX_LIBDIR)/transactionplugins/libsipxiantaocbilling.so" />
+  </bean>
+
+</beans>
