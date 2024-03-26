@@ -1,0 +1,41 @@
+Name: @PACKAGE@
+Version: @VERSION@
+Release: @PACKAGE_REVISION@
+
+Summary: Dashboard
+License: LGPL
+Group: Telcommunications
+Vendor: sipxcom
+Packager: sipxcom
+BuildArch: noarch
+Url: http://www.sipxcom.org
+
+Requires: php
+Requires: php-pgsql
+Requires: php-soap
+
+Provides: sipxdashboard
+
+Source: %name-%version.tar.gz
+
+%description
+sipXcom dashboard contributed by Sebastien Hache 2/12/2016
+
+%prep
+%setup -q
+
+%build
+%configure
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%dir %attr(775,sipx,sipx) %{_localstatedir}/sipxdata/dashboard
+%{_localstatedir}/sipxdata/dashboard/*
+%{_datadir}/sipxecs/cfinputs/plugin.d/sipxdashboard.cf
