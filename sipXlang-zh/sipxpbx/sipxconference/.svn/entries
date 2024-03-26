@@ -1,0 +1,52 @@
+8
+
+dir
+2
+http://sipxecs.sipfoundry.org/rep/sipXecs-il8n/zh/sipxpbx/sipxconference
+http://sipxecs.sipfoundry.org/rep/sipXecs-il8n
+
+
+
+2009-11-07T15:39:22.791976Z
+2
+albdam
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+5137fc8e-6557-4d5b-a35d-2b2242d53c51
+
+conference_zh.properties
+file
+
+
+
+
+2009-11-07T15:41:45.000000Z
+6723eb3f29fb2813ddf13b5033cf85ef
+2009-11-07T15:39:22.791976Z
+2
+albdam
+
+bridge_zh.properties
+file
+
+
+
+
+2009-11-07T15:41:45.000000Z
+8cbc391a9e6468815352a97f173f2d0b
+2009-11-07T15:39:22.791976Z
+2
+albdam
+

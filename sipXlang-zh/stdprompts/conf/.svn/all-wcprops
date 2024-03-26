@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/rep/sipXecs-il8n/!svn/ver/2/zh/stdprompts_zh/conf
+END
+JoinTone.wav
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/rep/sipXecs-il8n/!svn/ver/2/zh/stdprompts_zh/conf/JoinTone.wav
+END
+authfailed.wav
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/rep/sipXecs-il8n/!svn/ver/2/zh/stdprompts_zh/conf/authfailed.wav
+END
+mutingYourself.wav
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/rep/sipXecs-il8n/!svn/ver/2/zh/stdprompts_zh/conf/mutingYourself.wav
+END
+rollcallYouareTheOnly.wav
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/rep/sipXecs-il8n/!svn/ver/2/zh/stdprompts_zh/conf/rollcallYouareTheOnly.wav
+END
+lockingConference.wav
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/rep/sipXecs-il8n/!svn/ver/2/zh/stdprompts_zh/conf/lockingConference.wav
+END
+ByeBye.wav
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/rep/sipXecs-il8n/!svn/ver/2/zh/stdprompts_zh/conf/ByeBye.wav
+END
+unMutingYourself.wav
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/rep/sipXecs-il8n/!svn/ver/2/zh/stdprompts_zh/conf/unMutingYourself.wav
+END
+confid.wav
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/rep/sipXecs-il8n/!svn/ver/2/zh/stdprompts_zh/conf/confid.wav
+END

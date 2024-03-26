@@ -1,0 +1,17 @@
+presence.label=\u72b6\u6001\u670d\u52a1\u5668
+
+presence-config.SIP_PRESENCE_SIGN_IN_CODE.label=\u72b6\u6001\u7b7e\u5165\u7801
+presence-config.SIP_PRESENCE_SIGN_IN_CODE.description=\u901a\u8fc7\u62e8\u6253\u4ee3\u7801\u6765\u7b7e\u5165\u72b6\u6001\u914d\u7f6e\u76d1\u89c6\u5668\u3002
+
+presence-config.SIP_PRESENCE_SIGN_OUT_CODE.label=\u72b6\u6001\u7b7e\u51fa\u7801
+presence-config.SIP_PRESENCE_SIGN_OUT_CODE.description=\u901a\u8fc7\u62e8\u6253\u4ee3\u7801\u6765\u7b7e\u51fa\u72b6\u6001\u914d\u7f6e\u76d1\u89c6\u5668\u3002
+
+presence-config.PRESENCE_SERVER_SIP_PORT.label=SIP\u7aef\u53e3
+presence-config.PRESENCE_SERVER_SIP_PORT.description=\u5728\u8be5IP\u7aef\u53e3\u4e0a\uff0c\u72b6\u6001\u914d\u7f6e\u670d\u52a1\u5668\u76d1\u542cSIP\u6d88\u606f\u3002
+
+presence-config.PRESENCE_SERVER_HTTP_PORT.label=Http\u7aef\u53e3
+presence-config.PRESENCE_SERVER_HTTP_PORT.description=\u88ab\u7279\u6b8a\u5750\u5e2d\u5de5\u4f5c\u7ad9\u6240\u7ed1\u5b9a\u7684HTTP\u7aef\u53e3\uff0c\u8be5\u7aef\u53e3\u88ab\u7528\u6765\u53d1\u9001Xml-Rpc\u7b7e\u5165 \
+ \u7b7e\u51fa\u8bf7\u6c42\uff0c\u4f8b\u5982: 8111
+ 
+presence-config.SIP_PRESENCE_LOG_LEVEL.label=\u65e5\u5fd7\u8bb0\u5f55\u7ea7\u522b
+presence-config.SIP_PRESENCE_LOG_LEVEL.description=\u72b6\u6001\u76d1\u89c6\u4e8b\u4ef6

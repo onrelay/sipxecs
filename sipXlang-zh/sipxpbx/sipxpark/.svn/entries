@@ -1,0 +1,52 @@
+8
+
+dir
+2
+http://sipxecs.sipfoundry.org/rep/sipXecs-il8n/zh/sipxpbx/sipxpark
+http://sipxecs.sipfoundry.org/rep/sipXecs-il8n
+
+
+
+2009-11-07T15:39:22.791976Z
+2
+albdam
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+5137fc8e-6557-4d5b-a35d-2b2242d53c51
+
+park-orbit_zh.properties
+file
+
+
+
+
+2009-11-07T15:41:45.000000Z
+e38eb3ebd1ba0623a248d17d0a575431
+2009-11-07T15:39:22.791976Z
+2
+albdam
+
+sipxpark_zh.properties
+file
+
+
+
+
+2009-11-07T15:41:45.000000Z
+877d2bf8f3496a1245387430a7f3aa41
+2009-11-07T15:39:22.791976Z
+2
+albdam
+

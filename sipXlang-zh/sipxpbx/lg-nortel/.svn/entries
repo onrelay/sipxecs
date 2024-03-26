@@ -1,0 +1,52 @@
+8
+
+dir
+2
+http://sipxecs.sipfoundry.org/rep/sipXecs-il8n/zh/sipxpbx/lg-nortel
+http://sipxecs.sipfoundry.org/rep/sipXecs-il8n
+
+
+
+2009-11-07T15:39:22.791976Z
+2
+albdam
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+5137fc8e-6557-4d5b-a35d-2b2242d53c51
+
+line_zh.properties
+file
+
+
+
+
+2009-11-07T15:41:45.000000Z
+20e0237009a854c5f36495ae01d4d9f1
+2009-11-07T15:39:22.791976Z
+2
+albdam
+
+phone_zh.properties
+file
+
+
+
+
+2009-11-07T15:41:45.000000Z
+9bd043a5cb596d9910368b5608ae1513
+2009-11-07T15:39:22.791976Z
+2
+albdam
+

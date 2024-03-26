@@ -1,0 +1,52 @@
+8
+
+dir
+2
+http://sipxecs.sipfoundry.org/rep/sipXecs-il8n/zh/sipxpbx/linksys
+http://sipxecs.sipfoundry.org/rep/sipXecs-il8n
+
+
+
+2009-11-07T15:39:22.791976Z
+2
+albdam
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+5137fc8e-6557-4d5b-a35d-2b2242d53c51
+
+line_zh.properties
+file
+
+
+
+
+2009-11-07T15:41:45.000000Z
+5cdbf2eacc57c6e8e2bcd3a9fc50231b
+2009-11-07T15:39:22.791976Z
+2
+albdam
+
+phone_zh.properties
+file
+
+
+
+
+2009-11-07T15:41:45.000000Z
+4d64bb09270dfe7b6080bac5201b3f08
+2009-11-07T15:39:22.791976Z
+2
+albdam
+
