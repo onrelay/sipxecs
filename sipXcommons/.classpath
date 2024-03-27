@@ -17,7 +17,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/axis-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/axis-schema-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/backport-util-concurrent-3.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/bcel-5.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/bcel-6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bsf-2.4.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/c3p0-0.9.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cglib-nodep-2.1_3.jar"/>
@@ -28,8 +28,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-discovery-0.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-fileupload-1.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-httpclient-3.0.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-io-1.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-io-2.15.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-pool-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cssparser-0.9.5.jar"/>
@@ -39,7 +39,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/cxf-rt-frontend-jaxrs-3.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/woodstox-core-asl-4.3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dbunit-2.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/dnsjava-2.0.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/dnsjava-3.5.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-1.6.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gdata-client-1.0.jar"/>
@@ -51,7 +51,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/htmlunit-core-js-2.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/iText-2.1.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/j2ee_connector-1_0-fr-class.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/jain-sip-sdp-1.2.148.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jain-sip-sdp-1.3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta-oro-2.0.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta-regexp-1.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jasperreports-3.7.1.jar"/>
@@ -62,10 +62,10 @@
 	<classpathentry exported="true" kind="lib" path="lib/javax.ws.rs-api-2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxrpc.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jcommon-1.0.13.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jettison-1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jettison-1.3.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jfreechart-1.0.10.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jibx-bind-1.1.6a.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jibx-run-1.1.6a.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jibx-bind-1.4.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jibx-run-1.4.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jstl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jta.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/junitperf-1.9.1.jar"/>
@@ -82,6 +82,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/odmg-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ognl-2.7.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.json_2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/openfire-3.9.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.restlet-1.1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.restlet.ext.json-2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.restlet.ext.spring-2.5.jar"/>
@@ -110,7 +111,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/xmlunit-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xpp3-1.1.4c.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/antlr-2.7.7.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils-core-1.8.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils-core-1.9.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-cli-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/google-collections-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-data-mongodb-1.3.1.RELEASE.jar"/>
@@ -157,8 +158,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/jasper-compiler-5.5.23.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jasper-runtime-5.5.23.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javax.servlet.jsp-api-2.3.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.7.7.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/slf4j-log4j12-1.7.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.7.33.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-log4j12-1.7.33.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-webmvc-4.0.3.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-websocket-4.0.3.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/websocket-api-9.1.5.v20140505.jar"/>
