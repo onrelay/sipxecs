@@ -35,6 +35,7 @@ sipXconfig/packages/logging
 sipXconfig/packages/path
 sipXconfig/packages/unmodifiable_collection
 sipXconfig/etc/build/
+sipXconfig/.pub
 pubspec.lock
 /sipXyealink/nbproject/private/
 /sipXyealink/build/
@@ -43,3 +44,5 @@ pubspec.lock
 /sipXverify/target/test-classes/
 extras/translation-tool/classes/
 build/
+*.class
+packages
