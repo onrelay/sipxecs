@@ -81,13 +81,19 @@ public class StackLoggerImpl implements StackLogger {
     }
 
     @Override
+    public void logError(String string, Exception exception) {
+      logger.error(string,exception);
+
+    }
+
+    @Override
     public void logError(String string) {
         logger.error(string);
     }
 
     @Override
-    public void logError(String string, Exception exception) {
-      logger.error(string,exception);
+    public void logDebug(String string, Exception exception) {
+      logger.debug(string,exception);
 
     }
 
@@ -171,6 +177,8 @@ public class StackLoggerImpl implements StackLogger {
              logger.debug(message);
         }
     }
+
+
 
 
 }
