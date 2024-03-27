@@ -16,7 +16,7 @@ REWRITE_DEPS = \
 REWRITE_DEPS_redhat = \
 	$(REWRITE_DEPS) \
 	-e '/java-1_6_0-sun-devel/d' \
-	-e 's/java-devel/java-1.6.0-openjdk-devel/g' \
+	-e 's/java-devel/java-1.8.0-openjdk-devel/g' \
 	-e '/docbook-xsl-stylesheets/d' \
 	-e '/pwdutils/d' \
 	-e '/apache2-.*/d' \

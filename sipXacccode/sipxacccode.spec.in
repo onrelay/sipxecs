@@ -10,7 +10,7 @@ Packager: SIPfoundry <sipx-dev@sipfoundry.org>
 Url: http://www.sipfoundry.org
 
 BuildRequires: automake
-BuildRequires: java-1.7.0-openjdk-devel
+BuildRequires: java-1.8.0-openjdk-devel
 BuildRequires: zip
 BuildRequires: sipxcommons >= %version
 
@@ -24,7 +24,7 @@ Requires: chkconfig
 Requires: java-ibm >= 1.6
 Requires: java-ibm-unrestricted
 %else
-Requires: java-1.7.0-openjdk
+Requires: java-1.8.0-openjdk
 %endif
 
 Prefix: %_prefix

@@ -9,11 +9,11 @@ Summary:  Configuration Management for SIP
 License:  LGPL
 Group:    Productivity/Telephony/SIP/Servers
 Vendor:   SIPfoundry
-Packager: SIPfoundry <sipx-dev@list.sipfoundry.org>
+Packager: SIPfoundry <sipxcom-dev@googlegroups.com>
 Url:      http://www.sipfoundry.org/
 
 BuildRequires: automake
-BuildRequires: java-1.7.0-openjdk-devel
+BuildRequires: java-1.8.0-openjdk-devel
 
 %if %{_vendor} == redhat
 BuildRequires: shadow-utils

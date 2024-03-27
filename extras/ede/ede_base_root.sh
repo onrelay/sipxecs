@@ -281,7 +281,7 @@ yum -y remove sip-redirect &> /dev/null
 ## Install the required packages.
 
 # YUM_PACKAGES is the list of the required packages.
-YUM_PACKAGES="gcc gcc-c++ autoconf automake libtool subversion subversion-perl rpm-build httpd httpd-devel openssl-devel jpackage-utils pcre-devel expat-devel unixODBC-devel junit ant-commons-logging postgresql-server zlib-devel postgresql-devel postgresql-odbc alsa-lib-devel gnutls-devel mysql-devel ncurses-devel python-devel ruby ruby-devel ruby-rdoc bind tftp-server doxygen zip which unzip createrepo ant-junit mod_ssl libXp libpng-devel libart_lgpl-devel freetype freetype-devel gdb gdbm-devel mysql-devel ncurses-devel vsftpd mod_perl-devel dhcp net-snmp-utils net-snmp-devel net-snmp-perl ntp yum-utils java-1.6.0-openjdk java-1.6.0-openjdk-devel redhat-rpm-config ant ant-trax ant-nodeps jakarta-commons-collections jakarta-commons-beanutils log4j mrtg stunnel logrotate"
+YUM_PACKAGES="gcc gcc-c++ autoconf automake libtool subversion subversion-perl rpm-build httpd httpd-devel openssl-devel jpackage-utils pcre-devel expat-devel unixODBC-devel junit ant-commons-logging postgresql-server zlib-devel postgresql-devel postgresql-odbc alsa-lib-devel gnutls-devel mysql-devel ncurses-devel python-devel ruby ruby-devel ruby-rdoc bind tftp-server doxygen zip which unzip createrepo ant-junit mod_ssl libXp libpng-devel libart_lgpl-devel freetype freetype-devel gdb gdbm-devel mysql-devel ncurses-devel vsftpd mod_perl-devel dhcp net-snmp-utils net-snmp-devel net-snmp-perl ntp yum-utils java-1.8.0-openjdk java-1.8.0-openjdk-devel redhat-rpm-config ant ant-trax ant-nodeps jakarta-commons-collections jakarta-commons-beanutils log4j mrtg stunnel logrotate"
 
 # Check what distro we are running and update YUM_PACKAGES appropriately.
 if [ $(return_uname_distro_id) == $DISTRO_ID_CentOS5 ]; then
@@ -343,7 +343,7 @@ fi
 
 /usr/sbin/alternatives --set java /usr/lib/jvm/jre-1.6.0-openjdk/bin/java
 /usr/sbin/alternatives --display java > $FULL_PATH_EDE_LOGS/java_alternatives.log
-/usr/sbin/alternatives --set javac /usr/lib/jvm/java-1.6.0-openjdk/bin/javac
+/usr/sbin/alternatives --set javac /usr/lib/jvm/java-1.8.0-openjdk/bin/javac
 
 ## See if the development user already exists and if not, create it.
 

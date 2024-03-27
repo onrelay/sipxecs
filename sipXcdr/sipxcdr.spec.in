@@ -6,7 +6,7 @@ Summary: CDR (Call Distribution Record) aggregration
 License:  Pingtel Commercial License
 Group:    Productivity/Telephony/SIP/Servers
 Vendor:   SIPFoundry
-Packager: SIPFoundry <sipx-dev@list.sipfoundry.org>
+Packager: SIPFoundry <sipxcom-dev@googlegroups.com>
 Url:      http://www.sipfoundry.org
 
 BuildRequires: automake

@@ -6,14 +6,14 @@ Summary: sipXecs configuration of Audiocodes Phone Endpoints
 License: LGPL
 Group: Telcommunications
 Vendor: SIPfoundry
-Packager: Engineering <sipx-dev@list.sipfoundry.org>
+Packager: Engineering <sipxcom-dev@googlegroups.com>
 BuildArch: noarch
 Url: http://www.sipfoundry.org
 
 %if %{_vendor} == suse
 BuildRequires: java-1_6_0-sun-devel
 %else
-BuildRequires: java-1.7.0-openjdk-devel
+BuildRequires: java-1.8.0-openjdk-devel
 %endif
 BuildRequires: automake
 BuildRequires: sipxcommons >= %version

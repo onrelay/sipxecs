@@ -6,7 +6,7 @@ Summary:  Shared Appearance Agent
 License:  LGPL
 Group:    Productivity/Telephony/SIP/Servers
 Vendor:   SIPfoundry
-Packager: SIPfoundry <sipx-dev@list.sipfoundry.org>
+Packager: SIPfoundry <sipxcom-dev@googlegroups.com>
 Url:      http://www.sipfoundry.org/sipXsaa
 
 BuildRequires: automake

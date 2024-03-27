@@ -127,7 +127,7 @@ iso-packages-% : iso-download-os-% iso-download-epel-%
 	rsync -av $(ARCH)-epel-Packages/  $(ISO_DISC)/Packages/
 	rsync -av $(realpath $(RPM_DIST_DIR))/CentOS_6/$(ARCH)/ $(ISO_DISC)/Packages/
 	find $(ISO_DISC)/Packages \( \
-	    -not -name 'java-1.6.0-openjdk-devel-*.rpm' -a \
+	    -not -name 'java-1.8.0-openjdk-devel-*.rpm' -a \
 	    -not -name 'nodejs-devel-*.rpm' -a \
 	    -not -name 'v8-devel-*.rpm' -a \
 	    -not -name 'libuv-devel-*.rpm' -a \
@@ -423,10 +423,10 @@ ISO_ADD_OS = \
   jakarta-taglibs-standard-1.* \
   jasper-libs-* \
   java-1.5.0-gcj-1* \
-  java-1.6.0-openjdk-1.* \
-  java-1.6.0-openjdk-devel-* \
+  java-1.8.0-openjdk-1.* \
+  java-1.8.0-openjdk-devel-* \
   java_cup-0.* \
-  java-1.7.0-openjdk-1.* \
+  java-1.8.0-openjdk-1.* \
   jline-* \
   jpackage-utils-* \
   kbd-1.* \
