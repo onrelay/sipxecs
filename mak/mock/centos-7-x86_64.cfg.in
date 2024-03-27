@@ -33,21 +33,33 @@ enabled=1
 @CENTOS_BASE_URL_OFF@mirrorlist=http://mirrorlist.centos.org/?release=7&arch=x86_64&repo=updates
 failovermethod=priority
 
-[epel]
-name=epel
+#[epel]
+#name=epel
+#enabled=1
+#@CENTOS_BASE_URL_ON@baseurl=http://mirrors.nav.ro/epel/7/$basearch
+#@CENTOS_BASE_URL_OFF@mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=epel-7&arch=$basearch
+#failovermethod=priority
+
+[sipxcom]
+name=sipXcom
 enabled=1
-@CENTOS_BASE_URL_ON@baseurl=http://mirrors.nav.ro/epel/7/$basearch
-@CENTOS_BASE_URL_OFF@mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=epel-7&arch=$basearch
-failovermethod=priority
+baseurl=https://us-central1-yum.pkg.dev/projects/onrelay/sipxcom-24-01-centos7
+repo_gpgcheck=0
+gpgcheck=0
+
 
 # Normally from EPEL, just a list of rpms to create a basic build system
 [buildsys-build]
 name=buildsys-build
-baseurl=http://download.sipxcom.org/pub/sipXecs/buildsys-build/
+#baseurl=http://download.sipxcom.org/pub/sipXecs/buildsys-build/
+baseurl=https://storage.googleapis.com/sipxcom/buildsys-build
 enabled=1
 
 [build]
 name=build
-baseurl=http://localhost:@REPO_PORT@/CentOS_7/x86_64/
+#baseurl=http://localhost:@REPO_PORT@/CentOS_7/x86_64/
+baseurl=file:///src/sipxecs/build/repo/CentOS_7/x86_64/
 
 """
+
+

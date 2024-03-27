@@ -102,7 +102,7 @@ policydir = /usr/share/selinux/packages/sipxcom
 policy_DATA = sipxpol.pp
 	
 sipxpol.pp:
-	/usr/bin/checkmodule -M -m -o sipxpol.mod etc/sipxpol.te && \
+	/usr/bin/checkmodule -M -m -o sipxpol.mod $(top_srcdir)/etc/sipxpol.te && \
 	/usr/bin/semodule_package -o sipxpol.pp -m sipxpol.mod
 
 CLEANFILES = $(cfinputs_PROMISES) $(cfdefaults_DATA) $(cflib_DATA) $(tmpfilesd_SCRIPTS) security.sec.erb sipxpol.pp
