@@ -1,0 +1,50 @@
+#!BuildIgnore: post-build-checks
+Name: @PACKAGE@
+Version: @VERSION@
+Release: @PACKAGE_REVISION@
+
+# do not build a debuginfo package
+%define debug_package %{nil}
+
+Summary: sipXecs for Czech Republic
+License: L-GPL
+Group: Telecommunications
+Vendor: SIPfoundry
+Packager: SIPfoundry <sipx-dev@sipfoundry.org>
+Url: http://www.sipfoundry.org
+BuildArch: noarch
+
+BuildRequires: automake
+BuildRequires: java-devel
+
+Source: %name-%version.tar.gz
+
+Prefix: %_prefix
+BuildRoot: %{_tmppath}/%name-%version-root
+
+%description
+sipXecs dialing rules for Czech Republic
+
+%prep
+%setup -q
+
+%build
+%configure
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(644,root,root,755)
+%{_datadir}/java/sipXecs/sipXconfig/plugins/*
+
+%post
+
+%preun
+
+
