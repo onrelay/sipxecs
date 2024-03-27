@@ -32,6 +32,9 @@ public class DefaultMessagePacketInterceptor extends AbstractMessagePacketInterc
     private final static String CONF_DIRECTIVE = "@conf";
     private final static String TRANSFER_DIRECTIVE = "@xfer";
 
+    private final static String VALID_SIP_PHONE_NUMER_REGEXP = "^\\+?[0-9]{3,14}" +
+    		"\\@[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+";
+
     @Override
     public void start(@SuppressWarnings("hiding") SipXOpenfirePlugin plugin) {
         this.plugin = plugin;
@@ -342,7 +345,7 @@ public class DefaultMessagePacketInterceptor extends AbstractMessagePacketInterc
      * tries to map it to a JID then #1 is attempted; if that fails #3- assume that the name is
      * the userpart of the SIP URI. Append the SIP domain to it
      */
-    private String mapArbitraryNameToSipEndpoint(String name) {
+    private String mapArbitraryNameToSipEndpoint(String name) throws Exception {
         String sipEndpoint = null;
         // check if the supplied name has a domain part
         String[] result = name.split("@");
@@ -366,6 +369,11 @@ public class DefaultMessagePacketInterceptor extends AbstractMessagePacketInterc
             // is.
             sipEndpoint = name;
         }
+
+        if( !sipEndpoint.matches( VALID_SIP_PHONE_NUMER_REGEXP ) ) {
+            throw new PacketRejectedException( "Invalid SIP address: " + sipEndpoint );
+        }
+
         log.debug("mapArbitraryNameToSipEndpoint " + name + " to " + sipEndpoint);
         return sipEndpoint;
     }
@@ -379,7 +387,7 @@ public class DefaultMessagePacketInterceptor extends AbstractMessagePacketInterc
      * attempted; if that fails #4- assume that the name is the userpart of the SIP URI. Append
      * the SIP domain to it
      */
-    private String mapArbitraryNameToSipEndpoint(MUCRoom room, String name) {
+    private String mapArbitraryNameToSipEndpoint(MUCRoom room, String name) throws Exception {
         String sipEndpoint;
         try {
             MUCRole occupant = room.getOccupant(name);
