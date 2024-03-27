@@ -1,5 +1,5 @@
 AC_PREREQ(2.57)
-AC_INIT(sipxlang-pt_BR, 24.01, sipx-dev@list.sipfoundry.org)
+AC_INIT(sipxlang-pt_BR, 24.01, sipxcom-dev@googlegroups.com)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([stdprompts/01.wav])
 AM_INIT_AUTOMAKE(foreign tar-ustar)

@@ -1,5 +1,5 @@
 AC_PREREQ(2.57)
-AC_INIT(sipXportLib, 22.06, sipx-dev@list.sipfoundry.org)
+AC_INIT(sipXportLib, 24.01, sipxcom-dev@googlegroups.com)
 AC_CONFIG_AUX_DIR(config)
 m4_include([config/general.m4])
 m4_include([config/ax_boost_base.m4])
