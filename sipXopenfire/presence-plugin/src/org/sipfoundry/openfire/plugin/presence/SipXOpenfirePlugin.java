@@ -4,7 +4,7 @@
  */
 package org.sipfoundry.openfire.plugin.presence;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,7 +28,6 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jivesoftware.openfire.PacketRouter;
@@ -248,7 +247,7 @@ public class SipXOpenfirePlugin implements Plugin, Component {
         InputStream is = null;
         try {
             is = new FileInputStream("/tmp/sipx.properties");
-            if (isBlank(configurationPath)) {
+            if (StringUtils.isNotEmpty(configurationPath)) {
                 System.getProperties().load(is);
                 configurationPath = System.getProperty("conf.dir", "/etc/sipxpbx");
             }
@@ -453,6 +452,7 @@ public class SipXOpenfirePlugin implements Plugin, Component {
                         InterceptorManager.getInstance().addInterceptor(abstractMessagePacketInterceptor);
                         abstractMessagePacketInterceptors.add(abstractMessagePacketInterceptor);
                     }
+                    jarFile.close();
                 } catch (Throwable e) {
                     log.error("loadExtras caught exception:", e);
                 }
