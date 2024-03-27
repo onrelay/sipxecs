@@ -17,12 +17,14 @@ jar_PKGS = \
 	commons-collections \
 	spring-data-mongodb \
 	mongo \
-	sipxcommons
+	sipxcommons \
+	openfire \
+	commons-lang 
+
 	
 sync_SRC = $(shell cd $(srcdir); find src -name '*.java')
 sync_DEPS = \
 	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(jar_PKGS)) \
-	@OPENFIRE_HOME@/lib/openfire.jar \
 	$(mongolib_JAVAROOT)
 
 $(sync_JAR) : javac-sync

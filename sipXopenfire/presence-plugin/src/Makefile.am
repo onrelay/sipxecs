@@ -10,8 +10,7 @@ noinst_DATA = \
 	
 plugin_SRC = $(shell cd $(srcdir); find org -type f -name '*.java')
 plugin_DEPS = \
-	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(plugin_PKGS)) \
-	@OPENFIRE_HOME@/lib/openfire.jar
+	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(plugin_PKGS)) 
 	
 plugin_JAR = sipx-openfire-plugin.jar
 

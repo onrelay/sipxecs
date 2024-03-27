@@ -46,9 +46,9 @@ test_SRC = $(shell cd $(srcdir); find test -type f -name '*.java')
 test_PKGS = \
 	$(plugin_PKGS) \
 	junit \
-	smackx
+	smackx \
+	openfire
 
 test_DEPS = \
 	$(JAVAROOT) \
-	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(test_PKGS)) \
-	@OPENFIRE_HOME@/lib/openfire.jar
+	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(test_PKGS)) 

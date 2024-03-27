@@ -15,7 +15,6 @@ jardir = @SIPX_JAVADIR@/sipXopenfire/lib
                       
 cfg_DEPS = \
 	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(plugin_PKGS)) \
-	@OPENFIRE_HOME@/lib/openfire.jar \
 	${vcardsynchserver_JAVAROOT}/sipx-openfire-vcard-synchserver.jar
 
 cfg_SRC = \

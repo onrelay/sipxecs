@@ -16,8 +16,7 @@ synchserver_JAR = sipx-openfire-vcard-synchserver.jar
 synchserver_SRC = $(shell cd $(srcdir); find src -name '*.java')
 synchserver_DEPS = \
 	$(JAVAROOT) \
-	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(synchserver_PKGS)) \
-	@OPENFIRE_HOME@/lib/openfire.jar
+	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(synchserver_PKGS)) 
 
 $(synchserver_JAR) : javac-synchserver Manifest.txt Makefile
 	jar cfm $@ Manifest.txt \

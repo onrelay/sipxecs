@@ -19,8 +19,7 @@ cfg_RESOURCES = \
 	plugin.xml
                       
 cfg_DEPS = \
-	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(plugin_PKGS)) \
-	@OPENFIRE_HOME@/lib/openfire.jar
+	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(plugin_PKGS)) 
 
 cfg_SRC = \
 	$(shell cd $(srcdir); find src -name '*.java')

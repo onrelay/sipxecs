@@ -103,14 +103,20 @@ AC_DEFUN([CHECK_OPENFIRE],
     AC_HELP_STRING([--disable-openfire], [openfire integration]), enable_openfire=no, enable_openfire=yes)
 
     AC_ARG_VAR(OPENFIRE_HOME, [Openfire home directory])
-    AC_CHECK_FILE([$OPENFIRE_HOME],
-       [
-         OPENFIRE_HOME_DIR=$OPENFIRE_HOME 
-       ],
-       [
-           AC_MSG_WARN([Cannot find OPENFIRE_HOME ($OPENFIRE_HOME)]; openfire build disabled)
-           enable_openfire=no
-       ])
+#    AC_CHECK_FILE([$OPENFIRE_HOME],
+#       [
+#         OPENFIRE_HOME_DIR=$OPENFIRE_HOME 
+#       ],
+#       [
+#           AC_MSG_WARN([Cannot find OPENFIRE_HOME ($OPENFIRE_HOME)]; openfire build disabled)
+#           enable_openfire=no
+#       ])
+    if test x$OPENFIRE_HOME != x ; then
+      OPENFIRE_HOME_DIR=$OPENFIRE_HOME 
+    else
+      AC_MSG_WARN(OPENFIRE_HOME not defined, openfire build disabled)
+      enable_openfire=no
+    fi
     AC_SUBST(enable_openfire)
 ])
 

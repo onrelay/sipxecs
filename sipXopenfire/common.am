@@ -57,7 +57,14 @@ plugin_PKGS = \
 	org.springframework.transaction \
 	spring-core \
 	spring-beans \
-	spring-expression
+	spring-expression \
+	commons-lang \
+	log4j \
+	xmlrpc-server \
+	xmlrpc-client \
+	smack \
+	smackx \
+	openfire
 
 provider_PKGS = \
 	sipxcommons \
@@ -74,7 +81,10 @@ synchserver_PKGS = \
 	xmlrpc-client \
 	xmlrpc-server \
 	log4j \
-	commons-digester	
+	commons-digester \
+	openfire \
+	dom4j 
+
 
 provider_PKGS_RT = \
 	$(provider_PKGS) \
@@ -85,7 +95,6 @@ provider_PKGS_RT = \
 	mongo \
 	xmlrpc-common \
 	dnsjava \
-	dom4j \
 	not-yet-commons-ssl \
 	spring-context \
 	spring-context-support \

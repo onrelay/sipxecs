@@ -20,14 +20,14 @@ test_RESOURCES = $(shell cd $(srcdir); find . \( \
 
 test_PKGS = \
 	$(plugin_PKGS) \
-	junit
+	junit \
+	openfire
 
 test_DEPS = \
 	$(srcdir) \
 	$(JAVAROOT) \
 	$(mongoplugin_JAVAROOT) \
 	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(test_PKGS)) \
-	@OPENFIRE_HOME@/lib/openfire.jar \
 	@OPENFIRE_HOME@/lib/slf4j-log4j12.jar \
 	@SIPX_JAVADIR@/sipXopenfire/lib/sipx-openfire-vcard-synchserver.jar
 
