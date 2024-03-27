@@ -1,0 +1,43 @@
+<div jwcid="@common/Border" borderTitle="ognl:borderTitle">
+  <span jwcid="@common/TabNavigation" tabNames="ognl:{'settings', 'ddiImport', 'dnisImport'}" selectedTab="ognl:tab"/>
+  <div id="settings-content">
+    <span jwcid="@common/ErrorMsg"/>
+    <span jwcid="@RenderBlock" block="ognl:components.get(tab + 'Tab')" />
+  </div>  
+  <div jwcid="ddiImportTab@Block">
+    <form jwcid="ddiImportForm@Form" id="ddiImportForm" delegate="bean:validator" listener="listener:ddiImport">
+	  <span for="ddiUpload" jwcid="ddiUploadPanel@common/FieldPanel" field="component:ddiUpload" label="message:label.ddiUpload">
+	    <input type="file" id="ddiUpload" jwcid="ddiUpload@Upload" file="ognl:uploadFile"/>
+	  </span>
+	  <input jwcid="@Submit" id="form:ddiImport" type="button" listener="listener:ddiImport" label="message:button.ddiImport"/>
+    </form>
+    <a jwcid="exportddi@common/ExportLink" id="ccid:exportddi" listener="listener:export">
+      <span key="link.export"/>
+    </a>
+    <div jwcid="@For" source="ognl:aliases" value="ognl:alias">
+      <span jwcid="@Insert" value="ognl:alias.from"/> =&gt; <span jwcid="@Insert" value="ognl:alias.to"/><br/>
+    </div>
+  </div>
+  <div jwcid="dnisImportTab@Block">
+    <form jwcid="dnisImportForm@Form" id="dnisImportForm" delegate="bean:validator" listener="listener:dnisImport">
+	  <span for="dnisUpload" jwcid="dnisUploadPanel@common/FieldPanel" field="component:dnisUpload" label="message:label.dnisUpload">
+	    <input type="file" id="dnisUpload" jwcid="dnisUpload@Upload" file="ognl:uploadFile"/>
+	  </span>
+	  <input jwcid="@Submit" id="form:dnisImport" type="button" listener="listener:dnisImport" label="message:button.dnisImport"/>
+    </form>
+    <a jwcid="exportdnis@common/ExportLink" id="ccid:exportdnis" listener="listener:export">
+      <span key="link.export"/>
+    </a>
+    <div jwcid="@For" source="ognl:aliases" value="ognl:alias">
+      <span jwcid="@Insert" value="ognl:alias.from"/> =&gt; <span jwcid="@Insert" value="ognl:alias.to"/><br/>
+    </div>
+  </div>
+  <div jwcid="settingsTab@Block">
+    <form jwcid="form@Form" delegate="bean:validator">
+      <fieldset jwcid="@setting/SettingsFieldset"
+        settings="ognl:settings.settings" />
+      <ul jwcid="formActions@common/FormActions" callback="ognl:callback"
+        listener="listener:apply"/>
+    </form>
+  </div>
+</div>

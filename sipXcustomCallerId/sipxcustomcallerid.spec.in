@@ -1,0 +1,76 @@
+Name: @PACKAGE@
+Version: @VERSION@
+Release: @PACKAGE_REVISION@
+
+Summary: sipXecs Custom Caller ID from database
+License: LGPL
+Group: Telcommunications
+Vendor: Telecats B.V.
+Packager: Niek Vlessert <niekvlessert@gmail.com>
+Url: http://www.telecats.nl/
+
+Requires: sipxproxy >= %version
+
+BuildRequires: automake
+BuildRequires: sipxcommons >= %version
+BuildRequires: sipxconfig >= %version
+BuildRequires: sipxcommserverlib-devel >= %version
+BuildRequires: sipxproxy-devel >= %version
+BuildRequires: libxml2
+
+Source: %name-%version.tar.gz
+
+Prefix: %_prefix
+BuildRoot: %{_tmppath}/%name-%version-root
+
+%description
+Display company name from an incoming call on the display of the
+phone. This can be based on several resources. The number from all
+incoming calls will be searched in the database and a name will be
+added to the CID if a match is there. The plugin can be
+disabled/enabled without rebuilding. At night the database table can
+be synced from all the sources one needs like LDAP or some other
+database system.
+
+%package config
+Requires : sipxconfig >= %version
+Group: Telecommunications
+Vendor: Telecats B.V.
+Summary: Example configuration support for sipXecs. Meant to be changed by implementors
+
+%description config
+Configuration UI for managing customer caller id
+
+%package devel
+Requires : %name
+Group: Development/Libraries
+Vendor: Telecats B.V.
+Summary: Development libraries for custom caller id
+
+%description devel
+This is just sample text for the development portion of your project. Change this
+test to describe the development portion of your project in more detail.
+
+%prep
+%setup -q
+
+%build
+%configure --enable-rpmbuild @SIPX_RPM_CONFIGURE_OPTIONS@
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(644,root,root,755)
+%{_libdir}/authplugins/libsipxcustomcallerid.so*
+%{_datadir}/java/sipXecs/sipXconfig/plugins/sipxcustomcallerid.jar
+%{_sysconfdir}/sipxpbx/ccid/ccid.xml
+%{_sysconfdir}/sipxpbx/ccid/ccid.properties
+
+%files devel
+%{_libdir}/authplugins/libsipxcustomcallerid.la

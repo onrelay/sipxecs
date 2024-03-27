@@ -1,0 +1,17 @@
+sipXecs application to display company name from an incoming call on
+the display of the phone. You can rewrite CID based DDI (DID) or DNIS
+matches. CID are rewritten immediately without requiring restart to
+any service and workes in High Availablity clusters.
+
+Application include GUI component to edit mappings.
+
+Possible Future Enhancements
+===============================
+
+* We didn't build in any number recognition logic, we might do that,
+  but it's also an option to just require the number to be correct in
+  the source database.
+
+* Enhance UI to edit individual entry instead of requiring uploading
+  of entire mapping
+

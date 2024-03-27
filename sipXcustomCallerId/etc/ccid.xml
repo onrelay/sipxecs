@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE model
+    PUBLIC "-//SIPFoundry//sipXconfig//Model specification 2.0//EN"
+    "http://www.sipfoundry.org/sipXconfig/dtd/setting_2_0.dtd">
+<model>
+  <group name="ccid-config">
+    <setting name="enabled">
+      <type>
+        <boolean>
+          <true>
+            <value>enabled</value>
+          </true>
+          <false>
+            <value>disabled</value>
+          </false>
+        </boolean>
+      </type>
+      <value>disabled</value>
+    </setting>
+  </group>
+</model>

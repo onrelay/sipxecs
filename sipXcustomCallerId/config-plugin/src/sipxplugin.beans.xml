@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  
+  <bean id="customCallerIdHook" class="org.sipfoundry.sipxconfig.web.plugin.CustomCallerIdHook"/>
+
+  <bean id="customCallerIdManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+    <property name="target" ref="customCallerIdManagerImpl"/>
+    <property name="proxyInterfaces" value="nl.telecats.customcid.CustomCallerIdManager"/>
+  </bean>
+
+  <bean id="customCallerIdManagerImpl" class="nl.telecats.customcid.CustomCallerIdManagerImpl">
+    <property name="db" ref="imdb"/>
+    <property name="settingsDao">
+      <bean parent="beanWithSettingsDao">
+        <property name="target">
+          <bean parent="beanWithSettingsDaoImpl">
+            <constructor-arg value="nl.telecats.customcid.CustomCallerIdSettings"/>
+          </bean>
+        </property>
+      </bean>
+    </property>
+  </bean>
+
+  <bean id="ccidSettings" class="nl.telecats.customcid.CustomCallerIdSettings" parent="settingsBean">
+    <property name="modelFilesContext" ref="modelFilesContext"/>
+  </bean>
+
+  <bean id="ccidProxyHooks" class="nl.telecats.customcid.CustomCallerIdProxyHook">
+    <property name="ccidManager" ref="customCallerIdManager"/>
+    <property name="proxyHookName" value="SIPX_PROXY_HOOK_LIBRARY.720_customcallerid" />
+    <property name="proxyHookValue" value="$(sipx.SIPX_LIBDIR)/authplugins/libsipxcustomcallerid.so" />
+  </bean>
+</beans>
