@@ -28,7 +28,7 @@ jasperReportContextImpl.reportsDirectory=@SIPX_VARDIR@/reports
 
 # The following directives can be used to provide external sources
 #    of call routing information.  If you find yourself using them, it would
-#    be helpful to post a note on sipx-dev@list.sipfoundry.org as to why
+#    be helpful to post a note on sipxcom-dev@googlegroups.com as to why
 #    you could not accomplish what you needed using the normal mechanisms.
 # external aliases
 externalAliases.addinsDirectory=@SIPX_JAVADIR@
