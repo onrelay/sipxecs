@@ -348,7 +348,7 @@ clean-generic :
 	! test -d $(JAVAROOT) || rm -rf $(JAVAROOT)
 	! test -f javac-* || rm javac-*
 
-JAR_LIBSRC = ~/libsrc
+JAR_LIBSRC = libsrc
 
 $(JAR_LIBSRC) :
 	mkdir -p $@

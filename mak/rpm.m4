@@ -18,13 +18,23 @@ AC_ARG_ENABLE(upstream, [--disable-upstream Do not use upstream. Appropriate for
 ])
 AC_SUBST(UPSTREAM)
 
-AC_ARG_VAR(UPSTREAM_URL, [Where to find sipXecs distribution. Default: http://download.sipxcom.org/pub/sipXecs])
-if test -z "$UPSTREAM_URL"; then
-  # This repo matches the release branch code slightly more closely then last release
-  UPSTREAM_URL=http://download.sipxcom.org/pub/${PACKAGE_VERSION}-stable
-else
-  UPSTREAM_URL=`echo $UPSTREAM_URL | sed 's|/$||g'`
+# AC_ARG_VAR(REPO_BASE_URL, [sipXecs package distribution root. Default: http://download.sipxcom.org/pub/sipXecs])
+AC_ARG_VAR(REPO_BASE_URL, [sipXecs package distribution root. Default: https://us-central1-yum.pkg.dev/projects/sipxecs])
+if test -z "$REPO_BASE_URL"; then
+  # REPO_BASE_URL=http://download.sipxcom.org/pub
+  REPO_BASE_URL=https://us-central1-yum.pkg.dev/projects/sipxecs
 fi
+
+
+
+# AC_ARG_VAR(DOWNLOAD_BASE_URL, [sipXecs download root. Default: http://download.sipxcom.org/pub/sipXecs])
+AC_ARG_VAR(DOWNLOAD_BASE_URL, [sipXecs download root. Default: https://storage.googleapis.com/sipxecs])
+if test -z "$DOWNLOAD_BASE_URL"; then
+  # DOWNLOAD_BASE_URL=http://download.sipxcom.org/pub
+  DOWNLOAD_BASE_URL=https://storage.googleapis.com/sipxecs
+fi
+
+
 
 AC_ARG_WITH(yum-proxy, [--with-yum-proxy send downloads thru caching proxy like squid to speed downloads], [
   AC_SUBST(DOWNLOAD_PROXY,$withval)
@@ -95,11 +105,33 @@ AC_CHECK_FILE(/bin/rpm,
 ])
 
 AC_ARG_VAR(DISTRO, [What operating system you are compiling for. Default is ${DistroDefault}])
-test -n "${DISTRO}" || DISTRO="centos-6-x86_64"
+test -n "${DISTRO}" || DISTRO="centos-7-x86_64"
 
 AllDistrosDefault="fedora-16-i386 fedora-16-x86_64 fedora-17-i386 fedora-17-x86_64 fedora-18-i386 fedora-18-x86_64 fedora-19-i386 fedora-19-x86_64 centos-6-i386 centos-6-x86_64 centos-7-x86_64"
 AC_ARG_VAR(ALL_DISTROS, [All distros which using cross distroy compiling (xc.* targets) Default is ${AllDistrosDefault}])
 test -n "${ALL_DISTROS}" || ALL_DISTROS="${AllDistrosDefault}"
+
+
+AC_ARG_VAR(REPO_NAME, [sipXecs repo name])
+if test -z "$REPO_NAME"; then
+  DASH_PACKAGE_VERSION=`echo $PACKAGE_VERSION | sed 's/\./-/'`
+  DASH_DISTRO=`echo $DISTRO | sed 's/_/-/'`
+  REPO_NAME=sipxcom-${DASH_PACKAGE_VERSION}-${DASH_DISTRO}
+fi
+
+
+AC_ARG_VAR(REPO_URL, [sipXecs current repo URL])
+if test -z "$REPO_URL"; then
+  DASH_PACKAGE_VERSION=`echo $PACKAGE_VERSION | sed 's/\./-/'`
+  DASH_DISTRO=`echo $DISTRO | sed 's/_/-/'`
+  REPO_URL=${REPO_BASE_URL}/${REPO_NAME}
+fi
+
+AC_ARG_VAR(UPSTREAM_URL, [sipXecs upstream URL])
+if test -z "$UPSTREAM_URL"; then
+  UPSTREAM_URL=${REPO_URL}
+fi
+
 
 SETUP_TARGET=src
 AC_SUBST(SETUP_TARGET)
@@ -111,11 +143,14 @@ AC_ARG_ENABLE(rpm, [--enable-rpm Using mock package to build rpms],
   # so let's automatically disable checking host when building tarballs
   OPTIONS+=" --disable-dep-check"
 
-  AC_ARG_VAR(DOWNLOAD_LIB_CACHE, [When to cache source files that are downloaded, default ~/libsrc])
-  test -n "${DOWNLOAD_LIB_CACHE}" || DOWNLOAD_LIB_CACHE=~/libsrc
+  AC_ARG_VAR(DOWNLOAD_LIB_CACHE, [When to cache source files that are downloaded, default libsrc])
+  if test -z "$DOWNLOAD_LIB_CACHE"; then
+    DOWNLOAD_LIB_CACHE=libsrc  
+    mkdir -p ${DOWNLOAD_LIB_CACHE}
+  fi
 
-  AC_ARG_VAR(DOWNLOAD_LIB_URL, [When to cache source files that are downloaded, default download.sipxcom.org])
-  test -n "${DOWNLOAD_LIB_URL}" || DOWNLOAD_LIB_URL=http://download.sipxcom.org/pub/sipXecs/libs
+  AC_ARG_VAR(DOWNLOAD_LIB_URL, [When to cache source files that are downloaded, default ${DOWNLOAD_BASE_URL}/libs])
+  test -n "${DOWNLOAD_LIB_URL}" || DOWNLOAD_LIB_URL=${DOWNLOAD_BASE_URL}/libs
 
   AC_ARG_VAR(RPM_DIST_DIR, [Where to assemble final set of RPMs and SRPMs in preparation for publishing to a download server.])
   test -n "${RPM_DIST_DIR}" || RPM_DIST_DIR=repo

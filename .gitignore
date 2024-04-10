@@ -46,3 +46,4 @@ extras/translation-tool/classes/
 build/
 *.class
 packages
+.packages
