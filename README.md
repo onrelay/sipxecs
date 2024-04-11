@@ -1,12 +1,12 @@
-# Welcome to sipXecs!
+# Welcome to the sipXecs project!
 
-sipXcom is an advanced open soure SIP / IP based enterprise communication system originally developed by PingTel in the early 2000s. It has since then been developed and sponsored by commercial organizations such as Avaya, Nortel, eZuce and CoreDial. It is now being further developed and maintained by OnRelay, who is using sipXcom as an integral part of its cloud based Mobile Business Phone service.
+sipXcom is an advanced open soure SIP / IP based enterprise communication system originally developed by PingTel in the early 2000s. It has since then been developed and sponsored by commercial organizations such as Avaya, Nortel, eZuce and CoreDial. It is now being further developed and maintained by OnRelay, who is using sipXcom as an integral part of its cloud based mobile business phone service.
 
-Both sipXecs and sipXcom has been used interchangably for historic reasons. At OnRelay we now use sipXecs to name this open source project and sipXcom to name the resulting product, but this terminology will not be consistent across the code base and legacy documentation.
+Both *sipXecs* and *sipXcom* have been used interchangably for historic reasons. At OnRelay we now use *sipXecs* to name this open source project and *sipXcom* to name the resulting product, but this terminology may not be consistent across the code base and legacy documentation.
 
 ## Platform Support
 
-Recent versions of sipXcom are built and tested only for CentOS 7 x86_64 architectures. Upcoming releases will support Rocky Linux 9.
+Recent versions of sipXcom are built and tested for CentOS 7 x86_64 architectures. Upcoming releases will support Rocky Linux 9.
 
 ### Cloud Server Image
 To install or build sipXcom on a cloud Linux image, the following configuration is recommended:
