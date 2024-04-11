@@ -1,6 +1,6 @@
 # Welcome to sipXecs!
 
-sipXcom is an advanced open soure SIP / IP based enterprise communication system originally developed by PingTel in the early 2000s. It has since then been developed and sponsored by commercial organizations such as Avaya, Nortel, eZuce and CoreDial. It is now being further improved and maintained by OnRelay, who uses sipXcom as an integral part of its cloud based Mobile Business Phone service.
+sipXcom is an advanced open soure SIP / IP based enterprise communication system originally developed by PingTel in the early 2000s. It has since then been developed and sponsored by commercial organizations such as Avaya, Nortel, eZuce and CoreDial. It is now being further developed and maintained by OnRelay, who is using sipXcom as an integral part of its cloud based Mobile Business Phone service.
 
 Both sipXecs and sipXcom has been used interchangably for historic reasons. At OnRelay we now use sipXecs to name this open source project and sipXcom to name the resulting product, but this terminology will not be consistent across the code base and legacy documentation.
 
@@ -20,26 +20,26 @@ To install or build sipXcom on a cloud Linux image, the following configuration 
 
 ## Installation
 
-Use the following procedure to install sipXcom on a fresh Linux instance
+Use the following procedure to install sipXcom on a Linux server instance.
 
 ### Prepare Server
 
-- On first boot - you may need to edit your /etc/sysconfig/network-scripts/YourNICCard. Change `ONBOOT="no"` to `ONBOOT="yes"`
+- On first boot you may need to edit */etc/sysconfig/network-scripts/YourNICCard*. Change `ONBOOT="no"` to `ONBOOT="yes"`
 
 - Run `yum update -y`
 
 - Increase Max Number of ulimit open files and max user processes for MongoDB (important for larger systems)
 
-    - edit /etc/sysctl.conf to add fs.file-max = 65536 line. ONLY do this if default found from `cat /cproc/sys/fs/file-max` is less than 65536.
+    - edit */etc/sysctl.conf* to add fs.file-max = 65536 line. ONLY do this if default found from `cat /cproc/sys/fs/file-max` is less than 65536.
 
-    - edit /etc/security/limits.conf to add the following block of text:
+    - edit */etc/security/limits.conf* to add the following block of text:
 
             *          soft     nproc          65535
             *          hard     nproc          65535
             *          soft     nofile         65535
             *          hard     nofile         65535`
 
-- reboot
+- Run `reboot`
 
 ### Install sipXcom
 
@@ -57,32 +57,35 @@ Use the following procedure to install sipXcom on a fresh Linux instance
 
 - Run `sipxecs-setup` and the system will reboot to disable selinux to allow the rest of the setup routine to work properly.
 
-- Run set`sipxecs-setup`up again and e.g. answer basic questions as follows for a single server instance:
-    - hostname: e.g. us1
-    - domain: e.g. us1.onrelay.net
-    - SIP Domain: e.g. us1.onrelay.net
-    - SIP Realm: e.g. us1.onrelay.net
+- Run set`sipxecs-setup` again and e.g. answer questions as follows for a single server instance:
+    - hostname: e.g. *us1*
+    - domain: e.g. *us1.onrelay.net*
+    - SIP Domain: e.g. *us1.onrelay.net*
+    - SIP Realm: e.g. *us1.onrelay.net*
     
         Ignore *"Failed to open /dev/tty: No such device or address"* warnings
 
-- yum update -y
+- Run `yum update -y`
 
-- reboot
+- Run `reboot`
 
-- After a couple of minutes, the administration web interface should be available at `https://your-host-name-or-ip-address/`
+- After a couple of minutes, the administration web interface should be available at *https://your-host-name-or-ip-address/*
 
 ## Building
 
-### Docker Build
+### Create Build Image
+
+#### Server Build
+To build sipXcom on a physical server or cloud image where you intend to host the software, follow the steps under *Installation - Prepare Server* above to setup your server OS environment.
+
+#### Docker Build
 To build sipXcom in a docker image, instantiate a container with the following command:
 
     docker run -it --hostname=sipxecs --name=sipxecs-centos7 --privileged --env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --label='org.label-schema.build-date=20201113' --label='org.label-schema.license=GPLv2' --label='org.label-schema.name=CentOS Base Image' --label='org.label-schema.schema-version=1.0' --label='org.label-schema.vendor=CentOS' --label='org.opencontainers.image.created=2020-11-13 00:00:00+00:00' --label='org.opencontainers.image.licenses=GPL-2.0-only' --label='org.opencontainers.image.title=CentOS Base Image' --label='org.opencontainers.image.vendor=CentOS' --runtime=runc -d centos:centos7
 
-### Server Build
-To build sipXcom on a server where you intend to host the software, follow the steps under *Installation - Prepare Server* above to setup your OS environment.
 
 ### Add sipx User
-sipXcom must be built by a user called sipx with sudo privileges. Add sipx user as follows:
+sipXcom must be built by a user called *sipx* with sudo privileges. Add the *sipx* user as follows:
 
 - Run `yum install -y sudo`
 - Run `useradd -m sipx`
@@ -105,11 +108,11 @@ You can now use `sudo ./master-build.sh [options]` to configure and build the so
 
 This script will create /src/sipxecs/build and /usr/local/sipx directories where all build results are saved.
 
-#### Building For Current Server
+#### Building Executables For Current Server
 
 To build on a host server where you intend to run sipXcom, simply run `sudo ./master-build.sh`.
 
-#### Building on Docker
+#### Building RPMs on Docker
 To build all rpms on a docker image, simply run `sudo ./master-build.sh --rpm`.
 
 #### Other Build Options
