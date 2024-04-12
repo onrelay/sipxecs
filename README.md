@@ -1,10 +1,10 @@
-# Welcome to the sipXecs project!
+# Welcome to the sipXecs Project!
 
 sipXecs, aka sipXcom, is an advanced open soure IP based enterprise communication system originally developed by PingTel in the early 2000s. It has since then been developed and sponsored by a chain of commercial organizations such as Avaya, Nortel, eZuce and CoreDial. 
 
 sipXcom is now being further developed and maintained by OnRelay, who is using sipXcom as an integral part of its cloud based mobile business phone service. This repository is a fork from the latest stable release 21.04 at https://github.com/sipXcom/sipxecs. 
 
-Both *sipXecs* and *sipXcom* have been used interchangably for historic reasons. At OnRelay we now use *sipXecs* to name this open source project and *sipXcom* to name the resulting product, but this terminology may not be consistent across the code base and legacy documentation.
+Both *sipXecs* and *sipXcom* names have been used interchangably for historic reasons. At OnRelay we now use *sipXecs* to name the overall open source project and *sipXcom* to name the product, but this terminology may not be consistent across the code base and legacy documentation.
 
 ## Platform Support
 
@@ -17,8 +17,8 @@ To install or build sipXcom on a cloud Linux image, the following configuration 
 - Min 2 CPUs
 - Min 8GB memory
 - Network interface with a static public IP address
-- Assign a public domain for autogeneration of Let's Encrypt SSL certificates
-- Minimal OS installation
+- Assign a public domain 
+- Minimal CentOS7 OS installation
 
 ## Installation
 
@@ -87,11 +87,14 @@ To build sipXcom in a docker image, instantiate a container with the following c
 
     docker run -it --hostname=sipxecs --name=sipxecs-centos7 --privileged --env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --label='org.label-schema.build-date=20201113' --label='org.label-schema.license=GPLv2' --label='org.label-schema.name=CentOS Base Image' --label='org.label-schema.schema-version=1.0' --label='org.label-schema.vendor=CentOS' --label='org.opencontainers.image.created=2020-11-13 00:00:00+00:00' --label='org.opencontainers.image.licenses=GPL-2.0-only' --label='org.opencontainers.image.title=CentOS Base Image' --label='org.opencontainers.image.vendor=CentOS' --runtime=runc -d centos:centos7
 
+### Update System
+- Run `yum update -y`
+- Run `yum install -y sudo git`
+
 
 ### Add sipx User
 sipXcom must be built by a user called *sipx* with sudo privileges. Add the *sipx* user as follows:
 
-- Run `yum install -y sudo`
 - Run `useradd -m sipx`
 - If not on docker, run `passwd sipx`
 - Run `visudo` and append:
