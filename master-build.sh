@@ -184,12 +184,12 @@ function setupCentOS7()
 {
     echo "Begin setupCentOS7()"
 
-    sudo yum install -y git make autoconf automake libtool gcc-c++ openssl-devel libmcrypt-devel libtool-ltdl-devel \
+    sudo yum install -y make autoconf automake libtool gcc-c++ openssl-devel libmcrypt-devel libtool-ltdl-devel \
         pcre-devel pcre-devel findutils  db4-devel iptables iproute boost-devel libpcap-devel libdnet-devel xmlrpc-c-devel \
         libevent-devel poco-devel libconfig-devel hiredis-devel gtest-devel leveldb-devel cppunit-devel gperftools-devel \
         c-ares-devel libdb4-cxx-devel libdb-cxx-devel popt-devel xerces-c-devel zeromq-devel v8-devel httpd unixODBC-devel \
-        mock rsync gem wget systemd-sysv mongo-cxx-driver-devel ev-devel libuuid-devel swig cfengine openfire reciprocate-libs \
-        createrepo unzip java-1.8.0-openjdk-devel
+        mock rsync gem systemd-sysv mongo-cxx-driver-devel ev-devel libuuid-devel swig cfengine openfire reciprocate-libs \
+        dart-sdk createrepo unzip java-1.8.0-openjdk-devel 
 
     cd ${SOURCE_DIR}
     sudo mkdir -p /usr/local/sipx
@@ -227,6 +227,8 @@ function configure()
 
     cd ${BUILD_DIR}
 
+    sudo echo '$(sipx_all)' > .modules-include
+
     if [ -z "${RPM}" ]; then
         sudo ../configure
     else
@@ -235,8 +237,6 @@ function configure()
         sudo rpm -ivh thttpd-2.25b-33.el7.nux.x86_64.rpm
         rm -f thttpd-2.25b-33.el7.nux.x86_64.rpm
         sudo usermod -a -G mock sipx
-
-        sudo echo '$(sipx_all)' > .modules-include
         
         sudo ../configure --enable-rpm DISTRO="${PLATFORM}-${ARCHITECTURE}"
     fi
