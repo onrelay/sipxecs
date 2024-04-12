@@ -1,6 +1,8 @@
 # Welcome to the sipXecs project!
 
-sipXcom is an advanced open soure SIP / IP based enterprise communication system originally developed by PingTel in the early 2000s. It has since then been developed and sponsored by commercial organizations such as Avaya, Nortel, eZuce and CoreDial. It is now being further developed and maintained by OnRelay, who is using sipXcom as an integral part of its cloud based mobile business phone service.
+sipXecs, aka sipXcom, is an advanced open soure IP based enterprise communication system originally developed by PingTel in the early 2000s. It has since then been developed and sponsored by a chain of commercial organizations such as Avaya, Nortel, eZuce and CoreDial. 
+
+sipXcom is now being further developed and maintained by OnRelay, who is using sipXcom as an integral part of its cloud based mobile business phone service. This repository is a fork from the latest stable release 21.04 at https://github.com/sipXcom/sipxecs. 
 
 Both *sipXecs* and *sipXcom* have been used interchangably for historic reasons. At OnRelay we now use *sipXecs* to name this open source project and *sipXcom* to name the resulting product, but this terminology may not be consistent across the code base and legacy documentation.
 
@@ -24,13 +26,15 @@ Use the following procedure to install sipXcom on a Linux server instance.
 
 ### Prepare Server
 
+- Log on as root via ssh
+
 - On first boot you may need to edit */etc/sysconfig/network-scripts/YourNICCard*. Change `ONBOOT="no"` to `ONBOOT="yes"`
 
 - Run `yum update -y`
 
-- Increase Max Number of ulimit open files and max user processes for MongoDB (important for larger systems)
+- Increase Max Number of open files and max user processes for MongoDB (important for larger systems)
 
-    - edit */etc/sysctl.conf* to add fs.file-max = 65536 line. ONLY do this if default found from `cat /cproc/sys/fs/file-max` is less than 65536.
+    - edit */etc/sysctl.conf* to add fs.file-max = 65536 line. ONLY do this if the default returned from `cat /cproc/sys/fs/file-max` is less than 65536.
 
     - edit */etc/security/limits.conf* to add the following block of text:
 
@@ -43,9 +47,9 @@ Use the following procedure to install sipXcom on a Linux server instance.
 
 ### Install sipXcom
 
-- run `yum install -y wget` for downloading repo definitions
+- Run `yum install -y wget` used for downloading repo definitions
 
-- If not a GCP image, we must add and install the artifact registry plugin:
+- If you are not using a Google Cloud image, you must add and install their artifact registry plugin:
 
     - Run `wget -O /etc/yum.repos.d/artifact-registry-plugin.repo https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo`
 

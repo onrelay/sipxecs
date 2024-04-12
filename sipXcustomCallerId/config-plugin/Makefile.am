@@ -25,6 +25,8 @@ customcallerid_PKGS = \
 	tapestry-framework \
 	tapestry-annotations \
 	spring-data-mongodb \
+	spring-context \
+	spring-beans \
 	mongo \
 	hivemind \
 	sipxcommons \

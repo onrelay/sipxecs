@@ -47,7 +47,6 @@ sipx_extra = \
   sipXcustomCallerId \
   sipXviewer \
   sipXimbot \
-  sipXexample \
   sipXrest \
   sipXcallController \
   sipXcdrLog \
@@ -58,7 +57,8 @@ sipx_extra = \
   sipXcallback \
   sipXtcpdumplog \
   sipXdashboard \
-  mod_bcg729
+  mod_bcg729 \
+  # sipXexample 
 
 # sipxecs projects that are NOT essential for a running communication system
 # and are related to configuration system. Many are phone plugins
@@ -168,7 +168,7 @@ sipXrls_DEPS = sipXsqa sipXcallLib sipXcommserverLib
 sipXsaa_DEPS = sipXsqa sipXcallLib sipXcommserverLib
 sipXcallQueue_DEPS = sipXconfig
 sipXAocBilling_DEPS = sipXconfig
-sipXexample_DEPS = sipXcommserverLib sipXconfig
+# sipXexample_DEPS = sipXcommserverLib sipXconfig
 sipXsss_DEPS = sipXsqa sipXcommserverLib 
 sipXtools_DEPS = sipXtackLib sipXcommserverLib
 
