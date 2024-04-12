@@ -89,7 +89,7 @@ To build sipXcom in a docker image, instantiate a container with the following c
 
 ### Update System
 - Run `yum update -y`
-- Run `yum install -y sudo git`
+- Run `yum install -y sudo git wget`
 
 
 ### Add sipx User
