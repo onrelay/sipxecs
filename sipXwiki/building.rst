@@ -20,7 +20,9 @@ Docker Build
 
 To build sipXcom in a docker image, instantiate a container with the following command:
 
-    docker run -it --hostname=sipxecs --name=sipxecs-centos7 --privileged --env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --label='org.label-schema.build-date=20201113' --label='org.label-schema.license=GPLv2' --label='org.label-schema.name=CentOS Base Image' --label='org.label-schema.schema-version=1.0' --label='org.label-schema.vendor=CentOS' --label='org.opencontainers.image.created=2020-11-13 00:00:00+00:00' --label='org.opencontainers.image.licenses=GPL-2.0-only' --label='org.opencontainers.image.title=CentOS Base Image' --label='org.opencontainers.image.vendor=CentOS' --runtime=runc -d centos:centos7
+    .. code-block:: bash
+        
+        docker run -it --hostname=sipxecs --name=sipxecs-centos7 --privileged --env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --label='org.label-schema.build-date=20201113' --label='org.label-schema.license=GPLv2' --label='org.label-schema.name=CentOS Base Image' --label='org.label-schema.schema-version=1.0' --label='org.label-schema.vendor=CentOS' --label='org.opencontainers.image.created=2020-11-13 00:00:00+00:00' --label='org.opencontainers.image.licenses=GPL-2.0-only' --label='org.opencontainers.image.title=CentOS Base Image' --label='org.opencontainers.image.vendor=CentOS' --runtime=runc -d centos:centos7
 
 Prepare Server
 -----------------
@@ -38,10 +40,12 @@ Prepare Server
 
   - edit */etc/security/limits.conf* to add the following block of text:
 
-            \*          soft     nproc          65535 
-            \*          hard     nproc          65535
-            \*          soft     nofile         65535
-            \*          hard     nofile         65535`
+        .. code-block:: bash
+
+            *          soft     nproc          65535 
+            *          hard     nproc          65535
+            *          soft     nofile         65535
+            *          hard     nofile         65535`
 
 - Run `reboot`
 
@@ -60,6 +64,8 @@ sipXcom must be built by a user called *sipx* with sudo privileges. Add the *sip
 - Run `useradd -m sipx`
 - If not on docker, run `passwd sipx`
 - Run `visudo` and append:
+  
+    .. code-block:: bash
 
         # add sipx as sudo user
         sipx    ALL=(ALL)       NOPASSWD:ALL
