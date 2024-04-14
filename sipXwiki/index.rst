@@ -12,6 +12,7 @@ sipXcom Documentation
    features
    planning   
    installation
+   building
    setupscript
    webui
    troubleshooting
