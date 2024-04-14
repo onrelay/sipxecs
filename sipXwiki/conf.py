@@ -20,13 +20,13 @@
 # -- Project information -----------------------------------------------------
 
 project = 'sipxcom'
-copyright = '2020, Support Team'
+copyright = '2024, Support Team'
 author = 'Support Team'
 
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '20.04'
+release = '24.01'
 
 
 # -- General configuration ---------------------------------------------------

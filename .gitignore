@@ -47,3 +47,4 @@ build/
 *.class
 packages
 .packages
+.DS_Store
