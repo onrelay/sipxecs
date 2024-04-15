@@ -7,32 +7,23 @@ Building
 Server Build
 -----------------
 
-You may build sipXcom on a physical server or cloud image where you intend to host the software or create RPMS. 
+You may build sipXcom on a physical server or cloud image where you intend to host the software or create RPMs. 
 
 - 2x CPU/vCPU
 - 8GB RAM
 - 50GB or larger disk
 - Minimal CentOS7 OS installation
 
-
-Docker Build
+Build Server
 -----------------
 
-To build sipXcom in a docker image, instantiate a container with the following command:
-
-    .. code-block:: bash
-        
-        docker run -it --hostname=sipxecs --name=sipxecs-centos7 --privileged --env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --label='org.label-schema.build-date=20201113' --label='org.label-schema.license=GPLv2' --label='org.label-schema.name=CentOS Base Image' --label='org.label-schema.schema-version=1.0' --label='org.label-schema.vendor=CentOS' --label='org.opencontainers.image.created=2020-11-13 00:00:00+00:00' --label='org.opencontainers.image.licenses=GPL-2.0-only' --label='org.opencontainers.image.title=CentOS Base Image' --label='org.opencontainers.image.vendor=CentOS' --runtime=runc -d centos:centos7
-
-Prepare Server
------------------
-
+If you build on a physical server, prepare your image as follows:
 
 - Log on as root via ssh
 
-- On first boot you may need to edit */etc/sysconfig/network-scripts/YourNICCard*. Change `ONBOOT="no"` to `ONBOOT="yes"`
-
 - Run `yum update -y`
+
+- On first boot you may need to edit */etc/sysconfig/network-scripts/YourNICCard*. Change `ONBOOT="no"` to `ONBOOT="yes"`
 
 - Increase Max Number of open files and max user processes for MongoDB (important for larger systems)
 
@@ -49,11 +40,31 @@ Prepare Server
 
 - Run `reboot`
 
+Docker Build
+-----------------
+
+To instead build sipXcom in a docker image, instantiate a container with the following command:
+
+    .. code-block:: bash
+        
+        docker run -it --hostname=sipxecs --name=sipxecs-centos7 --privileged --env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --label='org.label-schema.build-date=20201113' --label='org.label-schema.license=GPLv2' --label='org.label-schema.name=CentOS Base Image' --label='org.label-schema.schema-version=1.0' --label='org.label-schema.vendor=CentOS' --label='org.opencontainers.image.created=2020-11-13 00:00:00+00:00' --label='org.opencontainers.image.licenses=GPL-2.0-only' --label='org.opencontainers.image.title=CentOS Base Image' --label='org.opencontainers.image.vendor=CentOS' --runtime=runc -d centos:centos7
+
 Update System
 -----------------
 
+- Log on as root via ssh
+
 - Run `yum update -y`
+
 - Run `yum install -y sudo git wget`
+
+- If you are not using a Google Cloud image, you must add and install their artifact registry plugin:
+
+  .. code-block:: bash
+
+    wget -O /etc/yum.repos.d/artifact-registry-plugin.repo https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
+    
+    yum install -y yum-plugin-artifact-registry`
 
 
 Add sipx User

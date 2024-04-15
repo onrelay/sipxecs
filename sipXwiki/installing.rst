@@ -49,7 +49,7 @@ Prepare Server
 
     yum update -y`
 
-- Install `wget`` used for downloading RPMs
+- Install `wget` used for downloading RPMs
 
   .. code-block:: bash
 
