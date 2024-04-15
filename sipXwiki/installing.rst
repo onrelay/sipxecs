@@ -56,31 +56,28 @@ Prepare Server
 Setup Google Could Artifact registry
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- If you are not using a Google Cloud image, you must add and install their artifact registry plugin:
+If you are not using a Google Cloud image, you must add and install their artifact registry plugin:
 
   .. code-block:: bash
 
     wget -O /etc/yum.repos.d/artifact-registry-plugin.repo https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
-
-  .. code-block:: bash
-
     yum install -y yum-plugin-artifact-registry`
 
 Configure System
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- Increase Max Number of open files and max user processes for MongoDB (important for larger systems)
+Increase Max Number of open files and max user processes for MongoDB (important for larger systems)
 
-  - edit */etc/sysctl.conf* to add fs.file-max = 65536 line. ONLY do this if the default returned from `cat /cproc/sys/fs/file-max` is less than 65536.
+- edit */etc/sysctl.conf* to add fs.file-max = 65536 line. ONLY do this if the default returned from `cat /cproc/sys/fs/file-max` is less than 65536.
 
-  - edit */etc/security/limits.conf* to add the following block of text:
+- edit */etc/security/limits.conf* to add the following block of text:
 
-    .. code-block:: bash
+  .. code-block:: bash
 
-      *          soft     nproc          65535
-      *          hard     nproc          65535
-      *          soft     nofile         65535
-      *          hard     nofile         65535`
+    *          soft     nproc          65535
+    *          hard     nproc          65535
+    *          soft     nofile         65535
+    *          hard     nofile         65535`
 
 - Reboot system:
 
@@ -92,16 +89,11 @@ Configure System
 Install sipXcom
 ----------------
 
-- Retrieve RPM:
+- Retrieve and install sipXcom RPM:
   
   .. code-block:: bash
 
     wget -O /etc/yum.repos.d/sipxcom.repo https://storage.googleapis.com/sipxecs/sipxcom/24.01/centos-7-x86_64/sipxcom.repo
-
-- Install RPM:
-
-  .. code-block:: bash
-
     yum install -y sipxcom
 
 Setup sipXcom
@@ -137,16 +129,11 @@ Network Configuration
     
     Ignore *"Failed to open /dev/tty: No such device or address"* warnings
 
-- Update system again:
+- Update system again and reboot:
   
   .. code-block:: bash
 
     yum update -y
-
-- Reboot system:
-  
-  .. code-block:: bash
-
     reboot
 
 After a few minutes, the administration web interface should be available at *https://your-host-name-or-ip-address/*
