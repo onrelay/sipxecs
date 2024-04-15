@@ -8,14 +8,16 @@ Both *sipXecs* and *sipXcom* names have been used interchangably for historic re
 
 The sipXcom Documentation can be found [here](https://onrelay.github.io/sipxecs).
 
-Shortcuts:
+Documentation shortcuts:
 
-- [Features](https://onrelay.github.io/sipxecs/features.html)
+- <a target="_blank" href="https://onrelay.github.io/sipxecs/features.html">Features</a>
 
-- [Installing](https://onrelay.github.io/sipxecs/installing.html)
+- <a target="_blank" href="https://onrelay.github.io/sipxecs/installing.html">Installing</a>
 
-- [Building](https://onrelay.github.io/sipxecs/building.html)
+- <a target="_blank" href="https://onrelay.github.io/sipxecs/building.html">Building</a>
 
+
+To get help, track release progress, ask questions, suggest improvements or otherwise contribute to the sipXcom open source project, please participate in the discussion at the <a target="_blank" href="https://groups.google.com/g/sipxcom-users">sipXcom User Group</a>!
 
 
 
