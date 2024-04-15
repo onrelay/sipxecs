@@ -4,52 +4,27 @@
 Building
 ============
 
-Server Build
------------------
-
-You may build sipXcom on a physical server or cloud image where you intend to host the software or create RPMs. 
-
-- 2x CPU/vCPU
-- 8GB RAM
-- 50GB or larger disk
-- Minimal CentOS7 OS installation
-
 Build Server
 -----------------
 
-If you build on a physical server, prepare your image as follows:
+To build the sipXcom source for execution or RPM generation on a physical server or cloud image, follow the instructions from installing_ to setup and configure a server.
 
-- Log on as root via ssh
-
-- Run `yum update -y`
-
-- On first boot you may need to edit */etc/sysconfig/network-scripts/YourNICCard*. Change `ONBOOT="no"` to `ONBOOT="yes"`
-
-- Increase Max Number of open files and max user processes for MongoDB (important for larger systems)
-
-  - edit */etc/sysctl.conf* to add fs.file-max = 65536 line. ONLY do this if the default returned from `cat /cproc/sys/fs/file-max` is less than 65536.
-
-  - edit */etc/security/limits.conf* to add the following block of text:
-
-        .. code-block:: bash
-
-            *          soft     nproc          65535 
-            *          hard     nproc          65535
-            *          soft     nofile         65535
-            *          hard     nofile         65535`
-
-- Run `reboot`
-
-Docker Build
+Docker Container
 -----------------
 
-To instead build sipXcom in a docker image, instantiate a container with the following command:
+To build sipXcom RPMs in a desktop or server Docker image, instantiate a container with the following command:
 
     .. code-block:: bash
         
-        docker run -it --hostname=sipxecs --name=sipxecs-centos7 --privileged --env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin --label='org.label-schema.build-date=20201113' --label='org.label-schema.license=GPLv2' --label='org.label-schema.name=CentOS Base Image' --label='org.label-schema.schema-version=1.0' --label='org.label-schema.vendor=CentOS' --label='org.opencontainers.image.created=2020-11-13 00:00:00+00:00' --label='org.opencontainers.image.licenses=GPL-2.0-only' --label='org.opencontainers.image.title=CentOS Base Image' --label='org.opencontainers.image.vendor=CentOS' --runtime=runc -d centos:centos7
+        docker run -it --hostname=sipxecs --name=sipxecs-centos7 --privileged \
+        --env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+        --label='org.label-schema.build-date=20201113' --label='org.label-schema.license=GPLv2' \
+        --label='org.label-schema.name=CentOS Base Image' --label='org.label-schema.schema-version=1.0' \
+        --label='org.label-schema.vendor=CentOS' --label='org.opencontainers.image.created=2020-11-13 00:00:00+00:00' \
+        --label='org.opencontainers.image.licenses=GPL-2.0-only' --label='org.opencontainers.image.title=CentOS Base Image' \
+        --label='org.opencontainers.image.vendor=CentOS' --runtime=runc -d centos:centos7
 
-Update System
+Setup System
 -----------------
 
 - Log on as root via ssh
@@ -62,7 +37,8 @@ Update System
 
   .. code-block:: bash
 
-    wget -O /etc/yum.repos.d/artifact-registry-plugin.repo https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
+    wget -O /etc/yum.repos.d/artifact-registry-plugin.repo \
+    https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
     
     yum install -y yum-plugin-artifact-registry`
 
@@ -70,13 +46,26 @@ Update System
 Add sipx User
 -----------------
 
-sipXcom must be built by a user called *sipx* with sudo privileges. Add the *sipx* user as follows:
+sipXcom must be built by a user called *sipx* with sudo privileges. 
 
-- Run `useradd -m sipx`
-- If not on docker, run `passwd sipx`
-- Run `visudo` and append:
+- Add the *sipx* user:
+
+    .. code-block:: bash
+
+        useradd -m sipx
+  
+- If not on desktop docker, protect the sipx user with a password:
   
     .. code-block:: bash
+
+        passwd sipx
+  
+- Assign sipx user sudo privileges:
+  
+    .. code-block:: bash
+
+        visudo 
+            ->
 
         # add sipx as sudo user
         sipx    ALL=(ALL)       NOPASSWD:ALL
@@ -96,7 +85,7 @@ Execute the following commands to checkout the sipXcom repository:
 
     chown -R sipx.sipx sipxecs
 
-Run Master Build Script
+Master Build Script
 -----------------------
 
 For straightforward builds, just execute the master build script:
@@ -123,7 +112,9 @@ To build all the sipX* RPMs from source, just add the --rpm option as follows:
 
     sudo ./master-build.sh --rpm
 
-Otherwise, the master-build.sh script has the following options:
+The resulting RPMs are found in the build/repo folder.
+
+The master-build.sh script has the following additional options:
 
 - **-p | --platform**: OS platform of sipxcom RPM to build, e.g. centos-7 (default), rocky-9
 
@@ -139,7 +130,7 @@ Otherwise, the master-build.sh script has the following options:
 Advanced Builds
 ---------------
 
-For more advanced builds, sipXcom relies on GNU autoconf and make mechanisms to build its source. To use these mechanisms directly, you may use the following steps:
+For more advanced builds, sipXcom relies on GNU autoconf and make to build its source. To use these mechanisms directly, you may use the following steps:
 
 - Prepare build folders:  
 
@@ -214,12 +205,9 @@ For more advanced builds, sipXcom relies on GNU autoconf and make mechanisms to 
 
     sudo make sipx.rpm
     
-- Run `sudo chown -R sipx.sipx repo` if it gives a permission error on first try)
+- Run `sudo chown -R sipx.sipx repo` if it gives a permission error on first try
 
-Resolving Dependencies
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If compilation stops for a subproject, it is possible to list all its dependencies:
+- If compilation stops for a subproject, it is possible to list all its dependencies:
 
   .. code-block:: bash
 
