@@ -97,7 +97,7 @@ Building RPMs on Docker
 
 To build all rpms on a docker image, simply run `sudo ./master-build.sh --rpm`.
 
-Other Build Options
+Other Master Build Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Additionally, the master-build.sh script has the following options:
@@ -108,7 +108,8 @@ Additionally, the master-build.sh script has the following options:
 - **-r | --rpm**: Include this option if building rpms
 
 Advanced Builds
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------
+
 
 For more advanced builds, sipXcom relies on GNU autoconf and make mechanisms to build its source. To use these mechanisms directly, you may use the following steps:
 

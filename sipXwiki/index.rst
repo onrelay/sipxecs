@@ -10,9 +10,9 @@ sipXcom Documentation
    history
    faq
    features
-   planning   
-   installation
+   installing
    building
+   planning   
    setupscript
    webui
    troubleshooting
