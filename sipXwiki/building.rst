@@ -84,43 +84,60 @@ sipXcom must be built by a user called *sipx* with sudo privileges. Add the *sip
 Checkout sipXcom
 -----------------
 
-- Run `mkdir /src` and `cd /src`
-- Run `git clone https://github.com/onrelay/sipxecs.git`
-- Run `chown -R sipx.sipx sipxecs`
+Execute the following commands to checkout the sipXcom repository:
+
+  .. code-block:: bash
+
+    mkdir /src
+
+    cd /src
+
+    git clone https://github.com/onrelay/sipxecs.git
+
+    chown -R sipx.sipx sipxecs
 
 Run Master Build Script
 -----------------------
 
-- Run `su sipx` to operate as sipx user
-- Run `cd /src/sipxecs`
+For straightforward builds, just execute the master build script:
 
-You can now use `sudo ./master-build.sh [options]` to configure and build the source in one step.
+  .. code-block:: bash
 
-This script will create /src/sipxecs/build and /usr/local/sipx directories where all build results are saved.
+    su sipx
 
-Building Executables For Current Server
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    cd /src/sipxecs
 
-To build on a host server where you intend to run sipXcom, simply run `sudo ./master-build.sh`.
+    sudo ./master-build.sh [options]
 
-Building RPMs on Docker
-~~~~~~~~~~~~~~~~~~~~~~~
+`master-build.sh` will create /src/sipxecs/build and /usr/local/sipx directories where all build results are saved.
 
-To build all rpms on a docker image, simply run `sudo ./master-build.sh --rpm`.
+To build all the source on a host server where you intend to run sipXcom, simply run:
 
-Other Master Build Options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  .. code-block:: bash
 
-Additionally, the master-build.sh script has the following options:
+    sudo ./master-build.sh
+
+To build all the sipX* rpms from source, just add the --rpm option as follows:
+
+  .. code-block:: bash
+
+    sudo ./master-build.sh --rpm
+
+Otherwise, the master-build.sh script has the following options:
+
 - **-p | --platform**: OS platform of sipxcom RPM to build, e.g. centos-7 (default), rocky-9
+
 - **-a | --architecture**: Hardware architecture of sipxcom RPM to build, e.g. x86_64 (default)
+
 - **-s | --subproject**: subproject to build or sipx for building all RPMs, e.g. sipx (default), sipXconfig, sipXproxy
+
 - **-v | --version**: sipXcom cersion to build, e.g 24.01 (default), 24.07
+
 - **-r | --rpm**: Include this option if building rpms
+
 
 Advanced Builds
 ---------------
-
 
 For more advanced builds, sipXcom relies on GNU autoconf and make mechanisms to build its source. To use these mechanisms directly, you may use the following steps:
 
