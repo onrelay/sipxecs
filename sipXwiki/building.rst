@@ -4,12 +4,12 @@
 Building
 ============
 
-Build Server
+Use Build Server
 -----------------
 
 To build the sipXcom source for execution or RPM generation on a physical server or cloud image, follow the instructions from installing_ to setup and configure a server.
 
-Docker Container
+Use Docker Container
 -----------------
 
 To build sipXcom RPMs in a desktop or server Docker image, instantiate a container with the following command:
@@ -29,18 +29,20 @@ Setup System
 
 - Log on as root via ssh
 
-- Run `yum update -y`
+  .. code-block:: bash
+    
+    yum update -y
 
-- Run `yum install -y sudo git wget`
+    yum install -y sudo git wget
 
 - If you are not using a Google Cloud image, you must add and install their artifact registry plugin:
 
   .. code-block:: bash
 
     wget -O /etc/yum.repos.d/artifact-registry-plugin.repo \
-    https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
+        https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
     
-    yum install -y yum-plugin-artifact-registry`
+    yum install -y yum-plugin-artifact-registry
 
 
 Add sipx User
@@ -65,7 +67,8 @@ sipXcom must be built by a user called *sipx* with sudo privileges.
     .. code-block:: bash
 
         visudo 
-            ->
+        
+        ->
 
         # add sipx as sudo user
         sipx    ALL=(ALL)       NOPASSWD:ALL
@@ -85,10 +88,10 @@ Execute the following commands to checkout the sipXcom repository:
 
     chown -R sipx.sipx sipxecs
 
-Master Build Script
+Build sipXcom
 -----------------------
 
-For straightforward builds, just execute the master build script:
+To build sipXcom from source, just execute the master build script from the root scr folder as the sipx user with sudo privileges:
 
   .. code-block:: bash
 
@@ -96,9 +99,8 @@ For straightforward builds, just execute the master build script:
 
     cd /src/sipxecs
 
-    sudo ./master-build.sh [options]
-
-`master-build.sh` will create /src/sipxecs/build and /usr/local/sipx directories where all build results are saved.
+Build Executables
+~~~~~~~~~~~~~~~~~~
 
 To build the sipX* executables from source on a host server where you intend to run sipXcom, simply run:
 
@@ -106,29 +108,41 @@ To build the sipX* executables from source on a host server where you intend to 
 
     sudo ./master-build.sh
 
+Build RPMs
+~~~~~~~~~~~~~~~~~~
+
 To build all the sipX* RPMs from source, just add the --rpm option as follows:
 
   .. code-block:: bash
 
     sudo ./master-build.sh --rpm
 
+The `master-build.sh` script will create /src/sipxecs/build and /usr/local/sipx directories where all build results are saved.
+
 The resulting RPMs are found in the build/repo folder.
+
+Additional Build Options
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The master-build.sh script has the following additional options:
 
-- **-p | --platform**: OS platform of sipxcom RPM to build, e.g. centos-7 (default), rocky-9
+  .. code-block:: bash
 
-- **-a | --architecture**: Hardware architecture of sipxcom RPM to build, e.g. x86_64 (default)
+    sudo ./master-build.sh [options]
 
-- **-s | --subproject**: subproject to build or sipx for building all RPMs, e.g. sipx (default), sipXconfig, sipXproxy
+        **-p | --platform**: OS platform of sipxcom RPM to build, e.g. centos-7 (default), rocky-9
 
-- **-v | --version**: sipXcom cersion to build, e.g 24.01 (default), 24.07
+        **-a | --architecture**: Hardware architecture of sipxcom RPM to build, e.g. x86_64 (default)
 
-- **-r | --rpm**: Include this option if building rpms
+        **-s | --subproject**: subproject to build or sipx for building all RPMs, e.g. sipx (default), sipXconfig, sipXproxy
+
+        **-v | --version**: sipXcom cersion to build, e.g 24.01 (default), 24.07
+
+        **-r | --rpm**: Include this option if building rpms
 
 
 Advanced Builds
----------------
+~~~~~~~~~~~~~~~
 
 For more advanced builds, sipXcom relies on GNU autoconf and make to build its source. To use these mechanisms directly, you may use the following steps:
 
