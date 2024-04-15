@@ -10,7 +10,7 @@ The sipXcom Documentation can be found [here](https://onrelay.github.io/sipxecs)
 
 Shortcuts:
 
-- [Features] (https://onrelay.github.io/sipxecs/features.html)
+- [Features](https://onrelay.github.io/sipxecs/features.html)
 
 - [Installing](https://onrelay.github.io/sipxecs/installing.html)
 
