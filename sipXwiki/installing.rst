@@ -12,12 +12,13 @@ System Specs
 Recent sipXcom RPMs will only install on CentOS 7.x with amd64/x86_64 architecture. We recommend using the `CentOS minimal ISO <http://isoredirect.centos.org/centos/7/isos/x86_64/>`_.
 
 The following is a recommended hardware configuration: 
-* 2x CPU/vCPU
-* 8GB RAM
-* 50GB or larger disk
 
-.. warning::
-  If the disk is larger than 50G and you use automatic partitioning, most of the space will be allocated to /home rather than /.
+- 2x CPU/vCPU
+  
+- 8GB RAM
+  
+- 50GB or larger disk
+
 
 .. note::
   * All servers in the cluster should have a static IP address.
@@ -29,9 +30,12 @@ The following is a recommended hardware configuration:
   * Allocate the rest of the free space for the root (/) partition as a LVM volume, XFS formatted
 
 
+.. warning::
+  If the disk is larger than 50G and you use automatic partitioning, most of the space will be allocated to /home rather than /.
+
 
 Prepare Server
-----------------
+---------------------
 
 - Log on as root via ssh
 
@@ -42,6 +46,28 @@ Prepare Server
   .. code-block:: bash
 
     yum update -y`
+
+- Install `wget`` used for downloading RPMs
+
+  .. code-block:: bash
+
+    yum install -y wget
+
+Setup Google Could Artifact registry
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- If you are not using a Google Cloud image, you must add and install their artifact registry plugin:
+
+  .. code-block:: bash
+
+    wget -O /etc/yum.repos.d/artifact-registry-plugin.repo https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
+
+  .. code-block:: bash
+
+    yum install -y yum-plugin-artifact-registry`
+
+Configure System
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Increase Max Number of open files and max user processes for MongoDB (important for larger systems)
 
@@ -56,7 +82,7 @@ Prepare Server
       *          soft     nofile         65535
       *          hard     nofile         65535`
 
-- Reboot system
+- Reboot system:
 
   .. code-block:: bash
 
@@ -66,29 +92,13 @@ Prepare Server
 Install sipXcom
 ----------------
 
-- Install `wget`` used for downloading repo definitions
-
-  .. code-block:: bash
-
-    yum install -y wget
-
-- If you are not using a Google Cloud image, you must add and install their artifact registry plugin:
-
-  .. code-block:: bash
-
-    wget -O /etc/yum.repos.d/artifact-registry-plugin.repo https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
-
-  .. code-block:: bash
-
-    yum install -y yum-plugin-artifact-registry`
-
-- Retrieve sipXcom RPM:
+- Retrieve RPM:
   
   .. code-block:: bash
 
     wget -O /etc/yum.repos.d/sipxcom.repo https://storage.googleapis.com/sipxecs/sipxcom/24.01/centos-7-x86_64/sipxcom.repo
 
-- Install sipXcom RPM:
+- Install RPM:
 
   .. code-block:: bash
 
@@ -96,10 +106,27 @@ Install sipXcom
 
 Setup sipXcom
 ----------------
-- Run `sipxecs-setup` and the system will reboot to disable selinux to allow the rest of the setup routine to work properly.
 
-- Run set`sipxecs-setup` again and e.g. answer questions as follows for a single server instance:
+Initial setup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  .. code-block:: bash
+
+    sipxecs-setup
+
+The system will reboot to disable selinux to allow the rest of the setup routine to work properly.
+
+Network Configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Run setup script again:
   
+  .. code-block:: bash
+
+    sipxecs-setup
+
+- Answer questions as follows for a single server instance:
+
   - hostname: e.g. *us1*
 
   - domain: e.g. *us1.onrelay.net*
@@ -110,8 +137,16 @@ Setup sipXcom
     
     Ignore *"Failed to open /dev/tty: No such device or address"* warnings
 
-- Run `yum update -y`
+- Update system again:
+  
+  .. code-block:: bash
 
-- Run `reboot`
+    yum update -y
 
-- After a couple of minutes, the administration web interface should be available at *https://your-host-name-or-ip-address/*
+- Reboot system:
+  
+  .. code-block:: bash
+
+    reboot
+
+After a few minutes, the administration web interface should be available at *https://your-host-name-or-ip-address/*
