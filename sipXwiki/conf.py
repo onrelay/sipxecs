@@ -19,9 +19,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'sipxcom'
-copyright = '2024, Support Team'
-author = 'Support Team'
+project = 'sipxecs'
+copyright = '2024'
+author = 'sipxcom.org'
 
 # The short X.Y version
 version = ''
