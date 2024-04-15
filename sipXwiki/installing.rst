@@ -9,7 +9,9 @@ Installing
 System Specs
 ----------------------
 
-Recent sipXcom RPMs will only install on CentOS 7.x with amd64/x86_64 architecture. We recommend using the `CentOS minimal ISO <http://isoredirect.centos.org/centos/7/isos/x86_64/>`_.
+Recent sipXcom RPMs will only install on CentOS 7.x with amd64/x86_64 architecture. 
+
+We recommend using the `CentOS minimal ISO <http://isoredirect.centos.org/centos/7/isos/x86_64/>`_.
 
 The following is a recommended hardware configuration: 
 
@@ -61,6 +63,7 @@ If you are not using a Google Cloud image, you must add and install their artifa
   .. code-block:: bash
 
     wget -O /etc/yum.repos.d/artifact-registry-plugin.repo https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
+    
     yum install -y yum-plugin-artifact-registry`
 
 Configure System
@@ -94,6 +97,7 @@ Install sipXcom
   .. code-block:: bash
 
     wget -O /etc/yum.repos.d/sipxcom.repo https://storage.googleapis.com/sipxecs/sipxcom/24.01/centos-7-x86_64/sipxcom.repo
+    
     yum install -y sipxcom
 
 Setup sipXcom
@@ -101,6 +105,8 @@ Setup sipXcom
 
 Initial setup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Execute the sipXcom setup script:
 
   .. code-block:: bash
 
@@ -134,6 +140,7 @@ Network Configuration
   .. code-block:: bash
 
     yum update -y
+    
     reboot
 
 After a few minutes, the administration web interface should be available at *https://your-host-name-or-ip-address/*
