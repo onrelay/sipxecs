@@ -8,13 +8,13 @@ sipXcom Documentation
    :caption: Contents:
 
    history
-   faq
    features
    installing
    building
    planning   
    setupscript
    webui
+   faq
    troubleshooting
    monitoring
    maintenance

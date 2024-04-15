@@ -111,13 +111,13 @@ For straightforward builds, just execute the master build script:
 
 `master-build.sh` will create /src/sipxecs/build and /usr/local/sipx directories where all build results are saved.
 
-To build all the source on a host server where you intend to run sipXcom, simply run:
+To build the sipX* executables from source on a host server where you intend to run sipXcom, simply run:
 
   .. code-block:: bash
 
     sudo ./master-build.sh
 
-To build all the sipX* rpms from source, just add the --rpm option as follows:
+To build all the sipX* RPMs from source, just add the --rpm option as follows:
 
   .. code-block:: bash
 
@@ -142,49 +142,90 @@ Advanced Builds
 For more advanced builds, sipXcom relies on GNU autoconf and make mechanisms to build its source. To use these mechanisms directly, you may use the following steps:
 
 - Prepare build folders:  
-    - Run `mkdir -p /src/sipxecs/build`
 
-    - Run `cd /src/sipxecs/build`
+  .. code-block:: bash
 
-    - Run `sudo mkdir -p /usr/local/sipx`
+    mkdir -p /src/sipxecs/build
 
-    - Run `sudo chown sipx.sipx /usr/local/sipx`
+    cd /src/sipxecs/build
+
+    sudo mkdir -p /usr/local/sipx
+
+    sudo chown sipx.sipx /usr/local/sipx
 
 - To exclude *oss_core* module from build:
-    - Run `sudo echo oss_core >> .modules-exclude`
-    - Run `sudo yum install -y oss_core oss_core-devel oss_core-debuginfo`
-    - Run `sudo mkdir -p /usr/local/sipx/lib`
-    - Run `sudo ln -s /usr/lib64/liboss_core.la /usr/local/sipx/lib/liboss_core.la`
-    - Run `sudo ln -s /usr/lib64/liboss_carp.la /usr/local/sipx/lib/liboss_carp.la`
-    - Run `sudo mkdir -p /usr/local/sipx/opt`
-    - Run `sudo ln -s /usr/opt/ossapp /usr/local/sipx/opt/ossapp`
+
+  .. code-block:: bash
+
+    sudo echo oss_core >> .modules-exclude
+
+    sudo yum install -y oss_core oss_core-devel oss_core-debuginfo
+
+    sudo mkdir -p /usr/local/sipx/lib
+
+    sudo ln -s /usr/lib64/liboss_core.la /usr/local/sipx/lib/liboss_core.la
+
+    sudo ln -s /usr/lib64/liboss_carp.la /usr/local/sipx/lib/liboss_carp.la
+
+    sudo mkdir -p /usr/local/sipx/opt
+
+    sudo ln -s /usr/opt/ossapp /usr/local/sipx/opt/ossapp
 
 - Configure:
-    - Run `cd /src/sipxecs`
-    - Run `sudo autoreconf -ivf`
-    - Run `sudo chown -R sipx.sipx build`
 
-- To build locally:
-    - Run `cd build`
-    - Run `sudo ../configure` 
-    - Run `sudo make sipx`
+  .. code-block:: bash
+
+    cd /src/sipxecs
+
+    sudo autoreconf -ivf
+
+    sudo chown -R sipx.sipx build
+
+
+- To build for running sipXcom locally:
+
+  .. code-block:: bash
+
+    cd build
+
+    sudo ../configure
+
+    sudo make sipx
  
 - Create a repo to build RPMs with mock:
-    - Run `sudo yum install -y createrepo rpm-build mock`
-    - Run `sudo wget http://li.nux.ro/download/nux/misc/el7/x86_64/thttpd-2.25b-33.el7.nux.x86_64.rpm`
-    - Run `sudo rpm -ivh thttpd-2.25b-33.el7.nux.x86_64.rpm`
-    - Run `rm -f thttpd-2.25b-33.el7.nux.x86_64.rpm`
-    - Run `sudo usermod -a -G mock sipx`
 
-    - Run e.g. `sudo ../configure --enable-rpm DISTRO="centos-7-x86_64"`
-    - Run `sudo make sipx.rpm` (run `sudo chown -R sipx.sipx repo` if it gives a permission error on first try)
+  .. code-block:: bash
+
+    sudo yum install -y createrepo rpm-build mock
+
+    sudo wget http://li.nux.ro/download/nux/misc/el7/x86_64/thttpd-2.25b-33.el7.nux.x86_64.rpm
+
+    sudo rpm -ivh thttpd-2.25b-33.el7.nux.x86_64.rpm
+
+    rm -f thttpd-2.25b-33.el7.nux.x86_64.rpm
+
+    sudo usermod -a -G mock sipx`
+
+- To create sipXcom RPMs:
+
+  .. code-block:: bash
+
+    sudo ../configure --enable-rpm DISTRO="centos-7-x86_64"
+
+    sudo make sipx.rpm
+    
+- Run `sudo chown -R sipx.sipx repo` if it gives a permission error on first try)
 
 Resolving Dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If compilation stops for a subproject, it is possible to list all its dependencies:
-- E.g. run `cd /src/sipxecs/sipXproxy`
-- Run `grep -R '^BuildRequires'  | awk '{print $2}'`
+
+  .. code-block:: bash
+
+    cd /src/sipxecs/sipXproxy
+
+    grep -R '^BuildRequires'  | awk '{print $2}'
 
 
 
