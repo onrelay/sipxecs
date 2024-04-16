@@ -156,6 +156,26 @@ function checkInput()
     echo "Done checkInput(): PLATFORM=${PLATFORM}, ARCHITECTURE=${ARCHITECTURE}, SUBPROJECT=${SUBPROJECT}, VERSION=${VERSION}, RPM=${RPM}"
 }
 
+function checkSELinux()
+{
+    SELINUX_ENFORCED=$(grep 'SELINUX=enforcing' /etc/selinux/config)
+
+    if [ ! -z ${SELINUX_ENFORCED} ]; then 
+
+        echo "Detected SELinux enforcing, setting SELinux to disabled"
+
+        sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
+
+        echo "A reboot is required to disable SELinux. Please login as root and run master-build.sh after the reboot to continue building."
+        
+        read -p "Press Enter to reboot the system now: " 
+
+        echo "Rebooting ..."
+        
+        sudo reboot
+    fi
+}
+
 function init()
 {
     echo "Begin init()"
@@ -217,25 +237,6 @@ function setupRocky9()
     echo "Done setupRocky9()"
 }
 
-function checkSELinux()
-{
-    SELINUX_ENFORCED=$(grep 'SELINUX=enforcing' /etc/selinux/config)
-
-    if [ ! -z ${SELINUX_ENFORCED} ]; then 
-
-        echo "Detected SELinux enforcing, setting SELinux to disabled"
-
-        sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
-
-        echo "A reboot is required to disable SELinux. Please login as root and run master-build.sh after the reboot to continue building."
-        
-        read -p "Press Enter to reboot the system now: " 
-
-        echo "Rebooting ..."
-        
-        sudo reboot -h now
-    fi
-}
 
 function configure() 
 {
@@ -325,4 +326,3 @@ function main()
 }
 
 main $@
-
