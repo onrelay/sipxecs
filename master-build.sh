@@ -171,6 +171,8 @@ function setupRepos()
 {
     echo "Begin setupRepos()"
 
+    yum remove -y epel-release
+
     wget -O /etc/yum.repos.d/sipxcom.repo \
         https://storage.googleapis.com/sipxecs/sipxcom/${VERSION}/${PLATFORM}-${ARCHITECTURE}/sipxcom.repo
 
