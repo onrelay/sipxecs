@@ -35,7 +35,7 @@ Setup System
 
     yum install -y sudo git wget
 
-- If you are not using a Google Cloud image, you must add and install their artifact registry plugin:
+- If you are NOT using a Google Cloud image, you must add and install their artifact registry plugin:
 
   .. code-block:: bash
 

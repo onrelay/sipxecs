@@ -21,7 +21,6 @@ The following is a recommended hardware configuration:
   
 - 50GB or larger disk
 
-
 .. note::
   * All servers in the cluster should have a static IP address.
   * The server(s) must have only one active NIC or IP interface.
@@ -39,7 +38,25 @@ The following is a recommended hardware configuration:
 Prepare Server
 ---------------------
 
-- Log on as root via ssh
+- Log on as root via ssh:
+
+  .. code-block:: bash
+
+    sudo -s
+
+- If you want root password authentication:
+
+  .. code-block:: bash
+
+    passwd 
+
+    vi /etc/ssh/sshd_config =>
+
+      PermitRootLogin yes
+
+      PasswordAuthentication yes
+    
+    service sshd restart
 
 - On first boot you may need to edit */etc/sysconfig/network-scripts/YourNICCard*. Change `ONBOOT="no"` to `ONBOOT="yes"`
 
@@ -47,7 +64,7 @@ Prepare Server
 
   .. code-block:: bash
 
-    yum update -y`
+    yum update -y
 
 - Install `wget` used for downloading RPMs
 
@@ -58,11 +75,12 @@ Prepare Server
 Setup Google Could Artifact registry
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are not using a Google Cloud image, you must add and install their artifact registry plugin:
+If you are NOT using a Google Cloud image, you must add and install their artifact registry plugin:
 
   .. code-block:: bash
 
-    wget -O /etc/yum.repos.d/artifact-registry-plugin.repo https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
+    wget -O /etc/yum.repos.d/artifact-registry-plugin.repo \
+      https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
     
     yum install -y yum-plugin-artifact-registry`
 
@@ -96,7 +114,8 @@ Install sipXcom
   
   .. code-block:: bash
 
-    wget -O /etc/yum.repos.d/sipxcom.repo https://storage.googleapis.com/sipxecs/sipxcom/24.01/centos-7-x86_64/sipxcom.repo
+    wget -O /etc/yum.repos.d/sipxcom.repo \
+      https://storage.googleapis.com/sipxecs/sipxcom/24.01/centos-7-x86_64/sipxcom.repo
     
     yum install -y sipxcom
 
