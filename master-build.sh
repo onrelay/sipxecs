@@ -219,6 +219,7 @@ function setupRocky9()
 
 function checkSELinux()
 {
+    SELINUX_ENFORCED=$(grep 'SELINUX=enforcing' /etc/selinux/config)
 
     if [ ! -z ${SELINUX_ENFORCED} ]; then 
 
