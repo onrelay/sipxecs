@@ -6,9 +6,6 @@
  */
 package org.sipfoundry.sipxbridge;
 
-import gov.nist.javax.sip.header.ViaList;
-import gov.nist.javax.sip.message.MessageFactoryImpl;
-
 import java.util.Properties;
 
 import javax.sip.SipException;
@@ -25,6 +22,9 @@ import org.apache.log4j.Logger;
 import org.sipfoundry.commons.log4j.ServerLoggerImpl;
 import org.sipfoundry.commons.log4j.SipFoundryLogRecordFactory;
 import org.sipfoundry.commons.log4j.StackLoggerImpl;
+
+import gov.nist.javax.sip.header.ViaList;
+import gov.nist.javax.sip.message.MessageFactoryImpl;
 
 
 /**
@@ -68,7 +68,8 @@ public class ProtocolObjects {
              * At this point we have already added an appender to this logger.
              * Just get the logger for the gateway and give it to the stack.
              */
-            Logger logger = Logger.getLogger(Gateway.class.getPackage().getName());
+            @SuppressWarnings("unused")
+			Logger logger = Logger.getLogger(Gateway.class.getPackage().getName());
          
             String logLevel = Gateway.getLogLevel();
             if (logLevel.equalsIgnoreCase("DEBUG") || logLevel.equalsIgnoreCase("TRACE")) {
@@ -77,6 +78,7 @@ public class ProtocolObjects {
                 stackProperties.setProperty("gov.nist.javax.sip.LOG_STACK_TRACE_ON_MESSAGE_SEND", "false");
             }
 
+            
             // stack log levels are "off by one": otherwise too much logging at DEBUG level
             if (logLevel.equalsIgnoreCase("TRACE")) {
                 logLevel = "DEBUG";
@@ -84,22 +86,55 @@ public class ProtocolObjects {
             else if (logLevel.equalsIgnoreCase("DEBUG")) {
                 logLevel = "INFO";
             }
+            
             stackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", logLevel);
+            
+            // OR: Uncomment for trace
+            //stackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
+            //stackProperties.setProperty("gov.nist.javax.sip.DEBUG_LOG", BridgeConfiguration.getLogFile());
+            //stackProperties.setProperty("gov.nist.javax.sip.SERVER_LOG", BridgeConfiguration.getLogFile() );
+                 
+            
+            //Security.setProperty( "ssl.KeyManagerFactory.algorithm", "PKIX");
+            
+            //stackProperties.setProperty("javax.net.debug","ssl:handshake:verbose");
+            stackProperties.setProperty("ssl.KeyManagerFactory.algorithm","PKIX");
+
 
             stackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
             stackProperties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT", "true");
-            stackProperties.setProperty("gov.nist.javax.sip.LOG_FACTORY",
-                    SipFoundryLogRecordFactory.class.getName());
-            stackProperties.setProperty("javax.sip.ROUTER_PATH",
-                    org.sipfoundry.commons.siprouter.ProxyRouter.class.getName());
+            stackProperties.setProperty("gov.nist.javax.sip.LOG_FACTORY", SipFoundryLogRecordFactory.class.getName());
+            stackProperties.setProperty("javax.sip.ROUTER_PATH",org.sipfoundry.commons.siprouter.ProxyRouter.class.getName());
             stackProperties.setProperty("gov.nist.javax.sip.TLS_SECURITY_POLICY", SipxTlsSecurityPolicy.class.getName());
             stackProperties.setProperty("gov.nist.javax.sip.CACHE_CLIENT_CONNECTIONS", "true");
             stackProperties.setProperty("gov.nist.javax.sip.CACHE_SERVER_CONNECTIONS", "true");
             stackProperties.setProperty("gov.nist.javax.sip.REJECT_STRAY_RESPONSES","true");
             stackProperties.setProperty("gov.nist.javax.sip.IS_BACK_TO_BACK_USER_AGENT", "true");
+            
+            // Comment for trace
             stackProperties.setProperty("gov.nist.javax.sip.STACK_LOGGER", StackLoggerImpl.class.getName());
             stackProperties.setProperty("gov.nist.javax.sip.SERVER_LOGGER",ServerLoggerImpl.class.getName());
-            stackProperties.setProperty("gov.nist.javax.sip.TLS_CLIENT_PROTOCOLS", "SSLv3, TLSv1");
+
+            // OR Change: stackProperties.setProperty("gov.nist.javax.sip.TLS_CLIENT_PROTOCOLS", "SSLv3, TLSv1");
+            //stackProperties.setProperty("gov.nist.javax.sip.TLS_CLIENT_PROTOCOLS", "TLSv1.2, TLSv1.1, TLSv1");
+            stackProperties.setProperty("gov.nist.javax.sip.TLS_CLIENT_PROTOCOLS", "TLSv1.2,TLSv1.3");
+            //stackProperties.setProperty("gov.nist.javax.sip.SSL_RENEGOTIATION_ENABLED ", "FALSE");
+            stackProperties.setProperty("gov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE", "Want");  // IPL: Default, or use Enabled, Want, Disabled or DisabledAll
+            stackProperties.setProperty("gov.nist.javax.sip.ENABLED_CIPHER_SUITES", 
+            		//"TLS_RSA_WITH_AES_128_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_SHA,TLS_DH_anon_WITH_AES_128_CBC_SHA,SSL_DH_anon_WITH_3DES_EDE_CBC_SHA");
+            		//"TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384");
+            		"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384");
+            		//"TLS_AES_256_GCM_SHA384");
+            		
+            // OR additions
+            
+            /*
+            stackProperties.setProperty("javax.net.ssl.keyStore", "/etc/sipxpbx/ssl/ssl.keystore");
+            stackProperties.setProperty("javax.net.ssl.keyStorePassword", "changeit");
+            stackProperties.setProperty("javax.net.ssl.trustStore", "/etc/sipxpbx/ssl/authorities.jks");
+            stackProperties.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+			*/
+
             // Interval between pings ( to avoid DOS attack ).
             stackProperties.setProperty("gov.nist.javax.sip.MIN_KEEP_ALIVE_TIME_SECONDS", "1000");
             stackProperties.setProperty("gov.nist.javax.sip.RFC_2543_SUPPORT_ENABLED","false");

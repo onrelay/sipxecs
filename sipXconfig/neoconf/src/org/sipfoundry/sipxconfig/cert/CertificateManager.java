@@ -24,6 +24,8 @@ public interface CertificateManager {
     public static final String CHAIN_CERT = "server-chain";
     public static final String CA_CERT = "ca-bundle";
     public static final String CRT = ".crt";
+    public static final String JAVA_CACERTS = "/etc/pki/java/cacerts";
+
 
     public static final AlarmDefinition ALARM_CERTIFICATE_WILL_EXPIRE = new AlarmDefinition("CERTIFICATE_WILL_EXPIRE");
     public static final AlarmDefinition ALARM_CERTIFICATE_DATE_RANGE_FUTURE = new AlarmDefinition("CERTIFICATE_DATE_RANGE_FUTURE");

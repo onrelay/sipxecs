@@ -8,13 +8,9 @@
 package org.sipfoundry.sipxbridge;
 
 import static java.lang.String.format;
-import gov.nist.javax.sip.SipStackExt;
-import gov.nist.javax.sip.SipStackImpl;
-import gov.nist.javax.sip.clientauthutils.AuthenticationHelper;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Timer;
@@ -22,6 +18,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Handler;
 
+import javax.net.ssl.KeyManagerFactory;
 import javax.sip.Dialog;
 import javax.sip.ListeningPoint;
 import javax.sip.SipException;
@@ -30,10 +27,6 @@ import javax.sip.address.Address;
 import javax.sip.address.Hop;
 import javax.sip.address.SipURI;
 import javax.sip.message.Request;
-
-import net.java.stun4j.StunAddress;
-import net.java.stun4j.client.NetworkConfigurationDiscoveryProcess;
-import net.java.stun4j.client.StunDiscoveryReport;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;
@@ -45,6 +38,13 @@ import org.sipfoundry.commons.siprouter.FindSipServer;
 import org.sipfoundry.commons.util.DomainConfiguration;
 import org.sipfoundry.sipxbridge.xmlrpc.SipXbridgeXmlRpcClient;
 import org.sipfoundry.sipxrelay.SymmitronClient;
+
+import gov.nist.javax.sip.SipStackExt;
+import gov.nist.javax.sip.SipStackImpl;
+import gov.nist.javax.sip.clientauthutils.AuthenticationHelper;
+import net.java.stun4j.StunAddress;
+import net.java.stun4j.client.NetworkConfigurationDiscoveryProcess;
+import net.java.stun4j.client.StunDiscoveryReport;
 
 /**
  * The main class
@@ -147,7 +147,12 @@ public class Gateway {
     /*
      * Default transport to talk to ITSP
      */
-    protected static final String DEFAULT_ITSP_TRANSPORT = "udp";
+    protected static final String DEFAULT_ITSP_TRANSPORT = "tcp";
+
+    /*
+     * Default transport to talk to ITSP
+     */
+    protected static final String DEFAULT_PROXY_TRANSPORT = "tcp";
 
     /*
      * Min value for session timer ( seconds ).
@@ -261,7 +266,8 @@ public class Gateway {
         SymmitronClient symmitronClient = symmitronClients.get(address);
         if (symmitronClient == null) {
             int symmitronPort;
-            boolean isSecure = false;
+            @SuppressWarnings("unused")
+			boolean isSecure = false;
 
             symmitronPort = Gateway.getBridgeConfiguration().getSymmitronXmlRpcPort();
 
@@ -432,15 +438,28 @@ public class Gateway {
 
     static PriorityQueue<Hop> initializeSipxProxyAddresses() throws SipXbridgeException {
         try {
-
-            FindSipServer serverFinder = new FindSipServer(logger);
+        	
             SipURI proxyUri = getProxyURI();
-
-            Collection<Hop> hops = serverFinder.findSipServers(proxyUri);
-            PriorityQueue<Hop> proxyAddressTable = new PriorityQueue<Hop>();
-            proxyAddressTable.addAll(hops);
+            
             if (logger.isDebugEnabled()) {
-                logger.debug("proxy address table = " + proxyAddressTable);
+                  logger.debug("initializeSipxProxyAddresses - proxy URI: " + proxyUri );
+            }
+            
+            FindSipServer serverFinder = new FindSipServer(logger);
+            
+            // OR: Note this only works with upgraded JAVA DNS
+        	
+            Collection<Hop> hops = serverFinder.findSipServers(proxyUri);
+
+            PriorityQueue<Hop> proxyAddressTable = new PriorityQueue<Hop>();          
+
+            proxyAddressTable.addAll(hops);
+                       
+            if (logger.isDebugEnabled()) {
+            	for( Hop hop : proxyAddressTable ) {
+                    logger.debug("initializeSipxProxyAddresses - proxy address table hop = " + 
+                    		hop.getHost() + ":" + hop.getPort() + "(" + hop.getTransport() + ")" );
+            	}
             }
             return proxyAddressTable;
         } catch (Exception ex) {
@@ -449,7 +468,7 @@ public class Gateway {
     }
 
     static boolean isAddressFromProxy(String address) {
-
+        
         PriorityQueue<Hop> proxyAddressTable = initializeSipxProxyAddresses();
         for (Hop hop : proxyAddressTable) {
             if (hop.getHost().equals(address)) {
@@ -490,6 +509,17 @@ public class Gateway {
                         externalAddress, externalPort + 1, "tls");
                 externalTlsProvider = ProtocolObjects.getSipStack().createSipProvider(externalTlsListeningPoint);
                 Gateway.supportedTransports.add("tls");
+                
+                if (logger.isDebugEnabled()) {
+                    logger.debug("tlsSupport is enabled -- creating TLS Listening point and provider" + ProtocolObjects.getSipStack());
+                }
+                
+				String keyStore = System.getProperties().getProperty("javax.net.ssl.keyStore");
+				if ( logger.isDebugEnabled() ) logger.debug("keyStore = " + keyStore);
+				
+				String defaultAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
+				if ( logger.isDebugEnabled() ) logger.debug("defaultAlgorithm = " + defaultAlgorithm);
+				         
             }
             externalProvider = ProtocolObjects.getSipStack().createSipProvider(externalUdpListeningPoint);
             externalProvider.addListeningPoint(externalTcpListeningPoint);
@@ -718,7 +748,8 @@ public class Gateway {
 
         try {
             Gateway.accountManager.startAuthenticationFailureTimers();
-            boolean foundAccount = false;
+            @SuppressWarnings("unused")
+			boolean foundAccount = false;
             logger.info("PROCESSING ITSP ACCOUNTS");
             for (ItspAccountInfo itspAccount : Gateway.accountManager.getItspAccounts()) {
 
@@ -902,6 +933,11 @@ public class Gateway {
 
             Gateway.proxyURI = ProtocolObjects.addressFactory.createSipURI(null, getBridgeConfiguration()
                     .getSipxProxyDomain());
+            
+            if (logger.isDebugEnabled()) {
+                logger.debug("sipx proxy URI is : " + Gateway.proxyURI );
+            }
+            
             if (getBridgeConfiguration().getSipxProxyPort() > 0) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("setting sipx proxy port " + getBridgeConfiguration().getSipxProxyPort());
@@ -911,7 +947,6 @@ public class Gateway {
                 if (logger.isDebugEnabled()) {
                     logger.debug("sipx proxy port is : " + getBridgeConfiguration().getSipxProxyPort());
                 }
-
             }
         } catch (Exception ex) {
             logger.error("Error initializing proxy address", ex);
@@ -929,6 +964,7 @@ public class Gateway {
         initializeSipListeningPoints();
 
         /* Test to see that we can do an address lookup */
+
         try {
             initializeSipxProxyAddresses();
         } catch (Exception e) {
@@ -1044,7 +1080,7 @@ public class Gateway {
         ProtocolObjects.stop();
 
     }
-
+    
     /**
      * Exit the gateway. Caution! This is called to actually stop the process and exit.
      */
@@ -1064,6 +1100,7 @@ public class Gateway {
                 .getExternalAddress(), Gateway.getBridgeConfiguration().getXmlRpcPort());
         client.stop();
         System.exit(0);
+        
     }
 
     /**
@@ -1120,7 +1157,7 @@ public class Gateway {
      *
      */
     static String getLogFile() {
-        return Gateway.getAccountManager().getBridgeConfiguration().getLogFileDirectory() + "/sipxbridge.log";
+        return BridgeConfiguration.getLogFile();
     }
 
     /**
@@ -1235,6 +1272,7 @@ public class Gateway {
     public static boolean isStrictProtocolEnforcement() {
         return Gateway.getBridgeConfiguration().isStrictProtocolEnforcement();
     }
+    
 
     /**
      * The main method for the Bridge.

@@ -6,8 +6,6 @@
  */
 package org.sipfoundry.sipxbridge;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.UnknownHostException;
 
 import javax.sdp.SessionDescription;

@@ -10,7 +10,6 @@ import java.net.InetAddress;
 import java.util.HashSet;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.sipfoundry.commons.log4j.SipFoundryLayout;
 
 /**
@@ -37,7 +36,8 @@ public class BridgeConfiguration {
     private int xmlRpcPort = 0;
     private int sipKeepalive = 20 ; // Seconds for SIP keepalive.
     private int mediaKeepalive = 100; // milisec for media keepalive.
-    private String logFileDirectory = "/var/log/sipxpbx/";
+    private static String logFileDirectory = "/var/log/sipxpbx";
+    private static String logFileName = "sipxbridge.log";
     private int globalAddressRediscoveryPeriod = 30;
     private boolean reInviteSupported = true;
     private String autoAttendantName = null;
@@ -204,6 +204,7 @@ public class BridgeConfiguration {
      */
     public String getLogLevel() {
         return SipFoundryLayout.getSipFoundryLogLevel(this.getClass()).toString();
+
     }
 
     /**
@@ -291,15 +292,19 @@ public class BridgeConfiguration {
     /**
      * @param logFileName the logFileName to set
      */
-    public void setLogFileDirectory(String logFileDirectory) {
-        this.logFileDirectory = logFileDirectory;
+    public static void setLogFileDirectory(String logFileDirectory) {
+        BridgeConfiguration.logFileDirectory = logFileDirectory;
     }
 
     /**
      * @return the logFileName
      */
-    public String getLogFileDirectory() {
-        return logFileDirectory;
+    public static String getLogFileDirectory() {
+        return BridgeConfiguration.logFileDirectory;
+    }
+    
+    public static String getLogFile() {
+    	return getLogFileDirectory() + "/" + logFileName;
     }
 
     public boolean isReInviteSupported() {

@@ -6,27 +6,13 @@
  */
 package org.sipfoundry.sipxbridge;
 
-import gov.nist.javax.sip.DialogExt;
-import gov.nist.javax.sip.SipStackExt;
-import gov.nist.javax.sip.SipStackImpl;
-import gov.nist.javax.sip.TransactionExt;
-import gov.nist.javax.sip.header.extensions.MinSE;
-import gov.nist.javax.sip.header.extensions.ReferencesHeader;
-import gov.nist.javax.sip.header.extensions.ReplacesHeader;
-import gov.nist.javax.sip.header.extensions.SessionExpires;
-import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
-import gov.nist.javax.sip.message.SIPResponse;
-import gov.nist.javax.sip.stack.SIPDialog;
-import gov.nist.javax.sip.stack.SIPServerTransaction;
-
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Locale;
-import java.util.Random;
 import java.util.Set;
 import java.util.TimerTask;
-import java.util.Iterator;
 
 import javax.sdp.SessionDescription;
 import javax.sip.ClientTransaction;
@@ -40,7 +26,6 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.TransactionAlreadyExistsException;
 import javax.sip.TransactionState;
-import javax.sip.TransactionUnavailableException;
 import javax.sip.address.SipURI;
 import javax.sip.header.AcceptHeader;
 import javax.sip.header.AcceptLanguageHeader;
@@ -56,15 +41,28 @@ import javax.sip.header.ReasonHeader;
 import javax.sip.header.RequireHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.header.WarningHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
-import javax.sip.header.ViaHeader;
 
 import org.apache.log4j.Logger;
 import org.sipfoundry.sipxrelay.KeepaliveMethod;
 import org.sipfoundry.sipxrelay.SymmitronException;
 import org.sipfoundry.sipxrelay.SymmitronResetHandler;
+
+import gov.nist.javax.sip.DialogExt;
+import gov.nist.javax.sip.SipStackExt;
+import gov.nist.javax.sip.SipStackImpl;
+import gov.nist.javax.sip.TransactionExt;
+import gov.nist.javax.sip.header.HeaderFactoryExt;
+import gov.nist.javax.sip.header.extensions.MinSE;
+import gov.nist.javax.sip.header.extensions.ReferencesHeader;
+import gov.nist.javax.sip.header.extensions.ReplacesHeader;
+import gov.nist.javax.sip.header.extensions.SessionExpires;
+import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
+import gov.nist.javax.sip.message.SIPResponse;
+import gov.nist.javax.sip.stack.SIPDialog;
 
 /**
  * This class does some pre-processing of requests and then acts as a high level router for
@@ -73,6 +71,9 @@ import org.sipfoundry.sipxrelay.SymmitronResetHandler;
  * @author M. Ranganathan
  *
  */
+
+@SuppressWarnings("rawtypes")
+
 class CallControlManager implements SymmitronResetHandler {
 
     static Logger logger = Logger.getLogger(CallControlManager.class);
@@ -94,7 +95,7 @@ class CallControlManager implements SymmitronResetHandler {
             this.transactionContext = transactionContext;
         }
 
-        @Override
+		@Override
         public void run() {
             try {
                 Request request = transactionContext.getClientTransaction().getRequest();
@@ -268,7 +269,26 @@ class CallControlManager implements SymmitronResetHandler {
              */
             Request newRequest = peerDialog.createRequest(Request.INVITE);
 
-            newRequest.setHeader(referencesHeader);
+			/*
+			 * By default the UAC always refreshes the session.
+			 */
+            
+            ItspAccountInfo itspAccount = dialogContext.getItspInfo();
+            int sessionTimerInterval;
+            if( itspAccount != null ) {
+            	sessionTimerInterval = itspAccount.getSessionTimerInterval();
+            }
+            else {
+            	sessionTimerInterval = Gateway.DEFAULT_SESSION_TIMER_INTERVAL;
+            }
+            
+			SessionExpires sessionExpires = (SessionExpires) ((HeaderFactoryExt) ProtocolObjects.headerFactory)
+					.createSessionExpiresHeader( sessionTimerInterval );
+			sessionExpires.setParameter("refresher", "uac");
+			sessionExpires.setExpires( sessionTimerInterval );
+			newRequest.addHeader(sessionExpires);
+                        
+			newRequest.setHeader(referencesHeader);
 
 
 
@@ -295,6 +315,11 @@ class CallControlManager implements SymmitronResetHandler {
                         request.getHeader(AuthorizationHeader.NAME);
                 newRequest.setHeader(authHeader);
             }
+
+            if ( request.getHeader("History-Info") != null ) {
+                newRequest.setHeader(request.getHeader("History-Info"));
+            }
+
 
             /*
              * Create a new client transaction with which to forward the request.
@@ -383,27 +408,32 @@ class CallControlManager implements SymmitronResetHandler {
                             requestEvent);
                     dialogContext.solicitSdpOfferFromPeerDialog(cdata,requestEvent.getRequest());
                 } else {
-                    /*
-                     * No MOH support on bridge so send OK right away.
-                     */
+                	
+                    // OR Change: ACK would otherwise sometimes get discarded by JAIN SIP, 
+                    // causing its ack semaphore to not get released, causing dialog to close,
+                    // causing some ITSPs to drop call due to timeout
+                    RtpSessionUtilities.forwardReInvite(rtpSession, serverTransaction, dialog, true);
+
+                	/*
+                    // No MOH support on bridge so send OK right away.
                     Response response = SipUtilities.createResponse(serverTransaction,
                             Response.OK);
                     SessionDescription sessionDescription = rtpSession.getReceiver()
                             .getSessionDescription();
                     SipUtilities.setSessionDescription(response, sessionDescription);
-                    /*
-                     * Send an OK to the other side with a SD that indicates that the HOLD
-                     * operation is successful. The hold operation is handled locally.
-                     */
+                    
+                     // Send an OK to the other side with a SD that indicates that the HOLD
+                     // operation is successful. The hold operation is handled locally.
+
                     if (dialogContext.getItspInfo() == null || dialogContext.getItspInfo().isGlobalAddressingUsed() ) {
                         SipUtilities.setGlobalAddress(response);
                     }
                     serverTransaction.sendResponse(response);
-
+                    */
                 }
             } else if (operation == RtpSessionOperation.REMOVE_HOLD
                     || operation == RtpSessionOperation.CODEC_RENEGOTIATION
-                    || operation == RtpSessionOperation.PORT_REMAP) {
+                    || operation == RtpSessionOperation.PORT_REMAP ) {
                 /*
                  * Remove hold and codec renegotiation require forwarding of re-INVITE.
                  */
@@ -494,6 +524,19 @@ class CallControlManager implements SymmitronResetHandler {
                 handleReInvite(requestEvent);
                 return;
 
+            } else if ( SipUtilities.getFromTag(request) != null
+                    && SipUtilities.getToTag(request) != null ){
+            	//
+              // This is a reinvite but the dialog state is unknown.
+              // If we allow this to pass, it will eventually loop back
+              // to us because the request-uri and possibly a route header
+              // is already set.  Drop this transaction!
+              //
+              if ( logger.isDebugEnabled() ) logger.debug("Dialog State is unknown.  Dropping transaction!");
+              logger.error("*XX* Dialog State is unknown.  Dropping transaction!");
+              Response response = SipUtilities.createResponse(serverTransaction, Response.SERVER_INTERNAL_ERROR);
+              serverTransaction.sendResponse(response);
+              return;
             }
 
             if (Gateway.getGlobalAddress() == null) {
@@ -507,6 +550,18 @@ class CallControlManager implements SymmitronResetHandler {
                 return;
 
             }
+
+    		try {
+    			logger.debug("Return Trying to sender (mcx)..");
+    			Response tempResponse = SipUtilities.createResponse(serverTransaction ,Response.TRYING);
+
+    			tempResponse.setReasonPhrase("Trying ...");
+    			serverTransaction.sendResponse(tempResponse );
+
+    		} catch (Exception ex) {
+    			logger.error("Error returning Trying message to sender", ex);
+    		}
+
 
             BackToBackUserAgent btobua;
 
@@ -663,8 +718,10 @@ class CallControlManager implements SymmitronResetHandler {
                 /*
                  * discard out of dialog requests.
                  */
+            	
+            	// OR: Changed from NOT ACCEPTABLE for better integration
                 Response response = ProtocolObjects.messageFactory.createResponse(
-                        Response.NOT_ACCEPTABLE, request);
+                        Response.NOT_FOUND, request);
                 if (st == null) {
                     provider.sendResponse(response);
                 } else {
@@ -729,7 +786,8 @@ class CallControlManager implements SymmitronResetHandler {
      *
      * @param requestEvent
      */
-    private void processRefer(RequestEvent requestEvent) {
+    @SuppressWarnings("unused")
+	private void processRefer(RequestEvent requestEvent) {
         if ( logger.isDebugEnabled() ) logger.debug("processRefer");
         TransactionContext tad = null;
 
@@ -1099,12 +1157,18 @@ class CallControlManager implements SymmitronResetHandler {
 
     }
 
+    /*
     /**
      * Processes an INCOMING CANCEL.
      *
      * @param requestEvent -- the inbound CANCEL.
      *
      */
+    
+    /*
+     * 
+     * OR: Hangs on Java 8 / CentOS 7
+     * 
     private void processCancel(RequestEvent requestEvent) {
         if ( logger.isDebugEnabled() ) logger.debug("processCancel");
 
@@ -1140,10 +1204,10 @@ class CallControlManager implements SymmitronResetHandler {
 
             String transport = itspAccount != null ? itspAccount.getOutboundTransport()
                     : Gateway.DEFAULT_ITSP_TRANSPORT;
-            /*
-             * Look at the state of the peer client transaction. If in calling or proceeding
-             * state we can process the CANCEL. If not we have to decline it.
-             */
+            
+             // Look at the state of the peer client transaction. If in calling or proceeding
+             // state we can process the CANCEL. If not we have to decline it.
+             
             if (ct.getState() == TransactionState.CALLING
                     || ct.getState() == TransactionState.PROCEEDING) {
                 Request cancelRequest = ct.createCancel();
@@ -1159,20 +1223,20 @@ class CallControlManager implements SymmitronResetHandler {
                     return;
                 }
                 clientTransaction.sendRequest();
-                /*
-                 * In case the dialog ever goes into a Confirmed state, it will be killed right
-                 * away by sending a BYE after an ACK is sent.
-                 */
+                
+                 // In case the dialog ever goes into a Confirmed state, it will be killed right
+                 // away by sending a BYE after an ACK is sent.
+                 
                 Dialog peerDialog = DialogContext.getPeerDialog(dialog);
                 if (peerDialog != null && peerDialog.getState() != DialogState.CONFIRMED) {
                     DialogContext.get(peerDialog).setTerminateOnConfirm();
                 }
-                /*
-                 * Send the Request TERMINATED response right away. We are done with the server
-                 * transaction at this point. This REQUEST_TERMINATED response must be sent back
-                 * to the ITSP here ( we cannot wait for the other end to send us the response --
-                 * see XX-517 workaround. )
-                 */
+                
+                 // Send the Request TERMINATED response right away. We are done with the server
+                 // transaction at this point. This REQUEST_TERMINATED response must be sent back
+                 // to the ITSP here ( we cannot wait for the other end to send us the response --
+                 // see XX-517 workaround. )
+            
                 Response requestTerminatedResponse = SipUtilities.createResponse(
                         inviteServerTransaction, Response.REQUEST_TERMINATED);
 
@@ -1185,23 +1249,24 @@ class CallControlManager implements SymmitronResetHandler {
         }
 
     }
-
+    */
+    
     /**
-     * Processes an INCOMING BYE
+     * Processes an INCOMING CANCEL
      */
-    private void processBye(RequestEvent requestEvent) {
-        if ( logger.isDebugEnabled() ) logger.debug("processBye");
+    private void processCancel(RequestEvent requestEvent) {
+        if ( logger.isDebugEnabled() ) logger.debug("processCancel");
         try {
-            BackToBackUserAgent b2bua = DialogContext.getBackToBackUserAgent(requestEvent
-                    .getDialog());
+            BackToBackUserAgent b2bua = DialogContext.getBackToBackUserAgent(requestEvent.getDialog());
 
-            if (requestEvent.getServerTransaction() != null) {
-                if ( logger.isDebugEnabled() ) logger.debug("serverTransaction Not found -- stray request -- discarding ");
-            }
+            // OR: makes no sense
+            //if (requestEvent.getServerTransaction() != null) {
+            //    if ( logger.isDebugEnabled() ) logger.debug("serverTransaction Not found -- stray request -- discarding ");
+            //}
 
             if (b2bua != null) {
 
-                b2bua.processBye(requestEvent);
+                b2bua.handleHangup(requestEvent);
 
             } else {
                 // Respond with an error
@@ -1211,7 +1276,38 @@ class CallControlManager implements SymmitronResetHandler {
             }
 
         } catch (Exception ex) {
-            logger.error("Problem sending bye", ex);
+            logger.error("Problem processing cancel", ex);
+        }
+
+    }
+    
+
+    /**
+     * Processes an INCOMING BYE
+     */
+    private void processBye(RequestEvent requestEvent) {
+        if ( logger.isDebugEnabled() ) logger.debug("processBye");
+        try {
+            BackToBackUserAgent b2bua = DialogContext.getBackToBackUserAgent(requestEvent.getDialog());
+
+            // OR: makes no sense
+            //if (requestEvent.getServerTransaction() != null) {
+            //    if ( logger.isDebugEnabled() ) logger.debug("serverTransaction Not found -- stray request -- discarding ");
+            //}
+
+            if (b2bua != null) {
+
+                b2bua.handleHangup(requestEvent);
+
+            } else {
+                // Respond with an error
+                Response response = SipUtilities.createResponse(requestEvent
+                        .getServerTransaction(), Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST);
+                requestEvent.getServerTransaction().sendResponse(response);
+            }
+
+        } catch (Exception ex) {
+            logger.error("Problem processing bye", ex);
         }
 
     }
@@ -1899,8 +1995,7 @@ class CallControlManager implements SymmitronResetHandler {
                 }
 
             } else {
-                logger
-                        .debug("Processing ReferRedirection: Could not find RtpSession for referred dialog");
+                logger.debug("Processing ReferRedirection: Could not find RtpSession for referred dialog");
             }
 
         } else if (response.getRawContent() != null) {
@@ -1983,11 +2078,14 @@ class CallControlManager implements SymmitronResetHandler {
          */
         if (response.getStatusCode() == Response.OK &&
         		DialogContext.get(dialog).getPendingAction() != PendingDialogAction.PENDING_SDP_ANSWER_IN_ACK) {
-            b2bua.addDialog(DialogContext.get(dialog));
-            Request ackRequest = dialog.createAck(((CSeqHeader) response
-                    .getHeader(CSeqHeader.NAME)).getSeqNumber());
-            DialogContext.get(dialog).sendAck(ackRequest);
+
+logger.debug("SEv Delaying ACK");
+
+            Gateway.getTimer().schedule( new delayAck( b2bua, dialog, response ), 50 );
+
         }
+
+
         /*
          * If there is a Music on hold dialog -- tear it down
          */
@@ -1997,6 +2095,32 @@ class CallControlManager implements SymmitronResetHandler {
         }
 
     }
+
+	class delayAck extends TimerTask{
+
+        private final BackToBackUserAgent b2bua;
+        private final Dialog dialog;
+        private final Response response;
+
+        public delayAck( BackToBackUserAgent b2bua, Dialog dialog, Response response ) {
+            this.b2bua = b2bua;
+            this.dialog = dialog;
+            this.response = response;
+        }
+
+		@Override
+		public void run() {
+			try{
+				b2bua.addDialog(DialogContext.get(dialog));
+				Request ackRequest = dialog.createAck(
+						( ( CSeqHeader ) response.getHeader( CSeqHeader.NAME ) ).getSeqNumber() );
+				DialogContext.get( dialog ).sendAck( ackRequest );
+			} catch (Exception ex) {
+				logger.error("SEv Error delaying ACK", ex);
+			}
+
+		}
+	}
 
     /**
      * Handles responses for ReferInviteToSipxProxy or Blind transfer to ITSP.
@@ -2689,13 +2813,13 @@ class CallControlManager implements SymmitronResetHandler {
 
         Dialog dialog = responseEvent.getDialog();
 
-        ClientTransaction clientTransaction = null;
+        ClientTransaction clientTransaction = responseEvent.getClientTransaction();
 
         /*
          * No client transaction in response. Discard it unless it is a forked
          * response.
          */
-        if ( responseEvent.getClientTransaction() == null ) {
+        if ( clientTransaction == null ) {
             /*
              * An In-Dialog response. If no client transaction
              * then return.
@@ -2713,8 +2837,6 @@ class CallControlManager implements SymmitronResetHandler {
                 if ( logger.isDebugEnabled() ) logger.debug("Dropping response -- no client transaction");
                 return;
             }
-        } else {
-            clientTransaction = responseEvent.getClientTransaction();
         }
 
 
@@ -3112,7 +3234,8 @@ class CallControlManager implements SymmitronResetHandler {
                     Response newResponse = SipUtilities.createResponse(st, response
                             .getStatusCode());
                     st.sendResponse(newResponse);
-                    BackToBackUserAgent b2bua = DialogContext
+                    @SuppressWarnings("unused")
+					BackToBackUserAgent b2bua = DialogContext
                             .getBackToBackUserAgent(responseEvent.getDialog());
                 }
             }

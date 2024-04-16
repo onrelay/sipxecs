@@ -6,36 +6,29 @@
  */
 package org.sipfoundry.sipxbridge;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+
+import javax.sip.ClientTransaction;
+import javax.sip.Dialog;
+import javax.sip.SipProvider;
+import javax.sip.address.Hop;
+import javax.sip.address.SipURI;
+import javax.sip.header.FromHeader;
+import javax.sip.header.ViaHeader;
+import javax.sip.message.Request;
+
+import org.apache.log4j.Logger;
 
 import gov.nist.javax.sip.SipStackExt;
 import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.clientauthutils.UserCredentials;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
-import gov.nist.javax.sip.header.ims.PPreferredIdentityHeader;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.sip.ClientTransaction;
-import javax.sip.Dialog;
-import javax.sip.ServerTransaction;
-import javax.sip.SipProvider;
-import javax.sip.address.Hop;
-import javax.sip.address.SipURI;
-import javax.sip.header.FromHeader;
-import javax.sip.message.Request;
-import javax.sip.header.ViaHeader;
-
-import org.apache.log4j.Logger;
-import org.apache.xmlrpc.XmlRpcException;
 
 /**
  * Keeps a mapping of account ID to ItspAccountInfo and a mapping of account ID to sip pbx account
@@ -108,24 +101,40 @@ public class AccountManagerImpl implements gov.nist.javax.sip.clientauthutils.Ac
     ItspAccountInfo getAccount(Request request) {
 
         SipURI sipUri = (SipURI) request.getRequestURI();
+        
         if ( logger.isDebugEnabled() ) logger.debug("getAccount: fetching account for " + sipUri);
+        
         // Request originated from LAN. If In-DIALOG request use previously discovered ITSP account
+        
         if (request.getMethod().equals(Request.INVITE) && request.getHeader(ReplacesHeader.NAME) != null) {
+        	
            Dialog replacesDialog =  ((SipStackExt)ProtocolObjects.getSipStack()).getReplacesDialog((ReplacesHeader)request.getHeader(ReplacesHeader.NAME)); 
+           
            if ( replacesDialog == null ) {
                logger.error("Could not find replaces dialog - returning null for ITSP account");
                return null;
            }
-           return DialogContext.get(replacesDialog).getItspInfo();           
+           
+           ItspAccountInfo accountInfo = DialogContext.get(replacesDialog).getItspInfo();
+           
+           if ( logger.isDebugEnabled() ) logger.debug("getItspAccount: matched via replaces dialog " + accountInfo);
+           return accountInfo;           
         }
-        ItspAccountInfo accountFound = null;
+        
+        
         try {
 
             for (ItspAccountInfo accountInfo : itspAccounts) {
+            	
                 if (accountInfo.getProxyDomain() != null && sipUri.getHost().endsWith(accountInfo.getProxyDomain())
+                		
                         && checkSipxecsLineid(accountInfo.getSipxecsLineIds(), sipUri)) {
+                	
                 	if ( sipUri.getParameter(SIPXECS_LINEID) != null ) {
+                		
+                        if ( logger.isDebugEnabled() ) logger.debug("getItspAccount: matched via line ID " + accountInfo);
                 		return accountInfo;
+                		
                 	} else if (accountInfo.getCallerId() == null) {
                         /*
                          * A null override caller ID has been provided. This case occurs when you
@@ -136,42 +145,55 @@ public class AccountManagerImpl implements gov.nist.javax.sip.clientauthutils.Ac
                         String userStr = ((SipURI) fromHeader.getAddress().getURI()).getUser();
 
                         if (accountInfo.getUserName() != null && userStr.equals(accountInfo.getUserName())) {
-                            accountFound = accountInfo;
+                        	
+                            if ( logger.isDebugEnabled() ) logger.debug("getItspAccount: matched in from header " + accountInfo);
                             return accountInfo;
                         }
                     } else {
+                    	
                         String callerId = accountInfo.getCallerId();
+                        
                         FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
 
                         String userStr = ((SipURI) fromHeader.getAddress().getURI()).getUser();
+                        
                         String domainStr = ((SipURI) fromHeader.getAddress().getURI()).getHost();
+                        
                         if (userStr.equals("anonymous") && domainStr.equals("invalid")) {
+                        	
                             PAssertedIdentityHeader pai = (PAssertedIdentityHeader) request
                                     .getHeader(PAssertedIdentityHeader.NAME);
+                            
                             if (pai == null) {
+                            	
                                 logger.warn("Anonymous call without P-Asserted-Identity ");
                                 // BUGBUG - this is really a mistake we should reject
                                 // the call if the PAI header is missing
-                                accountFound = accountInfo;
+                                
+                                if ( logger.isDebugEnabled() ) logger.debug("getItspAccount: found after pai == null " + accountInfo);
                                 return accountInfo;
                             }
                             userStr = ((SipURI) pai.getAddress().getURI()).getUser();
                         }
 
                         if (callerId.startsWith(userStr)) {
-                            accountFound = accountInfo;
+                            
+                            if ( logger.isDebugEnabled() ) logger.debug("getItspAccount: found from user " + accountInfo);
+
                             return accountInfo;
                         }
 
                     }
                 }
             }
-            // Fallback -- cannot find calling line id.
+
             for (ItspAccountInfo accountInfo : itspAccounts) {
-                logger.warn("Could not match user part of inbound request URI");
+            	
                 if (accountInfo.getProxyDomain() != null) {
+                	
                     if (sipUri.getHost().endsWith(accountInfo.getProxyDomain())) {
-                        accountFound = accountInfo;
+                    	
+                        if ( logger.isDebugEnabled() ) logger.debug("getItspAccount: found via proxy domain " + accountInfo);
                         return accountInfo;
                     }
                 }
@@ -180,25 +202,34 @@ public class AccountManagerImpl implements gov.nist.javax.sip.clientauthutils.Ac
             String userName = ((SipURI) ((FromHeader) request.getHeader(FromHeader.NAME)).getAddress().getURI())
                     .getUser();
 
+
             /*
              * If an account is not found return an account record with the domain set to the
              * outbound request domain. The INVITE will be forwarded. If the other side does not
              * like the INVITE it an complain about it. See issue XX-5623
              */
-            accountFound = new ItspAccountInfo();
-            accountFound.setProxyDomain(sipUri.getHost());
-            accountFound.setUserName(userName);
-            accountFound.setOutboundProxyPort(sipUri.getPort());
-            accountFound.setOutboundTransport(sipUri.getTransportParam() == null ? "udp" : sipUri
+            ItspAccountInfo defaultAccountInfo = null;
+
+            defaultAccountInfo = new ItspAccountInfo();
+            defaultAccountInfo.setProxyDomain(sipUri.getHost());
+            defaultAccountInfo.setUserName(userName);
+            defaultAccountInfo.setOutboundProxyPort(sipUri.getPort());
+            defaultAccountInfo.setOutboundTransport(sipUri.getTransportParam() == null ? 
+            		Gateway.DEFAULT_ITSP_TRANSPORT : sipUri
                     .getTransportParam());
-            accountFound.setGlobalAddressingUsed(true);
-            accountFound.setDummyAccount(true);
-            accountFound.setRegisterOnInitialization(false);
-            this.addItspAccount(accountFound);
-            return accountFound;
-        } finally {
-            if ( logger.isDebugEnabled() ) logger.debug("getItspAccount: returning " + accountFound);
-        }
+            defaultAccountInfo.setGlobalAddressingUsed(true);
+            defaultAccountInfo.setDummyAccount(true);
+            defaultAccountInfo.setRegisterOnInitialization(false);
+            this.addItspAccount(defaultAccountInfo);
+            
+            if ( logger.isDebugEnabled() ) logger.debug("getItspAccount: returning default " + defaultAccountInfo);
+            return defaultAccountInfo;
+            
+        } catch( Exception e ) {
+        	
+            logger.warn("getItspAccount: Error looking up ITSP account: " + e.getMessage() );
+            return null;
+        } 
     }
 
     /**
@@ -221,23 +252,23 @@ public class AccountManagerImpl implements gov.nist.javax.sip.clientauthutils.Ac
      * @return
      */
     ItspAccountInfo getItspAccount(String host, int port) {
-        if ( logger.isDebugEnabled() ) logger.debug("INVITE received on " + host + ":" + port);
+        if ( logger.isDebugEnabled() ) logger.debug("getItspAccount - for " + host + ":" + port);
         if (port == -1)
             port = 5060; // set default.
         try {
             String viaHost = InetAddress.getByName(host).getHostAddress();
-            if ( logger.isDebugEnabled() ) logger.debug("viaHost = " + viaHost + "viaPort = " + port);
+            if ( logger.isDebugEnabled() ) logger.debug("viaHost = " + viaHost + " viaPort = " + port);
             for (ItspAccountInfo accountInfo : this.getItspAccounts()) {
                 if (accountInfo.isRegisterOnInitialization()) {
                     // Account needs registration.
                     String registrarHost = accountInfo.getOutboundRegistrar();
                     // We assume that the Registrar is the same as the INBOUND proxy
                     // server.
-                    if ( logger.isDebugEnabled() ) logger.debug("registrarHost = " + registrarHost);
+                    if ( logger.isDebugEnabled() ) logger.debug("getItspAccount - registrarHost = " + registrarHost);
                     try {
                         Hop hop = accountInfo.getHopToRegistrar();
                         if (hop != null && viaHost.equals(InetAddress.getByName(hop.getHost()).getHostAddress())) {
-                            if ( logger.isDebugEnabled() ) logger.debug("found account " + accountInfo.getProxyDomain());
+                            if ( logger.isDebugEnabled() ) logger.debug("getItspAccount - found registered account " + accountInfo.getProxyDomain());
                             return accountInfo;
 
                         }
@@ -247,11 +278,11 @@ public class AccountManagerImpl implements gov.nist.javax.sip.clientauthutils.Ac
                 } else {
                     for (Hop hop : accountInfo.getInboundProxies()) {
                         if (hop != null) {
-                           if ( logger.isDebugEnabled() ) logger.debug("Checking " + hop.getHost() + " port " + hop.getPort());
+                           if ( logger.isDebugEnabled() ) logger.debug("getItspAccount - Checking " + hop.getHost() + " port " + hop.getPort());
                            try {
                                if (viaHost.equals(InetAddress.getByName(hop.getHost()).getHostAddress())
                                        && hop.getPort() == port) {
-                                   if ( logger.isDebugEnabled() ) logger.debug("Inbound request from : " + accountInfo.getProxyDomain());
+                                   if ( logger.isDebugEnabled() ) logger.debug("getItspAccount - found unregistered account : " + accountInfo.getProxyDomain());
                                    return accountInfo;
                                }
                            } catch ( UnknownHostException ex) {
@@ -278,28 +309,36 @@ public class AccountManagerImpl implements gov.nist.javax.sip.clientauthutils.Ac
      * @param port
      * @return
      */
-    ItspAccountInfo getItspAccount(Iterator vias)
-    {
-      ItspAccountInfo itspAccountInfo = null;
-      String host = null;
-      int port = 0;
-      if (vias != null) 
-      {
-	ViaHeader nextInboundVia = null;
-	while(vias.hasNext())
-	{
-	  nextInboundVia = (ViaHeader) vias.next();
-	  host = nextInboundVia.getReceived() != null ? nextInboundVia.getReceived()
-	  : nextInboundVia.getHost();
-	  // do some ITSPs need the rport?  For TLS it is not correct...
-	  port = nextInboundVia.getPort();
-	  itspAccountInfo = getItspAccount(host, port);
-	  if (itspAccountInfo != null)
-	    return itspAccountInfo;
+	ItspAccountInfo getItspAccount(Iterator<?> vias) {
+		
+		ItspAccountInfo itspAccountInfo = null;
+		
+		String host = null;
+		
+		int port = 0;
+		
+		if (vias != null) {
+			
+			ViaHeader nextInboundVia = null;
+			
+			while (vias.hasNext()) {
+				
+				nextInboundVia = (ViaHeader) vias.next();
+				
+				host = nextInboundVia.getReceived() != null ? nextInboundVia.getReceived() : nextInboundVia.getHost();
+								
+				port = nextInboundVia.getPort() > 0 ? nextInboundVia.getPort() : nextInboundVia.getRPort();
+				
+				itspAccountInfo = getItspAccount(host, port);
+				
+				if (itspAccountInfo != null) {
+					
+					return itspAccountInfo;
+				}
+			}
+		}
+		return null;
 	}
-      }
-      return null;
-    }
 
     // //////////////////////////////////////////////////////////////////
     // Public methods.

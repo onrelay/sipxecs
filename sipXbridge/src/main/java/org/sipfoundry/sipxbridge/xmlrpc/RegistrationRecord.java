@@ -5,9 +5,6 @@
  */
 package org.sipfoundry.sipxbridge.xmlrpc;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Registration record.
  */

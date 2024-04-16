@@ -6,27 +6,15 @@
  */
 package org.sipfoundry.sipxbridge;
 
+import org.apache.log4j.Logger;
+
 import gov.nist.javax.sip.ClientTransactionExt;
 import gov.nist.javax.sip.TlsSecurityPolicy;
-import gov.nist.javax.sip.stack.SIPTransaction;
-
-import java.text.ParseException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.sip.address.Hop;
-import javax.sip.address.SipURI;
-import javax.sip.header.RouteHeader;
-
-import org.apache.log4j.Logger;
-import org.apache.xmlrpc.XmlRpcException;
-import org.sipfoundry.commons.siprouter.FindSipServer;
 
 public class SipxTlsSecurityPolicy implements TlsSecurityPolicy {
 
-    private static final Logger logger = Logger.getLogger(SipxTlsSecurityPolicy.class);
+    @SuppressWarnings("unused")
+	private static final Logger logger = Logger.getLogger(SipxTlsSecurityPolicy.class);
 
     /**
      * Enforce any application-specific security policy for TLS clients.
@@ -37,8 +25,11 @@ public class SipxTlsSecurityPolicy implements TlsSecurityPolicy {
     @Override
     public void enforceTlsPolicy(ClientTransactionExt transaction) throws SecurityException
     {
+        /* OR: blocks permanently on extractCertIdentities
+
        // accept only certificates that match the intended destination
         if ( logger.isDebugEnabled() ) logger.debug("SipxTlsSecurityPolicy::enforceTlsPolicy");
+        
         List<String> certIdentities = null;
         try {
             certIdentities = ((SIPTransaction)transaction).extractCertIdentities();
@@ -100,6 +91,7 @@ public class SipxTlsSecurityPolicy implements TlsSecurityPolicy {
                 throw new SecurityException("Certificate identity does not match requested domain");
             }
         }
+        */
     }
 
 }

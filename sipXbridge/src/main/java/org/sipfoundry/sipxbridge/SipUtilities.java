@@ -6,27 +6,6 @@
  */
 package org.sipfoundry.sipxbridge;
 
-import gov.nist.javax.sdp.MediaDescriptionImpl;
-import gov.nist.javax.sdp.fields.AttributeField;
-import gov.nist.javax.sip.DialogExt;
-import gov.nist.javax.sip.TransactionExt;
-import gov.nist.javax.sip.header.HeaderFactoryExt;
-import gov.nist.javax.sip.header.HeaderFactoryImpl;
-import gov.nist.javax.sip.header.extensions.ReferencesHeader;
-import gov.nist.javax.sip.header.extensions.ReferredByHeader;
-import gov.nist.javax.sip.header.extensions.ReplacesHeader;
-import gov.nist.javax.sip.header.extensions.SessionExpires;
-import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
-import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
-import gov.nist.javax.sip.header.ims.PPreferredIdentityHeader;
-import gov.nist.javax.sip.header.ims.PrivacyHeader;
-import gov.nist.javax.sip.message.Content;
-import gov.nist.javax.sip.message.MessageExt;
-import gov.nist.javax.sip.message.MultipartMimeContent;
-import gov.nist.javax.sip.message.RequestExt;
-import gov.nist.javax.sip.message.SIPResponse;
-import gov.nist.javax.sip.message.SIPRequest;
-
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -61,7 +40,6 @@ import javax.sip.Transaction;
 import javax.sip.address.Address;
 import javax.sip.address.Hop;
 import javax.sip.address.SipURI;
-import javax.sip.address.URI;
 import javax.sip.header.AllowHeader;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
@@ -95,12 +73,33 @@ import javax.sip.message.Response;
 import org.apache.log4j.Logger;
 import org.sipfoundry.commons.siprouter.FindSipServer;
 
+import gov.nist.javax.sdp.MediaDescriptionImpl;
+import gov.nist.javax.sdp.fields.AttributeField;
+import gov.nist.javax.sip.DialogExt;
+import gov.nist.javax.sip.TransactionExt;
+import gov.nist.javax.sip.header.HeaderFactoryExt;
+import gov.nist.javax.sip.header.HeaderFactoryImpl;
+import gov.nist.javax.sip.header.extensions.ReferencesHeader;
+import gov.nist.javax.sip.header.extensions.ReferredByHeader;
+import gov.nist.javax.sip.header.extensions.ReplacesHeader;
+import gov.nist.javax.sip.header.extensions.SessionExpires;
+import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
+import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
+import gov.nist.javax.sip.header.ims.PPreferredIdentityHeader;
+import gov.nist.javax.sip.header.ims.PrivacyHeader;
+import gov.nist.javax.sip.message.Content;
+import gov.nist.javax.sip.message.MessageExt;
+import gov.nist.javax.sip.message.MultipartMimeContent;
+import gov.nist.javax.sip.message.RequestExt;
+import gov.nist.javax.sip.message.SIPRequest;
+import gov.nist.javax.sip.message.SIPResponse;
+
 /**
  *
  * @author mranga
  *
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked","rawtypes"})
 class SipUtilities {
 
 	private static Logger logger = Logger.getLogger(SipUtilities.class);
@@ -111,6 +110,9 @@ class SipUtilities {
 	private static final String APPLICATION = "application";
 
 	private static final String SDP = "sdp";
+	
+	private static final int MIN_DYNAMIC_CODDEC_ID = 96;
+	private static final int MAX_DYNAMIC_CODDEC_ID = 127;
 
 	/**
 	 * Create the UA header.
@@ -221,8 +223,7 @@ class SipUtilities {
 				throw new IllegalArgumentException("Bad transport: "
 						+ transport);
 
-			ListeningPoint listeningPoint = sipProvider
-					.getListeningPoint(transport);
+			ListeningPoint listeningPoint = sipProvider.getListeningPoint(transport);
 			String host = listeningPoint.getIPAddress();
 			int port = listeningPoint.getPort();
 			return ProtocolObjects.headerFactory.createViaHeader(host, port,
@@ -314,8 +315,8 @@ class SipUtilities {
 
                 try {
                     if ( transport == null ) {
-                        logger.warn("Null transport specified -- assuming UDP");
-                        transport = "udp";
+                        logger.warn("Null transport specified -- use default");
+                        transport = Gateway.DEFAULT_PROXY_TRANSPORT;
                     }
                     ListeningPoint lp = provider.getListeningPoint(transport);
                     String ipAddress = lp.getIPAddress();
@@ -394,11 +395,13 @@ class SipUtilities {
 				}
 				SipURI sipUri = ProtocolObjects.addressFactory.createSipURI(
 						user, Gateway.getGlobalAddress());
-				String transport = "udp";
+				String transport;
 				if ( transaction != null ) {
 					transport = SipUtilities.getTopmostViaTransport(transaction.getRequest());
 				} else if ( itspAccount != null ) {
 					transport = itspAccount.getOutboundTransport();
+				} else {
+					transport = Gateway.DEFAULT_ITSP_TRANSPORT;
 				}
 
 				//
@@ -433,9 +436,11 @@ class SipUtilities {
 	static ContactHeader createContactHeader(String user, SipProvider provider,
 			String transport) {
 		try {
+            if ( logger.isDebugEnabled() ) logger.debug("createContactHeader = " + provider.toString() + " transport = " + transport );
+
 			if ( transport == null ) {
-				logger.warn("Null transport specified -- assuming UDP");
-				transport = "udp";
+				logger.warn("Null transport specified -- use default");
+				transport = Gateway.DEFAULT_ITSP_TRANSPORT;
 			}
 			ListeningPoint lp = provider.getListeningPoint(transport);
 			String ipAddress = lp.getIPAddress();
@@ -480,7 +485,7 @@ class SipUtilities {
 			//
 			HopImpl hop = new HopImpl(Gateway.getLocalAddress(),
 						Gateway.getBridgeConfiguration().getSipxProxyPort(),
-						"tcp");
+						Gateway.getBridgeConfiguration().getSipxProxyTransport());
 			itspAccount.setHopToRegistrar(hop);
 		}
 
@@ -732,7 +737,9 @@ class SipUtilities {
 
 	static Request createInviteRequest(SipURI requestUri,
 			SipProvider sipProvider, ItspAccountInfo itspAccount,
-			FromHeader from, String callId, Collection<Hop> addresses)
+			FromHeader from, PAssertedIdentityHeader passertedIdentityHeader, String callId, 
+                        Collection<Hop> addresses)
+
 			throws SipException, SipXbridgeException {
 		try {
 
@@ -746,10 +753,12 @@ class SipUtilities {
 			}
 
 			Address address = itspAccount.getCallerAlias(from.getAddress());
-			PAssertedIdentityHeader passertedIdentityHeader = null;
-			if (address != null) {
+			if (address != null && passertedIdentityHeader == null ) {
+
 				passertedIdentityHeader = ((HeaderFactoryExt) ProtocolObjects.headerFactory)
 						.createPAssertedIdentityHeader(address);
+				
+
 			}
 			Address paddress = itspAccount.getPreferredCallerAlias(from.getAddress());
 			PPreferredIdentityHeader ppreferredIdentityHeader = null;
@@ -766,6 +775,7 @@ class SipUtilities {
 			 * From: header Domain determination.
 			 */
 			String domain = fromDomain;
+			@SuppressWarnings("unused")
 			Address fromAddress = null;
 			if (itspAccount.isFromItsp()) {
 			    if (itspAccount.getUserName() != null && itspAccount.getDefaultDomain() != null) {
@@ -798,7 +808,7 @@ class SipUtilities {
 
 			fromHeader.setTag(new Long(Math.abs(new java.util.Random()
 					.nextLong())).toString());
-			if (!domain.equals("anonymous.invalid") && fromDisplayName != null) {
+			if (!domain.equals("anonymous.invalid") && fromDisplayName != null ) {
 				// Set the from header display name.
 				fromHeader.getAddress().setDisplayName(fromDisplayName);
 			}
@@ -912,7 +922,7 @@ class SipUtilities {
             {
                 HopImpl sipXHop = new HopImpl(Gateway.getLocalAddress(),
                             Gateway.getBridgeConfiguration().getSipxProxyPort(),
-                            "tcp");
+                            Gateway.getBridgeConfiguration().getSipxProxyTransport());
                 RouteHeader sipXProxyRoute = SipUtilities.createRouteHeader(sipXHop);
                 request.setHeader(sipXProxyRoute);
             }
@@ -949,7 +959,7 @@ class SipUtilities {
 			String messageString = new String(message.getRawContent());
 			SessionDescription sd = SdpFactory.getInstance()
 					.createSessionDescription(messageString);
-			SipUtilities.removeCrypto(sd);
+			  // OR: SipUtilities.removeCrypto(sd);
 			return sd;
 		} else {
 			MultipartMimeContent mmc = ((MessageExt) message)
@@ -964,7 +974,7 @@ class SipUtilities {
 							.toString());
 					SessionDescription sd = SdpFactory.getInstance()
 							.createSessionDescription(messageString);
-					SipUtilities.removeCrypto(sd);
+					 // OR : SipUtilities.removeCrypto(sd);
 					return sd;
 				}
 			}
@@ -993,8 +1003,13 @@ class SipUtilities {
 						true);
 				for (Iterator it1 = formats.iterator(); it1.hasNext();) {
 					Object format = it1.next();
-					int fmt = new Integer(format.toString());
-					retval.add(fmt);
+					try{
+						int fmt = new Integer(format.toString());
+						retval.add(fmt);
+					} catch (NumberFormatException nfex) {
+						logger.warn("Unexpected format:" + format + " - No Need to kill the call", nfex);
+					}
+
 				}
 			}
 			return retval;
@@ -1080,13 +1095,10 @@ class SipUtilities {
 				Vector attributes = mediaDescription.getAttributes(true);
 				for (Iterator it1 = attributes.iterator(); it1.hasNext();) {
 					Attribute attr = (Attribute) it1.next();
-					if (attr.getName().equalsIgnoreCase("crypto")) {
+					if ( isCryptoAttribute( attr )) {
 						it1.remove();
-						if ( logger.isDebugEnabled() ) logger.debug("remove crypto");
-					} else if (attr.getName().equalsIgnoreCase("encryption")) {
-						it1.remove();
-						if ( logger.isDebugEnabled() ) logger.debug("remove encryption");
-					}
+						if ( logger.isDebugEnabled() ) logger.debug("remove crypto attribute");
+					} 
 				}
 
 			}
@@ -1095,8 +1107,36 @@ class SipUtilities {
 			throw new SipXbridgeException(
 					"Unexpected exception removing sdp encryption params", ex);
 		}
-
 	}
+	
+	static boolean isCryptoAttribute( Attribute attribute ) {
+		try {
+			if (attribute.getName().equalsIgnoreCase("crypto")) {
+				if ( logger.isDebugEnabled() ) logger.debug("isCryptoAttribute crypto");
+				return true;
+			} 
+			else if (attribute.getName().equalsIgnoreCase("encryption")) {
+				if ( logger.isDebugEnabled() ) logger.debug("isCryptoAttribute encryption");
+				return true;
+			}			
+			else if (attribute.getName().equalsIgnoreCase("setup")) {
+				if ( logger.isDebugEnabled() ) logger.debug("isCryptoAttribute setup");
+				return true;
+			}			
+			else if (attribute.getName().equalsIgnoreCase("fingerprint")) {
+				if ( logger.isDebugEnabled() ) logger.debug("isCryptoAttribute fingerprint");
+				return true;
+			}
+			
+			return false;
+			
+		} catch (Exception ex) {
+			logger.fatal("Unexpected exception!", ex);
+			throw new SipXbridgeException(
+					"Unexpected exception removing sdp encryption params", ex);
+		}
+	}
+	
 
 	/**
 	 * Cleans the Session description to include only the specified codec set.
@@ -1117,37 +1157,19 @@ class SipUtilities {
 			}
 
 			if ( logger.isDebugEnabled() ) logger.debug("Codecs = " + codecs);
-			Vector mediaDescriptions = sessionDescription
-					.getMediaDescriptions(true);
+			
+			Vector mediaDescriptions = sessionDescription.getMediaDescriptions(true);
+			
+			Set<Integer> filteredCodecs = new HashSet<Integer>();
 
 			for (Iterator it = mediaDescriptions.iterator(); it.hasNext();) {
 
-				MediaDescription mediaDescription = (MediaDescription) it
-						.next();
-				Vector formats = mediaDescription.getMedia().getMediaFormats(
-						true);
+				MediaDescription mediaDescription = (MediaDescription) it.next();
+								
 				String mediaType = mediaDescription.getMedia().getMediaType();
-
+				
 				if ( mediaType.equals("audio")) {
-					for (Iterator it1 = formats.iterator(); it1.hasNext();) {
-						Object format = it1.next();
-						try {
-							Integer fmt = new Integer(format.toString());
-							if (!codecs.contains(fmt)) {
-								/*
-								 * Preserve the telephone event lines and reserved payload -- this upsets
-								 * some ITSPs otherwise. AT&T Hack.
-								 */
-								if (fmt != 100 && fmt != 101 && fmt != 19) {
-									it1.remove();
-								}
-							}
-						} catch (NumberFormatException ex) {
-							logger.warn("Could not parse media format " + format);
-							continue;
-						}
-					}
-
+										
 					Vector attributes = mediaDescription.getAttributes(true);
 					for (Iterator it1 = attributes.iterator(); it1.hasNext();) {
 						Attribute attr = (Attribute) it1.next();
@@ -1163,32 +1185,107 @@ class SipUtilities {
 								int rtpMapCodec = Integer.parseInt(attrs[0]);
 
 								if (!codecs.contains(rtpMapCodec)) {
-									/*
-									 * Preserve the telephone event lines -- this upsets
-									 * some ITSPs otherwise. AT&T Hack.
-									 */
-									if (rtpMapCodec != 100 && rtpMapCodec != 101) {
-									    if ( logger.isDebugEnabled()) {
-									        logger.debug("codecs does not contain " + rtpMapCodec + " removing it ");
-									    }
+									
+									// Preserve the telephone event lines -- this upsets
+									// some ITSPs otherwise. AT&T Hack.
+									
+									if (rtpMapCodec < MIN_DYNAMIC_CODDEC_ID || rtpMapCodec > MAX_DYNAMIC_CODDEC_ID ) {
+									   
+										if ( logger.isDebugEnabled()) logger.debug("Dynamic payload ID outside allowed range: " + rtpMapCodec + " removing it ");
+									    
 										it1.remove();
+										
+										filteredCodecs.add( rtpMapCodec );
+									}
+									else if( attribute.contains("AMR") || attribute.contains("mode-change-capability") ){
+										
+										if ( logger.isDebugEnabled()) logger.debug("AMR codec: " + rtpMapCodec + " removing it ");
+									    
+										it1.remove();
+										
+										filteredCodecs.add( rtpMapCodec );
 									}
 								}
 							} catch ( NumberFormatException ex) {
 								logger.warn("could not parse RTP Map " + attrs[0]);
 								continue;
 							}
-						} else if (attr.getName().equalsIgnoreCase("crypto")) {
+						} 
+																
+						
+						/* OR change
+						else if ( isCryptoAttribute(attr) ) {
 							it1.remove();
 							if ( logger.isDebugEnabled() ) logger.debug("Not adding crypto");
-						} else if (attr.getName().equalsIgnoreCase("encryption")) {
+						} 
+						*/	
+						
+						// OR: Needed since some endpoints are not DTLS compatible, we require SDES
+						if (attr.getName().equalsIgnoreCase("setup")) {
+							if ( logger.isDebugEnabled() ) logger.debug("removing DTLS setup attribute: " + attr.getValue()  );
 							it1.remove();
-							if ( logger.isDebugEnabled() ) logger.debug("Not adding encryption");
+						} 
+						
+						if (attr.getName().equalsIgnoreCase("fingerprint")) {
+							if ( logger.isDebugEnabled() ) logger.debug("removing DTLS fingerprint attribute: " + attr.getValue() );
+							it1.remove();
 						}
-
+						
+						// OR: Filtering ICE parameters not appropriate for trunking
+						if (attr.getName().toLowerCase().startsWith("ice-")) {
+							if ( logger.isDebugEnabled() ) logger.debug("removing ICE attribute: " + attr.getValue() );
+							it1.remove();
+						} 
+						
+						if (attr.getName().equalsIgnoreCase("candidate")) {
+							if ( logger.isDebugEnabled() ) logger.debug("removing ICE candidate attribute: " + attr.getValue() );
+							it1.remove();
+						}
 					}
+					
+					// OR: Needed since some endpoints are not DTLS compatible, we require SDES
+					
+					String protocol = mediaDescription.getMedia().getProtocol();
+					
+					if ( logger.isDebugEnabled() ) logger.debug("filtering DTLS from protocol: " + protocol);
+					
+					protocol = protocol.replace( "SAVPF", "SAVP" );
+					protocol = protocol.replace( "UDP/TLS/RTP", "RTP" );
+										
+					mediaDescription.getMedia().setProtocol( protocol );
+				
 				}
+			}		
 
+			for (Iterator it = mediaDescriptions.iterator(); it.hasNext();) {
+	
+				MediaDescription mediaDescription = (MediaDescription) it.next();
+								
+				String mediaType = mediaDescription.getMedia().getMediaType();
+				
+				if ( mediaType.equals("audio")) {
+										
+					Vector formats = mediaDescription.getMedia().getMediaFormats(true);
+	
+					for (Iterator it1 = formats.iterator(); it1.hasNext();) {
+						
+						Object format = it1.next();
+						try {
+							Integer fmt = new Integer(format.toString());
+							if (filteredCodecs.contains(fmt)) {
+								
+								 if ( logger.isDebugEnabled())   logger.debug("Removing filtered codec from media formats: " + fmt );
+								    
+								it1.remove();
+								
+							}
+						} catch (NumberFormatException ex) {
+							logger.warn("Could not parse media format " + format);
+							continue;
+						}
+					}
+	
+				}
 			}
 
 			return sessionDescription;
@@ -1415,7 +1512,12 @@ class SipUtilities {
 	 * @param port
 	 *            -- new port to assign.
 	 */
-	static void fixupSdpMediaAddresses(SessionDescription sessionDescription,
+		static void fixupSdpMediaAddresses(SessionDescription sessionDescription,
+				String address) {
+			fixupSdpMediaAddresses( sessionDescription, address, -1 );
+		}
+
+		static void fixupSdpMediaAddresses(SessionDescription sessionDescription,
 			String address, int port) {
 		try {
 			Connection connection = sessionDescription.getConnection();
@@ -1428,10 +1530,17 @@ class SipUtilities {
 			origin.setAddress(address);
 			MediaDescription mediaDescription = getMediaDescription(sessionDescription);
 			if (mediaDescription.getConnection() != null) {
+	            logger.debug("RtpReceiverEndpoint.fixupSdpMediaAddresses() oldaddress = " + mediaDescription.getConnection().getAddress());
+	            logger.debug("RtpReceiverEndpoint.fixupSdpMediaAddresses() newaddress = " + address);
 				mediaDescription.getConnection().setAddress(address);
 			}
 
-			mediaDescription.getMedia().setMediaPort(port);
+			if( port != -1 ) {	
+	            logger.debug("RtpReceiverEndpoint.fixupSdpMediaAddresses() oldport = " + mediaDescription.getMedia().getMediaPort());
+	            logger.debug("RtpReceiverEndpoint.fixupSdpMediaAddresses() newport = " + port);
+
+				mediaDescription.getMedia().setMediaPort(port);
+			}
 
 		} catch (Exception ex) {
 			logger.error("Unepxected exception fixing up sdp addresses", ex);
@@ -1467,6 +1576,40 @@ class SipUtilities {
 		}
 
 	}
+	
+	static void setProxyRoute(Request request) {
+	    try {
+	    		        
+            RouteHeader routeHeader = SipUtilities.createRouteHeader(
+            		new HopImpl( Gateway.getBridgeConfiguration().getSipxProxyDomain(),
+            				Gateway.getBridgeConfiguration().getSipxProxyPort(), 
+            				Gateway.getBridgeConfiguration().getSipxProxyTransport())  );
+            		
+            request.setHeader(routeHeader);
+	        	        
+
+	    } catch (Exception ex) {
+	        logger.error("Unexpected exception ", ex);
+	        throw new SipXbridgeException("Unexepcted exception", ex);
+	    }
+
+	}
+
+	static void setProxyRoute(Response response) {
+		try {
+			
+            RouteHeader routeHeader = SipUtilities.createRouteHeader(
+            		new HopImpl( Gateway.getBridgeConfiguration().getSipxProxyDomain(),
+            				Gateway.getBridgeConfiguration().getSipxProxyPort(), 
+            				Gateway.getBridgeConfiguration().getSipxProxyTransport())  );
+            		
+            response.setHeader(routeHeader);
+
+		} catch (Exception ex) {
+			logger.error("Unexpected exception ", ex);
+			throw new SipXbridgeException("Unexepcted exception", ex);
+		}
+	}
 
 	/**
 	 * Fix up request to use global addressing.
@@ -1475,12 +1618,17 @@ class SipUtilities {
 	 */
 	static void setGlobalAddresses(Request request) {
 	    try {
+	    	
 	        String transport = ((ViaHeader) request.getHeader(ViaHeader.NAME))
 	                            .getTransport().toLowerCase();
+	                            	        
 	        SipURI sipUri = ProtocolObjects.addressFactory.createSipURI(null,
 	                        Gateway.getGlobalAddress());
+	        
 	        sipUri.setPort(Gateway.getGlobalPort(transport));
+	        
 	        ContactHeader contactHeader = (ContactHeader) request.getHeader(ContactHeader.NAME);
+	        
 	        if (contactHeader != null) {
 	            if ( transport.equalsIgnoreCase("TLS")) {
 	                sipUri.setTransportParam(transport);
@@ -1499,8 +1647,13 @@ class SipUtilities {
 
 	static void setGlobalAddress(Response response) {
 		try {
+			
+			/* OR Wrong with TLS
 			String transport = ((ViaHeader) response.getHeader(ViaHeader.NAME))
 					.getTransport().toLowerCase();
+					*/
+	    	String transport = Gateway.getSipxProxyTransport();
+			
 			SipURI sipUri = ProtocolObjects.addressFactory.createSipURI(null,
 					Gateway.getGlobalAddress());
 			sipUri.setPort(Gateway.getGlobalPort(transport));
@@ -1940,7 +2093,7 @@ class SipUtilities {
 							.getURI();
 					HopImpl hop = new HopImpl(Gateway.getLocalAddress(),
 							Gateway.getBridgeConfiguration().getLocalPort(),
-							"udp");
+							Gateway.DEFAULT_ITSP_TRANSPORT );
 					RouteHeader route = SipUtilities.createRouteHeader(hop);
 					requestUri.setHeader("route", URLEncoder.encode(route
 							.getAddress().toString(), "UTF-8"));
@@ -2229,7 +2382,7 @@ class SipUtilities {
 		// Skip the log writer frame and log all the other stack frames.
 		for (int i = 0; i < ste.length; i++) {
 			String callFrame = "[" + ste[i].getFileName() + ":"
-					+ ste[i].getLineNumber() + "]";
+					+ ste[i].getLineNumber() + "]\n";
 			pw.print(callFrame);
 		}
 		pw.close();
@@ -2248,8 +2401,17 @@ class SipUtilities {
 	}
 
 	public static String getViaTransport(Message sipMessage) {
-		ViaHeader header = (ViaHeader) sipMessage.getHeader(ViaHeader.NAME);
-		return (header == null ? "udp" : header.getTransport());
+		
+	    Iterator vias = sipMessage.getHeaders(ViaHeader.NAME);
+	    
+		while( vias != null && vias.hasNext())
+		{
+			ViaHeader header = (ViaHeader) vias.next();
+			
+			return header.getTransport();
+		}    
+
+		return Gateway.DEFAULT_ITSP_TRANSPORT;
 	}
 
 	public static String getViaHost(Message sipMessage) {

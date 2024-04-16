@@ -7,11 +7,6 @@
 package org.sipfoundry.sipxbridge;
 
 import java.text.ParseException;
-import java.util.TimerTask;
-
-import gov.nist.javax.sip.DialogExt;
-import gov.nist.javax.sip.header.extensions.ReferencesHeader;
-import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
 
 import javax.sdp.SdpParseException;
 import javax.sdp.SessionDescription;
@@ -21,14 +16,20 @@ import javax.sip.DialogState;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
-import javax.sip.address.SipURI;
 import javax.sip.header.AcceptHeader;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.ContentTypeHeader;
+import javax.sip.header.Header;
 import javax.sip.message.Request;
-import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+
+import gov.nist.javax.sip.DialogExt;
+import gov.nist.javax.sip.header.HeaderFactoryExt;
+import gov.nist.javax.sip.header.SIPHeader;
+import gov.nist.javax.sip.header.extensions.ReferencesHeader;
+import gov.nist.javax.sip.header.extensions.SessionExpires;
+import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
 
 public class RtpSessionUtilities {
 
@@ -83,6 +84,8 @@ public class RtpSessionUtilities {
 			return;
 		}
 		AuthorizationHeader authorizationHeader = null;
+		Header historyInfoHeader = null;
+
 	    /*
 		 * If we are re-negotiating media, then use the new session description
 		 * of the incoming invite for the call setup attempt.
@@ -108,6 +111,8 @@ public class RtpSessionUtilities {
 						inboundSessionDescription);
 			}
 	        authorizationHeader = (AuthorizationHeader)request.getHeader(AuthorizationHeader.NAME);  
+	        historyInfoHeader = request.getHeader("History-Info");  
+
 		}
 
 		/*
@@ -115,8 +120,8 @@ public class RtpSessionUtilities {
 		 * the correct addresses already set due to the setSessionDescription 
 		 * operation above.
 		 */
-		SessionDescription outboundSessionDescription = rtpSession
-				.getReceiver().getSessionDescription();
+		SessionDescription outboundSessionDescription = SipUtilities.cloneSessionDescription(
+				rtpSession.getReceiver().getSessionDescription() );
 
 		// HACK alert. Some ITSPs do not like sendonly
 		String duplexity = SipUtilities
@@ -180,6 +185,38 @@ public class RtpSessionUtilities {
 		} else {
 		    SipUtilities.addLanAllowHeaders(newInvite);
 		}
+
+        if( historyInfoHeader != null ){
+            String header = ((SIPHeader)historyInfoHeader).getValue();
+             if( header != null){
+                    if(header.contains("index=")){
+                            header.replace("index=", "index=1.");
+                    }
+            }
+            historyInfoHeader = 
+            		(Header) ProtocolObjects.headerFactory.createHeader( "History-Info", header);
+
+            newInvite.setHeader(historyInfoHeader);
+        }
+
+		/*
+		 * By default the UAC always refreshes the session.
+		 */
+        
+        int sessionTimerInterval;
+        ItspAccountInfo itspAccount = peerDat.getItspInfo();
+        if( itspAccount != null ) {
+        	sessionTimerInterval = itspAccount.getSessionTimerInterval();
+        }
+        else {
+        	sessionTimerInterval = peerDat.sessionExpires;
+        }
+		SessionExpires sessionExpires = (SessionExpires) ((HeaderFactoryExt) ProtocolObjects.headerFactory)
+				.createSessionExpiresHeader( sessionTimerInterval );
+		sessionExpires.setParameter("refresher", "uac");
+		sessionExpires.setExpires( sessionTimerInterval );
+		newInvite.addHeader(sessionExpires);
+		
 
 		newInvite.removeHeader(PAssertedIdentityHeader.NAME);
 		newInvite.addHeader(SipUtilities.createReferencesHeader(serverTransaction.getRequest(),ReferencesHeader.CHAIN));
@@ -310,7 +347,7 @@ public class RtpSessionUtilities {
 		
 		if ( logger.isDebugEnabled() ) logger.debug("rtpSession.getTransmitter().sessionDescription = " + rtpSession.getTransmitter().getSessionDescription());
 
-		SessionDescription sessionDescription = SipUtilities.getSessionDescription(request);
+		final SessionDescription sessionDescription = SipUtilities.getSessionDescription(request);
 
 		int newport = SipUtilities
 				.getSessionDescriptionMediaPort(sessionDescription);
@@ -347,22 +384,23 @@ public class RtpSessionUtilities {
 			/*
 			 * Somebody is trying to remove the hold.
 			 */
-			rtpSession.getTransmitter().setSessionDescription(
-					sessionDescription, true);
+			rtpSession.getTransmitter().setSessionDescription(sessionDescription, true);
 			removeHold(rtpSession, serverTransaction, dialog);
 			return RtpSessionOperation.REMOVE_HOLD;
-		} else if (!rtpSession.getTransmitter().getIpAddress().equals(
-				newIpAddress)
-				|| rtpSession.getTransmitter().getPort() != newport) {
+		} else if (rtpSession.getTransmitter().getIpAddress().equals( newIpAddress) &&
+					rtpSession.getTransmitter().getPort() != newport) {
 			/*
 			 * This is just a re-invite where he has changed his port. simply
 			 * adjust the ports so we know where the other end expects to get
 			 * data.
 			 */
-			rtpSession.getTransmitter().setSessionDescription(
-					sessionDescription, true);
+			
+			rtpSession.getTransmitter().setSessionDescription(sessionDescription, true);
+			
+            // OR: The PORT_REMAP handling is not working correctly, and in some cases incorrectly change port, root cause unknown
+			//return RtpSessionOperation.PORT_REMAP;
+			return RtpSessionOperation.NO_OP;
 
-			return RtpSessionOperation.PORT_REMAP;
 		} else if (SipUtilities
 				.getSessionDescriptionVersion(sessionDescription) == SipUtilities
 				.getSessionDescriptionVersion(rtpSession.getTransmitter()
@@ -375,8 +413,7 @@ public class RtpSessionUtilities {
 			/*
 			 * Must be the other side trying to renegotiate codec.
 			 */
-			rtpSession.getTransmitter().setSessionDescription(
-					sessionDescription, true);
+			rtpSession.getTransmitter().setSessionDescription(sessionDescription, true);
 
 			return RtpSessionOperation.CODEC_RENEGOTIATION;
 		}

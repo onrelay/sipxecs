@@ -13,15 +13,12 @@ package org.sipfoundry.sipxbridge;
 import java.util.Set;
 
 import javax.sdp.SessionDescription;
-import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ResponseEvent;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
-import javax.sip.SipProvider;
-import javax.sip.TransactionState;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 

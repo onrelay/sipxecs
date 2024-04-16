@@ -135,6 +135,7 @@ public class BackToBackUserAgentFactory {
 				 * proxy. If we know where the request is coming from, we can
 				 * set up various response fields accordingly.
 				 */
+				@SuppressWarnings("rawtypes")
 				Iterator inboundVias = request.getHeaders(ViaHeader.NAME);
 				accountInfo = Gateway.getAccountManager().getItspAccount(inboundVias);
 			}
@@ -195,7 +196,8 @@ public class BackToBackUserAgentFactory {
 		    logger.error("Exception while trying to create B2BUA",ex);
 		    throw ex;
 		} catch (Exception ex) {
-			logger.error("unexpected exception ", ex);
+			logger.error("unexpected exception: " + ex.getMessage(), ex);
+			if ( logger.isDebugEnabled() ) logger.debug( ex.getStackTrace() );
 			throw new SipXbridgeException(
 					"Initialization exception while processing request", ex);
 		} finally {

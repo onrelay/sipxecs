@@ -17,6 +17,7 @@
 package org.sipfoundry.sipxconfig.cert;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -109,7 +110,7 @@ public class CertificateConfig implements ConfigProvider {
             //remove old certs
             FileUtils.deleteQuietly(authDir);
             authDir.mkdir();
-            JavaKeyStore store = new JavaKeyStore();
+            JavaKeyStore store = new JavaKeyStore( new FileInputStream( CertificateManager.JAVA_CACERTS ) );
             for (String authority : m_certificateManager.getAuthorities()) {
                 String authCert = m_certificateManager.getAuthorityCertificate(authority);
                 FileUtils.writeStringToFile(new File(authDir, authority + ".crt"), authCert);

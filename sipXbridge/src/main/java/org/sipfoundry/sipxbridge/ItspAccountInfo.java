@@ -28,6 +28,8 @@ import org.sipfoundry.commons.siprouter.FindSipServer;
 import org.sipfoundry.sipxrelay.KeepaliveMethod;
 import org.sipfoundry.sipxbridge.xmlrpc.RegistrationRecord;
 
+
+
 /**
  * The information pertaining to an ITSP account resides in this class.
  *
@@ -95,7 +97,7 @@ public class ItspAccountInfo  {
     /**
      * What transport to use for signaling.
      */
-    private String outboundTransport = "udp";
+    private String outboundTransport = Gateway.DEFAULT_ITSP_TRANSPORT;
 
     /**
      * Whether or not to register on gateway initialization
@@ -153,7 +155,8 @@ public class ItspAccountInfo  {
     /*
      * Computed from the asserted Identity ( so we dont keep re-computing this)
      */
-    private Address callerAlias;
+    @SuppressWarnings("unused")
+	private Address callerAlias;
 
     /*
      * If set to true use the default asserted Identity.
@@ -168,7 +171,8 @@ public class ItspAccountInfo  {
     /*
      * Computed from the preferred Identity ( so we dont keep re-computing this)
      */
-    private Address preferredCallerAlias;
+    @SuppressWarnings("unused")
+	private Address preferredCallerAlias;
 
     /*
      * If set to true use the default preferred Identity.
@@ -585,7 +589,7 @@ public class ItspAccountInfo  {
 
             this.crLfTimerTaskStarted = true;
             this.crlfTimerTask = new CrLfTimerTask(Gateway
-                    .getWanProvider("udp"), this);
+                    .getWanProvider( this.getOutboundTransport() ), this);
             if ( logger.isDebugEnabled() ) logger.debug("ItspAccountInfo: startCrLfTimerTask() : "
                     + this.getProxyDomain() + " keepalive = "
                     + Gateway.getSipKeepaliveSeconds());
@@ -723,7 +727,8 @@ public class ItspAccountInfo  {
         this.preferredCallerId = callerId;
     }
 
-    private String getDefaultCallerId() {
+    @SuppressWarnings("unused")
+	private String getDefaultCallerId() {
 	    if (this.getDefaultDomain() == null ) {
 		    return null;
 	    }
@@ -989,4 +994,15 @@ public class ItspAccountInfo  {
     public void setRouteByToHeader(boolean routeByToHeader) {
         this.isRouteByHeader = routeByToHeader;
     }
+
+	@Override
+	public String toString() {
+		return "ItspAccountInfo [outboundProxy=" + outboundProxy + ", outboundProxyPort=" + outboundProxyPort
+				+ ", userName=" + userName + ", proxyDomain=" + proxyDomain + ", sipxecsLineId=" + sipxecsLineId
+				+ ", authenticationRealm=" + authenticationRealm + ", outboundTransport=" + outboundTransport
+				+ ", callerId=" + callerId + ", enabled=" + enabled + ", authenticationUserName="
+				+ authenticationUserName + "]";
+	}
+    
+    
 }

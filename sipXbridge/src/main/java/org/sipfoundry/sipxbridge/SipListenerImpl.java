@@ -6,11 +6,6 @@
  */
 package org.sipfoundry.sipxbridge;
 
-import gov.nist.javax.sip.DialogTimeoutEvent;
-import gov.nist.javax.sip.SipListenerExt;
-import gov.nist.javax.sip.SipStackExt;
-import gov.nist.javax.sip.TransactionExt;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.TimerTask;
@@ -23,18 +18,14 @@ import javax.sip.IOExceptionEvent;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
 import javax.sip.ServerTransaction;
-import javax.sip.SipListener;
 import javax.sip.SipProvider;
 import javax.sip.TimeoutEvent;
-import javax.sip.Transaction;
 import javax.sip.TransactionAlreadyExistsException;
 import javax.sip.TransactionState;
 import javax.sip.TransactionTerminatedEvent;
-import javax.sip.address.SipURI;
 import javax.sip.address.Hop;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
-import javax.sip.header.FromHeader;
 import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
@@ -42,6 +33,10 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+
+import gov.nist.javax.sip.DialogTimeoutEvent;
+import gov.nist.javax.sip.SipListenerExt;
+import gov.nist.javax.sip.TransactionExt;
 
 /**
  * This is the JAIN-SIP listener that fields all request and response events
@@ -392,19 +387,17 @@ public class SipListenerImpl implements SipListenerExt {
                   st.sendResponse(response);
                   return;
 
+/*
             } else if (provider == Gateway.getLanProvider()
                     && method.equals(Request.INVITE)
                     && ((viaHeader.getReceived() != null && !Gateway
-                            .isAddressFromProxy(viaHeader.getReceived())) || 
-                            (viaHeader.getReceived() == null && !Gateway
+                            .isAddressFromProxy(viaHeader.getReceived())) ||
+                             (viaHeader.getReceived() == null && !Gateway
                             .isAddressFromProxy(viaHeader.getHost())))) {
-                /*
-                 * Check to see that via header originated from proxy server.
-                 */
+
                 ServerTransaction st = requestEvent.getServerTransaction();
                 if (st == null) {
                     st = provider.getNewServerTransaction(request);
-
                 }
 
                 Response forbidden = SipUtilities.createResponse(st,
@@ -413,6 +406,26 @@ public class SipListenerImpl implements SipListenerExt {
                         .setReasonPhrase("Request not issued from SIPX proxy server");
                 st.sendResponse(forbidden);
                 return;
+
+             }
+*/
+            } else if (provider == Gateway.getLanProvider() && method.equals(Request.INVITE) ) {
+            	
+				if ((viaHeader.getReceived() != null && !Gateway.isAddressFromProxy(viaHeader.getReceived()))
+						|| (viaHeader.getReceived() == null && !Gateway.isAddressFromProxy(viaHeader.getHost()))) {
+
+					ServerTransaction st = requestEvent.getServerTransaction();
+					if (st == null) {
+						st = provider.getNewServerTransaction(request);
+
+					}
+
+					Response forbidden = SipUtilities.createResponse(st, Response.FORBIDDEN);
+					forbidden.setReasonPhrase("Request not issued from SIPX proxy server");
+					st.sendResponse(forbidden);
+										
+					return;
+				}
 
             }
             
@@ -424,6 +437,7 @@ public class SipListenerImpl implements SipListenerExt {
             if ( provider == Gateway.getLanProvider() ) {
                 itspAccount = Gateway.getAccountManager().getAccount(request);              
             } else {
+				@SuppressWarnings("rawtypes")
 				Iterator inboundVias = request.getHeaders(ViaHeader.NAME);
 				itspAccount = Gateway.getAccountManager().getItspAccount(inboundVias);
             }
@@ -561,6 +575,7 @@ public class SipListenerImpl implements SipListenerExt {
 						            //int port = SipUtilities.getViaPort(response);
 						            //ItspAccountInfo itspInfo = Gateway.getAccountManager().getItspAccount(host, port);
 						            
+						@SuppressWarnings("rawtypes")
 						Iterator inboundVias = response.getHeaders(ViaHeader.NAME);
 						ItspAccountInfo itspInfo = Gateway.getAccountManager().getItspAccount(inboundVias);
 

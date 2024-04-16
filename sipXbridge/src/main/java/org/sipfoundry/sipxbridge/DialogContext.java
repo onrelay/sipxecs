@@ -7,23 +7,13 @@
 
 package org.sipfoundry.sipxbridge;
 
-import gov.nist.javax.sip.DialogExt;
-import gov.nist.javax.sip.ServerTransactionExt;
-import gov.nist.javax.sip.SipProviderExt;
-import gov.nist.javax.sip.header.HeaderFactoryExt;
-import gov.nist.javax.sip.header.extensions.MinSE;
-import gov.nist.javax.sip.header.extensions.ReferencesHeader;
-import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
-import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
-import gov.nist.javax.sip.header.ims.PPreferredIdentityHeader;
-import gov.nist.javax.sip.message.SIPResponse;
-
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Random;
 import java.util.TimerTask;
 
+import javax.sdp.SdpParseException;
 import javax.sdp.SessionDescription;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -38,6 +28,7 @@ import javax.sip.header.AcceptHeader;
 import javax.sip.header.AllowHeader;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.Header;
 import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.header.SupportedHeader;
 import javax.sip.header.ViaHeader;
@@ -46,6 +37,16 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+
+import gov.nist.javax.sip.DialogExt;
+import gov.nist.javax.sip.ServerTransactionExt;
+import gov.nist.javax.sip.header.HeaderFactoryExt;
+import gov.nist.javax.sip.header.extensions.MinSE;
+import gov.nist.javax.sip.header.extensions.ReferencesHeader;
+import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
+import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
+import gov.nist.javax.sip.header.ims.PPreferredIdentityHeader;
+import gov.nist.javax.sip.message.SIPResponse;
 
 /**
  * Store information that is specific to a Dialog. This is a temporary holding place for dialog
@@ -177,6 +178,8 @@ class DialogContext {
 
 	private ProxyAuthorizationHeader proxyAuthorizationHeader;
 
+    private Header historyInfoHeader;
+
 	/*
 	 * The id for this dialog context.
 	 */
@@ -188,7 +191,7 @@ class DialogContext {
 	private ServerTransaction pendingReInvite;
 
     private MohTimer mohTimer;
-    
+
     private static int taskCounter;
 
 
@@ -223,7 +226,9 @@ class DialogContext {
                 Request request;
                 if ( logger.isDebugEnabled() ) logger.debug("Firing Session timer " );
                 if ( logger.isDebugEnabled() ) logger.debug("DialogState = " + dialog.getState());
+                if ( logger.isDebugEnabled() ) logger.debug("Dialog = " + dialog);
                 if ( logger.isDebugEnabled() ) logger.debug("peerDialog " + DialogContext.this.getPeerDialog());
+                if ( logger.isDebugEnabled() ) logger.debug("peerDialogstate " + DialogContext.this.getPeerDialog().getState());
 
                 if (dialog.getState() == DialogState.CONFIRMED
                         && DialogContext.get(dialog).getPeerDialog() != null) {
@@ -295,7 +300,11 @@ class DialogContext {
                     ClientTransaction ctx = dialogExt.getSipProvider().getNewClientTransaction(
                             request);
                     TransactionContext.attach(ctx, Operation.SESSION_TIMER);
-                    DialogContext.this.sendReInvite(ctx);
+                     // PHANTOM CALLS
+					logger.info("session timer fired - send bye to trunk");
+					DialogContext.this.sendBye(true,"Session Timer fired, Dropping call leg.");
+
+                    // DialogContext.this.sendReInvite(ctx);
                 }
 
             } catch (Exception ex) {
@@ -651,8 +660,8 @@ class DialogContext {
      *
      * @return true if REFER is allowed.
      */
-    @SuppressWarnings("unchecked")
-    boolean isReferAllowed() {
+    @SuppressWarnings("rawtypes")
+	boolean isReferAllowed() {
         if (this.dialogCreatingTransaction instanceof ServerTransaction) {
             if (this.getRequest() == null) {
                 return false;
@@ -716,6 +725,7 @@ class DialogContext {
                 }
                 reInvite.removeHeader(SupportedHeader.NAME);
                 reInvite.removeHeader("remote-party-Id");
+
                 if ( this.itspInfo != null ) {
                     Address address = this.itspInfo.getCallerAlias(dialog.getLocalParty());
                     PAssertedIdentityHeader passertedIdentityHeader = null;
@@ -741,8 +751,16 @@ class DialogContext {
                         ReferencesHeader.CHAIN);
                 reInvite.setHeader(referencesHeader);
                 SipUtilities.addWanAllowHeaders(reInvite);
+
                 SipProvider provider = ((DialogExt) peerDialog).getSipProvider();
-                String transport = ((SipProviderExt)provider).getListeningPoints()[0].getTransport();
+ 
+                /* OR: fails, must select other side transport
+
+                String transport = getTransport();
+                */
+                
+                String transport = provider.getListeningPoints()[0].getTransport();
+                                                
                 ViaHeader viaHeader = SipUtilities.createViaHeader(provider, transport);
 
                 reInvite.setHeader(viaHeader);
@@ -757,6 +775,44 @@ class DialogContext {
                 if ( provider == Gateway.getWanProvider(transport) &&
                 		(this.itspInfo == null || this.itspInfo.isGlobalAddressingUsed())) {
                 	SipUtilities.setGlobalAddresses(reInvite);
+                }
+
+                /*
+                 * some ITSP providiers are insisting on providing reinvite with SDP (Ex: SmartOne in Hongkong)
+                 */
+                if ( triggerMessage.getRawContent() != null ){
+                        try{
+                        	
+                        	SessionDescription sessionDescription = SipUtilities.cloneSessionDescription(
+                        			SipUtilities.getSessionDescription((Request)triggerMessage));
+                            SipUtilities.setDuplexity(sessionDescription, "sendrecv");
+
+                            reInvite.setContent(sessionDescription.toString(), ProtocolObjects.headerFactory
+                                      .createContentTypeHeader("application", "sdp"));
+                        } catch(SdpParseException spe){
+                            logger.error("Exception occured in parsing SDP data, ignore and continue without SDP ", spe);
+                        }
+                }
+
+                Header historyInfoHeader = triggerMessage.getHeader("History-Info");
+                if( historyInfoHeader != null ){
+
+/*
+                        String header = ((SIPHeader)historyInfoHeader).getValue();
+                         if( header != null){
+                                if(header.contains("index=")){
+                                        header.replace("index=", "index=1.");
+                                }
+                         }
+                 historyInfoHeader = (Header) ProtocolObjects.headerFactory.createHeader( "History-Info",
+                        header);
+*/
+
+
+                    reInvite.setHeader( historyInfoHeader );
+                    setHistoryInfoHeader( historyInfoHeader );
+
+                    logger.debug( "setting history header to " + historyInfoHeader );
                 }
 
                 ClientTransaction ctx = provider.getNewClientTransaction(reInvite);
@@ -933,8 +989,31 @@ class DialogContext {
         if ( this.proxyAuthorizationHeader != null ) {
         	ack.setHeader(proxyAuthorizationHeader);
         }
+                
+        try {
+            String transport = getTransport();
+            
+            // OR: Ack not recognized by Twilio if so
+            //SipURI ackUri = (SipURI) ack.getRequestURI();
+        	//ackUri.setTransportParam( transport );
+            //if ( logger.isDebugEnabled() ) logger.debug("Added transport to ack uri: " + transport );
+        	            
+            ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);
+            if( viaHeader != null ) {
+            	viaHeader.setTransport( transport );
+                if ( logger.isDebugEnabled() ) logger.debug("Set transport to ack via header: " + transport );
+            }  
+            else {
+                SipProvider provider = ((DialogExt) peerDialog).getSipProvider();
+                
+                viaHeader = SipUtilities.createViaHeader(provider, transport);
+                                
+                if ( logger.isDebugEnabled() ) logger.debug("Added ack via header: " + transport );
+            }
+            ack.setHeader(viaHeader);
+        } catch( ParseException ignore ) {}
+        
         dialog.sendAck(ack);
-
 
         if (terminateOnConfirm) {
             if ( logger.isDebugEnabled() ) logger.debug("tearing down MOH dialog because of terminateOnConfirm.");
@@ -991,6 +1070,13 @@ class DialogContext {
     	if ( this.proxyAuthorizationHeader != null ) {
     		clientTransaction.getRequest().setHeader(this.proxyAuthorizationHeader);
     	}
+
+        if( this.historyInfoHeader != null ){
+
+                logger.debug( "setting request with history header as " + historyInfoHeader );
+                clientTransaction.getRequest().setHeader( this.historyInfoHeader );
+        }
+        
 
     	/*
     	 * Record the last Re-INVITE sent.
@@ -1082,6 +1168,46 @@ class DialogContext {
     Request getRequest() {
         return request;
     }
+    
+    String getTransport() {
+    
+    	
+    	if( getSipProvider() == Gateway.getLanProvider() ) {
+    		
+    		return Gateway.getSipxProxyTransport();
+    	}
+    	else {    		
+        	if( this.itspInfo != null ) {
+        		
+                return this.itspInfo.getOutboundTransport();
+                
+            } 
+        	else if ( getSipProvider().getListeningPoints() != null &&  
+        				getSipProvider().getListeningPoints().length > 0 ){
+        		
+        		return getSipProvider().getListeningPoints()[0].getTransport();
+        	}
+        	else {
+        		return Gateway.DEFAULT_ITSP_TRANSPORT;
+        	}
+        	/*
+        	else {        	
+            	
+                Dialog peerDialog = DialogContext.getPeerDialog(dialog);
+                
+                if( peerDialog != null ) {
+                	
+                	SipProvider provider = ((DialogExt) peerDialog).getSipProvider();
+                	
+                	if( provider != null ) {
+                		transport = ((SipProviderExt)provider).getListeningPoints()[0].getTransport();
+                	}
+                }
+            }
+            */
+    	}
+    	    	
+    }
 
     /**
      * Send ACK for the dialog.
@@ -1138,11 +1264,21 @@ class DialogContext {
            
 
             if ( getSipProvider() != Gateway.getLanProvider() ) {
+            	
+                if ( logger.isDebugEnabled() ) logger.debug("DialogContext.forwardBye: Send BYE to WAN side with itspInfo: " + itspInfo );
+            	
                 if ( itspInfo == null || itspInfo.isGlobalAddressingUsed()) {
+                	
                     SipUtilities.setGlobalAddresses(bye);
                 }
             }
-
+            else {
+                if ( logger.isDebugEnabled() ) logger.debug("DialogContext.forwardBye: Send BYE to LAN side" );
+                
+                SipUtilities.setProxyRoute(bye);
+            
+            }
+            
             if ( this.proxyAuthorizationHeader != null ) {
             	bye.setHeader(proxyAuthorizationHeader);
             }
@@ -1183,18 +1319,36 @@ class DialogContext {
      * @throws SipException
      */
     void forwardBye(ServerTransaction serverTransaction) throws SipException {
+    	
         this.cancelSessionTimer();
+        
         Request bye = dialog.createRequest(Request.BYE);
+        
         ReferencesHeader referencesHeader = SipUtilities.createReferencesHeader(serverTransaction.getRequest(),
                 ReferencesHeader.CHAIN);
+        
         bye.setHeader(referencesHeader);
+        
         if ( this.proxyAuthorizationHeader != null ) {
+        	
             bye.setHeader(this.proxyAuthorizationHeader) ;
         }
+        
         if ( getSipProvider() != Gateway.getLanProvider() ) {
+        	
+            if ( logger.isDebugEnabled() ) logger.debug("DialogContext.forwardBye: Forward BYE to WAN side with itspInfo: " + itspInfo );
+        	
             if ( itspInfo == null || itspInfo.isGlobalAddressingUsed()) {
+            	
                 SipUtilities.setGlobalAddresses(bye);
             }
+        }
+        else {
+            if ( logger.isDebugEnabled() ) logger.debug("DialogContext.forwardBye: Forward BYE to LAN side" );
+            
+            // OR: Required by upgraded JAIN SIP which uses Route header to determine proxy destination
+            // It routes to proxy port 5061 if not, and throws a null pointer exception
+            SipUtilities.setProxyRoute(bye);
         }
 
         ClientTransaction clientTransaction = getSipProvider().getNewClientTransaction(bye);
@@ -1203,8 +1357,11 @@ class DialogContext {
                 clientTransaction, Operation.PROCESS_BYE);
 
         transactionContext.setItspAccountInfo(this.itspInfo);
+        
         TransactionContext.get(serverTransaction).setClientTransaction(clientTransaction);
+        
         TransactionContext.get(clientTransaction).setServerTransaction(serverTransaction);
+        
         dialog.sendRequest(clientTransaction);
     }
 
@@ -1296,6 +1453,10 @@ class DialogContext {
 	public void setProxyAuthorizationHeader(ProxyAuthorizationHeader pah) {
 		this.proxyAuthorizationHeader = pah;
 	}
+
+        public void setHistoryInfoHeader(Header hih) {
+                this.historyInfoHeader = hih;
+        }
 
     public String getDialogContextId() {
        return dialogContextId;

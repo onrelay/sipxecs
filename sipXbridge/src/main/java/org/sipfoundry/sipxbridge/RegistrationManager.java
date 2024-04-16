@@ -6,11 +6,8 @@
  */
 package org.sipfoundry.sipxbridge;
 
-import gov.nist.javax.sip.ClientTransactionExt;
-
 import java.text.ParseException;
 import java.util.ListIterator;
-import java.util.TimerTask;
 
 import javax.sip.ClientTransaction;
 import javax.sip.InvalidArgumentException;
@@ -18,7 +15,6 @@ import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
-import javax.sip.SipProvider;
 import javax.sip.TimeoutEvent;
 import javax.sip.TransactionState;
 import javax.sip.address.Hop;
@@ -29,6 +25,8 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+
+import gov.nist.javax.sip.ClientTransactionExt;
 
 /**
  * The registration manager. It refreshes registrations etc.
@@ -110,7 +108,6 @@ public class RegistrationManager {
      * @throws InvalidArgumentException
      *
      */
-    @SuppressWarnings("unchecked")
     public void processResponse(ResponseEvent responseEvent)
             throws SipXbridgeException, SipException, InvalidArgumentException {
 
@@ -145,7 +142,8 @@ public class RegistrationManager {
             }
         } else if (response.getStatusCode() == Response.OK) {
 
-            ListIterator contactHeaders = (ListIterator) response.getHeaders(ContactHeader.NAME);
+            @SuppressWarnings("rawtypes")
+			ListIterator contactHeaders = (ListIterator) response.getHeaders(ContactHeader.NAME);
             int time = 0;
 
             if (contactHeaders != null && contactHeaders.hasNext()) {

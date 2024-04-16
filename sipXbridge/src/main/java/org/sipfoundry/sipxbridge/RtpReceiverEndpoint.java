@@ -6,8 +6,6 @@
  */
 package org.sipfoundry.sipxbridge;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Random;
 
 import javax.sdp.Origin;
@@ -30,17 +28,20 @@ class RtpReceiverEndpoint implements SymEndpointInterface {
 
     private int sessionVersion;
 
-    private SymEndpointInterface symReceiverEndpoint;
+    //private SymEndpointInterface symReceiverEndpoint;
 
     private String ipAddress;
+    
+    private int port;
 
     private String globalAddress;
 
     private boolean useGlobalAddressing;
 
     RtpReceiverEndpoint(SymEndpointInterface symReceiverEndpoint) {
-        this.symReceiverEndpoint = symReceiverEndpoint;
+        //this.symReceiverEndpoint = symReceiverEndpoint;
         this.ipAddress = symReceiverEndpoint.getIpAddress();
+        this.port = symReceiverEndpoint.getPort();
         try {
             this.sessionId = Math.abs(new Random().nextLong());
             this.sessionVersion = 1;
@@ -64,7 +65,8 @@ class RtpReceiverEndpoint implements SymEndpointInterface {
     }
 
     public int getPort() {
-        return this.symReceiverEndpoint.getPort();
+        //return this.symReceiverEndpoint.getPort();
+    	return this.port;
     }
 
     public void setIpAddress(String ipAddress) {
@@ -84,24 +86,36 @@ class RtpReceiverEndpoint implements SymEndpointInterface {
      */
 
     void setSessionDescription(SessionDescription sessionDescription) {
-        if (this.sessionDescription != null && logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             logger.debug("RtpReceiverEndpoint.setSessionDescription() Old SD  = " + this.sessionDescription);
             logger.debug("RtpReceiverEndpoint.setSessionDescription() newSD = " + sessionDescription);
             logger.debug("setSessionDescription at : " + SipUtilities.getStackTrace());
         }
         
-        
-      
-
+        boolean updatePort = true;
+        if( sessionDescription != null &&
+        	this.sessionDescription != null &&
+        	sessionDescription.toString().equals( this.sessionDescription.toString() ) ) {
+        	// IPl: No change so we return. This check protects from something getting messed up below, which happens with
+        	// re-invites since this.getPort() is not reliable due to incorrect shared references rather than clones.
+            if ( logger.isDebugEnabled()) {
+                logger.debug("RtpReceiverEndpoint.setSessionDescription() no change to SD: Do not update port" );                
+            }
+            updatePort = false;
+        }
+ 
         try {
              	
             String address = useGlobalAddressing ? getGlobalAddress() : getIpAddress();
+            int port = getPort();
+            logger.debug("RtpReceiverEndpoint.setSessionDescription() address = " + address);
+            logger.debug("RtpReceiverEndpoint.setSessionDescription() port = " + port);
 
             /*
              * Filter the codecs to the allow set. This filter is applied only for
              * audio codecs.
              */
-            sessionDescription = SipUtilities.cleanSessionDescription( sessionDescription ); 
+            sessionDescription = SipUtilities.cleanSessionDescription( sessionDescription );
             
             /*
              * draft-ietf-sipping-sip-offeranswer-08 section 5.2.5 makes it clear that a UA cannot
@@ -109,12 +123,18 @@ class RtpReceiverEndpoint implements SymEndpointInterface {
              * We use the same Origin field for all interactions.
              */
             sessionDescription.setOrigin(origin);
-            SipUtilities.fixupSdpMediaAddresses(sessionDescription, address, this.getPort());
-            this.sessionDescription = SipUtilities.cloneSessionDescription(sessionDescription);
+            if( updatePort ) {           	
+            	SipUtilities.fixupSdpMediaAddresses(sessionDescription, address, port );
+            }
+            else {
+            	SipUtilities.fixupSdpMediaAddresses(sessionDescription, address );            	
+            }
 
             if ( logger.isDebugEnabled() ) {
                  logger.debug("sessionDescription after fixup : " + sessionDescription);
             }
+            
+            this.sessionDescription = SipUtilities.cloneSessionDescription(sessionDescription);
 
         } catch (Exception ex) {
             logger.error("Unexpected exception ", ex);

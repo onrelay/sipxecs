@@ -13,7 +13,6 @@ package org.sipfoundry.sipxbridge;
  * @author M. Ranganathan.
  *
  */
-@SuppressWarnings("serial")
 public class SipXbridgeException extends RuntimeException {
     public SipXbridgeException(String reason) {
         super(reason);

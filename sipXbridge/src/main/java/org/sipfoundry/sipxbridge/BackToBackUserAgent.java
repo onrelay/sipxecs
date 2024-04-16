@@ -6,17 +6,6 @@
  */
 package org.sipfoundry.sipxbridge;
 
-import gov.nist.javax.sip.ClientTransactionExt;
-import gov.nist.javax.sip.DialogExt;
-import gov.nist.javax.sip.SipStackExt;
-import gov.nist.javax.sip.TransactionExt;
-import gov.nist.javax.sip.header.HeaderFactoryExt;
-import gov.nist.javax.sip.header.extensions.ReferencesHeader;
-import gov.nist.javax.sip.header.extensions.ReferredByHeader;
-import gov.nist.javax.sip.header.extensions.ReplacesHeader;
-import gov.nist.javax.sip.message.SIPMessage;
-import gov.nist.javax.sip.stack.SIPTransaction;
-
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.text.ParseException;
@@ -46,15 +35,12 @@ import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.address.Hop;
 import javax.sip.address.SipURI;
-import javax.sip.header.AlertInfoHeader;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.CallInfoHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.ContentTypeHeader;
-import javax.sip.header.DateHeader;
-import javax.sip.header.ExtensionHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.InReplyToHeader;
@@ -62,7 +48,6 @@ import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.OrganizationHeader;
 import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.header.ReasonHeader;
-import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.ReferToHeader;
 import javax.sip.header.ReplyToHeader;
 import javax.sip.header.RouteHeader;
@@ -82,6 +67,17 @@ import org.sipfoundry.sipxrelay.SymImpl;
 import org.sipfoundry.sipxrelay.SymmitronClient;
 import org.sipfoundry.sipxrelay.SymmitronException;
 
+import gov.nist.javax.sip.ClientTransactionExt;
+import gov.nist.javax.sip.DialogExt;
+import gov.nist.javax.sip.SipStackExt;
+import gov.nist.javax.sip.TransactionExt;
+import gov.nist.javax.sip.header.HeaderFactoryExt;
+import gov.nist.javax.sip.header.extensions.ReferencesHeader;
+import gov.nist.javax.sip.header.extensions.ReferredByHeader;
+import gov.nist.javax.sip.header.extensions.ReplacesHeader;
+import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
+import gov.nist.javax.sip.message.SIPMessage;
+
 
 /**
  * A class that represents an ongoing call. An ongoing call maps to exactly one instance of this
@@ -97,6 +93,7 @@ import org.sipfoundry.sipxrelay.SymmitronException;
  * @author M. Ranganathan
  *
  */
+@SuppressWarnings({"rawtypes","unused"})
 public class BackToBackUserAgent implements Comparable {
     private static Logger logger = Logger.getLogger(BackToBackUserAgent.class);
 
@@ -214,6 +211,11 @@ public class BackToBackUserAgent implements Comparable {
         }
 
         public void run() {
+        	
+            if (logger.isDebugEnabled()) {
+                logger.debug("running DelayedByeSender - check dialog state: " + dialog.getState()  );
+             }
+            
             try {
                 if (dialog.getState() == DialogState.CONFIRMED && serverTransaction != null) {
                     TransactionContext.attach(serverTransaction, Operation.PROCESS_BYE);
@@ -228,12 +230,11 @@ public class BackToBackUserAgent implements Comparable {
     // ///////////////////////////////////////////////////////////////////////
     // Constructor.
     // ///////////////////////////////////////////////////////////////////////
-    @SuppressWarnings("unused")
     private BackToBackUserAgent() {
 
     }
 
-    BackToBackUserAgent(SipProvider provider, Request request, Dialog dialog,
+	BackToBackUserAgent(SipProvider provider, Request request, Dialog dialog,
             ItspAccountInfo itspAccountInfo) throws IOException {
         int load = 0;
 
@@ -252,8 +253,17 @@ public class BackToBackUserAgent implements Comparable {
             String address = (viaHeader.getReceived() != null ? viaHeader.getReceived()
                     : viaHeader.getHost());
             this.symmitronClient = Gateway.getSymmitronClient(address);
-            this.proxyAddress = new ProxyHop(address, viaHeader.getPort(), viaHeader
-                    .getTransport());
+            this.proxyAddress = new ProxyHop(address, 
+            		viaHeader.getPort() > 0 ?  
+            				viaHeader.getPort() :
+            				viaHeader.getRPort() > 0 ?
+            						viaHeader.getRPort() :
+            						Gateway.getBridgeConfiguration().getSipxProxyPort(), 
+            		viaHeader.getTransport());
+            
+            if ( logger.isDebugEnabled() ) logger.debug("BackToBackUserAgent: proxy address from VIA header " + this.proxyAddress.getHost() + ":"
+                    + this.proxyAddress.getPort() 
+                    + ";transport=" + this.proxyAddress.getTransport() );
 
         } else {
             this.findNextSipXProxy();
@@ -261,9 +271,9 @@ public class BackToBackUserAgent implements Comparable {
                 throw new IOException(
                         "Could not locate a sipx proxy server -- cannot create B2BUA");
             }
-            if ( logger.isDebugEnabled() ) logger.debug("routing call to " + this.proxyAddress.getHost() + ":"
-                    + this.proxyAddress.getPort() + " relay load = " + load);
-        }
+            if ( logger.isDebugEnabled() ) logger.debug("BackToBackUserAgent: proxy address found  " + this.proxyAddress.getHost() + ":"
+                    + this.proxyAddress.getPort() 
+                    + ";transport=" + this.proxyAddress.getTransport() );        }
 
         BridgeInterface bridge = symmitronClient.createBridge();
         this.symmitronServerHandle = symmitronClient.getServerHandle();
@@ -572,6 +582,7 @@ public class BackToBackUserAgent implements Comparable {
                 public void run() {
                     if (dialogTable.size() == 1) {
                         try {
+							logger.info("SEv Delayed teardown");
                             tearDown(Gateway.SIPXBRIDGE_USER, ReasonCode.CALL_TERMINATED,
                                     "Call Termination Detected");
                         } catch (Exception ex) {
@@ -580,7 +591,7 @@ public class BackToBackUserAgent implements Comparable {
                     }
                    
                 }
-            }, 2000);
+            }, 200000);
 
         }
 
@@ -767,12 +778,20 @@ public class BackToBackUserAgent implements Comparable {
 
             CSeqHeader cseq = ProtocolObjects.headerFactory.createCSeqHeader(1L, Request.INVITE);
             ViaHeader viaHeader = null;
+            /*
+             * OR: selects wrong proxy port with TLS
+             * 
             if (uri.getTransportParam() != null) {
-                viaHeader = SipUtilities.createViaHeader(Gateway.getLanProvider(), uri
-                        .getTransportParam());
+                viaHeader = SipUtilities.createViaHeader(Gateway.getLanProvider(), 
+                		uri.getTransportParam());
             } else {
-                viaHeader = SipUtilities.createViaHeader(Gateway.getLanProvider(), "UDP");
+                viaHeader = SipUtilities.createViaHeader(Gateway.getLanProvider(), 
+                		Gateway.DEFAULT_ITSP_TRANSPORT );
             }
+            */ 
+            viaHeader = SipUtilities.createViaHeader(Gateway.getLanProvider(), 
+            		Gateway.getSipxProxyTransport());           
+            
             List viaList = new LinkedList();
             viaList.add(viaHeader);
             MaxForwardsHeader maxForwards = ProtocolObjects.headerFactory
@@ -866,8 +885,10 @@ public class BackToBackUserAgent implements Comparable {
             }
 
             RtpSession lanRtpSession = this.createRtpSession(dialog);
-            SessionDescription sd = lanRtpSession.getReceiver().getSessionDescription();
+            SessionDescription sd = SipUtilities.cloneSessionDescription(
+            		lanRtpSession.getReceiver().getSessionDescription());
             SipUtilities.setDuplexity(sd, "sendrecv");
+            if ( logger.isDebugEnabled() ) logger.debug("duplexity set to sendrecv");
             newRequest.setContent(sd, cth);
 
             return newRequest;
@@ -928,7 +949,8 @@ public class BackToBackUserAgent implements Comparable {
                         "Out of dialog REFER");
                 response.setHeader(SipUtilities.createContactHeader(null,
                         ((SipProvider) referRequestEvent.getSource()),
-                        SipUtilities.getViaTransport(response)));
+                        Gateway.getSipxProxyTransport()));
+                        // OR: SipUtilities.getViaTransport(response)));
                 response.setHeader(warning);
                 if (stx != null) {
                     stx.sendResponse(response);
@@ -1011,6 +1033,39 @@ public class BackToBackUserAgent implements Comparable {
             tad.setDialogPendingSdpAnswer(dialogPendingSdpAnswer);
 
             tad.setMohClientTransaction(mohClientTransaction);
+
+            Header historyInfoHeader = referRequest.getHeader("History-Info");
+            if( historyInfoHeader == null ){
+
+                FromHeader fromHeader = (FromHeader) referRequest.getHeader(FromHeader.NAME).clone();
+
+                String fromUser = ((SipURI) fromHeader.getAddress().getURI()).getUser();
+                String fromHost = ((SipURI) fromHeader.getAddress().getURI()).getHost();
+
+                // OR: the wonky ;phone-context= in the sip address creates problems for some ITSPs
+                //historyInfoHeader = (Header) ProtocolObjects.headerFactory.createHeader( "History-Info",
+                //        ( "<sip:" + fromUser + ";phone-context=" + fromHost + ";user=phone>;index=1") );
+                historyInfoHeader = (Header) ProtocolObjects.headerFactory.createHeader( "History-Info",
+                        ( "<sip:" + fromUser + "@" + fromHost + ";user=phone>;index=1") );
+
+/*
+            } else {
+
+                String header = ((SIPHeader)historyInfoHeader).getValue();
+                if( header != null){
+			if(header.contains("index=")){
+				header.replace("index=", "index=1.");
+        		}
+                }
+                historyInfoHeader = (Header) ProtocolObjects.headerFactory.createHeader( "History-Info",
+                        header);
+*/
+
+            }
+
+            logger.debug("SETTING HISTORY HEADER USING FROM HEADER IN REFER REQUEST");
+            inviteRequest.setHeader( historyInfoHeader );
+
 
             /*
              * Stamp the via header with our stamp so that we know we Referred this request. we
@@ -1156,8 +1211,8 @@ public class BackToBackUserAgent implements Comparable {
              * Add the dialog context to our table of managed dialogs.
              */
             this.addDialog(DialogContext.get(inboundDialog));
-	    Iterator inboundVias = request.getHeaders(ViaHeader.NAME);
-	    ItspAccountInfo itspAccountInfo = Gateway.getAccountManager().getItspAccount(inboundVias);
+		    Iterator inboundVias = request.getHeaders(ViaHeader.NAME);
+		    ItspAccountInfo itspAccountInfo = Gateway.getAccountManager().getItspAccount(inboundVias);
 
             SipURI uri = null;
             if (!Gateway.isInboundCallsRoutedToAutoAttendant()) {
@@ -1212,8 +1267,27 @@ public class BackToBackUserAgent implements Comparable {
                 }
                 toHeader.removeParameter("tag");
             }
-            String transport = proxyAddress.getTransport().equalsIgnoreCase("TLS") ? "TLS"
-                    : "UDP";
+            /* OR: makes no sense
+            String transport;
+            if( proxyAddress.getTransport().equalsIgnoreCase("TLS") ) {
+            	transport = "TLS";
+            }
+            else if( itspAccountInfo != null ) {
+            	transport = itspAccountInfo.getOutboundTransport().toUpperCase();
+            }
+            else {
+            	transport = Gateway.DEFAULT_ITSP_TRANSPORT.toUpperCase();
+            }
+            */
+            
+            String transport = proxyAddress.getTransport();
+            
+            if ( logger.isDebugEnabled() ) logger.debug("sendInviteToSipxProxy: proxy transport = " + transport );
+            
+            if( transport == null )  {
+            	transport = Gateway.DEFAULT_ITSP_TRANSPORT.toUpperCase();
+            }
+            
 
             ViaHeader viaHeader = SipUtilities.createViaHeader(Gateway.getLanProvider(),
                     transport);
@@ -1249,11 +1323,19 @@ public class BackToBackUserAgent implements Comparable {
 
             ContactHeader contactHeader = SipUtilities.createContactHeader(
                     incomingRequestURI.getUser(), Gateway.getLanProvider(),
-                    SipUtilities.getViaTransport(newRequest));
+                    Gateway.getSipxProxyTransport());
             newRequest.setHeader(contactHeader);
             if (authorization != null) {
                 newRequest.addHeader(authorization);
             }
+            
+            /*
+            //OR
+        	Header historyInfoHeader = ( Header) ProtocolObjects.headerFactory.createHeader(
+					"History-Info", "<" + toHeader.getAddress().getURI() + ">;index=1" );
+            newRequest.addHeader(historyInfoHeader);
+            */
+
 
             /*
              * The incoming session description.
@@ -1324,10 +1406,13 @@ public class BackToBackUserAgent implements Comparable {
 
             SipUtilities.addLanAllowHeaders(newRequest);
 
+            /* OR: Has no utility, extractCertIdentities blocks
             if ( SipUtilities.getViaTransport(request).equalsIgnoreCase("TLS")) {
-                if ( logger.isDebugEnabled() ) logger.debug("incoming request came over TLS");
+                if ( logger.isDebugEnabled() ) logger.debug("incoming request is using TLS");
                 List<String> certIdentities = ((SIPTransaction)serverTransaction).extractCertIdentities();
-                if (certIdentities.isEmpty()) {
+                if ( logger.isDebugEnabled() ) logger.debug("Extracted cert identities");
+                if (certIdentities == null || certIdentities.isEmpty()) {
+                    if ( logger.isDebugEnabled() ) logger.debug("No cert indentities");
                     logger.warn("Could not find any identities in the TLS certificate");
                 }
                 else {
@@ -1358,6 +1443,7 @@ public class BackToBackUserAgent implements Comparable {
                     }
                 }
             }
+            */
 
             TransactionContext tad = new TransactionContext(ct,
                     Operation.SEND_INVITE_TO_SIPX_PROXY);
@@ -1553,18 +1639,18 @@ public class BackToBackUserAgent implements Comparable {
         Dialog incomingDialog = serverTransaction.getDialog();
         ItspAccountInfo itspAccountInfo = Gateway.getAccountManager().getAccount(incomingRequest);
 
+        String transport = itspAccountInfo == null ? Gateway.DEFAULT_ITSP_TRANSPORT
+                : itspAccountInfo.getOutboundTransport();
         SipProvider itspProvider = Gateway
-                .getWanProvider(itspAccountInfo == null ? Gateway.DEFAULT_ITSP_TRANSPORT
-                        : itspAccountInfo.getOutboundTransport());
+                .getWanProvider(transport);
 
         boolean spiral = SipUtilities.isOriginatorSipXbridge(incomingRequest);
 
         ReplacesHeader replacesHeader = (ReplacesHeader) incomingRequest
                 .getHeader(ReplacesHeader.NAME);
 
-        if (logger.isDebugEnabled()) {
-             logger.debug("sendInviteToItsp: spiral=" + spiral);
-        }
+        if (logger.isDebugEnabled())  logger.debug("sendInviteToItsp: spiral=" + spiral);
+        
         try {
             if (replacesHeader != null) {
 
@@ -1598,6 +1684,7 @@ public class BackToBackUserAgent implements Comparable {
 
             FromHeader fromHeader = (FromHeader) incomingRequest.getHeader(FromHeader.NAME)
                     .clone();
+            
             /*
              * If the proxy has sent us a maddr parameter or has inserted an LR parameter that
              * does not correspond to us, we use that as the list of addresses to send to next.
@@ -1605,7 +1692,16 @@ public class BackToBackUserAgent implements Comparable {
             Collection<Hop> addresses = new HashSet<Hop>();
             SipURI outboundRequestUri = (SipURI) incomingRequestUri.clone();
             /* remove sipx-line-id to avoid confusing the other end in case he is a sipx too */
-             outboundRequestUri.removeParameter("sipxecs-lineid");                  
+             outboundRequestUri.removeParameter("sipxecs-lineid");  
+             
+             /* Get MBX tenant caller name parameter */
+             String tenantParameter = outboundRequestUri.getParameter( "tenant" );
+             if( tenantParameter != null && tenantParameter.length() > 0 ) {
+            	 String tenantName = URLDecoder.decode( tenantParameter, "UTF-8" );
+            	 fromHeader.getAddress().setDisplayName( tenantName );
+                 outboundRequestUri.removeParameter("tenant");  
+             }
+             
             /*
              * Determine next hop information for the re-originated request. If the inbound
              * request URI has a maddr param, use it. Otherwise look at the topmost Route header.
@@ -1629,6 +1725,7 @@ public class BackToBackUserAgent implements Comparable {
                     if (route != null) {
                         Hop hop = SipUtilities.createHop(route);
                         addresses.add(hop);
+
                     } else if (incomingRequestUri.getMAddrParam() == null
                             || incomingRequestUri.getMAddrParam().equals(
                                     Gateway.getBridgeConfiguration().getLocalAddress())) {
@@ -1637,23 +1734,31 @@ public class BackToBackUserAgent implements Comparable {
                          * the OB proxy for the ITSP.
                          */
                         addresses = itspAccountInfo.getItspProxyAddresses();
+                                                
                     } else {
                         String maddr = incomingRequestUri.getParameter("maddr");
                         int port = incomingRequestUri.getPort() <= 0 ? 5060 : incomingRequestUri
-                                .getPort();
-                        String transport = incomingRequestUri.getParameter("transport");
-                        if (transport == null) {
-                            transport = "udp";
+                                .getPort();                        
+                        
+                        String incomingTransport = incomingRequestUri.getParameter("transport");
+                        
+                        if (incomingTransport == null) {
+                        	incomingTransport = Gateway.getBridgeConfiguration().getSipxProxyTransport();
                         }
-                        if (!Gateway.getSupportedTransports().contains(transport.toLowerCase())) {
+                        
+                        if (!Gateway.getSupportedTransports().contains(incomingTransport.toLowerCase())) {
+                        	
                             Response response = SipUtilities.createResponse(serverTransaction,
                                     Response.NOT_ACCEPTABLE);
+                            
                             response.setReasonPhrase("Requested Transport is not supported");
+                            
                             serverTransaction.sendResponse(response);
                             return;
                         }
-                        HopImpl hop = new HopImpl(maddr, port, transport);
+                        HopImpl hop = new HopImpl(maddr, port, incomingTransport);
                         addresses.add(hop);
+
                     }
 
                 } else {
@@ -1667,33 +1772,59 @@ public class BackToBackUserAgent implements Comparable {
                 if (incomingRequestUri.getMAddrParam().equals(
                         Gateway.getBridgeConfiguration().getLocalAddress())) {
                     addresses = itspAccountInfo.getItspProxyAddresses();
+
                 } else {
                     String maddr = incomingRequestUri.getParameter("maddr");
                     int port = incomingRequestUri.getPort() <= 0 ? 5060 : incomingRequestUri
                             .getPort();
-                    String transport = incomingRequestUri.getParameter("transport");
-                    if (transport == null) {
-                        transport = "udp";
+                    
+                    String incomingTransport = incomingRequestUri.getParameter("transport");
+                    
+                    if (incomingTransport == null) {
+                    	incomingTransport = Gateway.getBridgeConfiguration().getSipxProxyTransport();
                     }
-                    if (!Gateway.getSupportedTransports().contains(transport.toLowerCase())) {
+                    
+                    if (!Gateway.getSupportedTransports().contains(incomingTransport.toLowerCase())) {
+                    	
                         Response response = SipUtilities.createResponse(serverTransaction,
                                 Response.NOT_ACCEPTABLE);
+                        
                         response.setReasonPhrase("Requested Transport is not supported");
+                        
                         serverTransaction.sendResponse(response);
                         return;
                     }
-                    HopImpl hop = new HopImpl(maddr, port, transport);
+                    HopImpl hop = new HopImpl(maddr, port, incomingTransport);
                     addresses.add(hop);
-
                 }
 
             } else {
                 addresses = itspAccountInfo.getItspProxyAddresses();
             }
 
-            Request outgoingRequest = SipUtilities.createInviteRequest(
+            PAssertedIdentityHeader pAssertedIdHeader = (PAssertedIdentityHeader)
+                    incomingRequest.getHeader(PAssertedIdentityHeader.NAME);
+            
+           Request outgoingRequest = SipUtilities.createInviteRequest(
                     (SipURI) outboundRequestUri, itspProvider, itspAccountInfo, fromHeader,
-                    this.creatingCallId + "-" + baseCounter, addresses);
+                    pAssertedIdHeader, this.creatingCallId + "." + baseCounter, addresses);
+
+
+// This patch worked in US, but in UK it gave number +01225xxxxx, so need to fix that if to be used
+//			String fromUser = ((SipURI) fromHeader.getAddress().getURI()).getUser();
+//			String fromHost = ((SipURI) fromHeader.getAddress().getURI()).getHost();
+//			String fromName = fromHeader.getAddress().getDisplayName();
+//			String eh = "\"" + fromName + "\" " + "<sip:+" + fromUser + "@" + Gateway.getGlobalAddress() + ">";
+//			logger.debug( "SEv Remote-Party-ID added [" + eh + "]" );
+//
+//			ExtensionHeader extensionHeader =
+//					( ExtensionHeader ) ProtocolObjects.headerFactory.createHeader("Remote-Party-ID", eh);
+//			outgoingRequest.setHeader(extensionHeader);
+
+
+
+
+
             /*
              * If there is an AUTH header there, it could be that the client is sending
              * us credentials. In that case, do not change the call ID. 
@@ -1717,6 +1848,54 @@ public class BackToBackUserAgent implements Comparable {
             ReferencesHeader referencesHeader = SipUtilities.createReferencesHeader(incomingRequest,
                     ReferencesHeader.CHAIN);
             outgoingRequest.setHeader(referencesHeader);
+
+            if( incomingRequest.getHeader( "History-Info" ) != null ){
+/*
+                    Header historyInfoHeader = incomingRequest.getHeader("History-Info");
+
+	                String header = ((SIPHeader)historyInfoHeader).getValue();
+       		         if( header != null){
+				if(header.contains("index=")){
+					header.replace("index=", "index=1.");
+       		 		}
+       		         }
+       	         historyInfoHeader = (Header) ProtocolObjects.headerFactory.createHeader( "History-Info",
+                        header);
+
+                    outgoingRequest.setHeader( historyInfoHeader );
+*/
+                    outgoingRequest.setHeader( incomingRequest.getHeader( "History-Info" ) );
+                    logger.debug("SETTING HISTORY HEADER RECEIVED IN INCOMING REQUEST");
+            } else {
+
+                    String requestUser = ((SipURI) incomingRequest.getRequestURI()).getUser();
+                    ToHeader toHeader = (ToHeader) incomingRequest.getHeader(ToHeader.NAME).clone();
+
+                    String toUser = ((SipURI) toHeader.getAddress().getURI()).getUser();
+                    String toHost = ((SipURI) toHeader.getAddress().getURI()).getHost();
+
+                    //some times to user starts with external dial prefix, instead of E164
+                    //then remove the 9 & 0 s and compare. this needs improvement(like accessing the dial prefix from somewhere)
+                    if( toUser.startsWith("9") || toUser.startsWith("0") ){
+                        toUser = toUser.substring(1);
+                        for(int i =0 ;i<4; i++){ //assume max 4 leading zeroes
+                           if( toUser.startsWith("0") ){
+                                toUser = toUser.substring(1);
+                           } else break;
+                        }
+                    }
+                    if( !requestUser.equals( toUser ) && !toUser.endsWith( requestUser ) && !requestUser.endsWith( toUser) ){
+
+                        // OR: the wonky ;phone-context= in the sip address creates problems for some ITSPs
+                    	//Header historyInfoHeader = ( Header) ProtocolObjects.headerFactory.createHeader(
+						//		"History-Info", ( "<sip:" + toUser + ";phone-context=" + toHost + ";user=phone>;index=1") );
+                    	Header historyInfoHeader = ( Header) ProtocolObjects.headerFactory.createHeader(
+								"History-Info", ( "<sip:" + toUser + "@" + toHost + ";user=phone>;index=1") );
+                        outgoingRequest.setHeader( historyInfoHeader );
+                        logger.debug("SETTING HISTORY HEADER RECEIVED USING TO HEADER");
+                    }
+            }
+
 
             /*
              * If we have authorization information, we can attach it to the outbound request.
@@ -1780,7 +1959,11 @@ public class BackToBackUserAgent implements Comparable {
            } else {
                 RtpSession wanRtpSession = this.createRtpSession(outboundDialog);
                 wanRtpSession.getReceiver().setUseGlobalAddressing(globalAddressing);
-                outboundSessionDescription = SipUtilities.getSessionDescription(incomingRequest);
+                
+                outboundSessionDescription = SipUtilities.cloneSessionDescription(
+                		SipUtilities.getSessionDescription(incomingRequest));
+                SipUtilities.setDuplexity(outboundSessionDescription, "sendrecv");
+
                 wanRtpSession.getReceiver().setSessionDescription(outboundSessionDescription);
             }
 
@@ -2240,50 +2423,83 @@ public class BackToBackUserAgent implements Comparable {
 
     }
 
+
+
     /**
      * Handle a bye on one of the dialogs of this b2bua.
      *
      * @param dialog
      * @throws SipException
      */
-    void processBye(RequestEvent requestEvent) throws SipException {
+    
+    // OR renamed from processBye, processCancel was not working in call control manager
+    
+    void handleHangup(RequestEvent requestEvent) throws SipException {
+    	
         Dialog dialog = requestEvent.getDialog();
-        if ( logger.isDebugEnabled() ) logger.debug("processBye : BYE received on dialog " + dialog);
-        ServerTransaction st = requestEvent.getServerTransaction();
-        CallControlUtilities.sendTryingResponse(st);
+        
+        if ( logger.isDebugEnabled() ) logger.debug("handleHangup - in dialog state: " + dialog.getState() );
+        
+        ServerTransaction serverTransaction = requestEvent.getServerTransaction();
+        
+        // IP:
+        if( requestEvent.getRequest().getMethod().equals( Request.BYE ) ) {
+            CallControlUtilities.sendTryingResponse(serverTransaction);
+        }
 
         DialogContext dialogContext = (DialogContext) dialog.getApplicationData();
+        
         dialogContext.cancelSessionTimer();
+        
         Dialog peer = dialogContext.getPeerDialog();
         
-        if (!SipUtilities.isRequestNotForwarded(st.getRequest())
+        DialogContext peerDialogContext = DialogContext.get(peer);
+
+        
+        if (!SipUtilities.isRequestNotForwarded(serverTransaction.getRequest())
                 && dialogContext.isForwardByeToPeer() && peer != null
-                && peer.getState() != DialogState.TERMINATED && peer.getState() != null) {
-            if (peer.getState() == DialogState.EARLY) {
-                DialogContext peerDialogContext = DialogContext.get(peer);
+                && peer.getState() != DialogState.TERMINATED ) { // IP: && peer.getState() != null) {
+        	
+            if (peer.getState() == null || peer.getState() == DialogState.EARLY) {
+            	
+                
                 if (peerDialogContext.getDialogCreatingTransaction() != null &&
                 		peerDialogContext.getDialogCreatingTransaction() instanceof ClientTransaction ) {
+                	
                 	 ClientTransaction ctx = (ClientTransaction) peerDialogContext.getDialogCreatingTransaction();
+                	 
                 	 Request cancelRequest = ctx.createCancel();
+                	 
                 	 SipUtilities.addWanAllowHeaders(cancelRequest);
+                	 
                 	 SipProvider peerProvider = peerDialogContext.getSipProvider();
+                	 
                 	 ClientTransaction cancelCtx = peerProvider.getNewClientTransaction(cancelRequest);
+                	 
                 	 TransactionContext transactionContext = new TransactionContext(cancelCtx,Operation.CANCEL_INVITE);
+                	 
                 	 cancelCtx.sendRequest();
+                	 
+                     if ( logger.isDebugEnabled() ) logger.debug("handleHangup - cancelled invite" );
+
                 }
-                Gateway.getTimer().schedule(new DelayedByeSender(peer, st), 1000);
-                Response response = SipUtilities.createResponse(st, Response.OK);
+                
+                Gateway.getTimer().schedule(new DelayedByeSender(peer, serverTransaction), 1000);
+                
+                Response response = SipUtilities.createResponse(serverTransaction, Response.OK);
+                
                 try {
-					st.sendResponse(response);
+					serverTransaction.sendResponse(response);
 				} catch (InvalidArgumentException e) {
-					throw new SipXbridgeException("Unexpected exception",e);
+					throw new SipXbridgeException("handleHangup - Unexpected exception",e);
 				}
             } else {
                 if (requestEvent.getServerTransaction() != null) {
+                	
                     TransactionContext.attach(requestEvent.getServerTransaction(),
                             Operation.PROCESS_BYE);
-                    DialogContext.getPeerDialogContext(dialog).forwardBye(
-                            requestEvent.getServerTransaction());
+                    
+                    peerDialogContext.forwardBye( requestEvent.getServerTransaction() );
                 }
             }
 
@@ -2291,16 +2507,20 @@ public class BackToBackUserAgent implements Comparable {
             /*
              * Peer dialog is not yet established or is terminated.
              */
-            if ( logger.isDebugEnabled() ) logger.debug("BackToBackUserAgent: peerDialog = " + peer);
+            if ( logger.isDebugEnabled() ) logger.debug("handleHangup: peerDialog = " + peer);
+            
             if (peer != null) {
-                if ( logger.isDebugEnabled() ) logger.debug("BackToBackUserAgent: peerDialog state = " + peer.getState());
+            	
+                if ( logger.isDebugEnabled() ) logger.debug("handleHangup: peerDialog state = " + peer.getState());
+                
             }
+            
             try {
-                Response ok = SipUtilities.createResponse(st, Response.OK);
-                st.sendResponse(ok);
+                Response ok = SipUtilities.createResponse(serverTransaction, Response.OK);
+                serverTransaction.sendResponse(ok);
 
             } catch (InvalidArgumentException ex) {
-                logger.error("Unexpected exception", ex);
+                logger.error("handleHangup - Unexpected exception", ex);
             }
         }
 
@@ -2380,7 +2600,7 @@ public class BackToBackUserAgent implements Comparable {
                 DialogContext dialogCtx = DialogContext.get(dialog);
                 if ( dialogCtx != null ) {
                       dialogCtx.cancelSessionTimer(); 
-                      dialogCtx.removeDialogContext(dialogCtx);
+                      DialogContext.removeDialogContext(dialogCtx);
                 }
                 SipProvider lanProvider = ((DialogExt) dialog).getSipProvider();
                 if (dialogCtx != null
@@ -2503,15 +2723,20 @@ public class BackToBackUserAgent implements Comparable {
 
         }
 
-        for (Hop hop : Gateway.initializeSipxProxyAddresses()) {
+        Iterator<Hop> iterator = Gateway.initializeSipxProxyAddresses().iterator();
+        while ( iterator.hasNext() ) {
+        	Hop hop = iterator.next();
 
             try {
                 SymmitronClient symmitronClient = Gateway.getSymmitronClient(hop.getHost());
                 /* Find if sipxrelay is alive */
                 if (!symmitronClient.pingAndTest(hop.getHost(), hop.getPort())) {
-                    this.blackListedProxyServers.add(hop);
-                    continue;
-                }
+                    logger.warn("Failed to ping Relay at " + hop.getHost());
+                    if( iterator.hasNext() ) {
+	                    this.blackListedProxyServers.add(hop);
+	                    continue;
+                    }
+	            }
 
                 this.proxyAddress = hop;
                 this.symmitronClient = symmitronClient;
@@ -2522,6 +2747,7 @@ public class BackToBackUserAgent implements Comparable {
                 this.blackListedProxyServers.add(hop);
             }
         }
+        
 
         return (this.proxyAddress != null);
     }

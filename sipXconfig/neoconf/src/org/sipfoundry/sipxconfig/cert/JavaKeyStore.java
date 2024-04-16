@@ -36,16 +36,25 @@ public class JavaKeyStore {
 
     // historical password that jdk proper uses in it's default keystore. not meant
     // to be a big secret or that anyone should need to actually "changeit".
-    private char[] m_password = "changeit".toCharArray();
+    public final static String DEFAULT_KEYSTORE_PASSWORD = "changeit";
+    private char[] m_password = DEFAULT_KEYSTORE_PASSWORD.toCharArray();
 
     // Default store type, not need to change it although bouncycastle does not write out
     // to JKS, but we don't need it to at this time
     private String m_type = "JKS";
 
     public JavaKeyStore() {
+        this( null, null );
+    }
+
+    public JavaKeyStore( InputStream inputStream ) {
+        this( inputStream, DEFAULT_KEYSTORE_PASSWORD );
+    }
+
+    public JavaKeyStore( InputStream inputStream, String password ) {
         try {
             m_store = KeyStore.getInstance(m_type);
-            m_store.load(null, null);
+            m_store.load(inputStream, password != null ? password.toCharArray() : null );
         } catch (KeyStoreException e) {
             throw new RuntimeException(e);
         } catch (CertificateException e) {
