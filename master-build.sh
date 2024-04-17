@@ -208,9 +208,9 @@ function setupCentOS7()
     sudo yum install -y libtool gcc-c++ openssl-devel libmcrypt-devel libtool-ltdl-devel \
         pcre-devel pcre-devel findutils  db4-devel iptables iproute boost-devel libpcap-devel libdnet-devel xmlrpc-c-devel \
         libevent-devel poco-devel libconfig-devel hiredis-devel gtest-devel leveldb-devel cppunit-devel gperftools-devel \
-        c-ares-devel libdb4-cxx-devel libdb-cxx-devel popt-devel xerces-c-devel zeromq-devel v8-devel httpd unixODBC-devel \
+        c-ares-devel libdb4-cxx-devel libdb-cxx-devel popt-devel xerces-c-devel zeromq-devel libev-devel v8-devel httpd unixODBC-devel \
         mock rsync gem systemd-sysv mongo-cxx-driver-devel libuuid-devel swig cfengine openfire resiprocate-libs \
-        dart-sdk createrepo unzip java-1.8.0-openjdk-devel 
+        dart-sdk createrepo unzip checkpolicy policycoreutils policycoreutils-python freeswitch-devel bcg729-devel java-1.8.0-openjdk-devel 
 
     cd ${SOURCE_DIR}
     sudo mkdir -p /usr/local/sipx
