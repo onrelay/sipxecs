@@ -72,6 +72,12 @@ Prepare Server
 
     yum install -y wget
 
+- Remove `epel` to avoid conflicts
+
+  .. code-block:: bash
+
+    yum remove -y epel-release
+
 Setup Google Could Artifact registry
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -89,7 +95,7 @@ Configure System
 
 Increase Max Number of open files and max user processes for MongoDB (important for larger systems)
 
-- edit */etc/sysctl.conf* to add fs.file-max = 65536 line. ONLY do this if the default returned from `cat /cproc/sys/fs/file-max` is less than 65536.
+- edit */etc/sysctl.conf* to add fs.file-max = 65536 line. ONLY do this if the default returned from `cat /proc/sys/fs/file-max` is less than 65536.
 
 - edit */etc/security/limits.conf* to add the following block of text:
 
@@ -99,6 +105,14 @@ Increase Max Number of open files and max user processes for MongoDB (important 
     *          hard     nproc          65535
     *          soft     nofile         65535
     *          hard     nofile         65535`
+
+- Enable elasticsearch
+
+  .. code-block:: bash
+
+    systemctl enable elasticsearch
+
+    service elasticsearch start
 
 - Reboot system:
 
