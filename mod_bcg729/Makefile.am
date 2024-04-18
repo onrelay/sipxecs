@@ -21,7 +21,7 @@ all : mod_bcg729.o
 	$(CC) $(CFLAGS) $(INCLUDES) -shared -Xlinker -x -o mod_bcg729.so mod_bcg729.o $(LDFLAGS)
 
 mod_bcg729.o:
-	$(CC) $(CFLAGS) $(INCLUDES) -c src/mod_bcg729.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $(srcdir)/src/mod_bcg729.c
 	
 clean:
 	rm -f *.o *.so *.a *.la

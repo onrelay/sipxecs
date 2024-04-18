@@ -156,6 +156,26 @@ function checkInput()
     echo "Done checkInput(): PLATFORM=${PLATFORM}, ARCHITECTURE=${ARCHITECTURE}, SUBPROJECT=${SUBPROJECT}, VERSION=${VERSION}, RPM=${RPM}"
 }
 
+function checkSELinux()
+{
+    SELINUX_ENFORCED=$(grep 'SELINUX=enforcing' /etc/selinux/config)
+
+    if [ ! -z ${SELINUX_ENFORCED} ]; then 
+
+        echo "Detected SELinux enforcing, setting SELinux to disabled"
+
+        sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
+
+        echo "A reboot is required to disable SELinux. Please login as root and run master-build.sh after the reboot to continue building."
+        
+        read -p "Press Enter to reboot the system now: " 
+
+        echo "Rebooting ..."
+        
+        sudo reboot
+    fi
+}
+
 function init()
 {
     echo "Begin init()"
@@ -188,9 +208,9 @@ function setupCentOS7()
     sudo yum install -y libtool gcc-c++ openssl-devel libmcrypt-devel libtool-ltdl-devel \
         pcre-devel pcre-devel findutils  db4-devel iptables iproute boost-devel libpcap-devel libdnet-devel xmlrpc-c-devel \
         libevent-devel poco-devel libconfig-devel hiredis-devel gtest-devel leveldb-devel cppunit-devel gperftools-devel \
-        c-ares-devel libdb4-cxx-devel libdb-cxx-devel popt-devel xerces-c-devel zeromq-devel v8-devel httpd unixODBC-devel \
+        c-ares-devel libdb4-cxx-devel libdb-cxx-devel popt-devel xerces-c-devel zeromq-devel libev-devel v8-devel httpd unixODBC-devel \
         mock rsync gem systemd-sysv mongo-cxx-driver-devel libuuid-devel swig cfengine openfire resiprocate-libs \
-        dart-sdk createrepo unzip java-1.8.0-openjdk-devel 
+        dart-sdk createrepo unzip checkpolicy policycoreutils policycoreutils-python freeswitch-devel bcg729-devel java-1.8.0-openjdk-devel 
 
     cd ${SOURCE_DIR}
     sudo mkdir -p /usr/local/sipx
@@ -217,24 +237,6 @@ function setupRocky9()
     echo "Done setupRocky9()"
 }
 
-function checkSELinux()
-{
-
-    if [ ! -z ${SELINUX_ENFORCED} ]; then 
-
-        echo "Detected SELinux enforcing, setting SELinux to disabled"
-
-        sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
-
-        echo "A reboot is required to disable SELinux. Please login as root and run master-build.sh after the reboot to continue building."
-        
-        read -p "Press Enter to reboot the system now: " 
-
-        echo "Rebooting ..."
-        
-        sudo reboot -h now
-    fi
-}
 
 function configure() 
 {
@@ -324,4 +326,3 @@ function main()
 }
 
 main $@
-
