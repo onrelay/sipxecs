@@ -4,7 +4,7 @@
     <span key="prompt.forbidden">No permission</span>
   </div>
   <div jwcid="@If" condition="ognl:userSession.admin">
-    <span jwcid="@user/GroupCloud" />
+    <span jwcid="@setting/GroupCloud" groups="ognl:coreContext.groups" />
     <span jwcid="@user/UserCloud" />
     <span jwcid="@phone/PhoneCloud" />
     <!-- <div jwcid="@If" condition="ognl:sipxcom"> -->
