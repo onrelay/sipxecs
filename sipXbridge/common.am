@@ -13,5 +13,7 @@ bridge_PKGS = \
 	sipxcommons \
 	ws-commons-util \
 	xmlrpc-client \
-	xmlrpc-server
-
+	xmlrpc-server \
+	slf4j-api \
+	slf4j-log4j12
+	

@@ -160,6 +160,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/javax.servlet.jsp-api-2.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.7.33.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/slf4j-log4j12-1.7.33.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jcl-over-slf4j-1.7.33.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-webmvc-4.0.3.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-websocket-4.0.3.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/websocket-api-9.1.5.v20140505.jar"/>
@@ -184,7 +185,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jaxb-api-2.2.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxb-core-2.2.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxb-impl-2.2.7.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jcl-over-slf4j-1.7.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/neethi-3.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/stax2-api-3.1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-commons-annotations-3.2.0.Final.jar"/>
