@@ -99,17 +99,17 @@ To build sipXcom from source, execute the master build script from the root scr 
 
     cd /src/sipxecs
 
-The `sipxecs-buiild` script will create /src/sipxecs/build and /usr/local/sipx directories where all build results are saved.
+The `sipxecs-build` script will create /src/sipxecs/build and /usr/local/sipx directories where all build results are saved.
 
 
 Build RPMs
 ~~~~~~~~~~~~~~~~~~
 
-To build and install all the sipX* RPMs from source, just add the --rpm option to the sipxecs-buiild script as follows:
+To build and install all the sipX* RPMs from source, just add the --rpm option to the sipxecs-build script as follows:
 
   .. code-block:: bash
 
-    sudo ./sipxecs-buiild --rpm
+    sudo ./sipxecs-build --rpm
 
 The resulting RPMs are e.g. found in the build/repo/CentOS_7/x86_64 folder for CentOS 7.
 
@@ -117,7 +117,7 @@ To also install the RPMs locally, add the '--install' option:
 
   .. code-block:: bash
 
-    sudo ./sipxecs-buiild --rpm --install
+    sudo ./sipxecs-build --rpm --install
 
 Build Executables
 ~~~~~~~~~~~~~~~~~~
@@ -126,16 +126,16 @@ To just build the sipX* executables from source, simply run:
 
   .. code-block:: bash
 
-    sudo ./sipxecs-buiild
+    sudo ./sipxecs-build
 
 Additional Build Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The sipxecs-buiild script has the following additional options:
+The sipxecs-build script has the following additional options:
 
   .. code-block:: bash
 
-    sudo ./sipxecs-buiild [options]
+    sudo ./sipxecs-build [options]
 
         **-p | --platform**: OS platform of sipxcom RPM to build, e.g. centos-7 (default), rocky-9
 

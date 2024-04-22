@@ -97,8 +97,8 @@ function checkInput()
                 -i|--install: include if installing rpms locally
 
             Sample:
-                sudo sipxecs-buiild --platform=centos-7 --subproject=sipXconfig --version=24.01 --rpm --install
-                sudo sipxecs-buiild -p=rocky-9 -a=x86_64 -s=sipXconfig -v=24.07
+                sudo sipxecs-build --platform=centos-7 --subproject=sipXconfig --version=24.01 --rpm --install
+                sudo sipxecs-build -p=rocky-9 -a=x86_64 -s=sipXconfig -v=24.07
                 "
                 exit
             shift
@@ -173,7 +173,7 @@ function checkSELinux()
 
         sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
 
-        echo "A reboot is required to disable SELinux. Please login as root and run sipxecs-buiild after the reboot to continue building."
+        echo "A reboot is required to disable SELinux. Please login as root and run sipxecs-build after the reboot to continue building."
         
         read -p "Press Enter to reboot the system now: " 
 
