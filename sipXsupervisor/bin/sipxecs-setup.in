@@ -60,7 +60,7 @@ end
 
 def disable_selinux
   puts "Checking SELinux..."
-  enforced = run_command("cat /etc/selinux/config | grep SELINUX=enforcing")
+  enforced = run_command("grep 'SELINUX=enforcing' /etc/selinux/config")
   if enforced
     puts "Detected SELinux enforcing, setting SELinux to disabled"
     run_command("sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config")

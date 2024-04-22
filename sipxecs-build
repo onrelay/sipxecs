@@ -18,6 +18,8 @@ SOURCE_DIR=$(dirname ${THIS_MASTER_BUILD_SCRIPT})
 
 BUILD_DIR=${SOURCE_DIR}/build
 
+LOCAL_REPO=
+
 function checkUser()
 {
     echo "Begin checkUser(): SUDO_USER=${SUDO_USER}, USER=${USER}, SIPX_USER=${SIPX_USER}"
@@ -54,9 +56,9 @@ function checkUser()
 
 function checkInput()
 {
-    echo "Begin checkInput(): options=$1"
+    echo "Begin checkInput(): options=$@"
 
-    for i in "$1"
+    for i in "$@"
     do
         case $i in
             -p=*|--platform=*)
@@ -76,7 +78,11 @@ function checkInput()
             shift
             ;;
             -r|--rpm)
-            RPM=".rpm"
+            RPM="rpm"
+            shift
+            ;;
+            -i|--install)
+            INSTALL="install"
             shift
             ;;
             -h|--help)
@@ -88,10 +94,11 @@ function checkInput()
                 -s|--subproject: subproject to build or sipx for building all RPMs, e.g. ${DEFAULT_SUBPROJECT} (default) sipXconfig
                 -v|--version: version to build, e.g ${DEFAULT_VERSION} (default), 24.07
                 -r|--rpm: include if building rpms
+                -i|--install: include if installing rpms locally
 
             Sample:
-                sudo master-build.sh --platform=centos-7 --subproject=sipXconfig --version=24.01
-                sudo master-build.sh -p=rocky-9 -a=x86_64 -s=sipXconfig -v=24.07
+                sudo sipxecs-buiild --platform=centos-7 --subproject=sipXconfig --version=24.01 --rpm --install
+                sudo sipxecs-buiild -p=rocky-9 -a=x86_64 -s=sipXconfig -v=24.07
                 "
                 exit
             shift
@@ -153,7 +160,7 @@ function checkInput()
         esac
     fi
 
-    echo "Done checkInput(): PLATFORM=${PLATFORM}, ARCHITECTURE=${ARCHITECTURE}, SUBPROJECT=${SUBPROJECT}, VERSION=${VERSION}, RPM=${RPM}"
+    echo "Done checkInput(): PLATFORM=${PLATFORM}, ARCHITECTURE=${ARCHITECTURE}, SUBPROJECT=${SUBPROJECT}, VERSION=${VERSION}, INSTALL=${INSTALL}"
 }
 
 function checkSELinux()
@@ -166,7 +173,7 @@ function checkSELinux()
 
         sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
 
-        echo "A reboot is required to disable SELinux. Please login as root and run master-build.sh after the reboot to continue building."
+        echo "A reboot is required to disable SELinux. Please login as root and run sipxecs-buiild after the reboot to continue building."
         
         read -p "Press Enter to reboot the system now: " 
 
@@ -195,6 +202,22 @@ function setupRepos()
 
     wget -O /etc/yum.repos.d/sipxcom.repo \
         https://storage.googleapis.com/sipxecs/sipxcom/${VERSION}/${PLATFORM}-${ARCHITECTURE}/sipxcom.repo
+
+    case $PLATFORM in
+
+        "centos-7")
+            LOCAL_REPO=${BUILD_DIR}/repo/CentOS_7/${ARCHITECTURE}
+            ;;
+
+        "rocky-9")
+            LOCAL_REPO=${BUILD_DIR}/repo/Rocky_9/${ARCHITECTURE}
+            ;;
+
+        *)
+            echo "Error: Unknown platform ${PLATFORM}"
+            exit 1
+            ;;
+    esac
 
     echo "Done setupRepos()"
 }
@@ -225,7 +248,7 @@ function setupCentOS7()
     sudo ln -s /usr/opt/ossapp /usr/local/sipx/opt/ossapp
 
     cd ${BUILD_DIR}
-    sudo echo oss_core >> .modules-exclude
+    sudo echo oss_core > .modules-exclude
 
     echo "Done setupCentOS7()"
 }
@@ -272,18 +295,39 @@ function build()
     echo "Begin build()"
 
     cd ${BUILD_DIR}
-    sudo make ${SUBPROJECT}${RPM}
  
     # The make command may kick a permission error when creating RPMs
-    if [ ! -z "${RPM}" ]; then
+
+    if [ -z "${RPM}" ]; then
+
+        sudo make ${SUBPROJECT}
+    
+    else
+
+        echo "RPMs will be generated locally at ${LOCAL_REPO}"
+
+        sudo make ${SUBPROJECT}.rpm
+
         if [ $? -ne 0 ]; then 
             echo "Retrying make with new repo permissions"
             sudo chown -R sipx.sipx repo
             sudo make ${SUBPROJECT}${RPM}
-        fi
+        fi        
     fi
 
     echo "Done build()"
+}
+
+function install() 
+{
+    echo "Begin install()"
+
+    cd ${BUILD_DIR}
+
+    # 'repomanage' lists the most recent RPMs in a directory
+    sudo yum localinstall -y $(repomanage ${LOCAL_REPO})
+
+    echo "Done install()"
 }
 
 function main()
@@ -293,14 +337,13 @@ function main()
 
     checkUser
 
-    checkInput $1
+    checkInput $@
 
     checkSELinux
 
     init
 
     setupRepos
-
 
     case $PLATFORM in
 
@@ -321,6 +364,12 @@ function main()
     configure
 
     build
+
+    if [ ! -z "${INSTALL}" ]; then
+
+        install
+
+    fi
 
     echo "Finished ${THIS_MASTER_BUILD_SCRIPT}"
 }

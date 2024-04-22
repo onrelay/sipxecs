@@ -91,7 +91,7 @@ Execute the following commands to checkout the sipXcom repository:
 Build sipXcom
 -----------------------
 
-To build sipXcom from source, just execute the master build script from the root scr folder as the sipx user with sudo privileges:
+To build sipXcom from source, execute the master build script from the root scr folder as the sipx user with sudo privileges:
 
   .. code-block:: bash
 
@@ -99,36 +99,43 @@ To build sipXcom from source, just execute the master build script from the root
 
     cd /src/sipxecs
 
-Build Executables
-~~~~~~~~~~~~~~~~~~
+The `sipxecs-buiild` script will create /src/sipxecs/build and /usr/local/sipx directories where all build results are saved.
 
-To build the sipX* executables from source on a host server where you intend to run sipXcom, simply run:
-
-  .. code-block:: bash
-
-    sudo ./master-build.sh
 
 Build RPMs
 ~~~~~~~~~~~~~~~~~~
 
-To build all the sipX* RPMs from source, just add the --rpm option as follows:
+To build and install all the sipX* RPMs from source, just add the --rpm option to the sipxecs-buiild script as follows:
 
   .. code-block:: bash
 
-    sudo ./master-build.sh --rpm
+    sudo ./sipxecs-buiild --rpm
 
-The `master-build.sh` script will create /src/sipxecs/build and /usr/local/sipx directories where all build results are saved.
+The resulting RPMs are e.g. found in the build/repo/CentOS_7/x86_64 folder for CentOS 7.
 
-The resulting RPMs are found in the build/repo folder.
+To also install the RPMs locally, add the '--install' option:
+
+  .. code-block:: bash
+
+    sudo ./sipxecs-buiild --rpm --install
+
+Build Executables
+~~~~~~~~~~~~~~~~~~
+
+To just build the sipX* executables from source, simply run:
+
+  .. code-block:: bash
+
+    sudo ./sipxecs-buiild
 
 Additional Build Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The master-build.sh script has the following additional options:
+The sipxecs-buiild script has the following additional options:
 
   .. code-block:: bash
 
-    sudo ./master-build.sh [options]
+    sudo ./sipxecs-buiild [options]
 
         **-p | --platform**: OS platform of sipxcom RPM to build, e.g. centos-7 (default), rocky-9
 
