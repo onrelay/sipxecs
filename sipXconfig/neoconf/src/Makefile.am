@@ -18,9 +18,11 @@ neoconf_RESOURCES = \
 	$(shell cd $(srcdir); find . -type f \( \
 	  -name '*.json' \
 	  -o -name '*.properties' \
-	  -o -name 'verisignclass3ca' \
+	  -o -name 'isrg-root-x1-cross-signed' \
 	  -o -name 'isrgrootx1' \
+	  -o -name 'lets-encrypt-r3' \
 	  -o -name 'letsencryptauthorityx3' \
+	  -o -name 'verisignclass3ca' \
 	  -o -name '*.xml' \
 	  -o -name '*.jpg' \
 	  -o -name '*.xsd' \
