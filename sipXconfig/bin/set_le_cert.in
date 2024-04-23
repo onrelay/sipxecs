@@ -3,10 +3,40 @@
 set -e
 
 httpd_cert=/etc/httpd/conf.d/ssl
+sipx_cert=/var/sipxdata/cfdata/1/
+
+httpd_ssl_cert=$httpd_cert/ssl-web.crt
+httpd_ssl_key=$httpd_cert/ssl-web.key
+
+sipx_ssl_cert=$sipx_cert/ssl-web.crt
+sipx_ssl_key=$sipx_cert/ssl-web.key
+sipx_p12_keystore=$sipx_cert/ssl-web.p12
+sipx_ssl_keystore=$sipx_cert/ssl-web.keystore
+
+openfire_ssl_cert=$sipx_cert/ssl-openfire.crt
+openfire_ssl_key=$sipx_cert/ssl-openfire.key
+openfire_ssl_keystore=$sipx_cert/ssl-openfire.keystore
+
 
 umask 077
 
-cp "$RENEWED_LINEAGE/fullchain.pem" "$httpd_cert/ssl-web.crt"
-cp "$RENEWED_LINEAGE/privkey.pem" "$httpd_cert/ssl-web.key"
+cp -f $RENEWED_LINEAGE/fullchain.pem $httpd_ssl_cert
+cp -f $RENEWED_LINEAGE/privkey.pem $httpd_ssl_key
 
-chmod 600 "$httpd_cert/ssl-web.crt" "$httpd_cert/ssl-web.key"
+chmod 600 $httpd_ssl_cert $httpd_ssl_key 
+
+cp -f $httpd_ssl_cert $sipx_ssl_cert
+cp -f $httpd_ssl_key $sipx_ssl_key 
+
+openssl pkcs12 -export -in $sipx_ssl_cert -inkey $sipx_ssl_key -out $sipx_p12_keystore -name ssl-web -passout pass:changeit
+keytool -importkeystore -deststorepass changeit -destkeypass changeit -destkeystore $sipx_ssl_keystore -srckeystore $sipx_p12_keystore -srcstoretype PKCS12 -srcstorepass changeit -alias ssl-web
+
+rm -f $sipx_p12_keystore
+
+cp -f $sipx_ssl_cert $openfire_ssl_cert
+cp -f $sipx_ssl_key $openfire_ssl_key
+cp -f $sipx_ssl_keystore $openfire_ssl_keystore
+
+
+
+

@@ -51,60 +51,14 @@ public class CertificateConfig implements ConfigProvider {
         boolean caCertificate = false;
         Set<Location> locations = request.locations(manager);
         for (Location location : locations) {
-            File dir = manager.getLocationDataDirectory(location);
-            String sipCert = m_certificateManager.getCommunicationsCertificate();
-            FileUtils.writeStringToFile(new File(dir, "ssl.crt"), sipCert);
-            String sipKey = m_certificateManager.getCommunicationsPrivateKey();
-            FileUtils.writeStringToFile(new File(dir, "ssl.key"), sipKey);
-            String webCert = m_certificateManager.getWebCertificate();
-            FileUtils.writeStringToFile(new File(dir, "ssl-web.crt"), webCert);
-            StringBuffer openfireCert = new StringBuffer();
-            openfireCert.append(webCert);
-            String webKey = m_certificateManager.getWebPrivateKey();
-            File sslWebKey = new File(dir, "ssl-web.key");
-            FileUtils.writeStringToFile(sslWebKey, webKey);
-
-            String openfireSslKey = CertificateUtils.convertSslKeyToRSA(sslWebKey);
-            if (openfireSslKey != null) {
-                FileUtils.writeStringToFile(new File(dir, OPENFIRE_KEY), openfireSslKey);
-            } else {
-                FileUtils.writeStringToFile(new File(dir, OPENFIRE_KEY), webKey);
-            }
-
-            String chainCert = m_certificateManager.getChainCertificate();
-            if (chainCert != null) {
-                FileUtils.writeStringToFile(new File(dir, "server-chain.crt"), chainCert);
-                openfireCert.append(chainCert);
-                chainCertificate = true;
-            }
-            String caCert = m_certificateManager.getCACertificate();
-            if (caCert != null) {
-                FileUtils.writeStringToFile(new File(dir, "ca-bundle.crt"), caCert);
-                openfireCert.append(caCert);
-                caCertificate = true;
-            }
-            FileUtils.writeStringToFile(new File(dir, "ssl-openfire.crt"), openfireCert.toString());
-            Writer writer = new FileWriter(new File(dir, "ssl.conf"));
-            try {
-                write(writer, chainCertificate, caCertificate);
-            } finally {
-                IOUtils.closeQuietly(writer);
-            }
+            
+            CertificateSettings settings = m_certificateManager.getSettings();
 
             String domain = Domain.getDomain().getName();
 
-            JavaKeyStore sslSip = new JavaKeyStore();
-            sslSip.addKey(domain, sipCert, sipKey);
-            sslSip.storeIfDifferent(new File(dir, "ssl.keystore"));
+            File dir = manager.getLocationDataDirectory(location);
 
-            JavaKeyStore sslWeb = new JavaKeyStore();
-            sslWeb.addKey(domain, webCert, webKey);
-            sslWeb.storeIfDifferent(new File(dir, "ssl-web.keystore"));
-
-            //store the full chain for openfire certificate
-            JavaKeyStore sslOpenfire = new JavaKeyStore();
-            sslOpenfire.addKeys(domain, openfireCert.toString(), new String(openfireSslKey));
-            sslOpenfire.storeIfDifferent(new File(dir, "ssl-openfire.keystore"));
+            boolean useLetsEncrypt = settings.getUseLetsEncrypt();
 
             File authDir = new File(dir, "authorities");
             //remove old certs
@@ -123,19 +77,107 @@ public class CertificateConfig implements ConfigProvider {
                 IOUtils.closeQuietly(authoritiesStore);
             }
 
+            // Rebuild internal SIP extension certificate
+            String sipCert = m_certificateManager.getCommunicationsCertificate();
+
+            FileUtils.writeStringToFile(new File(dir, "ssl.crt"), sipCert);
+
+            String sipKey = m_certificateManager.getCommunicationsPrivateKey();
+
+            FileUtils.writeStringToFile(new File(dir, "ssl.key"), sipKey);
+
+            JavaKeyStore sslSip = new JavaKeyStore();
+
+            sslSip.addKey(domain, sipCert, sipKey);
+
+            sslSip.storeIfDifferent(new File(dir, "ssl.keystore"));
+
+            if( !useLetsEncrypt )  {
+
+                // Rebuild public certificate if letsencrypt not enabled (also used by SBC)
+
+                String webCert = m_certificateManager.getWebCertificate();
+
+                FileUtils.writeStringToFile(new File(dir, "ssl-web.crt"), webCert);
+
+                String webKey = m_certificateManager.getWebPrivateKey();
+
+                File sslWebKey = new File(dir, "ssl-web.key");
+
+                FileUtils.writeStringToFile(sslWebKey, webKey);
+
+                String chainCert = m_certificateManager.getChainCertificate();
+                if (chainCert != null) {
+                    FileUtils.writeStringToFile(new File(dir, "server-chain.crt"), chainCert);
+                    chainCertificate = true;
+                }
+
+                String caCert = m_certificateManager.getCACertificate();
+                if (caCert != null) {
+                    FileUtils.writeStringToFile(new File(dir, "ca-bundle.crt"), caCert);
+                    caCertificate = true;
+                }
+
+                Writer sslConfWriter = new FileWriter(new File(dir, "ssl.conf"));
+                try {
+                    write(sslConfWriter, chainCertificate, caCertificate);
+                } finally {
+                    IOUtils.closeQuietly(sslConfWriter);
+                }
+
+                JavaKeyStore sslWeb = new JavaKeyStore();
+
+                sslWeb.addKey(domain, webCert, webKey);
+
+                sslWeb.storeIfDifferent(new File(dir, "ssl-web.keystore"));
+
+                // Openfire certs
+
+                StringBuffer openfireCert = new StringBuffer();
+
+                openfireCert.append(webCert);
+
+                if (chainCert != null) {
+                    openfireCert.append(chainCert);
+                }
+
+                if (caCert != null) {
+                    openfireCert.append(caCert);
+                }
+
+                String openfireSslKey = CertificateUtils.convertSslKeyToRSA(sslWebKey);
+
+                if (openfireSslKey != null) {
+                    FileUtils.writeStringToFile(new File(dir, OPENFIRE_KEY), openfireSslKey);
+                } else {
+                    FileUtils.writeStringToFile(new File(dir, OPENFIRE_KEY), webKey);
+                }
+
+                FileUtils.writeStringToFile(new File(dir, "ssl-openfire.crt"), openfireCert.toString());
+
+                //store the full chain for openfire certificate
+
+                JavaKeyStore sslOpenfire = new JavaKeyStore();
+
+                sslOpenfire.addKeys(domain, openfireCert.toString(), new String(openfireSslKey));
+
+                sslOpenfire.storeIfDifferent(new File(dir, "ssl-openfire.keystore"));
+
+            } // !useLetsEncrypt
+
             if (location.isPrimary()) {
-                writer = new FileWriter(new File(dir, "letsencrypt.cfdat"));
+
+                Writer letsEncryptWriter = new FileWriter(new File(dir, "letsencrypt.cfdat"));
 
                 try {
-                    CfengineModuleConfiguration config = new CfengineModuleConfiguration(writer);
-                    CertificateSettings settings = m_certificateManager.getSettings();
+                    CfengineModuleConfiguration config = new CfengineModuleConfiguration(letsEncryptWriter);
 
                     config.writeClass("letsencrypt", settings.getUseLetsEncrypt());
                     config.write("letsencrypt_certbot_params", settings.getCertbotParams());
                     config.write("letsencrypt_email", settings.getLetsEncryptEmail());
                     config.write("letsencrypt_key_size", settings.getLetsEncryptKeySize());
                 } finally {
-                    IOUtils.closeQuietly(writer);
+                    IOUtils.closeQuietly(letsEncryptWriter);
                 }
             }
 
