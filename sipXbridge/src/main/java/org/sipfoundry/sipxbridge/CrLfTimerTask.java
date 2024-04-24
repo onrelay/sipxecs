@@ -35,13 +35,20 @@ class CrLfTimerTask extends TimerTask {
     @Override
     public void run() {
         try {
-            ListeningPointExt listeningPoint = (ListeningPointExt) provider.getListeningPoint("udp");
-            if ( logger.isDebugEnabled() ) logger.debug("sending heartbeat to " + accountInfo.getInboundProxy());
-            listeningPoint.sendHeartbeat
-                (InetAddress.getByName(accountInfo.getInboundProxy()).getHostAddress(),
-                    accountInfo.getInboundProxyPort());
+            String transport = accountInfo == null ? 
+                Gateway.DEFAULT_ITSP_TRANSPORT : this.accountInfo.getOutboundTransport();
+
+            ListeningPointExt listeningPoint = (ListeningPointExt) provider.getListeningPoint(transport);
+
+            if ( logger.isDebugEnabled() ) logger.debug("sending " + transport + " heartbeat to " + accountInfo.getInboundProxy());
+
+            listeningPoint.sendHeartbeat( 
+                InetAddress.getByName( accountInfo.getInboundProxy() ).getHostAddress(),
+                accountInfo.getInboundProxyPort()
+            );
+
         } catch (Exception ex) {
-            logger.error("Unexpected exception in CRLF timer task "+ ex.getMessage());
+            logger.error("Unexpected exception in CRLF timer task "+ ex.getMessage(), ex );
         }
         
 

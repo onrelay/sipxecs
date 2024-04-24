@@ -3,3 +3,7 @@
 /usr/bin/python -c 'import random; import time; time.sleep(random.random() * 3600)'
 /usr/bin/systemctl stop httpd.service && /usr/bin/certbot renew
 /usr/bin/systemctl start httpd.service
+
+if [ $(find /var/sipxdata/cfdata/1/ssl-web.keystore -mtime -1) ]; then
+    /usr/bin/systemctl restart sipxconfig.service
+fi

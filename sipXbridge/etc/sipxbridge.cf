@@ -88,7 +88,7 @@ bundle agent sipxbridge_running {
         comment => "start sipxbridge",
         args => "start";
 
-    sipxbridge.sipxbridge_running.(restart_sipxecs|restart_sipxbridge|java_ssl_repaired)::
+    sipxbridge.sipxbridge_running.(restart_sipxecs|restart_sipxbridge|java_ssl_web_repaired)::
       "$(sipx.SIPX_SERVICEDIR)/sipxbridge"
         comment => "restart sipxbridge",
         args => "asyncrestart";

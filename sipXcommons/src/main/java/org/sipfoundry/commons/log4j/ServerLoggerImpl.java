@@ -43,6 +43,11 @@ public class ServerLoggerImpl implements ServerLogger {
 
     @Override
     public void logMessage(SIPMessage message, String source, String destination, boolean isSender, long timeStamp) {
+
+        if( message.isNullRequest() ) {
+            return;
+        }
+
         String firstLine = message.getFirstLine();
         String tid = message.getTransactionId();
         String callId = message.getCallId().getCallId();

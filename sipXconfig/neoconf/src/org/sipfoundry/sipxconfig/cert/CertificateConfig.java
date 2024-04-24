@@ -137,11 +137,11 @@ public class CertificateConfig implements ConfigProvider {
 
                 openfireCert.append(webCert);
 
-                if (chainCert != null) {
+                if (chainCertificate) {
                     openfireCert.append(chainCert);
                 }
 
-                if (caCert != null) {
+                if (caCertificate) {
                     openfireCert.append(caCert);
                 }
 
