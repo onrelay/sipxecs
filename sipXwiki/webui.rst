@@ -1,10 +1,10 @@
 .. index:: webui
 
 =============
-sipXcom webui
+Web UI
 =============
 
-The sipxcom webui is controlled by the sipxconfig service. Restarting the sipxconfig service will not interrupt calls. If you find the webui unresponsive or there is a "internal error", try on the command line as root::
+The sipxcom web UI is controlled by the sipxconfig service. Restarting the sipxconfig service will not interrupt calls. If you find the webui unresponsive or there is a "internal error", try on the command line as root::
 
   service sipxconfig restart
 
