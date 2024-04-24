@@ -228,12 +228,24 @@ function setupCentOS7()
 
     sudo yum install -y make autoconf automake 
 
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "yum install error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
     sudo yum install -y libtool gcc-c++ openssl-devel libmcrypt-devel libtool-ltdl-devel \
         pcre-devel pcre-devel findutils  db4-devel iptables iproute boost-devel libpcap-devel libdnet-devel xmlrpc-c-devel \
         libevent-devel poco-devel libconfig-devel hiredis-devel gtest-devel leveldb-devel cppunit-devel gperftools-devel \
         c-ares-devel libdb4-cxx-devel libdb-cxx-devel popt-devel xerces-c-devel zeromq-devel libev-devel v8-devel httpd unixODBC-devel \
         mock rsync gem systemd-sysv mongo-cxx-driver-devel libuuid-devel swig cfengine openfire resiprocate-libs \
         dart-sdk createrepo unzip checkpolicy policycoreutils policycoreutils-python freeswitch-devel bcg729-devel java-1.8.0-openjdk-devel 
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "yum install error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
 
     cd ${SOURCE_DIR}
     sudo mkdir -p /usr/local/sipx
@@ -270,6 +282,12 @@ function configure()
     cd ${SOURCE_DIR}
     sudo autoreconf -ivf
 
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "autoreconf error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
     cd ${BUILD_DIR}
 
     sudo echo '$(sipx_all)' > .modules-include
@@ -285,6 +303,12 @@ function configure()
         
         sudo ../configure --enable-rpm DISTRO="${PLATFORM}-${ARCHITECTURE}"
     fi
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "configure error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
 
     echo "Done configure()"
 }
@@ -306,14 +330,14 @@ function build()
 
         echo "RPMs will be generated locally at ${LOCAL_REPO}"
 
-        sudo make ${SUBPROJECT}.rpm
-
-        if [ $? -ne 0 ]; then 
-            echo "Retrying make with new repo permissions"
-            sudo chown -R sipx.sipx repo
-            sudo make ${SUBPROJECT}${RPM}
-        fi        
+        sudo make ${SUBPROJECT}.rpm       
     fi
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "make error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
 
     echo "Done build()"
 }
