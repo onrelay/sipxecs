@@ -10,6 +10,7 @@ sipXcom Documentation
    history
    features
    installing
+   upgrading
    building
    planning   
    setupscript
