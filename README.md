@@ -9,6 +9,8 @@ Here are documentation shortcuts for installing and building the source:
 
 - <a target="_blank" href="https://onrelay.github.io/sipxecs/installing.html">Installing</a>
 
+- <a target="_blank" href="https://onrelay.github.io/sipxecs/upgrading.html">Upgrading</a>
+
 - <a target="_blank" href="https://onrelay.github.io/sipxecs/building.html">Building</a>
 
 To get help, track release progress, ask questions, suggest improvements or otherwise contribute to the sipXcom open source project, please participate in the discussion at the <a target="_blank" href="https://groups.google.com/g/sipxcom-users">sipXcom User Group</a>!
