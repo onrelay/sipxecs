@@ -42,13 +42,26 @@ Setup Repos
 Upgrade sipXcom
 ~~~~~~~~~~~~~~~~
 
-All changes are compatible with 21.04, so just update your sipXcom RPMs with yum as follows:
+All sipXcom code changes are backwards compatible with 21.04, so just update your sipXcom RPMs with yum as follows:
 
   .. code-block:: bash
 
-    systemctl stop sipxecs.service
+    service sipxecs stop
 
     yum update -y
+
+
+Change active java version to 1.8:
+
+  .. code-block:: bash
+
+    alternatives --config java
+    
+    => Select java-1.8.0-openjdk.x86_64 
+
+Reboot your system:
+
+  .. code-block:: bash
 
     reboot
 
