@@ -10,10 +10,11 @@
 
 # Location of the file containing the required SVCs to be modified
 SVCSLIST="@SIPX_CONFDIR@/sipxecs-services.ini"
+IGNORE_CFENGINE_ERROR="Failed to open /dev/tty"
 
 case "$1" in
 start)
-  @SIPX_BINDIR@/sipxagent -d start_sipxecs
+  @SIPX_BINDIR@/sipxagent -d start_sipxecs |& grep -v "^${IGNORE_CFENGINE_ERROR}" 
 ;;
 
 status)
@@ -23,11 +24,11 @@ status)
 ;;
 
 stop)
-  @SIPX_BINDIR@/sipxagent -d stop_sipxecs
+  @SIPX_BINDIR@/sipxagent -d stop_sipxecs |& grep -v "^${IGNORE_CFENGINE_ERROR}"
 ;;
 
 restart)
-  @SIPX_BINDIR@/sipxagent -d restart_sipxecs
+  @SIPX_BINDIR@/sipxagent -d restart_sipxecs |& grep -v "^${IGNORE_CFENGINE_ERROR}"
 ;;
 
 *)
