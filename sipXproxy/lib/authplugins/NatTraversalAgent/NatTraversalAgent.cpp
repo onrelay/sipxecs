@@ -454,6 +454,7 @@ void NatTraversalAgent::handleOutputMessage( SipMessage& message,
       // alteration must be done to requests carrying our Record-Route.
       adjustViaForNatTraversal( message, address, port );
       adjustRecordRouteForNatTraversal( message, address, port );
+      mpSipRouter->addNatMappingInfoToContacts( message );
 
       pCallTracker = getCallTrackerForMessage( message );
       if( pCallTracker )

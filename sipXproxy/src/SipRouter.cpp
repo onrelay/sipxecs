@@ -1952,7 +1952,7 @@ bool SipRouter::addPathHeaderIfNATOrTlsRegisterRequest( SipMessage& sipRequest )
    return bMessageModified;
 }
 
-bool SipRouter::addNatMappingInfoToContacts( SipMessage& sipRequest ) const 
+bool SipRouter::addNatMappingInfoToContacts( SipMessage& sipMessage ) const 
 {
    // Check if top via header has a 'received' parameter.  Presence of such
    // a header would indicate that the registering user is located behind
@@ -1962,11 +1962,11 @@ bool SipRouter::addNatMappingInfoToContacts( SipMessage& sipRequest ) const
    UtlBoolean bReceivedSet;
    UtlString  contactString;
    
-   sipRequest.getTopVia( &privateAddress, &privatePort, &protocol, NULL, &bReceivedSet );
+   sipMessage.getTopVia( &privateAddress, &privatePort, &protocol, NULL, &bReceivedSet );
 
    // Update nat mapping info for each contact from the sip request message
    for (int contactNumber = 0;
-        sipRequest.getContactEntry(contactNumber, &contactString);
+        sipMessage.getContactEntry(contactNumber, &contactString);
         contactNumber++ )
    {
 	   Url newContactUri( contactString );
@@ -2024,7 +2024,7 @@ bool SipRouter::addNatMappingInfoToContacts( SipMessage& sipRequest ) const
 		  // by the sipXtack and use them as the contact's IP & port
 		  UtlString publicAddress;
 		  int publicPort;
-		  sipRequest.getSendAddress( &publicAddress, &publicPort );
+		  sipMessage.getSendAddress( &publicAddress, &publicPort );
 		  newContactUri.setHostAddress( publicAddress );
 		  newContactUri.setHostPort( publicPort );
 
@@ -2050,7 +2050,7 @@ bool SipRouter::addNatMappingInfoToContacts( SipMessage& sipRequest ) const
 
 	   // set the newly constructed contact in the sip request
 	   newContactUri.toString( newContactString );
-	   sipRequest.setContactField( newContactString, contactNumber );
+	   sipMessage.setContactField( newContactString, contactNumber );
    }
 
    return true;

@@ -225,6 +225,8 @@ class SipRouter : public OsServerTask
    void modifyFinalResponse(SipTransaction* pTransaction, const SipMessage& request, SipMessage& finalResponse);
 
    UtlBoolean suppressAlertIndicatorForTransfers() const;
+
+   bool addNatMappingInfoToContacts( SipMessage& sipMessage ) const;
    
 /* //////////////////////////// PROTECTED ///////////////////////////////// */
   protected:
@@ -257,8 +259,6 @@ class SipRouter : public OsServerTask
     *  @returns true iff sipRequest was modified.
     */
    bool addPathHeaderIfNATOrTlsRegisterRequest( SipMessage& sipRequest ) const;
-
-   bool addNatMappingInfoToContacts( SipMessage& sipRequest ) const;
    
    /// Verifies if the proxy supports all the extensions listed in the Proxy-Require
    /// header of an incoming request.
