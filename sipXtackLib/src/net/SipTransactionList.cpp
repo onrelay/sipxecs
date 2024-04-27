@@ -446,7 +446,7 @@ void SipTransactionList::removeOldTransactions(long oldTransaction,
 
     if ( deleteCount || busyCount || numTransactions > 10000 ) // do not log 'doing nothing when nothing to do', even at debug
     {
-       Os::Logger::instance().log(FAC_SIP, PRI_NOTICE,
+       Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
                      "SipTransactionList::removeOldTransactions"
                      " deleting %d of %d transactions (%d busy)",
                      deleteCount , numTransactions, busyCount

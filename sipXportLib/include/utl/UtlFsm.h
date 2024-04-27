@@ -16,7 +16,7 @@
 #include "os/OsLogger.h"
 
 // DEFINES
-//#define LOG_STATE_CHANGES
+#define LOG_STATE_CHANGES
 
 // MACROS
 // EXTERNAL FUNCTIONS
@@ -306,7 +306,7 @@
                                StateType* transitionTarget )
       {
 #ifdef LOG_STATE_CHANGES
-         Os::Logger::instance().log(FAC_FSM, PRI_DEBUG,
+         Os::Logger::instance().log(FAC_FSM, PRI_INFO,
                        "ChangeState( FSM = %s, current state = %s. new state = %s )",
                        sm.name(),
                        transitionSource->name(),

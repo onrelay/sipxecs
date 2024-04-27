@@ -10,7 +10,6 @@
 
 // SYSTEM INCLUDES
 // APPLICATION INCLUDES
-#define LOG_STATE_CHANGES
 #include "utl/UtlFsm.h"
 
 // DEFINES

@@ -3203,10 +3203,11 @@ void SipUserAgent::garbageCollection()
         tcpThen = -1;
     }
 
-
+    #ifdef TRANSACTION_MATCH_DEBUG
     Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
                  "SipUserAgent[%s]::garbageCollection reaping terminated transactions. Message Queue size %d",
                  getName().data(), getMessageQueue()->numMsgs());
+    #endif
 
     #ifdef LOG_TIME
        Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
