@@ -1914,12 +1914,12 @@ bool SipRouter::addPathHeaderIfNATOrTlsRegisterRequest( SipMessage& sipRequest )
       // Check if top via header has a 'received' parameter.  Presence of such
       // a header would indicate that the registering user is located behind
       // a NAT.
-      UtlString  privateAddress, protocol;
-      int        privatePort;
+      UtlString  address, protocol;
+      int        port;
       UtlBoolean bReceivedSet;
       UtlBoolean bIsTls;
 
-      sipRequest.getTopVia( &privateAddress, &privatePort, &protocol, NULL, &bReceivedSet );
+      sipRequest.getTopVia( &address, &port, &protocol, NULL, &bReceivedSet );
       bIsTls = protocol.compareTo("tls", UtlString::ignoreCase) == 0;
 
       if( bReceivedSet || bIsTls)
@@ -1957,12 +1957,27 @@ bool SipRouter::addNatMappingInfoToContacts( SipMessage& sipMessage ) const
    // Check if top via header has a 'received' parameter.  Presence of such
    // a header would indicate that the registering user is located behind
    // a NAT.
-   UtlString  privateAddress, protocol;
-   int        privatePort;
+   UtlString  address, protocol;
+   int        port;
    UtlBoolean bReceivedSet;
    UtlString  contactString;
+
+   int numberOfViaFields = sipMessage.getNumberOfViaFields();
    
-   sipMessage.getTopVia( &privateAddress, &privatePort, &protocol, NULL, &bReceivedSet );
+   int viaIndex = 0;
+   
+   if( sipMessage.isResponse() && numberOfViaFields > 0 ) 
+   {
+    viaIndex = numberOfViaFields - 1;
+   }
+   
+   sipMessage.getVia( viaIndex, &address, &port, &protocol, NULL, &bReceivedSet );
+
+   Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "SipRouter::addNatMappingInfoToContacts getVia returned address=[%s], port=[%d], protocol=[%s], bReceivedSet=[%d]", 
+    address.data(),
+    port,
+    protocol.data(),
+    bReceivedSet );
 
    // Update nat mapping info for each contact from the sip request message
    for (int contactNumber = 0;
@@ -2022,10 +2037,21 @@ bool SipRouter::addNatMappingInfoToContacts( SipMessage& sipMessage ) const
 
 		  // get the user's public IP address and port as received
 		  // by the sipXtack and use them as the contact's IP & port
+
 		  UtlString publicAddress;
 		  int publicPort;
-		  sipMessage.getSendAddress( &publicAddress, &publicPort );
-		  newContactUri.setHostAddress( publicAddress );
+
+      if( sipMessage.isResponse() )
+      {
+        publicAddress = address;
+        publicPort = port;
+      }
+      else 
+      {
+		    sipMessage.getSendAddress( &publicAddress, &publicPort );
+      }
+
+      newContactUri.setHostAddress( publicAddress );
 		  newContactUri.setHostPort( publicPort );
 
 		  newContactUri.setUrlParameter( SIPX_PRIVATE_CONTACT_URI_PARAM, natUrlParameterValue );
