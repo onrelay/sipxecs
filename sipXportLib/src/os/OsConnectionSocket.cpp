@@ -440,19 +440,7 @@ int OsConnectionSocket::read(char* buffer, int bufferLength)
     int bytesRead = OsSocket::read(buffer, bufferLength);
     if (!bytesRead)
     {
-       int error = OsSocketGetERRNO();
-       if (error != EINTR && error != EAGAIN)
-       {
-          char* msgBuf;
-          msgBuf = strerror(error);
-
-          Os::Logger::instance().log(FAC_KERNEL, PRI_INFO,
-                        "OsConnectionSocket::read[2] error or EOF on fd %d, "
-                        "errno = %d %s",
-                        socketDescriptor, error, msgBuf
-                        );
-          close();
-       }
+       closeOnReadError();
     }
 
     return(bytesRead);
@@ -474,19 +462,7 @@ int OsConnectionSocket::read(char* buffer,
     }
     else
     {
-       int error = OsSocketGetERRNO();
-       if (error != EINTR && error != EAGAIN)
-       {
-          char* msgBuf;
-          msgBuf = strerror(error);
-
-          Os::Logger::instance().log(FAC_KERNEL, PRI_INFO,
-                        "OsConnectionSocket::read[4] error or EOF on fd %d, "
-                        "errno = %d %s",
-                        socketDescriptor, error, msgBuf
-                        );
-          close();
-       }
+       closeOnReadError();
     }
 
     return(bytesRead);
@@ -503,23 +479,36 @@ int OsConnectionSocket::read(char* buffer,
     int bytesRead = OsSocket::read(buffer, bufferLength, waitMilliseconds);
     if (!bytesRead)
     {
-       int error = OsSocketGetERRNO();
-       if (error != EINTR && error != EAGAIN)
-       {
-          char* msgBuf;
-          msgBuf = strerror(error);
-
-          Os::Logger::instance().log(FAC_KERNEL, PRI_INFO,
-                        "OsConnectionSocket::read[3] error or EOF on fd %d, "
-                        "errno = %d %s",
-                        socketDescriptor, error, msgBuf
-                        );
-          close();
-       }
+      closeOnReadError();
     }
 
     return(bytesRead);
 }
+
+/* ============================ PROTECTED ================================= */
+
+UtlBoolean OsConnectionSocket::closeOnReadError()
+{
+   int error = OsSocketGetERRNO();
+   if (error != EINTR && error != EAGAIN)
+   {
+      char* msgBuf;
+      msgBuf = strerror(error);
+
+      Os::Logger::instance().log(FAC_KERNEL, PRI_INFO,
+                  "OsConnectionSocket::closeOnReadError[3] error or EOF on fd %d, "
+                  "errno = %d %s",
+                  socketDescriptor, error, msgBuf
+                  );
+      close();
+
+      return true;
+   } 
+
+   return false;
+}
+
+
 
 /* ============================ ACCESSORS ================================= */
 OsSocket::IpProtocolSocketType OsConnectionSocket::getIpProtocol() const
