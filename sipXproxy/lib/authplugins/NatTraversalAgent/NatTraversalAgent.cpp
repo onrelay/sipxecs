@@ -452,7 +452,10 @@ void NatTraversalAgent::handleOutputMessage( SipMessage& message,
       // is going to a destination that is not on our local private subnet then
       // we need to alter the our via: to advertize our public IP address.  A similar
       // alteration must be done to requests carrying our Record-Route.
-      addNatMappingInfoToContacts( message, address, port );
+      
+      // OR TODO: not working for all calls yet, but missing contacts mapping for e.g. 180 and 183 responses
+      // addNatMappingInfoToContacts( message, address, port );
+
       adjustViaForNatTraversal( message, address, port );
       adjustRecordRouteForNatTraversal( message, address, port );
 
