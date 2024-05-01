@@ -97,11 +97,13 @@ OsSSLConnectionSocket::OsSSLConnectionSocket(SSL *s, int connectedSocketDescript
 // Constructor
 OsSSLConnectionSocket::OsSSLConnectionSocket(int serverPort, const char* serverName,
                                              long timeoutInSecs) :
-   OsConnectionSocket(serverPort,serverName,TRUE /* BLOCKING */,
-                      NULL /* local address == INADDR_ANY */,
-                      timeoutInSecs * OsTime::MSECS_PER_SEC ),
-   mSSL(NULL),
-   mPeerIdentity(NOT_IDENTIFIED)
+   OsConnectionSocket(serverPort,
+      serverName,
+      (timeoutInSecs > 0), // OR: Blocking here with no timeout creates all sorts of problems, make NON-BLOCKING then // TRUE /* BLOCKING */,
+      NULL /* local address == INADDR_ANY */,
+      timeoutInSecs * OsTime::MSECS_PER_SEC ),
+      mSSL(NULL),
+      mPeerIdentity(NOT_IDENTIFIED)
 {
     mbExternalSSLSocket = FALSE;
     if (mIsConnected)
