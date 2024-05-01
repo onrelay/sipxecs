@@ -13,7 +13,7 @@ sipXcom Documentation
    upgrading
    building
    planning   
-   setupscript
+   setup
    webui
    faq
    troubleshooting

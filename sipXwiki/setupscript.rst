@@ -1,7 +1,7 @@
-.. index:: setupscript
+.. index:: setup
 
 ============
-Setup Script
+Setup
 ============
 
 .. _setup-preparation:
