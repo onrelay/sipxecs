@@ -234,6 +234,8 @@ function setupCentOS7()
         exit ${ERROR}
     fi 
 
+    sed -i 's/obsoletes=1/obsoletes=0/' /etc/yum.conf
+
     sudo yum install -y libtool gcc-c++ openssl-devel libmcrypt-devel libtool-ltdl-devel \
         pcre-devel pcre-devel findutils  db4-devel iptables iproute boost-devel libpcap-devel libdnet-devel xmlrpc-c-devel \
         libevent-devel poco-devel libconfig-devel hiredis-devel gtest-devel leveldb-devel cppunit-devel gperftools-devel \
