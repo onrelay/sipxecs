@@ -93,6 +93,12 @@
       </type>
       <value>300</value>
     </setting>
+    <setting name="FREESWITCH_SECURE_RTP">
+      <type>
+        <boolean/>
+      </type>
+      <value>0</value>
+    </setting>
     <setting name="FREESWITCH_BLIND_TRANSFER">
       <type>
         <boolean/>
