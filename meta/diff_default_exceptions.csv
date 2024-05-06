@@ -43,6 +43,7 @@ sip-voIpProt.SIP.alertInfo.2.class, For sipXpage
 sip-voIpProt.SIP.alertInfo.2.value, For sipXpage
 sip-voIpProt.SIP.allowTransferOnProceeding, XCF-2981/XTRN-229: Polycoms don't do this correctly on proxying systems, such as sipXecs.
 sip-voIpProt.SIP.ms-forking, NON-BLANK DEFAULT
+sip-voIpProt.SIP.supportFor100rel, NON-BLANK DEFAULT
 sip-voIpProt.SIP.musicOnHold.uri, sipXecs has a MOH server
 sip-voIpProt.SIP.specialEvent.checkSync.alwaysReboot, sipXecs has a "Reboot" button for phones
 sip-voIpProt.SIP.outboundProxy.transport, UDPOnly results in an earlier DNS SRV for _sip_udp.hostname, and we don't need NAPTR
