@@ -1534,14 +1534,14 @@ public:
       // x-sipX-privcontact should be added for NATed endpoint
       sipMsg.setContactField("sip:callee@10.1.1.3:33855");
       sipMsg.setSendAddress("47.0.0.1", 5060);;
-      mSipRouter->addNatMappingInfoToContacts( sipMsg );
+      mSipRouter->addNatMappingInfoToRequestContacts( sipMsg );
       sipMsg.getContactEntry(0, &contactString);
       ASSERT_STR_EQUAL("<sip:callee@47.0.0.1:5060;x-sipX-privcontact=10.1.1.3%3A33855>",contactString.data());
 
       // x-sipX-privcontact should be added for NATed endpoint and should replace x-sipX-nonat
       sipMsg.setContactField("<sip:callee@10.1.1.3:33855;x-sipX-nonat>");
       sipMsg.setSendAddress("47.0.0.2", 5060);;
-      mSipRouter->addNatMappingInfoToContacts( sipMsg );
+      mSipRouter->addNatMappingInfoToRequestContacts( sipMsg );
       sipMsg.getContactEntry(0, &contactString);
       ASSERT_STR_EQUAL("<sip:callee@47.0.0.2:5060;x-sipX-privcontact=10.1.1.3%3A33855>",contactString.data());
       CPPUNIT_ASSERT( sipMsg.getContactEntry(1, &contactString) == FALSE );
@@ -1549,7 +1549,7 @@ public:
       // x-sipX-privcontact should be added for NATed endpoint and should replace old x-sipX-privcontact
       sipMsg.setContactField("<sip:callee@10.1.1.3:33855;x-sipX-privcontact=10.3.3.3%3A1234>");
       sipMsg.setSendAddress("47.0.0.3", 5060);;
-      mSipRouter->addNatMappingInfoToContacts( sipMsg );
+      mSipRouter->addNatMappingInfoToRequestContacts( sipMsg );
       sipMsg.getContactEntry(0, &contactString);
       ASSERT_STR_EQUAL("<sip:callee@47.0.0.3:5060;x-sipX-privcontact=10.1.1.3%3A33855>",contactString.data());
       CPPUNIT_ASSERT( sipMsg.getContactEntry(1, &contactString) == FALSE );
@@ -1574,14 +1574,14 @@ public:
       // x-sipX-nonat should be added for non-NATed endpoint
       sipMsg.setContactField("sip:callee@47.0.0.1:5060");
       sipMsg.setSendAddress("47.0.0.1", 5060);;
-      mSipRouter->addNatMappingInfoToContacts( sipMsg );
+      mSipRouter->addNatMappingInfoToRequestContacts( sipMsg );
       sipMsg.getContactEntry(0, &contactString);
       ASSERT_STR_EQUAL("<sip:callee@47.0.0.1:5060;x-sipX-nonat>",contactString.data());
 
       // x-sipX-nonat should be added for non-NATed endpoint and should replace x-sipX-nonat
       sipMsg.setContactField("<sip:callee@47.0.0.2:5060;x-sipX-nonat>");
       sipMsg.setSendAddress("47.0.0.2", 5060);;
-      mSipRouter->addNatMappingInfoToContacts( sipMsg );
+      mSipRouter->addNatMappingInfoToRequestContacts( sipMsg );
       sipMsg.getContactEntry(0, &contactString);
       ASSERT_STR_EQUAL("<sip:callee@47.0.0.2:5060;x-sipX-nonat>",contactString.data());
       CPPUNIT_ASSERT( sipMsg.getContactEntry(1, &contactString) == FALSE );
@@ -1589,7 +1589,7 @@ public:
       // x-sipX-privcontact should be preserved for seemingly non-NATed endpoint
       sipMsg.setContactField("<sip:callee@47.0.0.3:5060;x-sipX-privcontact=10.3.3.3%3A1234>");
       sipMsg.setSendAddress("47.0.0.3", 5060);;
-      mSipRouter->addNatMappingInfoToContacts( sipMsg );
+      mSipRouter->addNatMappingInfoToRequestContacts( sipMsg );
       sipMsg.getContactEntry(0, &contactString);
       ASSERT_STR_EQUAL("<sip:callee@47.0.0.3:5060;x-sipX-privcontact=10.3.3.3%3A1234>",contactString.data());
       CPPUNIT_ASSERT( sipMsg.getContactEntry(1, &contactString) == FALSE );
