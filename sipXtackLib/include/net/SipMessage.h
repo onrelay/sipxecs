@@ -892,6 +892,8 @@ public:
                               int              fromPort       ///< actual sender port
                               );
 
+    int getNumberOfViaFields();
+
     void addVia(const char* domainName,
                 int port,
                 const char* protocol,
@@ -1002,6 +1004,15 @@ public:
     // all the Via: headers and parsing ",".
     // Using BOTTOM_SUBFIELD as the subfieldIndex returns the last subfield
     UtlBoolean getViaFieldSubField(UtlString* viaSubField, int subFieldIndex) const;
+
+    void getVia(int viaIndex,
+                UtlString* viaAddress,
+                int* viaPort,
+                UtlString* protocol,
+                int* recievedPort = NULL,
+                UtlBoolean* receivedSet = NULL,
+                UtlBoolean* maddrSet = NULL,
+                UtlBoolean* receivedPortSet = NULL) const;
 
     void getTopVia(UtlString* viaAddress,
                    int* viaPort,

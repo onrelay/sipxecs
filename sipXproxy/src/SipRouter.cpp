@@ -1058,7 +1058,7 @@ void SipRouter::identifyCallerLocation(SipMessage& sipRequest)
     {
       std::ostringstream locHeader;
       
-      int iterCount = 0;
+      unsigned int iterCount = 0;
       for (EntityDB::CallerLocations::iterator iter = callerLocations.begin(); iter != callerLocations.end(); iter++)
       {
         if (!iter->empty())
@@ -1145,7 +1145,7 @@ SipRouter::ProxyAction SipRouter::proxyMessage(SipMessage& sipRequest, SipMessag
            // Apply NAT mapping info to all non-spiraling requests to make
            // sure all in-dialog requests sent by the UAS for this request
            // will be sent to a routable contact.
-           addNatMappingInfoToContacts( sipRequest );
+           addNatMappingInfoToRequestContacts( sipRequest );
 
            // Our custom spiraling header was NOT found indicating that the request
            // is not received as a result of spiraling. It could either be a
@@ -1914,12 +1914,12 @@ bool SipRouter::addPathHeaderIfNATOrTlsRegisterRequest( SipMessage& sipRequest )
       // Check if top via header has a 'received' parameter.  Presence of such
       // a header would indicate that the registering user is located behind
       // a NAT.
-      UtlString  privateAddress, protocol;
-      int        privatePort;
+      UtlString  address, protocol;
+      int        port;
       UtlBoolean bReceivedSet;
       UtlBoolean bIsTls;
 
-      sipRequest.getTopVia( &privateAddress, &privatePort, &protocol, NULL, &bReceivedSet );
+      sipRequest.getTopVia( &address, &port, &protocol, NULL, &bReceivedSet );
       bIsTls = protocol.compareTo("tls", UtlString::ignoreCase) == 0;
 
       if( bReceivedSet || bIsTls)
@@ -1952,17 +1952,91 @@ bool SipRouter::addPathHeaderIfNATOrTlsRegisterRequest( SipMessage& sipRequest )
    return bMessageModified;
 }
 
-bool SipRouter::addNatMappingInfoToContacts( SipMessage& sipMessage ) const 
+bool SipRouter::addNatMappingInfoToRequestContacts( SipMessage& sipRequest ) const 
 {
    // Check if top via header has a 'received' parameter.  Presence of such
    // a header would indicate that the registering user is located behind
    // a NAT.
-   UtlString  privateAddress, protocol;
-   int        privatePort;
+   UtlString  address, protocol;
+   int        port;
    UtlBoolean bReceivedSet;
    UtlString  contactString;
-   
-   sipMessage.getTopVia( &privateAddress, &privatePort, &protocol, NULL, &bReceivedSet );
+      
+   sipRequest.getTopVia( &address, &port, &protocol, NULL, &bReceivedSet );
+
+    bool hasPrivateAddress = bReceivedSet;
+
+    // get the user's public IP address and port as received
+    // by the sipXtack and use them as the contact's IP & port
+    UtlString publicAddress;
+    int publicPort = -1;
+
+    if( hasPrivateAddress )
+    {
+      sipRequest.getSendAddress( &publicAddress, &publicPort );
+    }
+
+    bool result = addNatMappingInfoToContacts( sipRequest, hasPrivateAddress, publicAddress, publicPort );
+
+   return result;
+}
+
+bool SipRouter::addNatMappingInfoToResponseContacts( SipMessage& sipResponse ) const 
+{
+  // OR: We can retrieve NAT info from the x-sipX-privcontact parameter of the transaction request 
+
+  SipTransaction* sipTransaction = sipResponse.getSipTransaction();
+
+  if( sipTransaction == NULL )
+  {
+    return false;
+  }
+
+  SipMessage* sipRequest = sipTransaction->getRequest();
+
+  UtlString requestBytes;
+  ssize_t requestLen;
+  sipRequest->getBytes(&requestBytes, &requestLen);
+
+  UtlString requestUriString;
+
+  sipRequest->getRequestUri( &requestUriString );
+
+  Url requestUri( requestUriString, TRUE );
+
+  UtlString searchResult;
+
+  if( !requestUri.getUrlParameter( SIPX_PRIVATE_CONTACT_URI_PARAM, searchResult, 0 ) )
+  {
+    // No privcontact in original invite
+    return false;
+  }
+
+  Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "SipRouter::addNatMappingInfoToResponseContacts: x-sipX-privcontact found in original request=[%s]", 
+      requestBytes.data());
+
+  UtlString publicAddress;
+  int publicPort;
+
+  requestUri.getHostAddress(publicAddress);
+
+  publicPort = requestUri.getHostPort();
+
+  bool hasPrivateAddress = true;
+
+  bool result = addNatMappingInfoToContacts( sipResponse, hasPrivateAddress, publicAddress, publicPort );
+
+  return result;
+}
+
+bool SipRouter::addNatMappingInfoToContacts( SipMessage& sipMessage, bool hasPrivateAddress, UtlString publicAddress, int publicPort ) const 
+{
+     Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "SipRouter::addNatMappingInfoToContacts - hasPrivateAddress=[%d] publicAddress=[%s], publicPort=[%d]", 
+      hasPrivateAddress,
+      publicAddress.data(), 
+      publicPort);
+
+   UtlString  contactString;
 
    // Update nat mapping info for each contact from the sip request message
    for (int contactNumber = 0;
@@ -1980,11 +2054,11 @@ bool SipRouter::addNatMappingInfoToContacts( SipMessage& sipMessage ) const
      //
      if (contactString.compareTo("*") == 0 || (scheme != Url::SipUrlScheme && scheme != Url::SipsUrlScheme))
      {
-       OS_LOG_NOTICE(FAC_SIP, "SipRouter::addNatMappingInfoToContacts skipping URI: " << contactString.data());
+       OS_LOG_NOTICE(FAC_SIP, "SipRouter::addNatMappingInfoToRequestContacts skipping URI: " << contactString.data());
        continue;
      }
 
-	   if( bReceivedSet )
+	   if( hasPrivateAddress )
 	   {
 		  UtlString  natUrlParameterValue;
 		  // presence of the 'received' parameter indicates that the UA is behind a NAT.
@@ -2020,12 +2094,7 @@ bool SipRouter::addNatMappingInfoToContacts( SipMessage& sipMessage ) const
 			 natUrlParameterValue.append( transport );
 		  }
 
-		  // get the user's public IP address and port as received
-		  // by the sipXtack and use them as the contact's IP & port
-		  UtlString publicAddress;
-		  int publicPort;
-		  sipMessage.getSendAddress( &publicAddress, &publicPort );
-		  newContactUri.setHostAddress( publicAddress );
+      newContactUri.setHostAddress( publicAddress );
 		  newContactUri.setHostPort( publicPort );
 
 		  newContactUri.setUrlParameter( SIPX_PRIVATE_CONTACT_URI_PARAM, natUrlParameterValue );
@@ -2055,6 +2124,7 @@ bool SipRouter::addNatMappingInfoToContacts( SipMessage& sipMessage ) const
 
    return true;
 }
+
 
 bool SipRouter::areAllExtensionsSupported( const SipMessage& sipRequest, 
                                            UtlString& disallowedExtensions ) const

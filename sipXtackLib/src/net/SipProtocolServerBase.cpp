@@ -115,7 +115,10 @@ UtlBoolean SipProtocolServerBase::send(SipMessage* message,
     bool canFailover = false;
     SipClient* client = getClientForDestination(hostAddress, hostPort, localIp, message, canFailover);
     
-    if (client)
+    // OR, added isOk() check here to avoid connection setups that block server indefinitely due to above OsLock
+    // It means we are trying to send on a dead socket that is in close-wait state or simmilar
+
+    if (client && client->isOk() )
     {
        if (Os::Logger::instance().willLog(FAC_SIP, PRI_DEBUG))
        {

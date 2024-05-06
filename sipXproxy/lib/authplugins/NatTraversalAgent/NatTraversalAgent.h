@@ -101,6 +101,7 @@ class NatTraversalAgent : public AuthPlugin, SipOutputProcessor, OsNotification
      void adjustViaForNatTraversal( SipMessage& message, const char* address, int port );
      void adjustRecordRouteForNatTraversal( SipMessage& message, const char* address, int port );
      void adjustReferToHeaderForNatTraversal( SipMessage& message, const char* address, int port );
+     bool addNatMappingInfoToResponseContacts( SipMessage& sipRespons, const char* address, int port );
      bool restoreOriginalContact( SipMessage& request );
 
      // Call Tracker Manipulation methods

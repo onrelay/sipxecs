@@ -2301,11 +2301,23 @@ void SipMessage::addVia(const char* domainName,
    addViaField(viaField.data());
 }
 
+int SipMessage::getNumberOfViaFields()
+{
+   int numberOfViaFields = 0;
+
+   UtlString viaHeader( SIP_VIA_FIELD );
+
+   numberOfViaFields = mNameValues.occurrencesOf(&viaHeader);
+
+   return numberOfViaFields;
+}
+
+
 void SipMessage::addViaField(const char* viaField, UtlBoolean afterOtherVias)
 {
     mHeaderCacheClean = FALSE;
 
-   NameValuePair* nv = new NameValuePair(SIP_VIA_FIELD, viaField);
+    NameValuePair* nv = new NameValuePair(SIP_VIA_FIELD, viaField);
     // Look for other via fields
     ssize_t fieldIndex = mNameValues.index(nv);
 
@@ -3237,6 +3249,18 @@ void SipMessage::getTopVia(UtlString* address,
                            UtlBoolean* maddrSet,
                            UtlBoolean* receivedPortSet) const
 {
+   getVia( 0, address, port, protocol, receivedPort, receivedSet, maddrSet, receivedPortSet );
+}
+
+void SipMessage::getVia(int viaIndex,
+                        UtlString* address,
+                           int* port,
+                           UtlString* protocol,
+                           int* receivedPort,
+                           UtlBoolean* receivedSet,
+                           UtlBoolean* maddrSet,
+                           UtlBoolean* receivedPortSet) const
+{
    UtlString Via;
 
    UtlString sipProtocol;
@@ -3277,9 +3301,8 @@ void SipMessage::getTopVia(UtlString* address,
       *receivedPortSet = FALSE;
    }
 
-   // Get the first (most recent) Via value, which is the one that tells
-   // how to send the response.
-   if (getFieldSubfield(SIP_VIA_FIELD, 0, &Via))
+   // Get the (most recent) Via value at viaIndex
+   if (getFieldSubfield(SIP_VIA_FIELD, viaIndex, &Via))
    {
       NameValueTokenizer::getSubField(Via, 0, SIP_SUBFIELD_SEPARATORS,
                                       &sipProtocol);

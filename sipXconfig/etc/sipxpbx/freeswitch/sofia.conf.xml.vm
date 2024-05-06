@@ -68,6 +68,8 @@
     <param name="tls-cert-dir" value="$${external_ssl_dir}"/>
     <!-- TLS version ("sslv23" (default), "tlsv1"). NOTE: Phones may not work with TLSv1 -->
     <param name="tls-version" value="$${sip_tls_version}"/>
+    <!-- Secure RTP ("false" (default), "true"). NOTE: Enforces secure RTP if set to true -->
+    <param name="rtp_secure_media" value="$settings.getSetting('FREESWITCH_SECURE_RTP').Value"/>
 
   </settings>
       <gateways>

@@ -97,11 +97,13 @@ OsSSLConnectionSocket::OsSSLConnectionSocket(SSL *s, int connectedSocketDescript
 // Constructor
 OsSSLConnectionSocket::OsSSLConnectionSocket(int serverPort, const char* serverName,
                                              long timeoutInSecs) :
-   OsConnectionSocket(serverPort,serverName,TRUE /* BLOCKING */,
-                      NULL /* local address == INADDR_ANY */,
-                      timeoutInSecs * OsTime::MSECS_PER_SEC ),
-   mSSL(NULL),
-   mPeerIdentity(NOT_IDENTIFIED)
+   OsConnectionSocket(serverPort,
+      serverName,
+      (timeoutInSecs > 0), // OR: Blocking here with no timeout creates all sorts of problems, make NON-BLOCKING then // TRUE /* BLOCKING */,
+      NULL /* local address == INADDR_ANY */,
+      timeoutInSecs * OsTime::MSECS_PER_SEC ),
+      mSSL(NULL),
+      mPeerIdentity(NOT_IDENTIFIED)
 {
     mbExternalSSLSocket = FALSE;
     if (mIsConnected)
@@ -131,7 +133,8 @@ OsSSLConnectionSocket::~OsSSLConnectionSocket()
 
 UtlBoolean OsSSLConnectionSocket::reconnect()
 {
-    return FALSE; //TODO
+   Os::Logger::instance().log(FAC_KERNEL, PRI_WARNING, "reconnect not implemented");
+   return FALSE;
 }
 
 void OsSSLConnectionSocket::close()
@@ -155,6 +158,8 @@ void OsSSLConnectionSocket::close()
       ERR_remove_state(0);
       mSSL = NULL;
    }
+
+   socketDescriptor = OS_INVALID_SOCKET_DESCRIPTOR;
 }
 
 int OsSSLConnectionSocket::write(const char* buffer, int bufferLength)
@@ -184,6 +189,11 @@ int OsSSLConnectionSocket::read(char* buffer, int bufferLength)
 
     bytesRead = SSL_read (mSSL, buffer, bufferLength);
 
+    if (!bytesRead)
+    {
+      OsConnectionSocket::closeOnReadError();
+    }
+
 #ifdef VALGRIND_MAKE_READABLE
     // If we are using Valgrind, we have to compensate for the fact that
     // Valgrind thinks all the output of SSL_read is undefined.
@@ -210,6 +220,11 @@ int OsSSLConnectionSocket::read(char* buffer,
     int bytesRead = -1;
 
     bytesRead = SSL_read (mSSL, buffer, bufferLength);
+
+    if (!bytesRead)
+    {
+      OsConnectionSocket::closeOnReadError();
+    }
 
 #ifdef VALGRIND_MAKE_READABLE
     // If we are using Valgrind, we have to compensate for the fact that
@@ -239,7 +254,12 @@ int OsSSLConnectionSocket::read(char* buffer,
     int bytesRead = -1;
     if(isReadyToRead(waitMilliseconds))
     {
-        bytesRead = SSL_read (mSSL, buffer, bufferLength);
+      bytesRead = SSL_read (mSSL, buffer, bufferLength);
+    
+      if (!bytesRead)
+      {
+         OsConnectionSocket::closeOnReadError();
+      }
     }
 #ifdef VALGRIND_MAKE_READABLE
     // If we are using Valgrind, we have to compensate for the fact that

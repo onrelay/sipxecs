@@ -135,6 +135,8 @@ protected:
 
    static const UtlContainableType TYPE;    ///< Class type used for runtime checking
 
+   virtual UtlBoolean closeOnReadError();
+
 /* //////////////////////////// PRIVATE /////////////////////////////////// */
 private:
    OsConnectionSocket(const OsConnectionSocket& rOsConnectionSocket);

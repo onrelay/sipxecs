@@ -226,8 +226,12 @@ class SipRouter : public OsServerTask
 
    UtlBoolean suppressAlertIndicatorForTransfers() const;
 
-   bool addNatMappingInfoToContacts( SipMessage& sipMessage ) const;
-   
+   bool addNatMappingInfoToRequestContacts( SipMessage& request ) const;
+
+   bool addNatMappingInfoToResponseContacts( SipMessage& response ) const;
+
+   bool addNatMappingInfoToContacts( SipMessage& message, bool hasPrivateAddress, UtlString publicAddres, int publicPort ) const;
+
 /* //////////////////////////// PROTECTED ///////////////////////////////// */
   protected:
 

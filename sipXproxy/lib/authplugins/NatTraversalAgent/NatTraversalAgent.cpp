@@ -433,7 +433,7 @@ void NatTraversalAgent::handleBufferedOutputMessage( SipMessage& message,
                                      const char* address,
                                      int port )
 {
-  Os::Logger::instance().log(FAC_NAT, PRI_DEBUG, "handleBufferedOutputMessage >>> handleOutputMessage from %s:%u", address, port );
+  Os::Logger::instance().log(FAC_NAT, PRI_DEBUG, "handleBufferedOutputMessage >>> handleOutputMessage to %s:%u", address, port );
   NatTraversalAgent::handleOutputMessage(message, address, port);
 }
 
@@ -446,15 +446,18 @@ void NatTraversalAgent::handleOutputMessage( SipMessage& message,
 
    if( mbNatTraversalFeatureEnabled )
    {
-      Os::Logger::instance().log(FAC_NAT, PRI_DEBUG, "handleOutputMessage considering %s from %s:%u", message.getFirstHeaderLine(), address, port );
+      Os::Logger::instance().log(FAC_NAT, PRI_DEBUG, "handleOutputMessage considering %s to %s:%u", message.getFirstHeaderLine(), address, port );
 
       // Check if the sipXecs is located behind a NAT.  If it is and the message
       // is going to a destination that is not on our local private subnet then
       // we need to alter the our via: to advertize our public IP address.  A similar
       // alteration must be done to requests carrying our Record-Route.
+      
+      // OR TODO: not working for all calls yet, but missing contacts mapping for e.g. 180 and 183 responses
+      addNatMappingInfoToResponseContacts( message, address, port );
+
       adjustViaForNatTraversal( message, address, port );
       adjustRecordRouteForNatTraversal( message, address, port );
-      mpSipRouter->addNatMappingInfoToContacts( message );
 
       pCallTracker = getCallTrackerForMessage( message );
       if( pCallTracker )
@@ -951,6 +954,31 @@ CallTracker* NatTraversalAgent::getCallTrackerFromCallId( const UtlString& callI
    return pCallTracker;
 }
 
+
+bool NatTraversalAgent::addNatMappingInfoToResponseContacts( SipMessage& response, const char* address, int port )
+{
+   bool rc = false;
+
+   if( !response.isResponse() )
+   {
+      // Not a response
+      return false;
+   }
+
+   // Only necessary to check this if it is a response to ourselves from the SIP extension
+
+   if( address == mNatTraversalRules.getProxyTransportInfo().getAddress() &&
+        port == mNatTraversalRules.getProxyTransportInfo().getPort()  
+        ||
+        address == mNatTraversalRules.getSecureProxyTransportInfo().getAddress() &&
+        port == mNatTraversalRules.getSecureProxyTransportInfo().getPort() )
+   {
+      rc = mpSipRouter->addNatMappingInfoToResponseContacts( response );
+   }
+
+   return rc;
+}
+
 bool NatTraversalAgent::restoreOriginalContact( SipMessage& request )
 {
    bool rc = false;
@@ -977,6 +1005,7 @@ bool NatTraversalAgent::restoreOriginalContact( SipMessage& request )
    }
    return rc;
 }
+
 
 /// destructor
 NatTraversalAgent::~NatTraversalAgent()

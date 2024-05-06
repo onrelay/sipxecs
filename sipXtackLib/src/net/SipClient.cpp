@@ -540,6 +540,11 @@ UtlBoolean SipClient::isAcceptableForDestination( const UtlString& hostName, int
       }
    }
 
+   /* 
+
+   OR: This logic causes us to block indefinitely when establishing a new SIP client to the same address / port combination.
+   isOK check has been moved to SipProtocolServerBase::send() method.
+
    // Make sure client is okay before declaring it acceptable
    if( isAcceptable && !isOk() )
    {
@@ -549,6 +554,9 @@ UtlBoolean SipClient::isAcceptableForDestination( const UtlString& hostName, int
                     mName.data(), hostName.data(), hostPort, localIp.data());
       isAcceptable = FALSE;
    }
+
+   */
+
    return(isAcceptable);
 }
 
