@@ -729,6 +729,13 @@ void OsSocket::makeNonblocking()
 void OsSocket::makeBlocking()
 {
    Os::Logger::instance().log(FAC_KERNEL, PRI_DEBUG, "OsSocket::makeBlocking %d", socketDescriptor);
+
+   if( socketDescriptor == OS_INVALID_SOCKET_DESCRIPTOR )
+   {
+      Os::Logger::instance().log(FAC_KERNEL, PRI_WARNING, "OsSocket::makeBlocking called on invalid socket descriptor");
+      return;
+   }
+
 #if defined(_WIN32)
     unsigned long c_ONDELAY=0;
     ioctlsocket(socketDescriptor, FIONBIO, &c_ONDELAY);
