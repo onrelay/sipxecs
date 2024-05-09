@@ -2924,6 +2924,12 @@
         </type>
         <value>0</value>
       </setting>
+      <setting name="supportFor100rel">
+        <type>
+          <boolean />
+        </type>
+        <value>0</value>
+      </setting>
       <setting name="keepalive.sessionTimers">
         <type>
           <boolean />
