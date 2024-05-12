@@ -278,6 +278,8 @@ class SipUtilities {
 	 */
 	static ContactHeader createContactHeader(SipProvider provider,
 			ItspAccountInfo itspAccount, String user, Transaction transaction) {
+        if ( logger.isDebugEnabled() ) logger.debug("createContactHeader: " + user + " itspAccount = " + itspAccount );
+
 		String target = null;
 		try
 		{
@@ -298,80 +300,7 @@ class SipUtilities {
 			 * the WAN and if global addressing is used, then place the bridge
 			 * public address in the contact header.
 			 */
-			if (target != null && target.equals(Gateway.getLocalAddress())
-		            && provider != Gateway.getLanProvider())
-		    {
-		        /*
-		         * This came from a local target but passed through the Wan provider.
-		         * This could only mean that this is a redirected request coming from the proxy
-		         *
-                 * Creating contact header for LAN bound request.
-                 */
-                if (user == null) {
-                    user = Gateway.SIPXBRIDGE_USER;
-                }
-
-                String transport = Gateway.getSipxProxyTransport();
-
-                try {
-                    if ( transport == null ) {
-                        logger.warn("Null transport specified -- use default");
-                        transport = Gateway.DEFAULT_PROXY_TRANSPORT;
-                    }
-                    ListeningPoint lp = provider.getListeningPoint(transport);
-                    String ipAddress = lp.getIPAddress();
-                    int port = lp.getPort();
-                    SipURI sipUri = ProtocolObjects.addressFactory.createSipURI(user,
-                            ipAddress);
-                    sipUri.setPort(port);
-                    if (transport.equalsIgnoreCase("tls")) {
-                        sipUri.setTransportParam(transport);
-                    }
-                    Address address = ProtocolObjects.addressFactory
-                            .createAddress(sipUri);
-                    ContactHeader ch = ProtocolObjects.headerFactory
-                            .createContactHeader(address);
-                    return ch;
-                } catch (Exception ex) {
-                    throw new SipXbridgeException(
-                            "Unexpected error creating contact header", ex);
-                }
-		    }
-			else if (provider != Gateway.getLanProvider()
-					&& (itspAccount != null && !itspAccount
-							.isGlobalAddressingUsed())
-					|| Gateway.getGlobalAddress() == null) {
-				String transport = itspAccount != null ? itspAccount
-						.getOutboundTransport()
-						: Gateway.DEFAULT_ITSP_TRANSPORT;
-				if (user == null) {
-				    user = Gateway.SIPXBRIDGE_USER;
-				}
-				ListeningPoint lp = provider.getListeningPoint(transport);
-				String ipAddress = lp.getIPAddress();
-				//
-				// EXPERIMENTAL.  Point contact address to the proxy port
-                int port = lp.getPort();
-                if (Gateway.getBridgeConfiguration().isEnableBridgeProxyRelay())
-                {
-                    transport = "tcp";
-                    port = Gateway.getBridgeConfiguration().getSipxProxyPort();
-                }
-				//
-				SipURI sipUri = ProtocolObjects.addressFactory.createSipURI(
-						user, ipAddress);
-
-                if (port > 0)
-                    sipUri.setPort(port);
-				sipUri.setTransportParam(transport);
-				Address address = ProtocolObjects.addressFactory
-						.createAddress(sipUri);
-				ContactHeader ch = ProtocolObjects.headerFactory
-						.createContactHeader(address);
-				ch.removeParameter("expires");
-				return ch;
-
-			} else if (provider == Gateway.getLanProvider()) {
+			if (provider == Gateway.getLanProvider()) {
 
 			    /*
 			     * Creating contact header for LAN bound request.
@@ -380,47 +309,141 @@ class SipUtilities {
 			        user = Gateway.SIPXBRIDGE_USER;
 			    }
 			    return SipUtilities.createContactHeader(
-					user, provider, Gateway
-						.getSipxProxyTransport());
-			} else {
-				/*
-				 * Creating contact header for WAN bound request. Nothing is
-				 * known about this ITSP.
-				 */
-
-				ContactHeader contactHeader = ProtocolObjects.headerFactory
-						.createContactHeader();
-				if (user == null) {
-				    user = Gateway.SIPXBRIDGE_USER;
-				}
-				SipURI sipUri = ProtocolObjects.addressFactory.createSipURI(
-						user, Gateway.getGlobalAddress());
-				String transport;
-				if ( transaction != null ) {
-					transport = SipUtilities.getTopmostViaTransport(transaction.getRequest());
-				} else if ( itspAccount != null ) {
-					transport = itspAccount.getOutboundTransport();
+					user, 
+					provider, 
+					Gateway.getSipxProxyTransport());
+			}
+			else { // provider != Gateway.getLanProvider()
+				
+				if (target != null && target.equals(Gateway.getLocalAddress()) )			
+			    {
+			        /*
+			         * This came from a local target but passed through the Wan provider.
+			         * This could only mean that this is a redirected request coming from the proxy
+			         *
+	                 * Creating contact header for LAN bound request.
+	                 */
+	                if (user == null) {
+	                    user = Gateway.SIPXBRIDGE_USER;
+	                }
+	
+	                String transport = Gateway.getSipxProxyTransport();
+	
+	                try {
+	                    if ( transport == null ) {
+	                        logger.warn("Null transport specified -- use default");
+	                        transport = Gateway.DEFAULT_PROXY_TRANSPORT;
+	                    }
+	                    ListeningPoint lp = provider.getListeningPoint(transport);
+	                    String ipAddress = lp.getIPAddress();
+	                    int port = lp.getPort();
+	                    SipURI sipUri = ProtocolObjects.addressFactory.createSipURI(user,
+	                            ipAddress);
+	                    sipUri.setPort(port);
+	                    if (transport.equalsIgnoreCase("tls")) {
+	                        sipUri.setTransportParam(transport);
+	                    }
+	                    Address address = ProtocolObjects.addressFactory
+	                            .createAddress(sipUri);
+	                    ContactHeader ch = ProtocolObjects.headerFactory
+	                            .createContactHeader(address);
+	                    return ch;
+	                } catch (Exception ex) {
+	                    throw new SipXbridgeException(
+	                            "Unexpected error creating contact header", ex);
+	                }
+			    }
+				else if (itspAccount != null && !itspAccount.isGlobalAddressingUsed()
+						|| 
+						Gateway.getGlobalAddress() == null) {
+					
+					String transport = itspAccount != null ? 
+							itspAccount.getOutboundTransport()
+							: 
+							Gateway.DEFAULT_ITSP_TRANSPORT;
+					
+					if (user == null) {
+					    user = Gateway.SIPXBRIDGE_USER;
+					}
+					
+					ListeningPoint lp = provider.getListeningPoint(transport);
+					String ipAddress = lp.getIPAddress();
+					
+					//
+					// EXPERIMENTAL.  Point contact address to the proxy port
+	                int port = lp.getPort();
+	                if (Gateway.getBridgeConfiguration().isEnableBridgeProxyRelay())
+	                {
+	                    transport = "tcp";
+	                    port = Gateway.getBridgeConfiguration().getSipxProxyPort();
+	                }
+					//
+					SipURI sipUri = ProtocolObjects.addressFactory.createSipURI(
+							user, ipAddress);
+	
+	                if (port > 0) {
+	                    sipUri.setPort(port);
+	                }
+	                
+					sipUri.setTransportParam(transport);
+					
+					Address address = ProtocolObjects.addressFactory.createAddress(sipUri);
+					
+					ContactHeader ch = ProtocolObjects.headerFactory.createContactHeader(address);
+					
+					ch.removeParameter("expires");
+					return ch;
+	
 				} else {
-					transport = Gateway.DEFAULT_ITSP_TRANSPORT;
+					/*
+					 * Creating contact header for WAN bound request. Nothing is
+					 * known about this ITSP.
+					 */
+	
+					ContactHeader contactHeader = 
+							ProtocolObjects.headerFactory.createContactHeader();
+					
+					if (user == null) {
+					    user = Gateway.SIPXBRIDGE_USER;
+					}
+					
+					SipURI sipUri = ProtocolObjects.addressFactory.createSipURI(
+							user, 
+							Gateway.getGlobalAddress());
+					
+					String transport;
+					
+					if ( transaction != null ) {
+						transport = SipUtilities.getTopmostViaTransport(transaction.getRequest());
+					} 
+					else if ( itspAccount != null ) {
+						transport = itspAccount.getOutboundTransport();
+					} 
+					else {
+						transport = Gateway.DEFAULT_ITSP_TRANSPORT;
+					}
+	
+					//
+					// EXPERIMENTAL.  Point contact address to the proxy port
+					int port = Gateway.getGlobalPort(transport);
+	                if (Gateway.getBridgeConfiguration().isEnableBridgeProxyRelay())
+	                {
+	                    transport = "tcp";
+	                    port = Gateway.getBridgeConfiguration().getSipxProxyPort();
+	                }
+					//
+	                if (port > 0) {
+	                    sipUri.setPort(port);
+	                }
+					sipUri.setTransportParam(transport);
+					
+					Address address = ProtocolObjects.addressFactory.createAddress(sipUri);
+					
+					contactHeader.setAddress(address);
+					
+					contactHeader.removeParameter("expires");
+					return contactHeader;
 				}
-
-				//
-				// EXPERIMENTAL.  Point contact address to the proxy port
-				int port = Gateway.getGlobalPort(transport);
-                if (Gateway.getBridgeConfiguration().isEnableBridgeProxyRelay())
-                {
-                    transport = "tcp";
-                    port = Gateway.getBridgeConfiguration().getSipxProxyPort();
-                }
-				//
-                if (port > 0)
-                    sipUri.setPort(port);
-				sipUri.setTransportParam(transport);
-				Address address = ProtocolObjects.addressFactory
-						.createAddress(sipUri);
-				contactHeader.setAddress(address);
-				contactHeader.removeParameter("expires");
-				return contactHeader;
 			}
 		} catch (Exception ex) {
 			logger.fatal("Unexpected exception creating contact header", ex);
@@ -433,10 +456,12 @@ class SipUtilities {
 	/**
 	 * Create a contact header for the given provider.
 	 */
-	static ContactHeader createContactHeader(String user, SipProvider provider,
+	static ContactHeader createContactHeader(
+			String user, 
+			SipProvider provider,
 			String transport) {
 		try {
-            if ( logger.isDebugEnabled() ) logger.debug("createContactHeader = " + provider.toString() + " transport = " + transport );
+            if ( logger.isDebugEnabled() ) logger.debug("createContactHeader: " + user + " transport = " + transport );
 
 			if ( transport == null ) {
 				logger.warn("Null transport specified -- use default");

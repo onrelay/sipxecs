@@ -26,6 +26,7 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.TransactionAlreadyExistsException;
 import javax.sip.TransactionState;
+import javax.sip.address.Address;
 import javax.sip.address.SipURI;
 import javax.sip.header.AcceptHeader;
 import javax.sip.header.AcceptLanguageHeader;
@@ -290,14 +291,13 @@ class CallControlManager implements SymmitronResetHandler {
                         
 			newRequest.setHeader(referencesHeader);
 
-
-
             /*
              * Contact header for the re-INVITE we are about to send.
              * Use the contact header from the inbound re-invite and extract the user name
              * from there.
              */
             ContactHeader requestContactHeader = (ContactHeader) request.getHeader(ContactHeader.NAME);
+            
             String contactUser;
             if (requestContactHeader != null) {
                SipURI contactURI = (SipURI) requestContactHeader.getAddress().getURI();
@@ -305,9 +305,12 @@ class CallControlManager implements SymmitronResetHandler {
             } else {
                contactUser = Gateway.SIPXBRIDGE_USER;
             } 
+            
             ContactHeader contactHeader = SipUtilities.createContactHeader(
-                    contactUser, peerDialogProvider,
+                    contactUser, 
+                    peerDialogProvider,
                     SipUtilities.getViaTransport(newRequest));
+            
             newRequest.setHeader(contactHeader);
 
             if ( request.getHeader(AuthorizationHeader.NAME) != null ) {
@@ -431,21 +434,25 @@ class CallControlManager implements SymmitronResetHandler {
                     serverTransaction.sendResponse(response);
                     */
                 }
-            } else if (operation == RtpSessionOperation.REMOVE_HOLD
+            } 
+            else if (operation == RtpSessionOperation.REMOVE_HOLD
                     || operation == RtpSessionOperation.CODEC_RENEGOTIATION
                     || operation == RtpSessionOperation.PORT_REMAP ) {
                 /*
                  * Remove hold and codec renegotiation require forwarding of re-INVITE.
                  */
                 RtpSessionUtilities.forwardReInvite(rtpSession, serverTransaction, dialog, true);
-            } else {
+            } 
+            else {
                 /*
                  * This is a request that can be handled locally. Grab the previous session
                  * description from the receiver side.
                  */
                 if ( logger.isDebugEnabled() ) logger.debug("session Timer INVITE -- sending old response ");
+                
                 SessionDescription newDescription = rtpSession.getReceiver()
                         .getSessionDescription();
+                
                 Response response = SipUtilities.createResponse(serverTransaction, Response.OK);
 
                 if (newDescription != null) {
@@ -453,20 +460,15 @@ class CallControlManager implements SymmitronResetHandler {
                             .createContentTypeHeader("application", "sdp"));
                 }
 
-                ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
-                String userName = ((SipURI) toHeader.getAddress().getURI()).getUser();
-                ContactHeader contactHeader = SipUtilities
-                        .createContactHeader(userName, provider, SipUtilities.getViaTransport(response));
+                
+                // Use the incoming request as contact address
+    			Address address = 
+    					ProtocolObjects.addressFactory.createAddress((SipURI)request.getRequestURI());
+    			
+    			ContactHeader contactHeader = ProtocolObjects.headerFactory.createContactHeader(address);
+                
                 response.setHeader(contactHeader);
-
-                /*
-                 * Request was seen from the WAN side.
-                 */
-                if ( provider != Gateway.getLanProvider()) {
-                    if ( dialogContext.getItspInfo() == null || dialogContext.getItspInfo().isGlobalAddressingUsed()) {
-                        SipUtilities.setGlobalAddress(response);
-                    }
-                }
+                
 
                 dialogContext.setSessionTimerResponseSent();
 
