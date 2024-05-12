@@ -50,8 +50,6 @@ class CrLfTimerTask extends TimerTask {
         } catch (Exception ex) {
             logger.error("Unexpected exception in CRLF timer task "+ ex.getMessage(), ex );
         }
-        
-
     }
 
 }

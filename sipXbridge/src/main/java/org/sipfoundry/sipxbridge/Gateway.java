@@ -16,7 +16,9 @@ import java.util.PriorityQueue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Handler;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.sip.Dialog;
@@ -29,8 +31,7 @@ import javax.sip.address.SipURI;
 import javax.sip.message.Request;
 
 import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.Level;
 import org.apache.log4j.SimpleLayout;
 import org.sipfoundry.commons.log4j.SipFoundryAppender;
 import org.sipfoundry.commons.log4j.SipFoundryLayout;
@@ -54,7 +55,7 @@ import net.java.stun4j.client.StunDiscoveryReport;
  */
 public class Gateway {
 
-    private static Logger logger = Logger.getLogger(Gateway.class.getPackage().getName());
+    private static Logger logger = Logger.getLogger(Gateway.getLogFile());
     private static Logger alarm_logger = Logger.getLogger("alarms");
 
     private static String configurationFile = "file:///etc/sipxpbx/sipxbridge.xml";
@@ -285,26 +286,13 @@ public class Gateway {
      */
     static void initializeLogging() throws SipXbridgeException {
         try {
-            java.util.logging.Logger log = java.util.logging.Logger.getLogger("net.java.stun4j");
-            /*
-             * BUGBUG For now turn off Logging on STUN4j. It writes to stdout.
-             */
-            log.setLevel(java.util.logging.Level.OFF);
-            java.util.logging.FileHandler fileHandler = new java.util.logging.FileHandler(Gateway.getLogFile(), true);
-
-            /*
-             * Remove all existing handlers.
-             */
-            for (Handler handler : log.getHandlers()) {
-                log.removeHandler(handler);
-            }
-
-            /*
-             * Add the file handler.
-             */
-            log.addHandler(fileHandler);
-            Gateway.logAppender = new SipFoundryAppender(new SipFoundryLayout(), Gateway.getLogFile(), true);
-
+     	        	        	                                       
+            Gateway.logAppender = new SipFoundryAppender(new SipFoundryLayout(), Gateway.getLogFile(), false );
+            
+            logger.addAppender(Gateway.logAppender);
+            
+            logger.setLevel(Level.toLevel(Gateway.getLogLevel()));
+            
         } catch (Exception ex) {
             throw new SipXbridgeException("Error initializing logging", ex);
         }

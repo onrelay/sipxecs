@@ -71,8 +71,8 @@ public class ProtocolObjects {
             @SuppressWarnings("unused")
 			Logger logger = Logger.getLogger(Gateway.class.getPackage().getName());
          
-            String logLevel = Gateway.getLogLevel();
-            if (logLevel.equalsIgnoreCase("DEBUG") || logLevel.equalsIgnoreCase("TRACE")) {
+            String stackLogLevel = Gateway.getLogLevel();
+            if (stackLogLevel.equalsIgnoreCase("DEBUG") || stackLogLevel.equalsIgnoreCase("TRACE")) {
                 stackProperties.setProperty("gov.nist.javax.sip.LOG_STACK_TRACE_ON_MESSAGE_SEND", "true");
             } else {
                 stackProperties.setProperty("gov.nist.javax.sip.LOG_STACK_TRACE_ON_MESSAGE_SEND", "false");
@@ -80,14 +80,14 @@ public class ProtocolObjects {
 
             
             // stack log levels are "off by one": otherwise too much logging at DEBUG level
-            if (logLevel.equalsIgnoreCase("TRACE")) {
-                logLevel = "DEBUG";
+            if (stackLogLevel.equalsIgnoreCase("TRACE")) {
+                stackLogLevel = "DEBUG";
             }
-            else if (logLevel.equalsIgnoreCase("DEBUG")) {
-                logLevel = "INFO";
+            else if (stackLogLevel.equalsIgnoreCase("DEBUG")) {
+                stackLogLevel = "INFO";
             }
             
-            stackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", logLevel);
+            stackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", stackLogLevel);
             
             // OR: Uncomment for trace
             //stackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
@@ -119,21 +119,13 @@ public class ProtocolObjects {
             //stackProperties.setProperty("gov.nist.javax.sip.TLS_CLIENT_PROTOCOLS", "TLSv1.2, TLSv1.1, TLSv1");
             stackProperties.setProperty("gov.nist.javax.sip.TLS_CLIENT_PROTOCOLS", "TLSv1.2,TLSv1.3");
             //stackProperties.setProperty("gov.nist.javax.sip.SSL_RENEGOTIATION_ENABLED ", "FALSE");
-            stackProperties.setProperty("gov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE", "Want");  // OR: Default, or use Enabled, Want, Disabled or DisabledAll
+            stackProperties.setProperty("gov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE", "Want");  // IPL: Default, or use Enabled, Want, Disabled or DisabledAll
             stackProperties.setProperty("gov.nist.javax.sip.ENABLED_CIPHER_SUITES", 
             		//"TLS_RSA_WITH_AES_128_CBC_SHA,SSL_RSA_WITH_3DES_EDE_CBC_SHA,TLS_DH_anon_WITH_AES_128_CBC_SHA,SSL_DH_anon_WITH_3DES_EDE_CBC_SHA");
             		//"TLS_DHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384");
             		"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384");
             		//"TLS_AES_256_GCM_SHA384");
             		
-            // OR additions
-            
-            /*
-            stackProperties.setProperty("javax.net.ssl.keyStore", System.getProperties().getProperty("javax.net.ssl.keyStore"));
-            stackProperties.setProperty("javax.net.ssl.keyStorePassword", System.getProperties().getProperty("javax.net.ssl.keyStorePassword"));
-            stackProperties.setProperty("javax.net.ssl.trustStore", System.getProperties().getProperty("javax.net.ssl.trustStore"));
-            stackProperties.setProperty("javax.net.ssl.trustStorePassword", System.getProperties().getProperty("javax.net.ssl.trustStorePassword"));
-			*/
 
             // Interval between pings ( to avoid DOS attack ).
             stackProperties.setProperty("gov.nist.javax.sip.MIN_KEEP_ALIVE_TIME_SECONDS", "1000");
@@ -141,7 +133,7 @@ public class ProtocolObjects {
                
             Logger stackLogger  = Logger.getLogger(StackLoggerImpl.class);
             stackLogger.addAppender(Gateway.logAppender);
-            stackLogger.setLevel(Level.toLevel(logLevel));
+            stackLogger.setLevel(Level.toLevel(Gateway.getLogLevel()));
          
             /*
              * Break up the via encoding.
