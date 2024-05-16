@@ -479,7 +479,8 @@ bool RegDB::getUnexpiredContactsUser(const string& identity, unsigned long timeN
         OS_LOG_INFO(FAC_SIP, "RegDB::getUnexpiredContactsUser "
         << " Identity: " << identity
         << " Contact: " << binding.getContact()
-        << " Expires: " << binding.getExpirationTime() - OsDateTime::getSecsSinceEpoch() << " sec"
+        << " Expires: " << binding.getExpirationTime() - timeNow << " sec"
+        << " Expired: " << binding.getExpired()
         << " Call-Id: " << binding.getCallId());
 
         push_or_replace_binding(bindings, binding);
@@ -490,7 +491,9 @@ bool RegDB::getUnexpiredContactsUser(const string& identity, unsigned long timeN
           << " Identity: " << identity
           << " Contact: " << binding.getContact()
           << " Call-Id: " << binding.getCallId()
-          << " Expires: " <<  binding.getExpirationTime() << " epoch"
+          << " Expiration time: " << binding.getExpirationTime() << " sec since epoch"
+          << " Expires: " << binding.getExpirationTime() - timeNow << " sec"
+          << " Expired: " << binding.getExpired()
           << " TimeNow: " << timeNow << " epoch");
       }
 

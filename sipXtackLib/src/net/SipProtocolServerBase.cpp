@@ -327,7 +327,7 @@ SipClient* SipProtocolServerBase::findExistingClientForDestination(const char* h
   {
     if( pClient->isAcceptableForDestination(hostAddressString, hostPort, localIp) )
     {
-      OS_LOG_INFO( FAC_SIP, "SipProtocolServerBase::findExistingClientForDestination found good flow " 
+      OS_LOG_INFO( FAC_SIP, "SipProtocolServerBase::findExistingClientForDestination found client " 
         << pClient->getName().data() 
         << " for target " << hostAddressString.data() << ":" << hostPort);
       return pClient;
