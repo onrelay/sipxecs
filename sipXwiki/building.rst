@@ -105,7 +105,7 @@ The `sipxecs-build` script will create /src/sipxecs/build and /usr/local/sipx di
 Build RPMs
 ~~~~~~~~~~~~~~~~~~
 
-To build and install all the sipX* RPMs from source, just add the --rpm option to the sipxecs-build script as follows:
+To build all the sipX* RPMs from source, just add the --rpm option to the sipxecs-build script as follows:
 
   .. code-block:: bash
 
