@@ -452,6 +452,12 @@ OsSocket* SipUdpServer::buildClientSocket(int hostPort,
                                          mStunOptions);
 
       existingSocketReused = false;
+      
+      if( !pSocket->isOk() )
+      {
+        delete pSocket;
+        return NULL;
+      }
    }
    return pSocket;
 }

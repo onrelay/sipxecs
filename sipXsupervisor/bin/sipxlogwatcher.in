@@ -9,8 +9,8 @@
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; echo; exit $ENOENT; }
 
 progName="sipxlogwatcher"
-prog="sec"
 exec="/usr/bin/sec"
+prog=$(basename $exec)
 lockfile="/var/lock/subsys/sec"
 PidFile=@SIPX_RUNDIR@/sipxlogwatcher/sipxlogwatcher.pid
 rc=@SIPX_CONFDIR@/sipxlogwatcher-rc
@@ -19,7 +19,7 @@ rc=@SIPX_CONFDIR@/sipxlogwatcher-rc
 
 start() {
   [ -x $exec ] || { echo -n "$execError"; echo_failure; echo; exit $ENOEXEC; }
-  checkRunningInstance "root" $prog > /dev/null 
+  checkRunningInstance "root" $exec > /dev/null 
   Status=$?
   [ $Status -eq 0 ] && { echo -n "$progName $runningError"; echo_failure; echo; exit $ERUNNING; }
 

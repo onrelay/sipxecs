@@ -232,11 +232,19 @@ OsSocket* SipTcpServer::buildClientSocket(int hostPort,
                                           const char* localIp,
                                           bool& existingSocketReused)
 {
+   existingSocketReused = false;
+
     // Create a socket in non-blocking mode while connecting
     OsConnectionSocket* socket =
        new OsConnectionSocket(hostPort, hostAddress, FALSE, localIp, 0);
+
+   if( !socket->isOk() )
+   {
+      delete socket;
+      return NULL;
+   }
+
     socket->makeBlocking();
-    existingSocketReused = false;
     return(socket);
 }
 

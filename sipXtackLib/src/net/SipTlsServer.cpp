@@ -169,11 +169,17 @@ OsSocket* SipTlsServer::buildClientSocket(int hostPort,
                                           const char* localIp,
                                           bool& existingSocketReused)
 {
-   OsSocket* socket;
-   socket = new OsSSLConnectionSocket(hostPort, hostAddress);
+   existingSocketReused = false;
+
+   OsSocket* socket = new OsSSLConnectionSocket(hostPort, hostAddress);
+
+   if( !socket->isOk() )
+   {
+      delete socket;
+      return NULL;
+   }
 
    socket->makeBlocking();
-   existingSocketReused = false;
    return(socket);
 }
 
