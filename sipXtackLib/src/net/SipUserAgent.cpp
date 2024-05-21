@@ -1694,7 +1694,10 @@ UtlBoolean SipUserAgent::sendTls(SipMessage* message,
    // Disallow an address begining with * as it gets broadcasted on NT
    if(!strchr(serverAddress,'*') && *serverAddress)
    {
-      sendSucceeded = mSipTlsServer->send(message, serverAddress, port);
+      if( mSipTlsServer )
+      {
+         sendSucceeded = mSipTlsServer->send(message, serverAddress, port);
+      }
    }
    else if(*serverAddress == '\0')
    {
