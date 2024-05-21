@@ -5,10 +5,12 @@ Upgrading
 ============
 
 
-Upgrading from Legacy 21.04 on CentOS 7
-----------------------------------------
+Upgrading from Legacy 21.04 to 24.01 on CentOS 7
+----------------------------------------------------------
 
-Follow the below procedure to upgrade an existing 21.04 sipXcom installation on CentOS 7.
+From 24.01 the sipXcom repository has moved to a Google Cloud Artifact Registry.
+
+Follow the below procedure to upgrade an existing 21.04 sipXcom installation to 24.01 or later on CentOS 7.
 
 Backup
 ~~~~~~~~~~~~
