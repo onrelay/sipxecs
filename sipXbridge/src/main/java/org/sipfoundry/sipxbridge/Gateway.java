@@ -287,7 +287,7 @@ public class Gateway {
     static void initializeLogging() throws SipXbridgeException {
         try {
      	        	        	                                       
-            Gateway.logAppender = new SipFoundryAppender(new SipFoundryLayout(), Gateway.getLogFile(), false );
+            Gateway.logAppender = new SipFoundryAppender(new SipFoundryLayout(), Gateway.getLogFile(), true );
             
             logger.addAppender(Gateway.logAppender);
             
