@@ -471,11 +471,13 @@ void NatTraversalAgent::handleOutputMessage( SipMessage& message,
             pCallTracker->handleResponse( message, address, port );
          }
       }
+      /* OR: Happens very frequently for non call signals
       else
       {
          Os::Logger::instance().log(FAC_NAT, PRI_NOTICE, "NatTraversalAgent[%s]::handleOutputMessage failed to retrieve CallTracker to handle request"
                                             , mInstanceName.data() );
       }
+      */
    }
 }
 
