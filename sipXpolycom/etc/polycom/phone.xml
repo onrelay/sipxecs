@@ -2438,7 +2438,7 @@
         <type>
           <boolean />
         </type>
-        <value>0</value>
+        <value>1</value>
       </setting>
       <setting name="keepalive.sessionTimers">
         <type>
