@@ -54,6 +54,7 @@
 #define CONFIG_SETTING_LOG_CONSOLE    "SIP_RLS_LOG_CONSOLE"
 #define CONFIG_SETTING_UDP_PORT       "SIP_RLS_UDP_PORT"
 #define CONFIG_SETTING_TCP_PORT       "SIP_RLS_TCP_PORT"
+#define CONFIG_SETTING_TLS_PORT       "SIP_RLS_TLS_PORT"
 #define CONFIG_SETTING_BIND_IP        "SIP_RLS_BIND_IP"
 #define CONFIG_SETTING_RLS_FILE       "SIP_RLS_FILE_NAME"
 #define CONFIG_SETTING_DOMAIN_NAME    "SIP_RLS_DOMAIN_NAME"
@@ -67,8 +68,9 @@
 
 #define LOG_FACILITY                  FAC_RLS
 
-#define RLS_DEFAULT_UDP_PORT          5130       // Default UDP port
-#define RLS_DEFAULT_TCP_PORT          5130       // Default TCP port
+#define RLS_DEFAULT_UDP_PORT          5140       // Default UDP port
+#define RLS_DEFAULT_TCP_PORT          5140       // Default TCP port
+#define RLS_DEFAULT_TLS_PORT          5141       // Default TLS port
 #define RLS_DEFAULT_BIND_IP           "0.0.0.0"  // Default bind ip; all interfaces
 #define RLS_DEFAULT_RESUBSCRIBE_INTERVAL (60 * 60) // Default subscription resubscribe interval.
 #define RLS_DEFAULT_MIN_RESUBSCRIBE_INTERVAL (40 * 60) // Default minimum subscription resubscribe interval.
@@ -222,6 +224,12 @@ int main(int argc, char* argv[])
     tcpPort = RLS_DEFAULT_TCP_PORT;
   }
 
+   int tlsPort;
+   if (configDb.get(CONFIG_SETTING_TLS_PORT, tlsPort) != OS_SUCCESS)
+   {
+    tlsPort = RLS_DEFAULT_TLS_PORT;
+   }
+
   UtlString bindIp;
   if (configDb.get(CONFIG_SETTING_BIND_IP, bindIp) != OS_SUCCESS ||
       !OsSocket::isIp4Address(bindIp))
@@ -308,7 +316,7 @@ int main(int argc, char* argv[])
       subscribeDb = SubscribeDB::CreateInstance();
       ResourceListServer rls(domainName, realm, lineMgr,
                              DIALOG_EVENT_TYPE, DIALOG_EVENT_CONTENT_TYPE,
-                             tcpPort, udpPort, PORT_NONE, bindIp,
+                             tcpPort, udpPort, tlsPort, bindIp,
                              &resourceListFile,
                              resubscribeInterval, minResubscribeInterval,
                              RLS_PUBLISH_DELAY,

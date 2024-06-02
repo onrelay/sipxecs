@@ -38,12 +38,14 @@
 #define CONFIG_SETTING_DOMAIN_NAME    "SIP_PRESENCE_DOMAIN_NAME"
 #define CONFIG_SETTING_UDP_PORT       "SIP_PRESENCE_UDP_PORT"
 #define CONFIG_SETTING_TCP_PORT       "SIP_PRESENCE_TCP_PORT"
+#define CONFIG_SETTING_TLS_PORT       "SIP_PRESENCE_TLS_PORT"
 #define CONFIG_SETTING_BIND_IP        "SIP_PRESENCE_BIND_IP"
 
 #define LOG_FACILITY                  FAC_ACD
 
 #define PRESENCE_DEFAULT_UDP_PORT              5130       // Default UDP port
 #define PRESENCE_DEFAULT_TCP_PORT              5130       // Default TCP port
+#define PRESENCE_DEFAULT_TLS_PORT              5131       // Default TCP port
 #define PRESENCE_DEFAULT_BIND_IP               "0.0.0.0"  // Default bind ip; all interfaces
 
 // MACROS
@@ -309,6 +311,13 @@ int main(int argc, char* argv[])
       TcpPort = PRESENCE_DEFAULT_TCP_PORT;
    }
 
+   int TlsPort;
+   if (configDb.get(CONFIG_SETTING_TLS_PORT, TlsPort) != OS_SUCCESS)
+   {
+      TlsPort = PRESENCE_DEFAULT_TLS_PORT;
+   }
+
+
    UtlString bindIp;
    if (configDb.get(CONFIG_SETTING_BIND_IP, bindIp) != OS_SUCCESS ||
          !OsSocket::isIp4Address(bindIp))
@@ -317,7 +326,7 @@ int main(int argc, char* argv[])
    }
 
    // Bind the SIP user agent to a port and start it up
-   SipUserAgent* userAgent = new SipUserAgent(TcpPort, UdpPort, PORT_NONE,
+   SipUserAgent* userAgent = new SipUserAgent(TcpPort, UdpPort, TlsPort,
          NULL, NULL, bindIp );
    userAgent->start();
 

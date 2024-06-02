@@ -51,6 +51,7 @@
 #define CONFIG_SETTING_LOG_CONSOLE               "SIP_SAA_LOG_CONSOLE"
 #define CONFIG_SETTING_UDP_PORT                  "SIP_SAA_UDP_PORT"
 #define CONFIG_SETTING_TCP_PORT                  "SIP_SAA_TCP_PORT"
+#define CONFIG_SETTING_TLS_PORT                  "SIP_SAA_TLS_PORT"
 #define CONFIG_SETTING_BIND_IP                   "SIP_SAA_BIND_IP"
 #define CONFIG_SETTING_SAA_FILE                  "SIP_SAA_FILE_NAME"
 #define CONFIG_SETTING_DOMAIN_NAME               "SIP_SAA_DOMAIN_NAME"
@@ -67,6 +68,7 @@
 
 #define SAA_DEFAULT_UDP_PORT          5170       // Default UDP port
 #define SAA_DEFAULT_TCP_PORT          5170       // Default TCP port
+#define SAA_DEFAULT_TLS_PORT          5171       // Default TLS port
 #define SAA_DEFAULT_BIND_IP           "0.0.0.0"  // Default bind ip; all interfaces
 #define SAA_DEFAULT_REFRESH_INTERVAL  (24 * 60 * 60) // Default subscription refresh interval.
 #define SAA_DEFAULT_RESUBSCRIBE_INTERVAL (60 * 60) // Default subscription resubscribe interval.
@@ -222,6 +224,12 @@ int main(int argc, char* argv[])
       tcpPort = SAA_DEFAULT_TCP_PORT;
    }
 
+   int tlsPort;
+   if (configDb.get(CONFIG_SETTING_TLS_PORT, tlsPort) != OS_SUCCESS)
+   {
+      tlsPort = SAA_DEFAULT_TLS_PORT;
+   }
+
     UtlString bindIp;
     if (configDb.get(CONFIG_SETTING_BIND_IP, bindIp) != OS_SUCCESS ||
             !OsSocket::isIp4Address(bindIp))
@@ -318,7 +326,7 @@ int main(int argc, char* argv[])
    {
       // Initialize the AppearanceAgent.
       AppearanceAgent saa(domainName, realm, lineMgr,
-                          tcpPort, udpPort, PORT_NONE, bindIp,
+                          tcpPort, udpPort, tlsPort, bindIp,
                           &appearanceGroupFile,
                           refreshInterval,
                           resubscribeInterval, minResubscribeInterval, seizedResubscribeInterval,

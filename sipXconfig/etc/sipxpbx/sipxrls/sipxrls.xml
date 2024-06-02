@@ -57,6 +57,10 @@
       <type refid="port" />
       <value>5140</value>
     </setting>
+    <setting name="SIP_RLS_TLS_PORT">
+      <type refid="port" />
+      <value>5141</value>
+    </setting>
     <setting name="SIP_RLS_SERVER_MIN_EXPIRATION">
       <type>
         <integer />

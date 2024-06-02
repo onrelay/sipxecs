@@ -3,6 +3,7 @@ SIP_RLS_LOG_LEVEL : $settings.getSetting('SIP_RLS_LOG_LEVEL').Value
 SIP_RLS_LOG_CONSOLE : 
 SIP_RLS_UDP_PORT : $rlsService.rlsPort
 SIP_RLS_TCP_PORT : $rlsService.rlsPort
+SIP_RLS_TLS_PORT : $rlsService.tlsPort
 SIP_RLS_BIND_IP : $location.address
 SIP_RLS_FILE_NAME : @SIPX_CONFDIR@/resource-lists.xml
 SIP_RLS_DOMAIN_NAME : $rlsService.domainName

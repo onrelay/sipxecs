@@ -52,6 +52,10 @@
       <type refid="nonRootPort"/>
       <value>5170</value>
     </setting>
+    <setting name="SIP_SAA_TLS_PORT">
+      <type refid="nonRootPort"/>
+      <value>5171</value>
+    </setting>
     <setting name="SIP_SAA_LOG_LEVEL">
       <type refid="loglevel" />
       <value>NOTICE</value>

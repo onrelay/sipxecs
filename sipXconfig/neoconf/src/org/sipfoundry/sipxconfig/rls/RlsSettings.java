@@ -44,6 +44,11 @@ public class RlsSettings extends PersistableSettings implements DeployConfigOnEd
         return (Integer) getSettingTypedValue("rls-config/SIP_RLS_UDP_PORT");
     }
 
+    public int getTlsPort() {
+        return (Integer) getSettingTypedValue("rls-config/SIP_RLS_TLS_PORT");
+    }
+
+
     @Override
     public String getBeanId() {
         return "rlsSettings";
