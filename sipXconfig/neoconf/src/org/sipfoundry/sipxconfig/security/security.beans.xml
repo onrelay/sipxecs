@@ -185,7 +185,7 @@
   </bean>
 
   <bean id="authenticationFailureHandler"
-        class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+        class="org.sipfoundry.sipxconfig.security.SipxSimpleUrlAuthenticationFailureHandler">
     <property name="defaultFailureUrl" value="/LoginPage.html?error=badCredentials"/>
   </bean>
 
