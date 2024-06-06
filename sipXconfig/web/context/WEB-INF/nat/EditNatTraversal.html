@@ -28,7 +28,7 @@
 	    </span>
 	    <span jwcid="natConfigColumnValue@Block">
 	      <span jwcid="@If" condition="ognl:currentRow.useStun">
-		    <span key="label.stunServer">Use STUN server</span>: <span jwcid="stun@Insert" value="ognl:currentRow.stunAddress"/>:<span jwcid="stun@Insert" value="ognl:currentRow.stunPort"/>
+		    <span key="label.stunServer">Use STUN server</span>: <span jwcid="stunAddress@Insert" value="ognl:currentRow.stunAddress"/>:<span jwcid="stunPort@Insert" value="ognl:currentRow.stunPort"/>
 	      </span>
 	      <span jwcid="@Else">
 	        <span key="label.publicIp">Public IP Address</span>: <span jwcid="public@Insert" value="ognl:currentRow.publicAddress"/>
