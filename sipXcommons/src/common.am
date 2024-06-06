@@ -5,7 +5,7 @@ commons_classes = $(abspath $(top_builddir)/src/main/java/classes)
 # packages to build commons. You won't need all of these to run unless you call specific functions.
 # for example, non-spring projects wouldn't need spring deps
 commons_PKGS = \
-	Stun4J \
+	ice4j \
 	log4j \
 	smackx \
 	xml \

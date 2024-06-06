@@ -43,9 +43,12 @@ import org.sipfoundry.sipxrelay.SymmitronClient;
 import gov.nist.javax.sip.SipStackExt;
 import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.clientauthutils.AuthenticationHelper;
-import net.java.stun4j.StunAddress;
-import net.java.stun4j.client.NetworkConfigurationDiscoveryProcess;
-import net.java.stun4j.client.StunDiscoveryReport;
+
+import org.ice4j.Transport;
+import org.ice4j.TransportAddress;
+import org.ice4j.stack.StunStack;
+import org.ice4j.stunclient.NetworkConfigurationDiscoveryProcess;
+import org.ice4j.stunclient.StunDiscoveryReport;
 
 /**
  * The main class
@@ -69,6 +72,7 @@ public class Gateway {
      * The account manager -- tracks user accounts. This is populated by reading the
      * sipxbridge.xml configuration file.
      */
+
     private static AccountManagerImpl accountManager;
 
     private static PeerIdentities peerIdentities;
@@ -116,9 +120,15 @@ public class Gateway {
     private static String globalAddress;
 
     /*
-     * The stun port
+     * The stun port (now read from config)
      */
-    private static final int STUN_PORT = 3478;
+    //  private static final int STUN_PORT = 3478;
+
+    /*
+     * The stun transport
+     */
+
+    static final Transport STUN_TRANSPORT = Transport.UDP;
 
     /*
      * A table of timers for re-registration
@@ -309,19 +319,23 @@ public class Gateway {
         try {
 
             BridgeConfiguration bridgeConfiguration = accountManager.getBridgeConfiguration();
+
+            StunStack stunStack = new StunStack();
             String stunServerAddress = bridgeConfiguration.getStunServerAddress();
+            int stunServerPort = bridgeConfiguration.getStunServerPort();
+
             String oldPublicAddress = Gateway.getGlobalAddress();
 
             if (stunServerAddress != null) {
                 // Todo -- deal with the situation when this port may be taken.
                 if (addressDiscovery == null) {
-                    int localStunPort = STUN_PORT + 2;
+                    int localStunPort = stunServerPort + 2;
 
-                    StunAddress localStunAddress = new StunAddress(Gateway.getLocalAddress(), localStunPort);
+                    TransportAddress localStunAddress = new TransportAddress(Gateway.getLocalAddress(), localStunPort, STUN_TRANSPORT );
 
-                    StunAddress serverStunAddress = new StunAddress(stunServerAddress, STUN_PORT);
+                    TransportAddress serverStunAddress = new TransportAddress(stunServerAddress, stunServerPort, STUN_TRANSPORT );
 
-                    addressDiscovery = new NetworkConfigurationDiscoveryProcess(localStunAddress, serverStunAddress);
+                    addressDiscovery = new NetworkConfigurationDiscoveryProcess( stunStack, localStunAddress, serverStunAddress);
 
                     addressDiscovery.start();
                 }
@@ -340,7 +354,8 @@ public class Gateway {
                     return;
                 }
 
-                globalAddress = report.getPublicAddress().getSocketAddress().getAddress().getHostAddress();
+                globalAddress = report.getPublicAddress().getAddress().getHostAddress();
+
                 if (logger.isDebugEnabled()) {
                     logger.debug("Stun report = " + report);
                 }
@@ -351,7 +366,7 @@ public class Gateway {
                 }
                 oldStunPort = report.getPublicAddress().getPort();
 
-                if (report.getPublicAddress().getPort() != STUN_PORT + 2) {
+                if (report.getPublicAddress().getPort() != stunServerPort + 2) {
                     logger.warn("WARNING External port != internal port your NAT may not be symmetric.");
                 }
 
@@ -395,12 +410,14 @@ public class Gateway {
             public void run() {
                 Gateway.discoverAddress();
                 if (Gateway.getGlobalAddress() == null && !alarmSent) {
-                    Gateway.raiseAlarm(Gateway.STUN_FAILURE_ALARM_ID, getBridgeConfiguration()
-                            .getStunServerAddress());
+                    Gateway.raiseAlarm(Gateway.STUN_FAILURE_ALARM_ID, 
+                    getBridgeConfiguration().getStunServerAddress() + ":" + 
+                        getBridgeConfiguration().getStunServerPort() );
                     alarmSent = true;
                 } else if (Gateway.getGlobalAddress() != null && alarmSent) {
-                    Gateway.raiseAlarm(Gateway.STUN_RECOVERY_ALARM_ID, getBridgeConfiguration()
-                            .getStunServerAddress());
+                    Gateway.raiseAlarm(Gateway.STUN_RECOVERY_ALARM_ID, 
+                    getBridgeConfiguration().getStunServerAddress() + ":" + 
+                        getBridgeConfiguration().getStunServerPort());
                     alarmSent = false;
                 }
             }
@@ -846,6 +863,7 @@ public class Gateway {
             startRediscoveryTimer();
         } else {
             Gateway.accountManager.getBridgeConfiguration().setStunServerAddress(null);
+            Gateway.accountManager.getBridgeConfiguration().setStunServerPort(0);
         }
     }
 

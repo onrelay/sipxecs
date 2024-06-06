@@ -1,5 +1,5 @@
 bridge_PKGS = \
-	Stun4J \
+	ice4j \
 	commons-beanutils \
 	commons-collections \
 	commons-digester \
