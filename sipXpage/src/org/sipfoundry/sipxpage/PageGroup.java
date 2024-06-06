@@ -174,9 +174,11 @@ public class PageGroup implements LegListener
          try
          {
             // Get the originator for the Page.
-            InboundLeg origLeg = (InboundLeg) inbound;
+            InboundLeg originatorLeg = (InboundLeg) inbound;
             String pageOriginatorAddress;
-            pageOriginatorAddress = origLeg.getAddress();
+            pageOriginatorAddress = originatorLeg.getAddress();
+
+            SessionDescription originatorSdp = originatorLeg.getInviteSessionDescription();
 
             // Answer the inbound call.
             inbound.acceptCall(rtpPort) ;
@@ -197,7 +199,7 @@ public class PageGroup implements LegListener
                // is initiating the page.
                if (destination.compareToIgnoreCase(pageOriginatorAddress) != 0)
                {
-                  Leg outbound = placeCall(inbound.getDisplayName(), origLeg.getCallId(), destination, alertInfoKey) ;
+                  Leg outbound = placeCall(inbound.getDisplayName(), originatorLeg.getCallId(), destination, alertInfoKey, originatorSdp ) ;
                   if (outbound != null)
                   {
                      // Keep track of them!
@@ -274,7 +276,7 @@ public class PageGroup implements LegListener
     * @param alertInfoKey The magic key needed for Polycom Auto-Answer
     * @return
     */
-   Leg placeCall(String fromName, String fromCallId, String destination, String alertInfoKey)
+   Leg placeCall(String fromName, String fromCallId, String destination, String alertInfoKey, SessionDescription originatorSdp )
    {
       LOG.debug(String.format("PageGroup::placeCall(%s, %s)", fromName, destination));
       OutboundLeg oLeg = null ;
@@ -287,7 +289,7 @@ public class PageGroup implements LegListener
          toAddress.setUser(user);
          toAddress.setHost(host);
 
-         SessionDescription sdp = legSipListener.buildSdp(new InetSocketAddress(ipAddress, tossPort), false) ;
+         SessionDescription sdp = legSipListener.buildSdp(new InetSocketAddress(ipAddress, tossPort), originatorSdp, false ) ;
 
          oLeg.createLeg(toAddress, "Page from "+fromName, fromCallId, sdp, alertInfoKey);
 

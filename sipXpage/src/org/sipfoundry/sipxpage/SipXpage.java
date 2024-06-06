@@ -35,6 +35,7 @@ public class SipXpage implements LegListener
    private SipStack sipStack;
    private ListeningPoint udpListeningPoint;
    private ListeningPoint tcpListeningPoint;
+   private ListeningPoint tlsListeningPoint;
    private SipProvider sipProvider;
    private LegSipListener legSipListener;
 
@@ -131,8 +132,10 @@ public class SipXpage implements LegListener
       try {
          udpListeningPoint = sipStack.createListeningPoint(config.ipAddress, config.udpSipPort, "udp");
          tcpListeningPoint = sipStack.createListeningPoint(config.ipAddress, config.tcpSipPort, "tcp");
+         tlsListeningPoint = sipStack.createListeningPoint(config.ipAddress, config.tlsSipPort, "tls");
          sipProvider = sipStack.createSipProvider(udpListeningPoint);
          sipProvider.addListeningPoint(tcpListeningPoint) ;
+         sipProvider.addListeningPoint(tlsListeningPoint) ;
 
          legSipListener= new LegSipListener() ;
          legSipListener.init(sipFactory, sipProvider, this);
@@ -190,8 +193,8 @@ public class SipXpage implements LegListener
 
 
 
-      LOG.info(String.format("sipXpage listening on %s:%04d/UDP %04d/TCP",
-         config.ipAddress, config.udpSipPort, config.tcpSipPort)) ;
+      LOG.info(String.format("sipXpage listening on %s:%04d/UDP %04d/TCP %04d/TLS",
+         config.ipAddress, config.udpSipPort, config.tcpSipPort, config.tlsSipPort)) ;
    }
 
    /**

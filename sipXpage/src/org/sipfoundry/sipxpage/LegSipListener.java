@@ -81,9 +81,12 @@ public class LegSipListener implements SipListener
    AddressFactory addressFactory ;
    HeaderFactory headerFactory ;
    ListeningPoint udpListeningPoint;
+   ListeningPoint tlsListeningPoint;
 
    String fromIPAddress ;
-   String fromSipAddress ;
+   String fromSipHost ;
+   int fromPort ;
+   String fromTransport ;
    UserAgentHeader userAgent  ;
    LegListener inviteListener ;        // The object we tell about new INVITE messages
 
@@ -102,8 +105,8 @@ public class LegSipListener implements SipListener
       sipProvider.addSipListener(this);
       sipStack = sipProvider.getSipStack() ;
       udpListeningPoint = sipProvider.getListeningPoint(ListeningPoint.UDP);
+      tlsListeningPoint = sipProvider.getListeningPoint(ListeningPoint.TLS);
       fromIPAddress = udpListeningPoint.getIPAddress() ;
-      fromSipAddress = fromIPAddress + ":" + udpListeningPoint.getPort() ;
 
       messageFactory = sipFactory.createMessageFactory();
       headerFactory = sipFactory.createHeaderFactory() ;
@@ -161,8 +164,13 @@ public class LegSipListener implements SipListener
     * @param alertInfoKey  The magic value needed to trigger Auto-Answer on Polycom Phones
     * @return The call Id of the created call
     */
-   public String placeCall(Leg leg, SipURI toAddress, String displayName, String fromCallId, SessionDescription sdp, String alertInfoKey) throws Throwable
-   {
+   public String placeCall(Leg leg, 
+      SipURI toAddress, 
+      String displayName, 
+      String fromCallId, 
+      SessionDescription sdp, 
+      String alertInfoKey) throws Throwable {
+
       // TODO Lookup the toAddress in the registration database, so as to only
       // send to the registered phones.
       LOG.info(String.format("LegSipListener::placeCall to %s", toAddress.toString())) ;
@@ -261,16 +269,20 @@ public class LegSipListener implements SipListener
 
    public void acceptCall(Leg leg) throws Throwable
    {
-      LOG.info(String.format("LegSipListener::acceptCall Leg %s", leg.toString())) ;
+      LOG.info(String.format("LegSipListener::acceptCall Leg %s:%d %s", fromIPAddress, leg.getPort(), leg.getTransport())) ;
 
-      Transaction transactionId = leg.getInviteTransaction() ;
-      ServerTransaction serverTransactionId = (ServerTransaction)transactionId ;
+      Transaction inviteTransaction = leg.getInviteTransaction() ;
+      SessionDescription originatorSessionDescription = leg.getInviteSessionDescription();
+      ServerTransaction serverTransaction = (ServerTransaction)inviteTransaction ;
+      
+      fromTransport = leg.getTransport();
+      fromPort = leg.getPort();
+      fromSipHost = fromIPAddress;
 
       // Clear the invite transaction of the leg
       leg.setInviteTransaction(null, false) ;
 
-
-      Request request = serverTransactionId.getRequest() ;
+      Request request = serverTransaction.getRequest() ;
 
       FromHeader fromHeader = (FromHeader)request.getHeader(FromHeader.NAME) ;
       String displayName = fromHeader.getAddress().getDisplayName() ;
@@ -282,7 +294,7 @@ public class LegSipListener implements SipListener
 
       InetSocketAddress localRtpAddress = new
          InetSocketAddress(udpListeningPoint.getIPAddress(), leg.getRtpPort()) ;
-      SessionDescription sdp = buildSdp(localRtpAddress, leg.getRtpPort() == 0) ;
+      SessionDescription sdp = buildSdp(localRtpAddress, originatorSessionDescription, leg.getRtpPort() == 0) ;
       Response response = messageFactory.createResponse(Response.OK, request) ;
 
       // Add Leg's tag
@@ -290,10 +302,9 @@ public class LegSipListener implements SipListener
       toHeader.setTag(leg.getTag()) ;
 
       // Create contact headers
-      SipURI fromURI = addressFactory.createSipURI("pager", fromSipAddress);
+      SipURI fromURI = addressFactory.createSipURI("pager", fromSipHost + ":" + fromPort);
       SipURI contactUrl = fromURI;
-      contactUrl.setPort(udpListeningPoint.getPort());
-
+      contactUrl.setPort(fromPort);
 
       // Create the contact name address.
       Address contactAddress = addressFactory.createAddress(fromURI);
@@ -306,7 +317,7 @@ public class LegSipListener implements SipListener
 
       // Add the sdp
       response.setContent(sdp, contentTypeHeader) ;
-      sendServerResponse(serverTransactionId, response);
+      sendServerResponse(serverTransaction, response);
    }
 
    /**
@@ -331,6 +342,7 @@ public class LegSipListener implements SipListener
    Request buildInviteRequest(Leg leg, String fromDisplayName, String fromCallId, SipURI toAddress, String alertInfoKey) throws Throwable
    {
       // create From Header
+      String fromSipAddress = fromSipHost + ":" + fromPort;
       SipURI fromURI = addressFactory.createSipURI("pager", fromSipAddress);
       Address fromNameAddress = addressFactory.createAddress("sip:pager@"+fromSipAddress) ;
       fromNameAddress.setDisplayName(fromDisplayName);
@@ -353,8 +365,8 @@ public class LegSipListener implements SipListener
 
       ArrayList<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
       ViaHeader viaHeader = headerFactory.createViaHeader(udpListeningPoint.getIPAddress(),
-            udpListeningPoint.getPort(),
-            ListeningPoint.UDP, null);
+            fromPort,
+            fromTransport, null);
 
       // add via headers
       viaHeaders.add(viaHeader) ;
@@ -393,7 +405,7 @@ public class LegSipListener implements SipListener
 
       // Create contact headers
       SipURI contactUrl = fromURI;
-      contactUrl.setPort(udpListeningPoint.getPort());
+      contactUrl.setPort(fromPort);
       contactUrl.setLrParam();
 
 
@@ -425,11 +437,10 @@ public class LegSipListener implements SipListener
     * @return The Session Description
     * @throws Exception
     */
-   public SessionDescription buildSdp(InetSocketAddress localRtpAddress, boolean sendOnly) throws Throwable
+   public SessionDescription buildSdp(InetSocketAddress localRtpAddress, SessionDescription originatorSdp, boolean sendOnly) throws Throwable
    {
       String localHost = "0.0.0.0" ;
       int localPort = 0 ;
-      Vector <Attribute>attrs = new Vector<Attribute>();
       if (!sendOnly)
       {
          // Get the dotted quad IP address, not the name.  SDP doesn't want to do DNS
@@ -442,43 +453,50 @@ public class LegSipListener implements SipListener
       sdp.setOrigin(sdpFactory.createOrigin("pager", 42, 42, "IN", "IP4", localHost)) ;
       sdp.setSessionName(sdpFactory.createSessionName("pager")) ;
       sdp.setConnection(sdpFactory.createConnection(localHost));
-      Vector <MediaDescription>mediaList = new Vector<MediaDescription>() ;
-      String[] codecs = {PCMU};
-      attrs.add(sdpFactory.createAttribute("rtpmap", "0 PCMU/8000"));
-      attrs.add(sdpFactory.createAttribute("ptime", "20"));
-      if (sendOnly)
-      {
-         attrs.add(sdpFactory.createAttribute("sendonly", null)) ;
+
+      if( originatorSdp != null ) {
+         sdp.setMediaDescriptions( originatorSdp.getMediaDescriptions(true));
+      } 
+      else {
+         Vector <MediaDescription>mediaList = new Vector<MediaDescription>() ;
+         Vector <Attribute>attrs = new Vector<Attribute>();
+         attrs.add(sdpFactory.createAttribute("rtpmap", "0 PCMU/8000"));
+         attrs.add(sdpFactory.createAttribute("ptime", "20"));
+         if (sendOnly)
+         {
+            attrs.add(sdpFactory.createAttribute("sendonly", null)) ;
+         }
+         else
+         {
+            attrs.add(sdpFactory.createAttribute("sendrecv", null)) ;
+         }
+         String[] codecs = {PCMU};
+         MediaDescription md = sdpFactory.createMediaDescription("audio", localPort, 2, "RTP/AVP", codecs);
+         md.setAttributes(attrs);
+         mediaList.add(md);
+         sdp.setMediaDescriptions(mediaList) ;
       }
-      else
-      {
-         attrs.add(sdpFactory.createAttribute("sendrecv", null)) ;
-      }
-      MediaDescription md = sdpFactory.createMediaDescription("audio", localPort, 2, "RTP/AVP", codecs);
-      md.setAttributes(attrs);
-      mediaList.add(md);
-      sdp.setMediaDescriptions(mediaList) ;
 
       return sdp ;
    }
 
-   Response processInvite(Request request, ServerTransaction serverTransactionId) throws Throwable
+   Response processInvite(Request request, ServerTransaction serverTransaction) throws Throwable
    {
       Dialog dialog = null ;
 
 
-      if (serverTransactionId != null)
+      if (serverTransaction != null)
       {
          // An existing dialog, it must be a re-invite
-         dialog = serverTransactionId.getDialog() ;
+         dialog = serverTransaction.getDialog() ;
          LOG.info(String.format("LegSipListener::processInvite re-Invite dialog=(%s)", dialog)) ;
 
-         Leg leg = (Leg)serverTransactionId.getApplicationData() ;
+         Leg leg = (Leg)serverTransaction.getApplicationData() ;
          if (leg == null)
          {
             leg = dialogLegMap.get(dialog) ;
-            serverTransactionId.setApplicationData(leg) ;
-            leg.setInviteTransaction(serverTransactionId, true) ;
+            serverTransaction.setApplicationData(leg) ;
+            leg.setInviteTransaction(serverTransaction, true) ;
          }
 
          InetSocketAddress addressPort = handleSdp(request) ;
@@ -502,8 +520,8 @@ public class LegSipListener implements SipListener
          LOG.info("LegSipListener::processInvite new Invite") ;
 
          // Create a new transaction
-         serverTransactionId = sipProvider.getNewServerTransaction(request);
-         dialog = serverTransactionId.getDialog() ;
+         serverTransaction = sipProvider.getNewServerTransaction(request);
+         dialog = serverTransaction.getDialog() ;
 
          // Create the leg and mappings
          InboundLeg leg = new InboundLeg(this, inviteListener) ;
@@ -518,7 +536,7 @@ public class LegSipListener implements SipListener
             }
          }
          leg.setCallId(dialog.getCallId().getCallId());
-         serverTransactionId.setApplicationData(leg) ;
+         serverTransaction.setApplicationData(leg) ;
          dialogLegMap.put(dialog, leg) ;
          legDialogMap.put(leg, dialog) ;
          LOG.debug(String.format("LegSipListener::processInvite associating dialog(%s) with leg(%s)", dialog.toString(), leg.toString())) ;
@@ -526,7 +544,7 @@ public class LegSipListener implements SipListener
          // Tell our invite listener
          LegEvent legEvent = new LegEvent(leg, "invite") ;
          legEvent.setSdpAddress(handleSdp(request)) ;
-         leg.setInviteTransaction(serverTransactionId, true) ;
+         leg.setInviteTransaction(serverTransaction, true) ;
          inviteListener.onEvent(legEvent) ;
       }
       return null ;  // No response.  Let the appropriate LegListener handle that.

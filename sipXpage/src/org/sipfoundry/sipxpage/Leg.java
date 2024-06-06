@@ -10,7 +10,11 @@ import gov.nist.javax.sip.message.SIPRequest;
 
 import java.net.InetSocketAddress;
 
+import javax.sdp.SdpFactory;
+import javax.sdp.SessionDescription;
 import javax.sip.Transaction;
+import javax.sip.message.Request;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -42,6 +46,7 @@ public abstract class Leg implements LegListener
    int rtpPort ;                    // The inbound RTP port (for OUR sdp)
    String tag ;                     // This leg's tag (random number)
    boolean m_gotBye;                // True if the far end sent this leg a bye
+   String transport;                // Transport of original invite
 
    public Leg (LegSipListener legSipListener, LegListener otherListener)
    {
@@ -169,6 +174,52 @@ public abstract class Leg implements LegListener
    public Transaction getInviteTransaction()
    {
       return inviteTransaction ;
+   }
+
+   public SessionDescription getInviteSessionDescription() {
+
+      try {
+         if( inviteTransaction != null ) {
+            
+            Request inviteRequest = inviteTransaction.getRequest();
+
+            if ( inviteRequest.getRawContent() != null ) {
+
+               String messageString = new String(inviteRequest.getRawContent());
+
+               SessionDescription sessionDescription = SdpFactory.getInstance().createSessionDescription(messageString);
+
+               return sessionDescription;
+            }
+         }
+
+      } catch (Exception ex) {}
+      LOG.error(String.format("Leg::getInviteSessionDescription no SDP in invite", myId));
+      return null;
+	}
+
+   int getPort() {
+      if (requestUri == null)
+      {
+         return 0;
+      }
+      else
+      {
+         return requestUri.getPort();
+      }
+   }
+
+   public String getTransport()
+   {
+      if (requestUri == null)
+      {
+         return "";
+      }
+      else
+      {
+         return legSipListener.tlsListeningPoint.getPort() == requestUri.getPort() ?
+            "tls" : "udp";
+      }
    }
 
    public String getTag()
