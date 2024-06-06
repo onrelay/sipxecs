@@ -72,6 +72,15 @@
 	        validators="spring-validators:validHostOrIp" />
 	  </tr>
 	  <tr jwcid="@common/FieldPanel"
+			field="component:stunPort"
+			label="message:stun.port"
+			description="message:stun.port.description">
+		<td jwcid="stunPort@TextField"
+			value="ognl:locationBean.stunPort"
+			translator="translator:integer,omitZero=true"
+		    validators="validators:required,min=1024,max=65535" />
+	  </tr>
+	  <tr jwcid="@common/FieldPanel"
 		    field="component:stunInterval"
 		    label="message:stun.interval"
 		    description="message:stun.interval.description">

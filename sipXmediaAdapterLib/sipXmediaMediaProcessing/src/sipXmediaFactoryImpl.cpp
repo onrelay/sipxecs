@@ -157,12 +157,13 @@ CpMediaInterface* sipXmediaFactoryImpl::createMediaInterface( const char* public
                                                               const char* locale,
                                                               int expeditedIpTos,
                                                               const char* szStunServer,
+                                                              int stunPort,
                                                               int stunOptions,
                                                               int iStunKeepAliveSecs
                                                             )
 {
     return new CpPhoneMediaInterface(this, publicAddress, localAddress,
-            numCodecs, sdpCodecArray, locale, expeditedIpTos, szStunServer,
+            numCodecs, sdpCodecArray, locale, expeditedIpTos, szStunServer, stunPort, 
             iStunKeepAliveSecs) ;
 }
 

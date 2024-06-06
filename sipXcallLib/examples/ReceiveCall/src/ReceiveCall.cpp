@@ -96,6 +96,7 @@ bool parseArgs(int argc,
                char** pszPassword,
                char** pszRealm,
                char** pszStunServer,
+               int* pStunPort,
                char** pszProxy,
                bool* bDialogEvents,
                char** pszDelay,
@@ -117,6 +118,7 @@ bool parseArgs(int argc,
     *pszPassword = NULL ;
     *pszRealm = NULL ;
     *pszStunServer = NULL ;
+    *pStunPort = 3478;
     *pszProxy = NULL;
     *bDialogEvents = false;
     *bTimestamp = false;
@@ -719,6 +721,7 @@ int main(int argc, char* argv[])
     char* szPassword ;
     char* szRealm ;
     char* szStunServer ;
+    int stunPort ;
     char* szProxy ;
     bool bDialogEvents ;
     // The default run time is 2^31-1 seconds, which is over 68 years.
@@ -739,7 +742,7 @@ int main(int argc, char* argv[])
     // Parse Arguments
     if (parseArgs(argc, argv, &iDuration, &iSipPort, &iRtpPort, &g_szPlayTones,
                   &g_szFile, &bLoopback, &szIdentity, &szUsername, &szPassword,
-                  &szRealm, &szStunServer, &szProxy, &bDialogEvents,
+                  &szRealm, &szStunServer, &stunPort, &szProxy, &bDialogEvents,
                   &g_callAnswerDelay, &g_timestamp, &runTime) &&
         (iDuration > 0) && (portIsValid(iSipPort)) && (portIsValid(iRtpPort)))
     {
@@ -793,7 +796,7 @@ int main(int argc, char* argv[])
             sipxConfigEnableRport(hInst, true) ;
             if (szStunServer)
             {
-                sipxConfigEnableStun(hInst, szStunServer, 28) ;
+                sipxConfigEnableStun(hInst, szStunServer, stunPort, 28) ;
             }
             sipxEventListenerAdd(hInst, EventCallBack, NULL) ;
             hLine = lineInit(hInst, szIdentity, szUsername, szPassword, szRealm) ;

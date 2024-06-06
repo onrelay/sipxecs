@@ -663,7 +663,7 @@ void sipXtapiTestSuite::testConfigEnableStunSuccess()
         CPPUNIT_ASSERT_EQUAL(rc, SIPX_RESULT_SUCCESS);
 
         validator.addMarker("Waiting for STUN success") ;
-        rc = sipxConfigEnableStun(hInst, "stun.fwdnet.net", 28) ;
+        rc = sipxConfigEnableStun(hInst, "freestun.net", 3478, 28) ;
         CPPUNIT_ASSERT_EQUAL(rc, SIPX_RESULT_SUCCESS);
 
         bRC = validator.waitForConfigEvent(CONFIG_STUN_SUCCESS) ;
@@ -702,7 +702,7 @@ void sipXtapiTestSuite::testConfigEnableStunFailure()
         CPPUNIT_ASSERT_EQUAL(rc, SIPX_RESULT_SUCCESS);
 
         validator.addMarker("Waiting for STUN failure") ;
-        rc = sipxConfigEnableStun(hInst, "www.pingtel.com", 28) ;
+        rc = sipxConfigEnableStun(hInst, "freestun.net", 3478, 28) ;
         CPPUNIT_ASSERT_EQUAL(rc, SIPX_RESULT_SUCCESS);
 
         bRC = validator.waitForConfigEvent(CONFIG_STUN_FAILURE) ;

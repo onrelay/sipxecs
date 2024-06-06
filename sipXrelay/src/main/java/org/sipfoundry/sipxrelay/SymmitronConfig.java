@@ -21,6 +21,7 @@ public class SymmitronConfig {
 	private String localAddress;
 	private String publicAddress;
 	private String stunServerAddress;
+	private int stunServerPort = 0;
 	private int rediscoveryTime = 60;
 	private boolean useHttps = true;
 	private boolean behindNat = true;
@@ -155,6 +156,21 @@ public class SymmitronConfig {
 	public String getStunServerAddress() {
 		return stunServerAddress;
 	}
+
+	/**
+	 * @param stunServerPort
+	 *            the stunServerPort to set
+	 */
+	public void setStunServerPort(int stunServerPort) {
+		this.stunServerPort = stunServerPort;
+	}
+
+	/** 
+	* @return the stunServerPort
+	*/
+   	public int getStunServerPort() {
+	   return stunServerPort;
+   }
 
 	/**
 	 * @param rediscoveryTime

@@ -74,6 +74,7 @@ public:
                                                     const char* locale,
                                                     int expeditedIpTos,
                                                     const char* szStunServer,
+                                                    int stunPort,
                                                     int stunOptions,
                                                     int iStunKeepAliveSecs
                                                   ) ;

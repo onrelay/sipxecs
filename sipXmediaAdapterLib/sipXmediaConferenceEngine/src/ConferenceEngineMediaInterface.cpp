@@ -120,6 +120,7 @@ ConferenceEngineMediaInterface::ConferenceEngineMediaInterface(ConferenceEngineF
                                                                const char* locale,
                                                                int expeditedIpTos,
                                                                const char* szStunServer,
+                                                               int stunPort,
                                                                int stunOptions,
                                                                int iStunKeepAlivePeriodSecs,
                                                                UtlBoolean bDTMFOutOfBand)
@@ -159,6 +160,8 @@ ConferenceEngineMediaInterface::ConferenceEngineMediaInterface(ConferenceEngineF
 
     mStunOptions = stunOptions ;
     mStunServer = szStunServer ;
+    mStunPort = stunPort ;
+    mStunTransort = szStunTransport ;
     mStunRefreshPeriodSecs = iStunKeepAlivePeriodSecs ;
 
     mFocus = FALSE;
@@ -257,12 +260,12 @@ OsStatus ConferenceEngineMediaInterface::createConnection(int& connectionId, voi
     ConferenceEngineDatagramSocket* rtpSocket = new ConferenceEngineDatagramSocket(
             mpConferenceEngine, connectionId, TYPE_RTP, 0, NULL,
             localPort, mLocalAddress.data(), mStunServer.length() != 0,
-            mStunServer, mStunRefreshPeriodSecs);
+            mStunServer, mStunPort, mStunTransport, mStunRefreshPeriodSecs);
 
     ConferenceEngineDatagramSocket* rtcpSocket = new ConferenceEngineDatagramSocket(
             mpConferenceEngine, connectionId, TYPE_RTCP, 0, NULL,
             localPort == 0 ? 0 : localPort + 1, mLocalAddress.data(),
-            mStunServer.length() != 0, mStunServer, mStunRefreshPeriodSecs);
+            mStunServer.length() != 0, mStunServer, mStunPort, mStunRefreshPeriodSecs);
 
     pMediaConnection->mpRtpSocket = rtpSocket;
     pMediaConnection->mpRtcpSocket = rtcpSocket;

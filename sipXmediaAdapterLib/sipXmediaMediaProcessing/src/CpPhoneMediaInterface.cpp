@@ -137,6 +137,7 @@ CpPhoneMediaInterface::CpPhoneMediaInterface(CpMediaInterfaceFactoryImpl* pFacto
                                              const char* locale,
                                              int expeditedIpTos,
                                              const char* szStunServer,
+                                             int stunPort,
                                              int iStunKeepAlivePeriodSecs)
     : CpMediaInterface(pFactoryImpl)
 {
@@ -148,6 +149,7 @@ CpPhoneMediaInterface::CpPhoneMediaInterface(CpMediaInterfaceFactoryImpl* pFacto
                  mpFlowGraph);
 
    mStunServer = szStunServer ;
+   mStunPort = stunPort ;
    mStunRefreshPeriodSecs = iStunKeepAlivePeriodSecs ;
 
    if(localAddress && *localAddress)
@@ -306,10 +308,10 @@ OsStatus CpPhoneMediaInterface::createConnection(int& connectionId,
         // host may be multi-homed
         OsStunDatagramSocket* rtpSocket = new OsStunDatagramSocket(0, NULL,
             localPort, mLocalAddress.data(), mStunServer.length() != 0,
-            mStunServer, mStunRefreshPeriodSecs);
+            mStunServer, mStunPort, mStunRefreshPeriodSecs);
         OsStunDatagramSocket* rtcpSocket = new OsStunDatagramSocket(0, NULL,
             localPort == 0 ? 0 : localPort + 1, mLocalAddress.data(),
-            mStunServer.length() != 0, mStunServer, mStunRefreshPeriodSecs);
+            mStunServer.length() != 0, mStunServer, mStunPort, mStunRefreshPeriodSecs);
 
 
         // Validate local port is not auto-selecting.
@@ -337,10 +339,10 @@ OsStatus CpPhoneMediaInterface::createConnection(int& connectionId,
                 delete rtpSocket;
                 delete rtcpSocket;
                 rtpSocket = new OsStunDatagramSocket(0, NULL, localPort,
-                   mLocalAddress.data(), mStunServer.length() != 0, mStunServer,
+                   mLocalAddress.data(), mStunServer.length() != 0, mStunServer, mStunPort, 
                    mStunRefreshPeriodSecs);
                 rtcpSocket = new OsStunDatagramSocket(0, NULL, localPort + 1,
-                   mLocalAddress.data(), mStunServer.length() != 0, mStunServer,
+                   mLocalAddress.data(), mStunServer.length() != 0, mStunServer, mStunPort, 
                    mStunRefreshPeriodSecs);
             }
         }

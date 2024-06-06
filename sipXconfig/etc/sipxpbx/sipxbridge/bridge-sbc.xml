@@ -91,13 +91,20 @@
     </setting>
     <setting name="sipx-supervisor-xml-rpc-port" hidden="yes">
       <!-- set from Location data -->
-	  <type>
+	    <type>
         <integer required="yes" />
       </type>
       <value>8092</value>
     </setting>
     <setting name="stun-server-address" hidden="yes">
       <!-- set from NAT location data -->
+    </setting>
+    <setting name="stun-server-port" hidden="yes">
+      <!-- set from NAT location data -->
+      <type>
+        <integer required="yes" />
+      </type>
+      <value>3478</value>
     </setting>
     <setting name="sip-keepalive-seconds" advanced="yes">
       <type>

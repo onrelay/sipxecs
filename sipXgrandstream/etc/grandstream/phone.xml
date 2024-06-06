@@ -1592,7 +1592,7 @@
             <type>
                 <string/>
             </type>
-            <value>stun.ezuce.com</value>
+            <value>freestun.net</value>
         </setting>
         <setting name="P1345" if="gsPhoneGxp21(30|35|40|60|70)">
             <label>Public Mode</label>

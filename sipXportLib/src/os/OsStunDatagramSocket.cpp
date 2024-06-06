@@ -44,6 +44,7 @@ OsStunDatagramSocket::OsStunDatagramSocket(int remoteHostPortNum,
                                            const char* localHost,
                                            bool bEnableStun,
                                            const char* szStunServer,
+                                           int stunPort,
                                            int iRefreshPeriodInSec,
                                            int iStunOptions,
                                            OsNotification *pNotification)
@@ -52,8 +53,8 @@ OsStunDatagramSocket::OsStunDatagramSocket(int remoteHostPortNum,
         , mKeepAlivePeriod(0)
         , mCurrentKeepAlivePeriod(0)
         , mStunServer(szStunServer ? szStunServer : "") // szStunServer can be NULL
+        , mStunPort(stunPort)
         , mStunOptions(iStunOptions)
-        , mStunPort(PORT_NONE)
         , mbEnabled(bEnableStun)
         , mStunRefreshErrors(0)
         , pStunAgent(OsStunAgentTask::getInstance(this))
@@ -310,6 +311,12 @@ void OsStunDatagramSocket::setStunServer(const char* szHostname)
     mStunServer = szHostname ;
 }
 
+
+void OsStunDatagramSocket::setStunPort(int stunPort)
+{
+    mStunPort = stunPort ;
+}
+
 void OsStunDatagramSocket::setStunOptions(int stunOptions)
 {
     mStunOptions = stunOptions ;
@@ -341,6 +348,7 @@ void OsStunDatagramSocket::enableStun(bool bEnable)
             // Clear the STUN values
             mStunAddress.remove(0) ;
             mStunPort = PORT_NONE ;
+
         }
     }
 }
@@ -360,7 +368,7 @@ void OsStunDatagramSocket::refreshStunBinding(UtlBoolean bFromReadSocket)
     if (bFromReadSocket)
     {
         OsStunQueryAgent agent;
-        if (agent.setServer(mStunServer))
+        if (agent.setServer(mStunServer, mStunPort))
         {
             // We must touch the socket and look for the next stun packet.
             bSuccess = agent.getMappedAddress(this, mStunAddress, mStunPort, mStunOptions, timeout) ;
@@ -378,7 +386,7 @@ void OsStunDatagramSocket::refreshStunBinding(UtlBoolean bFromReadSocket)
     }
     else
     {
-        pStunAgent->sendStunDiscoveryRequest(this, mStunServer, STUN_PORT, mStunOptions) ;
+        pStunAgent->sendStunDiscoveryRequest(this, mStunServer, mStunPort, mStunOptions) ;
     }
 }
 
@@ -547,8 +555,8 @@ void OsStunDatagramSocket::markStunFailure()
             (mStunRefreshErrors % STUN_REFRESH_REPORT_THRESHOLD) == 0)
     {
         Os::Logger::instance().log(FAC_NET, PRI_WARNING,
-                "STUN failed to obtain binding from %s (attempt=%d)\n",
-                mStunServer.data(), mStunRefreshErrors) ;
+                "STUN failed to obtain binding from %s:%d (attempt=%d)\n",
+                mStunServer.data(), mStunPort, mStunRefreshErrors) ;
 
         // Signal external identities interested in the STUN outcome.
         if (mpNotification)
@@ -572,8 +580,8 @@ void OsStunDatagramSocket::markStunFailure()
         if (mStunServer.length() > 0)
         {
             Os::Logger::instance().log(FAC_NET, PRI_ERR,
-                "STUN Aborted; Failed to obtain stun binding from %s (attempt=%d)\n",
-                mStunServer.data(), mStunRefreshErrors) ;
+                "STUN Aborted; Failed to obtain stun binding from %s:%d (attempt=%d)\n",
+                mStunServer.data(), mStunPort, mStunRefreshErrors) ;
             enableStun(FALSE) ;
         }
     }

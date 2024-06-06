@@ -27,11 +27,18 @@
 
 // Constructor
 CpMultiStringMessage::CpMultiStringMessage(unsigned char messageSubtype,
-                                 const char* str1, const char* str2,
-                                 const char* str3, const char* str4,
+                                 const char* str1, 
+                                 const char* str2,
+                                 const char* str3, 
+                                 const char* str4,
                                  const char* str5,
-                                 intptr_t int1, intptr_t int2, intptr_t int3, intptr_t int4,
-                                 intptr_t int5, intptr_t int6, intptr_t int7) :
+                                 intptr_t int1, 
+                                 intptr_t int2, 
+                                 intptr_t int3, 
+                                 intptr_t int4,
+                                 intptr_t int5, 
+                                 intptr_t int6, 
+                                 intptr_t int7) :
 OsMsg(OsMsg::PHONE_APP, messageSubtype)
 {
    mInt1 = int1;

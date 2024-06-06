@@ -23,7 +23,7 @@ int EnableStunCommand::execute(int argc, char* argv[])
 
 	if(argc == 3)
 	{
-		if(sipxConfigEnableStun(hInstance, argv[1], atoi(argv[2])) == SIPX_RESULT_SUCCESS)
+		if(sipxConfigEnableStun(hInstance, argv[1],  argv[2], atoi(argv[3]), atoi(argv[4])) == SIPX_RESULT_SUCCESS)
 		{
 			printf("Stun enabled.\n");
 		}

@@ -1018,24 +1018,19 @@ OsStunQueryAgent::OsStunQueryAgent () :
  * Arguments:
  *  host - hostname or IP address of the server (string format)
  *  port - The port number to be used
- * Default Arguments:
- *  port - Defaults to STUN_PORT
  * Arguments modified:
  *  None
  * Returns:
  *  The boolean status of the success of the operation
  *-----------------------------------------------------------------------------
  */
-bool OsStunQueryAgent::setServer (const char *host, USHORT port)
+bool OsStunQueryAgent::setServer(const char *host, USHORT port)
 {
     assert (host!=NULL); /* Should be a valid string */
     UtlBoolean          isIp = FALSE;
 
-    stunServer.port=port;
-
     // Look up name
-    // TODO: DNS SRV for stun server?
-    //        http://track.sipfoundry.org/browse/XPL-96
+
     UtlString serverAddress ;
     if (OsSocket::getHostIpByName(host, &serverAddress))
     {
@@ -1044,6 +1039,7 @@ bool OsStunQueryAgent::setServer (const char *host, USHORT port)
         if (isIp)
         {
             stunServer.addr=htonl(inet_addr(serverAddress));
+            stunServer.port=port;
             isValidServer=true;
         }
         else
@@ -1070,7 +1066,7 @@ bool OsStunQueryAgent::setServer (const char *host, USHORT port)
  *  The enumerated constant of the type of the NAT
  *-----------------------------------------------------------------------------
  */
-NatType OsStunQueryAgent::getNatType (OsDatagramSocket *oDS1, OsDatagramSocket *oDS2) {
+NatType OsStunQueryAgent::getNatType(OsDatagramSocket *oDS1, OsDatagramSocket *oDS2) {
     bool isNat=true; /* Is there a NAT or not? */
     bool respTestI=false; /* Response for Test I */
 

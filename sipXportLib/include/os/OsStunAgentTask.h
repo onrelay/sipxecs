@@ -101,7 +101,7 @@ public:
 
     UtlBoolean sendStunConnectivityRequest(OsStunDatagramSocket* pSocket,
                                            const UtlString& stunServer,
-                                           int iStunPort,
+                                           int stunPort,
                                            unsigned char cPriority) ;
 
     /**

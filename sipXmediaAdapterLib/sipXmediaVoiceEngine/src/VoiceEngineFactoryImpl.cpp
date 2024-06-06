@@ -184,6 +184,7 @@ CpMediaInterface* VoiceEngineFactoryImpl::createMediaInterface( const char* publ
                                                                 const char* locale,
                                                                 int expeditedIpTos,
                                                                 const char* szStunServer,
+                                                                int stunPort,
                                                                 int iStunKeepAliveSecs,
                                                                 int stunOptions
                                                                )
@@ -191,7 +192,7 @@ CpMediaInterface* VoiceEngineFactoryImpl::createMediaInterface( const char* publ
     VoiceEngineMediaInterface* pMediaInterface =
         new VoiceEngineMediaInterface(this, publicAddress, localAddress,
                 numCodecs, sdpCodecArray, locale, expeditedIpTos,
-                szStunServer, stunOptions, iStunKeepAliveSecs, mbDTMFOutOfBand) ;
+                szStunServer, stunPort, stunOptions, iStunKeepAliveSecs, mbDTMFOutOfBand) ;
 
     // store it in our internal list, as an int
     UtlInt* piMediaInterface = new UtlInt(pMediaInterface);

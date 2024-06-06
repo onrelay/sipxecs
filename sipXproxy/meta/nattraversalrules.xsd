@@ -42,6 +42,7 @@
         <element ref='dmp:behindnat' minOccurs='1' maxOccurs='1'/>
         <element ref='dmp:useSTUN' minOccurs='1' maxOccurs='1'/>
         <element ref='dmp:stun-server-address' minOccurs='0' maxOccurs='1'/>
+        <element ref='dmp:stun-server-port' minOccurs='0' maxOccurs='1'/>
         <element ref='dmp:rediscovery-time' minOccurs='0' maxOccurs='1'/>        
         <element ref='dmp:publicaddress' minOccurs='0' maxOccurs='1'/>
         <element ref='dmp:proxyunsecurehostport' minOccurs='1' maxOccurs='1'/>
@@ -106,6 +107,20 @@
       </restriction>
     </simpleType>
   </element>  
+
+  <element name='stun-server-port'>
+    <annotation>
+      <documentation>
+        Port of STUN server to use.  
+      </documentation>
+    </annotation>
+    <simpleType>
+      <restriction base='integer'>
+        <minInclusive value='1024'/>
+        <maxInclusive value='65535'/>
+      </restriction>
+    </simpleType>
+  </element> 
 
   <element name='publicaddress'>
     <annotation>

@@ -967,7 +967,8 @@ void Connection::setOfferingTimer(int milliSeconds)
 
     CpMultiStringMessage* offeringExpiredMessage =
         new CpMultiStringMessage(CpCallManager::CP_OFFERING_EXPIRED,
-                    callId.data(), remoteAddr.data());
+                    callId.data(), 
+                    remoteAddr.data());
     OsTimer* timer = new OsTimer((mpCallManager->getMessageQueue()),
             offeringExpiredMessage);
     // Convert from mSeconds to uSeconds
@@ -995,7 +996,8 @@ void Connection::setRingingTimer(int seconds)
     getRemoteAddress(&remoteAddr);
     CpMultiStringMessage* offeringExpiredMessage =
         new CpMultiStringMessage(CpCallManager::CP_RINGING_EXPIRED,
-                    callId.data(), remoteAddr.data());
+                    callId.data(), 
+                    remoteAddr.data());
     OsTimer* timer = new OsTimer((mpCallManager->getMessageQueue()),
             offeringExpiredMessage);
 

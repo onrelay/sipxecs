@@ -79,7 +79,8 @@ public:
      * @param localHostName Local host name for the socket (e.g. which interface
      *        to bind on.
      * @param bEnableStun Enable stun for this socket instance.
-     * @param szStunServer Default stun server
+     * @param szStunServer STUN server
+     * @param stunPort STUN port
      * @param iRefreshPeriodInSec How often to refresh the stun binding
      *        (keep alive).
      * @param iStunOptions Optional bitwise-or of STUN_CHANGE_* symbols.
@@ -94,6 +95,7 @@ public:
                          const char* localHostName = NULL,
                          bool bEnableStun = FALSE,
                          const char* szStunServer = NULL,
+                         int stunPort = 0,
                          int iRefreshPeriodInSec = 0,
                          int iStunOptions = STUN_OPTION_NORMAL,
                          OsNotification* pNotification = NULL) ;
@@ -140,13 +142,19 @@ public:
     virtual void setKeepAlivePeriod(int secs) ;
 
     /**
-     * Set the STUN server.  The new stun server will be used on the next
+     * Set the STUN server address.  The new stun server will be used on the next
      * timer refresh or manual call to refreshStunPacket.
      *
-     * @param szHostname Hostname or IP address for the stun server.  The
-     *        default STUN port (3478) will be used.
+     * @param szHostname Hostname or IP address for the stun server.  
      */
     virtual void setStunServer(const char* szHostname) ;
+
+    /**
+     * Set the STUN server port.  
+     *
+     * @param stunPort Port for the stun server. 
+     */
+    virtual void setStunPort(int stunPort) ;
 
     /**
      * Set the STUN client options.
@@ -277,9 +285,9 @@ private:
     int mKeepAlivePeriod ;      /**< Keep alive/refresh period */
     int mCurrentKeepAlivePeriod;/**< Current keep alive period -- may be
                                      accelerated under error conditions */
-    UtlString mStunServer ;     /**< stun server name */
+    UtlString mStunServer ;     /**< STUN server name */
+    int mStunPort ;             /**< STUN server port */
     int mStunOptions ;          /**< STUN client options */
-    int mStunPort ;             /**< port reported by stun process */
     UtlString mStunAddress ;    /**< ip address reported by stun process */
     OsTimer* mpTimer ;          /**< timer used for keep alives */
     OsQueuedEvent* mpRefreshEvent ; /**< Refresh event (performs keep alive) */

@@ -73,6 +73,7 @@ public:
                                    const char* pLocale = "",
                                    int expeditedIpTos = QOS_LAYER3_LOW_DELAY_IP_TOS,
                                    const char* szStunServer = NULL,
+                                   int stunPort = 0,
                                    int stunOptions = STUN_OPTION_NORMAL,
                                    int iStunKeepAlivePeriodSecs = 28,
                                    UtlBoolean bDTMFInband=TRUE);
@@ -332,6 +333,7 @@ private:
     int mExpeditedIpTos ;
 
     UtlString mStunServer ;
+    int mStunPort ;
     int mStunOptions ;
     int mStunRefreshPeriodSecs ;
 

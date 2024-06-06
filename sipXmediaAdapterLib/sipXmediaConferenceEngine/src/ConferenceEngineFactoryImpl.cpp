@@ -123,13 +123,14 @@ CpMediaInterface* ConferenceEngineFactoryImpl::createMediaInterface(const char* 
                                                                     const char* locale,
                                                                     int expeditedIpTos,
                                                                     const char* szStunServer,
+                                                                    int stunPort,
                                                                     int stunOptions,
                                                                     int iStunKeepAliveSecs)
 {
     ConferenceEngineMediaInterface* pMediaInterface =
         new ConferenceEngineMediaInterface(this, publicAddress, localAddress,
                 numCodecs, sdpCodecArray, locale, expeditedIpTos,
-                szStunServer, stunOptions, iStunKeepAliveSecs, mDTMFOutOfBand) ;
+                szStunServer, stunPort, stunOptions, iStunKeepAliveSecs, mDTMFOutOfBand) ;
 
     // store it in our internal list, as an int
     UtlVoidPtr* mediaInterface = new UtlVoidPtr(pMediaInterface);

@@ -40,8 +40,9 @@ ConferenceEngineDatagramSocket::ConferenceEngineDatagramSocket(ConferenceEngine*
                                                                const char* localHost,
                                                                bool bEnable,
                                                                const char* szStunServer,
+                                                               int stunPort,
                                                                int iRefreshPeriodInSec)
-        : OsStunDatagramSocket(remoteHostPortNum, remoteHost, localHostPortNum, localHost, bEnable, szStunServer, iRefreshPeriodInSec)
+        : OsStunDatagramSocket(remoteHostPortNum, remoteHost, localHostPortNum, localHost, bEnable, szStunServer, stunPort, iRefreshPeriodInSec)
 {
     mpConferenceEngine = pConferenceEngine ;
     miConferenceEngineChannel = channel ;

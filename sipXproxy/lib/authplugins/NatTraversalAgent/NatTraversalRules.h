@@ -45,6 +45,7 @@
 #define XML_TAG_MR_PORT_RANGE         "port-range"
 #define XML_TAG_USE_STUN              "useSTUN"
 #define XML_TAG_STUN_SERVER           "stun-server-address"
+#define XML_TAG_STUN_PORT             "stun-server-port"
 #define XML_TAG_STUN_REFRESH_INTERVAL "rediscovery-time"
 #define XML_TAG_AGGRESSIVENESS        "relayaggressiveness"
 #define XML_TAG_SECURE_XMLRPC         "secureXMLRPC"
@@ -151,7 +152,7 @@ private:
    class StunClient : public OsTask
    {
       public:
-         StunClient( const UtlString& stunServer );
+         StunClient( const UtlString& stunServer, int stunPort );
          virtual ~StunClient();
 
          bool getPublicIpAddress( UtlString& discoveredPublicIpAddress );
@@ -171,6 +172,7 @@ private:
          NatTraversalRules* mpNatTraversalRulesToKeepCurrent;
          UtlString mPublicIpAddressObtainedFromLastPoll;
          UtlString mStunServerName;
+         int mStunServerPort;
          bool mbStunServerIsValid;  // whether STUN server was resolved to an IP address
    };
 
@@ -192,6 +194,7 @@ private:
    int            mMaxMediaRelaySessions;
    bool           mbDiscoverPublicIpAddressViaStun;
    UtlString      mStunServer;
+   int            mStunPort;
    int            mStunRefreshIntervalInSecs;
    StunClient*    mpStunClient;
    bool           mbXmlRpcOverSecureTransport;
@@ -199,8 +202,10 @@ private:
 
    void initializeNatTraversalInfo( void );
 
-   // Private methods to be called by StunClient
    UtlString     getStunServer( void ) const;
+
+   // Private methods to be called by StunClient
+   int           getStunPort( void ) const;
 
    int           getStunRefreshIntervalInSecs( void ) const;
    

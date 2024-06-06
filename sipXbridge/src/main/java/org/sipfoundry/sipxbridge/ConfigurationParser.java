@@ -57,6 +57,11 @@ public class ConfigurationParser {
                 });
         digester.addCallMethod(String.format("%s/%s", BRIDGE_CONFIG, "stun-server-address"),
                 "setStunServerAddress", 0);
+        digester.addCallMethod(String.format("%s/%s", BRIDGE_CONFIG, "stun-server-port"),
+                "setStunServerPort", 0, new Class[] {
+                        Integer.class
+                });
+
         digester.addCallMethod(String.format("%s/%s", BRIDGE_CONFIG, "stun-interval"),
                 "setGlobalAddressRediscoveryPeriod", 0);
 

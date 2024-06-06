@@ -296,6 +296,7 @@ public:
     //:Set the maximum number of calls to admit to the system.
 
     virtual void enableStun(const char* szStunServer,
+                            int stunPort,
                             int iKeepAlivePeriodSecs,
                             int stunOptions,
                             OsNotification *pNotification = NULL) ;
@@ -465,6 +466,7 @@ private:
     volatile int mMaxCalls;
 
     UtlString mStunServer ;
+    int mStunPort ;
     int mStunOptions ;
     int mStunKeepAlivePeriodSecs ;
     CpMediaInterfaceFactory* mpMediaFactory;
@@ -508,6 +510,7 @@ private:
     //:message handler, passing along the content type and content.
 
     void doEnableStun(const char* szStunServer,
+                      int stunPort,
                       int iKeepAlivePeriodSecs,
                       int stunOptions,
                       OsNotification* pNotification) ;

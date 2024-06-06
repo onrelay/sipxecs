@@ -25,6 +25,7 @@ create table version_history(
  * For sipXconfig v4.1.8, the database version is 11.
  * For sipXconfig v4.4.0, the database version is 12.
  * For sipXconfig v4.6.0, the database version is 13.
+ * For sipXconfig v24.01, the database version is 14.
  */
 insert into version_history (version, applied) values 
   (1, now()),
@@ -39,7 +40,8 @@ insert into version_history (version, applied) values
   (10, now()),
   (11, now()),
   (12, now()),
-  (13, now());
+  (13, now()),
+  (14, now());
 
 create table patch(
   name varchar(32) not null primary key
@@ -785,6 +787,7 @@ create table location (
   registered boolean not null default false,
   use_stun boolean not null default true,
   stun_address varchar(255),
+  stun_port integer not null default 3478,
   stun_interval integer not null default 60,
   public_address varchar(255),
   public_port integer not null default 5060,

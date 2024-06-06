@@ -1289,7 +1289,8 @@ SIPXTAPI_API SIPX_RESULT sipxConfigSetSubscribeExpiration(const SIPX_INST hInst,
  *        seconds to be safe.
  */
 SIPXTAPI_API SIPX_RESULT sipxConfigEnableStun(const SIPX_INST hInst,
-                                              const char* szServer,
+                                              const char* szStunServer,
+                                              int stunPort,
                                               int iKeepAliveSecs) ;
 
 /**

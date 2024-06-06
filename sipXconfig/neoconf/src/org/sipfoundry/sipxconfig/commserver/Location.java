@@ -78,7 +78,8 @@ public class Location extends BeanWithId implements KeepsOriginalCopy<Location>,
     private Set<String> m_failedReplications;
     private Branch m_branch;
     private boolean m_useStun = false;
-    private String m_stunAddress = "stun.ezuce.com";
+    private String m_stunAddress = "freestun.net";
+    private int m_stunPort = 3478;
     private int m_stunInterval = 60; // seconds
     private String m_publicAddress;
     private int m_publicPort = 5060;
@@ -188,6 +189,14 @@ public class Location extends BeanWithId implements KeepsOriginalCopy<Location>,
 
     public void setStunAddress(String stunAddress) {
         m_stunAddress = stunAddress;
+    }
+
+    public int getStunPort() {
+        return m_stunPort;
+    }
+
+    public void setStunPort(int stunPort) {
+        m_stunPort = stunPort;
     }
 
     public int getStunInterval() {
@@ -437,7 +446,7 @@ public class Location extends BeanWithId implements KeepsOriginalCopy<Location>,
                 + m_callTraffic + ", m_state=" + m_state + ", m_lastAttempt=" + m_lastAttempt
                 + ", m_failedReplications=" + m_failedReplications + ", m_branch=" + m_branch
                 + ", m_useStun=" + m_useStun
-                + ", m_stunAddress=" + m_stunAddress + ", m_stunInterval=" + m_stunInterval + ", m_publicAddress="
+                + ", m_stunAddress=" + m_stunAddress + ", m_stunPort=" + m_stunPort + ", m_stunInterval=" + m_stunInterval + ", m_publicAddress="
                 + m_publicAddress + ", m_publicPort=" + m_publicPort + ", m_publicTlsPort=" + m_publicTlsPort
                 + ", m_startRtpPort=" + m_startRtpPort + ", m_stopRtpPort=" + m_stopRtpPort + ", m_hostName="
                 + m_hostName + "]";

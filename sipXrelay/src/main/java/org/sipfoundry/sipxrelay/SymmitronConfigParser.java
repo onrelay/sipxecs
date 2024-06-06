@@ -70,8 +70,13 @@ public class SymmitronConfigParser {
         
         digester.addCallMethod(String.format("%s/%s", BRIDGE_CONFIG, "port-range"),
                 "setPortRange", 0);
+
         digester.addCallMethod(String.format("%s/%s", BRIDGE_CONFIG, "stun-server-address"),
                 "setStunServerAddress", 0);
+        digester.addCallMethod(String.format("%s/%s", BRIDGE_CONFIG, "stun-server-port"),
+                "setStunServerPort", 0, new Class[] {
+                    Integer.class
+                });                
         digester.addCallMethod(String.format("%s/%s", BRIDGE_CONFIG, "publicaddress"),
                 "setPublicAddress", 0);
        

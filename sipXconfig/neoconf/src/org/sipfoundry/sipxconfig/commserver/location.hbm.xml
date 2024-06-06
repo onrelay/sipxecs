@@ -24,6 +24,7 @@
     </set>
     <property name="useStun" />
     <property name="stunAddress" />
+    <property name="stunPort" />
     <property name="stunInterval" />
     <property name="publicAddress" />
     <property name="publicPort" />

@@ -602,6 +602,7 @@ void SipUserAgent::shutdown(UtlBoolean blockingShutdown)
 }
 
 void SipUserAgent::enableStun(const char* szStunServer,
+                              int stunPort,
                               int refreshPeriodInSecs,
                               int stunOptions,
                               OsNotification* pNotification,
@@ -610,6 +611,7 @@ void SipUserAgent::enableStun(const char* szStunServer,
     if (mSipUdpServer)
     {
         mSipUdpServer->enableStun(szStunServer,
+                                  stunPort,
                                   szIp,
                                   refreshPeriodInSecs,
                                   stunOptions,

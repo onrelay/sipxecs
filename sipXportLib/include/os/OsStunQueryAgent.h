@@ -105,7 +105,7 @@ class OsDatagramSocket ;
 #define STUN_MAX_STRING 256
 #define STUN_MAX_UNKNOWN_ATTRIBUTES 8
 #define STUN_MAX_MESSAGE_SIZE 2048
-#define STUN_PORT 3478
+// #define STUN_PORT 3478 (now read from config)
 
 /* IP addres family */
 const UCHAR  IPv4Family = 0x01;
@@ -400,10 +400,11 @@ public:
     OsStunQueryAgent ();
 
     /* Set the STUN server address and port */
-    bool setServer (const char *host, USHORT port=STUN_PORT);
+    //bool setServer(const char *host, USHORT port=STUN_PORT);  // this can easily mask some errors for non default stun port
+    bool setServer(const char *stunServer, USHORT stunPort );
 
     /* Get the NAT type behind which the localhost runs */
-    NatType getNatType (OsDatagramSocket *oDS1, OsDatagramSocket *oDS2);
+    NatType getNatType(OsDatagramSocket *oDS1, OsDatagramSocket *oDS2);
 
     /* Get the mapped IP address and port for a given local host IP address
        and port */

@@ -213,12 +213,14 @@ UtlBoolean SipUdpServer::handleMessage(OsMsg& eventMessage)
 }
 
 void SipUdpServer::enableStun(const char* szStunServer,
+                              int stunPort,
                               const char* szLocalIp,
                               int refreshPeriodInSecs,
                               int stunOptions,
                               OsNotification* pNotification)
 {
     // Store settings
+    mStunPort = stunPort  ;
     mStunOptions = stunOptions ;
     mStunRefreshSecs = refreshPeriodInSecs ;
     if (szStunServer)
@@ -229,6 +231,7 @@ void SipUdpServer::enableStun(const char* szStunServer,
     {
         mStunServer.remove(0) ;
     }
+
 
     UtlHashMapIterator iterator(mServerSocketMap);
     UtlString* pKey = NULL;
@@ -266,6 +269,7 @@ void SipUdpServer::enableStun(const char* szStunServer,
             if (pSocket && mStunServer.length())
             {
                 pSocket->setStunServer(mStunServer) ;
+                pSocket->setStunPort(mStunPort) ;
                 pSocket->setKeepAlivePeriod(refreshPeriodInSecs) ;
                 pSocket->setNotifier(pNotification) ;
                 pSocket->setStunOptions(mStunOptions) ;
@@ -448,6 +452,7 @@ OsSocket* SipUdpServer::buildClientSocket(int hostPort,
                                          0, localIp,
                                          !mStunServer.isNull(),
                                          mStunServer.data(),
+                                         mStunPort,
                                          mStunRefreshSecs,
                                          mStunOptions);
 

@@ -47,9 +47,10 @@ VoiceEngineDatagramSocket::VoiceEngineDatagramSocket(GipsVoiceEngineLib* pVoiceE
                                                      const char* localHost,
                                                      bool bEnable,
                                                      const char* szStunServer,
+                                                     int stunPort,
                                                      int iRefreshPeriodInSec,
                                                      int stunOptions)
-        : OsStunDatagramSocket(remoteHostPortNum, remoteHost, localHostPortNum, localHost, bEnable, szStunServer, iRefreshPeriodInSec, stunOptions)
+        : OsStunDatagramSocket(remoteHostPortNum, remoteHost, localHostPortNum, localHost, bEnable, szStunServer, stunPort, iRefreshPeriodInSec, stunOptions)
 {
     mpVoiceEngine = pVoiceEngine ;
     mpVideoEngine = pVideoEngine ;

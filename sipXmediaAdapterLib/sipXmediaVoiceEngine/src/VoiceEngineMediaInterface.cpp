@@ -197,6 +197,7 @@ VoiceEngineMediaInterface::VoiceEngineMediaInterface(VoiceEngineFactoryImpl* pFa
                                                      const char* locale,
                                                      int expeditedIpTos,
                                                      const char* szStunServer,
+                                                     int stunPort,
                                                      int stunOptions,
                                                      int iStunKeepAlivePeriodSecs,
                                                      UtlBoolean bDTMFOutOfBand)
@@ -257,6 +258,7 @@ VoiceEngineMediaInterface::VoiceEngineMediaInterface(VoiceEngineFactoryImpl* pFa
 
     mStunOptions = stunOptions ;
     mStunServer = szStunServer ;
+    mStunPort = stunPort ;
     mStunRefreshPeriodSecs = iStunKeepAlivePeriodSecs ;
     mbDTMFOutOfBand = bDTMFOutOfBand;
     mbLocalMute = FALSE ;
@@ -357,11 +359,11 @@ OsStatus VoiceEngineMediaInterface::createConnection(int& connectionId,
     VoiceEngineDatagramSocket* rtpAudioSocket = new VoiceEngineDatagramSocket(
             mpVoiceEngine, NULL, connectionId, -1,
             TYPE_AUDIO_RTP, 0, NULL, localAudioPort, mLocalAddress.data(),
-            mStunServer.length() != 0, mStunServer, mStunOptions, mStunRefreshPeriodSecs);
+            mStunServer.length() != 0, mStunServer, mStunPort, mStunOptions, mStunRefreshPeriodSecs);
     VoiceEngineDatagramSocket* rtcpAudioSocket = new VoiceEngineDatagramSocket(
             mpVoiceEngine, NULL, connectionId, -1,
             TYPE_AUDIO_RTCP, 0, NULL, localAudioPort + 1, mLocalAddress.data(),
-            mStunServer.length() != 0, mStunServer, mStunOptions, mStunRefreshPeriodSecs);
+            mStunServer.length() != 0, mStunServer, mStunPort, mStunTransport, mStunOptions, mStunRefreshPeriodSecs);
 
     pMediaConnection->mpRtpAudioSocket = rtpAudioSocket;
     pMediaConnection->mpRtcpAudioSocket = rtcpAudioSocket;
@@ -1898,12 +1900,12 @@ void VoiceEngineMediaInterface::startVideoSupport(int connectionId)
         VoiceEngineDatagramSocket* rtpVideoSocket = new VoiceEngineDatagramSocket(
                 mpVoiceEngine, mpVideoEngine, connectionId, pMediaConnection->mVideoConnectionId,
                 TYPE_VIDEO_RTP, 0, NULL, localVideoPort, mLocalAddress.data(),
-                mStunServer.length() != 0, mStunServer, mStunOptions, mStunRefreshPeriodSecs);
+                mStunServer.length() != 0, mStunServer, mStunPort, mStunOptions, mStunRefreshPeriodSecs);
 
         VoiceEngineDatagramSocket* rtcpVideoSocket = new VoiceEngineDatagramSocket(
                 mpVoiceEngine, mpVideoEngine, connectionId, pMediaConnection->mVideoConnectionId,
                 TYPE_VIDEO_RTCP, 0, NULL, localVideoPort+1, mLocalAddress.data(),
-                mStunServer.length() != 0, mStunServer, mStunOptions, mStunRefreshPeriodSecs);
+                mStunServer.length() != 0, mStunServer, mStunPort, mStunOptions, mStunRefreshPeriodSecs);
 
         pMediaConnection->mpRtpVideoSocket = rtpVideoSocket;
         pMediaConnection->mpRtcpVideoSocket = rtcpVideoSocket;

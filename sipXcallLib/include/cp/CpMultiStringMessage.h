@@ -39,12 +39,17 @@ public:
 
     CpMultiStringMessage(
        unsigned char messageSubtype = CallManager::CP_UNSPECIFIED,
-       const char* str1 = NULL, const char* str2 = NULL,
-       const char* str3 = NULL, const char* str4 = NULL,
+       const char* str1 = NULL, 
+       const char* str2 = NULL,
+       const char* str3 = NULL, 
+       const char* str4 = NULL,
        const char* str5 = NULL,
-       intptr_t int1 = 0, intptr_t int2 = 0,
-       intptr_t int3 = 0, intptr_t int4 = 0,
-       intptr_t int5 = 0, intptr_t int6 = 0,
+       intptr_t int1 = 0, 
+       intptr_t int2 = 0,
+       intptr_t int3 = 0, 
+       intptr_t int4 = 0,
+       intptr_t int5 = 0, 
+       intptr_t int6 = 0,
        intptr_t int7 = 0);
     //:Default constructor
 

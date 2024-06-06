@@ -412,6 +412,7 @@
     registered CDATA #REQUIRED
     use_stun CDATA #REQUIRED
     stun_address CDATA #IMPLIED
+    stun_port CDATA #REQUIRED
     stun_interval CDATA #REQUIRED
     public_address CDATA #IMPLIED
     public_port CDATA #REQUIRED

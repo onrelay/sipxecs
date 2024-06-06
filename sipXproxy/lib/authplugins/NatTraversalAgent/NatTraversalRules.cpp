@@ -39,7 +39,7 @@ NatTraversalRules::NatTraversalRules()
      mMaxMediaRelaySessions( DEFAULT_MAX_MEDIA_RELAY_SESSIONS ),
      mbDiscoverPublicIpAddressViaStun( false ),
      mStunRefreshIntervalInSecs( 300 ),
-     mpStunClient( 0 ),
+     mpStunClient( NULL ),
      mbXmlRpcOverSecureTransport( true )
 {
    UtlString hostIpAddress;
@@ -324,7 +324,7 @@ void NatTraversalRules::initializeNatTraversalInfo( void )
             Os::Logger::instance().log(FAC_NAT, PRI_ERR, "NatTraversalRules::initializeNatTraversalInfo - No child Node named '%s'", XML_TAG_MR_PORT_RANGE );
          }
 
-         // get the 'useSTUN' node
+         // get the 'use STUN' node
          if( ( pChildNode = pNode->FirstChild( XML_TAG_USE_STUN ) ) && pChildNode->FirstChild() )
          {
             UtlString status = pChildNode->FirstChild()->Value();
@@ -338,7 +338,7 @@ void NatTraversalRules::initializeNatTraversalInfo( void )
             Os::Logger::instance().log(FAC_NAT, PRI_ERR, "NatTraversalRules::initializeNatTraversalInfo - No child Node named '%s'", XML_TAG_USE_STUN );
          }
 
-         // get the 'STUNRefreshInterval' node
+         // get the 'STUN RefreshInterval' node
          if( ( pChildNode = pNode->FirstChild( XML_TAG_STUN_REFRESH_INTERVAL ) ) && pChildNode->FirstChild() )
          {
             UtlString tempIntervalString;
@@ -350,7 +350,7 @@ void NatTraversalRules::initializeNatTraversalInfo( void )
             Os::Logger::instance().log(FAC_NAT, PRI_DEBUG, "NatTraversalRules::initializeNatTraversalInfo - No child Node named '%s'", XML_TAG_STUN_REFRESH_INTERVAL );
          }
 
-         // get the 'STUNServer' node
+         // get the 'STUN Server' node
          if( ( pChildNode = pNode->FirstChild( XML_TAG_STUN_SERVER ) ) && pChildNode->FirstChild() )
          {
             mStunServer = pChildNode->FirstChild()->Value();
@@ -358,6 +358,18 @@ void NatTraversalRules::initializeNatTraversalInfo( void )
          else
          {
             Os::Logger::instance().log(FAC_NAT, PRI_DEBUG, "NatTraversalRules::initializeNatTraversalInfo - No child Node named '%s'", XML_TAG_STUN_SERVER );
+         }
+
+         // get the 'STUN Port' node
+         if( ( pChildNode = pNode->FirstChild( XML_TAG_STUN_PORT ) ) && pChildNode->FirstChild() )
+         {
+            UtlString tempStunPortString;
+            tempStunPortString = pChildNode->FirstChild()->Value();
+            mStunPort = atoi( tempStunPortString.data() );
+         }
+         else
+         {
+            Os::Logger::instance().log(FAC_NAT, PRI_DEBUG, "NatTraversalRules::initializeNatTraversalInfo - No child Node named '%s'", XML_TAG_STUN_PORT );
          }
 
          // get the 'secureXMLRPC' node
@@ -435,7 +447,7 @@ void NatTraversalRules::initializeNatTraversalInfo( void )
          // Instantiate a new StunClient and ask for the public IP address.
          // If the request is successful, initialize the public transport with
          // the response and start the polling mechanism to maintain it current.
-         mpStunClient = new StunClient( mStunServer );
+         mpStunClient = new StunClient( mStunServer, mStunPort );
 
          UtlString publicIpAddress;
          if( mpStunClient->getPublicIpAddress( publicIpAddress ) )
@@ -447,7 +459,8 @@ void NatTraversalRules::initializeNatTraversalInfo( void )
             UtlString hostIpAddress;
             OsSocket::getHostIp( &hostIpAddress );
             mPublicTransport.setAddress( hostIpAddress );
-            Os::Logger::instance().log(FAC_NAT, PRI_ERR, "NatTraversalRules::initializeNatTraversalInfo - failed to contact STUN server %s - using host IP %s as public", mStunServer.data(), mPublicTransport.getAddress().data() );
+            Os::Logger::instance().log(FAC_NAT, PRI_ERR, "NatTraversalRules::initializeNatTraversalInfo - failed to contact STUN server %s:%d - using host IP %s as public", 
+               mStunServer.data(), mStunPort, mPublicTransport.getAddress().data() );
 
             if( !mbMediaRelayPublicAddressProvidedInConfig )
             {
@@ -586,19 +599,26 @@ UtlString NatTraversalRules::getStunServer( void ) const
    return mStunServer;
 }
 
+int NatTraversalRules::getStunPort( void ) const
+{
+   return mStunPort;
+}
+
 int NatTraversalRules::getStunRefreshIntervalInSecs( void ) const
 {
    return mStunRefreshIntervalInSecs;
 }
 
-NatTraversalRules::StunClient::StunClient( const UtlString& stunServer ) :
+
+NatTraversalRules::StunClient::StunClient( const UtlString& stunServer, int stunPort ) :
    mTimerMutex( OsMutex::Q_FIFO ),
-   mSocket( STUN_PORT, stunServer ),
+   mSocket( stunPort, stunServer ),
    mpNatTraversalRulesToKeepCurrent( 0 ),
    mStunServerName( stunServer ),
+   mStunServerPort( stunPort ),
    mbStunServerIsValid( false )
 {
-   mbStunServerIsValid = stunQueryAgent.setServer( stunServer );
+   mbStunServerIsValid = stunQueryAgent.setServer( stunServer, stunPort );
    mTimerMutex.acquire();
 }
 
@@ -614,7 +634,7 @@ bool NatTraversalRules::StunClient::getPublicIpAddress( UtlString& discoveredPub
    // network conditions have cleared.
    if( !mbStunServerIsValid )
    {
-      mbStunServerIsValid = stunQueryAgent.setServer( mStunServerName );
+      mbStunServerIsValid = stunQueryAgent.setServer( mStunServerName, mStunServerPort );
    }
 
    if( mbStunServerIsValid )
@@ -627,12 +647,14 @@ bool NatTraversalRules::StunClient::getPublicIpAddress( UtlString& discoveredPub
       if( rc )
       {
          discoveredPublicIpAddress = mappedAddress;
-         Os::Logger::instance().log(FAC_NAT,PRI_INFO,"StunClient::getPublicIpAddress obtained public IP address %s from server %s", mappedAddress.data(), mStunServerName.data() );
+         Os::Logger::instance().log(FAC_NAT,PRI_INFO,"StunClient::getPublicIpAddress obtained public IP address %s from server %s:%d", 
+            mappedAddress.data(), mStunServerName.data(), mStunServerPort);
       }
       else
       {
          discoveredPublicIpAddress.remove( 0 );
-         Os::Logger::instance().log(FAC_NAT,PRI_ERR,"StunClient::getPublicIpAddress failed to obtain mapping from server %s", mStunServerName.data() );
+         Os::Logger::instance().log(FAC_NAT,PRI_ERR,"StunClient::getPublicIpAddress failed to obtain mapping from server %s:%d", 
+            mStunServerName.data(), mStunServerPort );
       }
    }
    return rc;

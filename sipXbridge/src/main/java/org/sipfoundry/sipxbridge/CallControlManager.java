@@ -547,7 +547,8 @@ class CallControlManager implements SymmitronResetHandler {
                         Response.SERVICE_UNAVAILABLE);
                 response
                         .setReasonPhrase("SIPXBRIDGE Unable to resolve public address using stun to "
-                                + Gateway.getBridgeConfiguration().getStunServerAddress());
+                                + Gateway.getBridgeConfiguration().getStunServerAddress() + ":"  + 
+                                    Gateway.getBridgeConfiguration().getStunServerPort());
                 serverTransaction.sendResponse(response);
                 return;
 

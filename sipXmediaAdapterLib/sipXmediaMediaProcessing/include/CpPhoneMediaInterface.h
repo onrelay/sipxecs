@@ -59,6 +59,7 @@ public:
                          const char* pLocale = "",
                          int expeditedIpTos = QOS_LAYER3_LOW_DELAY_IP_TOS,
                          const char* szStunServer = NULL,
+                         int stunPort = 0,
                          int iStunKeepAlivePeriodSecs = 28);
      //:Default constructor
 
@@ -227,6 +228,8 @@ private:
    UtlDList mMediaConnections;
    int mExpeditedIpTos;
    UtlString mStunServer ;
+   int mStunPort ;
+   UtlString mStunTransport ;
    int mStunRefreshPeriodSecs ;
 
    // Disabled copy constructor

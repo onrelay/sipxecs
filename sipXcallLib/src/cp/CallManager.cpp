@@ -145,6 +145,7 @@ CallManager::CallManager(UtlBoolean isRequredUserIdMatch,
     // Instruct the factory to use the specified port range
     mpMediaFactory->getFactoryImplementation()->setRtpPortRange(rtpPortStart, rtpPortEnd) ;
     mStunServer = NULL;
+    mStunPort = 0;
 
     mLineAvailableBehavior = availableBehavior;
     mOfferedTimeOut = offeringDelay;
@@ -596,7 +597,7 @@ UtlBoolean CallManager::handleMessage(OsMsg& eventMessage)
                                 pMediaInterface = mpMediaFactory->createMediaInterface(
                                     NULL,
                                     localAddress, numCodecs, codecArray,
-                                    mLocale.data(), mExpeditedIpTos, mStunServer,
+                                    mLocale.data(), mExpeditedIpTos, mStunServer, mStunPort, 
                                     mStunOptions, mStunKeepAlivePeriodSecs);
 
 
@@ -936,6 +937,7 @@ UtlBoolean CallManager::handleMessage(OsMsg& eventMessage)
         case CP_ENABLE_STUN:
             {
                 UtlString stunServer ;
+                int stunPort ;
                 int iRefreshPeriod ;
                 int iStunOptions ;
                 OsNotification* pNotification ;
@@ -943,11 +945,12 @@ UtlBoolean CallManager::handleMessage(OsMsg& eventMessage)
 
                 CpMultiStringMessage& enableStunMessage = (CpMultiStringMessage&)eventMessage;
                 enableStunMessage.getString1Data(stunServer) ;
-                iRefreshPeriod = enableStunMessage.getInt1Data() ;
-                iStunOptions = enableStunMessage.getInt2Data() ;
-                pNotification = (OsNotification*) enableStunMessage.getInt3Data() ;
+                stunPort = enableStunMessage.getInt1Data() ;
+                iRefreshPeriod = enableStunMessage.getInt2Data() ;
+                iStunOptions = enableStunMessage.getInt3Data() ;
+                pNotification = (OsNotification*) enableStunMessage.getInt4Data() ;
 
-                doEnableStun(stunServer, iRefreshPeriod, iStunOptions, pNotification) ;
+                doEnableStun(stunServer, stunPort, iRefreshPeriod, iStunOptions, pNotification) ;
             }
         case CP_ANSWER_CONNECTION:
         case CP_DROP:
@@ -3054,12 +3057,13 @@ void CallManager::setMaxCalls(int maxCalls)
 
 // Enable STUN for NAT/Firewall traversal
 void CallManager::enableStun(const char* szStunServer,
+                             int stunPort,
                              int iKeepAlivePeriodSecs,
                              int stunOptions,
                              OsNotification* pNotification)
 {
-    CpMultiStringMessage enableStunMessage(CP_ENABLE_STUN, szStunServer, NULL,
-            NULL, NULL, NULL, iKeepAlivePeriodSecs, stunOptions, (intptr_t) pNotification) ;
+    CpMultiStringMessage enableStunMessage(CP_ENABLE_STUN, szStunServer, 
+            NULL, NULL, NULL, NULL, stunPort, iKeepAlivePeriodSecs, stunOptions, (intptr_t) pNotification) ;
     postMessage(enableStunMessage);
 }
 
@@ -3964,7 +3968,7 @@ void CallManager::doCreateCall(const char* callId,
             CpMediaInterface* mediaInterface = mpMediaFactory->createMediaInterface(
                 publicAddress.data(), localAddress.data(),
                 numCodecs, codecArray, mLocale.data(), mExpeditedIpTos,
-                mStunServer, mStunOptions, mStunKeepAlivePeriodSecs);
+                mStunServer, mStunPort, mStunOptions, mStunKeepAlivePeriodSecs);
 
             Os::Logger::instance().log(FAC_CP, PRI_DEBUG,
                           "CallManager::doCreateCall "
@@ -4125,17 +4129,19 @@ void CallManager::doSendInfo(const char* callId,
 
 
 void CallManager::doEnableStun(const char* szStunServer,
+                               int stunPort,
                                int iKeepAlivePeriodSecs,
                                int stunOptions,
                                OsNotification* pNotification)
 {
     mStunServer = szStunServer ;
+    mStunPort = stunPort ;
     mStunOptions = stunOptions ;
     mStunKeepAlivePeriodSecs = iKeepAlivePeriodSecs ;
 
     if (sipUserAgent)
     {
-        sipUserAgent->enableStun(szStunServer, iKeepAlivePeriodSecs, stunOptions, pNotification) ;
+        sipUserAgent->enableStun(szStunServer, stunPort, iKeepAlivePeriodSecs, stunOptions, pNotification) ;
     }
 }
 

@@ -231,6 +231,11 @@ public class BridgeSbc extends SbcDevice implements DeployConfigOnEdit {
             return m_location.getStunAddress();
         }
 
+        @SettingEntry(path = "bridge-configuration/stun-server-port")
+        public int getStunServerPort() {
+            return m_location.getStunPort();
+        }
+
         @SettingEntry(path = "bridge-configuration/sipx-supervisor-host")
         public String getSipxSupervisorHost() {
             return m_location.getFqdn();

@@ -49,7 +49,8 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
     private static final String LOCATION_PROP_ID = "locationId";
     private static final String DUPLICATE_FQDN_OR_IP = "&error.duplicateFqdnOrIp";
     private AuditLogContext m_auditLogContext;
-    private String m_defaultStunServer = "stun.ezuce.com";
+    private String m_defaultStunServer = "freestun.net";
+    private int m_defaultStunPort = 3478;
     private String m_primaryFqdn;
     private String m_primaryIp;
     private JdbcTemplate m_jdbc;
@@ -214,6 +215,7 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
             primary.setPrimary(true);
             primary.setName("Primary");
             primary.setStunAddress(m_defaultStunServer);
+            primary.setStunPort(m_defaultStunPort);
             primary.setState(State.CONFIGURED);
             saveLocation(primary);
         }
@@ -241,6 +243,10 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
 
     public void setDefaultStunServer(String defaultStunServer) {
         m_defaultStunServer = defaultStunServer;
+    }
+
+    public void setDefaultStunPort(int defaultStunPort) {
+        m_defaultStunPort = defaultStunPort;
     }
 
     public void setPrimaryFqdn(String primaryFqdn) {

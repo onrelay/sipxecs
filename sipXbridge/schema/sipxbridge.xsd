@@ -232,7 +232,18 @@
 					<xs:documentation xml:lang="en">
 						The stun server address used to determine the
 						global address of the bridge. If this is not present
-						then stun.ezuce.com is used for global address discovery.
+						then freestun.net is used for global address discovery.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="stun-server-port" type="xs:integer"
+				maxOccurs="1" minOccurs="0" >
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						The stun server port used to determine the
+						global address of the bridge. If this is not present
+						then default 3478 is used.
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>

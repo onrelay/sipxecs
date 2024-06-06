@@ -66,6 +66,7 @@ CpMediaInterface* CpMediaInterfaceFactory::createMediaInterface(const char* publ
                                                                 const char* locale,
                                                                 int expeditedIpTos,
                                                                 const char* szStunServer,
+                                                                int stunPort,
                                                                 int stunOptions,
                                                                 int iStunKeepAlivePeriodSecs)
 {
@@ -75,7 +76,7 @@ CpMediaInterface* CpMediaInterfaceFactory::createMediaInterface(const char* publ
     {
         pInterface = mpFactoryImpl->createMediaInterface(publicAddress,
                 localAddress, numCodecs, sdpCodecArray, locale,
-                expeditedIpTos, szStunServer, stunOptions, iStunKeepAlivePeriodSecs) ;
+                expeditedIpTos, szStunServer, stunPort, stunOptions, iStunKeepAlivePeriodSecs) ;
     }
 
     return pInterface ;

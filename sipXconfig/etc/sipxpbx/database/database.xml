@@ -136,7 +136,7 @@
   -->
   <target name="create" depends="createdb,schema" description="create database with schema" />
 
-  <target name="upgrade-no-init" depends="patches,version1,version2,version3,version4,version5,version6,version7,version8,version9,version10,version11,version12,version13" />
+  <target name="upgrade-no-init" depends="patches,version1,version2,version3,version4,version5,version6,version7,version8,version9,version10,version11,version12,version13,version14" />
 
   <target name="upgrade" description="applied all patches that need to be applied, and run initialization tasks" depends="upgrade-no-init,plugin-patches" />
 
@@ -381,8 +381,8 @@
     <antcall target="add_acccode_service" />
     <antcall target="auth_code" />
     <antcall target="ldap_connection_add_tls" />
-	<antcall target="drop_sbc_device_branch_column" />
-	<antcall target="remove_discovered_devices" />
+	  <antcall target="drop_sbc_device_branch_column" />
+	  <antcall target="remove_discovered_devices" />
   	<antcall target="add_addressbookentry_did_number" />
     <antcall target="sbc-addressPort" />
     <antcall target="createlang-plpgsql"/>
@@ -390,27 +390,27 @@
     <antcall target="location-add-tls-port" />
     <antcall target="add_did_numbers" />
     <antcall target="freeswitch-dial-plans" />
-	<antcall target="openacd" />
-	<antcall target="openacd-skills" />
+	  <antcall target="openacd" />
+	  <antcall target="openacd-skills" />
     <sipx-version version="12"/>
   </target>
 
   <target name="version12" description="upgrade from version 11" unless="version13">
-	<antcall target="openacd-add-skills-agent" />
-	<antcall target="openacd-add-clients" />
-	<antcall target="openacd-queues" />
-	<antcall target="openacd-add-additional-skills" />
-	<antcall target="openacd-set-default-skills" />
-	<antcall target="call-rate-limit" />
-	<antcall target="openacd-add-default-client" />
-	<antcall target="migrate-regionid-to-beanid" />
+    <antcall target="openacd-add-skills-agent" />
+    <antcall target="openacd-add-clients" />
+    <antcall target="openacd-queues" />
+    <antcall target="openacd-add-additional-skills" />
+    <antcall target="openacd-set-default-skills" />
+    <antcall target="call-rate-limit" />
+    <antcall target="openacd-add-default-client" />
+    <antcall target="migrate-regionid-to-beanid" />
     <antcall target="createlang-plpgsql2" />
     <antcall target="migrate-gw-calleralias-info" />
-	<antcall target="openacd-queue-remove-sort" />
-	<antcall target="openacd-add-skill-groups" />
-	<antcall target="location-configured" />
+	  <antcall target="openacd-queue-remove-sort" />
+	  <antcall target="openacd-add-skill-groups" />
+	  <antcall target="location-configured" />
   	<antcall target="openacd-insert-alias-did" />
-	<antcall target="openacd-add-queue-recipe" />
+	  <antcall target="openacd-add-queue-recipe" />
     <antcall target="location-active" />
     <antcall target="openacd-insert-commands" />
     <antcall target="openacd-add-line-regex" />
@@ -421,15 +421,15 @@
     <antcall target="settings_with_location" />
   	<antcall target="remove-personal-att-oper" />
   	<antcall target="setup-ids" />
-	<antcall target="openacd-remove-default-client" />
-	<antcall target="openacd-add-release-codes" />
-	<antcall target="alarm-drop-pkey" />
-	<antcall target="openacd-add-queuegroup-recipe" />
+	  <antcall target="openacd-remove-default-client" />
+	  <antcall target="openacd-add-release-codes" />
+	  <antcall target="alarm-drop-pkey" />
+	  <antcall target="openacd-add-queuegroup-recipe" />
     <antcall target="openacd-agent-remove-pin" />
     <antcall target="cert" />
     <antcall target="firewall" />
-	<antcall target="migrate-openacd-skill-groups" />
-	<antcall target="alarm_receiver" />
+	  <antcall target="migrate-openacd-skill-groups" />
+	  <antcall target="alarm_receiver" />
   	<antcall target="voicemail-pin" />
   	<antcall target="change-on-restore" />
   	<antcall target="crack-pin" />
@@ -442,8 +442,6 @@
   </target>
 
   <target name="version13" description="upgrade from version 12" unless="version14">
-    <!-- When freezing schema uncomment this line -->
-    <!-- sipx-version version="14" -->
     <antcall target="change-on-restore-update1" />
     <antcall target="iptables-call-rate-limit" />
     <antcall target="cisco-to-linksys"/>
@@ -505,6 +503,13 @@
   	<antcall target="agent-group-outbound-update"/>
   	<antcall target="ldap-connection-settings"/>
   	<antcall target="mongo_cannot_see_majority"/>
+    <sipx-version version="14"/>
+  </target>
+
+  <target name="version14" description="upgrade from version 13" unless="version15">
+  	<antcall target="location-add-stun-port"/>
+    <!-- When freezing schema uncomment this line -->
+    <!-- sipx-version version="15" -->
   </target>
 
   <target name="plugin-patches">
@@ -992,6 +997,10 @@
 
   <target name="park-server-migration-task" unless="park-server-migration-task">
     <db-patch patch="park-server-migration-task"/>
+  </target>
+
+  <target name="location-add-stun-port" unless="location-add-stun-port">
+    <db-patch patch="location-add-stun-port"/>
   </target>
 
 	<!--

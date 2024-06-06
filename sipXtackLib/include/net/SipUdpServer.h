@@ -65,6 +65,7 @@ public:
                      const char* szLocalSipIp = NULL);
 
     void enableStun(const char* szStunServer,
+                    int stunPort,
                     const char* szLocalIp,
                     int refreshPeriodInSecs,
                     int stunOptions,
@@ -94,6 +95,7 @@ protected:
     void printStatus();
 
     UtlString mStunServer;
+    int mStunPort;
     int mStunRefreshSecs;
     int mStunOptions;
 

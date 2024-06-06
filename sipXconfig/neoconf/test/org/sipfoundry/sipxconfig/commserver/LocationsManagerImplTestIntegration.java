@@ -180,7 +180,8 @@ public class LocationsManagerImplTestIntegration extends ImdbTestCase {
         Location nat = m_locationsManager.getPrimaryLocation();
         assertNotNull(nat);
 
-        nat.setStunAddress("stun.com");
+        nat.setStunAddress("freestun.com");
+        nat.setStunPort(3478);
         nat.setStunInterval(30);
         nat.setPublicPort(5160);
         nat.setPublicTlsPort(5161);
@@ -191,7 +192,8 @@ public class LocationsManagerImplTestIntegration extends ImdbTestCase {
 
         Location natDB = m_locationsManager.getLocation(nat.getId());
         assertNotNull(natDB);
-        assertEquals("stun.com", natDB.getStunAddress());
+        assertEquals("freestun.net", natDB.getStunAddress());
+        assertEquals(3478, natDB.getStunPort());
         assertEquals(30, natDB.getStunInterval());
         assertEquals(5160, natDB.getPublicPort());
         assertEquals(5161, natDB.getPublicTlsPort());
@@ -203,7 +205,8 @@ public class LocationsManagerImplTestIntegration extends ImdbTestCase {
         loadDataSet("nattraversal/nat_location.db.xml");
 
         Location natLocation = m_locationsManager.getLocation(111);
-        assertEquals("stun.ezuce.com", natLocation.getStunAddress());
+        assertEquals("freestun.net", natLocation.getStunAddress());
+        assertEquals(3478, natLocation.getStunPort());
         assertEquals(60, natLocation.getStunInterval());
         assertEquals(5060, natLocation.getPublicPort());
         assertEquals(5061, natLocation.getPublicTlsPort());

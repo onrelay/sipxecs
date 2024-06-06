@@ -85,6 +85,7 @@ bool parseArgs(int argc,
                char** pszRealm,
                char** pszFromIdentity,
                char** pszStunServer,
+               int*   pStunPort,
                char** pszProxy,
                int*   pRepeatCount,
                char** pszInputDevice,
@@ -110,6 +111,7 @@ bool parseArgs(int argc,
     *pszRealm = NULL ;
     *pszFromIdentity = NULL ;
     *pszStunServer = NULL ;
+    *pStunPort = 3478 ;
     *pszProxy = NULL;
     *pszInputDevice = NULL;
     *pszOutputDevice = NULL;
@@ -595,6 +597,7 @@ int main(int argc, char* argv[])
     char* szRealm;
     char* szFromIdentity;
     char* szStunServer;
+    int stunPort;
     char* szProxy;
     char* szOutDevice;
     char* szInDevice;
@@ -605,7 +608,7 @@ int main(int argc, char* argv[])
     // Parse Arguments
     if (parseArgs(argc, argv, &iDuration, &iSipPort, &iRtpPort, &szPlayTones,
                   &szFile, &szSipUrl, &bUseRport, &szUsername, &szPassword,
-                  &szRealm, &szFromIdentity, &szStunServer, &szProxy,
+                  &szRealm, &szFromIdentity, &szStunServer, &stunPort, &szProxy,
                   &iRepeatCount, &szInDevice, &szOutDevice, &szCodec, &bCList,
                   &g_timestamp)
             && (iDuration > 0) && (portIsValid(iSipPort)) && (portIsValid(iRtpPort)))
@@ -673,7 +676,7 @@ int main(int argc, char* argv[])
 
         if (szStunServer)
         {
-            sipxConfigEnableStun(g_hInst, szStunServer, 28) ;
+            sipxConfigEnableStun(g_hInst, szStunServer, stunPort, 28) ;
         }
         if (szOutDevice)
         {

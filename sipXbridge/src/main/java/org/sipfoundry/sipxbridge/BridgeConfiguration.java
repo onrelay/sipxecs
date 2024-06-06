@@ -31,6 +31,7 @@ public class BridgeConfiguration {
     private int sipxProxyPort = -1;
     private String sipxProxyDomain;
     private String stunServerAddress = null;
+    private int stunServerPort = -1;
     private String musicOnHoldName = "~~mh~";
     private boolean musicOnHoldEnabled = false;
     private int xmlRpcPort = 0;
@@ -179,6 +180,21 @@ public class BridgeConfiguration {
      */
     public String getStunServerAddress() {
         return stunServerAddress;
+    }
+
+    /**
+     * @param stunServerPort the stunServerPort to set
+     */
+    public void setStunServerPort(int stunServerPort) {
+
+        this.stunServerPort = stunServerPort;
+    }
+
+    /**
+     * @return the stunServerPort
+     */
+    public int getStunServerPort() {
+        return stunServerPort;
     }
 
     /**

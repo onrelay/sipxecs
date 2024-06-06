@@ -4248,13 +4248,14 @@ SIPXTAPI_API SIPX_RESULT sipxConfigSetDnsSrvFailoverTimeout(const SIPX_INST hIns
 
 
 SIPXTAPI_API SIPX_RESULT sipxConfigEnableStun(const SIPX_INST hInst,
-                                              const char* szServer,
+                                              const char* szStunServer,
+                                              int stunPort,
                                               int iKeepAliveInSec,
                                               int stunOptions)
 {
     Os::Logger::instance().log(FAC_SIPXTAPI, PRI_INFO,
-        "sipxConfigEnableStun hInst=%p server=%s keepalive=%d",
-        hInst, szServer, iKeepAliveInSec);
+        "sipxConfigEnableStun hInst=%p server=%s port=%d keepalive=%d",
+        hInst, szStunServer, stunPort, iKeepAliveInSec);
 
     SIPX_RESULT rc = SIPX_RESULT_INVALID_ARGS;
 
@@ -4280,7 +4281,11 @@ SIPXTAPI_API SIPX_RESULT sipxConfigEnableStun(const SIPX_INST hInst,
             pNotification = NULL ;
         }
 
-        pInst->pCallManager->enableStun(szServer, iKeepAliveInSec, stunOptions, pNotification) ;
+        pInst->pCallManager->enableStun(szStunServer, 
+            stunPort, 
+            iKeepAliveInSec, 
+            stunOptions, 
+            pNotification) ;
         rc = SIPX_RESULT_SUCCESS ;
     }
 
@@ -4301,7 +4306,7 @@ SIPXTAPI_API SIPX_RESULT sipxConfigDisableStun(const SIPX_INST hInst)
     assert(pInst);
     if (pInst)
     {
-        pInst->pCallManager->enableStun(NULL, 0, SIPX_STUN_NORMAL) ;
+        pInst->pCallManager->enableStun(NULL, 0, 0, SIPX_STUN_NORMAL) ;
         rc = SIPX_RESULT_SUCCESS ;
     }
 

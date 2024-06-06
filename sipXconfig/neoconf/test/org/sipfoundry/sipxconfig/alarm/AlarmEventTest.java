@@ -25,9 +25,9 @@ import org.sipfoundry.sipxconfig.admin.AdminContext;
 
 public class AlarmEventTest extends TestCase {
     private static final String LOG_ENTRY = "\"2009-06-22T13:39:56.406437Z\":4:ALARM:CRIT:sipx.example.org:sipXbridge::"
-            + "LOGIN_FAILED:\"The STUN Server 'stun.ezuce.com' is dysfunctional.\"";
+            + "LOGIN_FAILED:\"The STUN Server 'freestun.net' is dysfunctional.\"";
     private static final String LOG_ENTRY_WITH_COLONS = "\"2009-06-22T13:39:56.406437Z\":4:ALARM:CRIT:sipx.example.org:sipXbridge::"
-            + "LOGIN_FAILED:\"The STUN ::Server 'stun.ezuce.com' is dysfunctional: one, two, three.\"";
+            + "LOGIN_FAILED:\"The STUN ::Server 'freestun.net' is dysfunctional: one, two, three.\"";
     
     private AlarmServerManager m_mgr;
     

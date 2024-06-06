@@ -274,7 +274,8 @@ Eutelia.it
     <local-address>sipxpbx.example.com</local-address>
     <local-port>5090</local-port>
     <sipx-proxy-domain>example.com</sipx-proxy-domain>
-    <stun-server-address>stun.ezuce.com</stun-server-address>
+    <stun-server-address>freestun.net</stun-server-address>
+    <stun-server-port>3478</stun-server-port>
     <sip-keepalive-seconds>20</sip-keepalive-seconds>
     <media-keepalive-seconds>1</media-keepalive-seconds>
     <xml-rpc-port>0.0</xml-rpc-port>
@@ -315,7 +316,8 @@ sipcall.ch
     <local-address>sipxpbx.example.com</local-address>
     <local-port>5090</local-port>
     <sipx-proxy-domain>example.com</sipx-proxy-domain>
-    <stun-server-address>stun.ezuce.com</stun-server-address>
+    <stun-server-address>freestun.net</stun-server-address>
+    <stun-server-port>3478</stun-server-port>
     <sip-keepalive-seconds>20</sip-keepalive-seconds>
     <media-keepalive-seconds>1</media-keepalive-seconds>
     <xml-rpc-port>0.0</xml-rpc-port>
@@ -358,7 +360,8 @@ les.net
     <local-address>sipxpbx.example.com</local-address>
     <local-port>5090</local-port>
     <sipx-proxy-domain>example.com</sipx-proxy-domain>
-    <stun-server-address>stun.ezuce.com</stun-server-address>
+    <stun-server-address>freestun.net</stun-server-address>
+    <stun-server-port>3478</stun-server-port>
     <sip-keepalive-seconds>20</sip-keepalive-seconds>
     <media-keepalive-seconds>1</media-keepalive-seconds>
     <xml-rpc-port>0.0</xml-rpc-port>
@@ -400,7 +403,8 @@ bandtel.com
     <local-address>sipxpbx.example.com</local-address>
     <local-port>5090</local-port>
     <sipx-proxy-domain>example.com</sipx-proxy-domain>
-    <stun-server-address>stun.ezuce.com</stun-server-address>
+    <stun-server-address>freestun.net</stun-server-address>
+    <stun-server-port>3478</stun-server-port>
     <sip-keepalive-seconds>20</sip-keepalive-seconds>
     <media-keepalive-seconds>1</media-keepalive-seconds>
     <xml-rpc-port>0.0</xml-rpc-port>
@@ -446,7 +450,8 @@ cbeyond.net
     <local-address>sipxpbx.example.com</local-address>
     <local-port>5090</local-port>
     <sipx-proxy-domain>example.com</sipx-proxy-domain>
-    <stun-server-address>stun.ezuce.com</stun-server-address>
+    <stun-server-address>freestun.net</stun-server-address>
+    <stun-server-port>3478</stun-server-port>
     <sip-keepalive-seconds>20</sip-keepalive-seconds>
     <media-keepalive-seconds>1</media-keepalive-seconds>
     <xml-rpc-port>0.0</xml-rpc-port>
@@ -495,7 +500,8 @@ callwithus.com
     <local-address>sipxpbx.example.com</local-address>
     <local-port>5090</local-port>
     <sipx-proxy-domain>example.com</sipx-proxy-domain>
-    <stun-server-address>stun.ezuce.com</stun-server-address>
+    <stun-server-address>freestun.net</stun-server-address>
+    <stun-server-port>3478</stun-server-port>
     <sip-keepalive-seconds>20</sip-keepalive-seconds>
     <media-keepalive-seconds>1</media-keepalive-seconds>
     <xml-rpc-port>0.0</xml-rpc-port>

@@ -305,6 +305,7 @@ public:
     //! Enable stun lookups for UDP signaling.  Use a NULL szStunServer to
     //! disable
     virtual void enableStun(const char* szStunServer,
+                            int stunPort,
                             int refreshPeriodInSecs,
                             int stunOptions,
                             OsNotification* pNotification = NULL,

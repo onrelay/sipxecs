@@ -55,7 +55,8 @@ public:
                               int localHostPort = 0,
                               const char* localHostName = NULL,
                               bool bEnable = TRUE,
-                              const char* szStunServer = "larry.gloo.net",
+                              const char* szStunServer = NULL,
+                              int stunPort = 0,
                               int iRefreshPeriodInSec = 28,
                               int stunOptions = STUN_OPTION_NORMAL) ;
 
