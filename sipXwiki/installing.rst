@@ -90,6 +90,27 @@ If you are NOT using a Google Cloud image, you must add and install their artifa
     
     yum install -y yum-plugin-artifact-registry
 
+
+Setup sipXcom repo
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  
+  .. code-block:: bash
+
+    wget -O /etc/yum.repos.d/sipxcom.repo \
+      https://storage.googleapis.com/sipxecs/sipxcom/24.01/centos-7-x86_64/sipxcom.repo
+    
+
+Enable elasticsearch
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  .. code-block:: bash
+
+    yum install -y elasticsearch
+
+    systemctl enable elasticsearch
+
+    service elasticsearch start
+
 Configure System
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -106,13 +127,6 @@ Increase Max Number of open files and max user processes for MongoDB (important 
     *          soft     nofile         65535
     *          hard     nofile         65535`
 
-- Enable elasticsearch
-
-  .. code-block:: bash
-
-    systemctl enable elasticsearch
-
-    service elasticsearch start
 
 - Reboot system:
 
@@ -121,20 +135,15 @@ Increase Max Number of open files and max user processes for MongoDB (important 
     reboot
 
 
-Install sipXcom
-----------------
-
-- Retrieve and install sipXcom RPM:
+Install and Setup sipXcom
+--------------------------
   
+Install sipXcom RPMs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   .. code-block:: bash
-
-    wget -O /etc/yum.repos.d/sipxcom.repo \
-      https://storage.googleapis.com/sipxecs/sipxcom/24.01/centos-7-x86_64/sipxcom.repo
     
     yum install -y sipxcom
 
-Setup sipXcom
-----------------
 
 Initial setup
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
