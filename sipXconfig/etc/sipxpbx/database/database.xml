@@ -999,9 +999,6 @@
     <db-patch patch="park-server-migration-task"/>
   </target>
 
-  <target name="location-add-stun-port" unless="location-add-stun-port">
-    <db-patch patch="location-add-stun-port"/>
-  </target>
 
 	<!--
     Migration Targets Legend
@@ -1578,6 +1575,10 @@
   <target name="mongo_cannot_see_majority" unless="mongo_cannot_see_majority">
   	<db-patch patch="mongo_cannot_see_majority"/>
   </target>	
+  <target name="location-add-stun-port" unless="location-add-stun-port">
+    <db-patch patch="location-add-stun-port"/>
+  </target>
+
 
 	<!--
     - SUPPORT UTILITIES
