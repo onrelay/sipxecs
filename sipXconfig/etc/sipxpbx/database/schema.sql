@@ -40,8 +40,7 @@ insert into version_history (version, applied) values
   (10, now()),
   (11, now()),
   (12, now()),
-  (13, now()),
-  (14, now());
+  (13, now());
 
 create table patch(
   name varchar(32) not null primary key
