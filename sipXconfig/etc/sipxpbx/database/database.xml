@@ -503,13 +503,14 @@
   	<antcall target="agent-group-outbound-update"/>
   	<antcall target="ldap-connection-settings"/>
   	<antcall target="mongo_cannot_see_majority"/>
-    <sipx-version version="14"/>
+    <!-- When freezing schema uncomment this line -->
+    <!-- <sipx-version version="14"/> -->
   </target>
 
   <target name="version14" description="upgrade from version 13" unless="version15">
   	<antcall target="location-add-stun-port"/>
     <!-- When freezing schema uncomment this line -->
-    <!-- sipx-version version="15" -->
+    <!-- <sipx-version version="15"/> -->
   </target>
 
   <target name="plugin-patches">
