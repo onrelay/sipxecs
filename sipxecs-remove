@@ -1,0 +1,61 @@
+#!/bin/bash
+
+THIS_MASTER_REMOVE_SCRIPT=$(readlink -f ${BASH_SOURCE[0]})
+
+SOURCE_DIR=$(dirname ${THIS_MASTER_REMOVE_SCRIPT})
+
+function checkUser()
+{
+    echo "Begin checkUser(): USER=${USER}"
+
+    if [ "${USER}" != "root" ]; then
+        echo "
+        Error: You must run this script as root. 
+        "
+        exit 1;
+    fi
+
+    echo "Done checkUser()"
+
+}
+
+function remove()
+{
+    echo "Begin remove()"
+
+    service sipxecs stop
+
+    service postgresql stop
+
+    yum remove sipxportlib
+
+    rm -rf /etc/sipxpbx
+
+    rm -rf /var/sipxdata
+
+    rm -rf /var/log/sipxpbx
+
+    rm -rf /var/lib/pgsql/data/*
+
+    rm -rf /var/run/sipxpbx
+
+    service mongod stop
+
+    rm -rf /var/lib/mongodb/*
+
+    echo "Done remove()"
+}
+
+
+function main()
+{
+    echo "Starting ${THIS_MASTER_BUILD_SCRIPT}"
+
+    checkUser
+
+    remove
+
+    echo "Finished ${THIS_MASTER_REMOVE_SCRIPT}"
+}
+
+main $@
