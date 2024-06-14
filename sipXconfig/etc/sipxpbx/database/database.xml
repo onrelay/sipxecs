@@ -507,7 +507,7 @@
   </target>
 
   <target name="version14" description="upgrade from version 13" unless="version15">
-  	<antcall target="location-add-stun-port"/>
+  	<!-- <antcall target="location-add-stun-port"/> -->
     <!-- When freezing schema uncomment this line -->
     <!-- sipx-version version="15" -->
   </target>
