@@ -169,7 +169,7 @@ Network Configuration
 
   - hostname: e.g. *us1*
 
-  - domain: e.g. *us1.onrelay.net*
+  - domain: e.g. *onrelay.net*
   
   - SIP Domain: e.g. *us1.onrelay.net*
   
