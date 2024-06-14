@@ -786,6 +786,7 @@ create table location (
   registered boolean not null default false,
   use_stun boolean not null default true,
   stun_address varchar(255),
+  stun_port integer not null default 5061,
   stun_interval integer not null default 60,
   public_address varchar(255),
   public_port integer not null default 5060,
