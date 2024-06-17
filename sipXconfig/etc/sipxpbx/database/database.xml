@@ -503,7 +503,7 @@
   	<antcall target="agent-group-outbound-update"/>
   	<antcall target="ldap-connection-settings"/>
   	<antcall target="mongo_cannot_see_majority"/>
-    <antcall target="location-add-stun-port"/>
+    <!-- <antcall target="location-add-stun-port"/> -->
     <!-- When freezing schema uncomment this line -->
     <!-- <sipx-version version="14"/> -->
   </target>
