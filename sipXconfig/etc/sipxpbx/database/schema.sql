@@ -25,7 +25,6 @@ create table version_history(
  * For sipXconfig v4.1.8, the database version is 11.
  * For sipXconfig v4.4.0, the database version is 12.
  * For sipXconfig v4.6.0, the database version is 13.
- * For sipXconfig v24.01, the database version is 14.
  */
 insert into version_history (version, applied) values 
   (1, now()),
