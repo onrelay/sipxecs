@@ -796,7 +796,6 @@ create table location (
   last_attempt timestamp,
   call_traffic boolean not null default true,
   replicate_config boolean not null default true,
-  stun_port integer not null default 3478,
   primary key (location_id)
 );
 

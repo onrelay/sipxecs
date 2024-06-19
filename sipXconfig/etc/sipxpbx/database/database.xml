@@ -503,8 +503,7 @@
   	<antcall target="agent-group-outbound-update"/>
   	<antcall target="ldap-connection-settings"/>
   	<antcall target="mongo_cannot_see_majority"/>
-    <!-- Works for upgrades, but blocks original installs -->
-    <!-- <antcall target="location-add-stun-port"/> -->
+    <antcall target="location-add-stun-port"/>
     <!-- When freezing schema uncomment this line -->
     <!-- <sipx-version version="14"/> -->
   </target>
