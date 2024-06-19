@@ -198,7 +198,6 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
 
     @Override
     public boolean setup(SetupManager manager) {
-        upsertStunPortColumn();
         Location[] locations = getLocations();
         if (locations.length > 0) {
             for (Location l : locations) {
@@ -222,16 +221,6 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
             saveLocation(primary);
         }
         return true;
-    }
-
-    private void upsertStunPortColumn() {
-        // Server does not initialize unless this is done here
-        //
-        try {
-            m_jdbc.execute(format("alter table location add column stun_port integer default %d;", m_defaultStunPort));
-        } catch( DataAccessException dataAccessException ) {
-            // exception if already added
-        }
     }
 
     private void changePrimaryIp(String ip) {
