@@ -37,6 +37,7 @@ import org.sipfoundry.sipxconfig.setup.SetupManager;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate3.HibernateCallback;
 
@@ -197,6 +198,7 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
 
     @Override
     public boolean setup(SetupManager manager) {
+        upsertStunPortColumn();
         Location[] locations = getLocations();
         if (locations.length > 0) {
             for (Location l : locations) {
@@ -220,6 +222,16 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
             saveLocation(primary);
         }
         return true;
+    }
+
+    private void upsertStunPortColumn() {
+        // Server does not initialize unless this is done here
+        //
+        try {
+            m_jdbc.execute(format("alter table location add column stun_port integer default %d;", m_defaultStunPort));
+        } catch( DataAccessException dataAccessException ) {
+            // exception if already added
+        }
     }
 
     private void changePrimaryIp(String ip) {
