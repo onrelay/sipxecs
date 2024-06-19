@@ -412,13 +412,13 @@
     registered CDATA #REQUIRED
     use_stun CDATA #REQUIRED
     stun_address CDATA #IMPLIED
-    stun_port CDATA #REQUIRED
     stun_interval CDATA #REQUIRED
     public_address CDATA #IMPLIED
     public_port CDATA #REQUIRED
     public_tls_port CDATA #REQUIRED
     start_rtp_port CDATA #REQUIRED
     stop_rtp_port CDATA #REQUIRED
+    stun_port CDATA #REQUIRED
     branch_id CDATA #IMPLIED
 >
 

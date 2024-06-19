@@ -24,7 +24,6 @@
     </set>
     <property name="useStun" />
     <property name="stunAddress" />
-    <property name="stunPort" />
     <property name="stunInterval" />
     <property name="publicAddress" />
     <property name="publicPort" />
@@ -32,6 +31,7 @@
     <property name="startRtpPort" />
     <property name="stopRtpPort" />
     <property name="regionId" />
+    <property name="stunPort" />
     <many-to-one name="branch" column="branch_id" not-found="ignore" />
   </class>
 
