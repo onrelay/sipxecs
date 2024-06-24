@@ -96,7 +96,7 @@ public interface CertificateManager {
 
     public void setCACertificate(String cert);
 
-    public void checkAllCertificatesVlaidity();
+    public void checkAllCertificatesValidity();
 
     public boolean getLetsEncryptStatus();
 

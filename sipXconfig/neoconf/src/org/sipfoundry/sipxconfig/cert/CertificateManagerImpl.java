@@ -148,7 +148,7 @@ public class CertificateManagerImpl implements CertificateManager, SetupListener
     }
 
     @Override    
-    public void checkAllCertificatesVlaidity() {
+    public void checkAllCertificatesValidity() {
         LOG.debug("SCHEDULED JOB: Check certificates validity");
         List<Map<String, Object>> certs = getCertificates();
         for (Map<String, Object> cert : certs) {
