@@ -270,7 +270,7 @@ public class MongoReplSetManagerImpl implements MongoReplSetManager {
         boolean done = m_actionRunner.run();
         if (done) {
             if (m_actionRunner.getExitCode() != 0) {
-                throw new UserException("Command did not complete properly. " + m_actionRunner.getStderr());
+                throw new UserException( "Action: " + action + " did not complete properly. " + m_actionRunner.getStderr());
             }
         }
 
