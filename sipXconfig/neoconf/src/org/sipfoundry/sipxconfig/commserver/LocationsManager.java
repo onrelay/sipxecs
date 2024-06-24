@@ -28,6 +28,8 @@ public interface LocationsManager {
 
     Location getLocationByAddress(String address);
 
+    public int getPrimaryLocationId();
+
     Location getPrimaryLocation();
     
     String getPrimaryIp();

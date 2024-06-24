@@ -73,6 +73,8 @@ public interface ConfigManager {
 
     public File getGlobalDataDirectory();
 
+    public File getPrimaryLocationDataDirectory();
+
     public File getLocationDataDirectory(Location location);
 
     public DomainManager getDomainManager();

@@ -305,6 +305,15 @@ public class ConfigManagerImpl implements AddressProvider, ConfigManager, BeanFa
     }
 
     @Override
+    public File getPrimaryLocationDataDirectory() {
+        File d = new File(m_cfDataDir, String.valueOf(m_locationManager.getPrimaryLocationId()));
+        if (!d.exists()) {
+            d.mkdirs();
+        }
+        return d;
+    }
+
+    @Override
     public File getLocationDataDirectory(Location location) {
         File d = new File(m_cfDataDir, String.valueOf(location.getId()));
         if (!d.exists()) {

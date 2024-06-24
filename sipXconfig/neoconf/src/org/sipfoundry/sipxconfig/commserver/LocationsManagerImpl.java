@@ -49,6 +49,7 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
     private static final String LOCATION_PROP_IP = "ipAddress";
     private static final String LOCATION_PROP_ID = "locationId";
     private static final String DUPLICATE_FQDN_OR_IP = "&error.duplicateFqdnOrIp";
+    private static final int PRIMARY_LOCATION_ID = 1;
     private AuditLogContext m_auditLogContext;
     private String m_defaultStunServer = "freestun.net";
     private int m_defaultStunPort = 3478;
@@ -151,6 +152,11 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
     @Override
     public Location getPrimaryLocation() {
         return loadLocationByUniqueProperty(LOCATION_PROP_PRIMARY, true);
+    }
+
+    @Override
+    public int getPrimaryLocationId() {
+        return PRIMARY_LOCATION_ID;
     }
 
     /**
