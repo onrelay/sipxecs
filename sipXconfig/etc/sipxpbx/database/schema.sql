@@ -785,7 +785,6 @@ create table location (
   registered boolean not null default false,
   use_stun boolean not null default true,
   stun_address varchar(255),
-  stun_port integer not null default 3478,
   stun_interval integer not null default 60,
   public_address varchar(255),
   public_port integer not null default 5060,
@@ -797,6 +796,7 @@ create table location (
   last_attempt timestamp,
   call_traffic boolean not null default true,
   replicate_config boolean not null default true,
+  stun_port integer not null default 3478,
   primary key (location_id)
 );
 
