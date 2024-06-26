@@ -28,10 +28,10 @@
     <property name="publicAddress" />
     <property name="publicPort" />
     <property name="publicTlsPort" />
+    <property name="stunPort" />
     <property name="startRtpPort" />
     <property name="stopRtpPort" />
     <property name="regionId" />
-    <property name="stunPort" />
     <many-to-one name="branch" column="branch_id" not-found="ignore" />
   </class>
 

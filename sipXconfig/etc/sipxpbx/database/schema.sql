@@ -792,11 +792,11 @@ create table location (
   stop_rtp_port integer not null default 31000,
   branch_id int4,
   public_tls_port integer not null default 5061,
+  stun_port integer not null default 3478,
   state varchar(32) not null default 'UNCONFIGURED',
   last_attempt timestamp,
   call_traffic boolean not null default true,
   replicate_config boolean not null default true,
-  stun_port integer not null default 3478,
   primary key (location_id)
 );
 

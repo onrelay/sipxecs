@@ -388,6 +388,7 @@
     <antcall target="createlang-plpgsql"/>
     <antcall target="migrate-sbcs" />
     <antcall target="location-add-tls-port" />
+    <antcall target="location-add-stun-port"/>
     <antcall target="add_did_numbers" />
     <antcall target="freeswitch-dial-plans" />
 	  <antcall target="openacd" />
@@ -503,7 +504,6 @@
   	<antcall target="agent-group-outbound-update"/>
   	<antcall target="ldap-connection-settings"/>
   	<antcall target="mongo_cannot_see_majority"/>
-    <antcall target="location-add-stun-port"/>
     <!-- When freezing schema uncomment this line -->
     <!-- <sipx-version version="14"/> -->
   </target>
@@ -1248,6 +1248,9 @@
   <target name="location-add-tls-port" unless="location-add-tls-port">
     <db-patch patch="location-add-tls-port"/>
   </target>
+  <target name="location-add-stun-port" unless="location-add-stun-port">
+    <db-patch patch="location-add-stun-port"/>
+  </target>
   <target name="freeswitch-dial-plans" unless="freeswitch-dial-plans">
     <db-patch patch="freeswitch-dial-plans"/>
   </target>
@@ -1571,9 +1574,7 @@
   <target name="mongo_cannot_see_majority" unless="mongo_cannot_see_majority">
   	<db-patch patch="mongo_cannot_see_majority"/>
   </target>	
-  <target name="location-add-stun-port" unless="location-add-stun-port">
-    <db-patch patch="location-add-stun-port"/>
-  </target>
+
 
 
 	<!--
