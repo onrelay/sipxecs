@@ -685,7 +685,6 @@ create_pid_folders
 network_settings
 disable_firewalld
 custom_hook
-create_le_cert
 role_settings = nil
 
 while true
@@ -704,6 +703,7 @@ end
 # First pass generated cfdata info
 if is_primary?
   puts "Initial setup, this may take a few minutes..."
+  create_le_cert
   exit 1 unless run_command("#{$bindir}/sipxagent #{'-v ' if $verbose} -d setup")
   puts "Finishing system configuration, almost done..."
 else  
