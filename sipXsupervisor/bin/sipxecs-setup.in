@@ -84,6 +84,11 @@ def create_pid_folders
   exit 1 unless run_command "systemd-tmpfiles --create"
 end
 
+def create_le_cert
+  #harmless if re-run
+  exit 1 unless run_command "/usr/bin/renew_le_cert"
+end
+
 def set_secondary_role
   return true if File.exists?($secondary_dat)
   puts "Configuring as an additional server..."
@@ -680,6 +685,7 @@ create_pid_folders
 network_settings
 disable_firewalld
 custom_hook
+create_le_cert
 role_settings = nil
 
 while true

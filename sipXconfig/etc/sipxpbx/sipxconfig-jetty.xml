@@ -86,6 +86,14 @@
     </Call>
   </New>  
   
+  <New id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
+    <Set name="KeyStorePath"><SystemProperty name="jetty.conf.dir"/>/ssl/ssl-web.keystore</Set>
+    <Set name="KeyStorePassword">changeit</Set>
+    <Set name="KeyManagerPassword">changeit</Set>
+    <Set name="TrustStorePath"><SystemProperty name="jetty.conf.dir"/>/ssl/ssl-web.keystore</Set>
+    <Set name="TrustStorePassword">changeit</Set>
+    <Set name="ExcludeProtocols"><Array type="java.lang.String"><Item>SSLv3</Item></Array></Set>
+  </New>  
 
   <Call name="addConnector">
     <Arg>
@@ -123,15 +131,6 @@
       </New>
     </Arg>
   </Call>
-
-  <New id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
-    <Set name="KeyStorePath"><SystemProperty name="jetty.conf.dir"/>/ssl/ssl-web.keystore</Set>
-    <Set name="KeyStorePassword">changeit</Set>
-    <Set name="KeyManagerPassword">changeit</Set>
-    <Set name="TrustStorePath"><SystemProperty name="jetty.conf.dir"/>/ssl/ssl-web.keystore</Set>
-    <Set name="TrustStorePassword">changeit</Set>
-    <Set name="ExcludeProtocols"><Array type="java.lang.String"><Item>SSLv3</Item></Array></Set>
-  </New>
   
   <Call id="httpsConnector" name="addConnector">
     <Arg>
