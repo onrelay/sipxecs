@@ -22,13 +22,13 @@ syslog_device=
 [base]
 name=BaseOS
 enabled=1
-baseurl=htts://vault.centos.org/7/os/x86_64
+baseurl=https://vault.centos.org/7/os/x86_64
 failovermethod=priority
 
 [updates]
 name=updates
 enabled=1
-baseurl=htts://vault.centos.org/7/os/x86_64
+baseurl=https://vault.centos.org/7/os/x86_64
 failovermethod=priority
 
 #[epel]
