@@ -50,7 +50,7 @@ if test -z "$CENTOS_BASE_URL"; then
 #  else
 #    AC_MSG_ERROR([You must provide a value for CENTOS_BASE_URL or MIRROR_SITE if you are using a download proxy.\
 # See http://wiki.sipfoundry.org/display/sipXecs/Install+squid+caching+server+to+reduce+build+time for more details.])
-  fi
+#  fi
 fi
 
 AC_ARG_VAR(FEDORA_BASE_URL, [Where to find Fedora distribution. Example: http://mirrors.kernel.org/fedora/linux])
