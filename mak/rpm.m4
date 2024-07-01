@@ -40,6 +40,11 @@ AC_ARG_WITH(yum-proxy, [--with-yum-proxy send downloads thru caching proxy like 
   AC_SUBST(DOWNLOAD_PROXY_CONFIG_LINE,"proxy=$withval")
   AC_SUBST(WGET_PROXY_OPTS,"http_proxy=$withval")
 
+AC_ARG_VAR(CENTOS_BASE_URL, [legacy CentOS distribution. Default: https://vault.centos.org])
+if test -z "$CENTOS_BASE_URL"; then
+  CENTOS_BASE_URL=https://vault.centos.org]
+fi
+
 
 AC_ARG_VAR(FEDORA_BASE_URL, [Where to find Fedora distribution. Example: http://mirrors.kernel.org/fedora/linux])
 if test -z "$FEDORA_BASE_URL"; then
@@ -143,6 +148,14 @@ AC_ARG_ENABLE(rpm, [--enable-rpm Using mock package to build rpms],
 
   AC_ARG_VAR(RPM_DIST_DIR, [Where to assemble final set of RPMs and SRPMs in preparation for publishing to a download server.])
   test -n "${RPM_DIST_DIR}" || RPM_DIST_DIR=repo
+
+  if test -n "$CENTOS_BASE_URL"; then
+    AC_SUBST(CENTOS_BASE_URL_ON,[])
+    AC_SUBST(CENTOS_BASE_URL_OFF,[#])
+  else
+    AC_SUBST(CENTOS_BASE_URL_ON,[#])
+    AC_SUBST(CENTOS_BASE_URL_OFF,[])
+  fi
 
   if test -n "$FEDORA_BASE_URL"; then
     AC_SUBST(FEDORA_BASE_URL_ON,[])
