@@ -18,7 +18,6 @@
 bundle agent postgres {
   methods:
     postgres::
-      "any" usebundle => "commserverlib";
       "any" usebundle => postgres_init;
       "any" usebundle => postgres_config;
     fedora16_or_greater::
