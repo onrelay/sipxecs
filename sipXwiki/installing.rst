@@ -58,8 +58,6 @@ Prepare Server
     
     service sshd restart
 
-- On first boot you may need to edit */etc/sysconfig/network-scripts/YourNICCard*. Change `ONBOOT="no"` to `ONBOOT="yes"`
-
 
 - Since CentOS 7 is now end of life, we must use its vault for yum
 
@@ -128,13 +126,31 @@ Enable elasticsearch
 Configure System
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+- On first boot you may need to update your network interface card config
+
+.. code-block:: bash
+
+    vi */etc/sysconfig/network-scripts/YourNICCard* => (update)
+
+      ONBOOT="yes"    
+
 Increase Max Number of open files and max user processes for MongoDB (important for larger systems)
 
-- edit */etc/sysctl.conf* to add fs.file-max = 65536 line. ONLY do this if the default returned from `cat /proc/sys/fs/file-max` is less than 65536.
+- Update max file size. ONLY do this if the default is less than 65536.
 
-- edit */etc/security/limits.conf* to add the following block of text:
+.. code-block:: bash
+
+    cat /proc/sys/fs/file-max (to check default)
+
+    vi /etc/sysctl.conf =>
+
+      fs.file-max=65536    
+
+- edit system limits:
 
   .. code-block:: bash
+
+    vi /etc/security/limits.conf => (add)
 
     *          soft     nproc          65535
     *          hard     nproc          65535
