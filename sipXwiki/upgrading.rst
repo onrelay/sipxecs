@@ -40,6 +40,16 @@ Setup Repos
     wget -O /etc/yum.repos.d/sipxcom.repo \
         https://storage.googleapis.com/sipxecs/sipxcom/24.01/centos-7-x86_64/sipxcom.repo
 
+- Since CentOS 7 is now end of life, we must use its vault for yum
+
+  .. code-block:: bash
+    
+    sed -i 's|mirror.centos.org|vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+    sed -i 's|mirrorlist|#mirrorlist|g' /etc/yum.repos.d/CentOS-*
+    sed -i 's|#baseurl|baseurl|g' /etc/yum.repos.d/CentOS-*
+
+    yum clean all
+
 
 Upgrade sipXcom
 ~~~~~~~~~~~~~~~~
