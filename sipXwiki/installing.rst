@@ -60,6 +60,14 @@ Prepare Server
 
 - On first boot you may need to edit */etc/sysconfig/network-scripts/YourNICCard*. Change `ONBOOT="no"` to `ONBOOT="yes"`
 
+- Since CentOS 7 is now end of life, we must use its vault for yum
+
+  .. code-block:: bash
+    
+    sed -i 's|mirror.centos.org|vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+    sed -i 's|mirrorlist|#mirrorlist|g' /etc/yum.repos.d/CentOS-*
+    sed -i 's|#baseurl|baseurl|g' /etc/yum.repos.d/CentOS-*
+
 - Update OS: 
 
   .. code-block:: bash
