@@ -60,6 +60,7 @@ Prepare Server
 
 - On first boot you may need to edit */etc/sysconfig/network-scripts/YourNICCard*. Change `ONBOOT="no"` to `ONBOOT="yes"`
 
+
 - Since CentOS 7 is now end of life, we must use its vault for yum
 
   .. code-block:: bash
@@ -68,11 +69,20 @@ Prepare Server
     sed -i 's|mirrorlist|#mirrorlist|g' /etc/yum.repos.d/CentOS-*
     sed -i 's|#baseurl|baseurl|g' /etc/yum.repos.d/CentOS-*
 
+- Remove `epel` to avoid conflicts
+
+  .. code-block:: bash
+
+    yum remove -y epel-release
+
+
 - Update OS: 
 
   .. code-block:: bash
 
     yum update -y
+
+
 
 - Install `wget` used for downloading RPMs
 
@@ -80,11 +90,7 @@ Prepare Server
 
     yum install -y wget
 
-- Remove `epel` to avoid conflicts
 
-  .. code-block:: bash
-
-    yum remove -y epel-release
 
 Setup Google Could Artifact registry
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
