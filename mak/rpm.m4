@@ -40,11 +40,11 @@ AC_ARG_WITH(yum-proxy, [--with-yum-proxy send downloads thru caching proxy like 
   AC_SUBST(DOWNLOAD_PROXY_CONFIG_LINE,"proxy=$withval")
   AC_SUBST(WGET_PROXY_OPTS,"http_proxy=$withval")
 
-# Require BASE URL otherwise download proxy will be useless
-AC_ARG_VAR(CENTOS_BASE_URL, [Where to find CentOS distribution. Default: https://vault.centos.org])
+AC_ARG_VAR(CENTOS_BASE_URL, [legacy CentOS distribution. Default: https://vault.centos.org])
 if test -z "$CENTOS_BASE_URL"; then
-  CENTOS_BASE_URL=https://vault.centos.org
+  CENTOS_BASE_URL=https://vault.centos.org]
 fi
+
 
 AC_ARG_VAR(FEDORA_BASE_URL, [Where to find Fedora distribution. Example: http://mirrors.kernel.org/fedora/linux])
 if test -z "$FEDORA_BASE_URL"; then
