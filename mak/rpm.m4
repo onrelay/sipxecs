@@ -35,14 +35,13 @@ if test -z "$DOWNLOAD_BASE_URL"; then
 fi
 
 
-
 AC_ARG_WITH(yum-proxy, [--with-yum-proxy send downloads thru caching proxy like squid to speed downloads], [
   AC_SUBST(DOWNLOAD_PROXY,$withval)
   AC_SUBST(DOWNLOAD_PROXY_CONFIG_LINE,"proxy=$withval")
   AC_SUBST(WGET_PROXY_OPTS,"http_proxy=$withval")
 
 # Require BASE URL otherwise download proxy will be useless
-AC_ARG_VAR(CENTOS_BASE_URL, [Where to find CentOS distribution. Example: https://vault.centos.org])
+AC_ARG_VAR(CENTOS_BASE_URL, [Where to find CentOS distribution. Default: https://vault.centos.org])
 if test -z "$CENTOS_BASE_URL"; then
   CENTOS_BASE_URL=https://vault.centos.org
 fi
