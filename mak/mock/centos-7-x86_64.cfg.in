@@ -23,19 +23,21 @@ syslog_device=
 name=BaseOS
 enabled=1
 baseurl=https://vault.centos.org/7.9.2009/os/x86_64
+#mirrorlist=http://mirrorlist.centos.org/?release=7&arch=x86_64&repo=os
 failovermethod=priority
 
 [updates]
 name=updates
 enabled=1
-baseurl=https://vault.centos.org/7.9.2009/os/x86_64
+baseurl=https://vault.centos.org/7.9.2009/updates/x86_64
+#mirrorlist=http://mirrorlist.centos.org/?release=7&arch=x86_64&repo=updates
 failovermethod=priority
 
 #[epel]
 #name=epel
 #enabled=1
-#@CENTOS_BASE_URL_ON@baseurl=http://mirrors.nav.ro/epel/7/$basearch
-#@CENTOS_BASE_URL_OFF@mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=epel-7&arch=$basearch
+##baseurl=http://mirrors.nav.ro/epel/7/$basearch
+#mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=epel-7&arch=$basearch
 #failovermethod=priority
 
 [sipxcom]
