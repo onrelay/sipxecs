@@ -79,11 +79,11 @@ public class Location extends BeanWithId implements KeepsOriginalCopy<Location>,
     private Branch m_branch;
     private boolean m_useStun = false;
     private String m_stunAddress = "freestun.net";
+    private int m_stunPort = 3478;
     private int m_stunInterval = 60; // seconds
     private String m_publicAddress;
     private int m_publicPort = 5060;
     private int m_publicTlsPort = 5061;
-    private int m_stunPort = 3478;
     private int m_startRtpPort = 30000;
     private int m_stopRtpPort = 31000;
     private String m_hostName;

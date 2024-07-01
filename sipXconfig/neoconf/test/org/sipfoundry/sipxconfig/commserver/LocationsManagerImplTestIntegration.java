@@ -181,10 +181,10 @@ public class LocationsManagerImplTestIntegration extends ImdbTestCase {
         assertNotNull(nat);
 
         nat.setStunAddress("freestun.com");
+        nat.setStunPort(3478);
         nat.setStunInterval(30);
         nat.setPublicPort(5160);
         nat.setPublicTlsPort(5161);
-        nat.setStunPort(3478);
         nat.setStartRtpPort(30000);
         nat.setStopRtpPort(30100);
 

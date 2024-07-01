@@ -24,11 +24,11 @@
     </set>
     <property name="useStun" />
     <property name="stunAddress" />
+    <property name="stunPort" />
     <property name="stunInterval" />
     <property name="publicAddress" />
     <property name="publicPort" />
     <property name="publicTlsPort" />
-    <property name="stunPort" />
     <property name="startRtpPort" />
     <property name="stopRtpPort" />
     <property name="regionId" />
