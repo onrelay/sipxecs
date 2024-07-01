@@ -42,15 +42,9 @@ AC_ARG_WITH(yum-proxy, [--with-yum-proxy send downloads thru caching proxy like 
   AC_SUBST(WGET_PROXY_OPTS,"http_proxy=$withval")
 
 # Require BASE URL otherwise download proxy will be useless
-AC_ARG_VAR(CENTOS_BASE_URL, [Where to find CentOS distribution. Now end of lif. Default: https://vault.centos.org])
+AC_ARG_VAR(CENTOS_BASE_URL, [Where to find CentOS distribution. Example: https://vault.centos.org])
 if test -z "$CENTOS_BASE_URL"; then
   CENTOS_BASE_URL=https://vault.centos.org
-#  if test -n "$MIRROR_SITE"; then
-#    CENTOS_BASE_URL=$MIRROR_SITE/centos
-#  else
-#    AC_MSG_ERROR([You must provide a value for CENTOS_BASE_URL or MIRROR_SITE if you are using a download proxy.\
-# See http://wiki.sipfoundry.org/display/sipXecs/Install+squid+caching+server+to+reduce+build+time for more details.])
-#  fi
 fi
 
 AC_ARG_VAR(FEDORA_BASE_URL, [Where to find Fedora distribution. Example: http://mirrors.kernel.org/fedora/linux])
