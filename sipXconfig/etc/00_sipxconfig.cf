@@ -28,9 +28,10 @@ bundle agent 00_sipxconfig {
     any::
       # normally not nec but mongodb need 00_ssh to run first
       "any" usebundle => 00_ssh;
-      "any" usebundle => sipxcommserverlib;
+
       "any" usebundle => mongodb;
       "any" usebundle => postgres;
+      "any" usebundle => sipxcommserverlib;
       "any" usebundle => sipxsupervisor;
 
   files:

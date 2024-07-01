@@ -53,7 +53,6 @@ public class MongoHealthCheck implements HealthCheckProvider {
             Collection<String> actions = meta.getRequiredActions(server);
             if (actions != null) {
                 for (String action : actions) {
-                    /* OR: This breaks startup when SQL schema is changed
                     if (action.equals("SET_MEMBER_META")) {
                         // XX-10812 This can happen because database was rebuilt using straight
                         // mongo operations from CLI, or upgrade from any version prior
@@ -64,8 +63,6 @@ public class MongoHealthCheck implements HealthCheckProvider {
                         err = format("Server %s required action %s", server, action);
                         break;
                     }
-                    */
-                    err = format("Server %s required action %s", server, action);
                 }
             }
             if (err == null) {
