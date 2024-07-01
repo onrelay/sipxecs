@@ -23,8 +23,6 @@ bundle agent sipxcommserverlib {
 
       "any" usebundle => "snmp";
 
-      "any" usebundle => "posgresql";
-
       "any" usebundle => "sipxcommserverlib_config";
 }
 
