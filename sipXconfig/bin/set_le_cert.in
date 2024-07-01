@@ -17,6 +17,7 @@ openfire_ssl_cert=$sipx_cert/ssl-openfire.crt
 openfire_ssl_key=$sipx_cert/ssl-openfire.key
 openfire_ssl_keystore=$sipx_cert/ssl-openfire.keystore
 
+mkdir -p $httpd_cert
 mkdir -p $sipx_cert
 
 umask 077
