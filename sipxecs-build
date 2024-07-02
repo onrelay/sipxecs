@@ -189,7 +189,7 @@ function init()
 
     sudo mkdir -p ${BUILD_DIR}
 
-    sudo chown ${SIPX_USER}.${SIPX_USER} ${BUILD_DIR}
+    sudo chown -R ${SIPX_USER}.${SIPX_USER} ${SOURCE_DIR}
 
     echo "Done init()"
 }
@@ -249,7 +249,7 @@ function setupCentOS7()
         exit ${ERROR}
     fi 
 
-    cd ${SOURCE_DIR}
+    cd ${SOURCE_DIR}    
     sudo mkdir -p /usr/local/sipx
     sudo chown sipx.sipx /usr/local/sipx
 
@@ -321,6 +321,8 @@ function build()
     echo "Begin build()"
 
     cd ${BUILD_DIR}
+
+
  
     # The make command may kick a permission error when creating RPMs
 
