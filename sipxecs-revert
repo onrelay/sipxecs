@@ -1,0 +1,28 @@
+#!/bin/bash
+
+THIS_MASTER_REMOVE_SCRIPT=$(readlink -f ${BASH_SOURCE[0]})
+
+SOURCE_DIR=$(dirname ${THIS_MASTER_REMOVE_SCRIPT})
+
+function checkUser()
+{
+    echo "Begin checkUser(): USER=${USER}"
+
+    if [ "${USER}" != "root" ]; then
+        echo "
+        Error: You must run this script as root. 
+        "
+        exit 1;
+    fi
+
+    echo "Done checkUser()"
+
+}
+
+REVERT_TO_TAG=$@
+
+git checkout ${REVERT_TO_TAG}
+mkdir ../${REVERT_TO_TAG}
+cp -r . ../${REVERT_TO_TAG}
+git checkout 
+\cp -rf ../${REVERT_TO_TAG}/* .
