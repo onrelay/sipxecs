@@ -165,6 +165,7 @@ AC_ARG_ENABLE(rpm, [--enable-rpm Using mock package to build rpms],
   AC_CONFIG_FILES([mak/mock/centos-6-i386.cfg])
   AC_CONFIG_FILES([mak/mock/centos-6-x86_64.cfg])
   AC_CONFIG_FILES([mak/mock/centos-7-x86_64.cfg])
+  AC_CONFIG_FILES([mak/mock/centos-9-x86_64.cfg])
   AC_CONFIG_FILES([mak/mock/fedora-16-i386.cfg])
   AC_CONFIG_FILES([mak/mock/fedora-16-x86_64.cfg])
   AC_CONFIG_FILES([mak/mock/fedora-17-i386.cfg])

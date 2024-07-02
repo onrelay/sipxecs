@@ -109,11 +109,28 @@ function checkInput()
 
     if [ -z "${PLATFORM}" ]
     then
-        PLATFORM=${DEFAULT_PLATFORM}
+
+        CENTOS_VERSION=$(cat /etc/centos-release)
+        CENTOS_VERSION=$(echo $CENTOS_VERSION | sed -e 's/^CentOS.*release //')
+        CENTOS_VERSION=$(echo $CENTOS_VERSION | cut -d "." -f1)
+
+        case $CENTOS_VERSION in
+
+            "7")
+                PLATFORM=centos-7
+                ;;
+            "9")
+                PLATFORM=centos-9
+                ;;
+            *)
+                PLATFORM=${DEFAULT_PLATFORM}
+                ;;
+        esac
+
     else
         case $PLATFORM in
 
-            "centos-7" | "rocky-9")
+            "centos-7" | "centos-9" | "rocky-9")
                 ;;
 
             *)
@@ -209,6 +226,10 @@ function setupRepos()
             LOCAL_REPO=${BUILD_DIR}/repo/CentOS_7/${ARCHITECTURE}
             ;;
 
+        "centos-9")
+            LOCAL_REPO=${BUILD_DIR}/repo/CentOS_9/${ARCHITECTURE}
+            ;;
+
         "rocky-9")
             LOCAL_REPO=${BUILD_DIR}/repo/Rocky_9/${ARCHITECTURE}
             ;;
@@ -253,7 +274,7 @@ function setupCentOS7()
     sudo mkdir -p /usr/local/sipx
     sudo chown sipx.sipx /usr/local/sipx
 
-    echo "Using legacy oss_core for CentOS7"
+    echo "Using legacy oss_core for CentOS"
     sudo yum install -y oss_core oss_core-devel oss_core-debuginfo
     sudo mkdir -p /usr/local/sipx/lib
     sudo ln -s /usr/lib64/liboss_core.la /usr/local/sipx/lib/liboss_core.la
@@ -265,6 +286,15 @@ function setupCentOS7()
     sudo echo oss_core > .modules-exclude
 
     echo "Done setupCentOS7()"
+}
+
+function setupCentOS9() 
+{
+    echo "Begin setupCentOS9()"
+
+    setupCentOS7
+
+    echo "Done setupCentOS9()"
 }
 
 function setupRocky9() 
@@ -377,6 +407,10 @@ function main()
 
         "centos-7")
             setupCentOS7
+            ;;
+
+        "centos-9")
+            setupCentOS9
             ;;
 
         "rocky-9")
