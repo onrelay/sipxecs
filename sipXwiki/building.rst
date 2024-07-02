@@ -86,8 +86,6 @@ Execute the following commands to checkout the sipXcom repository:
 
     git clone https://github.com/onrelay/sipxecs.git
 
-    chown -R sipx.sipx sipxecs
-
 Build sipXcom
 -----------------------
 
