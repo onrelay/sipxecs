@@ -19,10 +19,21 @@ function checkUser()
 
 }
 
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 REVERT_TO_TAG=$@
 
 git checkout ${REVERT_TO_TAG}
-mkdir ../${REVERT_TO_TAG}
+ERROR=$?
+if [ ${ERROR} -ne 0 ]; then 
+    echo "git checkout error, exiting sipxecs-revert"
+    exit ${ERROR}
+fi
+mkdir -p ../${REVERT_TO_TAG}
 cp -r . ../${REVERT_TO_TAG}
-git checkout 
+git checkout ${CURRENT_BRANCH}
+ERROR=$?
+if [ ${ERROR} -ne 0 ]; then 
+    echo "git checkout error, exiting sipxecs-revert"
+    exit ${ERROR}
+fi
 \cp -rf ../${REVERT_TO_TAG}/* .
