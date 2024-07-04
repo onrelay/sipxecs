@@ -725,6 +725,8 @@ if !ok
   puts "failed."
   exit 1
 else
+  # this is necessary since sometimes SET_MEMBER_META signal does not take effect
+  exit 1 unless run_command "systemctl restart sipxconfig"
   puts "done."
   net = get_network
   if is_primary?
