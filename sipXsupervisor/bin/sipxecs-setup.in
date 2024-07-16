@@ -429,13 +429,15 @@ class Network
       end
     }
     
-    File.open('/etc/sysconfig/network', 'r') {|f|
-      while (line = f.gets)
-        if line =~ /^HOSTNAME=["']?(.*?)["']?$/
-          fqdn_from_network = $1
+    if File.exists?('/etc/sysconfig/network') 
+      File.open('/etc/sysconfig/network', 'r') {|f|
+        while (line = f.gets)
+          if line =~ /^HOSTNAME=["']?(.*?)["']?$/
+            fqdn_from_network = $1
+          end
         end
-      end
-    }
+      }
+    end
 
     x = `hostname -s 2>/dev/null`.chomp
     if $? == 0 && ! x.empty?
