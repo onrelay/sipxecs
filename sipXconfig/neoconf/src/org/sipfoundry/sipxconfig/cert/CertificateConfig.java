@@ -92,7 +92,11 @@ public class CertificateConfig implements ConfigProvider {
 
             sslSip.storeIfDifferent(new File(dir, "ssl.keystore"));
 
-            if( !useLetsEncrypt )  {
+            if( useLetsEncrypt )  {
+                
+                chainCertificate = true;
+            }
+            else {
 
                 // Rebuild public certificate if letsencrypt not enabled (also used by SBC)
 
@@ -116,13 +120,6 @@ public class CertificateConfig implements ConfigProvider {
                 if (caCert != null) {
                     FileUtils.writeStringToFile(new File(dir, "ca-bundle.crt"), caCert);
                     caCertificate = true;
-                }
-
-                Writer sslConfWriter = new FileWriter(new File(dir, "ssl.conf"));
-                try {
-                    write(sslConfWriter, chainCertificate, caCertificate);
-                } finally {
-                    IOUtils.closeQuietly(sslConfWriter);
                 }
 
                 JavaKeyStore sslWeb = new JavaKeyStore();
@@ -163,7 +160,14 @@ public class CertificateConfig implements ConfigProvider {
 
                 sslOpenfire.storeIfDifferent(new File(dir, "ssl-openfire.keystore"));
 
-            } // !useLetsEncrypt
+            } // useLetsEncrypt
+
+            Writer sslConfWriter = new FileWriter(new File(dir, "ssl.conf"));
+            try {
+                write(sslConfWriter, chainCertificate, caCertificate);
+            } finally {
+                IOUtils.closeQuietly(sslConfWriter);
+            }
 
             if (location.isPrimary()) {
 

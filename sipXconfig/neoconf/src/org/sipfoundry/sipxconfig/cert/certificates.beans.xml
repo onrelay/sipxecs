@@ -34,8 +34,6 @@
       <list>
         <value>isrg-root-x1-cross-signed</value>
         <value>isrgrootx1</value>
-        <value>lets-encrypt-r3</value>
-        <value>letsencryptauthorityx3</value>
         <value>verisignclass3ca</value>
       </list>
     </property>

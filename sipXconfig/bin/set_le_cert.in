@@ -5,8 +5,15 @@ set -e
 httpd_cert=/etc/httpd/conf.d/ssl
 sipx_cert=/var/sipxdata/cfdata/1/
 
+letsencrypt_ssl_cert=$RENEWED_LINEAGE/cert.pem
+letsencrypt_ssl_key=$RENEWED_LINEAGE/privkey.pem
+letsencrypt_combined_cert=$RENEWED_LINEAGE/fullchain.pem
+letsencrypt_chain_cert=$RENEWED_LINEAGE/chain.pem
+
 httpd_ssl_cert=$httpd_cert/ssl-web.crt
 httpd_ssl_key=$httpd_cert/ssl-web.key
+httpd_chain_cert=$httpd_cert/server-chain.crt
+httpd_ca_cert=$httpd_cert/ca-bundle.crt
 
 sipx_ssl_cert=$sipx_cert/ssl-web.crt
 sipx_ssl_key=$sipx_cert/ssl-web.key
@@ -17,18 +24,18 @@ openfire_ssl_cert=$sipx_cert/ssl-openfire.crt
 openfire_ssl_key=$sipx_cert/ssl-openfire.key
 openfire_ssl_keystore=$sipx_cert/ssl-openfire.keystore
 
-
 umask 077
 
-cp -f $RENEWED_LINEAGE/fullchain.pem $httpd_ssl_cert
-cp -f $RENEWED_LINEAGE/privkey.pem $httpd_ssl_key
+cp -f $letsencrypt_ssl_cert $httpd_ssl_cert
+cp -f $letsencrypt_ssl_key $httpd_ssl_key
+cp -f $letsencrypt_chain_cert $httpd_chain_cert
 
 chmod 600 $httpd_ssl_cert $httpd_ssl_key 
 
 cp -f $httpd_ssl_cert $sipx_ssl_cert
 cp -f $httpd_ssl_key $sipx_ssl_key 
 
-openssl pkcs12 -export -in $sipx_ssl_cert -inkey $sipx_ssl_key -out $sipx_p12_keystore -name ssl-web -passout pass:changeit
+openssl pkcs12 -export -in $letsencrypt_combined_cert -inkey $letsencrypt_ssl_key -out $sipx_p12_keystore -name ssl-web -passout pass:changeit
 keytool -importkeystore -deststorepass changeit -destkeypass changeit -destkeystore $sipx_ssl_keystore -srckeystore $sipx_p12_keystore -srcstoretype PKCS12 -srcstorepass changeit -alias ssl-web
 
 rm -f $sipx_p12_keystore

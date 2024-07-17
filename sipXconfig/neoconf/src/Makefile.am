@@ -20,8 +20,6 @@ neoconf_RESOURCES = \
 	  -o -name '*.properties' \
 	  -o -name 'isrg-root-x1-cross-signed' \
 	  -o -name 'isrgrootx1' \
-	  -o -name 'lets-encrypt-r3' \
-	  -o -name 'letsencryptauthorityx3' \
 	  -o -name 'verisignclass3ca' \
 	  -o -name '*.xml' \
 	  -o -name '*.jpg' \
