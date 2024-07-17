@@ -94,7 +94,12 @@ public class CertificateConfig implements ConfigProvider {
 
             if( useLetsEncrypt )  {
                 
-                chainCertificate = true;
+                // These are updated by the set_le_cert script
+                File chainCertificateFile = new File(dir, "server-chain.crt");
+                chainCertificate = chainCertificateFile.exists() && chainCertificateFile.length() > 0;
+
+                File caCertificateFile = new File(dir, "ca-bundle.crt");
+                caCertificate = caCertificateFile.exists() && caCertificateFile.length() > 0;
             }
             else {
 

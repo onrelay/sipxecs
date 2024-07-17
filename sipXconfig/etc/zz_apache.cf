@@ -98,13 +98,13 @@ bundle agent apache_config {
         perms => mog("644","root","root"),
         copy_from => local_cp("$(sipx.APACHE2_CONFDIR)/provusers.tmp");
 
-    !letsencrypt::
       "$(sipx.APACHE2_CONFDIR)/ssl/$(ssl_web)"
-        comment => "install ssl info $(this.promiser)",
+        comment => "install ssl certs info $(this.promiser)",
         create => "true",
         copy_from => copy_from_cfdata("$(sipx.location_id)/$(ssl_web)"),
         perms => mog("600","root","root"),
         classes => if_repaired("restart_apache");
+
 }
 
 bundle agent apache_sysv_running {

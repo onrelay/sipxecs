@@ -17,6 +17,8 @@ httpd_ca_cert=$httpd_cert/ca-bundle.crt
 
 sipx_ssl_cert=$sipx_cert/ssl-web.crt
 sipx_ssl_key=$sipx_cert/ssl-web.key
+sipx_chain_cert=$sipx_cert/server-chain.crt
+sipx_ca_cert=$sipx_cert/ca-bundle.crt
 sipx_p12_keystore=$sipx_cert/ssl-web.p12
 sipx_ssl_keystore=$sipx_cert/ssl-web.keystore
 
@@ -29,11 +31,15 @@ umask 077
 cp -f $letsencrypt_ssl_cert $httpd_ssl_cert
 cp -f $letsencrypt_ssl_key $httpd_ssl_key
 cp -f $letsencrypt_chain_cert $httpd_chain_cert
+rm -f $httpd_ca_cert
+touch $httpd_ca_cert
 
-chmod 600 $httpd_ssl_cert $httpd_ssl_key 
+chmod 600 $httpd_ssl_cert $httpd_ssl_key $httpd_chain_cert $httpd_ca_cert
 
 cp -f $httpd_ssl_cert $sipx_ssl_cert
 cp -f $httpd_ssl_key $sipx_ssl_key 
+cp -f $httpd_chain_cert $sipx_chain_cert 
+cp -f $httpd_ca_cert $sipx_ca_cert 
 
 openssl pkcs12 -export -in $letsencrypt_combined_cert -inkey $letsencrypt_ssl_key -out $sipx_p12_keystore -name ssl-web -passout pass:changeit
 keytool -importkeystore -deststorepass changeit -destkeypass changeit -destkeystore $sipx_ssl_keystore -srckeystore $sipx_p12_keystore -srcstoretype PKCS12 -srcstorepass changeit -alias ssl-web
