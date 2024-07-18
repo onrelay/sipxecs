@@ -19,6 +19,7 @@ public class SymmitronConfig {
 	private int portRangeUpperBound = 15500;
 	private int xmlRpcPort = 8089;
 	private String localAddress;
+	private boolean useStun = true;
 	private String publicAddress;
 	private String stunServerAddress;
 	private int stunServerPort = 0;
@@ -119,6 +120,22 @@ public class SymmitronConfig {
 	public String getLogLevel() {
 		return SipFoundryLayout.getSipFoundryLogLevel(this.getClass()).toString();
 	}
+
+	/**
+	 * @param useStun
+	 *            the useStun to set
+	 */
+	public void setUseStun(boolean useStun) {
+		this.useStun = useStun;
+	}
+
+	/**
+	 * @return the useStun
+	 */
+	public boolean useStun() {
+		return useStun;
+	}
+
 
 	public void setPublicAddress(String publicAddress) {
 		try {

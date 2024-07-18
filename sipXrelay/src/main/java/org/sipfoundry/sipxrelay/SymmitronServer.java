@@ -28,11 +28,6 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSession;
 
-import org.ice4j.Transport;
-import org.ice4j.TransportAddress;
-import org.ice4j.socket.IceUdpSocketWrapper;
-import org.ice4j.stunclient.SimpleAddressDetector;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -46,6 +41,7 @@ import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.util.InetAddrPort;
 import org.mortbay.util.ThreadedServer;
 import org.sipfoundry.commons.log4j.SipFoundryLayout;
+import org.sipfoundry.commons.util.AddressDiscovery;
 
 
 /**
@@ -132,13 +128,6 @@ public class SymmitronServer implements Symmitron {
     static SymmitronConfig symmitronConfig;
 
     /*
-     * The standard STUN port.
-     * (now read from config)
-     */
-    // private static final int STUN_PORT = 3478;
-    private static final Transport STUN_TRANSPORT = Transport.UDP;
-
-    /*
      * Dir where config file is stored.
      */
     private static String configDir;
@@ -154,9 +143,7 @@ public class SymmitronServer implements Symmitron {
     static final String STRAY_PACKET_ALARM_ID = "STRAY_PACKET Stray packets from host %s";
 
     static final int TIMEOUT = 1000;
-    
-    private static SimpleAddressDetector addressDetector = null;
-    
+        
     static CRLFReceiver crlfReceiver;
 
     static boolean filterStrayPackets = true;
@@ -396,12 +383,120 @@ public class SymmitronServer implements Symmitron {
     /**
      * Discover our address using stun.
      * 
-     * @throws SipXbridgeException
+     * @throws Exception
      */
+
+     /* 
+    static void discoverAddress() throws Exception {
+       
+        logger.debug("discoverAddress" );
+
+        try {
+            String stunServerAddress = symmitronConfig.getStunServerAddress();
+
+            logger.debug("stunServerAddress: " + stunServerAddress );
+
+            int stunServerPort = symmitronConfig.getStunServerPort();
+
+            logger.debug("stunServerPort: " + stunServerPort );
+
+            int localStunPort = stunServerPort + 1;
+
+            logger.debug("localStunPort: " + localStunPort );
+
+            if (stunServerAddress == null) {
+                logger.error("Stun server address not specified");
+            }
+            else if( stunServerPort <= 0 ) {
+                logger.error("Stun server port not valid: " + stunServerPort );
+            }
+            else {
+              
+                logger.debug("addressDetector: " + addressDetector );
+
+                if ( addressDetector == null ) { 
+                    TransportAddress localTransportAddress = new TransportAddress(
+                        symmitronConfig.getLocalAddress(), localStunPort, STUN_TRANSPORT );  
+
+                    logger.debug("localTransportAddress: " + localTransportAddress );
+
+                    TransportAddress serverTransportAddress = new TransportAddress(
+                        stunServerAddress, stunServerPort, STUN_TRANSPORT );
+
+                    logger.debug("serverTransportAddress: " + serverTransportAddress );
+
+                    StunStack stunStack = new StunStack();
+
+                    logger.debug("stunStack created" );
+
+                    addressDetector = new NetworkConfigurationDiscoveryProcess( stunStack, localTransportAddress, serverTransportAddress);
+
+                    logger.debug("addressDetector created" );
+
+                    addressDetector.start();
+
+                    logger.debug("Started address detector with server transport address: " + serverTransportAddress );
+                    
+                }
+
+                StunDiscoveryReport report = addressDetector.determineAddress();
+                if (report == null || report.getPublicAddress() == null) {
+                    logger.warn("STUN Error : Global address could not be found");
+                    try {
+                        if (addressDetector != null) {
+                            addressDetector.shutDown();
+                        }
+                    } catch (Exception e) {
+                        logger.error("Error shutting down address discovery ", e);
+                    } finally {
+                        addressDetector = null;
+                    }
+                    return;
+                }
+
+                logger.debug("Stun report = " + report);
+
+                if (report.getPublicAddress().getPort() != localStunPort ) {
+                    logger.warn("WARNING External port != internal port your NAT may not be symmetric.");
+                }
+
+                if (publicAddress == null || 
+                    !publicAddress.equals( report.getPublicAddress().getAddress()) ) {
+
+                    publicAddress = report.getPublicAddress().getAddress();
+
+                    symmitronConfig.setPublicAddress(publicAddress.getHostAddress());
+
+                    logger.debug("Updated symmitron config with new discovered address " + publicAddress.getHostAddress() );
+                }
+            }
+
+            logger.debug("STUN discovered address = " + publicAddress);
+
+        } catch (Exception ex) {
+
+            logger.error("Error discovering  address -- Check Stun Server", ex);
+
+            if (addressDetector != null) {
+                try {
+                    addressDetector.shutDown();
+                } catch (Exception e ) {
+                    logger.error("Problem shutting down address detector!",e);
+                } finally {
+                    addressDetector = null;
+                }
+            }
+        } 
+    }
+
+    */
+
+    /* 
     static void discoverAddress() throws Exception {
        
         try {
             String stunServerAddress = symmitronConfig.getStunServerAddress();
+
             int stunServerPort = symmitronConfig.getStunServerPort();
 
             TransportAddress serverTransportAddress = new TransportAddress(
@@ -412,41 +507,48 @@ public class SymmitronServer implements Symmitron {
             TransportAddress localTransportAddress = new TransportAddress(
                 symmitronConfig.getLocalAddress(), localStunPort, STUN_TRANSPORT );
 
-            if (stunServerAddress != null) {
+            if (stunServerAddress == null) {
+                logger.error("Stun server address not specified");
+            }
+            else if( stunServerPort <= 0 ) {
+                logger.error("Stun server port not valid: " + stunServerPort );
+            }
+            else {
               
                 if ( addressDetector == null ) { 
 
                     addressDetector = new SimpleAddressDetector( serverTransportAddress );
 
                     addressDetector.start();
-
-                    IceUdpSocketWrapper localSocket = new IceUdpSocketWrapper(new DatagramSocket(localTransportAddress));
-
-                    TransportAddress publicTransportAddress = addressDetector.getMappingFor(localSocket);
-
-                    if( publicTransportAddress == null )
-                    {
-                        logger.error("No stun address - could not do address discovery from STUN server: " + serverTransportAddress );
-                        return;
-                    }
-
-                    logger.info("Discovered public address " + publicAddress
-                        + " from STUN server " + stunServerAddress
-                        + " using local address " + localSocket);
-
-                    if (publicAddress == null || 
-                        !publicAddress.equals( publicTransportAddress.getAddress() ) ) {
-
-                        publicAddress = publicTransportAddress.getAddress();
-
-                        symmitronConfig.setPublicAddress(publicAddress.getHostAddress());
-
-                        logger.debug("Updated symmitron config with new public address " + publicAddress.getHostAddress() );
-                    }
                 }
-            } else {
-                logger.error("Stun server address not specified");
-            }
+
+                IceUdpSocketWrapper localSocket = new IceUdpSocketWrapper(new DatagramSocket(localTransportAddress));
+
+                TransportAddress publicTransportAddress = addressDetector.getMappingFor(localSocket);
+
+                if( publicTransportAddress == null )
+                {
+                    logger.error("No stun address - could not do address discovery from STUN server: " + serverTransportAddress );
+                    return;
+                }
+
+                logger.info("Discovered public address " + publicAddress
+                    + " from STUN server " + stunServerAddress
+                    + " using local address " + localSocket);
+
+                if (publicAddress == null || 
+                    !publicAddress.equals( publicTransportAddress.getAddress() ) ) {
+
+                    publicAddress = publicTransportAddress.getAddress();
+
+                    symmitronConfig.setPublicAddress(publicAddress.getHostAddress());
+
+                    logger.debug("Updated symmitron config with new public address " + publicAddress.getHostAddress() );
+                } 
+            } 
+
+            logger.debug("Public address from STUN is " + publicAddress.getHostAddress());
+
         } catch (Exception ex) {
             if (addressDetector != null) {
                 try {
@@ -458,13 +560,59 @@ public class SymmitronServer implements Symmitron {
                 }
             }
             logger.error("Error discovering  address -- Check Stun Server", ex);
-            return;
-        } finally {
-           logger.debug("public address = " + publicAddress);
-        }
+        } 
     }
-    
-    
+
+    */
+
+    static void discoverAddress() throws Exception {
+       
+        try {
+            String stunServerAddress = symmitronConfig.getStunServerAddress();
+
+            int stunServerPort = symmitronConfig.getStunServerPort();
+
+            String localAddress = symmitronConfig.getLocalAddress();
+
+            int localPort = stunServerPort + 1;
+
+            if (stunServerAddress == null) {
+                logger.error("Stun server address not specified");
+            }
+            else if( stunServerPort <= 0 ) {
+                logger.error("Stun server port not valid: " + stunServerPort );
+            }
+            else {
+                InetAddress discoveredAddress = AddressDiscovery.discoverAddress( localAddress, localPort, stunServerAddress, stunServerPort );
+
+                if( discoveredAddress == null )
+                {
+                    logger.error("No stun address - could not do address discovery from STUN server: " + stunServerAddress + ":" + stunServerPort );
+                    return;
+                }
+
+                logger.info("Discovered public address " + discoveredAddress
+                    + " from STUN server " + stunServerAddress + ":" + stunServerPort
+                    + " using local address " + localAddress + ":" + localPort );
+
+                if (publicAddress == null || !publicAddress.equals( discoveredAddress ) ) {
+
+                    publicAddress = discoveredAddress;
+
+                    symmitronConfig.setPublicAddress(publicAddress.getHostAddress());
+
+                    logger.debug("Updated symmitron config with new public address " + publicAddress.getHostAddress() );
+                } 
+            } 
+
+            logger.debug("Using public address from STUN " + publicAddress.getHostAddress());
+
+        } catch (Exception ex) {
+             logger.error("Error discovering  address -- Check Stun Server", ex);
+        } 
+    }
+
+     
 
     private Map<String, Object> createErrorMap(int errorCode, String reason) {
         Map<String, Object> retval = new HashMap<String, Object>();
@@ -580,9 +728,7 @@ public class SymmitronServer implements Symmitron {
             Logger log = Logger.getLogger("org.mortbay");
             log.setLevel(Level.OFF);
             isWebServerRunning = true;
-            webServer = new HttpServer();
-            
-            
+            webServer = new HttpServer(); 
 
             InetAddrPort inetAddrPort = new InetAddrPort(symmitronConfig
                     .getLocalAddress(), symmitronConfig.getXmlRpcPort());
@@ -1686,16 +1832,15 @@ public class SymmitronServer implements Symmitron {
                         SymmitronServer.symmitronConfig.getStunServerPort());
                 alarmSent = true;
 
-            } else if (SymmitronServer.getPublicInetAddress() != null
-                    && alarmSent) {
+            } else if (SymmitronServer.getPublicInetAddress() != null && alarmSent) {
                 SymmitronServer.raiseAlarm(STUN_RECOVERY_ALARM_ID,
-                        SymmitronServer.symmitronConfig.getStunServerAddress());
+                    SymmitronServer.symmitronConfig.getStunServerAddress() + ":" + 
+                    SymmitronServer.symmitronConfig.getStunServerPort());
                 alarmSent = false;
             }
         } catch (Exception ex) {
             if (!alarmSent) {
-                SymmitronServer.raiseAlarm(
-                        STUN_FAILURE_ALARM_ID,
+                SymmitronServer.raiseAlarm(STUN_FAILURE_ALARM_ID,
                         SymmitronServer.symmitronConfig.getStunServerAddress()+ ":" + 
                         SymmitronServer.symmitronConfig.getStunServerPort());
                 alarmSent = true;
@@ -1744,30 +1889,57 @@ public class SymmitronServer implements Symmitron {
         }
         logger.info("Port range checked ");
 
-        if (config.getPublicAddress() == null
-                && config.getStunServerAddress() != null) {
+        if (config.useStun() ) {
+
+            logger.info("Discovering public address from STUN server: " + config.getStunServerAddress() + ":" + config.getStunServerPort() );
 
             tryDiscoverAddress();
-            timer.schedule(new TimerTask() {
 
-                @Override
-                public void run() {
-                    tryDiscoverAddress();
+            if( SymmitronServer.getPublicInetAddress() == null ) {
 
-                }
+                timer.schedule(new TimerTask() {
 
-            }, config.getRediscoveryTime() * 1000,
-                    config.getRediscoveryTime() * 1000);
+                    @Override
+                    public void run() {
+
+                        tryDiscoverAddress();
+
+                        if( SymmitronServer.getPublicInetAddress() != null ) {
+
+                            cancel();
+
+                            connect();
+                        }
+                    }
+
+                }, config.getRediscoveryTime() * 1000, config.getRediscoveryTime() * 1000);
+            }
+        }
+        else {
+            logger.info("Use public address from config: " + config.getPublicAddress());
         }
 
-        logger.info("Public address is " + config.getPublicAddress());
+        connect();
 
-        SymmitronServer.initHttpsClient();
-
-        SymmitronServer.startWebServer();
         status = "RUNNING";
-
     }
+
+    public static void connect() {
+
+        try {
+            if( SymmitronServer.getPublicInetAddress() != null) {
+
+                logger.info("Connecting with public address: " + SymmitronServer.getPublicInetAddress());
+
+                SymmitronServer.initHttpsClient();
+
+                SymmitronServer.startWebServer();
+            }
+        } catch (Exception ex) {
+            logger.error( "Error connecting symmitron server with public address: " + SymmitronServer.getPublicInetAddress(), ex);
+        }
+    }
+
     
     public static void printBridges() {
       for ( Bridge bridge : SymmitronServer.bridgeMap.values() ) {

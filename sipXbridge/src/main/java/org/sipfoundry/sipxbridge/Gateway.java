@@ -10,6 +10,7 @@ package org.sipfoundry.sipxbridge;
 import static java.lang.String.format;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.PriorityQueue;
@@ -36,6 +37,7 @@ import org.apache.log4j.SimpleLayout;
 import org.sipfoundry.commons.log4j.SipFoundryAppender;
 import org.sipfoundry.commons.log4j.SipFoundryLayout;
 import org.sipfoundry.commons.siprouter.FindSipServer;
+import org.sipfoundry.commons.util.AddressDiscovery;
 import org.sipfoundry.commons.util.DomainConfiguration;
 import org.sipfoundry.sipxbridge.xmlrpc.SipXbridgeXmlRpcClient;
 import org.sipfoundry.sipxrelay.SymmitronClient;
@@ -187,7 +189,7 @@ public class Gateway {
 
     static SipFoundryAppender logAppender;
 
-    static NetworkConfigurationDiscoveryProcess addressDiscovery = null;
+    //static NetworkConfigurationDiscoveryProcess addressDiscovery = null;
 
     private static SipURI proxyURI;
 
@@ -218,7 +220,7 @@ public class Gateway {
     public static final int DEFAULT_SESSION_TIMER_INTERVAL = 1800;
     public static final boolean XX_7362 = true;
 
-    private static int oldStunPort = -1;
+    //private static int oldStunPort = -1;
 
     private static HashSet<String> supportedTransports = new HashSet<String>();
 
@@ -314,6 +316,8 @@ public class Gateway {
      *
      * @throws SipXbridgeException
      */
+
+     /* 
     static void discoverAddress() throws SipXbridgeException {
 
         try {
@@ -372,9 +376,7 @@ public class Gateway {
 
             }
         } catch (Exception ex) {
-            /*
-             * If problem finding address. release the port.
-             */
+
             logger.error("Error discovering  address", ex);
             try {
                 if (addressDiscovery != null) {
@@ -392,6 +394,50 @@ public class Gateway {
             }
         }
     }
+
+    */
+
+    static void discoverAddress() throws SipXbridgeException {
+
+        try {
+
+            BridgeConfiguration bridgeConfiguration = accountManager.getBridgeConfiguration();
+
+            String stunServerAddress = bridgeConfiguration.getStunServerAddress();
+
+            int stunServerPort = bridgeConfiguration.getStunServerPort();
+
+            String localAddress = Gateway.getLocalAddress();
+
+            int localPort = stunServerPort + 2;
+
+            String oldPublicAddress = Gateway.getGlobalAddress();
+
+            if (stunServerAddress != null) {
+
+                InetAddress discoveredAddress = 
+                AddressDiscovery.discoverAddress( localAddress, localPort, stunServerAddress, stunServerPort );
+
+                if( discoveredAddress == null ) {
+                    logger.warn("STUN Error : Global address not found from stun server " + stunServerAddress + ":" + stunServerPort );
+                    return;
+                }
+
+                logger.debug("Stun discovered address = " + discoveredAddress);
+                
+                globalAddress = discoveredAddress.getHostAddress();
+
+                if (oldPublicAddress != null && !oldPublicAddress.equals(globalAddress) ) {
+                    Gateway.raiseAlarm(Gateway.STUN_PUBLIC_ADDRESS_CHANGED_ALARM_ID, globalAddress);
+                }
+
+            }
+        } catch (Exception ex) {
+
+            logger.error("Error discovering  address", ex);
+        } 
+    }
+
 
     public static void raiseAlarm(String id, Object... args) {
         alarm_logger.error("ALARM_BRIDGE_" + format(id, args));
