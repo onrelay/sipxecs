@@ -38,6 +38,7 @@ public class VarsConfiguration extends AbstractFreeswitchConfiguration {
     public void write(Writer writer, Location location, FreeswitchSettings settings) throws IOException {
         VelocityContext context = new VelocityContext();
         context.put("freeswitchDomain", getFsDomain(location));
+        context.put("secureRtp", settings.isSecureRtpEnabled());
         write(writer, context);
     }
 
