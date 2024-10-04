@@ -86,7 +86,7 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
     public static final String FAX_EXTENSION_SETTING = "voicemail/fax/extension";
     public static final String DID_SETTING = "voicemail/fax/did";
     public static final String DOMAIN_SETTING = "user-domain/domain";
-    public static final String CALLFWD_TIMER = "callfwd/timer";
+    public static final String CALL_FWD_TIMER_SETTING = "callfwd/timer";
     public static final String OPERATOR_SETTING = "personal-attendant/operator";
     public static final String DEFAULT_VM_OPTION = "personal-attendant/default-vm-option";
     public static final String ON_THE_PHONE_MESSAGE = "im/on-the-phone-message";
@@ -863,7 +863,7 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
         return super.isGroupAvailable(group);
     }
 
-    @SettingEntry(path = CALLFWD_TIMER)
+    @SettingEntry(path = CALL_FWD_TIMER_SETTING)
     public int getDefaultInitDelay() {
         return m_proxyManager.getSettings().getDefaultInitDelay();
     }

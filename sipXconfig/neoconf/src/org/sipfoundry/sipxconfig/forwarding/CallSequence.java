@@ -65,7 +65,8 @@ public class CallSequence extends AbstractCallSequence {
     }
 
     public int getCfwdTime() {
-        return (Integer) m_user.getSettingTypedValue(CALL_FWD_TIMER_SETTING);
+        Integer cfwdTime = (Integer) m_user.getSettingTypedValue(CALL_FWD_TIMER_SETTING);
+        return cfwdTime != null ? cfwdTime : 0;
     }
 
     public void setCfwdTime(int cfwdtime) {
