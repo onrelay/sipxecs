@@ -1,0 +1,791 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitoring &mdash; sipxecs 24.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=ed338098"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Maintenance" href="maintenance.html" />
+    <link rel="prev" title="Troubleshooting" href="troubleshooting.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/sipxcom_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="history.html">Project History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planning.html">Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="webui.html">Web UI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Monitoring</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Nagios</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#preparing-a-host-for-monitoring">Preparing a host for monitoring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sipxcom-services">Sipxcom services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rd-party-checks">3rd Party Checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#additional-notes">Additional Notes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">Graylog</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installation-on-debian-10">Installation on Debian 10</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fluentd-on-graylog-server">Fluentd on Graylog server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fluentbit-on-the-sipxcom-server">Fluentbit on the sipxcom server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="maintenance.html">Maintenance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">Other / How To</a></li>
+<li class="toctree-l1"><a class="reference internal" href="restapi.html">REST API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="soapapi.html">SOAP API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sipxecs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Monitoring</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/monitoring.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="monitoring">
+<h1>Monitoring<a class="headerlink" href="#monitoring" title="Link to this heading"></a></h1>
+<p>There are several 3rd party options available to monitor the system, depending on your needs. <strong>Do not run other configuration management agents such as Puppet or Chef on the server!</strong> This is because <a class="reference external" href="https://cfengine.com/">CFengine</a> (sipxsupervisor service) is already in use. Other configuration management agents will likely interfere with CFengine/sipxsupervisor functioning correctly.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Sipxcom has built-in SNMP alarms for your convenience beneath Diagnostics - Alarms. Be sure to check those first.</p></li>
+<li><p>The sipcodes.sh script can also be used to produce high level SIP statistics ad hoc. Given the proxy log is at INFO or DEBUG verbosity the sipcodes script will automatically collect and report statistics upon snapshot collection as ./var/log/sipxpbx/sipcodes.log.</p></li>
+<li><p>The SIP proxy service has a option to save proxy statistics to a json file, /var/log/sipxpbx/proxy_stats.json.</p></li>
+</ul>
+<img alt="_images/system_services_proxy_stats.png" class="align-center" src="_images/system_services_proxy_stats.png" />
+<ul class="simple">
+<li><p>The /var/log/sipxpbx/proxy_stats.json file can be consumed by tools such as <a class="reference external" href="https://grafana.com/oss/grafana/">Grafana</a> , <a class="reference external" href="https://www.elastic.co/elastic-stack">ELK stacks</a>, <a class="reference external" href="https://www.graylog.org/products/open-source">Graylog</a>, <a class="reference external" href="https://www.splunk.com/">Splunk</a>, etc to create current or historical graphs.</p></li>
+<li><p><a class="reference external" href="https://www.nagios.org/downloads/nagios-core/">Nagios</a> , <a class="reference external" href="http://munin-monitoring.org/">Munin</a>, <a class="reference external" href="https://www.cacti.net/">Cacti</a> and many others can also be used to monitor service status, server health, etc.</p></li>
+</ul>
+</div></blockquote>
+<section id="id1">
+<h2>Nagios<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>This section provides example configuration of a Nagios Core to monitor sipxcom services.</p>
+<section id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h3>
+<p>You’ll need a separate server running <a class="reference external" href="https://www.nagios.org/downloads/nagios-core/">Nagios Core</a>, and administrative access to all the sipxcom servers. For this example I have compiled Nagios Core from source using the default settings rather than using a OS package. The path to files may vary if you have installed via rpm or apt. I will use the <a class="reference external" href="https://exchange.nagios.org/directory/Addons/Monitoring-Agents/NRPE--2D-Nagios-Remote-Plugin-Executor/details">Nagios Remote Plugin Executor (NRPE)</a> as a means to aggregate the checks, but there are alternatives available if NRPE doesn’t suit your needs. Most of the checks used are available from the standard Nagios Plugins. If you want to expand on these there are many more available from the Nagios Exchange.</p>
+</section>
+<section id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h3>
+<p>If compiled from source using the defaults, Nagios Core will install to /usr/local/nagios:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># tree --charset=ASCII -d nagios/
+nagios/
+|-- bin
+|-- etc
+|   `-- objects
+|-- libexec
+|-- sbin
+|-- share
+|   |-- contexthelp
+|   |-- docs
+|   |   `-- images
+|   |-- images
+|   |   `-- logos
+|   |-- includes
+|   |   `-- rss
+|   |       `-- extlib
+|   |-- js
+|   |-- media
+|   |-- ssi
+|   `-- stylesheets
+`-- var
+    |-- archives
+    |-- rw
+    `-- spool
+        `-- checkresults
+</pre></div>
+</div>
+<p>The etc/objects directory is where your host configuration files are stored. I recommend organizing hosts into groups beneath the objects directory, then grouping similar services beneath that. For example, if you have a group of three sipxcom servers at example.org:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mkdir /usr/local/nagios/etc/objects/example.org
+$ mkdir /usr/local/nagios/etc/objects/example.org/sipx
+$ touch /usr/local/nagios/etc/objects/example.org/sipx/sipx1.cfg
+$ touch /usr/local/nagios/etc/objects/example.org/sipx/sipx2.cfg
+$ touch /usr/local/nagios/etc/objects/example.org/sipx/sipx3.cfg
+</pre></div>
+</div>
+<p>By structuring in this way the system administrator can quickly understand who it belongs to and what it does. This is also especially helpful if you intend on running Nagios in a multi tenant fashion.</p>
+</section>
+<section id="preparing-a-host-for-monitoring">
+<h3>Preparing a host for monitoring<a class="headerlink" href="#preparing-a-host-for-monitoring" title="Link to this heading"></a></h3>
+<p>Before stepping into the sipx1.cfg configuration on the Nagios server we’ll need to prepare the sipxcom server(s) for our checks. Nagios Remote Plugin Executor (NRPE) works as an aggregate point for multiple check scripts.</p>
+<blockquote>
+<div><img alt="_images/nagios_nrpe.png" class="align-center" src="_images/nagios_nrpe.png" />
+</div></blockquote>
+<p>You’ll need to download and install both NRPE and the standard Nagios plugins on each host you intend on monitoring. After installing these you may wish to pause for a moment and review the check scripts now available under /usr/local/nagios/libexec. The NRPE configuration, /usr/local/nagios/etc/nrpe.cfg, was likely copied from the sample provided within the NRPE tarball. You should review this file for any environmental changes you may need to make such as partition locations:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">command</span><span class="p">[</span><span class="n">check_hda1</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_disk</span> <span class="o">-</span><span class="n">w</span> <span class="mi">20</span><span class="o">%</span> <span class="o">-</span><span class="n">c</span> <span class="mi">10</span><span class="o">%</span> <span class="o">-</span><span class="n">p</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">hda1</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_zombie_procs</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_procs</span> <span class="o">-</span><span class="n">w</span> <span class="mi">5</span> <span class="o">-</span><span class="n">c</span> <span class="mi">10</span> <span class="o">-</span><span class="n">s</span> <span class="n">Z</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_total_procs</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_procs</span> <span class="o">-</span><span class="n">w</span> <span class="mi">150</span> <span class="o">-</span><span class="n">c</span> <span class="mi">200</span>
+</pre></div>
+</div>
+<p>The commands defined should match what is being called within the host configuration file. For example, checks for sipx1.example.org are defined on the nagios server in /usr/local/nagios/etc/objects/example.org/sipx/sipx1.cfg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             Check Users
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_users
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             Check Swap
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_swap
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             Check Load
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_load
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             Check Boot Partition
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_boot
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             Check Root Partition
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_root
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             Check Zombie Processes
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_zombie_procs
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             Check Total Processes
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_total_procs
+        }
+</pre></div>
+</div>
+<p>The check_command line is essentially “connect with NRPE and run xxx”. Be sure that xxx is a defined within /usr/local/nagios/etc/nrpe.cfg of the host you are checking against. For things you want to execute from the Nagios server, make certain that you’ve defined those commands in the Nagios server /usr/local/nagios/etc/objects/commands.cfg. For example I defined the SSL certificate check on my Nagios server command.cfg:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>define command {
+        command_name    check_ssl_certificate
+        command_line    $USER1$/check_ssl_certificate -H $HOSTADDRESS$ -c 3 -w 7
+       }
+</pre></div>
+</div>
+<p>But in /usr/local/nagios/etc/objects/example.org/sipx1.cfg, this is defined without the check_nrpe prefix so it will execute from the Nagios server rather than on the sipx1.example.org host:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">define</span> <span class="n">service</span><span class="p">{</span>
+        <span class="n">use</span>                             <span class="n">generic</span><span class="o">-</span><span class="n">service</span>
+        <span class="n">host_name</span>                       <span class="n">sipx1</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span>
+        <span class="n">service_description</span>             <span class="n">SSL</span> <span class="n">Certificate</span> <span class="n">Expiration</span>
+        <span class="n">contact_groups</span>                  <span class="n">admins</span>
+        <span class="n">notifications_enabled</span>           <span class="mi">1</span>
+        <span class="n">check_command</span>                   <span class="n">check_ssl_certificate</span>
+        <span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="sipxcom-services">
+<h3>Sipxcom services<a class="headerlink" href="#sipxcom-services" title="Link to this heading"></a></h3>
+<p>Below are additional examples for sipx1.example.org that pertain to sipXcom/sipx services. These would be defined in /usr/local/nagios/etc/objects/example.org/sipx/sipx1.cfg on our Nagios server:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             NTP
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_ntp_time!0.5!1
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             Check SIP Registration
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_sip_registration
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             SSH
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_ssh!-p 22
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             TFTP
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_tftp
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             FTP
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_ftp!-H sipx1.example.org -p 21
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             Check sipx Web UI
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_ui
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             Check XMPP
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_jabber
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             TCP SIP SRV
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_tcp_sip_srv
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             UDP SIP SRV
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_udp_sip_srv
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             TCP SIPS SRV
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_tcp_sips_srv
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             SIP TLS SRV
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_sip_tls_srv
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             SIP RR SRV
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_sip_rr_srv
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             SIP MWI SRV
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_sip_mwi_srv
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             XMPP client SRV
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_xmpp_client_srv
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             XMPP server SRV
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_xmpp_server_srv
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             XMPP conference server SRV
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_xmpp_conf_srv
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             TCP Voicemail SRV
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_tcp_vm_srv
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             Check SIPXCONFIG
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_sipxconfig
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             Check SIPXCDR
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_sipxcdr
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             Check MySQL homer.db
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_homer
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             MongoDB Connection Check
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_mongo_connect
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             MongoDB Long running ops
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_mongo_lag
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             MongoDB Operations Count
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_nrpe!check_mongo_ops
+        }
+
+define service{
+        use                             generic-service
+        host_name                       sipx1.example.org
+        service_description             SSL Certificate Expiration
+        contact_groups                  admins
+        notifications_enabled           1
+        check_command                   check_ssl_certificate
+        }
+</pre></div>
+</div>
+<p>The command definitions for all commands prefixed with check_nrpe should be defined on sipx1.example.org within /usr/local/nagios/etc/nrpe.cfg, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># system checks</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_users</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_users</span> <span class="o">-</span><span class="n">w</span> <span class="mi">5</span> <span class="o">-</span><span class="n">c</span> <span class="mi">10</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_load</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_load</span> <span class="o">-</span><span class="n">w</span> <span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span> <span class="o">-</span><span class="n">c</span> <span class="mi">30</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">20</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_root</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_disk</span> <span class="o">-</span><span class="n">w</span> <span class="mi">20</span><span class="o">%</span> <span class="o">-</span><span class="n">c</span> <span class="mi">10</span><span class="o">%</span> <span class="o">-</span><span class="n">p</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">mapper</span><span class="o">/</span><span class="n">vg_root</span><span class="o">-</span><span class="n">lv_root</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_boot</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_disk</span> <span class="o">-</span><span class="n">w</span> <span class="mi">20</span><span class="o">%</span> <span class="o">-</span><span class="n">c</span> <span class="mi">10</span><span class="o">%</span> <span class="o">-</span><span class="n">p</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">vda1</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_zombie_procs</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_procs</span> <span class="o">-</span><span class="n">w</span> <span class="mi">5</span> <span class="o">-</span><span class="n">c</span> <span class="mi">10</span> <span class="o">-</span><span class="n">s</span> <span class="n">Z</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_total_procs</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_procs</span> <span class="o">-</span><span class="n">w</span> <span class="mi">200</span> <span class="o">-</span><span class="n">c</span> <span class="mi">250</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_swap</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_swap</span> <span class="o">-</span><span class="n">w</span> <span class="mi">80</span><span class="o">%</span> <span class="o">-</span><span class="n">c</span> <span class="mi">50</span><span class="o">%</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_memory</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_memory</span><span class="o">.</span><span class="n">pl</span>
+
+<span class="c1"># sipx service checks</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_sipxconfig</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_postgres</span><span class="o">.</span><span class="n">pl</span> <span class="o">-</span><span class="n">db</span> <span class="n">SIPXCONFIG</span> <span class="o">--</span><span class="n">action</span> <span class="n">connection</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_sipxcdr</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_postgres</span><span class="o">.</span><span class="n">pl</span> <span class="o">-</span><span class="n">db</span> <span class="n">SIPXCDR</span> <span class="o">--</span><span class="n">action</span> <span class="n">connection</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_ui</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_http</span> <span class="o">-</span><span class="n">w5</span> <span class="o">-</span><span class="n">c</span> <span class="mi">10</span> <span class="o">--</span><span class="n">ssl</span> <span class="o">-</span><span class="n">H</span> <span class="n">sipx1</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">u</span> <span class="o">/</span><span class="n">sipxconfig</span><span class="o">/</span><span class="n">app</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_sip_registration</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_registrations</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_ntp_time</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_ntp_time</span> <span class="o">-</span><span class="n">H</span> <span class="n">sipx1</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">w</span> <span class="mf">0.5</span> <span class="o">-</span><span class="n">c</span> <span class="mi">1</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_mongo_connect</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">python</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_mongo</span> <span class="o">-</span><span class="n">H</span> <span class="n">sipx1</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">A</span> <span class="n">connect</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_mongo_ops</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">python</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_mongo</span> <span class="o">-</span><span class="n">H</span> <span class="n">sipx1</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">A</span> <span class="n">count</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_mongo_lag</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">python</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_mongo</span> <span class="o">-</span><span class="n">H</span> <span class="n">sipx1</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">A</span> <span class="n">long</span>
+
+<span class="c1"># dns checks</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_tcp_sip_srv</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_dns</span> <span class="o">-</span><span class="n">H</span> <span class="n">_sip</span><span class="o">.</span><span class="n">_tcp</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">s</span> <span class="mf">127.0.0.1</span> <span class="o">-</span><span class="n">q</span> <span class="n">SRV</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_udp_sip_srv</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_dns</span> <span class="o">-</span><span class="n">H</span> <span class="n">_sip</span><span class="o">.</span><span class="n">_udp</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">s</span> <span class="mf">127.0.0.1</span> <span class="o">-</span><span class="n">q</span> <span class="n">SRV</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_tcp_sips_srv</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_dns</span> <span class="o">-</span><span class="n">H</span> <span class="n">_sips</span><span class="o">.</span><span class="n">_tcp</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">s</span> <span class="mf">127.0.0.1</span> <span class="o">-</span><span class="n">q</span> <span class="n">SRV</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_sip_tls_srv</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_dns</span> <span class="o">-</span><span class="n">H</span> <span class="n">_sip</span><span class="o">.</span><span class="n">_tls</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">s</span> <span class="mf">127.0.0.1</span> <span class="o">-</span><span class="n">q</span> <span class="n">SRV</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_sip_mwi_srv</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_dns</span> <span class="o">-</span><span class="n">H</span> <span class="n">_sip</span><span class="o">.</span><span class="n">_tcp</span><span class="o">.</span><span class="n">mwi</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">s</span> <span class="mf">127.0.0.1</span> <span class="o">-</span><span class="n">q</span> <span class="n">SRV</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_sip_rr_srv</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_dns</span> <span class="o">-</span><span class="n">H</span> <span class="n">_sip</span><span class="o">.</span><span class="n">_tcp</span><span class="o">.</span><span class="n">rr</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">s</span> <span class="mf">127.0.0.1</span> <span class="o">-</span><span class="n">q</span> <span class="n">SRV</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_tcp_vm_srv</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_dns</span> <span class="o">-</span><span class="n">H</span> <span class="n">_sip</span><span class="o">.</span><span class="n">_tcp</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">s</span> <span class="mf">127.0.0.1</span> <span class="o">-</span><span class="n">q</span> <span class="n">SRV</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_xmpp_server_srv</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_dns</span> <span class="o">-</span><span class="n">H</span> <span class="n">_xmpp</span><span class="o">-</span><span class="n">server</span><span class="o">.</span><span class="n">_tcp</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">s</span> <span class="mf">127.0.0.1</span> <span class="o">-</span><span class="n">q</span> <span class="n">SRV</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_xmpp_client_srv</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_dns</span> <span class="o">-</span><span class="n">H</span> <span class="n">_xmpp</span><span class="o">-</span><span class="n">client</span><span class="o">.</span><span class="n">_tcp</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">s</span> <span class="mf">127.0.0.1</span> <span class="o">-</span><span class="n">q</span> <span class="n">SRV</span>
+<span class="n">command</span><span class="p">[</span><span class="n">check_xmpp_conf_srv</span><span class="p">]</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">nagios</span><span class="o">/</span><span class="n">libexec</span><span class="o">/</span><span class="n">check_dns</span> <span class="o">-</span><span class="n">H</span> <span class="n">_xmpp</span><span class="o">-</span><span class="n">server</span><span class="o">.</span><span class="n">_tcp</span><span class="o">.</span><span class="n">conference</span><span class="o">.</span><span class="n">example</span><span class="o">.</span><span class="n">org</span> <span class="o">-</span><span class="n">s</span> <span class="mf">127.0.0.1</span> <span class="o">-</span><span class="n">q</span> <span class="n">SRV</span>
+</pre></div>
+</div>
+<p>As there are checks that are executed server side, those need to be defined in /usr/local/nagios/etc/objects/commands.cfg on the Nagios server:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>define command{
+command_name check_tftp
+command_line $USER1$/check_tftp --get $HOSTADDRESS$ 000000000000.cfg 7167
+}
+
+define command{
+command_name check_jabber
+command_line $USER1$/check_jabber -H $HOSTADDRESS$ --expect=&#39;xmlns=&quot;jabber:client&quot; from=&quot;example.org&quot;&#39;
+}
+
+define command {
+command_name check_ssl_certificate
+command_line $USER1$/check_ssl_certificate -H $HOSTADDRESS$ -c 3 -w 7
+}
+</pre></div>
+</div>
+</section>
+<section id="rd-party-checks">
+<h3>3rd Party Checks<a class="headerlink" href="#rd-party-checks" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://exchange.nagios.org/directory/Plugins/Instant-Messaging/check_jabber_login/details">check_jabber</a> is used for XMPP checks.
+<a class="reference external" href="https://github.com/mzupan/nagios-plugin-mongodb">check_mongo</a> is used for MongoDB checks.
+<a class="reference external" href="https://exchange.nagios.org/directory/Plugins/Databases/PostgresQL/check_postgres/details">check_postgres</a> is used for PostgreSQL checks.
+For check_sip_registration I created a shell script that utilizes sipx-dbutil.</p>
+</section>
+<section id="additional-notes">
+<h3>Additional Notes<a class="headerlink" href="#additional-notes" title="Link to this heading"></a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><p>You may find some checks complain of missing utils.pm. If you do, check if the script is making any references to the nagios plugins directory. You may need to alter the path to /usr/local/nagios/libexec/.</p></li>
+<li><p>Be sure to inspect any firewalls between your Nagios server and the sipXcom/sipx servers prior to running your checks. Some services such as ssh are restrictive by default in the sipXcom/sipx firewall.</p></li>
+<li><p>It is possible to utilize sipsak to test against the SIP stack, however <strong>be aware that by default sipxcom SIP security feature will will ban the source IP address of client using default sipsak User Agent string.</strong></p></li>
+<li><p>Try not to cause unnecessary stress or bandwidth consumption on the server with your service checks. Once a day is probably good enough for a check interval for some services such as the SSL certificate check. See the “External Command Check Interval” section here : <a class="reference external" href="http://nagios.sourceforge.net/docs/3_0/configmain.html">http://nagios.sourceforge.net/docs/3_0/configmain.html</a>.</p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+<section id="id2">
+<h2>Graylog<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://graylog.org/products/open-source/">Graylog</a> is open source log management/aggregation software. A fully supported Commercial/Enterprise version also exists. For this example I am using the open source version on a Debian 10 server.</p>
+<section id="installation-on-debian-10">
+<h3>Installation on Debian 10<a class="headerlink" href="#installation-on-debian-10" title="Link to this heading"></a></h3>
+<p>Starting from a fresh Debian 10 minimal installation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span> <span class="o">&amp;&amp;</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">upgrade</span> <span class="o">-</span><span class="n">y</span>
+<span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">apt</span><span class="o">-</span><span class="n">transport</span><span class="o">-</span><span class="n">https</span> <span class="n">openjdk</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="n">jre</span><span class="o">-</span><span class="n">headless</span> <span class="n">uuid</span><span class="o">-</span><span class="n">runtime</span> <span class="n">pwgen</span> <span class="n">dirmngr</span> <span class="n">curl</span>
+<span class="n">apt</span><span class="o">-</span><span class="n">key</span> <span class="n">adv</span> <span class="o">--</span><span class="n">keyserver</span> <span class="n">hkp</span><span class="p">:</span><span class="o">//</span><span class="n">keyserver</span><span class="o">.</span><span class="n">ubuntu</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="mi">80</span> <span class="o">--</span><span class="n">recv</span> <span class="mi">4</span><span class="n">B7C549A058F8B6B</span>
+<span class="n">echo</span> <span class="s2">&quot;deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.2 main&quot;</span> <span class="o">|</span> <span class="n">tee</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">apt</span><span class="o">/</span><span class="n">sources</span><span class="o">.</span><span class="n">list</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">mongodb</span><span class="o">-</span><span class="n">org</span><span class="o">-</span><span class="mf">4.2</span><span class="o">.</span><span class="n">list</span>
+<span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span> <span class="o">&amp;&amp;</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">mongodb</span><span class="o">-</span><span class="n">org</span> <span class="o">-</span><span class="n">y</span>
+<span class="n">systemctl</span> <span class="n">daemon</span><span class="o">-</span><span class="n">reload</span>
+<span class="n">systemctl</span> <span class="n">enable</span> <span class="n">mongod</span><span class="o">.</span><span class="n">service</span>
+<span class="n">systemctl</span> <span class="n">restart</span> <span class="n">mongod</span><span class="o">.</span><span class="n">service</span>
+<span class="n">wget</span> <span class="o">-</span><span class="n">qO</span> <span class="o">-</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">artifacts</span><span class="o">.</span><span class="n">elastic</span><span class="o">.</span><span class="n">co</span><span class="o">/</span><span class="n">GPG</span><span class="o">-</span><span class="n">KEY</span><span class="o">-</span><span class="n">elasticsearch</span> <span class="o">|</span> <span class="n">apt</span><span class="o">-</span><span class="n">key</span> <span class="n">add</span> <span class="o">-</span>
+<span class="n">echo</span> <span class="s2">&quot;deb https://artifacts.elastic.co/packages/oss-6.x/apt stable main&quot;</span> <span class="o">|</span> <span class="n">tee</span> <span class="o">-</span><span class="n">a</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">apt</span><span class="o">/</span><span class="n">sources</span><span class="o">.</span><span class="n">list</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">elastic</span><span class="o">-</span><span class="mf">6.</span><span class="n">x</span><span class="o">.</span><span class="n">list</span>
+<span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span> <span class="o">&amp;&amp;</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">elasticsearch</span><span class="o">-</span><span class="n">oss</span> <span class="o">-</span><span class="n">y</span>
+<span class="n">echo</span> <span class="s2">&quot;cluster.name: graylog&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">.</span><span class="n">yml</span>
+<span class="n">echo</span> <span class="s2">&quot;action.auto_create_index: false&quot;</span> <span class="o">&gt;&gt;</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">.</span><span class="n">yml</span>
+<span class="n">systemctl</span> <span class="n">daemon</span><span class="o">-</span><span class="n">reload</span>
+<span class="n">systemctl</span> <span class="n">enable</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">service</span>
+<span class="n">systemctl</span> <span class="n">restart</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">service</span>
+<span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">packages</span><span class="o">.</span><span class="n">graylog2</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">repo</span><span class="o">/</span><span class="n">packages</span><span class="o">/</span><span class="n">graylog</span><span class="o">-</span><span class="mf">3.1</span><span class="o">-</span><span class="n">repository_latest</span><span class="o">.</span><span class="n">deb</span>
+<span class="n">dpkg</span> <span class="o">-</span><span class="n">i</span> <span class="n">graylog</span><span class="o">-</span><span class="mf">3.1</span><span class="o">-</span><span class="n">repository_latest</span><span class="o">.</span><span class="n">deb</span>
+<span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span> <span class="o">&amp;&amp;</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">graylog</span><span class="o">-</span><span class="n">server</span> <span class="o">-</span><span class="n">y</span>
+</pre></div>
+</div>
+<p>For admin password as password and hash edit /etc/graylog/server/server.conf and set:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">echo</span> <span class="s2">&quot;password_secret = naln41C22HRxw3hy9mJ8bipFWBo1aewKFgtXDXp22dNjNJNqEtid6uC0476zIfX5iQ3mZuRp9y7h3XcNY63inPo6vJy7FuLP&quot;</span>
+<span class="n">echo</span> <span class="s2">&quot;root_password_sha2 = 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8&quot;</span>
+<span class="n">echo</span> <span class="s2">&quot;http_bind_address = 192.168.1.114:9000&quot;</span>
+<span class="n">echo</span> <span class="s2">&quot;http_publish_uri = http://192.168.1.114:9000&quot;</span>
+<span class="n">systemctl</span> <span class="n">enable</span> <span class="n">graylog</span><span class="o">-</span><span class="n">server</span><span class="o">.</span><span class="n">service</span>
+<span class="n">systemctl</span> <span class="n">start</span> <span class="n">graylog</span><span class="o">-</span><span class="n">server</span><span class="o">.</span><span class="n">service</span>
+</pre></div>
+</div>
+<p>The Graylog webui should now be up on <a class="reference external" href="http://192.168.1.114:9000">http://192.168.1.114:9000</a>. Create a GELF UDP input using the default port 12201.</p>
+</section>
+<section id="fluentd-on-graylog-server">
+<h3>Fluentd on Graylog server<a class="headerlink" href="#fluentd-on-graylog-server" title="Link to this heading"></a></h3>
+<p>Fluent Bit is an open source and multi-platform Log Processor and Forwarder which allows you to collect data/logs from different sources, unify and send them to multiple destinations. It’s fully compatible with Docker and Kubernetes environments. Fluent Bit is written in C and has a pluggable architecture supporting around 30 extensions.</p>
+<p>For this example fluentd is running on the Graylog server. It is used to convert data received into the Graylog GELF format.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># fluentd on graylog</span>
+<span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">sudo</span> <span class="n">ntp</span> <span class="n">ntpdate</span> <span class="n">ntpstat</span> <span class="n">ruby</span><span class="o">-</span><span class="n">gelf</span>
+<span class="n">curl</span> <span class="o">-</span><span class="n">L</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">toolbelt</span><span class="o">.</span><span class="n">treasuredata</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">sh</span><span class="o">/</span><span class="n">install</span><span class="o">-</span><span class="n">debian</span><span class="o">-</span><span class="n">buster</span><span class="o">-</span><span class="n">td</span><span class="o">-</span><span class="n">agent3</span><span class="o">.</span><span class="n">sh</span>
+<span class="n">systemctl</span> <span class="n">daemon</span><span class="o">-</span><span class="n">reload</span>
+<span class="n">systemctl</span> <span class="n">enable</span> <span class="n">td</span><span class="o">-</span><span class="n">agent</span>
+<span class="n">td</span><span class="o">-</span><span class="n">agent</span><span class="o">-</span><span class="n">gem</span> <span class="n">install</span> <span class="n">gelf</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">td</span><span class="o">-</span><span class="n">agent</span><span class="o">/</span><span class="n">plugin</span>
+<span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">raw</span><span class="o">.</span><span class="n">githubusercontent</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">emsearcy</span><span class="o">/</span><span class="n">fluent</span><span class="o">-</span><span class="n">plugin</span><span class="o">-</span><span class="n">gelf</span><span class="o">/</span><span class="n">master</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">fluent</span><span class="o">/</span><span class="n">plugin</span><span class="o">/</span><span class="n">out_gelf</span><span class="o">.</span><span class="n">rb</span>
+<span class="n">cd</span> <span class="o">../</span>
+</pre></div>
+</div>
+<p>Append to /etc/td-agent/td-agent.conf:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">source</span><span class="o">&gt;</span>
+    <span class="nb">type</span> <span class="n">syslog</span>
+    <span class="n">tag</span> <span class="n">hostname_goes_here</span>
+<span class="o">&lt;/</span><span class="n">source</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">match</span> <span class="o">*.*&gt;</span>
+    <span class="nb">type</span> <span class="n">copy</span>
+    <span class="o">&lt;</span><span class="n">store</span><span class="o">&gt;</span>
+        <span class="nb">type</span> <span class="n">gelf</span>
+        <span class="n">host</span> <span class="mf">0.0.0.0</span>
+        <span class="n">port</span> <span class="mi">12201</span>
+        <span class="n">flush_interval</span> <span class="mi">5</span><span class="n">s</span>
+    <span class="o">&lt;/</span><span class="n">store</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">store</span><span class="o">&gt;</span>
+        <span class="nb">type</span> <span class="n">stdout</span>
+    <span class="o">&lt;/</span><span class="n">store</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">match</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Restart the service and configure the service to start at boot with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">systemctl</span> <span class="n">restart</span> <span class="n">td</span><span class="o">-</span><span class="n">agent</span>
+<span class="n">systemctl</span> <span class="n">enable</span> <span class="n">td</span><span class="o">-</span><span class="n">agent</span>
+</pre></div>
+</div>
+</section>
+<section id="fluentbit-on-the-sipxcom-server">
+<h3>Fluentbit on the sipxcom server<a class="headerlink" href="#fluentbit-on-the-sipxcom-server" title="Link to this heading"></a></h3>
+<p>For this example I am using fluentbit on the sipxcom server to ship logs to the fluentd instance of the Graylog server:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># fluentbit on sipx/uniteme centos7</span>
+<span class="n">cd</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">yum</span><span class="o">.</span><span class="n">repos</span><span class="o">.</span><span class="n">d</span><span class="o">/</span>
+<span class="n">nano</span> <span class="n">fluentbit</span><span class="o">.</span><span class="n">repo</span>
+</pre></div>
+</div>
+<p>Inside fluentbit.repo:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">fluentbit</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">fluentbit</span>
+<span class="n">baseurl</span> <span class="o">=</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">packages</span><span class="o">.</span><span class="n">fluentbit</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">centos</span><span class="o">/</span><span class="mi">7</span>
+<span class="n">gpgcheck</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">gpgkey</span><span class="o">=</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">packages</span><span class="o">.</span><span class="n">fluentbit</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">fluentbit</span><span class="o">.</span><span class="n">key</span>
+<span class="n">enabled</span><span class="o">=</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>Next update the packages:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yum</span> <span class="n">update</span>
+<span class="n">yum</span> <span class="n">install</span> <span class="n">td</span><span class="o">-</span><span class="n">agent</span><span class="o">-</span><span class="n">bit</span> <span class="o">-</span><span class="n">y</span>
+<span class="n">mv</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">td</span><span class="o">-</span><span class="n">agent</span><span class="o">-</span><span class="n">bit</span><span class="o">/</span><span class="n">td</span><span class="o">-</span><span class="n">agent</span><span class="o">-</span><span class="n">bit</span><span class="o">.</span><span class="n">conf</span> <span class="o">~/</span><span class="n">td</span><span class="o">-</span><span class="n">agent</span><span class="o">-</span><span class="n">bit</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">orig</span>
+<span class="n">nano</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">td</span><span class="o">-</span><span class="n">agent</span><span class="o">-</span><span class="n">bit</span><span class="o">/</span><span class="n">td</span><span class="o">-</span><span class="n">agent</span><span class="o">-</span><span class="n">bit</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<p>Inside td-agent-bit.conf:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">INPUT</span><span class="p">]</span>
+    <span class="n">Name</span> <span class="n">cpu</span>
+    <span class="n">Tag</span>  <span class="n">cpu</span><span class="o">.</span><span class="n">local</span>
+    <span class="n">Interval_Sec</span> <span class="mi">1</span>
+
+<span class="p">[</span><span class="n">INPUT</span><span class="p">]</span>
+    <span class="n">Name</span> <span class="n">mem</span>
+    <span class="n">Tag</span> <span class="n">memory</span>
+
+<span class="p">[</span><span class="n">INPUT</span><span class="p">]</span>
+    <span class="n">Name</span> <span class="n">disk</span>
+    <span class="n">Tag</span> <span class="n">disk</span><span class="o">.</span><span class="n">local</span>
+    <span class="n">Interval_Sec</span> <span class="mi">1</span>
+
+<span class="p">[</span><span class="n">INPUT</span><span class="p">]</span>
+    <span class="n">Name</span> <span class="n">netif</span>
+    <span class="n">Tag</span> <span class="n">netif</span><span class="o">.</span><span class="n">eth0</span>
+    <span class="n">Interval_Sec</span> <span class="mi">1</span>
+    <span class="n">Interface</span> <span class="n">eth0</span>
+
+<span class="p">[</span><span class="n">INPUT</span><span class="p">]</span>
+    <span class="n">Name</span> <span class="n">health</span>
+    <span class="n">Tag</span> <span class="n">health</span><span class="o">.</span><span class="n">proxy</span>
+    <span class="n">Host</span> <span class="mf">192.168.2.14</span>
+    <span class="n">Port</span> <span class="mi">5060</span>
+    <span class="n">Interval_Sec</span> <span class="mi">60</span>
+    <span class="n">Alert</span> <span class="n">true</span>
+    <span class="n">Add_Host</span> <span class="n">true</span>
+    <span class="n">Add_Port</span> <span class="n">true</span>
+
+<span class="p">[</span><span class="n">INPUT</span><span class="p">]</span>
+    <span class="n">Name</span> <span class="n">health</span>
+    <span class="n">Tag</span> <span class="n">health</span><span class="o">.</span><span class="n">registrar</span>
+    <span class="n">Host</span> <span class="mf">192.168.2.14</span>
+    <span class="n">Port</span> <span class="mi">5070</span>
+    <span class="n">Interval_Sec</span> <span class="mi">60</span>
+    <span class="n">Alert</span> <span class="n">true</span>
+    <span class="n">Add_Host</span> <span class="n">true</span>
+    <span class="n">Add_Port</span> <span class="n">true</span>
+
+<span class="p">[</span><span class="n">INPUT</span><span class="p">]</span>
+    <span class="n">Name</span> <span class="n">health</span>
+    <span class="n">Tag</span> <span class="n">health</span><span class="o">.</span><span class="n">bridge</span>
+    <span class="n">Host</span> <span class="mf">192.168.2.14</span>
+    <span class="n">Port</span> <span class="mi">5090</span>
+    <span class="n">Interval_Sec</span> <span class="mi">60</span>
+    <span class="n">Alert</span> <span class="n">true</span>
+    <span class="n">Add_Host</span> <span class="n">true</span>
+    <span class="n">Add_Port</span> <span class="n">true</span>
+
+<span class="p">[</span><span class="n">INPUT</span><span class="p">]</span>
+    <span class="n">Name</span> <span class="n">health</span>
+    <span class="n">Tag</span> <span class="n">health</span><span class="o">.</span><span class="n">mongo</span>
+    <span class="n">Host</span> <span class="mf">127.0.0.1</span>
+    <span class="n">Port</span> <span class="mi">27017</span>
+    <span class="n">Interval_Sec</span> <span class="mi">60</span>
+    <span class="n">Alert</span> <span class="n">true</span>
+    <span class="n">Add_Host</span> <span class="n">true</span>
+    <span class="n">Add_Port</span> <span class="n">true</span>
+
+<span class="p">[</span><span class="n">INPUT</span><span class="p">]</span>
+    <span class="n">Name</span> <span class="n">health</span>
+    <span class="n">Tag</span> <span class="n">health</span><span class="o">.</span><span class="n">pgsql</span>
+    <span class="n">Host</span> <span class="mf">127.0.0.1</span>
+    <span class="n">Port</span> <span class="mi">5432</span>
+    <span class="n">Interval_Sec</span> <span class="mi">60</span>
+    <span class="n">Alert</span> <span class="n">true</span>
+    <span class="n">Add_Host</span> <span class="n">true</span>
+    <span class="n">Add_Port</span> <span class="n">true</span>
+
+<span class="p">[</span><span class="n">INPUT</span><span class="p">]</span>
+    <span class="n">Name</span> <span class="n">health</span>
+    <span class="n">Tag</span> <span class="n">health</span><span class="o">.</span><span class="n">dns</span>
+    <span class="n">Host</span> <span class="mf">127.0.0.1</span>
+    <span class="n">Port</span> <span class="mi">53</span>
+    <span class="n">Interval_Sec</span> <span class="mi">60</span>
+    <span class="n">Alert</span> <span class="n">true</span>
+    <span class="n">Add_Host</span> <span class="n">true</span>
+    <span class="n">Add_Port</span> <span class="n">true</span>
+
+<span class="p">[</span><span class="n">INPUT</span><span class="p">]</span>
+    <span class="n">Name</span> <span class="n">tail</span>
+    <span class="n">Path</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">sipxpbx</span><span class="o">/</span><span class="n">proxy_stats</span><span class="o">.</span><span class="n">json</span>
+    <span class="n">Refresh_Interval</span> <span class="mi">1</span>
+    <span class="n">Parser</span> <span class="n">json</span>
+
+<span class="p">[</span><span class="n">OUTPUT</span><span class="p">]</span>
+    <span class="n">Name</span>  <span class="n">forward</span>
+    <span class="n">Match</span> <span class="o">*</span>
+    <span class="n">Host</span> <span class="mf">192.168.1.114</span>
+    <span class="n">Port</span> <span class="mi">24224</span>
+</pre></div>
+</div>
+<p>And finally restart the service:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">service</span> <span class="n">td</span><span class="o">-</span><span class="n">agent</span><span class="o">-</span><span class="n">bit</span> <span class="n">restart</span>
+</pre></div>
+</div>
+<p>You should now see Graylog reporting activity on the GELF input.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="troubleshooting.html" class="btn btn-neutral float-left" title="Troubleshooting" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="maintenance.html" class="btn btn-neutral float-right" title="Maintenance" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

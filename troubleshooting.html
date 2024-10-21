@@ -1,0 +1,434 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Troubleshooting &mdash; sipxecs 24.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=ed338098"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Monitoring" href="monitoring.html" />
+    <link rel="prev" title="FAQ" href="faq.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/sipxcom_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="history.html">Project History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planning.html">Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="webui.html">Web UI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Troubleshooting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#detailed-problem-description">Detailed Problem Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#snapshot-covering-the-time-of-the-incident">Snapshot Covering the Time of the Incident</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#call-packet-capture">Call Packet Capture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-wireshark-to-view-packet-captures">Using Wireshark to view packet captures</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#logs">Logs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sipcodes-sh">sipcodes.sh</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dns-checks">DNS Checks</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ms-windows">MS Windows</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mac-linux-unix">Mac, Linux/Unix</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#the-call-id-header">The Call-ID Header</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="monitoring.html">Monitoring</a></li>
+<li class="toctree-l1"><a class="reference internal" href="maintenance.html">Maintenance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">Other / How To</a></li>
+<li class="toctree-l1"><a class="reference internal" href="restapi.html">REST API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="soapapi.html">SOAP API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sipxecs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Troubleshooting</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/troubleshooting.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="troubleshooting">
+<span id="index-0"></span><h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h1>
+<p>If you can’t reproduce the problem it probably isn’t worth troubleshooting it. Test multiple times, and from (or to) multiple locations.</p>
+<p>For example, internal (extension to extension) calls only traverse the proxy/registrar and do not involve PSTN gateways.
+If a internal ext to ext call is working correctly, but a internal ext to external PSTN number is not working, the problem is likely the PSTN gateway rather than sipxcom.</p>
+<p>Another example might be if the presence status is not updating for contacts on your phone, but other phones are fine.
+Rebooting the phone will force it to renew any line registrations and presence subscriptions. Try that first.</p>
+<p>Narrow down where the problem may be by following a process of elimination.</p>
+<section id="detailed-problem-description">
+<h2>Detailed Problem Description<a class="headerlink" href="#detailed-problem-description" title="Link to this heading"></a></h2>
+<p>Try to provide as much detail as possible. The more information the support team has to work with, the less likely they will have to ask for more information.</p>
+<p>For example, instead of stating:</p>
+<p><strong>Bob, on extension 204, can’t transfer a call to Sally on extension 205.</strong></p>
+<p>Provide significantly more detail by stating something like:</p>
+<p><strong>Bob (extension 204) received a call from 555-321-1234 at approximately 10:30 AM EST, which he then answered.
+Bob attempted to perform a consultative transfer to Sally (extension 205) but was prompted on her handset, “Cannot Complete Transfer.”</strong></p>
+<p>Note how the time that the incident occurred and the transfer type are important. This helps the support team track down the issue.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>There is a signaling difference between a blind transfer and a consultative/attended transfer.
+Blind transfer should work in every call scenario. Consultative transfer has limitations. For example, you cannot consultative transfer to a voicemail box or conference extension.
+<strong>We strongly recommend using blind transfer by default.</strong> Not all gateways can handle REFERs used in a consultative transfer, and PRACKs can cause audio issues.
+See the <a class="reference internal" href="webui.html#example-custom-configuration-files"><span class="std std-ref">Example custom configuration files</span></a> section for a custom config that sets blind transfer as default, or to disable phone response to PRACKs.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>“If no response” call forwards are similar to blind transfer. The call is not forked.
+“At the same time” call forwards are similar to consultative transfer. The call is forked.
+<strong>We strongly recommend using ‘if no response’ instead of ‘at the same time’.</strong>
+Again not all gateways can handle REFERs, and PRACKs can cause audio issues.</p>
+</div>
+</section>
+<section id="snapshot-covering-the-time-of-the-incident">
+<h2>Snapshot Covering the Time of the Incident<a class="headerlink" href="#snapshot-covering-the-time-of-the-incident" title="Link to this heading"></a></h2>
+<p>The following steps will ensure a good quality snapshot for support team to work with.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Turn up logging to INFO for the proxy service</p></li>
+<li><p>Reproduce the problem</p></li>
+<li><p>Take a snapshot as soon as possible after</p></li>
+</ul>
+</div></blockquote>
+<p>See the <a class="reference internal" href="webui.html#diagnostics-snapshot"><span class="std std-ref">Snapshot</span></a> section.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The snapshot archive(s) are saved locally beneath the primary (webui) server /var/sipxdata/tmp/.</p>
+</div>
+</section>
+<section id="call-packet-capture">
+<h2>Call Packet Capture<a class="headerlink" href="#call-packet-capture" title="Link to this heading"></a></h2>
+<p>See <a class="reference internal" href="webui.html#utility-services"><span class="std std-ref">Utility Services</span></a> for automated packet capture. This is resource intensive, so it should only be enabled while troubleshooting.
+Another option is initiate the packet capture on the command line. Just before you begin to reproduce the issue, issue as root (on all servers running the proxy service):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tcpdump</span> <span class="o">-</span><span class="n">s0</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">i</span> <span class="nb">any</span> <span class="o">-</span><span class="n">w</span> <span class="o">~/</span><span class="n">server1_example1</span><span class="o">.</span><span class="n">pcap</span>
+</pre></div>
+</div>
+<p>Notice the server name is in the filename so it can be easily distinguished. The CDR records may help you gather information, such as From:, To:, date/time of the call, or the Call-ID if you exported the CSV from CDRs.</p>
+<section id="using-wireshark-to-view-packet-captures">
+<h3>Using Wireshark to view packet captures<a class="headerlink" href="#using-wireshark-to-view-packet-captures" title="Link to this heading"></a></h3>
+<p>First open the packet capture file in <a class="reference external" href="https://www.wireshark.org/">Wireshark</a>, then navigate to Telephony - Voip Calls.</p>
+<img alt="_images/wireshark1.png" class="align-center" src="_images/wireshark1.png" />
+<p>Calls within the packet capture are listed in the “Voip Calls” window. Hold down shift and click to highlight those you’re interested in.</p>
+<img alt="_images/wireshark2.png" class="align-center" src="_images/wireshark2.png" />
+<p>After highlighting calls you are interested in, options will become available at the bottom of the Voip Calls window.</p>
+<img alt="_images/wireshark3.png" class="align-center" src="_images/wireshark3.png" />
+<p><strong>Prepare Filter</strong> will generate a filter in the main application window to display only SIP (and RTP packets if available) involved in the selected calls.</p>
+<img alt="_images/wireshark6-prepfilter.png" class="align-center" src="_images/wireshark6-prepfilter.png" />
+<p>This can be used to create sanitized (smaller) exports. To export a sanitized pcap (after using <strong>Prepare filter</strong>), click File - Export Specified Packets.</p>
+<img alt="_images/wireshark7-export1.png" class="align-center" src="_images/wireshark7-export1.png" />
+<p>Next provide the output filename. The “Displayed” option should be selected. This exports only packets displayed in the main application window (after filtering).</p>
+<img alt="_images/wireshark8-export2.png" class="align-center" src="_images/wireshark8-export2.png" />
+<ul class="simple">
+<li><p><strong>Flow Sequence</strong> will display the SIP ladder of the selected calls. Clicking any part of the ladder will move your placement in the main application window to that particular packet number.</p></li>
+</ul>
+<img alt="_images/wireshark4-ladder.png" class="align-center" src="_images/wireshark4-ladder.png" />
+<ul class="simple">
+<li><p><strong>Play Streams</strong> is useful to view or listen to audio RTP involved in the call.</p></li>
+</ul>
+<img alt="_images/wireshark5-playstreams.png" class="align-center" src="_images/wireshark5-playstreams.png" />
+</section>
+</section>
+<section id="logs">
+<h2>Logs<a class="headerlink" href="#logs" title="Link to this heading"></a></h2>
+<p>The first step is to gather logs.
+<strong>All SIP signaling passes through the proxy service, but by default the log verbosity of the proxy service is set to NOTICE which does not display the SIP messages.</strong></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each server has its own set of logs beneath /var/log/sipxpbx/. The sipXproxy.log on server1 will be different than on server2 or server3.</p>
+</div>
+<p>In order to see SIP messages in the sipXproxy.log file(s), increase the verbosity to INFO (or DEBUG) beneath System - Services - SIP Proxy - Log Level, then apply at the bottom of the page.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This will restart the proxy service which may interrupt calls.</p>
+</div>
+<img alt="_images/proxy_loglevelinfo.png" class="align-center" src="_images/proxy_loglevelinfo.png" />
+<p>This will also enable use of the <a class="reference internal" href="#sipcodes"><span class="std std-ref">sipcodes.sh</span></a> script, which is now included in the sipxcom (19.04 and above) rpms. It counts SIP messages in the logs, so log verbostiy must be at INFO or DEBUG to count them.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Upon snapshot creation the sipcodes script is ran against the entire proxy log file.
+You’ll always get the entire count (no matter what the log filter percentage was) in the snapshot as ./var/log/sipxpbx/sipcodes.log, given sipcodes had something to count (<strong>proxy log must be at INFO or DEBUG</strong>).</p>
+</div>
+<p>All sipxcom service logs are beneath /var/log/sipxpbx/. Other services such as apache2 (/var/log/httpd/), mongodb (/var/log/mongodb/), and postgresql (/var/lib/pgsql/data/pg_log/) logs are outside of that directory.
+A sipxcom snapshot is a handy way to grab everything that may be of use all at once.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The logs are rotated every 24 hours. Rotated logs are renamed to be suffixed with the date, and may be compressed with gzip.</p>
+</div>
+</section>
+<section id="sipcodes-sh">
+<span id="sipcodes"></span><h2>sipcodes.sh<a class="headerlink" href="#sipcodes-sh" title="Link to this heading"></a></h2>
+<p>The sipcodes script (/usr/bin/sipcodes.sh) was developed to provide quick counts from the /var/log/sipxpbx/sipXproxy.log, or /var/log/sipxpbx/sipxbridge.log.
+The log verbosity of these services must be set to INFO or DEBUG in order to see and count the SIP signaling within the log.</p>
+<p>A basic understanding of SIP signaling is required to understand and act upon the output of the script. In summary:</p>
+<blockquote>
+<div><ul>
+<li><p>A <strong>REGISTER</strong> is used to authenticate a SIP user.
+Within the <strong>REGISTER</strong> message, the <strong>From:</strong> header indicates the user attempting registration.
+The <strong>Contact:</strong> header provides the IP address of the phone or device sending the <strong>REGISTER</strong>.
+All registrations can be viewed beneath <a class="reference internal" href="webui.html#diagnostics-registrations"><span class="std std-ref">Diagnostics - Registrations</span></a>, or for a single user in <a class="reference internal" href="webui.html#users"><span class="std std-ref">Users Tab</span></a> - $user - Registrations.</p></li>
+<li><p>A <strong>INVITE</strong> is used when a user places a call.
+The <strong>To:</strong> header is the number dialed, the <strong>From:</strong> header is the user that sent it, and again the <strong>Contact:</strong> usually contains the IP of the device sending the message.
+INVITEs create entries in the <a class="reference internal" href="webui.html#diagnostics-call-detail-records"><span class="std std-ref">Call Detail Records</span></a>.</p></li>
+<li><p>A <strong>SUBSCRIBE</strong> is used when a SIP phone requests a feature on the server. Within the <strong>SUBSCRIBE</strong> message, the <strong>Event:</strong> header describes the service requested.</p>
+<ul>
+<li><p><strong>Event: message-summary</strong> is used with the <a class="reference internal" href="webui.html#message-waiting-indicator"><span class="std std-ref">Message Waiting Indicator (MWI)</span></a> service.
+A phone that supports this feature may have a light that blinks upon voicemail deposit.</p>
+<p>The MWI subscription of a Polycom phone is defined in the Users - $user - Phones - $phone - Lines - $line - Messaging tab.</p>
+<img alt="_images/mwi_subscription.png" class="align-center" src="_images/mwi_subscription.png" />
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To remove the MWI subscription empty the ‘subscribe’ field, apply, then send profiles to the phone. Repeat for each phone assigned.</p>
+</div>
+<ul>
+<li><p><strong>Event: dialog</strong> is used when the user is subscribed to the presence status of another user.
+These are defined in Users - $user - Speed Dials with the “Subscribe to presence” option checked.</p>
+<img alt="_images/speeddial_presence.png" class="align-center" src="_images/speeddial_presence.png" />
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Speed dial entries <strong>without</strong> “Subscribe to presence” checked are saved in /var/sipxdata/configserver/phone/profile/tftproot/$mac-directory.xml.
+Speed dial entries <strong>with</strong> “Subscribe to presence” checked are stored in the SIPXCONFIG database.</p>
+</div>
+<ul>
+<li><p><strong>Event: dialog;sla</strong> is used with the <a class="reference internal" href="webui.html#shared-appearance-agent"><span class="std std-ref">SAA/BLA</span></a> service.
+This allows a single extension to be assigned to multiple phones. The line status is shared between phones using this method.
+If the line is shared the ‘Shared’ box will be checked beneath Users - $user - Phones.</p>
+<img alt="_images/user_sharedlines.png" class="align-center" src="_images/user_sharedlines.png" />
+</li>
+</ul>
+<p>As with <strong>INVITE</strong> and <strong>REGISTER</strong>, the <strong>Contact:</strong> header in a <strong>SUBSCRIBE</strong> is usually the IP of the device sending the message.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Only those three <strong>SUBSCRIBE Event:</strong> headers are supported. If you find other Event: headers such as <strong>Event: presence</strong> or <strong>Event: as-feature-event</strong> you can safely assume the device is not configured properly.</p>
+</div>
+</li>
+</ul>
+</div></blockquote>
+<p>There are more such as <strong>OPTIONS</strong> and <strong>ACKs</strong>, but these are usually not as important.</p>
+<p>The first section of the sipcodes output describes the time period covered in the log file provided. Note that both proxy and bridge timestamps are in UTC/GMT.
+This portion is simply gathering and filtering output from the top (head) two lines and the last (tail) two lines of the log.</p>
+<p>The next section describes overall SIP message counts mentioned previously, including OPTIONS and ACKs.</p>
+<p>The “additional information” of each provides the most useful troubleshooting information.
+<strong>The default output only displays the top 50 results.</strong>
+If you have thousands of users or if there are more than 50 users/devices spamming the proxy, you may need to increase this (edit the “head -n50” parts of the script) to get a higher level perspective.</p>
+<p>Users with the lowest counts in each column are likely users with a single phone assignment and properly configured. <strong>Users with substantially higher counts than others should be suspected as misconfigured.</strong></p>
+<p>For example:</p>
+<ul class="simple">
+<li><p>A user who has configured a incorrect SIP password on a gateway/phone will have a much higher <strong>REGISTER</strong> count than others because the gateway/phone will continually send requests and fail.
+A successful REGISTER does not send another request until the registration counter is near expiration (expiration values are typically somewhere between 300 to 3600 seconds).
+The only legitimate reason for a high <strong>REGISTER</strong> count is multiple phone assignment, or the device is configured manually with a shorter registration interval than everyone else.</p></li>
+<li><p>A user with a much higher <strong>SUBSCRIBE Event: message-summary</strong> count may not have voicemail permission, or even exist anymore, but the phone is still configured to subscribe to MWI.
+If the user doesn’t exist or is disabled, you will probably see a high <strong>REGISTER</strong> count as well.</p></li>
+</ul>
+<p>At the bottom of the output are some <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_SIP_response_codes#4xx%E2%80%94Client_Failure_Responses">400</a>
+and <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_SIP_response_codes#5xx%E2%80%94Server_Failure_Responses">500</a> series checks. A healthy output would be 0 on all of those.
+If devices are flooding the server it will fill the proxy message queue and prevent it from processing legitimate traffic.
+If you see a high count of 503 Service Unavailable responses this has happened (or is happening).</p>
+<p>If you need to determine the IP address of a phone, the <strong>Contact:</strong> header may be used.
+The exception is if the device is behind a SBC (upper registered).
+For example, if there is a very high <strong>REGISTER</strong> count from user 200, who no longer exists in the system anymore but still assigned to a phone, you could manually filter the proxy log like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">grep</span> <span class="s2">&quot;REGISTER sip&quot;</span> <span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">sipxpbx</span><span class="o">/</span><span class="n">sipXproxy</span><span class="o">.</span><span class="n">log</span> <span class="o">|</span> <span class="n">grep</span> <span class="s2">&quot;INCOMING&quot;</span> <span class="o">|</span> <span class="n">grep</span> <span class="s2">&quot;sip:200&quot;</span> <span class="o">|</span> <span class="n">syslogviewer</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">pager</span> <span class="o">|</span> <span class="n">grep</span> <span class="s2">&quot;Contact:&quot;</span> <span class="o">|</span> <span class="n">awk</span> <span class="o">-</span><span class="n">F</span> <span class="s2">&quot;;&quot;</span> <span class="s1">&#39;{ print $1 }&#39;</span> <span class="o">|</span> <span class="n">sort</span> <span class="o">|</span> <span class="n">uniq</span> <span class="o">-</span><span class="n">c</span> <span class="o">|</span> <span class="n">sort</span> <span class="o">-</span><span class="n">rn</span>
+</pre></div>
+</div>
+</section>
+<section id="dns-checks">
+<span id="id3"></span><h2>DNS Checks<a class="headerlink" href="#dns-checks" title="Link to this heading"></a></h2>
+<p>Use a desktop on the same network as your phones.</p>
+<section id="ms-windows">
+<h3>MS Windows<a class="headerlink" href="#ms-windows" title="Link to this heading"></a></h3>
+<p>Use nslookup on the command line to check if DNS SRV records can be found.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">C</span><span class="p">:</span>\<span class="o">&gt;</span><span class="n">nslookup</span>
+<span class="n">Default</span> <span class="n">Server</span><span class="p">:</span>  <span class="n">UnKnown</span>
+<span class="n">Address</span><span class="p">:</span>  <span class="mf">192.168.1.14</span>
+
+<span class="o">&gt;</span> <span class="nb">set</span> <span class="nb">type</span><span class="o">=</span><span class="n">SRV</span>
+<span class="o">&gt;</span> <span class="n">_sip</span><span class="o">.</span><span class="n">_tcp</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span>
+<span class="n">Server</span><span class="p">:</span>  <span class="n">UnKnown</span>
+<span class="n">Address</span><span class="p">:</span>  <span class="mf">192.168.1.14</span>
+
+<span class="n">_sip</span><span class="o">.</span><span class="n">_tcp</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span>     <span class="n">SRV</span> <span class="n">service</span> <span class="n">location</span><span class="p">:</span>
+          <span class="n">priority</span>       <span class="o">=</span> <span class="mi">30</span>
+          <span class="n">weight</span>         <span class="o">=</span> <span class="mi">10</span>
+          <span class="n">port</span>           <span class="o">=</span> <span class="mi">5060</span>
+          <span class="n">svr</span> <span class="n">hostname</span>   <span class="o">=</span> <span class="n">sipx</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span>
+<span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span>       <span class="n">nameserver</span> <span class="o">=</span> <span class="n">sipx</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span>
+<span class="n">sipx</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span>  <span class="n">internet</span> <span class="n">address</span> <span class="o">=</span> <span class="mf">192.168.1.14</span>
+<span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="mac-linux-unix">
+<h3>Mac, Linux/Unix<a class="headerlink" href="#mac-linux-unix" title="Link to this heading"></a></h3>
+<p>Use dig on the command line to check if DNS SRV records can be found.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># dig -t SRV _sip._tcp.home.mattkeys.net @192.168.1.14</span>
+
+<span class="p">;</span> <span class="o">&lt;&lt;&gt;&gt;</span> <span class="n">DiG</span> <span class="mf">9.11.5</span><span class="o">-</span><span class="n">P4</span><span class="o">-</span><span class="mf">5.1</span><span class="o">+</span><span class="n">deb10u2</span><span class="o">-</span><span class="n">Debian</span> <span class="o">&lt;&lt;&gt;&gt;</span> <span class="o">-</span><span class="n">t</span> <span class="n">SRV</span> <span class="n">_sip</span><span class="o">.</span><span class="n">_tcp</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span> <span class="o">@</span><span class="mf">192.168.1.14</span>
+<span class="p">;;</span> <span class="k">global</span> <span class="n">options</span><span class="p">:</span> <span class="o">+</span><span class="n">cmd</span>
+<span class="p">;;</span> <span class="n">Got</span> <span class="n">answer</span><span class="p">:</span>
+<span class="p">;;</span> <span class="o">-&gt;&gt;</span><span class="n">HEADER</span><span class="o">&lt;&lt;-</span> <span class="n">opcode</span><span class="p">:</span> <span class="n">QUERY</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="n">NOERROR</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="mi">2639</span>
+<span class="p">;;</span> <span class="n">flags</span><span class="p">:</span> <span class="n">qr</span> <span class="n">aa</span> <span class="n">rd</span> <span class="n">ra</span><span class="p">;</span> <span class="n">QUERY</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ANSWER</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">AUTHORITY</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ADDITIONAL</span><span class="p">:</span> <span class="mi">2</span>
+
+<span class="p">;;</span> <span class="n">OPT</span> <span class="n">PSEUDOSECTION</span><span class="p">:</span>
+<span class="p">;</span> <span class="n">EDNS</span><span class="p">:</span> <span class="n">version</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">flags</span><span class="p">:;</span> <span class="n">udp</span><span class="p">:</span> <span class="mi">4096</span>
+<span class="p">;</span> <span class="n">COOKIE</span><span class="p">:</span> <span class="n">c0d5be2f1899987c18baf1545f96f47f46f6565a81ddbad1</span> <span class="p">(</span><span class="n">good</span><span class="p">)</span>
+<span class="p">;;</span> <span class="n">QUESTION</span> <span class="n">SECTION</span><span class="p">:</span>
+<span class="p">;</span><span class="n">_sip</span><span class="o">.</span><span class="n">_tcp</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span><span class="o">.</span>   <span class="n">IN</span>      <span class="n">SRV</span>
+
+<span class="p">;;</span> <span class="n">ANSWER</span> <span class="n">SECTION</span><span class="p">:</span>
+<span class="n">_sip</span><span class="o">.</span><span class="n">_tcp</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span><span class="o">.</span> <span class="mi">1800</span> <span class="n">IN</span>    <span class="n">SRV</span>     <span class="mi">30</span> <span class="mi">10</span> <span class="mi">5060</span> <span class="n">sipx</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span><span class="o">.</span>
+
+<span class="p">;;</span> <span class="n">AUTHORITY</span> <span class="n">SECTION</span><span class="p">:</span>
+<span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span><span class="o">.</span>      <span class="mi">1800</span>    <span class="n">IN</span>      <span class="n">NS</span>      <span class="n">sipx</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span><span class="o">.</span>
+
+<span class="p">;;</span> <span class="n">ADDITIONAL</span> <span class="n">SECTION</span><span class="p">:</span>
+<span class="n">sipx</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span><span class="o">.</span> <span class="mi">1800</span>    <span class="n">IN</span>      <span class="n">A</span>       <span class="mf">192.168.1.14</span>
+
+<span class="p">;;</span> <span class="n">Query</span> <span class="n">time</span><span class="p">:</span> <span class="mi">1</span> <span class="n">msec</span>
+<span class="p">;;</span> <span class="n">SERVER</span><span class="p">:</span> <span class="mf">192.168.1.14</span><span class="c1">#53(192.168.1.14)</span>
+<span class="p">;;</span> <span class="n">WHEN</span><span class="p">:</span> <span class="n">Mon</span> <span class="n">Oct</span> <span class="mi">26</span> <span class="mi">12</span><span class="p">:</span><span class="mi">08</span><span class="p">:</span><span class="mi">31</span> <span class="n">EDT</span> <span class="mi">2020</span>
+<span class="p">;;</span> <span class="n">MSG</span> <span class="n">SIZE</span>  <span class="n">rcvd</span><span class="p">:</span> <span class="mi">156</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="the-call-id-header">
+<h2>The Call-ID Header<a class="headerlink" href="#the-call-id-header" title="Link to this heading"></a></h2>
+<p>The Call-ID header remains unique during any SIP message dialog. This allows you to use it as the search term in utilities such as grep to follow the dialog.</p>
+<p>The easiest way to obtain the Call-ID of a call is probably using a CDR CSV export. The call ID is a column in the CSV output for each entry.</p>
+<p>The other method is working with the proxy log data directly. <strong>SIP messages are only visible if the proxy log is at INFO or DEBUG verbosity. It is at NOTICE by default, which does not display the SIP messages</strong>.</p>
+<p>The log verbosity setting is <strong>not retrospective</strong>. The setting must be at INFO or DEBUG <em>prior</em> to whatever it is you’re trying to troubleshoot.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you can’t reproduce the problem it probably isn’t worth troubleshooting it. Test multiple times.
+If it is intermittent, and you are running telephony services on multiple servers, that may indicate the problem is isolated to a particular server in the cluster (check DNS SRV and network path).</p>
+</div>
+<p>If the message dialog is a INVITE, and the call is forked such as with a ‘at the same time’ call forward, the end of the Call-ID will be suffixed with -0, -1, and so on for as many call forks there were.
+When using grep against the log, use the first half (that is everything prior to the &#64;) of the Call-ID as your search string. This will ensure you get the entire dialog in the grep output, including any forks.</p>
+<p>For example user 201 called user 200. A call is a INVITE, and the To: is “<a class="reference external" href="sip:200">sip:200</a>”. So we can show all Call-IDs To: 200 with the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># grep &quot;INVITE sip:200&quot; /var/log/sipxpbx/sipXproxy.log | syslogviewer --no-pager | grep &quot;Call-ID:&quot; | sort -u</span>
+<span class="n">Call</span><span class="o">-</span><span class="n">ID</span><span class="p">:</span> <span class="n">a52e3e8fa0e281c4ab51822b2d14f829</span><span class="o">@</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span><span class="p">:</span><span class="mi">0</span>
+</pre></div>
+</div>
+<p>Next use the Call-ID in the output to fetch the entire dialog and redirect output to a log file like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># grep &quot;a52e3e8fa0e281c4ab51822b2d14f829&quot; /var/log/sipxpbx/sipXproxy.log | syslogviewer --no-pager &gt; ~/a52e3e8fa0e281c4ab51822b2d14f829.log</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The syslogviewer utility is only available on systems with sipxcom rpms installed.
+It escapes all line returns (at each header) in the proxy log that would otherwise be considered one single line to tools like grep.
+In other words, syslogviewer makes reading the log human friendly. The –no-pager flag disables the pause at each page.
+This allows for redirection of the entire output to a small log file. As less is the default viewer, this allows for all the features of less.
+For example, use the / key to search and highlight occurrences of a search term.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># syslogviewer --help</span>
+<span class="n">Usage</span><span class="p">:</span>
+      <span class="n">syslogviewer</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span> <span class="o">|</span> <span class="o">--</span><span class="n">help</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="o">|</span> <span class="o">--</span><span class="n">indent</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span><span class="p">[</span><span class="n">nn</span><span class="p">]]</span>
+              <span class="p">[</span><span class="n">of</span><span class="o">=</span><span class="n">output</span><span class="p">]</span>
+              <span class="p">[</span><span class="nb">input</span><span class="p">]</span>
+
+      <span class="o">--</span><span class="n">help</span>  <span class="n">Print</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span><span class="o">.</span>
+      <span class="o">--</span><span class="n">indent</span>        <span class="n">Indent</span> <span class="n">messages</span> <span class="ow">and</span> <span class="n">continued</span> <span class="n">lines</span><span class="o">.</span>
+      <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">pager</span>      <span class="n">Do</span> <span class="ow">not</span> <span class="n">pipe</span> <span class="n">the</span> <span class="n">output</span> <span class="n">through</span> <span class="n">a</span> <span class="n">pager</span><span class="p">,</span> <span class="n">even</span> <span class="k">if</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">tty</span><span class="o">.</span>
+      <span class="o">-</span><span class="n">f</span><span class="p">[</span><span class="n">nn</span><span class="p">]</span>  <span class="n">Fold</span> <span class="n">lines</span> <span class="n">that</span> <span class="n">are</span> <span class="n">over</span> <span class="n">nn</span> <span class="p">(</span><span class="n">default</span> <span class="mi">80</span><span class="p">)</span> <span class="n">characters</span><span class="o">.</span>
+              <span class="n">Implies</span> <span class="o">--</span><span class="n">indent</span><span class="o">.</span>
+      <span class="k">if</span><span class="o">=&lt;</span><span class="n">file</span><span class="o">&gt;</span>       <span class="nb">input</span> <span class="n">file</span> <span class="n">name</span> <span class="p">(</span><span class="n">deprecated</span> <span class="o">-</span> <span class="n">use</span> <span class="n">file</span> <span class="n">name</span> <span class="n">directly</span><span class="p">)</span><span class="o">.</span>
+      <span class="n">of</span><span class="o">=&lt;</span><span class="n">file</span><span class="o">&gt;</span>       <span class="n">output</span> <span class="n">file</span> <span class="n">name</span> <span class="p">(</span><span class="n">defaults</span> <span class="n">to</span> <span class="n">stdout</span><span class="p">)</span>
+      <span class="nb">input</span> <span class="o">-</span> <span class="nb">input</span> <span class="n">file</span> <span class="n">name</span> <span class="p">(</span><span class="n">defaults</span> <span class="n">to</span> <span class="n">stdin</span><span class="p">)</span>
+
+      <span class="n">If</span> <span class="n">stdout</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">tty</span><span class="p">,</span> <span class="n">pipes</span> <span class="n">output</span> <span class="n">through</span> <span class="n">the</span> <span class="n">program</span> <span class="n">specified</span>
+      <span class="n">by</span> <span class="n">the</span> <span class="n">PAGER</span> <span class="n">environment</span> <span class="n">variable</span> <span class="p">(</span><span class="n">defaults</span> <span class="n">to</span> <span class="s1">&#39;less&#39;</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="faq.html" class="btn btn-neutral float-left" title="FAQ" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="monitoring.html" class="btn btn-neutral float-right" title="Monitoring" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

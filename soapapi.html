@@ -1,0 +1,2293 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOAP API Reference &mdash; sipxecs 24.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=ed338098"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="REST API Reference" href="restapi.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/sipxcom_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="history.html">Project History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planning.html">Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="webui.html">Web UI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monitoring.html">Monitoring</a></li>
+<li class="toctree-l1"><a class="reference internal" href="maintenance.html">Maintenance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">Other / How To</a></li>
+<li class="toctree-l1"><a class="reference internal" href="restapi.html">REST API Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SOAP API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#about-soap">About SOAP</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#soap-base-url">SOAP base URL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#soap-use-case-examples">SOAP use case examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#administration-services">Administration Services</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#permissions">Permissions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-permissions">Add Permissions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#find-permissions">Find Permissions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manage-permissions">Manage Permissions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#call-groups">Call Groups</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#add-call-groups">Add Call Groups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get-call-groups">Get Call Groups</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#users">Users</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#add-users">Add Users</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#find-users">Find Users</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manage-users">Manage Users</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#park-orbits">Park Orbits</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#add-park-orbits">Add Park Orbits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get-park-orbits">Get Park Orbits</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#phones">Phones</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#add-phones">Add Phones</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#find-phones">Find Phones</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manage-phones">Manage Phones</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#test">Test</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#reset-services">Reset services</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sipxecs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SOAP API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/soapapi.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="soap-api-reference">
+<span id="index-0"></span><span id="id1"></span><h1>SOAP API Reference<a class="headerlink" href="#soap-api-reference" title="Link to this heading"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Web services defined in this section for configuration of the system are all SOAP based services and require administrator privileges to be used.</p>
+</div>
+<section id="about-soap">
+<h2>About SOAP<a class="headerlink" href="#about-soap" title="Link to this heading"></a></h2>
+<p>The SOAP API enables administrators to perform a variety of functions offered by sipxconfig, but without the need to directly interacting with the sipxconfig webui.</p>
+<p>The server utilizes the <a class="reference external" href="https://axis.apache.org/axis/">Apache Axis</a> framework.</p>
+<section id="soap-base-url">
+<h3>SOAP base URL<a class="headerlink" href="#soap-base-url" title="Link to this heading"></a></h3>
+<p>The base URL for the configuration API is the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">host</span><span class="o">.</span><span class="n">domain</span><span class="o">/</span><span class="n">sipxconfig</span><span class="o">/</span><span class="n">services</span><span class="o">/</span>
+</pre></div>
+</div>
+</section>
+<section id="soap-use-case-examples">
+<h3>SOAP use case examples<a class="headerlink" href="#soap-use-case-examples" title="Link to this heading"></a></h3>
+<p>Use case examples for the SOAP APIs might be:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Integration of sipxcom functionality with your company Intranet site.</p></li>
+<li><p>Automate or script processes such as adding or importing users, updating phones, assigning phones to groups, etc.</p></li>
+<li><p>Customize the sipxconfig webui to suit your needs.</p></li>
+</ul>
+</div></blockquote>
+<p>You can use SOAP with WDSL, which is a formal API definition, and generate bindings in your preferred programming language such as Python, Perl, Ruby, Java, and others. It is recommended to select a programming language with good SOAP client support.</p>
+<p><strong>Ruby:</strong> From the WSDL you can use the <a class="reference external" href="https://rubygems.org/gems/soap4r/versions/1.5.8">SOAP4R project</a> to build client bindings.</p>
+<p><strong>Perl:</strong> Install <a class="reference external" href="https://metacpan.org/pod/SOAP::Lite">SOAP for Perl</a> with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">perl</span> <span class="o">-</span><span class="n">MCPAN</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;install SOAP::lite&#39;</span>
+</pre></div>
+</div>
+<p><strong>Command line:</strong> Use the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>java -jar $WsdlDocDir/wsdldoc.jar {color}
+-title &quot;sipXconfig SOAP API v3.2&quot; {color}
+-dir `pwd`&quot;/ws-api-3.2&quot; {color}
+http://sipXcom.sipfoundry.org/rep/sipXcom/main/sipXconfig/web/src/org/sipfoundry/sipxconfig/api/sipxconfig.wsdl
+</pre></div>
+</div>
+</section>
+</section>
+<section id="administration-services">
+<h2>Administration Services<a class="headerlink" href="#administration-services" title="Link to this heading"></a></h2>
+<p>The following resources for the Configuration API are only available for users with administration rights.</p>
+<dl class="simple">
+<dt><strong>Permissions</strong></dt><dd><ul class="simple">
+<li><p>Add permissions</p></li>
+<li><p>Find permissions</p></li>
+<li><p>Manage permissions</p></li>
+</ul>
+</dd>
+<dt><strong>Call Groups</strong></dt><dd><ul class="simple">
+<li><p>Add call group</p></li>
+<li><p>Find call groups</p></li>
+<li><p>WSDL Call Group</p></li>
+</ul>
+</dd>
+<dt><strong>Users</strong></dt><dd><ul class="simple">
+<li><p>Add users</p></li>
+<li><p>Find users</p></li>
+<li><p>Manage users</p></li>
+</ul>
+</dd>
+<dt><strong>Phones</strong></dt><dd><ul class="simple">
+<li><p>Add phones</p></li>
+<li><p>Find phones</p></li>
+<li><p>Manage phones</p></li>
+</ul>
+</dd>
+<dt><strong>Tests</strong></dt><dd><ul class="simple">
+<li><p>Reset</p></li>
+</ul>
+</dd>
+</dl>
+<section id="permissions">
+<h3>Permissions<a class="headerlink" href="#permissions" title="Link to this heading"></a></h3>
+<p>The Permission Web Services supported are SOAP based services. These services use the Web Service Definition Language (WSDL) to define the interfaces supported.</p>
+<p><strong>URI</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">host</span><span class="o">.</span><span class="n">domain</span><span class="o">/</span><span class="n">sipxconfig</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">PermissionService</span>
+</pre></div>
+</div>
+<p><strong>WSDL</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;wsdl:definitions targetNamespace=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:apachesoap=&quot;http://xml.apache.org/xml-soap&quot; xmlns:impl=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:intf=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:wsdl=&quot;http://schemas.xmlsoap.org/wsdl/&quot; xmlns:wsdlsoap=&quot;http://schemas.xmlsoap.org/wsdl/soap/&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+- &lt;!--
+WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)
+--&gt;
+&lt;wsdl:types&gt;
+&lt;schema targetNamespace=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+&lt;complexType name=&quot;Permission&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;name&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;label&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;description&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;defaultValue&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;type&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;builtIn&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;AddPermission&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;permission&quot; type=&quot;impl:Permission&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;AddPermission&quot; type=&quot;impl:AddPermission&quot; /&gt;
+&lt;complexType name=&quot;PermissionSearch&quot;&gt;
+&lt;sequence&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;byName&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;byLabel&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;FindPermission&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;search&quot; type=&quot;impl:PermissionSearch&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;FindPermission&quot; type=&quot;impl:FindPermission&quot; /&gt;
+&lt;complexType name=&quot;ArrayOfPermission&quot;&gt;
+&lt;sequence&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot; name=&quot;item&quot; type=&quot;impl:Permission&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;FindPermissionResponse&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;permissions&quot; type=&quot;impl:ArrayOfPermission&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;FindPermissionResponse&quot; type=&quot;impl:FindPermissionResponse&quot; /&gt;
+&lt;complexType name=&quot;Property&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;property&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element name=&quot;value&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;ManagePermission&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;search&quot; type=&quot;impl:PermissionSearch&quot; /&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; name=&quot;edit&quot; type=&quot;impl:Property&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;deletePermission&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;ManagePermission&quot; type=&quot;impl:ManagePermission&quot; /&gt;
+&lt;/schema&gt;
+&lt;/wsdl:types&gt;
+&lt;wsdl:message name=&quot;findPermissionRequest&quot;&gt;
+&lt;wsdl:part element=&quot;impl:FindPermission&quot; name=&quot;FindPermission&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;managePermissionRequest&quot;&gt;
+&lt;wsdl:part element=&quot;impl:ManagePermission&quot; name=&quot;ManagePermission&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;addPermissionRequest&quot;&gt;
+&lt;wsdl:part element=&quot;impl:AddPermission&quot; name=&quot;AddPermission&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;findPermissionResponse&quot;&gt;
+&lt;wsdl:part element=&quot;impl:FindPermissionResponse&quot; name=&quot;FindPermissionResponse&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;addPermissionResponse&quot; /&gt;
+&lt;wsdl:message name=&quot;managePermissionResponse&quot; /&gt;
+&lt;wsdl:portType name=&quot;PermissionService&quot;&gt;
+&lt;wsdl:operation name=&quot;addPermission&quot; parameterOrder=&quot;AddPermission&quot;&gt;
+&lt;wsdl:input message=&quot;impl:addPermissionRequest&quot; name=&quot;addPermissionRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:addPermissionResponse&quot; name=&quot;addPermissionResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;findPermission&quot; parameterOrder=&quot;FindPermission&quot;&gt;
+&lt;wsdl:input message=&quot;impl:findPermissionRequest&quot; name=&quot;findPermissionRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:findPermissionResponse&quot; name=&quot;findPermissionResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;managePermission&quot; parameterOrder=&quot;ManagePermission&quot;&gt;
+&lt;wsdl:input message=&quot;impl:managePermissionRequest&quot; name=&quot;managePermissionRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:managePermissionResponse&quot; name=&quot;managePermissionResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;/wsdl:portType&gt;
+&lt;wsdl:binding name=&quot;PermissionServiceSoapBinding&quot; type=&quot;impl:PermissionService&quot;&gt;
+&lt;wsdlsoap:binding style=&quot;document&quot; transport=&quot;http://schemas.xmlsoap.org/soap/http&quot; /&gt;
+&lt;wsdl:operation name=&quot;addPermission&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;addPermissionRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;addPermissionResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;findPermission&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;findPermissionRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;findPermissionResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;managePermission&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;managePermissionRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;managePermissionResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;/wsdl:binding&gt;
+&lt;wsdl:service name=&quot;ConfigImplService&quot;&gt;
+&lt;wsdl:port binding=&quot;impl:PermissionServiceSoapBinding&quot; name=&quot;PermissionService&quot;&gt;
+&lt;wsdlsoap:address location=&quot;https://47.134.206.174:8443/sipxconfig/services/PermissionService&quot; /&gt;
+&lt;/wsdl:port&gt;
+&lt;/wsdl:service&gt;
+&lt;/wsdl:definitions&gt;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>wsdlsoap:address location specified at the end of the WSDL will be specific to your system.</p>
+</div>
+</section>
+<section id="add-permissions">
+<h3>Add Permissions<a class="headerlink" href="#add-permissions" title="Link to this heading"></a></h3>
+<p><strong>Name:</strong> <em>addPermission</em></p>
+<p><strong>Description:</strong> Add a custom call permission to the system.</p>
+<p><strong>Input Parameters:</strong></p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value type</strong></p></td>
+<td><p><strong>Required/Optional</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>Editable/Read only</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>name</em></p></td>
+<td><p>string</p></td>
+<td><p>Required</p></td>
+<td><p>The name of the permission to add. Even though it is a required parameter its value is ignored and an internal name is generated.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>label</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The label of the permission to add. Label is the name displayed in the webui.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>description</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates if the permission is enabled (true) or disabled (false) by default for users.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>defaultValue</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates if the permission is enabled (true) or disabled (false) by default for users.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>type</em></p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>The type of permission. Read only, any string on add will be ignored.</p></td>
+<td><p>Read Only</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>builtIn</em></p></td>
+<td><p>boolean</p></td>
+<td></td>
+<td><p>Indicates if the permission is builtin (true) or not (false). Read only, any string on add will be ignored.</p></td>
+<td><p>Read Only</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output parameters:</strong> Empty response.</p>
+<p><strong>Example:</strong> Adding a call permission with label “Test three” whose default value is false:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">AddPermission</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">permission</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">name</span><span class="o">&gt;</span><span class="n">Test3</span><span class="o">&lt;/</span><span class="n">name</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">label</span><span class="o">&gt;</span><span class="n">Test</span> <span class="n">Three</span><span class="o">&lt;/</span><span class="n">label</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">description</span><span class="o">&gt;</span><span class="n">Third</span> <span class="n">test</span> <span class="n">permission</span><span class="o">&lt;/</span><span class="n">description</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">defaultValue</span><span class="o">&gt;</span><span class="n">false</span><span class="o">&lt;/</span><span class="n">defaultValue</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">permission</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">AddPermission</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="find-permissions">
+<h3>Find Permissions<a class="headerlink" href="#find-permissions" title="Link to this heading"></a></h3>
+<p><strong>Name:</strong> <em>findPermission</em></p>
+<p><strong>Description:</strong> Search for a permission or permissions defined in the system.</p>
+<p><strong>Input Parameters:</strong></p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value type</strong></p></td>
+<td><p><strong>Required/Optional</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>Editable/Read only</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>byName</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates a name for permissions by their name. May be null.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>byLabel</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates a search for permissions by their label. May be null.</p></td>
+<td><p>Editable</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Parameters:</strong> Array of items representing the permissions found in the search.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value Type</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>name</em></p></td>
+<td><p>string</p></td>
+<td><p>The name of the permission.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>label</em></p></td>
+<td><p>string</p></td>
+<td><p>The value representing the label of the permission.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>description</em></p></td>
+<td><p>string</p></td>
+<td><p>Describes the permission.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>defaultValue</em></p></td>
+<td></td>
+<td><p>Boolean indicating if the permission is enabled (true) or disabled (false) by default for users.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>builtIn</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Indicates if the permission is builtin (true) or not (false).</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong> Search to find all permissions defined in the system.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">FindPermission</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">FindPermission</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong> Search to find permission with label “test three”.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">FindPermission</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">byLabel</span><span class="o">&gt;</span><span class="n">Test</span> <span class="n">Three</span><span class="o">&lt;/</span><span class="n">byLabel</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">FindPermission</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="manage-permissions">
+<h3>Manage Permissions<a class="headerlink" href="#manage-permissions" title="Link to this heading"></a></h3>
+<p><strong>Name:</strong> <em>managePermission</em></p>
+<p><strong>Description:</strong> Manage (update or delete) existing permissions defined in the system. Only permissions which are not built into the system can be edited or deleted.</p>
+<p><strong>Input Parameters:</strong></p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value type</strong></p></td>
+<td><p><strong>Required/Optional</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>Editable/Read only</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>byName</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>String used to indicate a search for permissions by their name. May be null. Name is internally generated value and may not be useful for searching.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>byLabel</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates a search for permissions by their label. May be null.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>property</em></p></td>
+<td></td>
+<td></td>
+<td><p>Name of the permission field to edit.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><em>value</em></p></td>
+<td></td>
+<td></td>
+<td><p>Value to use for the permission field being edited.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><em>deletePermission</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicating to delete (true) a permission.</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Parameters:</strong> Empty response.</p>
+<p><strong>Example</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">foo</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="call-groups">
+<h2>Call Groups<a class="headerlink" href="#call-groups" title="Link to this heading"></a></h2>
+<p>The call group web services are SOAP based services. These services use the Web Service Definition Language (WSDL) to define the interfaces supported. A call group service deals with information related to hunt groups. Any information queried or added in one of the implemented services are mapped to a hunt group in the configuratio database.</p>
+<p><strong>URI</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">host</span><span class="o">.</span><span class="n">domain</span><span class="o">/</span><span class="n">sipxconfig</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">CallGroupService</span>
+</pre></div>
+</div>
+<p><strong>WSDL</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;wsdl:definitions targetNamespace=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:apachesoap=&quot;http://xml.apache.org/xml-soap&quot; xmlns:impl=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:intf=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:wsdl=&quot;http://schemas.xmlsoap.org/wsdl/&quot; xmlns:wsdlsoap=&quot;http://schemas.xmlsoap.org/wsdl/soap/&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+&lt;!--
+WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)
+--&gt;
+&lt;wsdl:types&gt;
+&lt;schema targetNamespace=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+&lt;complexType name=&quot;UserRing&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;expiration&quot; type=&quot;xsd:int&quot; /&gt;
+&lt;element name=&quot;type&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element name=&quot;position&quot; type=&quot;xsd:int&quot; /&gt;
+&lt;element name=&quot;userName&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;CallGroup&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;name&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;extension&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;description&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;enabled&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot; name=&quot;rings&quot; nillable=&quot;true&quot; type=&quot;impl:UserRing&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;AddCallGroup&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;callGroup&quot; type=&quot;impl:CallGroup&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;AddCallGroup&quot; type=&quot;impl:AddCallGroup&quot; /&gt;
+&lt;complexType name=&quot;ArrayOfCallGroup&quot;&gt;
+&lt;sequence&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot; name=&quot;item&quot; type=&quot;impl:CallGroup&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;GetCallGroupsResponse&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;callGroups&quot; type=&quot;impl:ArrayOfCallGroup&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;GetCallGroupsResponse&quot; type=&quot;impl:GetCallGroupsResponse&quot; /&gt;
+&lt;/schema&gt;
+&lt;/wsdl:types&gt;
+&lt;wsdl:message name=&quot;getCallGroupsResponse&quot;&gt;
+&lt;wsdl:part element=&quot;impl:GetCallGroupsResponse&quot; name=&quot;GetCallGroupsResponse&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;getCallGroupsRequest&quot; /&gt;
+&lt;wsdl:message name=&quot;addCallGroupResponse&quot; /&gt;
+&lt;wsdl:message name=&quot;addCallGroupRequest&quot;&gt;
+&lt;wsdl:part element=&quot;impl:AddCallGroup&quot; name=&quot;AddCallGroup&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:portType name=&quot;CallGroupService&quot;&gt;
+&lt;wsdl:operation name=&quot;addCallGroup&quot; parameterOrder=&quot;AddCallGroup&quot;&gt;
+&lt;wsdl:input message=&quot;impl:addCallGroupRequest&quot; name=&quot;addCallGroupRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:addCallGroupResponse&quot; name=&quot;addCallGroupResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;getCallGroups&quot;&gt;
+&lt;wsdl:input message=&quot;impl:getCallGroupsRequest&quot; name=&quot;getCallGroupsRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:getCallGroupsResponse&quot; name=&quot;getCallGroupsResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;/wsdl:portType&gt;
+&lt;wsdl:binding name=&quot;CallGroupServiceSoapBinding&quot; type=&quot;impl:CallGroupService&quot;&gt;
+&lt;wsdlsoap:binding style=&quot;document&quot; transport=&quot;http://schemas.xmlsoap.org/soap/http&quot; /&gt;
+&lt;wsdl:operation name=&quot;addCallGroup&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;addCallGroupRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;addCallGroupResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;getCallGroups&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;getCallGroupsRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;getCallGroupsResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;/wsdl:binding&gt;
+&lt;wsdl:service name=&quot;ConfigImplService&quot;&gt;
+&lt;wsdl:port binding=&quot;impl:CallGroupServiceSoapBinding&quot; name=&quot;CallGroupService&quot;&gt;
+&lt;wsdlsoap:address location=&quot;https://47.134.206.174:8443/sipxconfig/services/CallGroupService&quot; /&gt;
+&lt;/wsdl:port&gt;
+&lt;/wsdl:service&gt;
+&lt;/wsdl:definitions&gt;
+</pre></div>
+</div>
+<section id="add-call-groups">
+<h3>Add Call Groups<a class="headerlink" href="#add-call-groups" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value type</strong></p></td>
+<td><p><strong>Required/Optional</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>Editable/Read only</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>name</em></p></td>
+<td><p>string</p></td>
+<td><p>Required</p></td>
+<td><p>String representing the name of the hunt group to add.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>extension</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The extension to be associated with the hunt group.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>description</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>Describes the hunt group.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>enabled</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Optional</p></td>
+<td><p>Describing the members of the hunt group, their position in the group, time (in seconds) to ring the user.</p></td>
+<td><p>0 or more repetitions.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>expiration</em></p></td>
+<td></td>
+<td></td>
+<td><p>Time in seconds to present the call to the user.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><em>type</em></p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>The ring sequence. Can be “delayed” or “immediate”. Delay is used to build a sequential type hunt group and immediate a broadcast type hunt group. A mix can be used.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><em>position</em></p></td>
+<td></td>
+<td></td>
+<td><p>The unique position (starting at 0) of the user in the group.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><em>username</em></p></td>
+<td><p>string</p></td>
+<td></td>
+<td><p>The extension of the user.</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Parameters:</strong> Empty response.</p>
+<p><strong>Example:</strong> Add a new hunt group “TestGroup2” that is enabled, dialable at extension 556 and contains 4 members (212, 215, 211, and 221).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:con=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;&gt;
+&lt;soapenv:Header/&gt;
+&lt;soapenv:Body&gt;
+&lt;con:AddCallGroup&gt;
+&lt;callGroup&gt;
+&lt;name&gt;TestGroup2&lt;/name&gt;
+&lt;!-Optional:-&gt;
+&lt;extension&gt;556&lt;/extension&gt;
+&lt;!-Optional:-&gt;
+&lt;description&gt;Sample SOAP created Hunt Group&lt;/description&gt;
+&lt;!-Optional:-&gt;
+&lt;enabled&gt;true&lt;/enabled&gt;
+&lt;!-Zero or more repetitions:-&gt;
+&lt;rings&gt;
+&lt;expiration&gt;10&lt;/expiration&gt;
+&lt;type&gt;delayed&lt;/type&gt;
+&lt;position&gt;0&lt;/position&gt;
+&lt;userName&gt;212&lt;/userName&gt;
+&lt;/rings&gt;
+&lt;rings&gt;
+&lt;expiration&gt;10&lt;/expiration&gt;
+&lt;type&gt;immediate&lt;/type&gt;
+&lt;position&gt;1&lt;/position&gt;
+&lt;userName&gt;215&lt;/userName&gt;
+&lt;/rings&gt;
+&lt;rings&gt;
+&lt;expiration&gt;15&lt;/expiration&gt;
+&lt;type&gt;immediate&lt;/type&gt;
+&lt;position&gt;2&lt;/position&gt;
+&lt;userName&gt;211&lt;/userName&gt;
+&lt;/rings&gt;
+&lt;rings&gt;
+&lt;expiration&gt;15&lt;/expiration&gt;
+&lt;type&gt;delayed&lt;/type&gt;
+&lt;position&gt;3&lt;/position&gt;
+&lt;userName&gt;221&lt;/userName&gt;
+&lt;/rings&gt;
+&lt;/callGroup&gt;
+&lt;/con:AddCallGroup&gt;
+&lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+</pre></div>
+</div>
+</section>
+<section id="get-call-groups">
+<h3>Get Call Groups<a class="headerlink" href="#get-call-groups" title="Link to this heading"></a></h3>
+<p><strong>Name:</strong> <em>getCallGroups</em></p>
+<p><strong>Description:</strong> Query the hunt groups defined in the system.</p>
+<p><strong>Input Parameters:</strong> None</p>
+<p><strong>Output Parameters:</strong> Array of items representing the permissions found in the search.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value Type</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>name</em></p></td>
+<td><p>string</p></td>
+<td><p>The name of the hunt group.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>extension</em></p></td>
+<td><p>string</p></td>
+<td><p>Representing the extension associated with the hunt group.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>description</em></p></td>
+<td><p>string</p></td>
+<td><p>Describes the hunt group.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>enabled</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Indicates if the hunt group is enabled (true) or disabled (false).</p></td>
+</tr>
+<tr class="row-even"><td><p><em>rings</em></p></td>
+<td><p>array</p></td>
+<td><p>The members of the hunt group, their position, time (in seconds) to ring the user (0 or more repetitions).</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>expiration</em></p></td>
+<td></td>
+<td><p>Time in seconds to present the call to user.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>type</em></p></td>
+<td><p>string</p></td>
+<td><p>The ring sequence. Can be ‘delayed’ or ‘immediate’. Delayed is sequential, immediate is broadcast.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>position</em></p></td>
+<td></td>
+<td><p>The unique position (starting at 0) of the user in the group.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>username</em></p></td>
+<td><p>string</p></td>
+<td><p>The extension of the user.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong> Query the hunt groups defined in the system.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">/&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="users">
+<h2>Users<a class="headerlink" href="#users" title="Link to this heading"></a></h2>
+<p>The user web services are SOAP based services. These services use the Web Service Definition Language (WSDL) to define the interfaces supported.</p>
+<p><strong>URI</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">host</span><span class="o">.</span><span class="n">domain</span><span class="o">/</span><span class="n">sipxconfig</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">UserService</span>
+</pre></div>
+</div>
+<p><strong>WSDL</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;wsdl:definitions targetNamespace=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:apachesoap=&quot;http://xml.apache.org/xml-soap&quot; xmlns:impl=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:intf=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:wsdl=&quot;http://schemas.xmlsoap.org/wsdl/&quot; xmlns:wsdlsoap=&quot;http://schemas.xmlsoap.org/wsdl/soap/&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+- &lt;!--
+WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)
+--&gt;
+&lt;wsdl:types&gt;
+&lt;schema targetNamespace=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+&lt;complexType name=&quot;User&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;userName&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element name=&quot;pintoken&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element name=&quot;lastName&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element name=&quot;firstName&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element name=&quot;sipPassword&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot; name=&quot;aliases&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element name=&quot;emailAddress&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot; name=&quot;groups&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot; name=&quot;permissions&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; name=&quot;branchName&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;AddUser&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;user&quot; type=&quot;impl:User&quot; /&gt;
+&lt;element name=&quot;pin&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;AddUser&quot; type=&quot;impl:AddUser&quot; /&gt;
+&lt;complexType name=&quot;UserSearch&quot;&gt;
+&lt;sequence&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;byUserName&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;byFuzzyUserNameOrAlias&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;byGroup&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;FindUser&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;search&quot; type=&quot;impl:UserSearch&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;FindUser&quot; type=&quot;impl:FindUser&quot; /&gt;
+&lt;complexType name=&quot;ArrayOfUser&quot;&gt;
+&lt;sequence&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot; name=&quot;item&quot; type=&quot;impl:User&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;FindUserResponse&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;users&quot; type=&quot;impl:ArrayOfUser&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;FindUserResponse&quot; type=&quot;impl:FindUserResponse&quot; /&gt;
+&lt;complexType name=&quot;Property&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;property&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element name=&quot;value&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;ManageUser&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;search&quot; type=&quot;impl:UserSearch&quot; /&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; name=&quot;edit&quot; type=&quot;impl:Property&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;deleteUser&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;addGroup&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;removeGroup&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;updateGroup&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;ManageUser&quot; type=&quot;impl:ManageUser&quot; /&gt;
+&lt;/schema&gt;
+&lt;/wsdl:types&gt;
+&lt;wsdl:message name=&quot;findUserRequest&quot;&gt;
+&lt;wsdl:part element=&quot;impl:FindUser&quot; name=&quot;FindUser&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;addUserRequest&quot;&gt;
+&lt;wsdl:part element=&quot;impl:AddUser&quot; name=&quot;AddUser&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;manageUserResponse&quot; /&gt;
+&lt;wsdl:message name=&quot;addUserResponse&quot; /&gt;
+&lt;wsdl:message name=&quot;manageUserRequest&quot;&gt;
+&lt;wsdl:part element=&quot;impl:ManageUser&quot; name=&quot;ManageUser&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;findUserResponse&quot;&gt;
+&lt;wsdl:part element=&quot;impl:FindUserResponse&quot; name=&quot;FindUserResponse&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:portType name=&quot;UserService&quot;&gt;
+&lt;wsdl:operation name=&quot;addUser&quot; parameterOrder=&quot;AddUser&quot;&gt;
+&lt;wsdl:input message=&quot;impl:addUserRequest&quot; name=&quot;addUserRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:addUserResponse&quot; name=&quot;addUserResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;findUser&quot; parameterOrder=&quot;FindUser&quot;&gt;
+&lt;wsdl:input message=&quot;impl:findUserRequest&quot; name=&quot;findUserRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:findUserResponse&quot; name=&quot;findUserResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;manageUser&quot; parameterOrder=&quot;ManageUser&quot;&gt;
+&lt;wsdl:input message=&quot;impl:manageUserRequest&quot; name=&quot;manageUserRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:manageUserResponse&quot; name=&quot;manageUserResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;/wsdl:portType&gt;
+&lt;wsdl:binding name=&quot;UserServiceSoapBinding&quot; type=&quot;impl:UserService&quot;&gt;
+&lt;wsdlsoap:binding style=&quot;document&quot; transport=&quot;http://schemas.xmlsoap.org/soap/http&quot; /&gt;
+&lt;wsdl:operation name=&quot;addUser&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;addUserRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;addUserResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;findUser&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;findUserRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;findUserResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;manageUser&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;manageUserRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;manageUserResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;/wsdl:binding&gt;
+&lt;wsdl:service name=&quot;ConfigImplService&quot;&gt;
+&lt;wsdl:port binding=&quot;impl:UserServiceSoapBinding&quot; name=&quot;UserService&quot;&gt;
+&lt;wsdlsoap:address location=&quot;https://47.134.206.174:8443/sipxconfig/services/UserService&quot; /&gt;
+&lt;/wsdl:port&gt;
+&lt;/wsdl:service&gt;
+&lt;/wsdl:definitions&gt;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>wsdlsoap:address location specified at the end of the WSDL will be specific to your system.</p>
+</div>
+<section id="add-users">
+<h3>Add Users<a class="headerlink" href="#add-users" title="Link to this heading"></a></h3>
+<p><strong>Name:</strong> <em>addUser</em></p>
+<p><strong>Description:</strong> Add a new user to the system.</p>
+<p><strong>Input Parameters:</strong></p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value type</strong></p></td>
+<td><p><strong>Required/Optional</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>Editable/Read only</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>userName</em></p></td>
+<td><p>string</p></td>
+<td><p>Required</p></td>
+<td><p>The name of the user to add.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>pinToken</em></p></td>
+<td><p>string</p></td>
+<td><p>optional</p></td>
+<td><p>Internally generated token that is an encrypted version of the voicemail pin. This should not be specified as it will be internally generated.</p></td>
+<td><p>Read Only</p></td>
+</tr>
+<tr class="row-even"><td><p><em>lastName</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The last name of the user.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>firstName</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The first name of the user.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>sipPassword</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The SIP password for the user.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><em>aliases</em></p></td>
+<td><p>array</p></td>
+<td></td>
+<td><p>Array of strings, each representing membership in defined groups.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><em>permissions</em></p></td>
+<td><p>array</p></td>
+<td></td>
+<td><p>Array of strings, each representing a permission name that is granted to the user. Permissions can be general or call permissions. See <em>findPermission</em></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><em>pin</em></p></td>
+<td><p>string</p></td>
+<td><p>Required</p></td>
+<td><p>The PIN for the user.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>branchName</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>User branch</p></td>
+<td><p>Editable</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Parameters:</strong> Empty response.</p>
+<p><strong>Example:</strong> Add a new user 223 to the system with sip password 4567, pin 1234, along with various permissions and group memberships in the branch Berlin.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">AddUser</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">user</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">userName</span><span class="o">&gt;</span><span class="mi">223</span><span class="o">&lt;/</span><span class="n">userName</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">lastName</span><span class="o">&gt;</span><span class="n">Einstein</span><span class="o">&lt;/</span><span class="n">lastName</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">firstName</span><span class="o">&gt;</span><span class="n">Albert</span><span class="o">&lt;/</span><span class="n">firstName</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">sipPassword</span><span class="o">&gt;</span><span class="mi">4567</span><span class="o">&lt;/</span><span class="n">sipPassword</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">emailAddress</span><span class="o">&gt;</span><span class="n">albertE</span><span class="nd">@yahoo</span><span class="o">.</span><span class="n">com</span><span class="o">&lt;/</span><span class="n">emailAddress</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">branchName</span><span class="o">&gt;</span><span class="n">Berlin</span><span class="o">&lt;/</span><span class="n">branchName</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">groups</span><span class="o">&gt;</span><span class="n">Managers</span><span class="o">&lt;/</span><span class="n">groups</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">permissions</span><span class="o">&gt;</span><span class="n">FreeswitchVoicemailServer</span><span class="o">&lt;/</span><span class="n">permissions</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">permissions</span><span class="o">&gt;</span><span class="n">InternationalDialing</span><span class="o">&lt;/</span><span class="n">permissions</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">permissions</span><span class="o">&gt;</span><span class="n">LocalDialing</span><span class="o">&lt;/</span><span class="n">permissions</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">permissions</span><span class="o">&gt;</span><span class="n">LongDistanceDialing</span><span class="o">&lt;/</span><span class="n">permissions</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">permissions</span><span class="o">&gt;</span><span class="n">Mobile</span><span class="o">&lt;/</span><span class="n">permissions</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">permissions</span><span class="o">&gt;</span><span class="n">TollFree</span><span class="o">&lt;/</span><span class="n">permissions</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">permissions</span><span class="o">&gt;</span><span class="n">Voicemail</span><span class="o">&lt;/</span><span class="n">permissions</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">permissions</span><span class="o">&gt;</span><span class="n">music</span><span class="o">-</span><span class="n">on</span><span class="o">-</span><span class="n">hold</span><span class="o">&lt;/</span><span class="n">permissions</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">permissions</span><span class="o">&gt;</span><span class="n">perm_8</span><span class="o">&lt;/</span><span class="n">permissions</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">permissions</span><span class="o">&gt;</span><span class="n">personal</span><span class="o">-</span><span class="n">auto</span><span class="o">-</span><span class="n">attendant</span><span class="o">&lt;/</span><span class="n">permissions</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">permissions</span><span class="o">&gt;</span><span class="n">tui</span><span class="o">-</span><span class="n">change</span><span class="o">-</span><span class="n">pin</span><span class="o">&lt;/</span><span class="n">permissions</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">user</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">pin</span><span class="o">&gt;</span><span class="mi">1234</span><span class="o">&lt;/</span><span class="n">pin</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">AddUser</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="find-users">
+<h3>Find Users<a class="headerlink" href="#find-users" title="Link to this heading"></a></h3>
+<p><strong>Name:</strong> <em>findUser</em></p>
+<p><strong>Description:</strong> Find defined user(s) in the system.</p>
+<p><strong>Input Parameters:</strong> Either null for a listing of all users, or one of the following optional parameters.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value Type</strong></p></td>
+<td><p><strong>Required/Optional</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>Editable/Read Only</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>byUserName</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The name of the user to find.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>byFuzzyUserNameOrAlias</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>A partial user name or alias to search for, a type of wildcard search.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>byGroup</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The users which are members of a particular defined group.</p></td>
+<td><p>Editable</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output parameters:</strong> An array of 0 or more of the following.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value Type</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>userName</em></p></td>
+<td><p>string</p></td>
+<td><p>The name of the user to add.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>pinToken</em></p></td>
+<td><p>string</p></td>
+<td><p>Internally generated token that is an encrypted version of the pin.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>lastName</em></p></td>
+<td><p>string</p></td>
+<td><p>The last name of the user.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>firstName</em></p></td>
+<td><p>string</p></td>
+<td><p>The first name of the user.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>sipPassword</em></p></td>
+<td><p>string</p></td>
+<td><p>The SIP password for the user.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>aliases</em></p></td>
+<td><p>array</p></td>
+<td><p>Array of strings, each representing a user alias.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>emailAddress</em></p></td>
+<td><p>string</p></td>
+<td><p>The email address of the user.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>groups</em></p></td>
+<td><p>array</p></td>
+<td><p>Array of strings, each representing membership in defined groups.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>pin</em></p></td>
+<td><p>string</p></td>
+<td><p>The PIN for the user.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>branchName</em></p></td>
+<td><p>string</p></td>
+<td><p>Users branch.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong> Find all defined users in the system.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">FindUser</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">FindUser</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong> Find all users that are members of the group “Managers”.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">FindUser</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">byGroup</span><span class="o">&gt;</span><span class="n">Managers</span><span class="o">&lt;/</span><span class="n">byGroup</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">FindUser</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong> Find the user 223.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">FindUser</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">byUserName</span><span class="o">&gt;</span><span class="mi">223</span><span class="o">&lt;/</span><span class="n">byUserName</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">FindUser</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong> Find users whose userName begins with 22.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">FindUser</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">byFuzzyUserNameOrAlias</span><span class="o">&gt;</span><span class="mi">22</span><span class="o">&lt;/</span><span class="n">byFuzzyUserNameOrAlias</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">FindUser</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="manage-users">
+<h3>Manage Users<a class="headerlink" href="#manage-users" title="Link to this heading"></a></h3>
+<p><strong>Name:</strong> <em>manageUser</em></p>
+<p><strong>Description:</strong> Manage (update or delete) users defined in the system.</p>
+<p><strong>Input Paramters:</strong> Either null to list all, or one of the following optional parameters.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value Type</strong></p></td>
+<td><p><strong>Required/Optional</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>Editable/Read Only</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>byUserName</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The name of the user to find.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>byFuzzyUserNameOrAlias</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>A partial username or alias to search for. A type of wildcard search.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>byGroup</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The users which are members of a particular defined group.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>property</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>Name of the user field to edit.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>value</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>Value to use for the user field being edited.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>deleteUser</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates to delete (true) user(s). Dependent upon search results.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>addGroup</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The name of the group to add the user(s) to. Dependent upon search results.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>removeGroup</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The name of the group to remove the user(s) from. Dependent upon search results.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>updateBranch</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The name of the branch to update the user(s) to.</p></td>
+<td><p>Editable</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Parameters:</strong> Empty response</p>
+<p><strong>Example:</strong> Remove all users in the system beginning with 22 from group Managers</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">ManageUser</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">byFuzzyUserNameOrAlias</span><span class="o">&gt;</span><span class="mi">22</span><span class="o">&lt;/</span><span class="n">byFuzzyUserNameOrAlias</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">removeGroup</span><span class="o">&gt;</span><span class="n">Managers</span><span class="o">&lt;/</span><span class="n">removeGroup</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">ManageUser</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong> Add user with username 211 to the group Managers</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">ManageUser</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">byUserName</span><span class="o">&gt;</span><span class="mi">211</span><span class="o">&lt;/</span><span class="n">byUserName</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">addGroup</span><span class="o">&gt;</span><span class="n">Managers</span><span class="o">&lt;/</span><span class="n">addGroup</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">ManageUser</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong> Change all users from group Managers to have a <em>lastName</em> of “SuperDog” and <em>firstName</em> of “I am”</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:con=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;&gt;
+&lt;soapenv:Header/&gt;
+&lt;soapenv:Body&gt;
+&lt;con:ManageUser&gt;
+&lt;search&gt;
+&lt;!-Optional:-&gt;
+&lt;byGroup&gt;Managers&lt;/byGroup&gt;
+&lt;/search&gt;
+&lt;!-1 or more repetitions:-&gt;
+&lt;edit&gt;
+&lt;!-You may enter the following 2 items in any order-&gt;
+&lt;property&gt;lastName&lt;/property&gt;
+&lt;value&gt;SuperDog&lt;/value&gt;
+&lt;/edit&gt;
+&lt;edit&gt;
+&lt;!-You may enter the following 2 items in any order-&gt;
+&lt;property&gt;firstName&lt;/property&gt;
+&lt;value&gt;I am&lt;/value&gt;
+&lt;/edit&gt;
+&lt;/con:ManageUser&gt;
+&lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+</pre></div>
+</div>
+<p><strong>Example:</strong> Update user with username 211 to the branch Berlin</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">ManageUser</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">byUserName</span><span class="o">&gt;</span><span class="mi">211</span><span class="o">&lt;/</span><span class="n">byUserName</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">updateBranch</span><span class="o">&gt;</span><span class="n">Berlin</span><span class="o">&lt;/</span><span class="n">updateBranch</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">ManageUser</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="park-orbits">
+<h2>Park Orbits<a class="headerlink" href="#park-orbits" title="Link to this heading"></a></h2>
+<p>The park orbit web services are SOAP based services. These services use the Web Service Definition Language (WSDL) to define the interfaces supported.</p>
+<p><strong>URI</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">host</span><span class="o">.</span><span class="n">domain</span><span class="p">:</span><span class="mi">8443</span><span class="o">/</span><span class="n">sipxconfig</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">ParkOrbitService</span>
+</pre></div>
+</div>
+<p><strong>WSDL</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;wsdl:definitions targetNamespace=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:apachesoap=&quot;http://xml.apache.org/xml-soap&quot; xmlns:impl=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:intf=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:wsdl=&quot;http://schemas.xmlsoap.org/wsdl/&quot; xmlns:wsdlsoap=&quot;http://schemas.xmlsoap.org/wsdl/soap/&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+- &lt;!--
+WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)
+--&gt;
+&lt;wsdl:types&gt;
+&lt;schema targetNamespace=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+&lt;complexType name=&quot;ParkOrbit&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;name&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;extension&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;description&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;enabled&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;music&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;AddParkOrbit&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;parkOrbit&quot; type=&quot;impl:ParkOrbit&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;AddParkOrbit&quot; type=&quot;impl:AddParkOrbit&quot; /&gt;
+&lt;complexType name=&quot;ArrayOfParkOrbit&quot;&gt;
+&lt;sequence&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot; name=&quot;item&quot; type=&quot;impl:ParkOrbit&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;GetParkOrbitsResponse&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;parkOrbits&quot; type=&quot;impl:ArrayOfParkOrbit&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;GetParkOrbitsResponse&quot; type=&quot;impl:GetParkOrbitsResponse&quot; /&gt;
+&lt;/schema&gt;
+&lt;/wsdl:types&gt;
+&lt;wsdl:message name=&quot;addParkOrbitRequest&quot;&gt;
+&lt;wsdl:part element=&quot;impl:AddParkOrbit&quot; name=&quot;AddParkOrbit&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;addParkOrbitResponse&quot; /&gt;
+&lt;wsdl:message name=&quot;getParkOrbitsResponse&quot;&gt;
+&lt;wsdl:part element=&quot;impl:GetParkOrbitsResponse&quot; name=&quot;GetParkOrbitsResponse&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;getParkOrbitsRequest&quot; /&gt;
+&lt;wsdl:portType name=&quot;ParkOrbitService&quot;&gt;
+&lt;wsdl:operation name=&quot;addParkOrbit&quot; parameterOrder=&quot;AddParkOrbit&quot;&gt;
+&lt;wsdl:input message=&quot;impl:addParkOrbitRequest&quot; name=&quot;addParkOrbitRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:addParkOrbitResponse&quot; name=&quot;addParkOrbitResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;getParkOrbits&quot;&gt;
+&lt;wsdl:input message=&quot;impl:getParkOrbitsRequest&quot; name=&quot;getParkOrbitsRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:getParkOrbitsResponse&quot; name=&quot;getParkOrbitsResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;/wsdl:portType&gt;
+&lt;wsdl:binding name=&quot;ParkOrbitServiceSoapBinding&quot; type=&quot;impl:ParkOrbitService&quot;&gt;
+&lt;wsdlsoap:binding style=&quot;document&quot; transport=&quot;http://schemas.xmlsoap.org/soap/http&quot; /&gt;
+&lt;wsdl:operation name=&quot;addParkOrbit&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;addParkOrbitRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;addParkOrbitResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;getParkOrbits&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;getParkOrbitsRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;getParkOrbitsResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;/wsdl:binding&gt;
+&lt;wsdl:service name=&quot;ConfigImplService&quot;&gt;
+&lt;wsdl:port binding=&quot;impl:ParkOrbitServiceSoapBinding&quot; name=&quot;ParkOrbitService&quot;&gt;
+&lt;wsdlsoap:address location=&quot;https://47.134.206.174:8443/sipxconfig/services/ParkOrbitService&quot; /&gt;
+&lt;/wsdl:port&gt;
+&lt;/wsdl:service&gt;
+&lt;/wsdl:definitions&gt;
+</pre></div>
+</div>
+<section id="add-park-orbits">
+<h3>Add Park Orbits<a class="headerlink" href="#add-park-orbits" title="Link to this heading"></a></h3>
+<p><strong>Name:</strong> <em>addParkOrbit</em></p>
+<p><strong>Description:</strong> Add a new call park orbit to the system.</p>
+<p><strong>Input Parameters:</strong> Either null to list all users, or provide one of the following optional parameters.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value Type</strong></p></td>
+<td><p><strong>Required/Optional</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>Editable/Read Only</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>name</em></p></td>
+<td><p>string</p></td>
+<td><p>Required</p></td>
+<td><p>The name of the call park orbit to add.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>extension</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>Dialable extension to be used.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>description</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>Description of the call park orbit.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>enabled</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates if the call park is enabled (true) or disabled (false)</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>music</em></p></td>
+<td><p>path</p></td>
+<td><p>Optional</p></td>
+<td><p>Path to a wav file to play as background music for parked calls.</p></td>
+<td><p>Editable</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>wav files must be in the appropriate format of RIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 8000 Hz</p>
+</div>
+<p><strong>Output parameters:</strong> Empty response.</p>
+<p><strong>Example:</strong> Add a new call park orbit with the name ParkSales at extension 46 and is enabled.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:con=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;&gt;
+&lt;soapenv:Header/&gt;
+&lt;soapenv:Body&gt;
+&lt;con:AddParkOrbit&gt;
+&lt;parkOrbit&gt;
+&lt;name&gt;ParkSales&lt;/name&gt;
+&lt;!-Optional:-&gt;
+&lt;extension&gt;46&lt;/extension&gt;
+&lt;!-Optional:-&gt;
+&lt;description&gt;Sales calls park orbit&lt;/description&gt;
+&lt;!-Optional:-&gt;
+&lt;enabled&gt;true&lt;/enabled&gt;
+&lt;/parkOrbit&gt;
+&lt;/con:AddParkOrbit&gt;
+&lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+</pre></div>
+</div>
+</section>
+<section id="get-park-orbits">
+<h3>Get Park Orbits<a class="headerlink" href="#get-park-orbits" title="Link to this heading"></a></h3>
+<p><strong>Name:</strong> <em>getParkOrbits</em></p>
+<p><strong>Description:</strong> Queries information on all call park orbits defined in the system.</p>
+<p><strong>Input Parameters:</strong> None</p>
+<p><strong>Output Parameters:</strong></p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value Type</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>name</em></p></td>
+<td><p>string</p></td>
+<td><p>The name of the call park orbit.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>extension</em></p></td>
+<td><p>string</p></td>
+<td><p>The dialable extension.</p></td>
+</tr>
+<tr class="row-even"><td><p><em>description</em></p></td>
+<td><p>string</p></td>
+<td><p>A description of the call park orbit.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>enabled</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Indicates if the call park orbit is enabled (true) or disabled (false).</p></td>
+</tr>
+<tr class="row-even"><td><p><em>music</em></p></td>
+<td></td>
+<td><p>Path to a wav file to play as background music for parked calls.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>wav files must be in the appropriate format of RIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 8000 Hz</p>
+</div>
+<p><strong>Example:</strong> Query the call park orbits defined in the system.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">/&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="phones">
+<h2>Phones<a class="headerlink" href="#phones" title="Link to this heading"></a></h2>
+<p>The phone web services are SOAP based services. These services use the Web Service Definition Language (WSDL) to define the interfaces supported.</p>
+<p><strong>URI</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">host</span><span class="o">.</span><span class="n">domain</span><span class="o">/</span><span class="n">sipxconfig</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">PhoneService</span>
+</pre></div>
+</div>
+<p><strong>WSDL</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;wsdl:definitions targetNamespace=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:apachesoap=&quot;http://xml.apache.org/xml-soap&quot; xmlns:impl=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:intf=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:wsdl=&quot;http://schemas.xmlsoap.org/wsdl/&quot; xmlns:wsdlsoap=&quot;http://schemas.xmlsoap.org/wsdl/soap/&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+- &lt;!--
+WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)
+--&gt;
+&lt;wsdl:types&gt;
+&lt;schema targetNamespace=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+&lt;complexType name=&quot;Line&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;userId&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element name=&quot;uri&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;Phone&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;serialNumber&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element name=&quot;modelId&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;description&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot; name=&quot;groups&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot; name=&quot;lines&quot; nillable=&quot;true&quot; type=&quot;impl:Line&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;deviceVersion&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;AddPhone&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;phone&quot; type=&quot;impl:Phone&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;AddPhone&quot; type=&quot;impl:AddPhone&quot; /&gt;
+&lt;complexType name=&quot;PhoneSearch&quot;&gt;
+&lt;sequence&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;bySerialNumber&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;byGroup&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;FindPhone&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;search&quot; type=&quot;impl:PhoneSearch&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;FindPhone&quot; type=&quot;impl:FindPhone&quot; /&gt;
+&lt;complexType name=&quot;ArrayOfPhone&quot;&gt;
+&lt;sequence&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; minOccurs=&quot;0&quot; name=&quot;item&quot; type=&quot;impl:Phone&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;FindPhoneResponse&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;phones&quot; type=&quot;impl:ArrayOfPhone&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;FindPhoneResponse&quot; type=&quot;impl:FindPhoneResponse&quot; /&gt;
+&lt;complexType name=&quot;Property&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;property&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element name=&quot;value&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;AddExternalLine&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;userId&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;displayName&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;password&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element name=&quot;registrationServer&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;voiceMail&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;complexType name=&quot;ManagePhone&quot;&gt;
+&lt;sequence&gt;
+&lt;element name=&quot;search&quot; type=&quot;impl:PhoneSearch&quot; /&gt;
+&lt;element maxOccurs=&quot;unbounded&quot; name=&quot;edit&quot; type=&quot;impl:Property&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;deletePhone&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;addGroup&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;removeGroup&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;addLine&quot; nillable=&quot;true&quot; type=&quot;impl:Line&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;addExternalLine&quot; nillable=&quot;true&quot; type=&quot;impl:AddExternalLine&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;removeLineByUserId&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;removeLineByUri&quot; nillable=&quot;true&quot; type=&quot;xsd:string&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;generateProfiles&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;restart&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;ManagePhone&quot; type=&quot;impl:ManagePhone&quot; /&gt;
+&lt;/schema&gt;
+&lt;/wsdl:types&gt;
+&lt;wsdl:message name=&quot;findPhoneRequest&quot;&gt;
+&lt;wsdl:part element=&quot;impl:FindPhone&quot; name=&quot;FindPhone&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;managePhoneResponse&quot; /&gt;
+&lt;wsdl:message name=&quot;addPhoneResponse&quot; /&gt;
+&lt;wsdl:message name=&quot;managePhoneRequest&quot;&gt;
+&lt;wsdl:part element=&quot;impl:ManagePhone&quot; name=&quot;ManagePhone&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;addPhoneRequest&quot;&gt;
+&lt;wsdl:part element=&quot;impl:AddPhone&quot; name=&quot;AddPhone&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;findPhoneResponse&quot;&gt;
+&lt;wsdl:part element=&quot;impl:FindPhoneResponse&quot; name=&quot;FindPhoneResponse&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:portType name=&quot;PhoneService&quot;&gt;
+&lt;wsdl:operation name=&quot;addPhone&quot; parameterOrder=&quot;AddPhone&quot;&gt;
+&lt;wsdl:input message=&quot;impl:addPhoneRequest&quot; name=&quot;addPhoneRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:addPhoneResponse&quot; name=&quot;addPhoneResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;findPhone&quot; parameterOrder=&quot;FindPhone&quot;&gt;
+&lt;wsdl:input message=&quot;impl:findPhoneRequest&quot; name=&quot;findPhoneRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:findPhoneResponse&quot; name=&quot;findPhoneResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;managePhone&quot; parameterOrder=&quot;ManagePhone&quot;&gt;
+&lt;wsdl:input message=&quot;impl:managePhoneRequest&quot; name=&quot;managePhoneRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:managePhoneResponse&quot; name=&quot;managePhoneResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;/wsdl:portType&gt;
+&lt;wsdl:binding name=&quot;PhoneServiceSoapBinding&quot; type=&quot;impl:PhoneService&quot;&gt;
+&lt;wsdlsoap:binding style=&quot;document&quot; transport=&quot;http://schemas.xmlsoap.org/soap/http&quot; /&gt;
+&lt;wsdl:operation name=&quot;addPhone&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;addPhoneRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;addPhoneResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;findPhone&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;findPhoneRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;findPhoneResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;wsdl:operation name=&quot;managePhone&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;managePhoneRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;managePhoneResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;/wsdl:binding&gt;
+&lt;wsdl:service name=&quot;ConfigImplService&quot;&gt;
+&lt;wsdl:port binding=&quot;impl:PhoneServiceSoapBinding&quot; name=&quot;PhoneService&quot;&gt;
+&lt;wsdlsoap:address location=&quot;https://47.134.206.174/sipxconfig/services/PhoneService&quot; /&gt;
+&lt;/wsdl:port&gt;
+&lt;/wsdl:service&gt;
+&lt;/wsdl:definitions&gt;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>wsdlsoap:address location specified at the end of the WSDL will be specific to your system.</p>
+</div>
+<section id="add-phones">
+<h3>Add Phones<a class="headerlink" href="#add-phones" title="Link to this heading"></a></h3>
+<p><strong>Name:</strong> <em>addPhone</em></p>
+<p><strong>Description:</strong> Add a new phone to the system.</p>
+<p><strong>Input Parameters:</strong></p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value Type</strong></p></td>
+<td><p><strong>Required/Optional</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>Editable/Read Only</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>serialNumber</em></p></td>
+<td><p>string</p></td>
+<td><p>Required</p></td>
+<td><p>The MAC address of the phone.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>modelId</em></p></td>
+<td><p>string</p></td>
+<td><p>Required</p></td>
+<td><p>A supported model ID.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>description</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>A description of the phone.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>groups</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The phone group(s) the new phone will be a member of.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>lines</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>String representing assigned lines to the phone.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>deviceVersion</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The version of the phone.</p></td>
+<td><p>Editable</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Parameters:</strong> Empty response.</p>
+<p><strong>Example:</strong> Add a new polycom spip 321 phone to the system, assign line 221, and add to phone group FirstPhoneGroup.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:con=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;&gt;
+&lt;soapenv:Header/&gt;
+&lt;soapenv:Body&gt;
+&lt;con:AddPhone&gt;
+&lt;phone&gt;
+&lt;serialNumber&gt;000000000002&lt;/serialNumber&gt;
+&lt;modelId&gt;polycom321&lt;/modelId&gt;
+&lt;!-Optional:-&gt;
+&lt;description&gt;SOAP added phone&lt;/description&gt;
+&lt;!-Zero or more repetitions:-&gt;
+&lt;groups&gt;FirstPhoneGroup&lt;/groups&gt;
+&lt;!-Zero or more repetitions:-&gt;
+&lt;lines&gt;
+&lt;userId&gt;221&lt;/userId&gt;
+&lt;uri&gt;221@Uniteme.ezuce.com&lt;/uri&gt;
+&lt;/lines&gt;
+&lt;!-Optional:-&gt;
+&lt;/phone&gt;
+&lt;/con:AddPhone&gt;
+&lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+</pre></div>
+</div>
+<p><strong>List of supported phones:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">aastra53i</span>
+<span class="n">aastra55i</span>
+<span class="n">aastra57i</span>
+<span class="n">aastra560m</span>
+<span class="n">aastra</span> <span class="n">sip</span> <span class="n">ip</span> <span class="mi">53</span><span class="n">i</span>
+<span class="n">audiocodesMP112_FXS</span>
+<span class="n">audiocodesMP114_FXS</span>
+<span class="n">audiocodesMP118_FXS</span>
+<span class="n">audiocodesMP124_FXS</span>
+<span class="n">avaya</span><span class="o">-</span><span class="mi">1210</span>
+<span class="n">avaya</span><span class="o">-</span><span class="mi">1220</span>
+<span class="n">avaya</span><span class="o">-</span><span class="mi">1230</span>
+<span class="n">bria</span>
+<span class="n">ciscoplus7911G</span>
+<span class="n">ciscoplus7941G</span>
+<span class="n">ciscoplus7945G</span>
+<span class="n">ciscoplus7961G</span>
+<span class="n">ciscoplus7965G</span>
+<span class="n">ciscoplus7970G</span>
+<span class="n">ciscoplus7975G</span>
+<span class="n">cisco7960</span>
+<span class="n">cisco7940</span>
+<span class="n">cisco7912</span>
+<span class="n">cisco7905</span>
+<span class="n">cisco18x</span>
+<span class="n">clearone</span>
+<span class="n">gtekAq10x</span>
+<span class="n">gtekHl20x</span>
+<span class="n">gtekVt20x</span>
+<span class="n">gsPhoneBt100</span>
+<span class="n">gsPhoneBt200</span>
+<span class="n">gsPhoneGxp2020</span>
+<span class="n">gsPhoneGxp2010</span>
+<span class="n">gsPhoneGxp2000</span>
+<span class="n">gsPhoneGxp1200</span>
+<span class="n">gsPhoneGxv3000</span>
+<span class="n">gsFxsGxw4004</span>
+<span class="n">gsFxsGxw4008</span>
+<span class="n">gsHt286</span>
+<span class="n">gsHt386</span>
+<span class="n">gsHt486</span>
+<span class="n">gsHt488</span>
+<span class="n">gsHt496</span>
+<span class="n">hitachi3000</span>
+<span class="n">hitachi5000</span>
+<span class="n">hitachi5000A</span>
+<span class="n">ipDialog</span>
+<span class="n">isphone</span>
+<span class="n">karelIP116</span>
+<span class="n">karelIP112</span>
+<span class="n">karelIP111</span>
+<span class="n">karelNT32I</span>
+<span class="n">karelNT42I</span>
+<span class="n">linksys901</span>
+<span class="n">linksys921</span>
+<span class="n">linksys922</span>
+<span class="n">linksys941</span>
+<span class="n">linksys942</span>
+<span class="n">linksys962</span>
+<span class="n">linksys2102</span>
+<span class="n">linksys3102</span>
+<span class="n">linksys8000</span>
+<span class="n">SPA501G</span>
+<span class="n">SPA502G</span>
+<span class="n">SPA504G</span>
+<span class="n">SPA508G</span>
+<span class="n">SPA509G</span>
+<span class="n">SPA525G</span>
+<span class="n">mitel</span>
+<span class="n">nortel11xx</span>
+<span class="n">nortel1535</span>
+<span class="n">lip6804</span>
+<span class="n">lip6812</span>
+<span class="n">lip6830</span>
+<span class="n">polycom321</span>
+<span class="n">polycom320</span>
+<span class="n">polycom330</span>
+<span class="n">polycom331</span>
+<span class="n">polycom335</span>
+<span class="n">polycom430</span>
+<span class="n">polycom450</span>
+<span class="n">polycom550</span>
+<span class="n">polycom560</span>
+<span class="n">polycom650</span>
+<span class="n">polycom670</span>
+<span class="n">polycomVVX1500</span>
+<span class="n">polycom5000</span>
+<span class="n">polycom6000</span>
+<span class="n">polycom7000</span>
+<span class="n">snom300</span>
+<span class="n">snom320</span>
+<span class="n">snom360</span>
+<span class="n">snom370</span>
+<span class="n">snomM3</span>
+<span class="n">unidatawpu7700</span>
+</pre></div>
+</div>
+</section>
+<section id="find-phones">
+<h3>Find Phones<a class="headerlink" href="#find-phones" title="Link to this heading"></a></h3>
+<p><strong>Name:</strong> <em>findPhone</em></p>
+<p><strong>Description:</strong> Find defined phone(s) in the system.</p>
+<p><strong>Input Parameters:</strong> Either null for a listing of all, or provide one of the following optional parameters.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value Type</strong></p></td>
+<td><p><strong>Required/Optional</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>Editable/Read Only</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>bySerialNumber</em></p></td>
+<td><p>string</p></td>
+<td><p>Required</p></td>
+<td><p>The MAC address of the phone to find</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>byGroup</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The phones which are members of the specified group.</p></td>
+<td><p>Editable</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Parameters:</strong> An array of 0 or more of the following.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value Type</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>serialNumber</em></p></td>
+<td><p>string</p></td>
+<td><p>The MAC address of the phone.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>extension</em></p></td>
+<td><p>string</p></td>
+<td><p>The dialable extension</p></td>
+</tr>
+<tr class="row-even"><td><p><em>description</em></p></td>
+<td><p>string</p></td>
+<td><p>The description of the phone</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Example:</strong> List all defined phones.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">FindPhone</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">FindPhone</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong> Find all phones that are members of the phone group FirstPhoneGroup.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">FindPhone</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">byGroup</span><span class="o">&gt;</span><span class="n">FirstPhoneGroup</span><span class="o">&lt;/</span><span class="n">byGroup</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">FindPhone</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong> Find all phones with the MAC address of 000000000001</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">FindPhone</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">bySerialNumber</span><span class="o">&gt;</span><span class="mi">000000000001</span><span class="o">&lt;/</span><span class="n">bySerialNumber</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">FindPhone</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="manage-phones">
+<h3>Manage Phones<a class="headerlink" href="#manage-phones" title="Link to this heading"></a></h3>
+<p><strong>Name:</strong> <em>managePhone</em></p>
+<p><strong>Description:</strong> Update or delete phones defined in the system.</p>
+<p><strong>Input Parameters:</strong> Either null for a listing of all, or provide one of the following optional parameters.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value Type</strong></p></td>
+<td><p><strong>Required/Optional</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>Editable/Read Only</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>bySerialNumber</em></p></td>
+<td><p>string</p></td>
+<td><p>Required</p></td>
+<td><p>Search for a phone by MAC address. May be null.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>byGroup</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>Phones which are members of a specified phone group.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>property</em></p></td>
+<td></td>
+<td></td>
+<td><p>The name of the phone field to edit.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><em>value</em></p></td>
+<td></td>
+<td></td>
+<td><p>Value to use for the phone field being edited.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><em>deletePhone</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates to delete (true) the phone(s). Dependent upon search results.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><em>addGroup</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The phone group to add the phone(s) to. Dependent upon search results.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><em>removeGroup</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The phone group to remove the phone(s) from. Dependent upon search results.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><em>addLine</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>userid and uri to add to the phone(s). Dependent upon search results.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><em>addExternalLine</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>userid, dispalyname, password, registrationserver and voicemail of the external line to add to the phone(s). Dependent upon search results.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><em>userId</em></p></td>
+<td><p>string</p></td>
+<td><p>Required</p></td>
+<td><p>The user portion of the SIP URI and default value for authorization.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><em>displayName</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The display name to use for the userId.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><em>password</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The password for the userid.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><em>registrationServer</em></p></td>
+<td><p>string</p></td>
+<td><p>Required</p></td>
+<td><p>The domain the userid should register to.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><em>voicemail</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The voicemail extension for the userid.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><em>removeLineByUserId</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The userid of the line to remove from the phone(s). Dependent upon search results.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><em>removeLineByUri</em></p></td>
+<td><p>string</p></td>
+<td><p>Optional</p></td>
+<td><p>The uri of the line to remove from the phone(s). Dependent upon search results.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><em>restart</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates to restart (true) the phone(s). Dependent upon search results.</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Parameters:</strong> Empty Response</p>
+<p><strong>Example:</strong> Delete all phones which are a part of the group FirstPhoneGroup.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">ManagePhone</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">byGroup</span><span class="o">&gt;</span><span class="n">FirstPhoneGroup</span><span class="o">&lt;/</span><span class="n">byGroup</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">deletePhone</span><span class="o">&gt;</span><span class="n">true</span><span class="o">&lt;/</span><span class="n">deletePhone</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">ManagePhone</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong> Add line with userid 221 to the phones in FirstPhoneGroup, generate the profiles for the phones and restart them.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">ManagePhone</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">byGroup</span><span class="o">&gt;</span><span class="n">FirstPhoneGroup</span><span class="o">&lt;/</span><span class="n">byGroup</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">addLine</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">userId</span><span class="o">&gt;</span><span class="mi">221</span><span class="o">&lt;/</span><span class="n">userId</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">uri</span><span class="o">&gt;</span><span class="mi">221</span><span class="nd">@Uniteme</span><span class="o">.</span><span class="n">ezuce</span><span class="o">.</span><span class="n">com</span><span class="o">&lt;/</span><span class="n">uri</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">addLine</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">generateProfiles</span><span class="o">&gt;</span><span class="n">true</span><span class="o">&lt;/</span><span class="n">generateProfiles</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">restart</span><span class="o">&gt;</span><span class="n">true</span><span class="o">&lt;/</span><span class="n">restart</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">ManagePhone</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong> Remove all the phones in FirstPhoneGroup.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">soapenv</span><span class="o">=</span><span class="s2">&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;</span> <span class="n">xmlns</span><span class="p">:</span><span class="n">con</span><span class="o">=</span><span class="s2">&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Header</span><span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">con</span><span class="p">:</span><span class="n">ManagePhone</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">byGroup</span><span class="o">&gt;</span><span class="n">FirstPhoneGroup</span><span class="o">&lt;/</span><span class="n">byGroup</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">search</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">removeGroup</span><span class="o">&gt;</span><span class="n">FirstPhoneGroup</span><span class="o">&lt;/</span><span class="n">removeGroup</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">con</span><span class="p">:</span><span class="n">ManagePhone</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Body</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">soapenv</span><span class="p">:</span><span class="n">Envelope</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="test">
+<h2>Test<a class="headerlink" href="#test" title="Link to this heading"></a></h2>
+<p>The test web services are SOAP based services. These services use the Web Service Definition Language (WSDL) to define the interfaces supported.</p>
+<p><strong>URI</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">host</span><span class="o">.</span><span class="n">domain</span><span class="o">/</span><span class="n">sipxconfig</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">TestService</span>
+</pre></div>
+</div>
+<p><strong>WSDL</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;wsdl:definitions targetNamespace=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:apachesoap=&quot;http://xml.apache.org/xml-soap&quot; xmlns:impl=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:intf=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns:wsdl=&quot;http://schemas.xmlsoap.org/wsdl/&quot; xmlns:wsdlsoap=&quot;http://schemas.xmlsoap.org/wsdl/soap/&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+- &lt;!--
+WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)
+--&gt;
+&lt;wsdl:types&gt;
+&lt;schema targetNamespace=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot; xmlns=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+&lt;complexType name=&quot;ResetServices&quot;&gt;
+&lt;sequence&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;callGroup&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;parkOrbit&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;permission&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;phone&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;user&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;element maxOccurs=&quot;1&quot; minOccurs=&quot;0&quot; name=&quot;superAdmin&quot; nillable=&quot;true&quot; type=&quot;xsd:boolean&quot; /&gt;
+&lt;/sequence&gt;
+&lt;/complexType&gt;
+&lt;element name=&quot;ResetServices&quot; type=&quot;impl:ResetServices&quot; /&gt;
+&lt;/schema&gt;
+&lt;/wsdl:types&gt;
+&lt;wsdl:message name=&quot;resetServicesRequest&quot;&gt;
+&lt;wsdl:part element=&quot;impl:ResetServices&quot; name=&quot;ResetServices&quot; /&gt;
+&lt;/wsdl:message&gt;
+&lt;wsdl:message name=&quot;resetServicesResponse&quot; /&gt;
+&lt;wsdl:portType name=&quot;TestService&quot;&gt;
+&lt;wsdl:operation name=&quot;resetServices&quot; parameterOrder=&quot;ResetServices&quot;&gt;
+&lt;wsdl:input message=&quot;impl:resetServicesRequest&quot; name=&quot;resetServicesRequest&quot; /&gt;
+&lt;wsdl:output message=&quot;impl:resetServicesResponse&quot; name=&quot;resetServicesResponse&quot; /&gt;
+&lt;/wsdl:operation&gt;
+&lt;/wsdl:portType&gt;
+&lt;wsdl:binding name=&quot;TestServiceSoapBinding&quot; type=&quot;impl:TestService&quot;&gt;
+&lt;wsdlsoap:binding style=&quot;document&quot; transport=&quot;http://schemas.xmlsoap.org/soap/http&quot; /&gt;
+&lt;wsdl:operation name=&quot;resetServices&quot;&gt;
+&lt;wsdlsoap:operation soapAction=&quot;&quot; /&gt;
+&lt;wsdl:input name=&quot;resetServicesRequest&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:input&gt;
+&lt;wsdl:output name=&quot;resetServicesResponse&quot;&gt;
+&lt;wsdlsoap:body use=&quot;literal&quot; /&gt;
+&lt;/wsdl:output&gt;
+&lt;/wsdl:operation&gt;
+&lt;/wsdl:binding&gt;
+&lt;wsdl:service name=&quot;ConfigImplService&quot;&gt;
+&lt;wsdl:port binding=&quot;impl:TestServiceSoapBinding&quot; name=&quot;TestService&quot;&gt;
+&lt;wsdlsoap:address location=&quot;https://47.134.206.174:8443/sipxconfig/services/TestService&quot; /&gt;
+&lt;/wsdl:port&gt;
+&lt;/wsdl:service&gt;
+&lt;/wsdl:definitions&gt;
+</pre></div>
+</div>
+<section id="reset-services">
+<h3>Reset services<a class="headerlink" href="#reset-services" title="Link to this heading"></a></h3>
+<p><strong>Name:</strong> <em>resetServices</em></p>
+<p><strong>Description:</strong> Resets (deletes) the data associated with one or more web services.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is an extremely dangerous service as it could permanently delete large amounts of configuration data. Use extreme caution!</p>
+</div>
+<p><strong>Input Parameters:</strong></p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Name</strong></p></td>
+<td><p><strong>Value Type</strong></p></td>
+<td><p><strong>Required/Optional</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>Editable/Read Only</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><em>callGroup</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates to delete (true) all callGroup (hunt group) data.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>parkOrbit</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates to delete (true) all call park orbits.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>permission</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates to delete (true) all non-system defined permissions.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>phone</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates to delete (true) all defined phones.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-even"><td><p><em>user</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates to delete (true) all defined users except superadmin.</p></td>
+<td><p>Editable</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>superadmin</em></p></td>
+<td><p>boolean</p></td>
+<td><p>Optional</p></td>
+<td><p>Indicates to delete (true) all superadmin data except for the PIN.</p></td>
+<td><p>Editable</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Output Parameters:</strong> Empty response.</p>
+<p><strong>Example:</strong> Remove all hunt groups, park orbits, and permissions defined.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:con=&quot;http://www.sipfoundry.org/2007/08/21/ConfigService&quot;&gt;
+&lt;soapenv:Header/&gt;
+&lt;soapenv:Body&gt;
+&lt;con:ResetServices&gt;
+&lt;!-Optional:-&gt;
+&lt;callGroup&gt;true&lt;/callGroup&gt;
+&lt;!-Optional:-&gt;
+&lt;parkOrbit&gt;true&lt;/parkOrbit&gt;
+&lt;!-Optional:-&gt;
+&lt;permission&gt;true&lt;/permission&gt;
+&lt;/con:ResetServices&gt;
+&lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="restapi.html" class="btn btn-neutral float-left" title="REST API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1741 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web UI &mdash; sipxecs 24.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=ed338098"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="FAQ" href="faq.html" />
+    <link rel="prev" title="Planning" href="planning.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/sipxcom_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="history.html">Project History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planning.html">Planning</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Web UI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#initial-login">Initial Login</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#resetting-the-superadmin-password">Resetting the superadmin password</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#show-advanced-settings">Show Advanced Settings</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#users-tab">Users Tab</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Users</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#phantom-users">Phantom Users</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#user-id">User ID</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#alias-field">Alias Field</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#password-field">Password Field</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#voicemail-pin">Voicemail PIN</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sip-password">SIP Password</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#user-groups">User Groups</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#user-group-settings">User Group Settings</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#devices-tab">Devices Tab</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gateways">Gateways</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#managed-or-unmanaged-gateway">Managed or Unmanaged Gateway?</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#phones">Phones</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#managed-or-unmanaged-phone">Managed or Unmanaged Phone?</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#phone-groups">Phone Groups</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#features-tab">Features Tab</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#auth-codes">Auth Codes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#auth-code-options">Auth Code options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#auto-attendants">Auto Attendants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#call-park">Call Park</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#call-queue">Call Queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#callback-on-busy">Callback on Busy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#conferencing">Conferencing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#adding-a-conference-room">Adding a Conference Room</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#hunt-groups">Hunt Groups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#intercom">Intercom</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#music-on-hold">Music on Hold</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#paging-groups">Paging Groups</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#paging-prefix">Paging Prefix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#paging-group-options">Paging Group options</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#phonebooks">Phonebooks</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#phonebook-options">Phonebook Options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#system-tab">System Tab</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#databases">Databases</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#database-settings">Database Settings</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#dialing">Dialing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#dial-plans">Dial Plans</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#maintenance">Maintenance</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#backup">Backup</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#local">Local</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ftp">FTP</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#import-export">Import/Export</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#import">Import</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#export">Export</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#restore">Restore</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id23">Restore</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#restore-from-ftp">Restore from FTP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#backup-file-upload">Backup file upload</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#security">Security</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#certificates">Certificates</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#firewall">Firewall</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rules">Rules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#groups">Groups</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#call-rate-limit">Call Rate Limit</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#settings">Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sip-security">SIP Security</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tls-peers">TLS Peers</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#servers">Servers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#about-sipxsupervisor-cfengine">About sipxsupervisor (CFEngine)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id26">Servers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core-services">Core Services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#telephony-services">Telephony Services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#instant-messaging">Instant Messaging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#device-provisioning">Device Provisioning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#utility-services">Utility Services</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#services">Services</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cdr">CDR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#conference-event-listener">Conference Event Listener</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dns">DNS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ftp-server">FTP Server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id37">Instant Messaging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#log-watcher">Log Watcher</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#media-services">Media Services</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#message-waiting-indicator-mwi">Message Waiting Indicator (MWI)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#my-buddy">My Buddy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#phone-provision">Phone Provision</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rest-server">Rest Server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#saa-bla">SAA/BLA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#service-msg-queue">Service Msg Queue</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rls">RLS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sip-proxy">SIP Proxy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sip-registrar">SIP Registrar</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sip-trunk">SIP Trunk</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#snmp">SNMP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#voicemail">Voicemail</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#settings-menu">Settings</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#admin">Admin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#authentication">Authentication</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#date-and-time">Date and Time</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#device-time-zone">Device Time Zone</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#did-pool">DID Pool</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#domain">Domain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#extension-pool">Extension Pool</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#internet-calling">Internet Calling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#localization">Localization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#locations">Locations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#nat-traversal">NAT Traversal</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permissions">Permissions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#regions">Regions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#diagnostics-tab">Diagnostics Tab</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#about">About</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#alarms">Alarms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id60">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#alarm-groups">Alarm Groups</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#trap-receivers">Trap Receivers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#history">History</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#banned-hosts">Banned Hosts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#call-detail-records">Call Detail Records</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#active">Active</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#historic">Historic</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reports">Reports</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#job-status">Job Status</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#failed-jobs">Failed Jobs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#successful-jobs">Successful Jobs</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#network-packet-capture">Network Packet Capture</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#configure">Configure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#log-files">Log Files</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#registrations">Registrations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sip-trunk-statistics">SIP Trunk Statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#snapshot">Snapshot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#system-audit">System Audit</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#id61">History</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id62">Settings</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monitoring.html">Monitoring</a></li>
+<li class="toctree-l1"><a class="reference internal" href="maintenance.html">Maintenance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">Other / How To</a></li>
+<li class="toctree-l1"><a class="reference internal" href="restapi.html">REST API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="soapapi.html">SOAP API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sipxecs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Web UI</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/webui.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="web-ui">
+<span id="index-0"></span><h1>Web UI<a class="headerlink" href="#web-ui" title="Link to this heading"></a></h1>
+<p>The sipxcom web UI is controlled by the sipxconfig service. Restarting the sipxconfig service will not interrupt calls. If you find the webui unresponsive or there is a “internal error”, try on the command line as root:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">service</span> <span class="n">sipxconfig</span> <span class="n">restart</span>
+</pre></div>
+</div>
+<p>sipxconfig is a java jetty fronted by apache2. Self signed SSL certificates are used by default, so you can expect to see a warning about this in the web browser upon first login.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Firefox or Chrome are the recommended browsers to interact with the webui. Issues have been reported with Internet Explorer and Edge.</p>
+</div>
+<p><a class="reference external" href="https://letsencrypt.org/">Lets Encrypt Certificates</a> are now available for use in the webui.
+The <a class="reference external" href="https://letsencrypt.org/how-it-works/">domain validation</a> component requires that server have an A record in public DNS, and be accessible on port 80 (http) and 443 (https) from the public internet.
+If a Lets Encrypt certificate is used the server will automatically renew the SSL certificate – for free! The CA is also trusted by all browsers.</p>
+<p>Other options are to purchase a certificate from a trusted CA, use your own CA, or ignore the warning.</p>
+<section id="initial-login">
+<h2>Initial Login<a class="headerlink" href="#initial-login" title="Link to this heading"></a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Beware of browser auto-fill features unintentionally changing important fields like Password, PIN, or SIP password!</p>
+</div>
+<p>The default administrative account is “superadmin”. The first login to the webui will prompt to set the superadmin password.</p>
+<blockquote>
+<div><img alt="_images/superadmin_pwd.png" class="align-center" src="_images/superadmin_pwd.png" />
+</div></blockquote>
+<section id="resetting-the-superadmin-password">
+<h3>Resetting the superadmin password<a class="headerlink" href="#resetting-the-superadmin-password" title="Link to this heading"></a></h3>
+<p>If you need to reset the superadmin password, issue on the command line as root:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">service</span> <span class="n">sipxconfig</span> <span class="n">reset</span><span class="o">-</span><span class="n">superadmin</span>
+</pre></div>
+</div>
+<p>Restart your browser and upon next login use a blank password for the superadmin password.</p>
+</section>
+<section id="show-advanced-settings">
+<h3>Show Advanced Settings<a class="headerlink" href="#show-advanced-settings" title="Link to this heading"></a></h3>
+<p>Some fields or options are hidden by default. For example, the user SIP password on the user properties page. Use the “Show Advanced Settings” option on the page to see all available settings and options of the page.</p>
+<blockquote>
+<div><img alt="_images/showadvanced.png" class="align-center" src="_images/showadvanced.png" />
+</div></blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Avoid leaving your browser open for extended periods of time on pages that automatically refresh, such as diagnostics - registrations page and features - conferencing.
+Another option is to uncheck the option to automatically refresh.</p>
+<img alt="_images/auto_refresh.png" class="align-center" src="_images/auto_refresh.png" />
+<p>Repeated requests to these pages (and others such as running large CDR reports) may result in a sipxconfig <a class="reference external" href="https://docs.oracle.com/javase/7/docs/api/java/lang/OutOfMemoryError.html">java out of memory</a> error.
+Try a ‘service sipxconfig restart’ as the root user on the primary (webui) server if you encounter that.
+This will restart only the webui service and related components. It is not disruptive to telephony services.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The sipxconfig maximum java heap (<strong>-Xmx</strong>) size is 1GB by default.
+The value can be changed but will likely be overwritten upon any future sipxconfig rpm upgrades.</p>
+<p>It is configured in the /etc/init.d/sipxconfig file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">Command</span><span class="o">=</span><span class="s2">&quot;$JavaCmd </span><span class="se">\</span>
+<span class="s2">-Dprocname=$</span><span class="si">{procNameId}</span><span class="s2"> </span><span class="se">\</span>
+<span class="s2">-XX:MaxPermSize=128M </span><span class="se">\</span>
+<span class="s2">-Xmx1024m </span><span class="se">\</span>
+</pre></div>
+</div>
+<p>The java manual page (man java) suggests the maximum value would be 2048m:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">Xmxn</span>
+   <span class="n">Specifies</span> <span class="n">the</span> <span class="n">maximum</span> <span class="n">size</span><span class="p">,</span> <span class="ow">in</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">of</span> <span class="n">the</span> <span class="n">memory</span> <span class="n">allocation</span> <span class="n">pool</span><span class="o">.</span> <span class="n">This</span> <span class="n">value</span> <span class="n">must</span> <span class="n">a</span> <span class="n">multiple</span> <span class="n">of</span> <span class="mi">1024</span> <span class="n">greater</span> <span class="n">than</span> <span class="mi">2</span> <span class="n">MB</span><span class="o">.</span> <span class="n">Append</span> <span class="n">the</span> <span class="n">letter</span> <span class="n">k</span> <span class="ow">or</span> <span class="n">K</span> <span class="n">to</span> <span class="n">indicate</span> <span class="n">kilobytes</span><span class="p">,</span> <span class="ow">or</span> <span class="n">m</span> <span class="ow">or</span> <span class="n">M</span> <span class="n">to</span> <span class="n">indicate</span> <span class="n">megabytes</span><span class="o">.</span> <span class="n">The</span> <span class="n">default</span>
+   <span class="n">value</span> <span class="ow">is</span> <span class="n">chosen</span> <span class="n">at</span> <span class="n">runtime</span> <span class="n">based</span> <span class="n">on</span> <span class="n">system</span> <span class="n">configuration</span><span class="o">.</span>
+   <span class="n">For</span> <span class="n">server</span> <span class="n">deployments</span><span class="p">,</span> <span class="o">-</span><span class="n">Xms</span> <span class="ow">and</span> <span class="o">-</span><span class="n">Xmx</span> <span class="n">are</span> <span class="n">often</span> <span class="nb">set</span> <span class="n">to</span> <span class="n">the</span> <span class="n">same</span> <span class="n">value</span><span class="o">.</span> <span class="n">See</span> <span class="n">Garbage</span> <span class="n">Collector</span> <span class="n">Ergonomics</span> <span class="n">at</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">docs</span><span class="o">.</span><span class="n">oracle</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">javase</span><span class="o">/</span><span class="mi">7</span><span class="o">/</span><span class="n">docs</span><span class="o">/</span><span class="n">technotes</span><span class="o">/</span><span class="n">guides</span><span class="o">/</span><span class="n">vm</span><span class="o">/</span><span class="n">gc</span><span class="o">-</span><span class="n">ergonomics</span><span class="o">.</span><span class="n">html</span>
+   <span class="n">Examples</span><span class="p">:</span>
+   <span class="o">-</span><span class="n">Xmx83886080</span>
+   <span class="o">-</span><span class="n">Xmx81920k</span>
+   <span class="o">-</span><span class="n">Xmx80m</span>
+   <span class="n">On</span> <span class="n">Solaris</span> <span class="mi">7</span> <span class="ow">and</span> <span class="n">Solaris</span> <span class="mi">8</span> <span class="n">SPARC</span> <span class="n">platforms</span><span class="p">,</span> <span class="n">the</span> <span class="n">upper</span> <span class="n">limit</span> <span class="k">for</span> <span class="n">this</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">approximately</span> <span class="mi">4000</span> <span class="n">m</span> <span class="n">minus</span> <span class="n">overhead</span> <span class="n">amounts</span><span class="o">.</span> <span class="n">On</span> <span class="n">Solaris</span> <span class="mf">2.6</span> <span class="ow">and</span> <span class="n">x86</span> <span class="n">platforms</span><span class="p">,</span> <span class="n">the</span> <span class="n">upper</span> <span class="n">limit</span> <span class="ow">is</span> <span class="n">approximately</span> <span class="mi">2000</span> <span class="n">m</span> <span class="n">minus</span> <span class="n">overhead</span>
+   <span class="n">amounts</span><span class="o">.</span> <span class="n">On</span> <span class="n">Linux</span> <span class="n">platforms</span><span class="p">,</span> <span class="n">the</span> <span class="n">upper</span> <span class="n">limit</span> <span class="ow">is</span> <span class="n">approximately</span> <span class="mi">2000</span> <span class="n">m</span> <span class="n">minus</span> <span class="n">overhead</span> <span class="n">amounts</span><span class="o">.</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="users-tab">
+<span id="users"></span><h2>Users Tab<a class="headerlink" href="#users-tab" title="Link to this heading"></a></h2>
+<blockquote>
+<div><img alt="_images/users_tab.png" class="align-right" src="_images/users_tab.png" />
+</div></blockquote>
+<p>The users tab includes the Users, and User Group menu items.</p>
+<section id="id1">
+<h3>Users<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://tools.ietf.org/html/rfc3261#section-4">RFC-3261 section 4</a> provides an excellent overview if you’re completely new to SIP.</p>
+<p>There are two types of users - regular or phantom. Both will terminate the User ID field, and anything in the Alias field, as the user portion of a SIP URI.</p>
+<section id="phantom-users">
+<h4>Phantom Users<a class="headerlink" href="#phantom-users" title="Link to this heading"></a></h4>
+<p>Phantoms are not allowed to register to the system. They are only used for call routing purposes, or as a general voicemail box target.</p>
+<blockquote>
+<div><img alt="_images/users_phantom.png" class="align-center" src="_images/users_phantom.png" />
+</div></blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>A phantom user is not allowed to register to the system.
+Changing a normal user to a phantom user can cause a REGISTER and SUBSCRIBE flood from any phones that were assigned to that user.
+This also applies to disabling (unchecking the “Enabled” option in the user profile) or deleting the user.</strong>
+You must first remove line assignments from any phones assigned to that user.
+Next send profiles to the phones, which should remove any current registrations of the user. Verify beneath users - $user - registrations.
+Don’t forget about any FXS gateways that may need to be manually configured.
+Only after you have checked these things should you delete, disable, or convert a user to phantom.</p>
+</div>
+</section>
+<section id="user-id">
+<h4>User ID<a class="headerlink" href="#user-id" title="Link to this heading"></a></h4>
+<p>The “User ID” field is the internal extension number. It is typically numerical, as this is what other registered extensions would dial to call this user.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>DIDs should not be entered into this field. Use the alias field instead for that.</p>
+</div>
+</section>
+<section id="alias-field">
+<span id="id2"></span><h4>Alias Field<a class="headerlink" href="#alias-field" title="Link to this heading"></a></h4>
+<p>Non-numerical entries such as “matt” and DIDs are usually added in the aliases field. If you have a large number of DIDs to manage, consider using <a class="reference internal" href="#did-pool"><span class="std std-ref">DID Pool</span></a> feature instead of terminating them here.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When terminating DIDs it is important to list all possible variations of the DID. For example, in the United States the DID could be presented as 7 digit, 10 digit, 11 digit, or 11 digit prefixed with a +. To terminate all variations of the (fake) DID 4235551212 I’d need to list:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">5551212</span> <span class="mi">4235551212</span> <span class="mi">14235551212</span> <span class="o">+</span><span class="mi">14235551212</span>
+</pre></div>
+</div>
+<p>A missing entry here might instead match the outbound dial plan, which would introduce a signaling loop between outbound (egress) and inbound (ingress) traffic.</p>
+</div>
+</section>
+<section id="password-field">
+<h4>Password Field<a class="headerlink" href="#password-field" title="Link to this heading"></a></h4>
+<p>This is the password the user will use to log into the sipxcom webui or using XMPP Instant Messaging chat client such as <a class="reference external" href="http://pidgin.im/">Pidgin</a>. <a class="reference external" href="https://jitsi.org/">Jitsi</a> and <a class="reference external" href="https://www.counterpath.com/">CounterPath Bria</a> also have XMPP capabilities built-in.</p>
+</section>
+<section id="voicemail-pin">
+<h4>Voicemail PIN<a class="headerlink" href="#voicemail-pin" title="Link to this heading"></a></h4>
+<p>The Voicemail PIN is the numerical passcode the user enters to access voicemail.</p>
+</section>
+<section id="sip-password">
+<h4>SIP Password<a class="headerlink" href="#sip-password" title="Link to this heading"></a></h4>
+<p>The SIP password is the password a phone or soft phone uses register the line. The user ID field is the username the phone or softphone would use.</p>
+</section>
+</section>
+<section id="user-groups">
+<span id="id3"></span><h3>User Groups<a class="headerlink" href="#user-groups" title="Link to this heading"></a></h3>
+<p>User groups are a way to organize users into logical groupings in order to share common settings between the members of that group. There is an administrators group created by default, which the superadmin user is a member of.</p>
+<blockquote>
+<div><img alt="_images/user_usergroup.png" class="align-center" src="_images/user_usergroup.png" />
+</div></blockquote>
+<section id="user-group-settings">
+<h4>User Group Settings<a class="headerlink" href="#user-group-settings" title="Link to this heading"></a></h4>
+<p>User groups are a powerful tool for keeping the system easy to manage. The common settings available are Unified Messaging, Schedules, Conference, External User, Speed Dials, Music On Hold, Permissions, Caller ID, Personal Auto Attendant, Instant Messaging, Call Forwarding, and User Portal.</p>
+<blockquote>
+<div><img alt="_images/user_usergroup_settings.png" class="align-center" src="_images/user_usergroup_settings.png" />
+</div></blockquote>
+<p>For example, a “novoicemail” group where the administrator has unchecked the “Voicemail” permission in the group properties beneath the Permissions tab.</p>
+</section>
+</section>
+</section>
+<section id="devices-tab">
+<span id="devices"></span><h2>Devices Tab<a class="headerlink" href="#devices-tab" title="Link to this heading"></a></h2>
+<blockquote>
+<div><img alt="_images/devices_tab.png" class="align-right" src="_images/devices_tab.png" />
+</div></blockquote>
+<p>The devices tab includes Gateways, Phones, and Phone Groups menu items.</p>
+<p>Sipxcom classifies physical equipment into two areas – managed and unmanaged. Generally speaking managed devices are devices the system can generate configuration files for. Unmanaged devices must be manually configured.</p>
+<section id="gateways">
+<h3>Gateways<a class="headerlink" href="#gateways" title="Link to this heading"></a></h3>
+<p>Gateways provide connectivity out of the system such as out to the Public Switched Telephone Network (PSTN), or to interconnect with another PBX.</p>
+<section id="managed-or-unmanaged-gateway">
+<h4>Managed or Unmanaged Gateway?<a class="headerlink" href="#managed-or-unmanaged-gateway" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/devices_gw_addnew.png" class="align-right" src="_images/devices_gw_addnew.png" />
+</div></blockquote>
+<ul class="simple">
+<li><p>A unmanaged gateway is usually something like an AudioCodes gateway, an SBC, or a different PBX. It is a device the server should be aware of to allow traffic, but a device the server cannot directly interact with to change configuration or restart. For example sipxcom can generate the .INI file that you would load on a AudioCodes gateway, but it cannot directly change the configuration of that gateway live or reboot it remotely.</p></li>
+<li><p>A managed gateway example would be a SIP Trunk to a ITSP. SIP trunks can be configured with or without authentication.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If SIP trunk is selected the system will use the sipxbridge service to communicate with the ITSP by default. Sipxbridge listens on port 5080, so your ITSP should SIP traffic to port 5080 instead of port 5060.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Unmanaged gateways such as AudioCodes gateways should send SIP traffic to the proxy service, which is listening on port 5060. Unmanaged gateways cannot be configured to authenticate.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You should only allow connections to 5080 or 5060 (and generally any labeled PUBLIC in the firewall rules page) from trusted source IPs. Do not expose them to the entire public internet!</p>
+</div>
+</section>
+</section>
+<section id="phones">
+<span id="id4"></span><h3>Phones<a class="headerlink" href="#phones" title="Link to this heading"></a></h3>
+<p>The phones page is used to define phones to be managed by the server.</p>
+<section id="managed-or-unmanaged-phone">
+<h4>Managed or Unmanaged Phone?<a class="headerlink" href="#managed-or-unmanaged-phone" title="Link to this heading"></a></h4>
+<img alt="_images/devices_phone_addnew.png" class="align-right" src="_images/devices_phone_addnew.png" />
+<ul class="simple">
+<li><p><strong>Unmanaged phones</strong> - It is not required to define the phone in order for that phone to register to the system. For example you only need the user ID and SIP password to register a Jitsi or CounterPath Bria soft phone.</p></li>
+<li><p><strong>Managed Phones</strong> - These are phones sipxcom has a template for and that you want to centrally manage from the sipxcom webui.</p></li>
+</ul>
+<p>When “send profiles” is used this regenerates the *.cfg files for that device, then attempts to send it a reboot command.
+The configuration files are stored beneath /var/sipxdata/configserver/phone/profile/tftproot/.
+The reboot command is sent via a “check-sync” event SIP NOTIFY like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2020</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">20</span><span class="n">T03</span><span class="p">:</span><span class="mi">23</span><span class="p">:</span><span class="mf">12.890728</span><span class="n">Z</span><span class="p">:</span><span class="mi">337948</span><span class="p">:</span><span class="n">OUTGOING</span><span class="p">:</span><span class="n">INFO</span><span class="p">:</span><span class="n">sipx</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span><span class="p">:</span><span class="n">SipClientTcp</span><span class="o">-</span><span class="mi">5043</span><span class="p">:</span><span class="mi">7</span><span class="n">ff0ea672700</span><span class="p">:</span><span class="n">sipxproxy</span><span class="p">:</span><span class="n">SipUserAgent</span><span class="p">::</span><span class="n">sendTcp</span> <span class="n">TCP</span> <span class="n">SIP</span> <span class="n">User</span> <span class="n">Agent</span> <span class="n">sent</span> <span class="n">message</span><span class="p">:</span>
+<span class="o">----</span><span class="n">Local</span> <span class="n">Host</span><span class="p">:</span><span class="mf">192.168.1.14</span><span class="o">----</span> <span class="n">Port</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="o">----</span>
+<span class="o">----</span><span class="n">Remote</span> <span class="n">Host</span><span class="p">:</span><span class="mf">192.168.1.126</span><span class="o">----</span> <span class="n">Port</span><span class="p">:</span> <span class="mi">5060</span><span class="o">----</span>
+<span class="n">NOTIFY</span> <span class="n">sip</span><span class="p">:</span><span class="mi">200</span><span class="o">@</span><span class="mf">192.168.1.126</span><span class="p">;</span><span class="n">transport</span><span class="o">=</span><span class="n">tcp</span><span class="p">;</span><span class="n">x</span><span class="o">-</span><span class="n">sipX</span><span class="o">-</span><span class="n">nonat</span><span class="p">;</span><span class="n">sipXecs</span><span class="o">-</span><span class="n">CallDest</span><span class="o">=</span><span class="n">INT</span> <span class="n">SIP</span><span class="o">/</span><span class="mf">2.0</span>
+<span class="n">Record</span><span class="o">-</span><span class="n">Route</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">sip</span><span class="p">:</span><span class="mf">192.168.1.14</span><span class="p">:</span><span class="mi">5060</span><span class="p">;</span><span class="n">lr</span><span class="o">&gt;</span>
+<span class="n">Call</span><span class="o">-</span><span class="n">Id</span><span class="p">:</span> <span class="n">b9d6a0732edf685a09aae8a24d61b3ce</span><span class="o">@</span><span class="mf">192.168.1.14</span>
+<span class="n">Cseq</span><span class="p">:</span> <span class="mi">100</span> <span class="n">NOTIFY</span>
+<span class="n">From</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">sip</span><span class="p">:</span><span class="o">~~</span><span class="nb">id</span><span class="o">~</span><span class="n">config</span><span class="nd">@sipx</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span><span class="o">&gt;</span><span class="p">;</span><span class="n">tag</span><span class="o">=</span><span class="mi">206087292</span>
+<span class="n">To</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">sip</span><span class="p">:</span><span class="o">~~</span><span class="ow">in</span><span class="o">~</span><span class="mi">0004</span><span class="n">f28034d2</span><span class="nd">@home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span><span class="o">&gt;</span>
+<span class="n">Via</span><span class="p">:</span> <span class="n">SIP</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">TCP</span> <span class="mf">192.168.1.14</span><span class="p">;</span><span class="n">branch</span><span class="o">=</span><span class="n">z9hG4bK</span><span class="o">-</span><span class="n">XX</span><span class="o">-</span><span class="mi">2</span><span class="n">ff7BwYh_bvFZp7K5e28muVtGg</span><span class="o">~</span><span class="n">P6CvTajezxHXKaDzP0uqhA</span>
+<span class="n">Via</span><span class="p">:</span> <span class="n">SIP</span><span class="o">/</span><span class="mf">2.0</span><span class="o">/</span><span class="n">UDP</span> <span class="mf">192.168.1.14</span><span class="p">:</span><span class="mi">5180</span><span class="p">;</span><span class="n">branch</span><span class="o">=</span><span class="n">z9hG4bK98271829329565e17ea8a136c99f2dd63434</span>
+<span class="n">Max</span><span class="o">-</span><span class="n">Forwards</span><span class="p">:</span> <span class="mi">19</span>
+<span class="n">Contact</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">sip</span><span class="p">:</span><span class="mf">192.168.1.14</span><span class="p">:</span><span class="mi">5180</span><span class="p">;</span><span class="n">transport</span><span class="o">=</span><span class="n">udp</span><span class="p">;</span><span class="n">x</span><span class="o">-</span><span class="n">sipX</span><span class="o">-</span><span class="n">nonat</span><span class="o">&gt;</span>
+<span class="n">Event</span><span class="p">:</span> <span class="n">check</span><span class="o">-</span><span class="n">sync</span>
+<span class="n">Subscription</span><span class="o">-</span><span class="n">State</span><span class="p">:</span> <span class="n">Active</span>
+<span class="n">Content</span><span class="o">-</span><span class="n">Length</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">Date</span><span class="p">:</span> <span class="n">Tue</span><span class="p">,</span> <span class="mi">20</span> <span class="n">Oct</span> <span class="mi">2020</span> <span class="mi">03</span><span class="p">:</span><span class="mi">23</span><span class="p">:</span><span class="mi">12</span> <span class="n">GMT</span>
+<span class="n">X</span><span class="o">-</span><span class="n">Sipx</span><span class="o">-</span><span class="n">Spiral</span><span class="p">:</span> <span class="n">true</span>
+</pre></div>
+</div>
+<p>The phone must have a registered line in order to receive that SIP NOTIFY message, and the phone must be configured to use the correct provisioning protocol and server IP in order to download the files from the server.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Don’t forget to configure your DHCP scopes with option 160 for <a class="reference external" href="http://">http://</a> and <a class="reference external" href="https://">https://</a> provisioning server addresses.
+For <a class="reference external" href="tftp://">tftp://</a> or <a class="reference external" href="ftp://">ftp://</a> provisioning addresses use option 66. If both are specified a Polycom will prefer option 160 by default.
+It’s also a good idea to specify option 42 for NTP servers. See also the <a class="reference internal" href="#date-and-time"><span class="std std-ref">Date and Time</span></a> section to point sipxcom to those same NTP server(s).</p>
+</div>
+</section>
+</section>
+<section id="phone-groups">
+<span id="id5"></span><h3>Phone Groups<a class="headerlink" href="#phone-groups" title="Link to this heading"></a></h3>
+<p>Phone groups are useful to group models together for similar configuration options. Other reasons might include:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Incompatible firmware between devices</strong> - Polycom SoundPoint IP series and Polycom VVX series phones run incompatible firmware with each other, so it would be useful to group them separately.</p></li>
+<li><p><strong>Incompatible features or physical capabilities</strong> - There may be enough difference in the capabiilities or features of a series of models to necessitate separate grouping between the series. For example, the difference of color displays on the VVX 500 and the grayscale displays of the VVX 300/301s models.</p></li>
+<li><p><strong>Production vs testbeds</strong> - Another reason would be to test the latest version firmware on a smaller subset of phones – production vs testbed.</p></li>
+<li><p><strong>Physical Location</strong> – For example all VVX 500s at the Central Office.</p></li>
+</ul>
+</div></blockquote>
+<img alt="_images/devices_phonegrp_addnew.png" class="align-center" src="_images/devices_phonegrp_addnew.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A good minimal practice is to create a group for each model you have in use.</p>
+</div>
+</section>
+</section>
+<section id="features-tab">
+<span id="id6"></span><h2>Features Tab<a class="headerlink" href="#features-tab" title="Link to this heading"></a></h2>
+<blockquote>
+<div><img alt="_images/features_tab.png" class="align-right" src="_images/features_tab.png" />
+</div></blockquote>
+<p>The features tab includes Auth Codes, Auto Attendants, Call Park, Call Queue, Callback on Busy, Conferencing, Hunt Groups, Intercom, Music on Hold, Paging Groups, and Phonebook menu items.</p>
+<section id="auth-codes">
+<span id="id7"></span><h3>Auth Codes<a class="headerlink" href="#auth-codes" title="Link to this heading"></a></h3>
+<p>Authorization codes provide the ability to a user to initiate a call that requires permissions to which it is normally not allowed.</p>
+<blockquote>
+<div><img alt="_images/features_authcode.png" class="align-center" src="_images/features_authcode.png" />
+</div></blockquote>
+<section id="auth-code-options">
+<h4>Auth Code options<a class="headerlink" href="#auth-code-options" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/features_authcode_authcode.png" class="align-center" src="_images/features_authcode_authcode.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="auto-attendants">
+<span id="id8"></span><h3>Auto Attendants<a class="headerlink" href="#auto-attendants" title="Link to this heading"></a></h3>
+<p>Sipxcom includes a multi-level auto attendant service.</p>
+<blockquote>
+<div><img alt="_images/features_autoatt.png" class="align-center" src="_images/features_autoatt.png" />
+</div></blockquote>
+<p>Auto attendants provide automatic answering of incoming calls, dial-by-name directory, automated transfer to extension, access to voicemail remotely, and transfer to other auto attendants.
+For good auto attendant design, try to avoid nesting more than two auto attendants menus deep. This also applies to hunt groups.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Consider using the more powerful <a class="reference internal" href="#call-queue"><span class="std std-ref">Call Queue</span></a> feature instead of nesting AAs.</p>
+</div>
+<p>By default a “Operator” and “After Hours” attendant are created. See the <a class="reference internal" href="#dial-plans"><span class="std std-ref">Dial Plans</span></a> section on assigning extension numbers to auto attendants.</p>
+<blockquote>
+<div><img alt="_images/features_autoatt_att.png" class="align-center" src="_images/features_autoatt_att.png" />
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>wav files must be in the appropriate format of RIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 8000 Hz</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There are three major standards for DTMF interpretation: <a class="reference external" href="https://tools.ietf.org/html/rfc2833">RFC-2833 (inband within RTP)</a>, <a class="reference external" href="https://tools.ietf.org/html/rfc2976">RFC-2976 (out of band SIP INFO)</a>, and <a class="reference external" href="https://tools.ietf.org/html/rfc3265">RFC-3265 (out of band SIP NOTIFY)</a>. The AA/IVR only supports RFC-2833 by default.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The auto attendant cannot dial a PSTN number as the target. It does not have dial plan permissions to use gateways. It can call a phantom user however, and that phantom user can call forward to the PSTN.</p>
+</div>
+</section>
+<section id="call-park">
+<span id="id9"></span><h3>Call Park<a class="headerlink" href="#call-park" title="Link to this heading"></a></h3>
+<p>The call park feature enables the transfer of calls to an extension. Calls can be retrieved after parking by pressing *4 followed by the extension number.</p>
+<blockquote>
+<div><img alt="_images/features_callpark.png" class="align-center" src="_images/features_callpark.png" />
+</div></blockquote>
+</section>
+<section id="call-queue">
+<span id="id10"></span><h3>Call Queue<a class="headerlink" href="#call-queue" title="Link to this heading"></a></h3>
+<p>The call queue feature leverages the <a class="reference external" href="https://freeswitch.org/confluence/display/FREESWITCH/mod_callcenter">FreeSWITCH inbound call queueing application, mod_callcenter</a>.
+This provides lightweight call center functionality by distributing the calls to agents using various scenarios and rules.</p>
+<blockquote>
+<div><img alt="_images/features_callqueue.png" class="align-center" src="_images/features_callqueue.png" />
+</div></blockquote>
+</section>
+<section id="callback-on-busy">
+<span id="id11"></span><h3>Callback on Busy<a class="headerlink" href="#callback-on-busy" title="Link to this heading"></a></h3>
+<p>The Callback on Busy feature enables a caller to dial the callback prefix and an intended user number.
+When the intended user is available it will initiate a call between the two users, provided that the callback request has not expired.
+To request a callback, you need to dial the callback prefix (default *92) with the extension you want a callback from (example *92200).</p>
+<blockquote>
+<div><img alt="_images/features_callback.png" class="align-center" src="_images/features_callback.png" />
+</div></blockquote>
+</section>
+<section id="conferencing">
+<span id="id12"></span><h3>Conferencing<a class="headerlink" href="#conferencing" title="Link to this heading"></a></h3>
+<p>The conferencing feature leverages the FreeSWITCH inbound and outbound conference bridge service, mod_conference. You can create as many conferences as you like, but take care not to overcommit the system resources.</p>
+<blockquote>
+<div><img alt="_images/features_conf1.png" class="align-center" src="_images/features_conf1.png" />
+</div></blockquote>
+<section id="adding-a-conference-room">
+<h4>Adding a Conference Room<a class="headerlink" href="#adding-a-conference-room" title="Link to this heading"></a></h4>
+<p>Conferences can be added from the features - conference - $server page, or beneath the user properties.</p>
+<blockquote>
+<div><img alt="_images/features_conf2.png" class="align-center" src="_images/features_conf2.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="hunt-groups">
+<span id="id13"></span><h3>Hunt Groups<a class="headerlink" href="#hunt-groups" title="Link to this heading"></a></h3>
+<p>Hunt groups distribute a given inbound call to members of the group in either a broadcast-like “at the same time”, a sequential “if no response” manner, or combination of both.</p>
+<blockquote>
+<div><img alt="_images/features_huntgroup.png" class="align-center" src="_images/features_huntgroup.png" />
+</div></blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A hunt group should not exceed more than 5 members.</p>
+</div>
+<p>Signaling delay to endpoints is a common problem with hunt groups. This is due to the nature of the signaling involved.
+The larger the hunt group becomes, the greater the chance there will be a signaling delay issue.
+This may manifest as calls the hunt group members are unable to answer (call was CANCELed or answered elsewhere already).
+Hunt groups can be nested however this practice is also strongly discouraged for the same reasons.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If more than 5 members or nesting is needed consider using the more powerful <a class="reference internal" href="#call-queue"><span class="std std-ref">Call Queue</span></a> feature instead,
+which utilizes <a class="reference external" href="https://freeswitch.org/confluence/display/FREESWITCH/mod_callcenter">FreeSwitch mod_callcenter</a> instead of burdening the proxy.</p>
+</div>
+</section>
+<section id="intercom">
+<span id="id14"></span><h3>Intercom<a class="headerlink" href="#intercom" title="Link to this heading"></a></h3>
+<p>Intercom is only supported on devices that can be configured to automatically answer incoming calls.
+The intercom call can be initiated from any phone. To configure intercom create a new phone group and specify dial prefix.</p>
+<blockquote>
+<div><img alt="_images/features_intercom.png" class="align-center" src="_images/features_intercom.png" />
+</div></blockquote>
+</section>
+<section id="music-on-hold">
+<span id="id15"></span><h3>Music on Hold<a class="headerlink" href="#music-on-hold" title="Link to this heading"></a></h3>
+<p>Music on Hold (MoH) is supported on any phone model that implements <a class="reference external" href="https://tools.ietf.org/html/rfc7088">IETF RFC-7008</a> .
+When incoming call is put on hold the caller will hear music from the source selected on this page.
+Files can be uploaded to system music directory, and existing files can be deleted.
+The default MoH files are Creative Commons licensed sound files that included in FreeSWITCH packages.</p>
+<blockquote>
+<div><img alt="_images/features_moh.png" class="align-center" src="_images/features_moh.png" />
+</div></blockquote>
+<p>Users can also upload their own Music on Hold.</p>
+<blockquote>
+<div><img alt="_images/moh_user.png" class="align-center" src="_images/moh_user.png" />
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>wav files must be in the appropriate format of RIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 8000 Hz</p>
+</div>
+</section>
+<section id="paging-groups">
+<span id="id16"></span><h3>Paging Groups<a class="headerlink" href="#paging-groups" title="Link to this heading"></a></h3>
+<p>The paging group contains a list of extensions to call when the paging prefix followed by the paging group number is dialed.
+You can make changes to the paging server configuration without affecting the running server.
+The paging server will be automatically restarted when the configuration is changed.</p>
+<blockquote>
+<div><img alt="_images/features_paging1.png" class="align-center" src="_images/features_paging1.png" />
+</div></blockquote>
+<section id="paging-prefix">
+<h4>Paging Prefix<a class="headerlink" href="#paging-prefix" title="Link to this heading"></a></h4>
+<p>The page group number represents the digits that follow the prefix. For example, with the prefix set to *77, when dialing “*770” will invoke the page to page group 0.</p>
+<blockquote>
+<div><img alt="_images/features_paging2.png" class="align-center" src="_images/features_paging2.png" />
+</div></blockquote>
+</section>
+<section id="paging-group-options">
+<h4>Paging Group options<a class="headerlink" href="#paging-group-options" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/features_paging3.png" class="align-center" src="_images/features_paging3.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="phonebooks">
+<span id="id17"></span><h3>Phonebooks<a class="headerlink" href="#phonebooks" title="Link to this heading"></a></h3>
+<p>The phonebook feature allows for central management of phone number directories. This allows users to look up phone extensions and numbers by name and dial directly from the directory. The administrator can create different directories per department, user group, or for individual users. In addition to maintaining a list of internal users, lists of external phone numbers can be imported as well. At present this feature is supported on Polycom and Snom phones.</p>
+<blockquote>
+<div><img alt="_images/features_phonebook1.png" class="align-center" src="_images/features_phonebook1.png" />
+</div></blockquote>
+<section id="phonebook-options">
+<h4>Phonebook Options<a class="headerlink" href="#phonebook-options" title="Link to this heading"></a></h4>
+<p>The administrator can specify a Google Apps Domain to append to contact information when the domain is ommited from an account name. When the Everyone check box is ticked, the system will automatically add all system users to any user phonebooks.</p>
+<blockquote>
+<div><img alt="_images/features_phonebook2.png" class="align-center" src="_images/features_phonebook2.png" />
+</div></blockquote>
+</section>
+</section>
+</section>
+<section id="system-tab">
+<span id="id18"></span><h2>System Tab<a class="headerlink" href="#system-tab" title="Link to this heading"></a></h2>
+<p>The system tab includes the Databases, Dialing, Maintenance, Security, Servers, Services, and Settings menu options.</p>
+<blockquote>
+<div><img alt="_images/system_tab.png" class="align-right" src="_images/system_tab.png" />
+</div></blockquote>
+<section id="databases">
+<span id="id19"></span><h3>Databases<a class="headerlink" href="#databases" title="Link to this heading"></a></h3>
+<p>This is the configuration page for the MongoDB global and regional databases. A global database on each server in the cluster is an optional configuration. If running as a cluster MongoDB requires an odd number of servers in the replica set. For example 3 servers, each server running a full global databse. Or you could have 3 servers, two of them running a full global database and one server running arbiter service. See the <a class="reference external" href="https://docs.mongodb.com/v3.6/replication/">MongoDB Manual on Replication</a> . We also recommend reviewing the <a class="reference external" href="https://docs.mongodb.com/v3.6/administration/production-notes/">MongoDB Production Notes</a>, particularly <a class="reference external" href="https://docs.mongodb.com/v3.6/administration/production-notes/#mongodb-and-numa-hardware">the part about NUMA hardware</a>.</p>
+<blockquote>
+<div><img alt="_images/system_db_dbs.png" class="align-center" src="_images/system_db_dbs.png" />
+</div></blockquote>
+<section id="database-settings">
+<h4>Database Settings<a class="headerlink" href="#database-settings" title="Link to this heading"></a></h4>
+<p>This page allows you to tweak settings of the mongo driver.</p>
+<blockquote>
+<div><img alt="_images/system_db_settings.png" class="align-center" src="_images/system_db_settings.png" />
+</div></blockquote>
+<p>Increasing the Query Read Timeout and Query Write Timeout may be necessary if you have slow disks or a heavy disk IO frequently. If these are exceeded a warning is broadcast on the command line, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Broadcast</span> <span class="n">message</span> <span class="kn">from</span> <span class="nn">systemd</span><span class="o">-</span><span class="n">journald</span><span class="nd">@sipxcom1</span><span class="o">.</span><span class="n">home</span><span class="o">.</span><span class="n">mattkeys</span><span class="o">.</span><span class="n">net</span> <span class="p">(</span><span class="n">Sun</span> <span class="mi">2020</span><span class="o">-</span><span class="mi">10</span><span class="o">-</span><span class="mi">18</span> <span class="mi">17</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">30</span> <span class="n">EDT</span><span class="p">):</span>
+<span class="n">sipXproxy</span><span class="p">[</span><span class="mi">25189</span><span class="p">]:</span> <span class="n">ALARM_MONGODB_SLOW_READ</span> <span class="n">Last</span> <span class="n">Mongo</span> <span class="n">read</span> <span class="n">took</span> <span class="n">a</span> <span class="n">long</span> <span class="n">time</span><span class="p">:</span> <span class="n">document</span><span class="p">:</span> <span class="n">node</span><span class="o">.</span><span class="n">subscription</span> <span class="n">delay</span><span class="p">:</span> <span class="mi">1698</span> <span class="n">milliseconds</span>
+
+<span class="n">Message</span> <span class="kn">from</span> <span class="nn">syslogd</span><span class="nd">@sipxcom1</span> <span class="n">at</span> <span class="n">Oct</span> <span class="mi">18</span> <span class="mi">17</span><span class="p">:</span><span class="mi">29</span><span class="p">:</span><span class="mi">30</span> <span class="o">...</span>
+<span class="n">sipXproxy</span><span class="p">[</span><span class="mi">25189</span><span class="p">]:</span><span class="n">ALARM_MONGODB_SLOW_READ</span> <span class="n">Last</span> <span class="n">Mongo</span> <span class="n">read</span> <span class="n">took</span> <span class="n">a</span> <span class="n">long</span> <span class="n">time</span><span class="p">:</span> <span class="n">document</span><span class="p">:</span> <span class="n">node</span><span class="o">.</span><span class="n">subscription</span> <span class="n">delay</span><span class="p">:</span> <span class="mi">1698</span> <span class="n">milliseconds</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="dialing">
+<h3>Dialing<a class="headerlink" href="#dialing" title="Link to this heading"></a></h3>
+<p>Dial Plans is the only sub menu item.</p>
+<section id="dial-plans">
+<span id="id20"></span><h4>Dial Plans<a class="headerlink" href="#dial-plans" title="Link to this heading"></a></h4>
+<p>This page allows you to utilize any gateways defined in the system, or to perform dial string manipulation to and from gateways. By default eight plans are created as templates. These are Emergency, International, Local, Long Distance, Restricted, Toll Free, AutoAttendant, and Voicemail.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Avoid the use of whitespace or special characters in the dial plan names. Dial plan configuration is written to files such as /etc/sipxpbx/mappringrules.xml on the filesystem. Special characters or whitespace may interfere with sipxconfig reading in, or writing out, data correctly to those files. To avoid this problem use lower case only and replace spaces with underscores in field entries, e.g. local_dialing.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Avoid creating dial plan entries that have no permission requirements. If you do, you may be creating an opportunity for your dial plan and gateways to be exploited.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Ordering matters. Dial plan entries are read from top to bottom. Rules at the top are processed before the rules at the bottom.</p>
+</div>
+<img alt="_images/system_dialing.png" class="align-center" src="_images/system_dialing.png" />
+</section>
+</section>
+<section id="maintenance">
+<span id="maintenance-tab"></span><h3>Maintenance<a class="headerlink" href="#maintenance" title="Link to this heading"></a></h3>
+<p>The maintenance tab includes Backup, Import/Export, and Restore menu options.</p>
+<section id="backup">
+<span id="id21"></span><h4>Backup<a class="headerlink" href="#backup" title="Link to this heading"></a></h4>
+<p>The Backup page has two tabs - Local or FTP backups.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The backup log is /var/log/sipxpbx/backup.log. Check it for clues if you’re having problems. Filenames (uploaded prompts, music on hold, etc) with whitespace or special characters can cause problems with archive creation.</p>
+</div>
+</section>
+<section id="local">
+<h4>Local<a class="headerlink" href="#local" title="Link to this heading"></a></h4>
+<p>Local backups are stored on the server disk.</p>
+<blockquote>
+<div><img alt="_images/system_maintenance_backup_local.png" class="align-center" src="_images/system_maintenance_backup_local.png" />
+</div></blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Creating a backup archive can use a lot of disk space, especially if voicemail is selected. <strong>If you run out of free disk space all services will halt!</strong> We strongly recommend setting “number of backups to keep” to 5 or less.</p>
+</div>
+</section>
+<section id="ftp">
+<h4>FTP<a class="headerlink" href="#ftp" title="Link to this heading"></a></h4>
+<p>FTP backups can be used to transfer the backup automatically to a FTP (use the uri <a class="reference external" href="ftp://">ftp://</a>) or SFTP (use the uri sftp://) server.</p>
+<blockquote>
+<div><img alt="_images/system_maintenance_backup_ftp.png" class="align-center" src="_images/system_maintenance_backup_ftp.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="import-export">
+<span id="id22"></span><h3>Import/Export<a class="headerlink" href="#import-export" title="Link to this heading"></a></h3>
+<section id="import">
+<h4>Import<a class="headerlink" href="#import" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_maintenance_import.png" class="align-center" src="_images/system_maintenance_import.png" />
+</div></blockquote>
+<p>Phone and user data can be imported from a CSV file (comma separated values), which is compatible with most spreadsheet applications. The CSV should have a title line and the following fields:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>User name</p></li>
+<li><p>PIN</p></li>
+<li><p>Voice-mail PIN</p></li>
+<li><p>SIP password</p></li>
+<li><p>First name</p></li>
+<li><p>Last name</p></li>
+<li><p>User alias</p></li>
+<li><p>EMail Address</p></li>
+<li><p>User group</p></li>
+<li><p>Phone serial number</p></li>
+<li><p>Phone model</p></li>
+<li><p>Phone group</p></li>
+<li><p>Phone description</p></li>
+<li><p>IM ID</p></li>
+</ul>
+</div></blockquote>
+<p>All CSV header fields as of 20.04:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">User</span> <span class="n">name</span><span class="p">,</span><span class="n">PIN</span><span class="p">,</span><span class="n">Voicemail</span> <span class="n">PIN</span><span class="p">,</span><span class="n">SIP</span> <span class="n">password</span><span class="p">,</span><span class="n">First</span> <span class="n">name</span><span class="p">,</span><span class="n">Last</span> <span class="n">name</span><span class="p">,</span><span class="n">User</span> <span class="n">alias</span><span class="p">,</span><span class="n">EMail</span> <span class="n">address</span><span class="p">,</span><span class="n">User</span> <span class="n">group</span><span class="p">,</span><span class="n">Phone</span> <span class="n">serial</span> <span class="n">number</span><span class="p">,</span><span class="n">Phone</span> <span class="n">model</span><span class="p">,</span><span class="n">Phone</span> <span class="n">group</span><span class="p">,</span><span class="n">Phone</span> <span class="n">description</span><span class="p">,</span><span class="n">Im</span> <span class="n">Id</span><span class="p">,</span><span class="n">Salutation</span><span class="p">,</span><span class="n">Manager</span><span class="p">,</span><span class="n">EmployeeId</span><span class="p">,</span><span class="n">Job</span> <span class="n">Title</span><span class="p">,</span><span class="n">Job</span> <span class="n">department</span><span class="p">,</span><span class="n">Company</span> <span class="n">name</span><span class="p">,</span><span class="n">Assistant</span> <span class="n">name</span><span class="p">,</span><span class="n">Cell</span> <span class="n">phone</span> <span class="n">number</span><span class="p">,</span><span class="n">Home</span> <span class="n">phone</span> <span class="n">number</span><span class="p">,</span><span class="n">Assistant</span> <span class="n">phone</span> <span class="n">number</span><span class="p">,</span><span class="n">Fax</span> <span class="n">number</span><span class="p">,</span><span class="n">Did</span> <span class="n">number</span><span class="p">,</span><span class="n">Alternate</span> <span class="n">email</span><span class="p">,</span><span class="n">Alternate</span> <span class="n">im</span><span class="p">,</span><span class="n">Location</span><span class="p">,</span><span class="n">Home</span> <span class="n">street</span><span class="p">,</span><span class="n">Home</span> <span class="n">city</span><span class="p">,</span><span class="n">Home</span> <span class="n">state</span><span class="p">,</span><span class="n">Home</span> <span class="n">country</span><span class="p">,</span><span class="n">Home</span> <span class="nb">zip</span><span class="p">,</span><span class="n">Office</span> <span class="n">street</span><span class="p">,</span><span class="n">Office</span> <span class="n">city</span><span class="p">,</span><span class="n">Office</span> <span class="n">state</span><span class="p">,</span><span class="n">Office</span> <span class="n">country</span><span class="p">,</span><span class="n">Office</span> <span class="nb">zip</span><span class="p">,</span><span class="n">Office</span> <span class="n">mail</span> <span class="n">stop</span><span class="p">,</span><span class="n">Twitter</span><span class="p">,</span><span class="n">Linkedin</span><span class="p">,</span><span class="n">Facebook</span><span class="p">,</span><span class="n">Xing</span><span class="p">,</span><span class="n">Active</span> <span class="n">greeting</span><span class="p">,</span><span class="n">Email</span> <span class="n">voicemail</span> <span class="n">notification</span><span class="p">,</span><span class="n">Email</span> <span class="nb">format</span><span class="p">,</span><span class="n">Email</span> <span class="n">attach</span> <span class="n">audio</span><span class="p">,</span><span class="n">Alternate</span> <span class="n">email</span> <span class="n">voicemail</span> <span class="n">notification</span><span class="p">,</span><span class="n">Alternate</span> <span class="n">email</span> <span class="nb">format</span><span class="p">,</span><span class="n">Alternate</span> <span class="n">email</span> <span class="n">attach</span> <span class="n">audio</span><span class="p">,</span><span class="n">Internal</span> <span class="n">Voicemail</span> <span class="n">Server</span><span class="p">,</span><span class="n">Caller</span> <span class="n">ID</span><span class="p">,</span><span class="n">Block</span> <span class="n">Caller</span> <span class="n">ID</span><span class="p">,</span><span class="n">Additional</span> <span class="n">phone</span> <span class="n">settings</span><span class="p">,</span><span class="n">Additional</span> <span class="n">line</span> <span class="n">settings</span><span class="p">,</span><span class="n">Auth</span> <span class="n">Account</span> <span class="n">Name</span><span class="p">,</span><span class="n">EMail</span> <span class="n">address</span> <span class="n">aliases</span><span class="p">,</span><span class="n">Custom</span> <span class="mi">1</span><span class="p">,</span><span class="n">Custom</span> <span class="mi">2</span><span class="p">,</span><span class="n">Custom</span> <span class="mi">3</span>
+</pre></div>
+</div>
+<p>Each line from imported file will result in creation of the phone and the user assigned to that phone. If user group or phone group fields are not empty, the newly created user and phone will be added to respective groups. Groups will be created if they do not exist already.</p>
+<p>If the user with the same username is already present, this system will update existing user instead of creating a new one. The same is true for phones: if the phone with the same serial number already exist it’ll be updated.
+Only user name and phone serial number are obligatory fields. You can leave the remaining fields empty - in which case this system will not overwrite their values.</p>
+</section>
+<section id="export">
+<h4>Export<a class="headerlink" href="#export" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_maintenance_export.png" class="align-center" src="_images/system_maintenance_export.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="restore">
+<span id="backup-restore"></span><h3>Restore<a class="headerlink" href="#restore" title="Link to this heading"></a></h3>
+<p>The restore feature allows administrators to restore configuration data, voicemail data, or CDR data. The gzip archives are created by the Backup feature.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Backup archives from very old installations (prior to 14.04) may need to be restored in a series of incremental steps. In those cases a CSV restore of only user and phone data may be more appropriate.</p>
+</div>
+<section id="id23">
+<h4>Restore<a class="headerlink" href="#id23" title="Link to this heading"></a></h4>
+<p>The Restore page reads from the local backups folder by default.</p>
+<blockquote>
+<div><img alt="_images/system_maintenance_restore_restore.png" class="align-center" src="_images/system_maintenance_restore_restore.png" />
+</div></blockquote>
+</section>
+<section id="restore-from-ftp">
+<h4>Restore from FTP<a class="headerlink" href="#restore-from-ftp" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_maintenance_restore_ftp.png" class="align-center" src="_images/system_maintenance_restore_ftp.png" />
+</div></blockquote>
+</section>
+<section id="backup-file-upload">
+<h4>Backup file upload<a class="headerlink" href="#backup-file-upload" title="Link to this heading"></a></h4>
+<p>Upload configuration, voicemail, or CDR data archives.</p>
+<blockquote>
+<div><img alt="_images/system_maintenance_restore_upload.png" class="align-center" src="_images/system_maintenance_restore_upload.png" />
+</div></blockquote>
+<p>The options presented upon a configuration restore are to keep the existing SIP domain, keep the existing hostname, decode voicemail PINs or specify the voicemail PIN length, reset all voicemail PINs, and reset user passwords (user portal/IM password).</p>
+<blockquote>
+<div><img alt="_images/system_maintenance_restore_upload1.png" class="align-center" src="_images/system_maintenance_restore_upload1.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="security">
+<span id="security-tab"></span><h3>Security<a class="headerlink" href="#security" title="Link to this heading"></a></h3>
+<section id="certificates">
+<span id="ssl-certificates"></span><h4>Certificates<a class="headerlink" href="#certificates" title="Link to this heading"></a></h4>
+<p>The system - certificates page has three tabs to the left, Web Certificate, SIP Certificate, and Certificate Authorities (CAs). The web certificate is used for https on the webui and device provisioning, SIP certificate for SIPS (SIP+TLS) connections, and the Certificate Authorities to load CA or any intermediary certificates.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Use of sips (5061) is not recommended because not all services work properly with it. If this is important to you we recommend offloading TLS (sips) on the way to the sipxcom with a Session Border Controller (SBC).</p>
+</div>
+<img alt="_images/system_security_certificate_webcsr.png" class="align-center" src="_images/system_security_certificate_webcsr.png" />
+</section>
+</section>
+<section id="firewall">
+<span id="id24"></span><h3>Firewall<a class="headerlink" href="#firewall" title="Link to this heading"></a></h3>
+<p>Sipxcom includes a generic yet powerful firewall based upon <a class="reference external" href="https://en.wikipedia.org/wiki/Iptables">netfilter iptables</a>.</p>
+<section id="rules">
+<h4>Rules<a class="headerlink" href="#rules" title="Link to this heading"></a></h4>
+<p>Rules are determined automatically based on what services are running.</p>
+<blockquote>
+<div><img alt="_images/system_security_firewall_rules.png" class="align-center" src="_images/system_security_firewall_rules.png" />
+</div></blockquote>
+</section>
+<section id="groups">
+<h4>Groups<a class="headerlink" href="#groups" title="Link to this heading"></a></h4>
+<p>PUBLIC is all addresses (0.0.0.0), CLUSTER is only the servers in the sipxcom cluster. You can also add custom groups.</p>
+<blockquote>
+<div><img alt="_images/system_security_firewall_groups.png" class="align-center" src="_images/system_security_firewall_groups.png" />
+</div></blockquote>
+</section>
+<section id="call-rate-limit">
+<h4>Call Rate Limit<a class="headerlink" href="#call-rate-limit" title="Link to this heading"></a></h4>
+<p>Create Call Rate Limit Rule in order to prevent DoS attacks or to limit SIP traffic for the defined range of IPs. Leave end IP empty in case you want to define call rate limit for a single IP address or for a subnet.</p>
+<blockquote>
+<div><img alt="_images/system_security_firewall_ratelimit.png" class="align-center" src="_images/system_security_firewall_ratelimit.png" />
+</div></blockquote>
+</section>
+<section id="settings">
+<h4>Settings<a class="headerlink" href="#settings" title="Link to this heading"></a></h4>
+<p>Use the settings page to add IPs or IP ranges (in CIDR format) to the whitelist (always allow), blacklist (always block), or new in 20.04 you can add the blacklist from <a class="reference external" href="https://www.apiban.org/">LODs API Ban</a>.
+Also important on this page are the “Log xxx” options. These are required for SIP Security mechanisms and rate limiting.</p>
+<blockquote>
+<div><img alt="_images/system_security_firewall_settings.png" class="align-center" src="_images/system_security_firewall_settings.png" />
+</div></blockquote>
+</section>
+<section id="sip-security">
+<span id="id25"></span><h4>SIP Security<a class="headerlink" href="#sip-security" title="Link to this heading"></a></h4>
+<p>The SIP security page uses <a class="reference external" href="https://fail2ban.org/">fail2ban</a> to automatically ban IPs that have exceeded the thresholds defined. It does so by adding a rule to iptables to deny the source address all destinations.</p>
+<blockquote>
+<div><img alt="_images/system_security_sipsecurity_settings.png" class="align-center" src="_images/system_security_sipsecurity_settings.png" />
+</div></blockquote>
+<p>Usage of these mechanisms requires additional logging (see Firewall Settings section).</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Do not use this feature if a Session Border Controller (SBC) is in use! All SIP traffic will originate from the SBC in that case and you wouldn’t want to ban that. The SBC should have rules in place to protect sipxcom.
+Use the <a class="reference internal" href="troubleshooting.html#sipcodes"><span class="std std-ref">sipcodes.sh</span></a> script to verify those rules are working.</p>
+</div>
+<img alt="_images/system_security_sipsecurity_sipsecurity.png" class="align-center" src="_images/system_security_sipsecurity_sipsecurity.png" />
+</section>
+<section id="tls-peers">
+<h4>TLS Peers<a class="headerlink" href="#tls-peers" title="Link to this heading"></a></h4>
+<p>To allow calls from an authenticated peer to use resources that require permissions, add the domain as a Trusted Peer and configure the permissions for it.
+The peer must use TLS to communicate to this system, and the Certificate Authority used to sign certificates must be installed on both systems.</p>
+</section>
+</section>
+<section id="servers">
+<span id="servers-tab"></span><h3>Servers<a class="headerlink" href="#servers" title="Link to this heading"></a></h3>
+<p>The Servers page includes six tabs on the left: Servers, Core Services, Telephony Services, Instant Messaging, Device Provisioning, and Utility Services.</p>
+<section id="about-sipxsupervisor-cfengine">
+<h4>About sipxsupervisor (CFEngine)<a class="headerlink" href="#about-sipxsupervisor-cfengine" title="Link to this heading"></a></h4>
+<p>Sipxsupervisor uses <a class="reference external" href="https://cfengine.com">CFEngine</a>, a configuration management and automation framework, to define the desired state and configuration of each server.
+The sipxsupervisor service (cfengine agent) running on each server ensures compliance.
+The key exchange model used for this process is based on that used by openssh. The keys are exchanged during the intitial <a class="reference internal" href="setupscript.html#setup-script"><span class="std std-ref">setup script</span></a> (just after the <em>Is this the first server in the cluster?</em> question).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If a server in the cluster is showing “Uninitialized” in the status field, that generally indicates the primary (webui) server has lost communication with the cfengine agent running on that server.
+To correct the problem try issuing on the affected server:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">service</span> <span class="n">sipxsupervisor</span> <span class="n">restart</span>
+</pre></div>
+</div>
+<p>It expected to see Uninitialized status if you have defined the server in the webui, but have yet to run the sipxecs-setup script on the server to complete the key exchange.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Do not alter the sshd (or firewall, network, etc) configuration in such a way that would prevent root login between the servers. This will break sipxsupervisor (cfengine) communication.
+Running other configuration management agents such as Puppet or Chef will also conflict with sipxsupervisor (cfengine).</strong></p>
+</div>
+</section>
+<section id="id26">
+<h4>Servers<a class="headerlink" href="#id26" title="Link to this heading"></a></h4>
+<p>This page lists each server in the cluster as a hyperlink. The status field indicates if sipxsupervisor (cfengine) is responding and healthy on that server.</p>
+<img alt="_images/system_servers_servers.png" class="align-center" src="_images/system_servers_servers.png" />
+<p>By clicking the link of a server, you can restart any service on that server. This is also accomplished by communicating with sipxsupervisor (cfengine) on that server.</p>
+<blockquote>
+<div><img alt="_images/system_servers_server_services.png" class="align-center" src="_images/system_servers_server_services.png" />
+</div></blockquote>
+<section id="sending-server-profiles">
+<span id="id27"></span><h5>Sending Server Profiles<a class="headerlink" href="#sending-server-profiles" title="Link to this heading"></a></h5>
+<p>The send profiles button forcefully redeploys all configuration, for all services, to the selected servers.
+The cfengine term for this is <a class="reference external" href="https://cfengine.com/learn/how-cfengine-works/">configuration convergence</a>.
+Any affected services will be restarted (if required) automatically by the agent.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Upon sending server profiles you can verify the connection took place by monitoring (tail -f) /var/log/messages of the server(s). The log entry should look similar to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Oct</span> <span class="mi">19</span> <span class="mi">18</span><span class="p">:</span><span class="mi">16</span><span class="p">:</span><span class="mi">53</span> <span class="n">sipxcom1</span> <span class="n">cf</span><span class="o">-</span><span class="n">serverd</span><span class="p">[</span><span class="mi">16545</span><span class="p">]:</span> <span class="n">Accepting</span> <span class="n">connection</span> <span class="kn">from</span> <span class="s2">&quot;192.168.1.31&quot;</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="reset-keys">
+<h5>Reset Keys<a class="headerlink" href="#reset-keys" title="Link to this heading"></a></h5>
+<p>The Reset Keys option attempts to re-establish <a class="reference external" href="https://docs.cfengine.com/docs/3.13/reference-components-cf-key.html">stored authentication key pairs</a> used by sipxsupervisor (cfengine) agents in the cluster.
+The key exchange model is based on that used by OpenSSH. It is a peer to peer exchange model, not a central certificate authority model.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To verify the network path is good, ssh as root to each server in the cluster, and from each server in the cluster.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Only use Reset Keys if the key pairs that were established during initial setup have changed. You should have a good explaination as to why the stored keys have changed.</p>
+</div>
+<p>If needed you can force the sipxsupervisor (cfengine) agent of any server to run configuration convergence by issuing on the command line:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sipxagent</span>
+</pre></div>
+</div>
+<p>Similar to <a class="reference internal" href="#sending-server-profiles"><span class="std std-ref">Sending Server Profiles</span></a>, you can verify by checking for agent connection log entries in /var/log/messages of the server(s).</p>
+</section>
+</section>
+<section id="core-services">
+<span id="id28"></span><h4>Core Services<a class="headerlink" href="#core-services" title="Link to this heading"></a></h4>
+<p>This page allows you to enable or disable DHCP, DNS, Elasticsearch, Firewall, Log watcher, NTP, SIP Security, SMTP, SNMP, SNMP Alarms, and System Audit. A sipxcom feature might require one or more of these services to be enabled. Some services can only run on the primary server.</p>
+<blockquote>
+<div><img alt="_images/system_servers_coreservices.png" class="align-center" src="_images/system_servers_coreservices.png" />
+</div></blockquote>
+</section>
+<section id="telephony-services">
+<span id="id29"></span><h4>Telephony Services<a class="headerlink" href="#telephony-services" title="Link to this heading"></a></h4>
+<p>This page lists all telephony related services, and what server it is enabled on in the cluster. Some services can only run on the primary server. Some services require other services to be enabled. The webui should refresh in that case and highlight service(s) required.</p>
+<blockquote>
+<div><img alt="_images/system_servers_telephonyservices.png" class="align-center" src="_images/system_servers_telephonyservices.png" />
+</div></blockquote>
+</section>
+<section id="instant-messaging">
+<span id="id30"></span><h4>Instant Messaging<a class="headerlink" href="#instant-messaging" title="Link to this heading"></a></h4>
+<p>This page allows you to enable or disable the OpenFire XMPP server service. The My Buddy function is dependant upon the IMBot service being enabled. The IMBot depends upon the IM-XMPP feature.</p>
+<blockquote>
+<div><img alt="_images/system_servers_instantmessaging.png" class="align-center" src="_images/system_servers_instantmessaging.png" />
+</div></blockquote>
+</section>
+<section id="device-provisioning">
+<span id="id31"></span><h4>Device Provisioning<a class="headerlink" href="#device-provisioning" title="Link to this heading"></a></h4>
+<p>This page allows you to enable or disable the DHCP, FTP, Phone Auto Provisioning (HTTP/HTTPS), Phone Logging (syslog server), or Trivial FTP (tftp) services.</p>
+<blockquote>
+<div><img alt="_images/system_servers_deviceprovisioning.png" class="align-center" src="_images/system_servers_deviceprovisioning.png" />
+</div></blockquote>
+</section>
+<section id="utility-services">
+<span id="id32"></span><h4>Utility Services<a class="headerlink" href="#utility-services" title="Link to this heading"></a></h4>
+<p>This page allows you to enable automatic packet captures using tcpdump.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This is resource intensive and should only be enabled to assist in troubleshooting a problem that you can replicate. If you enable this don’t forget to review settings beneath <a class="reference internal" href="#diagnostics-network-packet-capture"><span class="std std-ref">Diagnostics - Network Packet Capture - Configure tab</span></a>.</p>
+</div>
+<img alt="_images/system_servers_utilityservices.png" class="align-center" src="_images/system_servers_utilityservices.png" />
+</section>
+</section>
+<section id="services">
+<span id="services-menu"></span><h3>Services<a class="headerlink" href="#services" title="Link to this heading"></a></h3>
+<p>The Services menu has the CDR, Conference Event Listener, DNS, FTP Server, Instant Messaging, Log Watcher, Media Services, MWI, My Buddy, Phone Provision, Rest Server, SAA/BLA, Service Msg Queue, RLS, SIP Proxy, SIP Registrar, SIP Trunk, SNMP, and Voicemail options.</p>
+<section id="cdr">
+<span id="cdr-service"></span><h4>CDR<a class="headerlink" href="#cdr" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_cdr.png" class="align-center" src="_images/system_services_cdr.png" />
+</div></blockquote>
+</section>
+<section id="conference-event-listener">
+<span id="conference-event"></span><h4>Conference Event Listener<a class="headerlink" href="#conference-event-listener" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_conferenceevent.png" class="align-center" src="_images/system_services_conferenceevent.png" />
+</div></blockquote>
+</section>
+<section id="dns">
+<span id="id33"></span><h4>DNS<a class="headerlink" href="#dns" title="Link to this heading"></a></h4>
+<p>The DNS menu has five tabs to the left: Settings, Fail-over Plans, Record Views, Custom Records, and Advisor.</p>
+<section id="settings-tab">
+<h5>Settings tab<a class="headerlink" href="#settings-tab" title="Link to this heading"></a></h5>
+<p>If using Managed DNS, sipxcom (sipxsupervisor/cfengine) will manage the DNS zone file, which is stored beneath /var/named/, and the DNS server configuration file /etc/named.conf.</p>
+<p>If using Unmanaged DNS, sipxcom (sipxsupervisor/cfengine) will not change the zone file or /etc/named.conf.</p>
+<blockquote>
+<div><img alt="_images/system_services_dns_settings.png" class="align-center" src="_images/system_services_dns_settings.png" />
+</div></blockquote>
+</section>
+<section id="fail-over-plans">
+<h5>Fail-over Plans<a class="headerlink" href="#fail-over-plans" title="Link to this heading"></a></h5>
+<p>Fail-over plans control what services are used and when and how much traffic they receive. Fail-over plans are used in DNS record views and they can be reused for many views.</p>
+<p>A fail-over plan controls how traffic flows into and through the cluster when there is a server or network failure.
+This can also be used when you want to distribute traffic unevenly through your system to account for resource constraints or various other reasons.
+It’s important to understand that regardless of the failover plan, once traffic hits a server the services that are local to that server will be preferred.
+For example, you may have a SIP proxy take 1% of the traffic, but once the SIP REGISTER message enters that server it will use the local registrar.
+The failover plan will only be used if the local registrar does not respond.</p>
+<blockquote>
+<div><img alt="_images/system_services_dns_failover.png" class="align-center" src="_images/system_services_dns_failover.png" />
+</div></blockquote>
+</section>
+<section id="record-views">
+<span id="id34"></span><h5>Record Views<a class="headerlink" href="#record-views" title="Link to this heading"></a></h5>
+<p>Record views allow you to have a different set of DNS records for a region of your network.</p>
+<blockquote>
+<div><img alt="_images/system_services_dns_recordview1.png" class="align-center" src="_images/system_services_dns_recordview1.png" />
+</div></blockquote>
+<p>The default SRV record priority and weight will distribute traffic evenly among all cluster members.</p>
+<blockquote>
+<div><img alt="_images/system_services_dns_recordview2.png" class="align-center" src="_images/system_services_dns_recordview2.png" />
+</div></blockquote>
+</section>
+<section id="custom-records">
+<span id="id35"></span><h5>Custom Records<a class="headerlink" href="#custom-records" title="Link to this heading"></a></h5>
+<p>You’ll need to add records for entries missing from the default plan such as MX or A records.</p>
+<blockquote>
+<div><img alt="_images/system_services_dns_customrecord1.png" class="align-center" src="_images/system_services_dns_customrecord1.png" />
+</div></blockquote>
+<p>Click ‘Add custom record’ to create new zone entries.</p>
+<blockquote>
+<div><img alt="_images/system_services_dns_customrecord2.png" class="align-center" src="_images/system_services_dns_customrecord2.png" />
+</div></blockquote>
+<p>After saving the new record(s), navigate to <a class="reference internal" href="#id34">Record Views</a> and click the zone. Highlight the records to add into the zone next, then click apply. The preview should now dispaly the new records at the bottom of the zone.</p>
+<blockquote>
+<div><img alt="_images/system_services_dns_recordview3.png" class="align-center" src="_images/system_services_dns_recordview3.png" />
+</div></blockquote>
+</section>
+<section id="advisor">
+<h5>Advisor<a class="headerlink" href="#advisor" title="Link to this heading"></a></h5>
+<blockquote>
+<div><img alt="_images/system_services_dns_advisor.png" class="align-center" src="_images/system_services_dns_advisor.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="ftp-server">
+<span id="id36"></span><h4>FTP Server<a class="headerlink" href="#ftp-server" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_ftp.png" class="align-center" src="_images/system_services_ftp.png" />
+</div></blockquote>
+</section>
+<section id="id37">
+<h4>Instant Messaging<a class="headerlink" href="#id37" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_im.png" class="align-center" src="_images/system_services_im.png" />
+</div></blockquote>
+</section>
+<section id="log-watcher">
+<span id="id38"></span><h4>Log Watcher<a class="headerlink" href="#log-watcher" title="Link to this heading"></a></h4>
+<p>Service that reads incoming log messages and reacts accordingly. Typically used to trigger a SNMP alarms.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This setting does not change the log verbosity of other services.</p>
+</div>
+<img alt="_images/system_services_lw.png" class="align-center" src="_images/system_services_lw.png" />
+</section>
+<section id="media-services">
+<span id="id39"></span><h4>Media Services<a class="headerlink" href="#media-services" title="Link to this heading"></a></h4>
+<p>This is the configuration page for Media Services (FreeSWITCH). WAV or MP3 files can be used for prompts, MoH, and voicemail recordings.
+<a class="reference external" href="https://www.audacityteam.org/">Audacity</a> is a good program to use to create or convert media files. Another popular utility is <a class="reference external" href="http://sox.sourceforge.net/">Sound Exchange (sox)</a>.</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>wav files must be in the appropriate format of RIFF (little-endian) data, WAVE audio, Microsoft PCM, 16 bit, mono 8000 Hz</p>
+</div>
+</div></blockquote>
+<p>An easy way to record a file quickly is to use the Voicemail Attachment option beneath the user profile Unified Messaging tab. The file attachment will be in the proper format.
+By default 8 is the voicemail prefix. So if your extension is 200, dial 8200 to immediately deposit a voicemail to yourself.</p>
+<img alt="_images/system_services_ms1.png" class="align-center" src="_images/system_services_ms1.png" />
+<p>Each server running media services (freeswitch) in the cluster is listed and can be individually edited.</p>
+<img alt="_images/system_services_ms2.png" class="align-center" src="_images/system_services_ms2.png" />
+<p>The Settings tab on the left are global settings.</p>
+<img alt="_images/system_services_ms3.png" class="align-center" src="_images/system_services_ms3.png" />
+</section>
+<section id="message-waiting-indicator-mwi">
+<span id="message-waiting-indicator"></span><h4>Message Waiting Indicator (MWI)<a class="headerlink" href="#message-waiting-indicator-mwi" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_mwi.png" class="align-center" src="_images/system_services_mwi.png" />
+</div></blockquote>
+</section>
+<section id="my-buddy">
+<span id="id40"></span><h4>My Buddy<a class="headerlink" href="#my-buddy" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_mybuddy.png" class="align-center" src="_images/system_services_mybuddy.png" />
+</div></blockquote>
+</section>
+<section id="phone-provision">
+<span id="phone-provisioning"></span><h4>Phone Provision<a class="headerlink" href="#phone-provision" title="Link to this heading"></a></h4>
+<p>The Provision Menu is used to upload phone firmware. There are two menu options of Device Files and Settings.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All generated phone configuration files are beneath /var/sipxdata/configserver/phone/profile/tftproot/.
+Any phone custom configuration (Unmanaged TFTP) files and uploaded firmware archives are deployed beneath that path as well.</p>
+</div>
+<section id="device-files">
+<h5>Device Files<a class="headerlink" href="#device-files" title="Link to this heading"></a></h5>
+<blockquote>
+<div><img alt="_images/system_services_pp1.png" class="align-center" src="_images/system_services_pp1.png" />
+</div></blockquote>
+<p>To find the latest GA for your model Polycom visit the Polycom firmware matrix.
+There are two pages, one <a class="reference external" href="https://downloads.polycom.com/voice/voip/sip_sw_releases_matrix.html">for SoundPoint and SoundStation IP models</a>,
+and the other <a class="reference external" href="https://downloads.polycom.com/voice/voip/uc_sw_releases_matrix.html">for VVX models</a>.</p>
+<p><strong>The Version drop-down is only a label to distinguish a set of files. It is not required to match the actual firmware version.</strong></p>
+<img alt="_images/system_services_pp2.png" class="align-center" src="_images/system_services_pp2.png" />
+<p>The firmware application zip is extracted to the server filesystem beneath whatever the label was set to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ls -l /var/sipxdata/configserver/phone/profile/tftproot/polycom</span>
+<span class="n">total</span> <span class="mi">8</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span> <span class="mi">5</span> <span class="n">sipx</span> <span class="n">sipx</span> <span class="mi">4096</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="mf">4.0</span><span class="o">.</span><span class="n">X</span>
+<span class="n">drwxr</span><span class="o">-</span><span class="n">xr</span><span class="o">-</span><span class="n">x</span> <span class="mi">5</span> <span class="n">sipx</span> <span class="n">sipx</span> <span class="mi">4096</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="mf">5.5.2</span>
+</pre></div>
+</div>
+<p>You can load any version, but if there is a difference document that in the description field. If there is a large difference there will likely be missing features or configuration options.
+Try to stay in the ballpark (3.2.x, 4.0.x, 5.x) if possible. In the screenshot below I have version 5.9.6 firmware loaded into the 5.5.2 slot.</p>
+<p>This label must match in the phone profile.</p>
+<img alt="_images/phone_versiondropdown.png" class="align-center" src="_images/phone_versiondropdown.png" />
+<p>There is also a setting for this at the phone group level.</p>
+<img alt="_images/group_versiondropdown.png" class="align-center" src="_images/group_versiondropdown.png" />
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Be cautious of conflicting group firmware versions if the phone is a member of multiple phone groups.
+When troubleshooting it is a good idea to remove the phone from all phone groups and just use the phone level setting so there is no doubt what it will download.</p>
+</div>
+<p><strong>The bootrom is only required for special circumstances</strong>. For example, when upgrading SPIP phones between version 3.2.x and version 4.0.x a special upgrader bootrom is required.
+A separate downgrader bootrom may be required for the inverse from 4.0.x to 3.2.x. Check the release notes of the firmware version you’re interested in for instructions.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Using a incompatible version firmware application archive or bootrom will result with the phone being stuck in a reboot loop.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>On the Polycom matrix page, the release notes link should be just to the right of the version.</p>
+<a class="reference internal image-reference" href="_images/firmware_release_notes.png"><img alt="_images/firmware_release_notes.png" src="_images/firmware_release_notes.png" style="width: 300px; height: 200px;" />
+</a>
+<a class="reference internal image-reference" href="_images/firmware_release_notes_vvx.png"><img alt="_images/firmware_release_notes_vvx.png" src="_images/firmware_release_notes_vvx.png" style="width: 300px; height: 200px;" />
+</a>
+</div>
+</section>
+<section id="example-custom-configuration-files">
+<span id="id41"></span><h5>Example custom configuration files<a class="headerlink" href="#example-custom-configuration-files" title="Link to this heading"></a></h5>
+<p>If a needed feature or configuration option is missing from the device profile a custom configuration file may be a possible workaround. For example:</p>
+<p><a class="reference download internal" download="" href="_downloads/d14dc2602f7048ba91f73a663d2ced88/blindxferdefault.cfg"><code class="xref download docutils literal notranslate"><span class="pre">This</span> <span class="pre">file</span> <span class="pre">sets</span> <span class="pre">blind</span> <span class="pre">transfer</span> <span class="pre">as</span> <span class="pre">the</span> <span class="pre">default</span> <span class="pre">transfer</span> <span class="pre">method</span> <span class="pre">on</span> <span class="pre">Polycom</span> <span class="pre">SPIP</span> <span class="pre">and</span> <span class="pre">VVX</span> <span class="pre">phones</span></code></a>. Blind should always work, consultative (also known as attended) transfers have limitations. For example, <strong>you cannot consultative transfer to a voicemail or conference target (anything freeswitch), and possibly PSTN targets (depending on your pstn gateway)</strong>.</p>
+<p><a class="reference download internal" download="" href="_downloads/ca0c143bed6e39623be3a2bd971bda8a/100reldisable.cfg"><code class="xref download docutils literal notranslate"><span class="pre">This</span> <span class="pre">file</span> <span class="pre">removes</span> <span class="pre">100rel</span> <span class="pre">support</span> <span class="pre">from</span> <span class="pre">a</span> <span class="pre">Polycom</span> <span class="pre">SPIP</span> <span class="pre">or</span> <span class="pre">VVX</span> <span class="pre">phone</span></code></a>. This would prevent the phone from responding to PRACKs.</p>
+</section>
+<section id="building-a-custom-configuration-file">
+<h5>Building a custom configuration file<a class="headerlink" href="#building-a-custom-configuration-file" title="Link to this heading"></a></h5>
+<p>The <a class="reference external" href="https://documents.polycom.com/bundle/ucs-ag-5-9-0/page/r-ucs-ag-configuration-parameters.html">Polycom UC Software Administrator Guide</a> describes all the options available and what template should be used.</p>
+<p>The templates can be found on the server filesystem after you’ve uploaded the application zip:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ls -l /var/sipxdata/configserver/phone/profile/tftproot/polycom/4.0.X/Config/</span>
+<span class="n">total</span> <span class="mi">3764</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">sipx</span> <span class="n">sipx</span>    <span class="mi">2322</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="n">applications</span><span class="o">.</span><span class="n">cfg</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">sipx</span> <span class="n">sipx</span>   <span class="mi">13927</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="n">device</span><span class="o">.</span><span class="n">cfg</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">sipx</span> <span class="n">sipx</span>   <span class="mi">22823</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="n">features</span><span class="o">.</span><span class="n">cfg</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">sipx</span> <span class="n">sipx</span>    <span class="mi">1162</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="n">H323</span><span class="o">.</span><span class="n">cfg</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">sipx</span> <span class="n">sipx</span> <span class="mi">3605355</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="n">polycomConfig</span><span class="o">.</span><span class="n">xsd</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">sipx</span> <span class="n">sipx</span>    <span class="mi">9393</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="n">reg</span><span class="o">-</span><span class="n">advanced</span><span class="o">.</span><span class="n">cfg</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">sipx</span> <span class="n">sipx</span>     <span class="mi">529</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="n">reg</span><span class="o">-</span><span class="n">basic</span><span class="o">.</span><span class="n">cfg</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">sipx</span> <span class="n">sipx</span>   <span class="mi">31638</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="n">region</span><span class="o">.</span><span class="n">cfg</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">sipx</span> <span class="n">sipx</span>     <span class="mi">739</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="n">sip</span><span class="o">-</span><span class="n">basic</span><span class="o">.</span><span class="n">cfg</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">sipx</span> <span class="n">sipx</span>   <span class="mi">21262</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="n">sip</span><span class="o">-</span><span class="n">interop</span><span class="o">.</span><span class="n">cfg</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">sipx</span> <span class="n">sipx</span>  <span class="mi">104003</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="n">site</span><span class="o">.</span><span class="n">cfg</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">sipx</span> <span class="n">sipx</span>    <span class="mi">5271</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="n">video</span><span class="o">.</span><span class="n">cfg</span>
+<span class="o">-</span><span class="n">rw</span><span class="o">-</span><span class="n">r</span><span class="o">--</span><span class="n">r</span><span class="o">--</span> <span class="mi">1</span> <span class="n">sipx</span> <span class="n">sipx</span>     <span class="mi">505</span> <span class="n">Oct</span>  <span class="mi">2</span> <span class="mi">10</span><span class="p">:</span><span class="mi">02</span> <span class="n">video</span><span class="o">-</span><span class="n">integration</span><span class="o">.</span><span class="n">cfg</span>
+</pre></div>
+</div>
+</section>
+<section id="uploading-a-custom-configuration-file">
+<h5>Uploading a custom configuration file<a class="headerlink" href="#uploading-a-custom-configuration-file" title="Link to this heading"></a></h5>
+<p>Use the “Unmanaged TFTP Files” option to upload the custom configuration file(s). You can upload multiple files in one, or create multiple individual unmanaged tftp files entries. Don’t forget to provide a description as to what it is supposed to do.</p>
+<img alt="_images/devicefiles_unmanagedtftp.png" class="align-center" src="_images/devicefiles_unmanagedtftp.png" />
+</section>
+<section id="adding-the-custom-config-to-a-phone">
+<h5>Adding the custom config to a phone<a class="headerlink" href="#adding-the-custom-config-to-a-phone" title="Link to this heading"></a></h5>
+<p>Navigate to devices - phones, select the phone, then select the ‘custom configuration’ tab in the phone profile. You can also set this at the phone group level.
+Type the filename exactly (case sensitive) as it exists on the filesystem. If you have multiple custom config files, use a comma with no space between filenames. Apply to save, then send profiles to the phone.</p>
+<img alt="_images/phoneprofile_customconfigs.png" class="align-center" src="_images/phoneprofile_customconfigs.png" />
+<p>Upon sending profiles to the phone the custom configuration files are added to the $mac.cfg</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># grep &quot;CONFIG_FILES&quot; /var/sipxdata/configserver/phone/profile/tftproot/111122223333.cfg</span>
+  <span class="n">CONFIG_FILES</span><span class="o">=</span><span class="s2">&quot;100reldisable.cfg,blindxferdefault.cfg,[PHONE_MAC_ADDRESS]-sipx-applications.cfg,[PHONE_MAC_ADDRESS]-sipx-features.cfg,[PHONE_MAC_ADDRESS]-sipx-reg-advanced.cfg,[PHONE_MAC_ADDRESS]-sipx-region.cfg,[PHONE_MAC_ADDRESS]-sipx-sip-basic.cfg,[PHONE_MAC_ADDRESS]-sipx-sip-interop.cfg,[PHONE_MAC_ADDRESS]-sipx-site.cfg,[PHONE_MAC_ADDRESS]-sipx-video.cfg&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The phone must be configured (possibly manually) to download from the server.
+Polycom phones use DHCP option 66 (<a class="reference external" href="tftp://">tftp://</a> or <a class="reference external" href="ftp://">ftp://</a>), or option 160 (<a class="reference external" href="http://">http://</a> or <a class="reference external" href="https://">https://</a>) for the provisioning server address.
+If both are specified option 160 is preferred. It’s also a good idea to specify option 42 for NTP servers.</p>
+</div>
+</section>
+<section id="the-settings-tab">
+<h5>The Settings Tab<a class="headerlink" href="#the-settings-tab" title="Link to this heading"></a></h5>
+<p>The settings tab allows fine tuning of the FTP (vsftpd) service.</p>
+<blockquote>
+<div><img alt="_images/system_services_pp3.png" class="align-center" src="_images/system_services_pp3.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="rest-server">
+<span id="id42"></span><h4>Rest Server<a class="headerlink" href="#rest-server" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_rest.png" class="align-center" src="_images/system_services_rest.png" />
+</div></blockquote>
+</section>
+<section id="saa-bla">
+<span id="shared-appearance-agent"></span><h4>SAA/BLA<a class="headerlink" href="#saa-bla" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_saa.png" class="align-center" src="_images/system_services_saa.png" />
+</div></blockquote>
+</section>
+<section id="service-msg-queue">
+<span id="message-queue"></span><h4>Service Msg Queue<a class="headerlink" href="#service-msg-queue" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_redis.png" class="align-center" src="_images/system_services_redis.png" />
+</div></blockquote>
+</section>
+<section id="rls">
+<span id="resource-list-server"></span><h4>RLS<a class="headerlink" href="#rls" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_rls.png" class="align-center" src="_images/system_services_rls.png" />
+</div></blockquote>
+</section>
+<section id="sip-proxy">
+<span id="id43"></span><h4>SIP Proxy<a class="headerlink" href="#sip-proxy" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_proxy.png" class="align-center" src="_images/system_services_proxy.png" />
+</div></blockquote>
+</section>
+<section id="sip-registrar">
+<span id="id44"></span><h4>SIP Registrar<a class="headerlink" href="#sip-registrar" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_reg.png" class="align-center" src="_images/system_services_reg.png" />
+</div></blockquote>
+</section>
+<section id="sip-trunk">
+<span id="sip-trunks"></span><h4>SIP Trunk<a class="headerlink" href="#sip-trunk" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_trunk1.png" class="align-center" src="_images/system_services_trunk1.png" />
+<img alt="_images/system_services_trunk2.png" class="align-center" src="_images/system_services_trunk2.png" />
+</div></blockquote>
+</section>
+<section id="snmp">
+<span id="id45"></span><h4>SNMP<a class="headerlink" href="#snmp" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_snmp.png" class="align-center" src="_images/system_services_snmp.png" />
+</div></blockquote>
+</section>
+<section id="voicemail">
+<span id="id46"></span><h4>Voicemail<a class="headerlink" href="#voicemail" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_services_voicemail.png" class="align-center" src="_images/system_services_voicemail.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="settings-menu">
+<span id="id47"></span><h3>Settings<a class="headerlink" href="#settings-menu" title="Link to this heading"></a></h3>
+<p>The Settings menu includes Admin, Authentication, Date and Time, DID Pool, Domain, Extension Pool, Internet Calling, Localization, Locations, NAT Traversal, Permissions, and Regions menu options.</p>
+<section id="admin">
+<span id="webui-settings"></span><h4>Admin<a class="headerlink" href="#admin" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_settings_admin.png" class="align-center" src="_images/system_settings_admin.png" />
+</div></blockquote>
+</section>
+<section id="authentication">
+<span id="id48"></span><h4>Authentication<a class="headerlink" href="#authentication" title="Link to this heading"></a></h4>
+<p>LDAP/Active Directory is the only menu item.</p>
+<section id="ldap-active-directory">
+<span id="ldap-ad"></span><h5>LDAP/Active Directory<a class="headerlink" href="#ldap-active-directory" title="Link to this heading"></a></h5>
+<p>This page is used to manage (read only) <a class="reference external" href="https://en.wikipedia.org/wiki/Lightweight_Directory_Access_Protocol">Lightweight Directory Access Protocol (LDAP)</a> or <a class="reference external" href="https://en.wikipedia.org/wiki/Active_Directory">Microsoft Active Directory (AD)</a> connections. There are two tabs to the left, Configuration and Management Settings.</p>
+<p>Values which can be imported are listed in the following table along with the recommended AD attribute.</p>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>Value</strong></p></td>
+<td><p><strong>Description</strong></p></td>
+<td><p><strong>AD Attribute</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>User ID</strong></p></td>
+<td><p>Represents the user ID. The value <strong>must</strong> be unique.</p></td>
+<td><p><em>ipPhone</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>First name</strong></p></td>
+<td><p>The first name of the user.</p></td>
+<td><p><em>givenName</em></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Last name</strong></p></td>
+<td><p>The last name of the user.</p></td>
+<td><p><em>sn</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Alias</strong></p></td>
+<td><p>If this has more than one value a separate alias will be created for each. You can map multiple LDAP attributes and each LDAP attribute mapped can have multiple values.</p></td>
+<td><p><em>sAMAccountName</em></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Email address</strong></p></td>
+<td><p>If this has more than one value a separate alias will be created for each.</p></td>
+<td><p><em>mail</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>User Groups</strong></p></td>
+<td><p>If this has more than one value the user will be added to multiple groups. Groups are created as necessary.</p></td>
+<td><p><em>ou</em></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Voicemail PIN</strong></p></td>
+<td><p>The user PIN code to access voicemail. When blank imported users are assigned a default PIN.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Default PIN</strong></p></td>
+<td><p>The default (voicemail) PIN code.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>Confirm Default PIN</strong></p></td>
+<td><p>Confirmation of the above.</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>SIP Password</strong></p></td>
+<td><p>If blank or not mapped sipxcom will automatically generate a random SIP password for each imported user. If it is mapped to something you will somehow need to regenerate phone profiles for all phones assigned to the user as well.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>IM ID</strong></p></td>
+<td><p>The instant message (IM) ID.</p></td>
+<td><p><em>sAMAccountName</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Job Title</strong></p></td>
+<td><p>The user job title. The value is saved under the user contact information.</p></td>
+<td><p><em>title</em></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Department</strong></p></td>
+<td><p>The user job department.</p></td>
+<td><p><em>department</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Company Name</strong></p></td>
+<td><p>The name of the company.</p></td>
+<td><p><em>company</em></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Assistant Name</strong></p></td>
+<td><p>The user assistant or secretary name.</p></td>
+<td><p><em>secretary</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Mobile Phone</strong></p></td>
+<td><p>The user mobile phone number.</p></td>
+<td><p><em>mobile</em></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Home Phone Number</strong></p></td>
+<td><p>The user home phone number.</p></td>
+<td><p><em>homePhone</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Assistant phone number</strong></p></td>
+<td><p>The assistant or secretary phone number.</p></td>
+<td><p><em>telephoneAssistant</em></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Fax Number</strong></p></td>
+<td><p>The users fax number.</p></td>
+<td><p><em>facsimileTelephoneNumber</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Alternate email</strong></p></td>
+<td><p>Alternative email addresses for the user.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>Alternate IM Account</strong></p></td>
+<td><p>Alternative IM accounts</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Location</strong></p></td>
+<td><p>The user location.</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>Home Address</strong></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Street</strong></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>City</strong></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>State</strong></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>Country</strong></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zip Code</strong></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>Office Address</strong></p></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Street</strong></p></td>
+<td></td>
+<td><p><em>streetAddress</em></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>City</strong></p></td>
+<td></td>
+<td><p><em>city</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>State</strong></p></td>
+<td></td>
+<td><p><em>st</em></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Country</strong></p></td>
+<td></td>
+<td><p><em>co</em></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Zip Code</strong></p></td>
+<td></td>
+<td><p><em>postalCode</em></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="configuration">
+<h5>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h5>
+<p>As a good security practice you should create a user in LDAP or AD with read only permissions for the sole purpose of syncing data to sipxcom. It is also a good idea to keep service or admin level accounts in their own OU.</p>
+<blockquote>
+<div><img alt="_images/system_settings_auth1.png" class="align-center" src="_images/system_settings_auth1.png" />
+<ul class="simple">
+<li><p><strong>Host</strong>: Enter the IP address or fqdn of the server running LDAP/AD services.</p></li>
+<li><p><strong>Domain</strong>: This specifies the user domain. The value is saved as a user setting and can be used for sipxcom web portal authentication (as <a class="reference external" href="mailto:user&#37;&#52;&#48;domain">user<span>&#64;</span>domain</a> or domain\user as the username).</p></li>
+<li><p><strong>Use TLS</strong>: Enable or disable SSL/TLS connections to your LDAP/AD server (ldaps://).</p></li>
+<li><p><strong>Connection Read Timeout</strong>: If there is no response from the LDAP server within the specified period, the read attempt is aborted. A value less than or equal to 0 will disable the read timeout and wait indefinately. The default value is 10 seconds.</p></li>
+<li><p><strong>Port</strong>: The port number on which the LDAP/AD server is listening. The default port for LDAP is 389 or 636 for LDAPS.</p></li>
+<li><p><strong>User/Password/Confirm Password</strong>: Credentials of the read only user that was created for the purpose of ldap/ad sync.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="management-settings">
+<h5>Management Settings<a class="headerlink" href="#management-settings" title="Link to this heading"></a></h5>
+<blockquote>
+<div><img alt="_images/system_settings_auth2.png" class="align-center" src="_images/system_settings_auth2.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="date-and-time">
+<span id="id49"></span><h4>Date and Time<a class="headerlink" href="#date-and-time" title="Link to this heading"></a></h4>
+<p>Date and Time is the NTP service configuration. There are three tabs to the left, Settings, Time Zone, and Unmanaged Service.</p>
+<blockquote>
+<div><img alt="_images/system_settings_ntpsettings.png" class="align-center" src="_images/system_settings_ntpsettings.png" />
+<img alt="_images/system_settings_ntpzone.png" class="align-center" src="_images/system_settings_ntpzone.png" />
+<img alt="_images/system_settings_ntpunmanaged.png" class="align-center" src="_images/system_settings_ntpunmanaged.png" />
+</div></blockquote>
+</section>
+<section id="device-time-zone">
+<span id="device-timezone"></span><h4>Device Time Zone<a class="headerlink" href="#device-time-zone" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_settings_devicezone.png" class="align-center" src="_images/system_settings_devicezone.png" />
+</div></blockquote>
+</section>
+<section id="did-pool">
+<span id="id50"></span><h4>DID Pool<a class="headerlink" href="#did-pool" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_settings_didpool.png" class="align-center" src="_images/system_settings_didpool.png" />
+</div></blockquote>
+</section>
+<section id="domain">
+<span id="id51"></span><h4>Domain<a class="headerlink" href="#domain" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_settings_domain.png" class="align-center" src="_images/system_settings_domain.png" />
+</div></blockquote>
+</section>
+<section id="extension-pool">
+<span id="id52"></span><h4>Extension Pool<a class="headerlink" href="#extension-pool" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_settings_extpool.png" class="align-center" src="_images/system_settings_extpool.png" />
+</div></blockquote>
+</section>
+<section id="internet-calling">
+<span id="id53"></span><h4>Internet Calling<a class="headerlink" href="#internet-calling" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_settings_inetcalling.png" class="align-center" src="_images/system_settings_inetcalling.png" />
+</div></blockquote>
+</section>
+<section id="localization">
+<span id="id54"></span><h4>Localization<a class="headerlink" href="#localization" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_settings_localization.png" class="align-center" src="_images/system_settings_localization.png" />
+</div></blockquote>
+</section>
+<section id="locations">
+<span id="id55"></span><h4>Locations<a class="headerlink" href="#locations" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_settings_location.png" class="align-center" src="_images/system_settings_location.png" />
+</div></blockquote>
+</section>
+<section id="nat-traversal">
+<span id="id56"></span><h4>NAT Traversal<a class="headerlink" href="#nat-traversal" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_settings_nat1.png" class="align-center" src="_images/system_settings_nat1.png" />
+<img alt="_images/system_settings_nat2.png" class="align-center" src="_images/system_settings_nat2.png" />
+<img alt="_images/system_settings_nat3.png" class="align-center" src="_images/system_settings_nat3.png" />
+</div></blockquote>
+</section>
+<section id="permissions">
+<span id="id57"></span><h4>Permissions<a class="headerlink" href="#permissions" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/system_settings_perms.png" class="align-center" src="_images/system_settings_perms.png" />
+</div></blockquote>
+</section>
+<section id="regions">
+<span id="id58"></span><h4>Regions<a class="headerlink" href="#regions" title="Link to this heading"></a></h4>
+<p>Regions are used to organize servers into groups based on your network topology. Servers with the same region are generally located on the same LAN and have very low latency between the servers. Regions are used to determine how local databases and DNS is configured.</p>
+<blockquote>
+<div><img alt="_images/system_settings_region.png" class="align-center" src="_images/system_settings_region.png" />
+</div></blockquote>
+</section>
+</section>
+</section>
+<section id="diagnostics-tab">
+<span id="id59"></span><h2>Diagnostics Tab<a class="headerlink" href="#diagnostics-tab" title="Link to this heading"></a></h2>
+<blockquote>
+<div><img alt="_images/diagnostics_tab.png" class="align-right" src="_images/diagnostics_tab.png" />
+</div></blockquote>
+<p>The diagnostics tab includes About, Alarms, Banned Hosts, Call Detail Records, Job Status, Network Packet Capture, Registrations, SIP Trunk Statistics, Snapshot, and System Audit menu options.</p>
+<section id="about">
+<span id="diagnostics-about"></span><h3>About<a class="headerlink" href="#about" title="Link to this heading"></a></h3>
+<p>The About option displays the current version and license information.</p>
+<blockquote>
+<div><img alt="_images/diagnostics_about.png" class="align-center" src="_images/diagnostics_about.png" />
+</div></blockquote>
+</section>
+<section id="alarms">
+<span id="diagnostics-alarms"></span><h3>Alarms<a class="headerlink" href="#alarms" title="Link to this heading"></a></h3>
+<p>The Alarms page has four tabs to the left - Configuration, Alarm Groups, Trap Receivers, and History.</p>
+<section id="id60">
+<h4>Configuration<a class="headerlink" href="#id60" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/diagnostics_alarms_config.png" class="align-center" src="_images/diagnostics_alarms_config.png" />
+</div></blockquote>
+</section>
+<section id="alarm-groups">
+<h4>Alarm Groups<a class="headerlink" href="#alarm-groups" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/diagnostics_alarms_groups.png" class="align-center" src="_images/diagnostics_alarms_groups.png" />
+</div></blockquote>
+</section>
+<section id="trap-receivers">
+<h4>Trap Receivers<a class="headerlink" href="#trap-receivers" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/diagnostics_alarms_traps.png" class="align-center" src="_images/diagnostics_alarms_traps.png" />
+</div></blockquote>
+</section>
+<section id="history">
+<h4>History<a class="headerlink" href="#history" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/diagnostics_alarms_history.png" class="align-center" src="_images/diagnostics_alarms_history.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="banned-hosts">
+<span id="diagnostics-banned-hosts"></span><h3>Banned Hosts<a class="headerlink" href="#banned-hosts" title="Link to this heading"></a></h3>
+<p>This page displays IPs that have been banned by the SIP Security rules. You can also unban hosts from this page.</p>
+<blockquote>
+<div><img alt="_images/diagnostics_banned.png" class="align-center" src="_images/diagnostics_banned.png" />
+</div></blockquote>
+</section>
+<section id="call-detail-records">
+<span id="diagnostics-call-detail-records"></span><h3>Call Detail Records<a class="headerlink" href="#call-detail-records" title="Link to this heading"></a></h3>
+<p>The Call Detail Records page has three tabs to the left - Active, Historic, and Reports.</p>
+<section id="active">
+<h4>Active<a class="headerlink" href="#active" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/diagnostics_cdr_active.png" class="align-center" src="_images/diagnostics_cdr_active.png" />
+</div></blockquote>
+</section>
+<section id="historic">
+<h4>Historic<a class="headerlink" href="#historic" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/diagnostics_cdr_historic.png" class="align-center" src="_images/diagnostics_cdr_historic.png" />
+</div></blockquote>
+</section>
+<section id="reports">
+<h4>Reports<a class="headerlink" href="#reports" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/diagnostics_cdr_reports.png" class="align-center" src="_images/diagnostics_cdr_reports.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="job-status">
+<span id="diagnostics-job-status"></span><h3>Job Status<a class="headerlink" href="#job-status" title="Link to this heading"></a></h3>
+<p>There are two tabs to the left, Failed and Successful jobs.</p>
+<section id="failed-jobs">
+<h4>Failed Jobs<a class="headerlink" href="#failed-jobs" title="Link to this heading"></a></h4>
+<p>Often sending profiles to a phone that is not currently registered, powered off, or disconnected from the network will trigger an entry here.</p>
+<blockquote>
+<div><img alt="_images/diagnostics_jobs_failed.png" class="align-center" src="_images/diagnostics_jobs_failed.png" />
+</div></blockquote>
+</section>
+<section id="successful-jobs">
+<h4>Successful Jobs<a class="headerlink" href="#successful-jobs" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/diagnostics_jobs_success.png" class="align-center" src="_images/diagnostics_jobs_success.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="network-packet-capture">
+<span id="diagnostics-network-packet-capture"></span><h3>Network Packet Capture<a class="headerlink" href="#network-packet-capture" title="Link to this heading"></a></h3>
+<p>Network Packet Capture can be used to automate rolling packet captures on all servers in the cluster.</p>
+<section id="configure">
+<h4>Configure<a class="headerlink" href="#configure" title="Link to this heading"></a></h4>
+<p>Configure the size of each pcap file and number of pcaps to keep.</p>
+<blockquote>
+<div><img alt="_images/diagnostics_pcap_configure.png" class="align-center" src="_images/diagnostics_pcap_configure.png" />
+</div></blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>If you run out of free disk space all services will halt!</strong> The default settings will consume 5GB (per server).</p>
+</div>
+</section>
+<section id="log-files">
+<h4>Log Files<a class="headerlink" href="#log-files" title="Link to this heading"></a></h4>
+<p>The resulting pcap files are listed on this page for download.</p>
+<blockquote>
+<div><img alt="_images/diagnostics_pcap_logfiles.png" class="align-center" src="_images/diagnostics_pcap_logfiles.png" />
+</div></blockquote>
+</section>
+</section>
+<section id="registrations">
+<span id="diagnostics-registrations"></span><h3>Registrations<a class="headerlink" href="#registrations" title="Link to this heading"></a></h3>
+<p>This page shows all current SIP registrations.</p>
+<blockquote>
+<div><img alt="_images/diagnostics_regs.png" class="align-center" src="_images/diagnostics_regs.png" />
+</div></blockquote>
+</section>
+<section id="sip-trunk-statistics">
+<span id="diagnostics-sip-trunk-status"></span><h3>SIP Trunk Statistics<a class="headerlink" href="#sip-trunk-statistics" title="Link to this heading"></a></h3>
+<p>This page shows the current status of any SIP trunks that are using the sipxbridge service.</p>
+<blockquote>
+<div><img alt="_images/diagnostics_trunkstat.png" class="align-center" src="_images/diagnostics_trunkstat.png" />
+</div></blockquote>
+</section>
+<section id="snapshot">
+<span id="diagnostics-snapshot"></span><h3>Snapshot<a class="headerlink" href="#snapshot" title="Link to this heading"></a></h3>
+<p>Snapshot archives contain the logs and configuration data needed to troubleshoot without having access to the command line of the server.</p>
+<blockquote>
+<div><img alt="_images/diagnostics_snapshot.png" class="align-center" src="_images/diagnostics_snapshot.png" />
+</div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><strong>The snapshot log filter percentage can only cover the current day logs.</strong> 99% will grab everything for today but will also increase the size of the resulting archive.</p>
+</div>
+<p>On Windows you will need a utility installed that can extract tar or gzipped archives. We recommend <a class="reference external" href="https://www.7-zip.org/">7-zip</a> .
+<a class="reference external" href="https://notepad-plus-plus.org/downloads/">Notepad++</a> is recommended for viewing log data rather than Notepad, WordPad, or Word.
+<a class="reference external" href="https://winmerge.org/">WinMerge</a> is recommended for side-by-side file comparisons.</p>
+<p>On Mac or Linux  copy the archive to a location on the filesystem and use the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tar</span> <span class="o">-</span><span class="n">zxvf</span> <span class="n">sipx</span><span class="o">-</span><span class="n">snapshot</span><span class="o">-</span><span class="n">host</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
+</pre></div>
+</div>
+</section>
+<section id="system-audit">
+<span id="diagnostics-system-audit"></span><h3>System Audit<a class="headerlink" href="#system-audit" title="Link to this heading"></a></h3>
+<p>System Audit keeps track of changes made in the webui, when the change was made, and the user that made the change. There are two tabs to the left, History and Settings.</p>
+<section id="id61">
+<h4>History<a class="headerlink" href="#id61" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/diagnostics_audit_history.png" class="align-center" src="_images/diagnostics_audit_history.png" />
+</div></blockquote>
+</section>
+<section id="id62">
+<h4>Settings<a class="headerlink" href="#id62" title="Link to this heading"></a></h4>
+<blockquote>
+<div><img alt="_images/diagnostics_audit_settings.png" class="align-center" src="_images/diagnostics_audit_settings.png" />
+</div></blockquote>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="planning.html" class="btn btn-neutral float-left" title="Planning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="faq.html" class="btn btn-neutral float-right" title="FAQ" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

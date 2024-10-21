@@ -1,0 +1,334 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Installing &mdash; sipxecs 24.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=ed338098"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Upgrading" href="upgrading.html" />
+    <link rel="prev" title="Features" href="features.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/sipxcom_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="history.html">Project History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#system-specs">System Specs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prepare-server">Prepare Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#setup-google-could-artifact-registry">Setup Google Could Artifact registry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setup-sipxcom-repo">Setup sipXcom repo</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#enable-elasticsearch">Enable elasticsearch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configure-system">Configure System</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#install-and-setup-sipxcom">Install and Setup sipXcom</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#install-sipxcom-rpms">Install sipXcom RPMs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#initial-setup">Initial setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#network-configuration">Network Configuration</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planning.html">Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="webui.html">Web UI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monitoring.html">Monitoring</a></li>
+<li class="toctree-l1"><a class="reference internal" href="maintenance.html">Maintenance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">Other / How To</a></li>
+<li class="toctree-l1"><a class="reference internal" href="restapi.html">REST API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="soapapi.html">SOAP API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sipxecs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Installing</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/installing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="installing">
+<span id="rpm-installation"></span><span id="index-0"></span><h1>Installing<a class="headerlink" href="#installing" title="Link to this heading"></a></h1>
+<section id="system-specs">
+<h2>System Specs<a class="headerlink" href="#system-specs" title="Link to this heading"></a></h2>
+<p>Recent sipXcom RPMs will only install on CentOS 7.x with amd64/x86_64 architecture.</p>
+<p>We recommend using the <a class="reference external" href="http://isoredirect.centos.org/centos/7/isos/x86_64/">CentOS minimal ISO</a>.</p>
+<p>The following is a recommended hardware configuration:</p>
+<ul class="simple">
+<li><p>2x CPU/vCPU</p></li>
+<li><p>8GB RAM</p></li>
+<li><p>50GB or larger disk</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>All servers in the cluster should have a static IP address.</p></li>
+<li><p>The server(s) must have only one active NIC or IP interface.</p></li>
+<li><p>Only IPv4 is supported. Disabling IPv6 on the NIC during OS install is recommended.</p></li>
+<li><p>Review the partition sizes if automatic partitioning is used.</p></li>
+<li><p>1GB ext2 for the /boot partition with the boot flag set</p></li>
+<li><p>Set swap partition equal to the system RAM size</p></li>
+<li><p>Allocate the rest of the free space for the root (/) partition as a LVM volume, XFS formatted</p></li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If the disk is larger than 50G and you use automatic partitioning, most of the space will be allocated to /home rather than /.</p>
+</div>
+</section>
+<section id="prepare-server">
+<h2>Prepare Server<a class="headerlink" href="#prepare-server" title="Link to this heading"></a></h2>
+<ul>
+<li><p>Log on as root via ssh:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>-s
+</pre></div>
+</div>
+</li>
+<li><p>If you want root password authentication:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>passwd
+
+vi<span class="w"> </span>/etc/ssh/sshd_config<span class="w"> </span><span class="o">=</span>&gt;
+
+<span class="w">  </span>PermitRootLogin<span class="w"> </span>yes
+
+<span class="w">  </span>PasswordAuthentication<span class="w"> </span>yes
+
+service<span class="w"> </span>sshd<span class="w"> </span>restart
+</pre></div>
+</div>
+</li>
+<li><p>Since CentOS 7 is now end of life, we must use its vault for yum</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;s|mirror.centos.org|vault.centos.org|g&#39;</span><span class="w"> </span>/etc/yum.repos.d/CentOS-*
+sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;s|mirrorlist|#mirrorlist|g&#39;</span><span class="w"> </span>/etc/yum.repos.d/CentOS-*
+sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">&#39;s|#baseurl|baseurl|g&#39;</span><span class="w"> </span>/etc/yum.repos.d/CentOS-*
+</pre></div>
+</div>
+</li>
+<li><p>Remove <cite>epel</cite> to avoid conflicts</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>yum<span class="w"> </span>remove<span class="w"> </span>-y<span class="w"> </span>epel-release
+</pre></div>
+</div>
+</li>
+<li><p>Update OS:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>yum<span class="w"> </span>update<span class="w"> </span>-y
+</pre></div>
+</div>
+</li>
+<li><p>Install <cite>wget</cite> used for downloading RPMs</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>yum<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>wget
+</pre></div>
+</div>
+</li>
+</ul>
+<section id="setup-google-could-artifact-registry">
+<h3>Setup Google Could Artifact registry<a class="headerlink" href="#setup-google-could-artifact-registry" title="Link to this heading"></a></h3>
+<p>If you are NOT using a Google Cloud image, you must add and install their artifact registry plugin:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>-O<span class="w"> </span>/etc/yum.repos.d/artifact-registry-plugin.repo<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
+
+yum<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>yum-plugin-artifact-registry
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="setup-sipxcom-repo">
+<h3>Setup sipXcom repo<a class="headerlink" href="#setup-sipxcom-repo" title="Link to this heading"></a></h3>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>-O<span class="w"> </span>/etc/yum.repos.d/sipxcom.repo<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://storage.googleapis.com/sipxecs/sipxcom/24.01/centos-7-x86_64/sipxcom.repo
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="enable-elasticsearch">
+<h3>Enable elasticsearch<a class="headerlink" href="#enable-elasticsearch" title="Link to this heading"></a></h3>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>yum<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>elasticsearch
+
+systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>elasticsearch
+
+service<span class="w"> </span>elasticsearch<span class="w"> </span>start
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="configure-system">
+<h3>Configure System<a class="headerlink" href="#configure-system" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>On first boot you may need to update your network interface card config</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>vi<span class="w"> </span>*/etc/sysconfig/network-scripts/YourNICCard*<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">(</span>update<span class="o">)</span>
+
+<span class="w">  </span><span class="nv">ONBOOT</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span>
+</pre></div>
+</div>
+<p>Increase Max Number of open files and max user processes for MongoDB (important for larger systems)</p>
+<ul class="simple">
+<li><p>Update max file size. ONLY do this if the default is less than 65536.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cat<span class="w"> </span>/proc/sys/fs/file-max<span class="w"> </span><span class="o">(</span>to<span class="w"> </span>check<span class="w"> </span>default<span class="o">)</span>
+
+vi<span class="w"> </span>/etc/sysctl.conf<span class="w"> </span><span class="o">=</span>&gt;
+
+<span class="w">  </span>fs.file-max<span class="o">=</span><span class="m">65536</span>
+</pre></div>
+</div>
+<ul>
+<li><p>edit system limits:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>vi<span class="w"> </span>/etc/security/limits.conf<span class="w"> </span><span class="o">=</span>&gt;<span class="w"> </span><span class="o">(</span>add<span class="o">)</span>
+
+*<span class="w">          </span>soft<span class="w">     </span>nproc<span class="w">          </span><span class="m">65535</span>
+*<span class="w">          </span>hard<span class="w">     </span>nproc<span class="w">          </span><span class="m">65535</span>
+*<span class="w">          </span>soft<span class="w">     </span>nofile<span class="w">         </span><span class="m">65535</span>
+*<span class="w">          </span>hard<span class="w">     </span>nofile<span class="w">         </span><span class="m">65535</span><span class="sb">`</span>
+</pre></div>
+</div>
+</li>
+<li><p>Reboot system:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>reboot
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<section id="install-and-setup-sipxcom">
+<h2>Install and Setup sipXcom<a class="headerlink" href="#install-and-setup-sipxcom" title="Link to this heading"></a></h2>
+<section id="install-sipxcom-rpms">
+<h3>Install sipXcom RPMs<a class="headerlink" href="#install-sipxcom-rpms" title="Link to this heading"></a></h3>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>yum<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>sipxcom
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="initial-setup">
+<h3>Initial setup<a class="headerlink" href="#initial-setup" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Execute the sipXcom setup script:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sipxecs-setup
+</pre></div>
+</div>
+</li>
+</ul>
+<p>The system will reboot to disable selinux to allow the rest of the setup routine to work properly.</p>
+</section>
+<section id="network-configuration">
+<h3>Network Configuration<a class="headerlink" href="#network-configuration" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Run setup script again:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sipxecs-setup
+</pre></div>
+</div>
+</li>
+<li><p>Answer questions as follows for a single server instance:</p>
+<ul>
+<li><p>hostname: e.g. <em>us1</em></p></li>
+<li><p>domain: e.g. <em>onrelay.net</em></p></li>
+<li><p>SIP Domain: e.g. <em>us1.onrelay.net</em></p></li>
+<li><p>SIP Realm: e.g. <em>us1.onrelay.net</em></p>
+<p>Ignore <em>“Failed to open /dev/tty: No such device or address”</em> warnings</p>
+</li>
+</ul>
+</li>
+<li><p>Update system again and reboot:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>yum<span class="w"> </span>update<span class="w"> </span>-y
+
+reboot
+</pre></div>
+</div>
+</li>
+</ul>
+<p>After a few minutes, the administration web interface should be available at <em>https://your-host-name-or-ip-address/</em></p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="features.html" class="btn btn-neutral float-left" title="Features" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="upgrading.html" class="btn btn-neutral float-right" title="Upgrading" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

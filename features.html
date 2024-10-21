@@ -1,0 +1,1093 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Features &mdash; sipxecs 24.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=ed338098"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installing" href="installing.html" />
+    <link rel="prev" title="Project History" href="history.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/sipxcom_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="history.html">Project History</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#system-application-services">System Application Services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#soa-architecture-business-process-integration-using-web-services">SOA Architecture / Business Process Integration using Web Services</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#core-calling-features-telephony-features">Core Calling Features (Telephony Features)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#e911-emergency-response">E911 Emergency Response</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#remote-branch-office-support">Remote Branch office support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#enterprise-instant-messaging-im-and-presence">Enterprise Instant Messaging (IM) and Presence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#personal-assistant-im-bot">Personal Assistant IM Bot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#presence-and-im-federation">Presence and IM Federation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#fixed-mobile-convergence-fmc-application">Fixed Mobile Convergence (FMC) Application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#web-conferencing-collaboration">Web Conferencing &amp; Collaboration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#user-self-control-user-web-configuration-portal">User Self-Control (User Web Configuration Portal)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#superior-voice-quality">Superior Voice Quality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#user-management">User Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#call-permissions">Call permissions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#system-permissions">System permissions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dial-plan">Dial Plan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#internet-calling">Internet Calling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#directory-softkeys-speed-dial">Directory, Softkeys, Speed Dial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pstn-trunking">PSTN Trunking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sip-trunking">SIP Trunking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#integration-with-microsoft-active-directory-and-exchange">Integration with Microsoft Active Directory and Exchange</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#supported-softclients">Supported Softclients</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#combined-sip-and-xmpp-clients">Combined SIP and XMPP clients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#xmpp-im-only-clients">XMPP (IM only) clients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#analog-gateways-fxo-and-fxs">Analog Gateways (FXO and FXS)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#performance">Performance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#high-availability">High Availability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#call-detail-records-collection-and-reporting">Call Detail Records collection and reporting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#security">Security</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#system-administration-features">System Administration Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plug-play-device-management">Plug &amp; Play Device Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#unified-messaging-voicemail">Unified Messaging (Voicemail)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#personal-auto-attendant">Personal Auto Attendant</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#auto-attendant-features">Auto Attendant Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#presence-server-features">Presence Server Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hunt-groups">Hunt Groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#call-park-server">Call Park Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#group-paging-server">Group Paging Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conferencing-server">Conferencing Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#call-queueing-acd">Call Queueing (ACD)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sipxcom-managed-devices">sipXcom Managed Devices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sipxcom-managed-devices-community-supported">sipXcom Managed Devices (Community supported)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#centrally-managed-sipxcom-distributed-system-cluster">Centrally Managed sipXcom Distributed System (cluster)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sip-implementation">SIP Implementation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planning.html">Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="webui.html">Web UI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monitoring.html">Monitoring</a></li>
+<li class="toctree-l1"><a class="reference internal" href="maintenance.html">Maintenance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="howto.html">Other / How To</a></li>
+<li class="toctree-l1"><a class="reference internal" href="restapi.html">REST API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="soapapi.html">SOAP API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sipxecs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Features</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/features.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="features">
+<span id="index-0"></span><h1>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h1>
+<section id="system-application-services">
+<h2>System Application Services<a class="headerlink" href="#system-application-services" title="Link to this heading"></a></h2>
+<p>All the sipXcom application services are allocated to specific server roles. Using the centralized cluster management system each role can be instantiated on a dedicated server or several (all) roles can be run on a single server. Configuration of all services and participating servers is fully automatic and Web UI based.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>SIP Session Router, optionally geo-redundant and load sharing</p></li>
+<li><p>Media server for unified messaging and IVR (auto-attendant) services</p></li>
+<li><p>Conferencing server based on FreeSWITCH</p></li>
+<li><p>XMPP Instant Messaging (IM) and presence server (based on Openfire)</p></li>
+<li><p>Contact center (ACD) server</p></li>
+<li><p>Call park / Music on Hold (MoH) server</p></li>
+<li><p>Presence server (Broadsoft and IETF compliant resource list server for BLF)</p></li>
+<li><p>Shared Appearance Agent server to support shared lines (BLA)</p></li>
+<li><p>Group paging server</p></li>
+<li><p>SIP trunking server (media anchoring and B2BUA for SIP trunking &amp; remote worker support)</p></li>
+<li><p>Call Detail Record (CDR) collection &amp; processing server</p></li>
+<li><p>Third party call control (3PCC) server using REST interfaces</p></li>
+<li><p>Management and configuration server</p></li>
+<li><p>Process management server for centralized cluster management</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="soa-architecture-business-process-integration-using-web-services">
+<h2>SOA Architecture / Business Process Integration using Web Services<a class="headerlink" href="#soa-architecture-business-process-integration-using-web-services" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Web Services SOAP interfacefor key administrative functions</p></li>
+<li><p>Web Services REST interface for user portal functions and third party call control</p></li>
+<li><p>All components centrally managed using XML RPC</p></li>
+<li><p>Google Web Toolkit (GWT)</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="core-calling-features-telephony-features">
+<h2>Core Calling Features (Telephony Features)<a class="headerlink" href="#core-calling-features-telephony-features" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Transfer (consultative &amp; blind)</p></li>
+<li><p>Call coverage</p></li>
+<li><p>Call hold / retrieve</p></li>
+<li><p>Consultation hold</p></li>
+<li><p>Music on Hold for IETF standards compliant phones</p></li>
+<li><p>User-specific MoH files</p></li>
+<li><p>MoH music from an external streaming source</p></li>
+<li><p>Admin or user configurable Busy Lamp Field (BLF) presence and softkeys</p></li>
+<li><p>Shared Line Appearance / Bridged Line Appearance (Polycom only)</p></li>
+<li><p>Uploadable music file</p></li>
+<li><p>3-way / 5-way video and voice conference on the phone</p></li>
+<li><p>Call pickup (global and directed call pickup)</p></li>
+<li><p>Call park &amp; retrieve</p></li>
+<li><p>Hunt groups</p></li>
+<li><p>Intercom with auto-answer (bi-directional)</p></li>
+<li><p>SIP URI dialing</p></li>
+<li><p>CLID (Calling Line Identification)</p></li>
+<li><p>CNIP (Calling party Name Identification Presentation)</p></li>
+<li><p>CLIP (Call Line Identification Presentation)</p></li>
+<li><p>CLIR (Call Line Identification Restriction)</p></li>
+<li><p>Per gateway CLIP manipulation</p></li>
+<li><p>Call waiting / retrieve</p></li>
+<li><p>Do not Disturb (DnD)</p></li>
+<li><p>Forward on busy, no answer, do not disturb</p></li>
+<li><p>Multiple line appearances</p></li>
+<li><p>Multiple calls per line</p></li>
+<li><p>Multiple station appearance</p></li>
+<li><dl class="simple">
+<dt>Outbound call blocking - Calls from phones to PSTN numbers, or classes of numbers, can be blocked based on:</dt><dd><ul>
+<li><p>The destination of the call; for example, when a user or device cannot initiate an international long distance call.</p></li>
+<li><p>The source of the call; for example, when a lobby phone can only initiate calls to internal numbers.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Click-to-call</p></li>
+<li><p>Redial</p></li>
+<li><p>Call history (dialed, received, missed)</p></li>
+<li><p>Auto off-hook / ring down</p></li>
+<li><p>Incoming only</p></li>
+<li><p>Configuration of individual Speed Dial softkeys</p></li>
+<li><p>Auto-generation of directory information</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="e911-emergency-response">
+<h2>E911 Emergency Response<a class="headerlink" href="#e911-emergency-response" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Internal notification using email and SMS</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="remote-branch-office-support">
+<h2>Remote Branch office support<a class="headerlink" href="#remote-branch-office-support" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Centralized deployment: Branch only provides phones and optionally PSTN gateway for failover, reduced WAN BW consumption or E911 calls</p></li>
+<li><p>Distributed deployment: Branch provides full call server with SIP site-to-site dialing between offices</p></li>
+<li><p>Branch office locations can be defined in the mgmt UI with a postal address</p></li>
+<li><p>Users, phones, gateways, SBC, and servers can be assigned to a branch location</p></li>
+<li><p>A PSTN gateway can be available for calls that originate in a specific branch only or for general use</p></li>
+<li><p>Source routing allows call routing based on location (branch local calls are routed through local gateway preferably)</p></li>
+<li><p>Branch postal address automatically proliferates to user’s office address</p></li>
+<li><p>Survivable branch configuration possible with Audiocodes gateways SAS functionality (auto-configured)</p></li>
+<li><p>Certain sipXcom services can be deployed in the branch as part of the cluster (e.g. conferencing)</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="enterprise-instant-messaging-im-and-presence">
+<h2>Enterprise Instant Messaging (IM) and Presence<a class="headerlink" href="#enterprise-instant-messaging-im-and-presence" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>XMPP based IM and presence server based on Openfire</p></li>
+<li><p>Supports XMPP standards based clients</p></li>
+<li><p>Auto-configuration of user’s IM accounts</p></li>
+<li><p>Auto-configuration of IM user groups</p></li>
+<li><p>Personal group chat room for every user auto-configured</p></li>
+<li><p>Federation of phone presence with IM presence</p></li>
+<li><p>Customizable “on the phone” presence status message</p></li>
+<li><p>Dynamic call routing based on user’s presence status</p></li>
+<li><p>Message archiving and search for compliance (pending)</p></li>
+<li><p>Server-to-server XMPP federation</p></li>
+<li><p>Optional secure client connections</p></li>
+<li><p>Client-to-client file transfer</p></li>
+<li><p>Group chat rooms</p></li>
+<li><p>XMPP search</p></li>
+<li><p>Integration of user profile information and avatar (pending)</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="personal-assistant-im-bot">
+<h2>Personal Assistant IM Bot<a class="headerlink" href="#personal-assistant-im-bot" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>My Buddy Personal Assistant feature</p></li>
+<li><p>Dynamic call control using IM</p></li>
+<li><p>Dynamic conference management using IM</p></li>
+<li><p>Unified messaging management using IM</p></li>
+<li><p>Call history / missed calls</p></li>
+<li><p>Call initiation using corporate dialplan</p></li>
+<li><p>Corporate directory look-ups</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="presence-and-im-federation">
+<h2>Presence and IM Federation<a class="headerlink" href="#presence-and-im-federation" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Server side federation with other public XMPP IM systems</p></li>
+<li><p>Allows group chat sessions across systems</p></li>
+<li><p>Allows message archiving (if enabled) across systems</p></li>
+<li><p>User self-administration of credentials for other IM systems</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="fixed-mobile-convergence-fmc-application">
+<h2>Fixed Mobile Convergence (FMC) Application<a class="headerlink" href="#fixed-mobile-convergence-fmc-application" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>3rd Party FMC application with the following functionality:</p></li>
+<li><p>Enterprise number dialing</p></li>
+<li><p>System call-back saves on wireless toll charges</p></li>
+<li><p>Corporate directory look-ups</p></li>
+<li><p>Call history</p></li>
+<li><p>Presence sharing</p></li>
+<li><p>IM</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="web-conferencing-collaboration">
+<h2>Web Conferencing &amp; Collaboration<a class="headerlink" href="#web-conferencing-collaboration" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Commercial options available through eZuce’s viewme and viewme Cloud products</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="user-self-control-user-web-configuration-portal">
+<h2>User Self-Control (User Web Configuration Portal)<a class="headerlink" href="#user-self-control-user-web-configuration-portal" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Every user on the system gets access to a personal Web user portal for self-management and control</p></li>
+<li><p>Management of unified messaging (voicemail)</p></li>
+<li><p>Configuration of unified messaging preferences</p></li>
+<li><p>Time based find-me / follow-me</p></li>
+<li><p>Flexible configuration of call forwarding</p></li>
+<li><p>Management of personal profile data including avatar</p></li>
+<li><p>Personal call history</p></li>
+<li><p>Personal phone book, speed dial and presence management</p></li>
+<li><p>Click-to-call</p></li>
+<li><p>Individual phone management</p></li>
+<li><p>Personal auto-attendant</p></li>
+<li><p>Management of personal IM account</p></li>
+<li><p>Personal MoH music upload and preferences</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="superior-voice-quality">
+<h2>Superior Voice Quality<a class="headerlink" href="#superior-voice-quality" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Peer-to-peer media routing for best quality (media not routed through the sipXcom server)</p></li>
+<li><p>Unmatched voice quality with lowest delay and jitter</p></li>
+<li><p>Support for any codec supported by the phone or gateway (including video)</p></li>
+<li><p>Support for HD Voice (Polycom and other phones)</p></li>
+<li><p>Codec negotiation (no transcoding required)</p></li>
+<li><p>Conferencing, auto-attendant and voicemail support HD voice w/ transcoding if necessary</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="user-management">
+<h2>User Management<a class="headerlink" href="#user-management" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Create a user, provision a phone and assign a line in only three clicks - easy!</p></li>
+<li><p>Numeric or alpha-numeric User ID</p></li>
+<li><p>User PIN management (UI or TUI)</p></li>
+<li><p>Aliasing facility (numeric and alpha-numeric aliases)</p></li>
+<li><p>Extension and alias uniqueness assurance</p></li>
+<li><p>Management or auto-assignment of user’s IM ID and display name</p></li>
+<li><p>Automatic IM buddy list creation based on user groups</p></li>
+<li><p>Granular per user permissions</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="call-permissions">
+<h2>Call permissions<a class="headerlink" href="#call-permissions" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>900 Dialing</p></li>
+<li><p>International Dialing</p></li>
+<li><p>Long Distance Dialing</p></li>
+<li><p>Mobile Dialing</p></li>
+<li><p>Local Dialing</p></li>
+<li><p>Toll Free Dialing</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="system-permissions">
+<h2>System permissions<a class="headerlink" href="#system-permissions" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>User has voicemail inbox</p></li>
+<li><p>User listed in auto-attendant directory</p></li>
+<li><p>User can record system prompts</p></li>
+<li><p>User has superuser access</p></li>
+<li><p>User allowed to change PIN from TUI</p></li>
+<li><p>User can use Microsoft Exchange VM</p></li>
+<li><p>User has a personal auto-attendant</p></li>
+<li><p>Custom permissions as defined by the admin</p></li>
+<li><p>Supervisor permission for groups (e.g. Call Center supervisor)</p></li>
+<li><p>Management of user contact record (user profile)</p></li>
+<li><p>Comprehensive profile data</p></li>
+<li><p>Work and home address</p></li>
+<li><p>In-building location information</p></li>
+<li><p>Assistant information</p></li>
+<li><p>Support for avatar including support for gravatar</p></li>
+<li><p>SIP password management for security</p></li>
+<li><p>User groups with group properties</p></li>
+<li><dl class="simple">
+<dt>Per user call forwarding (follow me)</dt><dd><ul>
+<li><p>To local extension, PSTN number, or SIP address</p></li>
+<li><p>Based on user or admin defined time schedules</p></li>
+<li><p>Parallel or serial ring</p></li>
+<li><p>Allows definition of ring time before trying next number</p></li>
+<li><p>Allows several forwarding destinations</p></li>
+<li><p>Follow-me configuration using user portal</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Extension pool with automatic assignment</p></li>
+<li><p>Per user Caller ID (CLID) assignment</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="dial-plan">
+<h2>Dial Plan<a class="headerlink" href="#dial-plan" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Easy to use GUI based dial plan manipulation</p></li>
+<li><p>Time-based dialing rules with different admin defined schedules</p></li>
+<li><p>Rules based least cost routing</p></li>
+<li><p>Dynamic call routing based on user’s IM presence status</p></li>
+<li><p>Directly route to voicemail on IM status DND</p></li>
+<li><p>Dynamically add forwarding destination based on phone number in custom presence status</p></li>
+<li><p>Automatic gateway redundancy and fail-over</p></li>
+<li><p>Specific E911 routing</p></li>
+<li><p>Permission based rules</p></li>
+<li><p>Prefix manipulation</p></li>
+<li><p>Dialplan templating for international dial plans</p></li>
+<li><p>Built-in support for U.S., German, Swiss, and Polish local dial plans (Any other local dial plan can be added as a plugin)</p></li>
+<li><p>Specify internal extension length</p></li>
+<li><p>Specific rule for site-to-site call routing between SIP systems</p></li>
+<li><p>Redirector plugins - any imaginable dial rule can be added as a plugin</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="internet-calling">
+<h2>Internet Calling<a class="headerlink" href="#internet-calling" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Ability to configure SIP URI based call routing to other domains</p></li>
+<li><p>Specific SBC selection for call routing</p></li>
+<li><p>Configuration of native NAT traversal w/ optionally redundant media anchoring if necessary</p></li>
+<li><p>Media anchoring supports voice and video for any codec</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="directory-softkeys-speed-dial">
+<h2>Directory, Softkeys, Speed Dial<a class="headerlink" href="#directory-softkeys-speed-dial" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Automated generation of directory information per user or per user group</p></li>
+<li><p>Support for complete contact information and user profile, including avatar</p></li>
+<li><p>Crreation and Management of many different directories (per user, per user group, per location, etc.)</p></li>
+<li><p>Upload of contacts from GMail and Outlook</p></li>
+<li><p>User management of directory information</p></li>
+<li><p>Automated provisioning of directory information into user’s phones</p></li>
+<li><p>Allows adding contacts to the directory from a .csv file (Excel)</p></li>
+<li><p>User configurable speed dial (internal / external numbers, SIP URIs)</p></li>
+<li><p>Speed dial generated server side and backed up</p></li>
+<li><p>Auto-provisioning of speed dial to phones</p></li>
+<li><p>User configuration of Busy Lamp Field (BLF) to monitor presence of other users or phones (e.g. attendant console)</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="pstn-trunking">
+<h2>PSTN Trunking<a class="headerlink" href="#pstn-trunking" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Unlimited number of PSTN gateways and trunk lines</p></li>
+<li><p>Supports most SIP compliant gateways (e.g. Audiocodes, Mediatrix, Sangoma, Patton, etc.)</p></li>
+<li><p>Gateways can be in any location</p></li>
+<li><p>Gateway selection per dialing rule</p></li>
+<li><p>Source routing of calls so that calls can be routed through a local gateway to save WAN bandwidth</p></li>
+<li><p>DID</p></li>
+<li><p>Local DID per gateway</p></li>
+<li><p>DNIS</p></li>
+<li><dl class="simple">
+<dt>CLIP Management</dt><dd><ul>
+<li><p>User CLIP</p></li>
+<li><p>Gateway default CLIP</p></li>
+<li><p>Prefix stripping / appending</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Per gateway CLIR</p></li>
+<li><dl class="simple">
+<dt>Automatic Route Selection (ARS)</dt><dd><ul>
+<li><p>Implemented with XML-formatted mapping rules.</p></li>
+<li><p>Mapping values re-write SIP URLs to specify the next hop or destination for a SIP message that has been received by the Communications Server component.</p></li>
+<li><p>Direct messages to different SIP/PSTN trunk gateways, either on premise or at a remote premise location, based on any portion of SIP URL or E.164 number.</p></li>
+<li><p>Route messages to commercial SIP/PSTN service providers, which reduces or eliminates the need for on-premise trunk gateways.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Least-cost routing (LCR)</p></li>
+<li><p>Automatic failover if unavailable</p></li>
+<li><p>Automatic failover if busy</p></li>
+<li><p>Inbound FAX support</p></li>
+<li><p>Mixing of PSTN and SIP trunks with least cost routing</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="sip-trunking">
+<h2>SIP Trunking<a class="headerlink" href="#sip-trunking" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Basic SIP trunking gateway w/ NAT traversal</p></li>
+<li><p>Remote worker support w/ near-end and far-end NAT traversal and auto-detection</p></li>
+<li><dl class="simple">
+<dt>ITSP templates for simplified configuration. Interop (not certified) with the following ITSPs. Many other ITSP are compatible, see SIP Trunking section</dt><dd><ul>
+<li><p>BT (UK)</p></li>
+<li><p>AT&amp;T</p></li>
+<li><p>Bandwidth.com</p></li>
+<li><p>CBeyond</p></li>
+<li><p>Bandtel</p></li>
+<li><p>CallWithUs</p></li>
+<li><p>Eutelia (Italy)</p></li>
+<li><p>LES.NET</p></li>
+<li><p>SIPcall (Switzerland)</p></li>
+<li><p>Vitality</p></li>
+<li><p>VOIPUser (UK)</p></li>
+<li><p>VOIP.MS</p></li>
+<li><p>Appia</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>SIP interop with Nortel CS1000 R6</p></li>
+<li><p>SIP call origination &amp; termination</p></li>
+<li><p>Branch office routing</p></li>
+<li><p>Proxy to proxy interconnect using ACLs</p></li>
+<li><p>Least-cost-routing (LCR)</p></li>
+<li><p>Mixing of PSTN trunks with SIP trunks</p></li>
+<li><p>TLS support for secure signaling</p></li>
+<li><p>Route header for flexible call routing through an SBC</p></li>
+<li><p>Flexible rules for SBC selection (route selection)</p></li>
+<li><p>Support for Skype for Business SIP trunking</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="integration-with-microsoft-active-directory-and-exchange">
+<h2>Integration with Microsoft Active Directory and Exchange<a class="headerlink" href="#integration-with-microsoft-active-directory-and-exchange" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Synchronization with Microsoft Active Directory</dt><dd><ul>
+<li><p>Using LDAP interface</p></li>
+<li><p>On demand or automatically based on a schedule</p></li>
+<li><p>Graphical query design combines ease of use with flexibility</p></li>
+<li><p>Allows preview of records to be imported</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Dialplan integration with Microsoft Exchange voicemail server</dt><dd><ul>
+<li><p>Allows mixed environment with groups of users on Exchange or the sipXcom VM server</p></li>
+<li><p>Permission based selection of VM server per user or user group</p></li>
+<li><p>Automatic dialplan routing to Exchange VM</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Enables sll speech based Exchange capabilities</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="supported-softclients">
+<h2>Supported Softclients<a class="headerlink" href="#supported-softclients" title="Link to this heading"></a></h2>
+<section id="combined-sip-and-xmpp-clients">
+<h3>Combined SIP and XMPP clients<a class="headerlink" href="#combined-sip-and-xmpp-clients" title="Link to this heading"></a></h3>
+<p>Jitsi and Counterpath Bria clients can be used with the provisioning server for automated mass deployment of SIP and XMPP account setup.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://www.counterpath.com/">Counterpath</a> Bria professional</p></li>
+<li><p><a class="reference external" href="https://jitsi.org/">Jitsi</a></p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="xmpp-im-only-clients">
+<h3>XMPP (IM only) clients<a class="headerlink" href="#xmpp-im-only-clients" title="Link to this heading"></a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://pidgin.im/">Pidgin</a></p></li>
+<li><p><a class="reference external" href="https://trillian.im/">Trillian</a></p></li>
+<li><p><a class="reference external" href="https://igniterealtime.org/projects/spark/">Spark</a></p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="analog-gateways-fxo-and-fxs">
+<h3>Analog Gateways (FXO and FXS)<a class="headerlink" href="#analog-gateways-fxo-and-fxs" title="Link to this heading"></a></h3>
+<blockquote>
+<div><ul class="simple">
+<li><p>Supports any SIP compliant FXO or FXS gateway</p></li>
+<li><p>Analog fax machines FXS gateways</p></li>
+<li><p>Analog cordless phone support with FXS gateways</p></li>
+<li><p>Plug &amp; play management of many analog gateway models</p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+<section id="performance">
+<h2>Performance<a class="headerlink" href="#performance" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Unlimited number of simultaneous calls (voice, HD voice, video) - only depends on LAN/WAN bandwidth</p></li>
+<li><p>54,000 BHCC, 120,000 BHCC two-way redundant (depends on server HW)</p></li>
+<li><p>Up to three-way redundant configuration using cluster mgmt Web GUI</p></li>
+<li><p>Up to 10,000 users per dual-server HA system</p></li>
+<li><p>Tested up to 10,000 IM users</p></li>
+<li><p>450 simultaneous calls through the SIP trunking gateway require &lt; 20% CPU on dual core system</p></li>
+<li><p>Up to 500 simultaneous conferencing ports per server</p></li>
+<li><p>Up to 300 media server ports for unified messaging (supports 15,000 users)</p></li>
+<li><p>Automatic time distribution of re-registration and subscription events</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="high-availability">
+<h2>High Availability<a class="headerlink" href="#high-availability" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Optionally fully redundant call control system</p></li>
+<li><p>Geo-redundant SIP session manager</p></li>
+<li><p>Based in DNS SRV (no cluster required)</p></li>
+<li><p>Load balance under normal operating conditions</p></li>
+<li><p>Geographic dispersion of redundant systems</p></li>
+<li><p>Real-time synchronization of state information</p></li>
+<li><p>Automatic recovery after server failure</p></li>
+<li><p>Reports on load distribution</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="call-detail-records-collection-and-reporting">
+<h2>Call Detail Records collection and reporting<a class="headerlink" href="#call-detail-records-collection-and-reporting" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Call State Events (CSE) collected for all signaling activity</p></li>
+<li><p>Processing of CSEs into CDRs</p></li>
+<li><p>All data stored in a database at all times</p></li>
+<li><p>Flexible report generation using Jasper Reports, built-in</p></li>
+<li><p>Supports redundant call control</p></li>
+<li><p>Determines and records call type information</p></li>
+<li><p>Internal / external calls</p></li>
+<li><p>Calls to specific sipXcom services</p></li>
+<li><p>Collates call legs</p></li>
+<li><p>Historic Call Detail Record reporting in real-time</p></li>
+<li><p>Additional reports using call type info</p></li>
+<li><p>Monitoring of currently active (on-going) calls</p></li>
+<li><p>Export of active and historic CDRs to Excel (.csv file)</p></li>
+<li><p>Direct database access for reporting application (e.g. Crystal Reports, Jasper Reports)</p></li>
+<li><p>SOAP Web Services access to CDR data</p></li>
+<li><p>Individual call history per user in the user portal</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="security">
+<h2>Security<a class="headerlink" href="#security" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>All outbound calls authenticated</p></li>
+<li><p>Secure user password management</p></li>
+<li><p>DoS attack prevention</p></li>
+<li><p>HTTPS secure Web access</p></li>
+<li><p>TLS based signaling for SIP trunks</p></li>
+<li><p>HTTPS secures non-SIP communication between sipX components.</p></li>
+<li><p>HTTPS secures communications between sipX components and admin and user consoles.</p></li>
+<li><p>Secure channel for retrieving messages from voicemail repository.</p></li>
+<li><p>HTTP digest authentication for SIP signaling, as specified in RFC 2617, is used for authentication challenges between SIP endpoints and sipX components.</p></li>
+<li><p>HTTP digest implementation supports MD5.</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="system-administration-features">
+<h2>System Administration Features<a class="headerlink" href="#system-administration-features" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Browser based configuration and management</p></li>
+<li><p>Several admin accounts</p></li>
+<li><p>Notification when new version or patches are available</p></li>
+<li><p>GUI based software upgrade</p></li>
+<li><p>GUI based certificate management</p></li>
+<li><p>LDAP integration</p></li>
+<li><p>Integration with Microsoft Exchange 2007 for voicemail and Active Directory</p></li>
+<li><p>SOAP Web Services interface</p></li>
+<li><p>CSV import and export of user and device data</p></li>
+<li><p>Administration of Instant Messaging (IM) and Presence settings</p></li>
+<li><p>Integrated backup &amp; restore</p></li>
+<li><p>Scheduled backups</p></li>
+<li><dl class="simple">
+<dt>Diagnostics</dt><dd><ul>
+<li><p>Display active registrations</p></li>
+<li><p>Display job status</p></li>
+<li><p>Status of services</p></li>
+<li><p>Snapshot logs for debugging</p></li>
+<li><p>Logging (customizable log levels, message log per service)</p></li>
+<li><p>Display active calls</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Domain Aliasing</p></li>
+<li><p>Support for DNS SRV</p></li>
+<li><p>Support for DNS NAPTR based call routing</p></li>
+<li><dl class="simple">
+<dt>Automatic restart after power failure</dt><dd><ul>
+<li><p>Single sipXcom application can start all other application processes associated with starting up sipXcom, including dependent processes that must be started in particular order.</p></li>
+<li><p>Configured from browser interface</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Login history report (successful and unsuccessful)</p></li>
+<li><p>Automated testing of network services (DHCP, DNS, NTP, TFTP, FTP, HTTP) for proper configuration</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="plug-play-device-management">
+<h2>Plug &amp; Play Device Management<a class="headerlink" href="#plug-play-device-management" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Auto-discovery of phones &amp; gateways on the LAN</p></li>
+<li><p>Auto-registration of Polycom phones simplifies installation</p></li>
+<li><p>Plug &amp; play management of phones</p></li>
+<li><p>Plug &amp; play management of PSTN gateways</p></li>
+<li><p>Auto-generation of phone / gateway config profile</p></li>
+<li><p>Auto-pickup of profile by phone / gateway</p></li>
+<li><p>Centralized management of all the parameters</p></li>
+<li><p>Centralized backup and restore of all the configs</p></li>
+<li><p>Auto-generation of lines by assigning users to devices</p></li>
+<li><p>Device group management &amp; properties</p></li>
+<li><p>Firmware upgrade management</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="unified-messaging-voicemail">
+<h2>Unified Messaging (Voicemail)<a class="headerlink" href="#unified-messaging-voicemail" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Integrated unified messaging system</p></li>
+<li><p>Localized per user by installing language packs</p></li>
+<li><p>Number of voicemail boxes only limited by disk size (tested up to 10,000)</p></li>
+<li><p>Performance tested up to 300 simultaneous calls (ports) on dual core server</p></li>
+<li><p>IMAP back-end connection</p></li>
+<li><p>Acts as an IMAP client into MSFT Exchange and other compatible email systems</p></li>
+<li><p>User manageable credentials for IMAP federation</p></li>
+<li><p>Properly controls MWI on the phone when message is “read” using the email client</p></li>
+<li><p>Browser based user portal for unified messaging management</p></li>
+<li><p>RSS feed for new messages</p></li>
+<li><p>Message Waiting Indication (MWI)</p></li>
+<li><p>User configurable distribution lists</p></li>
+<li><p>Group and system distribution lists</p></li>
+<li><p>Unified Messaging:</p></li>
+<li><p>Email notification of new voicemail messages</p></li>
+<li><p>Forwarding of message as .wav file</p></li>
+<li><p>Supports several parallel notifications</p></li>
+<li><p>IMAP client into Exchange</p></li>
+<li><p>Per user selectable templates for email format used when forwarding voicemail</p></li>
+<li><p>Manage folders: Folders for message organization</p></li>
+<li><p>Manage greetings: Multiple customizable greetings</p></li>
+<li><p>Operator escape from anywhere</p></li>
+<li><p>Remote voicemail access using a phone</p></li>
+<li><p>SOA Web Services (REST) access to messages and greetings</p></li>
+<li><p>Unlimited number of inboxes</p></li>
+<li><p>Auto-removal of deleted messages</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="personal-auto-attendant">
+<h2>Personal Auto Attendant<a class="headerlink" href="#personal-auto-attendant" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>User configurable personal auto-attendant for every user on the system</p></li>
+<li><p>Up to 10 individual forwarding choices (keys 0 through 9)</p></li>
+<li><p>User can record greeting that corresponds with key configuration</p></li>
+<li><p>Individual zero-out to a personal assistant or receptionist</p></li>
+<li><p>Individual selection of language based on installed language packs</p></li>
+<li><p>Personal greeting</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="auto-attendant-features">
+<h2>Auto Attendant Features<a class="headerlink" href="#auto-attendant-features" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Unlimited number of auto-attendants</p></li>
+<li><p>Dial by extension and name</p></li>
+<li><p>Night and holiday service</p></li>
+<li><p>Special auto-attendant</p></li>
+<li><p>Transfer on invalid response</p></li>
+<li><p>Nested auto-attendants (multi-level)</p></li>
+<li><dl class="simple">
+<dt>Fully customizable actions:</dt><dd><ul>
+<li><p>Operator</p></li>
+<li><p>Dial by Name</p></li>
+<li><p>Repeat Prompt</p></li>
+<li><p>Voicemail login</p></li>
+<li><p>Disconnect</p></li>
+<li><p>Auto-Attendant</p></li>
+<li><p>Goto Extension</p></li>
+<li><p>Deposit Voicemail</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Uploadable custom prompts</p></li>
+<li><p>Configurable DTMF handling</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="presence-server-features">
+<h2>Presence Server Features<a class="headerlink" href="#presence-server-features" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Compatible with Broadsoft or IETF implementations</p></li>
+<li><p>Centralized management of resource lists for dialog events</p></li>
+<li><p>Busy Lamp Field (BLF) feature based on presence</p></li>
+<li><p>Used to support shared lines (BLA)</p></li>
+<li><p>Presence federated with IM presence to show “on the phone” status</p></li>
+<li><p>Support for 3rd party Attendant Consoles (such as Voice Operator Panel)</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="hunt-groups">
+<h2>Hunt Groups<a class="headerlink" href="#hunt-groups" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Unlimited number of hunt groups</p></li>
+<li><p>Serial and parallel forking (rings sequentially or at the same time)</p></li>
+<li><p>Configurable ring time per attempt</p></li>
+<li><p>Enable / disable user call forwarding rules while hunting</p></li>
+<li><p>Flexible configuration of destination if no answer</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="call-park-server">
+<h2>Call Park Server<a class="headerlink" href="#call-park-server" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Unlimited number of park orbits</p></li>
+<li><p>Visual indication on the phone of the state of the park orbit using the presence server (BLF)</p></li>
+<li><p>Music on park</p></li>
+<li><p>Uploadable music file</p></li>
+<li><p>Configurable call retrieve code</p></li>
+<li><p>Configurable call retrieve timeout</p></li>
+<li><p>Automatic park timeout with configurable time</p></li>
+<li><p>Configurable park escape key</p></li>
+<li><p>Allow multiple calls on one orbit</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="group-paging-server">
+<h2>Group Paging Server<a class="headerlink" href="#group-paging-server" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Integrated group paging server</p></li>
+<li><p>Unlimited number of paging groups</p></li>
+<li><p>Supports regular SIP phones using auto-answer</p></li>
+<li><p>Supports dedicated in-ceiling devices (SIP)</p></li>
+<li><p>Configurable paging prefix</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="conferencing-server">
+<h2>Conferencing Server<a class="headerlink" href="#conferencing-server" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Voice conferencing server that can run on the same sipXcom server or on dedicated hardware</p></li>
+<li><p>Support for voice conferencing</p></li>
+<li><p>Each user on the sipXcom system can have a personal conference bridge</p></li>
+<li><p>Recording of conference calls</p></li>
+<li><p>Dynamic conference controls from the user’s Web portal (user portal)</p></li>
+<li><p>Dynamic conference control using IM</p></li>
+<li><p>Participant entry / exit messages</p></li>
+<li><p>Roll call</p></li>
+<li><p>Mute, isolate, disconnect, invite</p></li>
+<li><p>Association of personal conference bridge with personal group chat room</p></li>
+<li><p>Automatic migration of group chat to a voice conference using the &#64;conf directive</p></li>
+<li><p>Support for HD Audio and transcoding if necessary</p></li>
+<li><p>Support for up to 500 ports of conferencing, dependent on hardware</p></li>
+<li><p>Configurable DTMF keys for conference controls using the TUI</p></li>
+<li><p>A sipXcom IP PBX system can have more than one conference server if more capacity is needed</p></li>
+<li><p>All conferencing servers and services centrally managed and configured</p></li>
+<li><p>Conferencing based on FreeSWITCH</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="call-queueing-acd">
+<h2>Call Queueing (ACD)<a class="headerlink" href="#call-queueing-acd" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>ACD server collocated or on a different server hardware</p></li>
+<li><p>Several (unlimited) queues per server</p></li>
+<li><p>Several lines per queue</p></li>
+<li><p>Support trunk lines (many calls per line) or single call per line</p></li>
+<li><p>Dedicated overflow queues or overflow to hunt group or voicemail</p></li>
+<li><p>Configurable call routing scheme per queue:</p></li>
+<li><p>Ring all</p></li>
+<li><p>Circular</p></li>
+<li><p>Linear</p></li>
+<li><p>Longest idle</p></li>
+<li><p>Agent presence monitor using presence server</p></li>
+<li><p>Separate welcome and queue audio</p></li>
+<li><p>Call termination tone or audio</p></li>
+<li><p>Configurable answer mode</p></li>
+<li><p>Agent wrap-up time</p></li>
+<li><p>Auto sign-out of agents if calls are not answered</p></li>
+<li><p>Configurable maximum ring delay</p></li>
+<li><p>Configurable maximum queue length</p></li>
+<li><p>Configurable maximum wait time until overflow condition</p></li>
+<li><p>Unlimited number of agents per queue</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="sipxcom-managed-devices">
+<h2>sipXcom Managed Devices<a class="headerlink" href="#sipxcom-managed-devices" title="Link to this heading"></a></h2>
+<p>Almost any SIP compatible phone works with sipXcom if configured manually (i.e. by logging into the phone’s Web interface to configure it one phone at a time). The following devices are plug &amp; play managed automatically and centrally by sipXcom:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Polycom SoundPoint all models (IP 301, 320, 330, 430, 450, 501, 550, 560, 601, 650, 670)</p></li>
+<li><p>Polycom SoundStation IP 4000, 6000, 7000 SIP</p></li>
+<li><p>Polycom VVX phones (300/310, 400/410, 500, 600, 1500)</p></li>
+<li><p>Audiocodes gateways MP112, MP114, MP118, MP124 FXS</p></li>
+<li><p>Audiocodes gateways FXO and PRI/BRI</p></li>
+<li><p>Counterpath Bria Professional</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="sipxcom-managed-devices-community-supported">
+<h2>sipXcom Managed Devices (Community supported)<a class="headerlink" href="#sipxcom-managed-devices-community-supported" title="Link to this heading"></a></h2>
+<p>Community supported means that the phone plugin for plug &amp; play management is provided as is. These phone plugins are provided and maintained by community members. Some system functionality might not be implemented or supported.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Aastra 53i, 55i, 57i</p></li>
+<li><p>Snom 300, 320, 360, 370 up to firmware 7.x</p></li>
+<li><p>Grandstream BudgeTone, HandyTone</p></li>
+<li><p>Grandstream GXP2000, GXP1200, GXP2010, GXP2020</p></li>
+<li><p>Grandstream GXV3000 Video Phone</p></li>
+<li><p>Hitachi IP3000 and IP5000 WiFi phones</p></li>
+<li><p>Cisco ATA 186/188</p></li>
+<li><p>Cisco 7960, 7940, 7912, 7905</p></li>
+<li><p>Cisco 7911, 7941, 7945, 7961, 7965, 7970, 7975</p></li>
+<li><p>ClearOne MaxIP Conference Phone</p></li>
+<li><p>LG-Nortel LG 6804, 6812, 6830</p></li>
+<li><p>Nortel video phone 1535</p></li>
+<li><p>Linksys ATA 2102, ATA 3102</p></li>
+<li><p>Linksys SPA8000</p></li>
+<li><p>Linksys SPA901, SPA921, SPA922, SPA941, SPA942, SPA962</p></li>
+<li><p>Nortel 1120 / 1140 SIP</p></li>
+<li><p>G-Tec AQ10x, HL20x, VT20x</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="centrally-managed-sipxcom-distributed-system-cluster">
+<h2>Centrally Managed sipXcom Distributed System (cluster)<a class="headerlink" href="#centrally-managed-sipxcom-distributed-system-cluster" title="Link to this heading"></a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><p>Automated installation and configuration of a distributed system with specific server roles</p></li>
+<li><p>Automated and central configuration of a high-availability redundant sipXcom system</p></li>
+<li><p>Allows for dedicated server hardware for conferencing, voicemail, ACD Call Center, and Call Control</p></li>
+<li><p>All configuration for remote servers is centrally generated and distributed securely</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="sip-implementation">
+<h2>SIP Implementation<a class="headerlink" href="#sip-implementation" title="Link to this heading"></a></h2>
+<p>This is probably quite an incomplete list. In any case, sipXcom IP PBX is fully SIP standards compliant.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>RFC 3261 Session Initiation Protocol using both UDP and TCP transports</p></li>
+<li><dl class="simple">
+<dt>Advanced call control using RFCs</dt><dd><ul>
+<li><p>RFC 3515 Refer Method</p></li>
+<li><p>RFC 3891 Referred-By header</p></li>
+<li><p>RFC 3892 Replaces header</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Provide for consultative and blind transfer and third party call controls</dt><dd><ul>
+<li><p>Blind transfer (Unannounced) to a different phone without speaking to the other phone prior to transfer.</p></li>
+<li><p>Consultative transfer (announced) to a different phone without speaking to the other phone prior to transfer.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>RFC 3263 Locating SIP Servers - use of DNS SRV records for call routing control and server redundancy.</p></li>
+<li><p>RFC 3581 Symmetric Response Routing (rport)</p></li>
+<li><p>RFC 3265 SIP Event Notification - for phone configuration and</p></li>
+<li><p>RFC 3842 Voice mail message waiting indication (MWI)</p></li>
+<li><p>RFC 3262 Reliable Provisional Responses</p></li>
+<li><p>RFC 2833 Out-of-band DTMF tones</p></li>
+<li><p>RFC 3264 Offer/Answer model for SDP for Codec Negotiation</p></li>
+<li><p>RFC 2617 HTTP Authentication: Basic and Digest Access Authentication</p></li>
+<li><p>RFC 3327 Path header</p></li>
+<li><p>RFC 3325 P-Asserted identity</p></li>
+<li><p>RFC 4235 An INVITE-Initiated Dialog Event Package for the Session Initiation Protocol (SIP)</p></li>
+<li><p>RFC 4662 A Session Initiation Protocol (SIP) Event Notification Extension for Resource Lists</p></li>
+<li><p>RFC 2327 SDP: Session Description Protocol</p></li>
+<li><p>RFC 3326 The Reason Header Field for the Session Initiation Protocol (SIP)</p></li>
+<li><p>Early media (SDP in 180/183)</p></li>
+<li><p>Delayed SDP (SDP in ACK)</p></li>
+<li><p>Re-INVITE: Codec change, hold, off-hold</p></li>
+<li><p>Route/Record-Route header fields</p></li>
+<li><p>Configurable RTP/RTCP ports</p></li>
+<li><p>Configurable SIP ports</p></li>
+<li><p>BLA support</p></li>
+<li><p>RFC 3680: A Session Initiation Protocol (SIP) Event Package for Registrations</p></li>
+<li><p>RFC 3265: Session Initiation Protocol (SIP)-Specific Event Notification</p></li>
+<li><p>draft-ietf-sipping-dialog-package-06</p></li>
+<li><p>draft-anil-sipping-bla-02</p></li>
+<li><p>XMPP Compliance</p></li>
+<li><p>RFC 3920: XMPP Core</p></li>
+<li><p>RFC 3921: XMPP IM</p></li>
+<li><p>XEP-0030: Service Discovery</p></li>
+<li><p>XEP-0077: In-Band Registration</p></li>
+<li><p>XEP-0078: Non-SASL Authentication</p></li>
+<li><p>XEP-0086: Error Condition Mappings</p></li>
+<li><p>XEP-0073: Basic IM Protocol Suite</p></li>
+<li><p>XEP-0004: Data Forms</p></li>
+<li><p>XEP-0045: Multi-User Chat</p></li>
+<li><p>XEP-0047: In-Band Bytestreams</p></li>
+<li><p>XEP-0065: SOCKS5 Bytestreams</p></li>
+<li><p>XEP-0071: XHTML-IM</p></li>
+<li><p>XEP-0096: File Transfer</p></li>
+<li><p>XEP-0115: Entity Capabilities</p></li>
+<li><p>XEP-0004: Data Forms</p></li>
+<li><p>XEP-0012: Last Activity</p></li>
+<li><p>XEP-0013: Flexible Offline Message Retrieval</p></li>
+<li><p>XEP-0030: Service Discovery</p></li>
+<li><p>XEP-0033: Extended Stanza Addressing</p></li>
+<li><p>XEP-0045: Multi-User Chat</p></li>
+<li><p>XEP-0049: Private XML Storage</p></li>
+<li><p>XEP-0050: Ad-Hoc Commands</p></li>
+<li><p>XEP-0054: vcard-temp</p></li>
+<li><p>XEP-0055: Jabber Search</p></li>
+<li><p>XEP-0059: Result Set Management</p></li>
+<li><p>XEP-0060: Publish-Subscribe</p></li>
+<li><p>XEP-0065: SOCKS5 Bytestreams</p></li>
+<li><p>XEP-0077: In-Band Registration</p></li>
+<li><p>XEP-0078: Non-SASL Authentication</p></li>
+<li><p>XEP-0082: Jabber Date and Time Profiles</p></li>
+<li><p>XEP-0086: Error Condition Mappings</p></li>
+<li><p>XEP-0090: Entity Time</p></li>
+<li><p>XEP-0091: Delayed Delivery</p></li>
+<li><p>XEP-0092: Software Version</p></li>
+<li><p>XEP-0096: File Transfer</p></li>
+<li><p>XEP-0106: JID Escaping</p></li>
+<li><p>XEP-0114: Jabber Component Protocol</p></li>
+<li><p>XEP-0115: Entity Capabilities</p></li>
+<li><p>XEP-0124: HTTP Binding</p></li>
+<li><p>XEP-0128: Service Discovery Extensions</p></li>
+<li><p>XEP-0138: Stream Compression</p></li>
+<li><p>XEP-0163: Personal Eventing via Pubsub</p></li>
+<li><p>XEP-0175: Best Practices for Use of SASL ANONYMOUS</p></li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="history.html" class="btn btn-neutral float-left" title="Project History" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installing.html" class="btn btn-neutral float-right" title="Installing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
