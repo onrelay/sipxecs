@@ -60,5 +60,5 @@ To check port 5061 is enabled to receive TLS connections, you may run the follow
   
   .. code-block:: bash
 
-    openssl s_client -connect <sipXcom IP or domain>:5081                       
+    openssl s_client -connect <sipXcom IP or domain>:5061                       
 
