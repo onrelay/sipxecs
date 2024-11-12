@@ -15,6 +15,7 @@ sipXcom Documentation
    planning   
    setup
    webui
+   security
    faq
    troubleshooting
    monitoring
