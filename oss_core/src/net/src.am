@@ -1,0 +1,113 @@
+liboss_core_la_SOURCES +=  \
+    net/AccessControl.cpp \
+    net/IPAddress.cpp \
+    net/DNS.cpp \
+    net/Net.cpp \
+    net/rtnl_get_route.cpp
+
+if ENABLE_FEATURE_CARP
+liboss_core_la_LIBADD += $(LTLIBINTL)
+liboss_core_la_CFLAGS += -DLOCALEDIR=\"$(localedir)\"
+liboss_core_la_SOURCES += net/Carp.cpp \
+    net/carp/gettext.h \
+    net/carp/ucarp.c \
+    net/carp/ucarp.h \
+    net/carp/carp.c \
+    net/carp/carp_p.h \
+    net/carp/ucarp_p.h \
+    net/carp/ip_carp.h \
+    net/carp/crypto-sha1.c \
+    net/carp/crypto.h \
+    net/carp/crypto-sha1.h \
+    net/carp/globals.h \
+    net/carp/fillmac.c \
+    net/carp/fillmac.h \
+    net/carp/bsd-getopt_long.h \
+    net/carp/bsd-getopt_long.c \
+    net/carp/garp.c \
+    net/carp/garp.h \
+    net/carp/spawn.c \
+    net/carp/spawn.h \
+    net/carp/fakesnprintf.c \
+    net/carp/fakesnprintf.h \
+    net/carp/mysnprintf.c \
+    net/carp/mysnprintf.h \
+    net/carp/log.c \
+    net/carp/log.h \
+    net/carp/syslognames.h
+endif
+
+if ENABLE_FEATURE_WEBSOCKETS
+liboss_core_la_SOURCES +=  \
+    net/ws/src/base64/base64.cpp \
+    net/ws/src/md5/md5.c \
+    net/ws/src/messages/data.cpp \
+    net/ws/src/network_utilities.cpp \
+    net/ws/src/processors/hybi_header.cpp \
+    net/ws/src/processors/hybi_util.cpp \
+    net/ws/src/sha1/sha1.cpp \
+    net/ws/src/uri.cpp \
+    net/ws/src/common.hpp \
+    net/ws/src/connection.hpp \
+    net/ws/src/endpoint.hpp \
+    net/ws/src/network_utilities.hpp \
+    net/ws/src/shared_const_buffer.hpp \
+    net/ws/src/uri.hpp \
+    net/ws/src/websocket_frame.hpp \
+    net/ws/src/websocketpp.hpp \
+    net/ws/src/base64/base64.h \
+    net/ws/src/http/parser.hpp \
+    net/ws/src/http/constants.hpp \
+    net/ws/src/logger/logger.hpp \
+    net/ws/src/md5/md5.h \
+    net/ws/src/md5/md5.hpp \
+    net/ws/src/messages/control.hpp \
+    net/ws/src/messages/data.hpp \
+    net/ws/src/processors/hybi.hpp \
+    net/ws/src/processors/hybi_header.hpp \
+    net/ws/src/processors/hybi_legacy.hpp \
+    net/ws/src/processors/hybi_util.hpp \
+    net/ws/src/processors/processor.hpp \
+    net/ws/src/rng/blank_rng.hpp \
+    net/ws/src/rng/boost_rng.hpp \
+    net/ws/src/roles/client.hpp \
+    net/ws/src/roles/server.hpp \
+    net/ws/src/sha1/sha1.h \
+    net/ws/src/sockets/plain.hpp \
+    net/ws/src/sockets/socket_base.hpp \
+    net/ws/src/sockets/tls.hpp \
+    net/ws/src/utf8_validator/utf8_validator.hpp \
+    net/WebSocketClient.cpp \
+    net/WebSocketServer.cpp \
+    net/WebSocketTlsServer.cpp
+endif
+
+if ENABLE_FEATURE_ZMQ
+liboss_core_la_SOURCES +=  \
+    net/ZMQSocketClient.cpp \
+    net/ZMQSocketServer.cpp
+endif
+
+liboss_core_la_SOURCES += \
+    net/esl/include/cc.h \
+    net/esl/include/esl_cJSON_Utils.h \
+    net/esl/include/esl_buffer.h \
+    net/esl/include/esl_threadmutex.h \
+    net/esl/include/esl_oop.h \
+    net/esl/include/esl.h \
+    net/esl/include/esl_config.h \
+    net/esl/include/esl_config_auto.h \
+    net/esl/include/esl_cJSON.h \
+    net/esl/include/esl_json.h \
+    net/esl/include/esl_event.h \
+    net/esl/esl.c \
+    net/esl/esl_event.c \
+    net/esl/esl_threadmutex.c \
+    net/esl/esl_config.c \
+    net/esl/esl_json.c \
+    net/esl/esl_buffer.c \
+    net/esl/cJSON.c \
+    net/esl/cJSON_Utils.c \
+    net/ESLEvent.cpp \
+    net/ESLConnection.cpp \
+    net/Pinger.cpp

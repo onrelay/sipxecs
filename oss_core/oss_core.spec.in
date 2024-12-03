@@ -1,0 +1,220 @@
+#!BuildIgnore: post-build-checks
+
+Name: @PACKAGE@
+Version: @VERSION@
+Release: @PACKAGE_REVISION@
+
+Summary: OS Abstraction and OS Utilities library for OSS modules
+License: LGPL
+Group: Development/Libraries
+Vendor: OSS Software Solutions
+Url: http://www.ossapp.com
+
+BuildRequires: automake
+BuildRequires: libtool
+BuildRequires: gcc-c++
+BuildRequires: openssl-devel
+BuildRequires: libmcrypt-devel
+Requires: libmcrypt
+BuildRequires: libtool-ltdl-devel
+Requires: libtool-ltdl
+BuildRequires: pcre-devel
+BuildRequires: findutils
+BuildRequires: db4-devel
+Requires: db4
+Requires: openssl >= 0.9.7a
+Requires: pcre >= 4.5
+BuildRequires: iptables
+BuildRequires: iproute
+
+BuildRequires: boost-devel
+Requires: boost
+BuildRequires: v8-devel
+Requires: v8
+
+BuildRequires: libsrtp-devel
+Requires: libsrtp
+
+BuildRequires: libpcap-devel
+Requires: libpcap
+
+BuildRequires: libdnet-devel
+Requires: libdnet
+
+BuildRequires: zeromq3-devel
+Requires: zeromq3
+
+BuildRequires: poco-devel
+Requires: poco-crypto
+Requires: poco-data
+Requires: poco-foundation
+Requires: poco-mysql
+Requires: poco-net
+Requires: poco-netssl
+Requires: poco-odbc
+Requires: poco-pagecompiler
+Requires: poco-sqlite
+Requires: poco-util
+Requires: poco-xml
+Requires: poco-zip
+
+BuildRequires: libconfig-devel
+Requires: libconfig
+BuildRequires: hiredis-devel
+Requires: hiredis
+BuildRequires: gtest-devel
+Requires: gtest
+
+BuildRequires: leveldb-devel
+Requires: leveldb
+
+Source: %name-%version.tar.gz
+
+Prefix: %_prefix
+BuildRoot: %{_tmppath}/%name-%version-root
+
+%description
+oss_core is a high level library implementation of a SIP B2BUA
+The library currently provides classes that
+encapsulate functions and operations for:
+
+    * SIP ABNF Parser
+    * SIP Finite State Machines
+    * SIP B2B User Agent
+    * Java Script Engine using Google V8
+    * SIP Over Websockets
+    * STUN server
+    * RTP Proxy
+    * CARP High Availability
+
+
+%if %{_vendor} == suse
+%debug_package
+%endif
+
+# Install header files
+%package devel
+Requires: %name
+Group: Development/Libraries
+Vendor: OSS Software Solutions
+Summary: Header files for %name
+
+
+%description devel
+oss_core is a high level library implementation of a SIP B2BUA
+The library currently provides classes that
+encapsulate functions and operations for:
+
+    * SIP ABNF Parser
+    * SIP Finite State Machines
+    * B2BUA
+    * Java Script Engine using Google V8
+    * SIP Over Websockets
+    * STUN server
+    * RTP Proxy
+    * CARP High Availability
+
+# Install header files
+%package utils
+Requires: %name
+Group: Applications/Networking
+Vendor: OSS Software Solutions
+Summary: Group: Applications bundled with %name
+
+
+%description utils
+oss_core is a high level library implementation of a SIP B2BUA
+The library currently provides classes that
+encapsulate functions and operations for:
+
+    * SIP ABNF Parser
+    * SIP Finite State Machines
+    * B2BUA
+    * Java Script Engine using Google V8
+    * SIP Over Websockets
+    * STUN server
+    * RTP Proxy
+    * CARP High Availability
+
+%prep
+%setup -q
+
+%build
+autoreconf -if
+./configure --enable-all-features --program-prefix= --prefix=%{_prefix} --exec-prefix=%{_prefix} --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} --infodir=%{_infodir}
+
+make all
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(644,root,root,755)
+%doc CONTRIBUTORS README NEWS TODO ChangeLog
+%attr(755,root,root) %{_libdir}/liboss_*.so*
+%attr(755,root,root) %{_bindir}/ossjs
+
+%dir %attr(755,root,root) %{_libdir}/oss_modules/examples
+%dir %attr(755,root,root) %{_libdir}/oss_modules/async
+%dir %attr(755,root,root) %{_libdir}/oss_modules/dns
+%dir %attr(755,root,root) %{_libdir}/oss_modules/http
+%dir %attr(755,root,root) %{_libdir}/oss_modules/json_rpc
+%dir %attr(755,root,root) %{_libdir}/oss_modules/logger
+%dir %attr(755,root,root) %{_libdir}/oss_modules/isolate
+%dir %attr(755,root,root) %{_libdir}/oss_modules/inotify
+%dir %attr(755,root,root) %{_libdir}/oss_modules/config
+%dir %attr(755,root,root) %{_libdir}/oss_modules/assert
+%dir %attr(755,root,root) %{_libdir}/oss_modules/buffer
+%dir %attr(755,root,root) %{_libdir}/oss_modules/console
+%dir %attr(755,root,root) %{_libdir}/oss_modules/constants
+%dir %attr(755,root,root) %{_libdir}/oss_modules/error
+%dir %attr(755,root,root) %{_libdir}/oss_modules/fifo
+%dir %attr(755,root,root) %{_libdir}/oss_modules/file
+%dir %attr(755,root,root) %{_libdir}/oss_modules/filesystem
+%dir %attr(755,root,root) %{_libdir}/oss_modules/getopt
+%dir %attr(755,root,root) %{_libdir}/oss_modules/socket
+%dir %attr(755,root,root) %{_libdir}/oss_modules/object
+%dir %attr(755,root,root) %{_libdir}/oss_modules/pipe
+%dir %attr(755,root,root) %{_libdir}/oss_modules/poll
+%dir %attr(755,root,root) %{_libdir}/oss_modules/process
+%dir %attr(755,root,root) %{_libdir}/oss_modules/system
+%dir %attr(755,root,root) %{_libdir}/oss_modules/zmq
+%dir %attr(755,root,root) %{_libdir}/oss_modules/timer
+%dir %attr(755,root,root) %{_libdir}/oss_modules/url-parser
+%dir %attr(755,root,root) %{_libdir}/oss_modules/utils
+%dir %attr(755,root,root) %{_libdir}/oss_modules/xml-parser
+%dir %attr(755,root,root) %{_libdir}/oss_modules/dns
+%dir %attr(755,root,root) %{_libdir}/oss_modules/async
+%dir %attr(755,root,root) %{_libdir}/oss_modules/logger
+%dir %attr(755,root,root) %{_libdir}/oss_modules/json_rpc
+%dir %attr(755,root,root) %{_libdir}/oss_modules/sip-parser
+%dir %attr(755,root,root) %{_libdir}/oss_modules/parser
+%dir %attr(755,root,root) %{_libdir}/oss_modules/lexer
+%dir %attr(755,root,root) %{_libdir}/oss_modules/sbc-hook
+
+#%{_libdir}/oss_modules/*.js
+#%{_libdir}/oss_modules/*.jso
+%{_libdir}/oss_modules/*/*.js
+%{_libdir}/oss_modules/*/*.jso
+
+#
+# parser module
+#
+%{_libdir}/oss_modules/parser/lib/*.js
+%{_libdir}/oss_modules/parser/transformers/*.js
+
+%files devel
+%defattr(644,root,root,755)
+%dir %attr(755,root,root) %{_includedir}/OSS
+%{_includedir}/OSS/*
+%{_libdir}/liboss_*.la
+%{_libdir}/liboss_*.a
+
+
+%post
+
+

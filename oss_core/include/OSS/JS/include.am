@@ -1,0 +1,30 @@
+nobase_include_HEADERS += \
+    OSS/JS/JS.h \
+    OSS/JS/JSObjectWrap.h \
+    OSS/JS/JSUtil.h \
+    OSS/JS/JSModule.h \
+    OSS/JS/JSPlugin.h \
+    OSS/JS/JSPluginManager.h \
+    OSS/JS/JSIsolate.h \
+    OSS/JS/JSIsolateManager.h \
+    OSS/JS/JSEventLoop.h \
+    OSS/JS/JSPromise.h \
+    OSS/JS/JSFileDescriptor.h \
+    OSS/JS/JSFileDescriptorManager.h \
+    OSS/JS/JSEventArgument.h \
+    OSS/JS/JSEventEmitter.h \
+    OSS/JS/JSPersistentValue.h \
+    OSS/JS/JSEventQueueManager.h \
+    OSS/JS/JSTask.h \
+    OSS/JS/JSTaskManager.h \
+    OSS/JS/JSFunctionCallback.h \
+    OSS/JS/JSFunctionCallbackQueue.h \
+    OSS/JS/JSTimer.h \
+    OSS/JS/JSTimerManager.h \
+    OSS/JS/JSWakeupPipe.h \
+    OSS/JS/JSEventLoopComponent.h \
+    OSS/JS/JSInterIsolateCall.h \
+    OSS/JS/JSInterIsolateCallManager.h
+
+include OSS/JS/modules/include.am
+

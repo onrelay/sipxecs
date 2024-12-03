@@ -1,0 +1,7 @@
+nobase_include_HEADERS += \
+    OSS/Persistent/BerkeleyDb.h \
+    OSS/Persistent/RedisClient.h \
+    OSS/Persistent/ClassType.h \
+    OSS/Persistent/DataType.h \
+    OSS/Persistent/Persistent.h \
+    OSS/Persistent/Reference.h

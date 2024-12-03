@@ -1,0 +1,22 @@
+nobase_include_HEADERS += \
+    OSS/Net/oss_carp.h \
+    OSS/Net/Carp.h \
+    OSS/Net/AccessControl.h \
+    OSS/Net/IPAddress.h \
+    OSS/Net/DNS.h \
+    OSS/Net/Net.h \
+    OSS/Net/rtnl_get_route.h \
+    OSS/Net/WebSocket.h \
+    OSS/Net/WebSocketClient.h \
+    OSS/Net/ClientTransport.h \
+    OSS/Net/ZMQSocketClient.h \
+    OSS/Net/WebSocketServer.h \
+    OSS/Net/WebSocketTlsServer.h \
+    OSS/Net/ServerTransport.h \
+    OSS/Net/ZMQSocketServer.h \
+    OSS/Net/TlsContext.h \
+    OSS/Net/ESLEvent.h \
+    OSS/Net/ESLConnection.h \
+    OSS/Net/ipv4_header.h \
+    OSS/Net/icmp_header.h \
+    OSS/Net/Pinger.h

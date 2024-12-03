@@ -1,0 +1,41 @@
+if ENABLE_FEATURE_V8
+liboss_core_la_SOURCES +=  \
+    js/JSObjectWrap.cpp \
+    js/JSUtil.cpp \
+    js/JSModule.cpp \
+    js/JSPluginManager.cpp \
+    js/JSIsolate.cpp \
+    js/JSIsolateManager.cpp \
+    js/JSEventLoop.cpp \
+    js/JSEventEmitter.cpp \
+    js/JSEventQueueManager.cpp \
+    js/JSTaskManager.cpp \
+    js/JSFunctionCallbackQueue.cpp \
+    js/JSTimer.cpp \
+    js/JSTimerManager.cpp \
+    js/JSEventLoopComponent.cpp \
+    js/JSInterIsolateCallManager.cpp \
+    js/JSFileDescriptorManager.cpp
+
+    bin_PROGRAMS += oss_core
+    oss_core_SOURCES = js/oss_core.cpp
+endif
+
+
+JAVASCRIPT_SRC = \
+    js/OSSJS_modules.js.h
+
+EXTRA_DIST += JAVASCRIPT_SRC 
+BUILT_SOURCES += ${JAVASCRIPT_SRC}
+CLEANFILES += ${JAVASCRIPT_SRC}
+
+js/OSSJS_%.js.h: js/%.js
+	$(top_srcdir)/config/doublequoteme $< $@
+
+if ENABLE_FEATURE_V8
+include js/modules/src.am
+js_plugin-install-hook: js_module-install-hook
+else
+js_plugin-install-hook:
+	@echo "Not installing plugins"
+endif

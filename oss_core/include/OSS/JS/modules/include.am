@@ -1,0 +1,24 @@
+
+nobase_include_HEADERS += \
+    OSS/JS/modules/BufferObject.h \
+    OSS/JS/modules/QueueObject.h \
+    OSS/JS/modules/ZMQSocketObject.h \
+    OSS/JS/modules/ConfigObject.h \
+    OSS/JS/modules/FileObject.h \
+    OSS/JS/modules/HttpParserObject.h \
+    OSS/JS/modules/http_parser/http_parser.h \
+    OSS/JS/modules/ProcessObject.h \
+    OSS/JS/modules/inet_socket/inet_socket.h \
+    OSS/JS/modules/HttpClientObject.h \
+    OSS/JS/modules/HttpRequestObject.h \
+    OSS/JS/modules/HttpResponseObject.h \
+    OSS/JS/modules/HttpServerObject.h \
+    OSS/JS/modules/HttpSSLContextObject.h \
+    OSS/JS/modules/ESLEventObject.h \
+    OSS/JS/modules/ESLConnectionObject.h \
+    OSS/JS/modules/ResipSIPStack.h \
+    OSS/JS/modules/ResipDialogUsageManager.h \
+    OSS/JS/modules/ResipMasterProfile.h \
+    OSS/JS/modules/ResipClientRegistrationHandler.h \
+    OSS/JS/modules/ResipClientSubscriptionHandler.h \
+    OSS/JS/modules/ResipUserProfile.h

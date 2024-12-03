@@ -1,0 +1,79 @@
+## The OSS Core library currently provides classes that encapsulate functions and operations for:
+
+    * SIP ABNF Parser
+    * SIP Finite State Machines
+    * SIP B2B User Agent
+    * CommonJS Java Script Engine using Google V8
+    * SIP Over Websockets
+    * STUN server
+    * RTP Proxy
+    * CARP High Availability
+    * SIPCapture (HEP3)
+    * REST Persistence Store
+    * BSON/JSON Parser
+    * RAFT Consensus
+
+## Minimal Prerequisites (Mac and Linux)
+### Mac build is tested using homebrew installed packages
+    * openssl-devel
+    * boost-devel
+    * poco-devel
+
+Note: In Mac, you will need to create a softlink of the openssl include directory in /usr/local/include
+
+## Prerequisites (CentOS or Fedora)
+-----------------------------------
+You can use the spec file to install all dependencies
+
+To list build dependencies
+
+  grep '^BuildRequires' oss_core/oss_core.spec.in | awk '{print $2}'
+
+To list runtime dependencies
+
+  grep '^Requires' oss_core/oss_core.spec.in | awk '{print $2}'
+
+To install build dependencies
+  
+  sudo yum install -y `grep '^BuildRequires' oss_core/oss_core.spec.in | awk '{print $2}'`
+
+## Prerequisites for Ubuntu
+  apt-get -qq update
+  apt-get install -y build-essential autoconf libtool
+  apt-get install -y libpoco-dev libboost-all-dev libzmq3-dev libv8-dev libhiredis-dev libconfig++-dev libpcap-dev
+
+## Optional dependencies for Ubuntu
+  apt-get install -y libleveldb-dev libmcrypt-dev libdb++-dev
+  
+  
+## Building From Source (Mac and Linux)
+------------------------------------------
+### Download the source code from https://github.com/joegen/oss_core and build it
+    git clone https://github.com/joegen/oss_core.git
+    cd oss_core
+    autoreconf -if
+    mkdir -p .build
+    cd .build
+    ../configure
+    make && sudo make install
+  
+## Building RPMS (CentOS or Fedora)
+-----------------------------------
+  
+### Create RPM Build environment
+    echo "%_topdir      $HOME/rpmbuild" >> ~/.rpmmacros
+    mkdir -p ~/rpmbuild/{BUILD,SOURCES,RPMS,SRPMS,SPECS}
+    cd oss_core
+    autoreconf -if
+    mkdir -p .build
+    cd .build
+    ../configure --enable-all-features --disable-dep-check
+    make dist
+    rpmbuild -ta oss_core-*tar.gz
+
+## Building DEB (Debian or Ubuntu)
+-----------------------------------
+    cd oss_core
+    apt-get install -y debhelper pkg-config dh-autoreconf devscripts
+    debuild -uc -us
+

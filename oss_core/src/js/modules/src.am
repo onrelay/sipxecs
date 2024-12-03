@@ -1,0 +1,58 @@
+js_helper-install-hook:
+	cd ${DESTDIR}${libdir}; rm -rf oss_modules
+
+INSTALL_PROCEDURES = js_helper-install-hook
+
+include js/modules/examples/src.am
+include js/modules/http/module.am
+include js/modules/isolate/module.am
+include js/modules/config/module.am
+include js/modules/assert/module.am
+include js/modules/buffer/module.am
+include js/modules/console/module.am
+include js/modules/constants/module.am
+include js/modules/error/module.am
+include js/modules/esl/module.am
+include js/modules/fifo/module.am
+include js/modules/file/module.am
+include js/modules/filesystem/module.am
+include js/modules/fork/module.am
+include js/modules/getopt/module.am
+include js/modules/socket/module.am
+include js/modules/object/module.am
+include js/modules/pipe/module.am
+include js/modules/poll/module.am
+include js/modules/process/module.am
+include js/modules/system/module.am
+include js/modules/zmq/module.am
+include js/modules/timer/module.am
+include js/modules/url-parser/module.am
+include js/modules/utils/module.am
+include js/modules/xml-parser/module.am
+include js/modules/dns/module.am
+include js/modules/async/module.am
+include js/modules/logger/module.am
+include js/modules/json_rpc/module.am
+include js/modules/sip-parser/module.am
+include js/modules/lexer/module.am
+include js/modules/parser/module.am
+include js/modules/pinger/module.am
+
+if ENABLE_FEATURE_SBC
+if ENABLE_FEATURE_B2BUA
+include js/modules/sbc-hook/module.am
+endif
+endif
+
+if ENABLE_FEATURE_INOTIFY
+include js/modules/inotify/module.am
+endif
+
+if ENABLE_FEATURE_RESIP_UA
+include js/modules/resip_ua/module.am
+endif
+
+
+js_module-install-hook: ${INSTALL_PROCEDURES}
+	rm -f ${DESTDIR}${libdir}/liboss_js*.*
+

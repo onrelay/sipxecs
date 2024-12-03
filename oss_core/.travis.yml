@@ -1,0 +1,22 @@
+sudo: required
+dist: trusty
+language: cpp
+compiler:
+  - gcc
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libpoco-dev
+  - sudo apt-get install -y libboost-all-dev
+  - sudo apt-get install -y libzmq-dev
+  - sudo apt-get install -y libv8-dev
+  - sudo apt-get install -y libhiredis-dev
+  - sudo apt-get install -y libconfig++-dev
+  - sudo apt-get install -y libpcap-dev
+  - sudo apt-get install -y libdb++-dev
+script: autoreconf -if && ./configure && make
+notifications:
+  email:
+    recipients:
+      - joegen@ossapp.com
+    on_success: change
+    on_failure: always
