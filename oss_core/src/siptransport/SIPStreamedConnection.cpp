@@ -47,17 +47,20 @@
 ////////////////////////////////////////////////////////////////////////////////
  
 
-
-#include <vector>
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
+#include "OSS/OSS.h"
 #include "OSS/UTL/Logger.h"
 #include "OSS/SIP/SIPTransportSession.h"
 #include "OSS/SIP/SIPStreamedConnection.h"
 #include "OSS/SIP/SIPStreamedConnectionManager.h"
 #include "OSS/SIP/SIPFSMDispatch.h"
 #include "OSS/SIP/SIPListener.h"
+
+#include <vector>
+
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
+
 
 
 namespace OSS {
@@ -633,7 +636,7 @@ void SIPStreamedConnection::handleServerHandshake(const boost::system::error_cod
     {
         err = std::string(" (")
                 +boost::lexical_cast<std::string>(ERR_GET_LIB(e.value()))+","
-                +boost::lexical_cast<std::string>(ERR_GET_FUNC(e.value()))+","
+                // +boost::lexical_cast<std::string>(ERR_GET_FUNC(e.value()))+"," // Deprecated
                 +boost::lexical_cast<std::string>(ERR_GET_REASON(e.value()))+") "
         ;
         //ERR_PACK /* crypto/err/err.h */

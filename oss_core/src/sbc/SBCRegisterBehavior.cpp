@@ -576,7 +576,7 @@ void SBCRegisterBehavior::onProcessResponseOutbound(
   std::string expires = pResponse->hdrGet("expires");
   std::string hContactList = pResponse->hdrGet("contact");
   
-  bool is2xx = pResponse->is2xx();
+  boost::tribool is2xx = pResponse->is2xx();
   bool isTrunkReg = pTransaction->hasProperty("is-trunk-reg");
   
   ContactURI curi;

@@ -7,10 +7,10 @@ isolate-install:
 INSTALL_PROCEDURES += isolate-install
 
 EXTRA_DIST += \
-    js/modules/isolate/index.js \
-    js/modules/isolate/isolate.js
+    ${srcdir}/js/modules/isolate/index.js \
+    ${srcdir}/js/modules/isolate/isolate.js
 
 lib_LTLIBRARIES += liboss_jsisolate.la
 liboss_jsisolate_la_LDFLAGS = -module -fpic -version-info @OSS_CORE_VERSION_INFO@
 liboss_jsisolate_la_LIBADD = @OSS_CORE_DEP_LIBS@ $(corelibldadd)
-liboss_jsisolate_la_SOURCES = js/modules/isolate/isolate.cpp
+liboss_jsisolate_la_SOURCES = ${srcdir}/js/modules/isolate/isolate.cpp

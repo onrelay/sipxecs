@@ -709,7 +709,25 @@ SIPTransportSession::Ptr SIPTransportService::createClientTransport(
   std::string logId = pMsg->createContextId(true);
   std::string requirePersistentValue;
   pMsg->getProperty(OSS::PropertyMap::PROP_RequirePersistentConnection, requirePersistentValue);
-  bool requirePersistent = pMsg->isResponse() || !requirePersistentValue.empty();
+
+
+  boost::tribool isResponse = pMsg->isResponse();
+  boost::tribool emptyRequirePersistentValue = requirePersistentValue.empty();
+
+  bool requirePersistent;
+
+  if( isResponse )
+  {
+    requirePersistent = true;
+  }
+  else if( !emptyRequirePersistentValue )
+  {
+    requirePersistent = true;
+  }
+  else 
+  {
+    requirePersistent = false;
+  }
   
   if (!transportId.empty())
   {

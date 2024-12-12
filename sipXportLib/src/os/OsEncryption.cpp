@@ -44,6 +44,8 @@
 #include "os/OsEncryption.h"
 #include "os/OsSocket.h"
 #include "os/OsLogger.h"
+#include "os/OsSSL.h"
+
 
 // EXTERNAL FUNCTIONS
 // EXTERNAL VARIABLES
@@ -64,6 +66,7 @@ UtlBoolean OsEncryption::sIgnoreEncryption = FALSE;
 // For OpenSLL API information
 
 
+
 /* //////////////////////////// PUBLIC //////////////////////////////////// */
 OsEncryption::OsEncryption(void)
 {
@@ -79,10 +82,9 @@ OsEncryption::OsEncryption(void)
     mHeaderLen = 0;
 #if defined (OSENCRYPTION)
     mAlgorithm = NULL;
-    memset(&mContext, 0, sizeof(mContext));
+    mContext = EVP_CIPHER_CTX_new();
 #endif
 }
-
 
 OsEncryption::~OsEncryption(void)
 {
@@ -163,6 +165,8 @@ OsStatus OsEncryption::release(void)
         mResultsLen = 0;
     }
 
+    EVP_CIPHER_CTX_free(mContext);
+
     retval = OS_SUCCESS;
 #endif
 
@@ -181,17 +185,17 @@ OsStatus OsEncryption::init(Direction direction)
     {
         ERR_clear_error();
 
-        SSLeay_add_all_algorithms();
+        COMPAT_SSLeay_add_all_algorithms();
         mAlgorithm = PKCS5_pbe_set(NID_pbeWithMD5AndDES_CBC,
             PKCS5_DEFAULT_ITER, mSalt, mSaltLen);
 
         if (mAlgorithm != NULL)
         {
-            EVP_CIPHER_CTX_init(&(mContext));
+            EVP_CIPHER_CTX_init(mContext);
             if (EVP_PBE_CipherInit(mAlgorithm->algorithm, (const char *)mKey, mKeyLen,
-                                   mAlgorithm->parameter, &(mContext), (int)direction))
+                                   mAlgorithm->parameter, mContext, (int)direction))
             {
-                int blockSize = EVP_CIPHER_CTX_block_size(&mContext);
+                int blockSize = EVP_CIPHER_CTX_block_size(mContext);
                 int allocLen = mDataLen + mHeaderLen + blockSize + 1; // plus 1 for null terminator on decrypt
                 mResults = (unsigned char *)OPENSSL_malloc(allocLen);
                 if (mResults == NULL)
@@ -219,6 +223,8 @@ OsStatus OsEncryption::init(Direction direction)
         Os::Logger::instance().log(FAC_AUTH, PRI_ERR, "No encryption key(%d) or data(%d) set.\n",
             mKeyLen, mDataLen);
     }
+
+
 #endif
 
     return retval;
@@ -262,11 +268,11 @@ OsStatus OsEncryption::crypto(Direction direction)
             }
 
             int outLenPart1 = 0;
-            if (EVP_CipherUpdate(&(mContext), out, &outLenPart1, in, inLen))
+            if (EVP_CipherUpdate(mContext, out, &outLenPart1, in, inLen))
             {
                 out += outLenPart1;
                 int outLenPart2 = 0;
-                if (EVP_CipherFinal(&(mContext), out, &outLenPart2))
+                if (EVP_CipherFinal(mContext, out, &outLenPart2))
                 {
                     outLen += outLenPart1 + outLenPart2;
                     retval = OS_SUCCESS;
@@ -295,13 +301,13 @@ UtlBoolean OsEncryption::openSslError(void)
     if (err != 0)
     {
         ERR_load_crypto_strings();
-        ERR_load_ERR_strings();
+        COMPAT_ERR_load_ERR_strings();
         char errbuff[256];
         errbuff[0] = 0;
         ERR_error_string_n(err, errbuff, sizeof(errbuff));
         osPrintf("OpenSLL ERROR:\n\tlib:%s\n\tfunction:%s\n\treason:%s\n",
             ERR_lib_error_string(err),
-            ERR_func_error_string(err),
+            COMPAT_ERR_func_error_string(err),
             ERR_reason_error_string(err));
         ERR_free_strings();
 

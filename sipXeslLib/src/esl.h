@@ -40,7 +40,7 @@
 extern "C" {
 #endif /* defined(__cplusplus) */
 
-#define esl_copy_string(_x, _y, _z) strncpy(_x, _y, _z - 1)
+#define esl_copy_string(_x, _y, _z) do { strncpy((_x), (_y), (_z) - 1); (_x)[(_z) - 1] = '\0'; } while (0)
 #define esl_set_string(_x, _y) esl_copy_string(_x, _y, sizeof(_x))
 #define ESL_VA_NONE "%s", ""
 

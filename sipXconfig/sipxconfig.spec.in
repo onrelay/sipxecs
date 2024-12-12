@@ -23,7 +23,7 @@ BuildRequires: cronie
 BuildRequires: vixie-cron
 %endif
 %endif
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 BuildRequires: pwdutils
 BuildRequires: cron
 %endif
@@ -134,7 +134,7 @@ Obsoletes: sipxevent
 Obsoletes: mongodb
 Obsoletes: mongodb-server
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 Requires: apache2-prefork
 Requires: pwdutils
 %endif
@@ -177,7 +177,7 @@ SOAP, postgresql and other JEE technologies to get the job done.
 %if %{_vendor} == redhat
 Requires: tftp-server
 %endif
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 Requires: tftp
 %endif
 Requires: %{name} >= %{version}

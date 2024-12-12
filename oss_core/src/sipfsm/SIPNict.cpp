@@ -103,7 +103,7 @@ void SIPNict::onReceivedMessage(SIPMessage::Ptr pMsg, SIPTransportSession::Ptr p
   if (!pMsg->isResponse() || state == SIPTransaction::TRN_STATE_TERMINATED || state == COMPLETED)
     return;
 
-  bool is2xx = pMsg->is2xx();
+  boost::tribool is2xx = pMsg->is2xx();
 
   SIPTransaction::Ptr pParent = pTransaction->getParent();
 

@@ -13,7 +13,8 @@ DISTRO_VER = $(word 2,$(subst -, ,$(DISTRO)))
 DISTRO_ARCH = $(word 3,$(subst -, ,$(DISTRO)))
 DISTRO_RESULTS_DIR = $(strip \
         $(subst fedora,Fedora, \
-        $(subst centos,CentOS,$(DISTRO_OS)))_$(DISTRO_VER))
+        $(subst centos,CentOS, \
+        $(subst rocky,Rocky,$(DISTRO_OS))))_$(DISTRO_VER))
 
 # utility
 empty :=

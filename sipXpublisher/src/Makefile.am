@@ -9,8 +9,8 @@ bin_PROGRAMS = sipstatus
 sipstatus_LDADD = \
 	-lmongoclient \
 	@SIPXCOMMSERVER_LIBS@ \
-	-lboost_system-mt \
-	-lboost_thread-mt \
+	-lboost_system \
+	-lboost_thread \
 	-lpthread
 
 sipstatus_CXXFLAGS = \

@@ -18,14 +18,7 @@
 #include "os/OsLogger.h"
 #include "openssl/ssl.h"
 
-// DEFINES
-// MACROS
-// EXTERNAL FUNCTIONS
-// EXTERNAL VARIABLES
-// CONSTANTS
-// STRUCTS
-// TYPEDEFS
-// FORWARD DECLARATIONS
+
 class UtlString;
 class UtlSList;
 
@@ -133,8 +126,10 @@ class OsSSL
    /// callback for OpenSSL CRYPTO_set_id_callback
    static unsigned long OpenSSL_id_function(void);
 
+#if defined(USE_LEGACY_OPENSLL_LOCKS)
    /// callback for OpenSSL CRYPTO_set_locking_callback
    static void OpenSSL_locking_function(int mode, int n, const char *file, int line);
+#endif
 
 /* ============================ INQUIRY =================================== */
 
@@ -158,7 +153,9 @@ class OsSSL
     * @note See 'man SSL_CTX_set_verify'
     */
 
+#if defined(USE_LEGACY_OPENSLL_LOCKS)
    static OsMutex* spOpenSSL_locks[CRYPTO_NUM_LOCKS];
+#endif
 
    /// Disable copy constructor
    OsSSL(const OsSSL& rOsSSL);

@@ -9,7 +9,7 @@ Vendor:   SIPfoundry
 Packager: SIPfoundry <sipxcom-dev@googlegroups.com>
 Url:      http://www.sipfoundry.org/
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 BuildRequires: java-1_6_0-sun-devel
 %else
 BuildRequires: java-1.8.0-openjdk-devel
@@ -38,7 +38,7 @@ BuildRoot: %{_tmppath}/%name-%version-root
 State Queue Agent is a network event queue using a proprietary RPC protocol 
 combined with ZeroMQ Message Queue .
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 %debug_package
 %endif
 

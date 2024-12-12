@@ -20,8 +20,8 @@ BuildRequires: libtool-ltdl-devel
 Requires: libtool-ltdl
 BuildRequires: pcre-devel
 BuildRequires: findutils
-BuildRequires: db4-devel
-Requires: db4
+BuildRequires: libdb-devel
+Requires: libdb
 Requires: openssl >= 0.9.7a
 Requires: pcre >= 4.5
 BuildRequires: iptables
@@ -41,8 +41,8 @@ Requires: libpcap
 BuildRequires: libdnet-devel
 Requires: libdnet
 
-BuildRequires: zeromq3-devel
-Requires: zeromq3
+BuildRequires: zeromq-devel
+Requires: zeromq
 
 BuildRequires: poco-devel
 Requires: poco-crypto
@@ -88,7 +88,7 @@ encapsulate functions and operations for:
     * CARP High Availability
 
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 %debug_package
 %endif
 
@@ -196,8 +196,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %attr(755,root,root) %{_libdir}/oss_modules/lexer
 %dir %attr(755,root,root) %{_libdir}/oss_modules/sbc-hook
 
-#%{_libdir}/oss_modules/*.js
-#%{_libdir}/oss_modules/*.jso
 %{_libdir}/oss_modules/*/*.js
 %{_libdir}/oss_modules/*/*.jso
 

@@ -8,10 +8,10 @@ inotify-install:
 INSTALL_PROCEDURES += inotify-install
 
 EXTRA_DIST += \
-    js/modules/inotify/index.js \
-    js/modules/inotify/monitored_file.js
+    ${srcdir}/js/modules/inotify/index.js \
+    ${srcdir}/js/modules/inotify/monitored_file.js
 
 lib_LTLIBRARIES += liboss_jsinotify.la
 liboss_jsinotify_la_LDFLAGS = -module -fpic -version-info @OSS_CORE_VERSION_INFO@
 liboss_jsinotify_la_LIBADD = @OSS_CORE_DEP_LIBS@ $(corelibldadd)
-liboss_jsinotify_la_SOURCES = js/modules/inotify/inotify.cpp
+liboss_jsinotify_la_SOURCES = ${srcdir}/js/modules/inotify/inotify.cpp

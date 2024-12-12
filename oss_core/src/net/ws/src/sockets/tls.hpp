@@ -28,6 +28,8 @@
 #ifndef WEBSOCKETPP_SOCKET_TLS_HPP
 #define WEBSOCKETPP_SOCKET_TLS_HPP
 
+#include "OSS/OSS.h"
+
 #include "../common.hpp"
 #include "socket_base.hpp"
 

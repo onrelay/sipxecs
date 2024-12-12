@@ -47,7 +47,7 @@ REWRITE_DEPS_suse = \
 	-e '/vixiecron/d'
 
 CURRENT_DISTRO := $(shell rpm --eval \
-	'%{?fedora:Fedora}%{!?fedora:%{?suse_version:Suse}%{!?suse_version:CentOS}}')
+	'%{?fedora:Fedora}%{!?fedora:%{?suse_version:Suse}%{!?suse_version:%{?centos:CentOS}%{!?centos:Rocky}}}')
 
 ifeq ($(CURRENT_DISTRO),CentOS)
 RPMSPEC := $(SRC)/mak/rpmspec-rh6-x86_64

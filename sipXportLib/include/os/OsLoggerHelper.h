@@ -203,7 +203,7 @@ namespace Os
         // We dump emergency level to syslog as well
         //
         if (level == PRI_EMERG)
-          syslog (LOG_EMERG, message.c_str());
+          syslog (LOG_EMERG, "%s", message.c_str());
       }
       
       return false; // Tell the subsystem that we are not consuming the log by returning false

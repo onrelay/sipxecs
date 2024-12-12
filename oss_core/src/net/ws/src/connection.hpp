@@ -28,6 +28,8 @@
 #ifndef WEBSOCKETPP_CONNECTION_HPP
 #define WEBSOCKETPP_CONNECTION_HPP
 
+#include "OSS/OSS.h"
+
 #include "common.hpp"
 #include "http/parser.hpp"
 #include "logger/logger.hpp"

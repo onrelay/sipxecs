@@ -30,7 +30,7 @@ COMMON_LIBS = \
 	@SIPXUNIT_LIBS@ \
 	@SIPXCOMMSERVER_LIBS@ \
   -lmongoclient \
-  -lboost_system-mt
+  -lboost_system
 
 #enforcerulestest_CXXFLAGS = \
 #	$(COMMON_CXX_FLAGS)

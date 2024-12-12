@@ -141,7 +141,7 @@ The sipxecs-build script has the following additional options:
 
         **-s | --subproject**: subproject to build or sipx for building all RPMs, e.g. sipx (default), sipXconfig, sipXproxy
 
-        **-v | --version**: sipXcom cersion to build, e.g 24.01 (default), 24.07
+        **-v | --version**: sipXcom cersion to build, e.g 25.01 (default), 24.07
 
         **-r | --rpm**: Include this option if building rpms
 

@@ -1,7 +1,7 @@
 AC_PREREQ(2.57)
-AC_INIT(sipxexample, 24.01, sipxcom-dev@googlegroups.com)
+AC_INIT(sipxexample, 25.01, sipxcom-dev@googlegroups.com)
 AC_CONFIG_AUX_DIR(config)
-AM_INIT_AUTOMAKE(foreign tar-ustar)
+AM_INIT_AUTOMAKE(foreign subdir-objects tar-ustar)
 m4_include([config/general.m4])
 m4_include([config/sipXlib.m4])
 

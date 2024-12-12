@@ -5,9 +5,9 @@ system-install:
 
 INSTALL_PROCEDURES += system-install
 
-EXTRA_DIST += js/modules/system/index.js
+EXTRA_DIST += ${srcdir}/js/modules/system/index.js
 
 lib_LTLIBRARIES += liboss_jssystem.la
 liboss_jssystem_la_LDFLAGS = -module -fpic -version-info @OSS_CORE_VERSION_INFO@
 liboss_jssystem_la_LIBADD = @OSS_CORE_DEP_LIBS@ $(corelibldadd)
-liboss_jssystem_la_SOURCES = js/modules/system/system.cpp
+liboss_jssystem_la_SOURCES = ${srcdir}/js/modules/system/system.cpp

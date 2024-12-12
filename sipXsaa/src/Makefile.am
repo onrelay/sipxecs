@@ -10,7 +10,7 @@ EXTRA_DIST =
 sipxsaa_LDADD = \
 	@SIPXCOMMSERVER_LIBS@ \
         -lmongoclient \
-        -lboost_system-mt	
+        -lboost_system	
 
 sipxsaa_CXXFLAGS = \
         -I$(top_builddir)/config \

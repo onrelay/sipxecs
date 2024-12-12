@@ -8,6 +8,8 @@
 #ifndef ALL_BOOST_H
 #define	ALL_BOOST_H
 
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS 
+
 #include <boost/algorithm/string.hpp>
 #include <boost/any.hpp>
 #include <boost/array.hpp>

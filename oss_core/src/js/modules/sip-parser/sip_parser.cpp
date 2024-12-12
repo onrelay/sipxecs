@@ -452,12 +452,28 @@ JS_METHOD_IMPL(msgIsRequest)
   {
     if (method.empty())
     {
-      js_method_set_return_boolean(pMsg->isRequest());
+      boost::tribool isRequest = pMsg->isRequest();
+      if( isRequest )
+      {
+        js_method_set_return_boolean(true);
+      }
+      else
+      {
+        js_method_set_return_boolean(false);
+      }
       return;
     }
     else
     {
-      js_method_set_return_boolean(pMsg->isRequest(method.c_str()));
+      boost::tribool isRequest = pMsg->isRequest(method.c_str());
+      if( isRequest )
+      {
+        js_method_set_return_boolean(true);
+      }
+      else
+      {
+        js_method_set_return_boolean(false);
+      }
       return;
     }
   }
@@ -489,7 +505,15 @@ JS_METHOD_IMPL(msgIsResponse)
 
   try
   {
-    js_method_set_return_boolean(pMsg->isResponse());
+      boost::tribool isResponse = pMsg->isResponse();
+      if( isResponse )
+      {
+        js_method_set_return_boolean(true);
+      }
+      else
+      {
+        js_method_set_return_boolean(false);
+      }
   }
   catch(const OSS::Exception& e)
   {
@@ -518,7 +542,15 @@ JS_METHOD_IMPL(msgIs1xx)
 
   try
   {
-    js_method_set_return_boolean(pMsg->is1xx());
+      boost::tribool is1xx = pMsg->is1xx();
+      if( is1xx )
+      {
+        js_method_set_return_boolean(true);
+      }
+      else
+      {
+        js_method_set_return_boolean(false);
+      }
   }
   catch(const OSS::Exception& e)
   {
@@ -547,7 +579,15 @@ JS_METHOD_IMPL(msgIs2xx)
 
   try
   {
-    js_method_set_return_boolean(pMsg->is2xx());
+    boost::tribool is2xx = pMsg->is2xx();
+    if( is2xx )
+    {
+      js_method_set_return_boolean(true);
+    }
+    else
+    {
+      js_method_set_return_boolean(false);
+    }
   }
   catch(const OSS::Exception& e)
   {
@@ -576,7 +616,15 @@ JS_METHOD_IMPL(msgIs3xx)
 
   try
   {
-    js_method_set_return_boolean(pMsg->is3xx());
+    boost::tribool is3xx = pMsg->is3xx();
+    if( is3xx )
+    {
+      js_method_set_return_boolean(true);
+    }
+    else
+    {
+      js_method_set_return_boolean(false);
+    }
   }
   catch(const OSS::Exception& e)
   {
@@ -605,7 +653,15 @@ JS_METHOD_IMPL(msgIs4xx)
 
   try
   {
-    js_method_set_return_boolean(pMsg->is4xx());
+    boost::tribool is4xx = pMsg->is4xx();
+    if( is4xx )
+    {
+      js_method_set_return_boolean(true);
+    }
+    else
+    {
+      js_method_set_return_boolean(false);
+    }
   }
   catch(const OSS::Exception& e)
   {
@@ -634,7 +690,15 @@ JS_METHOD_IMPL(msgIs5xx)
 
   try
   {
-    js_method_set_return_boolean(pMsg->is5xx());
+    boost::tribool is5xx = pMsg->is5xx();
+    if( is5xx )
+    {
+      js_method_set_return_boolean(true);
+    }
+    else
+    {
+      js_method_set_return_boolean(false);
+    }
   }
   catch(const OSS::Exception& e)
   {
@@ -663,7 +727,15 @@ JS_METHOD_IMPL(msgIs6xx)
 
   try
   {
-    js_method_set_return_boolean(pMsg->is6xx());
+    boost::tribool is6xx = pMsg->is6xx();
+    if( is6xx )
+    {
+      js_method_set_return_boolean(true);
+    }
+    else
+    {
+      js_method_set_return_boolean(false);
+    }
   }
   catch(const OSS::Exception& e)
   {
@@ -694,7 +766,15 @@ JS_METHOD_IMPL(msgIsResponseFamily)
 
   try
   {
-    js_method_set_return_boolean(pMsg->isResponseFamily(responseCode));
+    boost::tribool isResponseFamily = pMsg->isResponseFamily(responseCode);
+    if( isResponseFamily )
+    {
+      js_method_set_return_boolean(true);
+    }
+    else
+    {
+      js_method_set_return_boolean(false);
+    }    
   }
   catch(const OSS::Exception& e)
   {
@@ -724,7 +804,15 @@ JS_METHOD_IMPL(msgIsErrorResponse)
 
   try
   {
-    js_method_set_return_boolean(pMsg->isErrorResponse());
+    boost::tribool isErrorResponse = pMsg->isErrorResponse();
+    if( isErrorResponse )
+    {
+      js_method_set_return_boolean(true);
+    }
+    else
+    {
+      js_method_set_return_boolean(false);
+    } 
   }
   catch(const OSS::Exception& e)
   {
@@ -753,7 +841,15 @@ JS_METHOD_IMPL(msgIsMidDialog)
 
   try
   {
-    js_method_set_return_boolean(pMsg->isMidDialog());
+    boost::tribool isMidDialog = pMsg->isMidDialog();
+    if( isMidDialog )
+    {
+      js_method_set_return_boolean(true);
+    }
+    else
+    {
+      js_method_set_return_boolean(false);
+    } 
   }
   catch(const OSS::Exception& e)
   {

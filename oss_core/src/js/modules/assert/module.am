@@ -5,4 +5,4 @@ assert-install:
 
 INSTALL_PROCEDURES += assert-install
 
-EXTRA_DIST += js/modules/assert/index.js
+EXTRA_DIST += ${srcdir}/js/modules/assert/index.js

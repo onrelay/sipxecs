@@ -27,7 +27,7 @@ BuildRequires: sipxtacklib-devel >= %version
 %if %{_vendor} == redhat
 BuildRequires: httpd-devel >= 2.0.46
 %endif
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 BuildRequires: apache2-devel
 %endif
 
@@ -39,7 +39,7 @@ Requires: expat >= 1.95
 %if %{_vendor} == redhat
 Requires: httpd >= 2.0.46
 %endif
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 Requires: apache2-prefork
 %endif
 
@@ -72,7 +72,7 @@ Requires: ntp
 %if %{_vendor} == redhat
 Requires: smtpdaemon
 %endif
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 Requires: sendmail
 %endif
 
@@ -86,7 +86,7 @@ Requires: newt-python
 Requires: newt
 %endif
 %endif
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 Requires: python-newt
 %endif
 
@@ -102,7 +102,7 @@ The sipXpbx project is a comprehensive small/medium scale Enterprise SIP PBX. It
  * Media Server sipXvxml with auto-attendant and voice mail applications,
  * PBX and phone configuration support from sipXconfig.
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 %debug_package
 %endif
 

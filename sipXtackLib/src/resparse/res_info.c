@@ -44,7 +44,7 @@ const char* res_error_str()
         return(_res_errors[h_reserrno]);
 }
 
-#ifdef NEED_RES_OPCODES
+#ifdef __pingtel_on_posix__
 extern const char *_res_opcodes[] = {
         "QUERY",
         "IQUERY",

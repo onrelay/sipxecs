@@ -233,6 +233,9 @@
     #define OSS_ARCH_BIG_ENDIAN 1
 #endif
 
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS 
+
+
 #include <string>
 #include <iostream>
 #include <iomanip>

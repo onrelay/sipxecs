@@ -9,7 +9,7 @@ Vendor: SipXcom
 Packager: SIPfoundry <sipx-dev@sipxcom.org>
 Url: http://www.sipxcom.org
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 BuildRequires: java-1_6_0-sun-devel
 %else
 BuildRequires: java-1.8.0-openjdk-devel

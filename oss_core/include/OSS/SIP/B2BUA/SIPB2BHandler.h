@@ -23,6 +23,8 @@
 #include "OSS/build.h"
 #if ENABLE_FEATURE_B2BUA
 
+#include "OSS/OSS.h"
+
 #include <boost/noncopyable.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/function.hpp>

@@ -18,12 +18,6 @@
 //
 
 #include "OSS/OSS.h"
-#include <iostream>
-#include <vector>
-#include <sstream>
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
 #include "OSS/SIP/SIPTransportSession.h"
 #include "OSS/SIP/SIPUDPConnection.h"
 #include "OSS/SIP/SIPUDPConnectionClone.h"
@@ -33,6 +27,14 @@
 #include "OSS/UTL/Logger.h"
 #include "OSS/UTL/PropertyMap.h"
 #include "OSS/SIP/SIPListener.h"
+
+#include <iostream>
+#include <vector>
+#include <sstream>
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
+
 
 
 namespace OSS {

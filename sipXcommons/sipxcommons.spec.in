@@ -10,7 +10,7 @@ Group: Productivity/Telephony/SIP/Servers
 Vendor: SIPfoundry
 Packager: SIPfoundry <sipx-dev@sipfoundry.org>
 Url: http://www.sipfoundry.org/sipXcommons
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 BuildRequires: java-1_6_0-sun-devel
 %else
 BuildRequires: java-1.8.0-openjdk-devel
@@ -19,7 +19,7 @@ BuildRequires: automake
 %if %{_vendor} == redhat
 BuildRequires: shadow-utils
 %endif
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 BuildRequires: pwdutils
 %endif
 BuildRequires: zip
@@ -30,7 +30,7 @@ BuildRequires: rsync
 
 Source: %name-%version.tar.gz
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 Requires: pwdutils
 %else
 Requires: shadow-utils
@@ -43,7 +43,7 @@ Requires: java-ibm-unrestricted
 Requires: java-1.8.0-openjdk
 %endif
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 Requires: openssl >= 0.9.8
 %endif
 

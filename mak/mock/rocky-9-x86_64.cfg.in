@@ -1,0 +1,99 @@
+config_opts['root'] = 'rocky-9-x86_64'
+config_opts['target_arch'] = 'x86_64'
+config_opts['legal_host_arches'] = ('x86_64',)
+config_opts['dist'] = 'el9'  # only useful for --resultdir variable subst
+config_opts['releasever'] = '9'
+config_opts['basearc'] = 'x86_64'
+config_opts['rltype'] = ''
+config_opts['use_bootstrap'] = False
+#config_opts['use_bootstrap_image'] = True
+#config_opts['bootstrap_image'] = 'rockylinux:9'
+config_opts['chroot_additional_packages'] = [
+    'rpm-build-libs',
+    'redhat-rpm-config',
+    'gcc-c++',
+    'krb5-devel',
+    'openssl-devel',
+    'v8-devel',
+    'libdb-devel',
+    'libdb-cxx-devel'
+    ]
+
+config_opts['yum.conf'] = """
+
+[main]
+cachedir=/var/cache/yum
+debuglevel=1
+reposdir=/dev/null
+logfile=/var/log/yum.log
+retries=20
+obsoletes=1
+gpgcheck=0
+assumeyes=1
+syslog_ident=mock
+syslog_device=
+@DOWNLOAD_PROXY_CONFIG_LINE@
+
+[baseos]
+name=Rocky Linux $releasever - BaseOS
+mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=BaseOS-$releasever
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/BaseOS/$basearch/os/
+gpgcheck=1
+enabled=1
+countme=1
+metadata_expire=6h
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+
+[appstream]
+name=Rocky Linux $releasever - AppStream
+mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=AppStream-$releasever
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/AppStream/$basearch/os/
+gpgcheck=1
+enabled=1
+countme=1
+metadata_expire=6h
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+
+[devel]
+name=Rocky Linux $releasever - Devel WARNING! FOR BUILDROOT ONLY DO NOT LEAVE ENABLED
+mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=devel-$releasever
+#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/devel/$basearch/os/
+gpgcheck=1
+enabled=1
+countme=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
+
+[epel]
+name=Extra Packages for Enterprise Linux $releasever - $basearch
+# It is much more secure to use the metalink, but if you wish to use a local mirror
+# place its address here.
+#baseurl=https://download.example/pub/epel/$releasever/Everything/$basearch/
+metalink=https://mirrors.fedoraproject.org/metalink?repo=epel-$releasever&arch=$basearch&infra=$infra&content=$contentdir
+enabled=1
+gpgcheck=1
+countme=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-$releasever
+
+
+[sipxcom]
+name=sipXcom
+enabled=1
+baseurl=@UPSTREAM_URL@
+repo_gpgcheck=0
+gpgcheck=0
+
+
+# Normally from EPEL, just a list of rpms to create a basic build system
+[buildsys-build]
+name=buildsys-build
+baseurl=@DOWNLOAD_BASE_URL@/buildsys-build
+enabled=1
+
+[build]
+name=build
+#baseurl=http://localhost:@REPO_PORT@/Rocky_9/x86_64/
+baseurl=file:///src/sipxecs/build/repo/Rocky_9/x86_64/
+
+"""
+
+

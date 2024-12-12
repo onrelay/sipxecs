@@ -14,7 +14,7 @@ BuildRequires: gcc-c++
 BuildRequires: cppunit-devel
 BuildRequires: pcre-devel >= 4.5
 BuildRequires: openssl-devel
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 BuildRequires: apache2-devel
 BuildRequires: libapr1-devel
 %else
@@ -41,7 +41,7 @@ BuildRoot: %{_tmppath}/%name-%version-root
 %description
 Manages shared appearances for sipx.
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 %debug_package
 %endif
 

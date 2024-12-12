@@ -28,6 +28,9 @@
 #ifndef WEBSOCKETPP_ROLE_CLIENT_HPP
 #define WEBSOCKETPP_ROLE_CLIENT_HPP
 
+#include "OSS/OSS.h"
+#include "OSS/UTL/CoreUtils.h"
+
 #include <limits>
 #include <iostream>
 
@@ -41,7 +44,6 @@
 #include "../uri.hpp"
 #include "../shared_const_buffer.hpp"
 
-#include "OSS/UTL/CoreUtils.h"
 
 #ifdef _MSC_VER
 // Disable "warning C4355: 'this' : used in base member initializer list".

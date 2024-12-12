@@ -6,6 +6,6 @@ parser-install:
 
 INSTALL_PROCEDURES += parser-install
 
-EXTRA_DIST += js/modules/parser/*.js
-EXTRA_DIST += js/modules/parser/transformers/*.js
-EXTRA_DIST += js/modules/parser/lib/*.js
+EXTRA_DIST += ${srcdir}/js/modules/parser/*.js
+EXTRA_DIST += ${srcdir}/js/modules/parser/transformers/*.js
+EXTRA_DIST += ${srcdir}/js/modules/parser/lib/*.js

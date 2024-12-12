@@ -32,7 +32,7 @@ functionality to achieve the ability to embed the stacks). The
 primary interface to the SIP stack is through the SipUserAgent
 class. This project depends upon the sipXportLib OS abstraction layer.
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 %debug_package
 %endif
 

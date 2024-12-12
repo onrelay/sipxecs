@@ -22,9 +22,9 @@ version_Revision=0
 version_Age=0
 
 LDADD =  \
-        -lboost_system-mt \
-        -lboost_thread-mt \
-        -lboost_filesystem-mt \
+        -lboost_system \
+        -lboost_thread \
+        -lboost_filesystem \
         -lpthread
 
 LDFLAGS = -rdynamic

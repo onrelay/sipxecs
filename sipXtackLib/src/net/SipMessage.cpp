@@ -3926,13 +3926,13 @@ void SipMessage::addLastRouteUri(const char* routeUri)
             routeString.append(SIP_MULTIFIELD_SEPARATOR);
         }
         // Make sure the route is in name-addr format
-        if(strstr(routeUri,"<") <= 0)
+        if(strstr(routeUri,"<") == NULL )
         {
             routeString.append("<");
         }
 
         routeString.append(routeUri);
-        if(strstr(routeUri, ">") <= 0)
+        if(strstr(routeUri, ">") == NULL)
         {
             routeString.append(">");
         }
@@ -4199,13 +4199,13 @@ void SipMessage::addLastPathUri(const char* pathUri)
            pathString.append(SIP_MULTIFIELD_SEPARATOR);
         }
         // Make sure the route is in name-addr format
-        if(strstr(pathUri,"<") <= 0)
+        if(strstr(pathUri,"<") == NULL)
         {
            pathString.append("<");
         }
 
         pathString.append(pathUri);
-        if(strstr(pathUri, ">") <= 0)
+        if(strstr(pathUri, ">") == NULL )
         {
            pathString.append(">");
         }

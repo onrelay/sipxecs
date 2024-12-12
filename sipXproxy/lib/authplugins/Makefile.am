@@ -11,7 +11,7 @@ AUTHPLUGIN_COMMON_CXX_FLAGS = \
 version_Current=1
 # Revision - set to 0 if Current was incremented
 #            increment if -lmongoclient \
-    -lboost_system-mtany implementation has changed
+    -lboost_systemany implementation has changed
 version_Revision=0
 # Age - set to 0 of any interfaces have been removed
 #       increment if any interfaces have been added
@@ -46,7 +46,7 @@ authplugins_libCallerAlias_la_LDFLAGS = \
 authplugins_libCallerAlias_la_LIBADD = \
     @SIPXCOMMSERVER_LIBS@ \
     -lmongoclient \
-    -lboost_system-mt
+    -lboost_system
 
 
 authplugins_libCallerAlertInfo_la_SOURCES = \
@@ -76,7 +76,7 @@ authplugins_libEnforceAuthRules_la_LDFLAGS = \
 authplugins_libEnforceAuthRules_la_LIBADD = \
     @SIPXCOMMSERVER_LIBS@ \
     -lmongoclient \
-    -lboost_system-mt
+    -lboost_system
 
 authplugins_libRequestLinter_la_SOURCES = \
     RequestLinter.h \
@@ -91,7 +91,7 @@ authplugins_libRequestLinter_la_LDFLAGS = \
 authplugins_libRequestLinter_la_LIBADD = \
     @SIPXCOMMSERVER_LIBS@ \
     -lmongoclient \
-    -lboost_system-mt
+    -lboost_system
 
 authplugins_libTransferControl_la_SOURCES = \
     TransferControl.h \
@@ -106,7 +106,7 @@ authplugins_libTransferControl_la_LDFLAGS = \
 authplugins_libTransferControl_la_LIBADD = \
     @SIPXCOMMSERVER_LIBS@ \
     -lmongoclient \
-    -lboost_system-mt
+    -lboost_system
 
 authplugins_libMSFT_ExchangeTransferHack_la_SOURCES = \
     MSFT_ExchangeTransferHack.h \
@@ -121,7 +121,7 @@ authplugins_libMSFT_ExchangeTransferHack_la_LDFLAGS = \
 authplugins_libMSFT_ExchangeTransferHack_la_LIBADD = \
     @SIPXCOMMSERVER_LIBS@ \
     -lmongoclient \
-    -lboost_system-mt
+    -lboost_system
 
 authplugins_libSubscriptionAuth_la_SOURCES = \
     SubscriptionAuth.h \
@@ -136,7 +136,7 @@ authplugins_libSubscriptionAuth_la_LDFLAGS = \
 authplugins_libSubscriptionAuth_la_LIBADD = \
     @SIPXCOMMSERVER_LIBS@ \
     -lmongoclient \
-    -lboost_system-mt
+    -lboost_system
 
 authplugins_libCallDestination_la_SOURCES = \
     CallDestination.h \
@@ -151,7 +151,7 @@ authplugins_libCallDestination_la_LDFLAGS = \
 authplugins_libCallDestination_la_LIBADD = \
     @SIPXCOMMSERVER_LIBS@ \
     -lmongoclient \
-    -lboost_system-mt
+    -lboost_system
 
 authplugins_libEmergencyLineIdentifier_la_SOURCES = \
     EmergencyDB.h \
@@ -167,7 +167,7 @@ authplugins_libEmergencyLineIdentifier_la_LDFLAGS = \
 authplugins_libEmergencyLineIdentifier_la_LIBADD = \
     @SIPXCOMMSERVER_LIBS@ \
     -lmongoclient \
-    -lboost_system-mt
+    -lboost_system
 
 authplugins_libV8Engine_la_SOURCES = \
     V8Engine.h \
@@ -182,4 +182,4 @@ authplugins_libV8Engine_la_LDFLAGS = \
 authplugins_libV8Engine_la_LIBADD = \
     @SIPXCOMMSERVER_LIBS@ \
     -lmongoclient \
-    -lboost_system-mt
+    -lboost_system

@@ -1,11 +1,11 @@
 AC_PREREQ(2.57)
-AC_INIT(sipXcounterpath, 24.01, sipxcom-dev@googlegroups.com)
+AC_INIT(sipXcounterpath, 25.01, sipxcom-dev@googlegroups.com)
 AC_CONFIG_AUX_DIR(config)
 m4_include([config/general.m4])
 m4_include([config/sipXlib.m4])
 m4_include([config/java.m4])
 m4_include([config/java2.m4])
-AM_INIT_AUTOMAKE(foreign tar-ustar)
+AM_INIT_AUTOMAKE(foreign subdir-objects tar-ustar)
 AC_CONFIG_SRCDIR([device])
 SFAC_INIT_FLAGS
 AC_PROG_JAVA_CC([javac])

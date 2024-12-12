@@ -173,7 +173,7 @@ public:
             size_t expectedIndex = testDataForStringList[i].expectedIndex ;
             const UtlContainable* ucAct = stringList.at(expectedIndex) ;
             string msg ;
-            char strItr[33] ;
+            char strItr[100] ;
             sprintf(strItr, "%zu", expectedIndex);
             TestUtilities::createMessage(3, &msg, prefix1, suffix, strItr) ;
             CPPUNIT_ASSERT_EQUAL_MESSAGE(msg.data(),
@@ -185,7 +185,7 @@ public:
             size_t expectedIndex = testDataForIntList[j].expectedIndex ;
             const UtlContainable* ucAct = intList.at(expectedIndex) ;
             string msg ;
-            char strItr[33] ;
+            char strItr[100] ;
             sprintf(strItr, "%zu", expectedIndex);
             TestUtilities::createMessage(3, &msg, prefix2, suffix, strItr) ;
             CPPUNIT_ASSERT_EQUAL_MESSAGE(msg.data(),
@@ -261,8 +261,8 @@ public:
         for (int k=0; k < stringListCount; k++)
         {
             size_t expectedIndex = testDataForStringList[k].expectedIndex ;
-            char strOldItr[33] ;
-            char strItr[33] ;
+            char strOldItr[100] ;
+            char strItr[100] ;
             sprintf(strOldItr, "%d", k) ;
             sprintf(strItr, "%zu", expectedIndex);
 

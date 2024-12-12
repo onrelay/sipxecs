@@ -1,10 +1,10 @@
 AC_PREREQ(2.57)
-AC_INIT(sipXaudiocodes, 24.01, sipxcom-dev@googlegroups.com)
+AC_INIT(sipXaudiocodes, 25.01, sipxcom-dev@googlegroups.com)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR([src/org/sipfoundry/sipxconfig/phone/audiocodesphone/AudioCodesPhone.java])
 m4_include([config/sipXlib2.m4])
 m4_include([config/java2.m4])
-AM_INIT_AUTOMAKE(foreign tar-ustar)
+AM_INIT_AUTOMAKE(foreign subdir-objects tar-ustar)
 AC_PROG_JAVA_CC([javac])
 AC_PROG_JAVA([java])
 PROG_JAVA_DEP

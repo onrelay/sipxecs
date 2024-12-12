@@ -129,7 +129,7 @@ void SIPTransaction::onReceivedMessage(SIPMessage::Ptr pMsg, SIPTransportSession
 {
   OSS::mutex_lock lock(_mutex);
 
-  bool isAck = pMsg->isRequest("ACK");
+  boost::tribool isAck = pMsg->isRequest("ACK");
 
   if (pMsg->isRequest() && !_pInitialRequest && !isAck)
     _pInitialRequest = pMsg;

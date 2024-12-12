@@ -43,10 +43,12 @@
 #include "os/OsUtil.h"
 #include "os/OsLogger.h"
 #include "os/OsTask.h"
+#include "os/OsEncryption.h"
 
 #ifdef VALGRIND_MAKE_READABLE
 #include "valgrind/memcheck.h"
 #endif
+
 
 // EXTERNAL FUNCTIONS
 // EXTERNAL VARIABLES
@@ -155,7 +157,7 @@ void OsSSLConnectionSocket::close()
    if (mSSL)
    {
       SSL_free(mSSL);
-      ERR_remove_state(0);
+      COMPAT_ERR_remove_state(0);
       mSSL = NULL;
    }
 

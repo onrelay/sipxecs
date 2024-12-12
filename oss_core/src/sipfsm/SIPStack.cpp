@@ -17,9 +17,8 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
-
-#include "OSS/SIP/SIPStack.h"
 #include "OSS/OSS.h"
+#include "OSS/SIP/SIPStack.h"
 #include "OSS/SIP/SIPException.h"
 #include "OSS/Persistent/ClassType.h"
 #include "OSS/SIP/SIPVia.h"

@@ -4,5 +4,5 @@ json_rpc-install:
 
 INSTALL_PROCEDURES += json_rpc-install
 
-EXTRA_DIST += js/modules/json_rpc/*.js
+EXTRA_DIST += ${srcdir}/js/modules/json_rpc/*.js
 

@@ -11,6 +11,8 @@
 #ifndef OSS_PINGER_H_INCLUDED
 #define OSS_PINGER_H_INCLUDED
 
+#include "OSS/OSS.h"
+
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>

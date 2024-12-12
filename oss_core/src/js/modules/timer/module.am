@@ -4,4 +4,4 @@ timer-install:
 
 INSTALL_PROCEDURES += timer-install
 
-EXTRA_DIST += js/modules/timer/index.js
+EXTRA_DIST += ${srcdir}/js/modules/timer/index.js

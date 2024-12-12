@@ -22,7 +22,7 @@ Requires: cfengine >= 3.2.3
 %if %{_vendor} == redhat
 Requires: chkconfig
 %endif
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 Requires: net-snmp >= 5.3.1
 BuildRequires: net-snmp-devel >= 5.3.1
 %else
@@ -65,7 +65,7 @@ distributed configuration system.  The fact cfengine is used in this
 project should not interfere with any configuration systems an IT
 infrastruture might already have like puppet, chef or even cfengine.
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 %debug_package
 %endif
 

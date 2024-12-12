@@ -175,9 +175,9 @@ void SIPEndpoint::sendEndpointResponse(
     return;
   }
   
-  bool is2xx = pResponse->isResponseFamily(OSS::SIP::SIPMessage::CODE_200_Ok);
-  bool isInvite = pResponse->isResponseTo(OSS::SIP::REQ_INVITE);
-  bool isReliableTransport = pTransaction->transport()->isReliableTransport();
+  boost::tribool is2xx = pResponse->isResponseFamily(OSS::SIP::SIPMessage::CODE_200_Ok);
+  boost::tribool isInvite = pResponse->isResponseTo(OSS::SIP::REQ_INVITE);
+  boost::tribool isReliableTransport = pTransaction->transport()->isReliableTransport();
   Retransmitter::Ptr pRetran;
   if (!isReliableTransport && is2xx && isInvite)
   {    
@@ -230,7 +230,7 @@ void SIPEndpoint::handleAckOr2xxTransaction(
   const OSS::SIP::SIPMessage::Ptr& pMsg,
   const OSS::SIP::SIPTransportSession::Ptr& pTransport)
 {
-  bool isAck = pMsg->isRequest(OSS::SIP::REQ_ACK);
+  boost::tribool isAck = pMsg->isRequest(OSS::SIP::REQ_ACK);
   
   std::string logId = pMsg->createContextId(true);
   std::string msgType = "2xx";

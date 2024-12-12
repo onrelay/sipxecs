@@ -28,11 +28,11 @@ sipxsqa_LDADD = \
 	libsipXsqa.la \
 	@SIPXPORT_LIBS@ \
 	@SIPXCOMMSERVER_LIBS@ \
-	  -lboost_date_time-mt \
-	  -lboost_filesystem-mt \
-	  -lboost_system-mt \
-	  -lboost_thread-mt \
-	  -lboost_program_options-mt \
+	  -lboost_date_time \
+	  -lboost_filesystem \
+	  -lboost_system \
+	  -lboost_thread \
+	  -lboost_program_options \
 	  -lpthread \
 	  -lzmq \
 	  -lmongoclient \

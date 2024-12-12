@@ -4,4 +4,4 @@ xml-parser-install:
 
 INSTALL_PROCEDURES += xml-parser-install
 
-EXTRA_DIST += js/modules/xml-parser/index.js
+EXTRA_DIST += ${srcdir}/js/modules/xml-parser/index.js

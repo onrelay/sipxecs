@@ -16,9 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
+#include "OSS/OSS.h"
+#include "OSS/Net/Firewall.h"
 
 #include "gtest/gtest.h"
-#include "OSS/Net/Firewall.h"
 #include <boost/bind.hpp>
 
 using namespace OSS;

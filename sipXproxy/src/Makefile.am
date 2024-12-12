@@ -24,7 +24,7 @@ sipXproxy_LDADD = \
 	@OSSCORE_LIBS@ \
 	    -lzmq \
         -lmongoclient \
-        -lboost_system-mt
+        -lboost_system
 
 sipXproxy_SOURCES =  \
 	sipXproxymain.cpp

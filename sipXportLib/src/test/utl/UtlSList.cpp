@@ -166,7 +166,7 @@ public:
             UtlContainable* ucExpected = commonContainables[i] ;
             UtlContainable* ucActual = commonList.at(i) ;
             string msg ;
-            char strItr[33] ;
+            char strItr[100] ;
             sprintf(strItr, "%d", i);
             TestUtilities::createMessage(3, &msg, "Verify that the at(n) method, where n = ", \
                 strItr, " ;") ;

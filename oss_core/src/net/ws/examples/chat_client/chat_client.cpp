@@ -25,6 +25,8 @@
  * 
  */
 
+#include "OSS/OSS.h"
+
 #include "chat_client_handler.hpp"
 
 #include "../../src/roles/client.hpp"

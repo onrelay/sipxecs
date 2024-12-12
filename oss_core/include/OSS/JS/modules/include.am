@@ -1,5 +1,6 @@
 
 nobase_include_HEADERS += \
+    OSS/JS/modules/Async.h \
     OSS/JS/modules/BufferObject.h \
     OSS/JS/modules/QueueObject.h \
     OSS/JS/modules/ZMQSocketObject.h \
@@ -14,6 +15,7 @@ nobase_include_HEADERS += \
     OSS/JS/modules/HttpResponseObject.h \
     OSS/JS/modules/HttpServerObject.h \
     OSS/JS/modules/HttpSSLContextObject.h \
+    OSS/JS/modules/IsolateObject.h \
     OSS/JS/modules/ESLEventObject.h \
     OSS/JS/modules/ESLConnectionObject.h \
     OSS/JS/modules/ResipSIPStack.h \

@@ -4,7 +4,9 @@
 OPTIONS = @OPTIONS@
 DOWNLOAD_LIB_CACHE = @DOWNLOAD_LIB_CACHE@
 
-git_submodules = $(shell sed -e '/^\[submodule/! d' -e 's/^\[submodule "\(.*\)"]$$/\1/g' $(wildcard $(SRC)/.gitmodules))
+git_submodules = $(shell if [ -f $(SRC)/.gitmodules ]; then \
+    sed -e '/^\[submodule/! d' -e 's/^\[submodule "\(.*\)"]$$/\1/g' $(SRC)/.gitmodules; \
+    fi)
 custommodules =
 git_custommodules_file = $(wildcard $(SRC)/custom/.gitmodules)
 ifneq ($(git_custommodules_file),)

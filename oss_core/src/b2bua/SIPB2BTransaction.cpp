@@ -138,7 +138,15 @@ void SIPB2BTransaction::runTask()
       OSS::log_information(logMsg.str());
     }
 
-    _isMidDialog = _pServerRequest->isMidDialog();
+    if( _pServerRequest->isMidDialog() )
+    {
+      _isMidDialog = true;
+    }
+    else
+    {
+      _isMidDialog = false;
+    }
+
     //
     // Signal transaction creation
     //

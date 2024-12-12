@@ -121,110 +121,35 @@ AC_DEFUN([CHECK_OPENFIRE],
 ])
 
 # ============= C P P U N I T ==================
+dnl Removed cppunit-config:
 dnl
 dnl AM_PATH_CPPUNIT(MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
 dnl
 AC_DEFUN([AM_PATH_CPPUNIT],
 [
+  AC_MSG_CHECKING([for CppUnit >= $1 using pkg-config])
 
-AC_ARG_WITH(cppunit-prefix,[  --with-cppunit-prefix=PFX   Prefix where CppUnit is installed (optional)],
-            cppunit_config_prefix="$withval", cppunit_config_prefix="")
-AC_ARG_WITH(cppunit-exec-prefix,[  --with-cppunit-exec-prefix=PFX  Exec prefix where CppUnit is installed (optional)],
-            cppunit_config_exec_prefix="$withval", cppunit_config_exec_prefix="")
+  PKG_CHECK_MODULES([CPPUNIT], [cppunit >= $1], [
+    AC_MSG_RESULT([found])
+    CPPUNIT_CFLAGS=$CPPUNIT_CFLAGS
+    CPPUNIT_LIBS=$CPPUNIT_LIBS
+    ifelse([$2], , :, [$2])
+  ], [
+    AC_MSG_RESULT([not found])
+    CPPUNIT_CFLAGS=""
+    CPPUNIT_LIBS=""
+    ifelse([$3], , :, [$3])
+  ])
 
-  dnl Assemble the arguments to be passed to cppunit-config in cppunit_config_args.
-  dnl Construct the cppunit-config executable name in CPPUNIT_CONFIG.
-  cppunit_config_args=
-  if test x$cppunit_config_exec_prefix != x ; then
-     cppunit_config_args="$cppunit_config_args --exec-prefix=$cppunit_config_exec_prefix"
-     if test x${CPPUNIT_CONFIG+set} != xset ; then
-        CPPUNIT_CONFIG=$cppunit_config_exec_prefix/bin/cppunit-config
-     fi
-  fi
-  if test x$cppunit_config_prefix != x ; then
-     cppunit_config_args="$cppunit_config_args --prefix=$cppunit_config_prefix"
-     if test x${CPPUNIT_CONFIG+set} != xset ; then
-        CPPUNIT_CONFIG=$cppunit_config_prefix/bin/cppunit-config
-     fi
-  fi
-
-  dnl Find cppunit-config, put path in CPPUNIT_CONFIG, but if CPPUNIT_CONFIG
-  dnl already has a value containing '/', use that value.
-  AC_PATH_PROG(CPPUNIT_CONFIG, cppunit-config, no)
-  cppunit_version_min=$1
-
-  AC_MSG_CHECKING(for Cppunit - version >= $cppunit_version_min)
-  no_cppunit=""
-  if test "$CPPUNIT_CONFIG" = "no" ; then
-    AC_MSG_RESULT(no)
-    no_cppunit=yes
-  else
-    dnl Get cppunit's recommendations for cflags and libraries.
-    CPPUNIT_CFLAGS=`$CPPUNIT_CONFIG $cppunit_config_args --cflags`
-    CPPUNIT_LIBS=`$CPPUNIT_CONFIG $cppunit_config_args --libs`
-    dnl Query cppunit to determine its version.
-    cppunit_version=`$CPPUNIT_CONFIG $cppunit_config_args --version`
-
-    cppunit_major_version=`echo $cppunit_version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
-    cppunit_minor_version=`echo $cppunit_version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
-    cppunit_micro_version=`echo $cppunit_version | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
-
-    cppunit_major_min=`echo $cppunit_version_min | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\1/'`
-    if test "x${cppunit_major_min}" = "x" ; then
-       cppunit_major_min=0
-    fi
-
-    cppunit_minor_min=`echo $cppunit_version_min | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
-    if test "x${cppunit_minor_min}" = "x" ; then
-       cppunit_minor_min=0
-    fi
-
-    cppunit_micro_min=`echo $cppunit_version_min | \
-           sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
-    if test "x${cppunit_micro_min}" = "x" ; then
-       cppunit_micro_min=0
-    fi
-
-    cppunit_version_proper=`expr \
-        $cppunit_major_version \> $cppunit_major_min \| \
-        $cppunit_major_version \= $cppunit_major_min \& \
-        $cppunit_minor_version \> $cppunit_minor_min \| \
-        $cppunit_major_version \= $cppunit_major_min \& \
-        $cppunit_minor_version \= $cppunit_minor_min \& \
-        $cppunit_micro_version \>= $cppunit_micro_min `
-
-    if test "$cppunit_version_proper" = "1" ; then
-      AC_MSG_RESULT([$cppunit_major_version.$cppunit_minor_version.$cppunit_micro_version])
-    else
-      AC_MSG_RESULT(no)
-      no_cppunit=yes
-    fi
-  fi
-
-  if test "x$no_cppunit" = x ; then
-     ifelse([$2], , :, [$2])
-  else
-     CPPUNIT_CFLAGS=""
-     CPPUNIT_LIBS=""
-     ifelse([$3], , :, [$3])
-  fi
-
-  AC_SUBST(CPPUNIT_CFLAGS)
-  AC_SUBST(CPPUNIT_LIBS)
+  AC_SUBST([CPPUNIT_CFLAGS])
+  AC_SUBST([CPPUNIT_LIBS])
 ])
-
 
 AC_DEFUN([CHECK_CPPUNIT],
 [
     AM_PATH_CPPUNIT(1.9,
       [],
-      [SF_MISSING_DEP("cppunit headers not found")]
-    )
+      [SF_MISSING_DEP("CppUnit headers not found")])
 ])
 
 m4_include([config/check_jdk.m4])
@@ -334,6 +259,8 @@ AC_DEFUN([CHECK_SSL],
     AC_SUBST(SSL_CFLAGS,"$SSL_CFLAGS")
     AC_SUBST(SSL_CXXFLAGS,"$SSL_CFLAGS")
 ])
+
+
 
 # ============ P O C O  =========================
 AC_DEFUN([CHECK_POCO],

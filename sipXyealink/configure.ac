@@ -1,10 +1,10 @@
 AC_PREREQ(2.57)
-AC_INIT(sipXyealink, 24.01, info@siplabs.ru)
+AC_INIT(sipXyealink, 25.01, info@siplabs.ru)
 AC_CONFIG_AUX_DIR(config)
 m4_include([config/general.m4])
 m4_include([config/sipXlib.m4])
 m4_include([config/java2.m4])
-AM_INIT_AUTOMAKE(foreign tar-ustar)
+AM_INIT_AUTOMAKE(foreign subdir-objects tar-ustar)
 AC_CONFIG_SRCDIR([src])
 SFAC_INIT_FLAGS
 AC_PROG_JAVA_CC([javac])

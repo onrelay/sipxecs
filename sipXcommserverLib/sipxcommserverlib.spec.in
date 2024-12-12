@@ -30,7 +30,7 @@ BuildRequires: mongo-cxx-driver-devel >= 2.6.7
 Source: %name-%version.tar.gz
 
 Requires: rpm
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 BuildRequires: apache2-devel
 BuildRequires: xerces-c-devel = 2.8.0
 Requires: xerces-c >= 2.6.0
@@ -75,14 +75,14 @@ This project is used to hold code used in common by a number of the
 sipX family servers. It is not intended to be useful as a standalone
 project.
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 %debug_package
 %endif
 
 # Install header files
 %package devel
 Requires: %name
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 Requires: xerces-c-devel >= 2.6.0
 %endif
 %if %{_vendor} == redhat

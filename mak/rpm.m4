@@ -74,8 +74,7 @@ fi
 ],)
 
 dnl NOTE: To support non-rpm based distos, write equivalent of this that defines DISTRO_* vars
-AC_CHECK_FILE(/bin/rpm,
-[
+if test -e /bin/rpm; then
   RPMBUILD_TOPDIR="\$(shell rpm --eval '%{_topdir}')"
   AC_SUBST(RPMBUILD_TOPDIR)
 
@@ -85,18 +84,18 @@ AC_CHECK_FILE(/bin/rpm,
   DistroArchDefault=`rpm --eval '%{_target_cpu}'`
 
   dnl NOTE LIMITATION: default doesn't account for distros besides centos, redhat and suse or redhat 6
-  DistroOsDefault=`rpm --eval '%{?fedora:fedora}%{!?fedora:%{?suse_version:suse}%{!?suse_version:centos}}'`
+  DistroOsDefault=`rpm --eval '%{?fedora:fedora}%{!?fedora:%{?suse_version:suse}%{!?suse_version:%{?centos:centos}%{!?centos:rocky}}}'`
 
   dnl NOTE LIMITATION: default doesn't account for distros besides centos, redhat and suse or redhat 6
-  DistroVerDefault=`rpm --eval '%{?fedora:%fedora}%{!?fedora:%{?suse_version:%suse_version}%{!?suse_version:5}}'`
+  DistroVerDefault=`rpm --eval '%{?fedora:%fedora}%{!?fedora:%{?suse_version:%suse_version}%{!?suse_version:%{?centos:%centos}%{!?centos:%rocky}}}'`
 
   DistroDefault="${DistroOsDefault}-${DistroVerDefault}-${DistroArchDefault}"
-])
+fi
 
 AC_ARG_VAR(DISTRO, [What operating system you are compiling for. Default is ${DistroDefault}])
-test -n "${DISTRO}" || DISTRO="centos-7-x86_64"
+test -n "${DISTRO}" || DISTRO=${DistroDefault}
 
-AllDistrosDefault="fedora-16-i386 fedora-16-x86_64 fedora-17-i386 fedora-17-x86_64 fedora-18-i386 fedora-18-x86_64 fedora-19-i386 fedora-19-x86_64 centos-6-i386 centos-6-x86_64 centos-7-x86_64"
+AllDistrosDefault="fedora-16-i386 fedora-16-x86_64 fedora-17-i386 fedora-17-x86_64 fedora-18-i386 fedora-18-x86_64 fedora-19-i386 fedora-19-x86_64 centos-6-i386 centos-6-x86_64 centos-7-x86_64 centos-9-x86_64 rocky-9-x86_64"
 AC_ARG_VAR(ALL_DISTROS, [All distros which using cross distroy compiling (xc.* targets) Default is ${AllDistrosDefault}])
 test -n "${ALL_DISTROS}" || ALL_DISTROS="${AllDistrosDefault}"
 
@@ -166,6 +165,7 @@ AC_ARG_ENABLE(rpm, [--enable-rpm Using mock package to build rpms],
   AC_CONFIG_FILES([mak/mock/centos-6-x86_64.cfg])
   AC_CONFIG_FILES([mak/mock/centos-7-x86_64.cfg])
   AC_CONFIG_FILES([mak/mock/centos-9-x86_64.cfg])
+  AC_CONFIG_FILES([mak/mock/rocky-9-x86_64.cfg])
   AC_CONFIG_FILES([mak/mock/fedora-16-i386.cfg])
   AC_CONFIG_FILES([mak/mock/fedora-16-x86_64.cfg])
   AC_CONFIG_FILES([mak/mock/fedora-17-i386.cfg])

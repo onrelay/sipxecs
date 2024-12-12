@@ -28,7 +28,7 @@ libsipxiantaocbilling_la_LDFLAGS = \
     -version-info ${version_Current}:${version_Revision}:${version_Age}
 
 libsipxiantaocbilling_la_LIBADD = \
-	-lboost_system-mt \
+	-lboost_system \
 	@SIPXPORT_LIBS@ \
 	@SIPXCOMMSERVER_LIBS@ \
 	-lmongoclient

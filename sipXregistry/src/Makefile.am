@@ -31,7 +31,7 @@ libsipXregistry_la_LIBADD = \
 libsipXregistry_la_LIBADD = \
 	@SIPXCOMMSERVER_LIBS@ \
         -lmongoclient \
-        -lboost_system-mt
+        -lboost_system
 
 libsipXregistry_la_SOURCES = \
     RedirectPlugin.cpp \

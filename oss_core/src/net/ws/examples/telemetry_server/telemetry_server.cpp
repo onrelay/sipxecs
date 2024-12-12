@@ -25,6 +25,8 @@
  * 
  */
 
+#include "OSS/OSS.h"
+
 #include "../../src/websocketpp.hpp"
 
 #include <cstring>

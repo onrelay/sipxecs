@@ -20,6 +20,7 @@
 #ifndef UDNSPP_DNSRESOLVER_INCLUDED
 #define UDNSPP_DNSRESOLVER_INCLUDED
 
+#include "OSS/OSS.h"
 #include <OSS/UDNS/dnscontext.h>
 #include <OSS/UDNS/dnsarecord.h>
 #include <OSS/UDNS/dnssrvrecord.h>

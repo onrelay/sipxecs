@@ -32,7 +32,7 @@ authplugins_libsipxcustomcallerid_la_LDFLAGS = \
 authplugins_libsipxcustomcallerid_la_LIBADD = \
 	@SIPXCOMMSERVER_LIBS@ \
     -lmongoclient \
-    -lboost_system-mt
+    -lboost_system
 
 authplugins_libsipxcustomcallerid_la_SOURCES = \
 	CallerID.cpp \

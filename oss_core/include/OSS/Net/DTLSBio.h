@@ -19,6 +19,7 @@
 #ifndef OSS_DTLSBIO_H_INCLUDED
 #define	OSS_DTLSBIO_H_INCLUDED
 
+#include "OSS/OSS.h"
 
 #include <openssl/err.h>
 #include <openssl/dh.h>
@@ -29,8 +30,6 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
-
-#include "OSS/OSS.h"
 
 
 

@@ -21,11 +21,13 @@
 #ifndef OSS_BLOCKINGQUEUE_H_INCLUDED
 #define OSS_BLOCKINGQUEUE_H_INCLUDED
 
+#include "OSS/OSS.h"
+#include "OSS/UTL/Thread.h"
+
 #include <queue>
 #include <boost/noncopyable.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
-#include "OSS/UTL/Thread.h"
 #include <unistd.h>
 
 namespace OSS {

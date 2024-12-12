@@ -28,6 +28,8 @@
 #ifndef WEBSOCKETPP_ROLE_SERVER_HPP
 #define WEBSOCKETPP_ROLE_SERVER_HPP
 
+#include "OSS/OSS.h"
+
 #include "../processors/hybi.hpp"
 #include "../processors/hybi_legacy.hpp"
 #include "../rng/blank_rng.hpp"

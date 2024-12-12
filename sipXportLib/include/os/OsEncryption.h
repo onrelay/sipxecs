@@ -27,6 +27,31 @@
 #include "os/OsStatus.h"
 #include "os/OsTime.h"
 
+
+#if defined(OSENCRYPTION)
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+
+/* OpenSSL 1.x and earlier */
+#define COMPAT_SSLeay_add_all_algorithms() SSLeay_add_all_algorithms()
+#define COMPAT_ERR_load_ERR_strings() ERR_load_ERR_strings()
+#define COMPAT_ERR_func_error_string(err) ERR_func_error_string(err)
+#define COMPAT_ERR_remove_state(pid) ERR_remove_state(pid)
+
+#define USE_LEGACY_OPENSLL_LOCKS
+
+#else
+
+/* OpenSSL 3.x and later */
+#define COMPAT_SSLeay_add_all_algorithms() OPENSSL_init_crypto(OPENSSL_INIT_ADD_ALL_CIPHERS | OPENSSL_INIT_ADD_ALL_DIGESTS, NULL)
+#define COMPAT_ERR_load_ERR_strings() ((void)0)
+#define COMPAT_ERR_func_error_string(err) ERR_error_string(err, NULL)
+#define COMPAT_ERR_remove_state(pid) ((void)0)
+
+#endif
+
+#endif
+
+
 // DEFINES
 // MACROS
 // EXTERNAL FUNCTIONS
@@ -118,7 +143,7 @@ class OsEncryption
 #if defined (OSENCRYPTION)
     X509_ALGOR *mAlgorithm;
 
-    EVP_CIPHER_CTX mContext;
+    EVP_CIPHER_CTX* mContext;
 #endif
 
     unsigned char *mSalt;     // defeats brute force decryption via appling dictionary

@@ -16,16 +16,15 @@ version_Age=0
 
 libsipXzmq_la_LDFLAGS = \
 	-version-info ${version_Current}:${version_Revision}:${version_Age} \
-	@SSL_LDFLAGS@ \
-	@BOOST_LDFLAGS@
+	@SSL_LDFLAGS@ 
 
 libsipXzmq_la_LIBADD = \
 	@SSL_LIBS@ \
 	-lpthread  \
 	-lstdc++ \
-	-lboost_system-mt \
-	-lboost_thread-mt \
-	-lboost_filesystem-mt \
+	-lboost_system \
+	-lboost_thread \
+	-lboost_filesystem \
 	-lzmq
 
 # this is helpful if you're debugging something with lots of inlines (like the UtlLink code)

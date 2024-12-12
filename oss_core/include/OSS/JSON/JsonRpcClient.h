@@ -21,15 +21,16 @@
 #ifndef OSS_JSONRPCCLIENT_H_INCLUDED
 #define OSS_JSONRPCCLIENT_H_INCLUDED
 
-
-#include <map>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
+#include "OSS/OSS.h"
 #include "OSS/JSON/Json.h"
 #include "OSS/UTL/BlockingQueue.h"
 #include "OSS/UTL/Thread.h"
 #include "OSS/UTL/Logger.h"
 #include "OSS/Net/ClientTransport.h"
+
+#include <map>
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 
 
 namespace OSS {

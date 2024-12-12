@@ -17,17 +17,19 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+#include "OSS/OSS.h"
+#include "OSS/SIP/SIPTransportSession.h"
+#include "OSS/SIP/SIPUDPConnectionClone.h"
+#include "OSS/SIP/SIPFSMDispatch.h"
+#include "OSS/SIP/SIPException.h"
+#include "OSS/SIP/SIPListener.h"
 
 #include <vector>
 #include <sstream>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-#include "OSS/SIP/SIPTransportSession.h"
-#include "OSS/SIP/SIPUDPConnectionClone.h"
-#include "OSS/SIP/SIPFSMDispatch.h"
-#include "OSS/SIP/SIPException.h"
-#include "OSS/SIP/SIPListener.h"
+
 
 namespace OSS {
 namespace SIP {

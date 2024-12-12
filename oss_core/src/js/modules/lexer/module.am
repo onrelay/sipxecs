@@ -5,4 +5,4 @@ lexer-install:
 
 INSTALL_PROCEDURES += lexer-install
 
-EXTRA_DIST += js/modules/lexer/index.js
+EXTRA_DIST += ${srcdir}/js/modules/lexer/index.js

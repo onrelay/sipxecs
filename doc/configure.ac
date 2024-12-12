@@ -8,7 +8,7 @@ m4_include([config/sipXlib.m4])
 
 SFAC_SIPX_INSTALL_PREFIX
 
-AM_INIT_AUTOMAKE(foreign)
+AM_INIT_AUTOMAKE(foreign subdir-objects)
 SFAC_AUTOMAKE_VERSION([1.6])
 CHECK_AUTOCONF
 

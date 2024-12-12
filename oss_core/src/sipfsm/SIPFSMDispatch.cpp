@@ -210,7 +210,6 @@ SIPTransaction::Ptr SIPFSMDispatch::createClientTransaction(const SIPMessage::Pt
 
   SIPTransaction::Ptr trn;
   SIPTransportSession::Ptr nullTransport;
-  bool isAck = false;
   if (OSS::string_caseless_starts_with(pRequest->startLine(), "invite"))
   {
     //
@@ -223,7 +222,7 @@ SIPTransaction::Ptr SIPFSMDispatch::createClientTransaction(const SIPMessage::Pt
     //
     // This is an NICT
     //
-    isAck = pRequest->isRequest(OSS::SIP::REQ_ACK);
+    boost::tribool isAck = pRequest->isRequest(OSS::SIP::REQ_ACK);
     if (!isAck)
     {
       trn = _nict.findTransaction(pRequest, nullTransport);

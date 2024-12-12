@@ -16,7 +16,6 @@
 #ifndef OSPOOLEDTASK_H_INCLUDED
 #define	OSPOOLEDTASK_H_INCLUDED
 
-
 #include <vector>
 #include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>

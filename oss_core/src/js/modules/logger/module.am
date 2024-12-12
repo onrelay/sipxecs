@@ -5,10 +5,10 @@ logger-install:
 
 INSTALL_PROCEDURES += logger-install
 
-EXTRA_DIST += js/modules/logger/*.js
+EXTRA_DIST += ${srcdir}/js/modules/logger/*.js
 
 lib_LTLIBRARIES += liboss_jslogger.la
 liboss_jslogger_la_LDFLAGS = -module -fpic -version-info @OSS_CORE_VERSION_INFO@
 liboss_jslogger_la_LIBADD = @OSS_CORE_DEP_LIBS@ $(corelibldadd)
-liboss_jslogger_la_SOURCES = js/modules/logger/logger.cpp
+liboss_jslogger_la_SOURCES = ${srcdir}/js/modules/logger/logger.cpp
 

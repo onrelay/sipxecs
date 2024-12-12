@@ -5,10 +5,10 @@ zmq-install:
 
 INSTALL_PROCEDURES += zmq-install
 
-EXTRA_DIST += js/modules/zmq/index.js
+EXTRA_DIST += ${srcdir}/js/modules/zmq/index.js
 
 lib_LTLIBRARIES += liboss_jszmq.la
 liboss_jszmq_la_LDFLAGS = -module -fpic -version-info @OSS_CORE_VERSION_INFO@
 liboss_jszmq_la_LIBADD = @OSS_CORE_DEP_LIBS@ $(corelibldadd)
-liboss_jszmq_la_SOURCES = js/modules/zmq/zmq.cpp
+liboss_jszmq_la_SOURCES = ${srcdir}/js/modules/zmq/zmq.cpp
 

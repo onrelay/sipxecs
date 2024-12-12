@@ -8,7 +8,7 @@ DEFAULT_ARCHITECTURE=x86_64
 
 DEFAULT_SUBPROJECT=sipx
 
-DEFAULT_VERSION=24.01
+DEFAULT_VERSION=25.01
 
 SIPXCOM_USER_GROUP=sipxcom-dev@googlegroups.com
 
@@ -97,7 +97,7 @@ function checkInput()
                 -i|--install: include if installing rpms locally
 
             Sample:
-                sudo sipxecs-build --platform=centos-7 --subproject=sipXconfig --version=24.01 --rpm --install
+                sudo sipxecs-build --platform=centos-7 --subproject=sipXconfig --version=25.01 --rpm --install
                 sudo sipxecs-build -p=rocky-9 -a=x86_64 -s=sipXconfig -v=24.07
                 "
                 exit
@@ -110,23 +110,41 @@ function checkInput()
     if [ -z "${PLATFORM}" ]
     then
 
-        CENTOS_VERSION=$(cat /etc/centos-release)
-        CENTOS_VERSION=$(echo $CENTOS_VERSION | sed -e 's/^CentOS.*release //')
-        CENTOS_VERSION=$(echo $CENTOS_VERSION | cut -d "." -f1)
+        if [ -f /etc/centos-release ]; then
 
-        case $CENTOS_VERSION in
+            CENTOS_VERSION=$(cat /etc/centos-release)
+            CENTOS_VERSION=$(echo $CENTOS_VERSION | sed -e 's/^CentOS.*release //')
+            CENTOS_VERSION=$(echo $CENTOS_VERSION | cut -d "." -f1)
 
-            "7")
-                PLATFORM=centos-7
-                ;;
-            "9")
-                PLATFORM=centos-9
-                ;;
-            *)
-                PLATFORM=${DEFAULT_PLATFORM}
-                ;;
-        esac
+            case $CENTOS_VERSION in
 
+                "7")
+                    PLATFORM=centos-7
+                    ;;
+                "9")
+                    PLATFORM=centos-9
+                    ;;
+                *)
+                    PLATFORM=${DEFAULT_PLATFORM}
+                    ;;
+            esac
+
+        elif [ -f /etc/rocky-release ]; then
+
+            ROCKY_VERSION=$(cat /etc/rocky-release)
+            ROCKY_VERSION=$(echo $ROCKY_VERSION | sed -e 's/^Rocky.*release //')
+            ROCKY_VERSION=$(echo $ROCKY_VERSION | cut -d "." -f1)
+
+            case $ROCKY_VERSION in
+
+                "9")
+                    PLATFORM=rocky-9
+                    ;;
+                *)
+                    PLATFORM=${DEFAULT_PLATFORM}
+                    ;;
+            esac
+        fi
     else
         case $PLATFORM in
 
@@ -168,6 +186,9 @@ function checkInput()
         case $VERSION in
 
         "24.01")
+            ;;
+
+        "25.01")
             ;;
 
         *)
@@ -215,8 +236,6 @@ function setupRepos()
 {
     echo "Begin setupRepos()"
 
-    yum remove -y epel-release
-
     wget -O /etc/yum.repos.d/sipxcom.repo \
         https://storage.googleapis.com/sipxecs/sipxcom/${VERSION}/${PLATFORM}-${ARCHITECTURE}/sipxcom.repo
 
@@ -246,6 +265,14 @@ function setupRepos()
 function setupCentOS7() 
 {
     echo "Begin setupCentOS7()"
+
+    yum remove -y epel-release
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "error removing epel-release, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
 
     sudo yum install -y make autoconf automake 
 
@@ -285,6 +312,14 @@ function setupCentOS7()
     cd ${BUILD_DIR}
     sudo echo oss_core > .modules-exclude
 
+    if [ "${RPM}" != "" ]; then
+        sudo yum install -y createrepo rpm-build mock
+        sudo wget http://li.nux.ro/download/nux/misc/el7/x86_64/thttpd-2.25b-33.el7.nux.x86_64.rpm
+        sudo rpm -ivh thttpd-2.25b-33.el7.nux.x86_64.rpm
+        rm -f thttpd-2.25b-33.el7.nux.x86_64.rpm
+        sudo usermod -a -G mock sipx        
+    fi
+
     echo "Done setupCentOS7()"
 }
 
@@ -292,7 +327,6 @@ function setupCentOS9()
 {
     echo "Begin setupCentOS9()"
 
-    setupCentOS7
 
     echo "Done setupCentOS9()"
 }
@@ -301,13 +335,110 @@ function setupRocky9()
 {
     echo "Begin setupRocky9()"
 
+    echo "installing build tools"
+    sudo dnf install -y make autoconf automake libtool epel-release
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "dnf install error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    echo "installing rpms from sipxcom repo"
+    # sudo dnf install -y 
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "dnf install error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    echo "installing standard OS repo tools"
+    sudo dnf install -y boost-devel dnf-plugins-core gcc-c++ krb5-devel 
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "dnf install error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    echo "installing standard devel repo tools"
+    dnf config-manager --enable devel
+    sudo dnf install -y v8-devel 
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "dnf install error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    echo "installing epel repo tools"
+    dnf config-manager --enable epel
+    sudo dnf install -y gperftools-devel poco-devel zeromq-devel gtest-devel hiredis-devel leveldb-devel libdnet-devel libmcrypt-devel 
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "dnf install error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    echo "installing crb repo tools"
+    dnf config-manager --enable crb
+    sudo dnf install -y cppunit-devel  poco-devel zeromq-devel libconfig-devel libpcap-devel libsrtp-devel libdb-cxx-devel
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "dnf install error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+
+    if [ "${RPM}" != "" ]; then
+
+        echo "installing standard RPM tools"
+        sudo yum install -y createrepo rpm-build podman
+
+        ERROR=$?
+        if [ ${ERROR} -ne 0 ]; then 
+            echo "dnf install error, exiting sipxecs-build"
+            exit ${ERROR}
+        fi 
+
+        echo "installing crb RPM tools"
+        dnf config-manager --enable crb
+        sudo yum install -y mock
+
+        ERROR=$?
+        if [ ${ERROR} -ne 0 ]; then 
+            echo "dnf install error, exiting sipxecs-build"
+            exit ${ERROR}
+        fi 
+        sudo usermod -a -G mock sipx
+
+        ERROR=$?
+        if [ ${ERROR} -ne 0 ]; then 
+            echo "dnf install error, exiting sipxecs-build"
+            exit ${ERROR}
+        fi 
+
+        echo "installing  other sipxcom RPM tools"
+        sudo yum install -y thttpd 
+
+        ERROR=$?
+        if [ ${ERROR} -ne 0 ]; then 
+            echo "dnf install error, exiting sipxecs-build"
+            exit ${ERROR}
+        fi 
+    fi
+
+
     echo "Done setupRocky9()"
 }
 
 
-function configure() 
+function configureCentOS7() 
 {
-    echo "Begin configure()"
+    echo "Begin configureCentOS7()"
 
     sed -i "/^AC_INIT.*/ s//AC_INIT(sipX, ${VERSION}, ${SIPXCOM_USER_GROUP})/" ${SOURCE_DIR}/configure.ac
 
@@ -327,12 +458,6 @@ function configure()
     if [ -z "${RPM}" ]; then
         sudo ../configure
     else
-        sudo yum install -y createrepo rpm-build mock
-        sudo wget http://li.nux.ro/download/nux/misc/el7/x86_64/thttpd-2.25b-33.el7.nux.x86_64.rpm
-        sudo rpm -ivh thttpd-2.25b-33.el7.nux.x86_64.rpm
-        rm -f thttpd-2.25b-33.el7.nux.x86_64.rpm
-        sudo usermod -a -G mock sipx
-        
         sudo ../configure --enable-rpm DISTRO="${PLATFORM}-${ARCHITECTURE}"
     fi
 
@@ -342,7 +467,48 @@ function configure()
         exit ${ERROR}
     fi 
 
-    echo "Done configure()"
+    echo "Done configureCentOS7()"
+}
+
+function configureCentOS9() 
+{
+    echo "Begin configureCentOS9()"
+
+    echo "Done configureCentOS9()"
+}
+
+function configureRocky9() 
+{
+    echo "Begin configureRocky9()"
+
+    sed -i "/^AC_INIT.*/ s//AC_INIT(sipX, ${VERSION}, ${SIPXCOM_USER_GROUP})/" ${SOURCE_DIR}/configure.ac
+
+    cd ${SOURCE_DIR}
+    sudo autoreconf -ivf
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "autoreconf error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    cd ${BUILD_DIR}
+
+    sudo echo '$(sipx_all)' > .modules-include
+
+    if [ -z "${RPM}" ]; then
+        sudo ../configure
+    else
+        sudo ../configure --enable-rpm DISTRO="${PLATFORM}-${ARCHITECTURE}"
+    fi
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "configure error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    echo "Done configureRocky9()"
 }
 
 
@@ -351,7 +517,6 @@ function build()
     echo "Begin build()"
 
     cd ${BUILD_DIR}
-
 
  
     # The make command may kick a permission error when creating RPMs
@@ -407,14 +572,17 @@ function main()
 
         "centos-7")
             setupCentOS7
+            configureCentOS7
             ;;
 
         "centos-9")
             setupCentOS9
+            configureCentOS9
             ;;
 
         "rocky-9")
             setupRocky9
+            configureRocky9
             ;;
 
         *)
@@ -423,8 +591,6 @@ function main()
             ;;
     esac
     
-    configure
-
     build
 
     if [ ! -z "${INSTALL}" ]; then

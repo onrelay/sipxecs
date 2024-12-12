@@ -383,7 +383,7 @@ void OsUtil::getCurTime(UtlString& timeStr, const struct tm* pCurTime,
 {
    int       hour;
    UtlBoolean isAm;
-   char      str[10];
+   char      str[100];
 
    // convert from 24 hour to 12 hour representation
    hour = pCurTime->tm_hour;

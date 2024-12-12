@@ -35,7 +35,7 @@ libsipdb_la_CXXFLAGS = \
 
 libsipdb_la_LIBADD = \
 	@SIPXTACK_LIBS@ \
-	-lboost_system-mt
+	-lboost_system
 
 libsipdb_la_SOURCES =  \
    MongoDB.cpp \

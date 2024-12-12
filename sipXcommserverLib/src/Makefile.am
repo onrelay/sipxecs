@@ -47,8 +47,8 @@ libsipXcommserver_la_LIBADD = \
 	@SIPXTACK_LIBS@ \
 	@ODBC_LIBS@ \
 	sipdb/libsipdb.la \
-	-lboost_regex-mt \
-	-lboost_program_options-mt
+	-lboost_regex \
+	-lboost_program_options
 
 libsipXcommserver_la_SOURCES = \
     digitmaps/UrlMapping.cpp \

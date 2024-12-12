@@ -782,7 +782,7 @@ stunRandomPort()
 static void
 computeHmac(char* hmac, const char* input, int length, const char* key, int sizeKey)
 {
-   strncpy(hmac,"hmac-not-implemented",20);
+   strcpy(hmac,"ssl-not-implemented");
 }
 #else
 #include <openssl/hmac.h>
@@ -1146,6 +1146,7 @@ stunServerProcessMsg( char* buf,
                      // need access to shared secret
 
                      unsigned char hmac[20];
+                     hmac[0] = '\0';
 #ifndef NOSSL
                      unsigned int hmacSize=20;
 

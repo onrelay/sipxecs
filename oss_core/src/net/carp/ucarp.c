@@ -261,12 +261,29 @@ int oss_carp_run(int argc, char *argv[])
 #endif    
     if (interface == NULL || *interface == 0) {
         char errbuf[PCAP_ERRBUF_SIZE];
-        interface = pcap_lookupdev(errbuf);
-        if (interface == NULL || *interface == 0) {
-            logfile(LOG_ERR, _("You must supply a network interface"));
+        pcap_if_t *all_devs = NULL, *device = NULL;
+
+        // Find all available devices
+        if (pcap_findalldevs(&all_devs, errbuf) == -1) {
+            logfile(LOG_ERR, _("Error finding devices: %s"), errbuf);
             return 1;
         }
+
+        // Check if any devices are found
+        if (all_devs == NULL) {
+            logfile(LOG_ERR, _("No network interfaces found. You must supply a network interface"));
+            return 1;
+        }
+
+        // Use the first available device
+        device = all_devs;
+        interface = device->name;
+
+        // Log the selected network interface
         logfile(LOG_INFO, _("Using [%s] as a network interface"), interface);
+
+        // Free the list of devices
+        pcap_freealldevs(all_devs);
     }
     if (vhid == 0) {
         logfile(LOG_ERR, _("You must supply a valid virtual host id"));

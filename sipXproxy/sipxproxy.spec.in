@@ -29,7 +29,7 @@ BuildRequires: libtool-ltdl-devel
 BuildRequires: libconfig-devel
 BuildRequires: boost-devel
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 BuildRequires: pwdutils
 %else
 BuildRequires: shadow-utils
@@ -40,7 +40,7 @@ BuildRequires: sipxtacklib-devel        >= %version
 
 Source:   %name-%version.tar.gz
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 Requires: pwdutils
 Requires: cron
 %else
@@ -69,7 +69,7 @@ may also be used with the sipXproxy though it is not necessary. The
 sipXproxy provides service level routing, parallel and serial forking
 and AAA services.
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 %debug_package
 %endif
 

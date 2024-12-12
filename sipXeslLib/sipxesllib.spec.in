@@ -23,7 +23,7 @@ BuildRoot: %{_tmppath}/%name-%version-root
 %description
 This project provides a C++ wrapper for FreeSwitch Event Socket Layer
 
-%if %{_vendor} == suse
+%if "%{_vendor}" == "suse"
 %debug_package
 %endif
 

@@ -17,6 +17,7 @@
 #include "os/OsSSL.h"
 #include "os/OsLock.h"
 #include "os/OsLogger.h"
+#include "os/OsEncryption.h"
 #include "utl/UtlString.h"
 #include "utl/UtlSList.h"
 
@@ -31,7 +32,10 @@ static UtlString defaultCAFile                = SIPX_CONFDIR "/ssl/ca.crt";
 static bool isCertificateAuthorityEnabled        = false;
 
 bool OsSSL::sInitialized = false;
+
+#if defined(USE_LEGACY_OPENSLL_LOCKS)
 OsMutex* OsSSL::spOpenSSL_locks[];
+#endif
 
 
 /* //////////////////////////// PUBLIC //////////////////////////////////// */
@@ -199,7 +203,7 @@ OsSSL::~OsSSL()
 {
    // Since error queue data structures are allocated automatically for new threads,
    // they must be freed when threads are terminated in order to avoid memory leaks.
-   ERR_remove_state(0);
+   COMPAT_ERR_remove_state(0);
 
    if (mCTX)
    {
@@ -242,13 +246,16 @@ void OsSSL::OpenSSL_thread_setup()
       return;
    }
 
+#if defined(USE_LEGACY_OPENSLL_LOCKS)
    for (int i=0 ; i<CRYPTO_NUM_LOCKS ; i++)
    {
       spOpenSSL_locks[i] = new OsMutex(OsMutex::Q_FIFO);
    }
 
+
    // set locking callback to make SSL thread-safe
    CRYPTO_set_locking_callback((void (*)(int,int,const char*, int))OpenSSL_locking_function);
+#endif
 
    // set ID callback for linux, where getpid() returns the same for multiple threads
    CRYPTO_set_id_callback(OpenSSL_id_function);
@@ -256,12 +263,14 @@ void OsSSL::OpenSSL_thread_setup()
 
 void OsSSL::OpenSSL_thread_cleanup()
 {
+#if defined(USE_LEGACY_OPENSLL_LOCKS)
    CRYPTO_set_locking_callback(NULL);
    for (int i=0 ; i<CRYPTO_NUM_LOCKS ; i++)
    {
       delete spOpenSSL_locks[i];
       spOpenSSL_locks[i] = NULL;
    }
+#endif
 }
 
 /// callback for OpenSSL CRYPTO_set_id_callback
@@ -275,6 +284,7 @@ unsigned long OsSSL::OpenSSL_id_function(void)
    return ((unsigned long) pthread_self());
 }
 
+#if defined(USE_LEGACY_OPENSLL_LOCKS)
 /// callback for OpenSSL CRYPTO_set_locking_callback
 void OsSSL::OpenSSL_locking_function(int mode, int n, const char *file, int line)
 {
@@ -287,6 +297,7 @@ void OsSSL::OpenSSL_locking_function(int mode, int n, const char *file, int line
       spOpenSSL_locks[n]->release();
    }
 }
+#endif
 
 /* ============================ ACCESSORS ================================= */
 
@@ -341,7 +352,7 @@ void OsSSL::releaseConnection(SSL*& connection)
    if (connection)
    {
       SSL_free(connection);
-      ERR_remove_state(0);
+      COMPAT_ERR_remove_state(0);
       connection = NULL;
    }
 }

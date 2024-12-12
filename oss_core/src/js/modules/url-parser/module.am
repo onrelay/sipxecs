@@ -4,4 +4,4 @@ url-parser-install:
 
 INSTALL_PROCEDURES += url-parser-install
 
-EXTRA_DIST += js/modules/url-parser/index.js
+EXTRA_DIST += ${srcdir}/js/modules/url-parser/index.js

@@ -646,8 +646,8 @@ void OSSApplication::setup()
 {
 	poco_assert (_pInstance == 0);
 
-	_pConfig->add(new SystemConfiguration, PRIO_SYSTEM, false, false);
-	_pConfig->add(new MapConfiguration, PRIO_APPLICATION, true, false);
+	_pConfig->add(Poco::AutoPtr<Poco::Util::SystemConfiguration>(new Poco::Util::SystemConfiguration));
+	_pConfig->add(Poco::AutoPtr<Poco::Util::MapConfiguration>(new Poco::Util::MapConfiguration));
 
 	addSubsystem(new OSSLoggingSubsystem);
 
@@ -774,8 +774,9 @@ int OSSApplication::loadConfiguration(int priority)
     //
     if (findAppConfigFile(appPath.getBaseName(), "properties", cfgPath))
     {
-        _pConfig->add(new PropertyFileConfiguration(cfgPath.toString()), priority, false, false);
-        _pConfig->setString("application.configDir", cfgPath.parent().toString());
+		_pConfig->add(Poco::AutoPtr<Poco::Util::PropertyFileConfiguration>(
+			new Poco::Util::PropertyFileConfiguration(cfgPath.toString())));
+	    _pConfig->setString("application.configDir", cfgPath.parent().toString());
         return 1;
     }
 
@@ -785,17 +786,21 @@ int OSSApplication::loadConfiguration(int priority)
 
 void OSSApplication::loadConfiguration(const std::string& path, int priority)
 {
-Path confPath(path);
-std::string ext = confPath.getExtension();
-if (icompare(ext, "properties") == 0)
-    _pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false, false);
-else
-    throw Poco::InvalidArgumentException("Unsupported configuration file type", ext);
+	Path confPath(path);
+	std::string ext = confPath.getExtension();
+	if (icompare(ext, "properties") == 0)
+			_pConfig->add(Poco::AutoPtr<Poco::Util::PropertyFileConfiguration>(
+				new Poco::Util::PropertyFileConfiguration(confPath.toString())));
+	else
+    	throw Poco::InvalidArgumentException("Unsupported configuration file type", ext);
 }
 
 void OSSApplication::loadConfiguration(std::istream& strm, int priority)
 {
-  _pConfig->add(new PropertyFileConfiguration(strm), priority, false, false);
+	std::ostringstream oss;
+	oss << strm.rdbuf(); 
+	_pConfig->add(Poco::AutoPtr<Poco::Util::PropertyFileConfiguration>(
+		new Poco::Util::PropertyFileConfiguration(oss.str())));
 }
 
 std::string OSSApplication::commandName() const

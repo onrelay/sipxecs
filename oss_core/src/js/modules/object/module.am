@@ -5,5 +5,5 @@ object-install:
 
 INSTALL_PROCEDURES += object-install
 
-EXTRA_DIST += js/modules/object/index.js
+EXTRA_DIST += ${srcdir}/js/modules/object/index.js
 

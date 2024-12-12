@@ -30,7 +30,6 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
-#include "OSS/OSS.h"
 
 
 namespace OSS {

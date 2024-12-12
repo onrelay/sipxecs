@@ -31,10 +31,10 @@
 #endif
 
 // APPLICATION INCLUDES
-#include "os/OsSSL.h"
 #include "os/OsSSLServerSocket.h"
 #include "os/OsDefs.h"
 #include "os/OsLogger.h"
+#include "os/OsSSL.h"
 
 // EXTERNAL FUNCTIONS
 // EXTERNAL VARIABLES
