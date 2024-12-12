@@ -13,32 +13,6 @@ AC_SUBST(OSS_CORE_VERSION_AGE)
 m4_include([config/ax_cxx_compile_stdcxx.m4])
 
 #
-# Common CXX and C Flags
-#
-OSS_CXX_C_FLAGS="-fmessage-length=0"
-#
-# Compiler warnings
-#
-OSS_CXX_WARNINGS="-Wall -Wformat -Wwrite-strings -Wpointer-arith -Wno-unused-result -Wno-strict-aliasing"
-OSS_C_WARNINGS="-Wall -Wnested-externs -Werror=return-type -Werror=uninitialized -Wno-pointer-sign -Wno-unused-function -Wno-shift-negative-value -Wno-format-extra-args"
-#
-# Additional CXX and C Flags
-#
-CXXFLAGS="$CXXFLAGS $OSS_CXX_C_FLAGS $OSS_CXX_WARNINGS"
-CFLAGS="$CFLAGS $OSS_CXX_C_FLAGS $OSS_C_WARNINGS -fno-omit-frame-pointer -fno-common -fsigned-char -fPIC"
-
-#
-# Set C++ 14 flag if supported by compiler
-#
-AX_CXX_COMPILE_STDCXX([14], [], [optional])
-
-#
-# Used by applications building oss_core inline.  In our case, we set it to nothing
-#
-AC_SUBST([OSS_CORE_ADDITIONAL_INCLUDES], [''])
-
-
-#
 # --disable-dep-check will simply display missing 
 # dependencies as warnings.  This is useful when you
 # simply need to generate the makefile for tasks that
@@ -99,6 +73,22 @@ case $host_os in
         ;;
 esac
 
+#
+# Enable LEAK_CHECKER compilation
+#
+AC_ARG_ENABLE([leak-checker],
+    AC_HELP_STRING([--enable-leak-checker], [Enable Compilation of leak checker]),
+    [ENABLE_FEATURE(LEAK_CHECKER)],
+    [DISABLE_FEATURE(LEAK_CHECKER)])
+
+#
+# Enable CRASH_HANDLER compilation
+#
+AC_ARG_ENABLE([crash-handler],
+    AC_HELP_STRING([--enable-crash-handler], [Enable Compilation of crash hander]),
+    [ENABLE_FEATURE(CRASH_HANDLER)],
+    [DISABLE_FEATURE(CRASH_HANDLER)])
+
 
 #
 # Enable ALL features
@@ -119,7 +109,7 @@ AC_ARG_ENABLE([all-features],
         ENABLE_FEATURE(MCRYPT)
         ENABLE_FEATURE(CONFIG)
         ENABLE_FEATURE(INOTIFY)
-        ENABLE_FEATURE(RESIP_UA)
+        ENABLE_FEATURE(RESIPROCATE)
     ],
     [
         #
@@ -137,19 +127,19 @@ AC_ARG_ENABLE([all-features],
             [DISABLE_FEATURE(SBC)],
             [ENABLE_FEATURE(SBC)])
         #
+        # Enable RESIPROCATE compilation
+        #
+        AC_ARG_ENABLE([resiprocate],
+            AC_HELP_STRING([--enable-resiprocate], [Enable Compilation of Resiprocate module]),
+            [ENABLE_FEATURE(RESIPROCATE)],
+            [DISABLE_FEATURE(RESIPROCATE)])
+        #
         # Disable RTP Proxy compilation
         #
         AC_ARG_ENABLE([rtp],
             AC_HELP_STRING([--disable-rtp], [Disable RTP Proxy Feature]),
             [DISABLE_FEATURE(RTP)],
             [ENABLE_FEATURE(RTP)])
-        #
-        # Enable RESIP_UA compilation
-        #
-        AC_ARG_ENABLE([resip-ua],
-            AC_HELP_STRING([--enable-resip-ua], [Enable ReSIProcate Feature]),
-            [ENABLE_FEATURE(RESIP_UA)],
-            [DISABLE_FEATURE(RESIP_UA)])
 
         #
         # Enable UCARP compilation
@@ -314,7 +304,6 @@ AC_LANG_POP([C++])
 #
 AC_LANG_PUSH([C++])
 
-
 AC_CHECK_HEADER(Poco/Foundation.h, [], [ERROR_MISSING_DEP(OSS_HAVE_POCO_FOUNDATION, 
     "Poco C++ Foundation Library Headers not found")])
 AC_CHECK_LIB(PocoFoundation, main,
@@ -400,21 +389,6 @@ else
     AM_CONDITIONAL(OSS_HAVE_INOTIFY, false)
     AC_SUBST(OSS_HAVE_INOTIFY, 0)
 fi
-#
-# RESIPROCATE
-#
-AC_LANG_PUSH([C++])
-if test "x$FEATURE_RESIP_UA" == "xenabled"; then
-AC_CHECK_HEADER(resip/stack/SipStack.hxx,
-    [FLAG_EXISTING_CXX_DEP(OSS_HAVE_RESIP, -lrutil -lresipares -ldum -lresip)], 
-    [FLAG_MISSING_DEP(OSS_HAVE_RESIP, "reSIProcate Library is not installed")])
-else
-    AM_CONDITIONAL(OSS_HAVE_RESIP, false)
-    AC_SUBST(OSS_HAVE_RESIP, 0)
-fi
-AC_LANG_POP([C++])
-
-
 
 
 #
@@ -491,8 +465,32 @@ OSS_CORE_SRCDIR=`pwd`
 AC_SUBST(OSS_CORE_SRCDIR)
 cd ${CURRENT_DIR}
 
+#
+# Common CXX and C Flags
+#
+OSS_CXX_C_FLAGS="-fmessage-length=0"
+#
+# Compiler warnings
+#
+OSS_CXX_WARNINGS="-Wall -Wformat -Wwrite-strings -Wpointer-arith -Wno-unused-result -Wno-strict-aliasing"
+OSS_C_WARNINGS="-Wall -Wnested-externs -Werror=return-type -Werror=uninitialized -Wno-pointer-sign -Wno-unused-function -Wno-shift-negative-value -Wno-format-extra-args"
+#
+# Additional CXX and C Flags
+#
+CXXFLAGS="$CXXFLAGS $OSS_CXX_C_FLAGS $OSS_CXX_WARNINGS"
+CFLAGS="$CFLAGS $OSS_CXX_C_FLAGS $OSS_C_WARNINGS -fno-omit-frame-pointer -fno-common -fsigned-char -fPIC"
 
+#
+# Set C++ 11 flag if supported by compiler
+#
+AX_CXX_COMPILE_STDCXX([11], [], [optional])
 
+#
+# Used by applications building oss_core inline.  In our case, we set it to nothing
+#
+AC_SUBST([OSS_CORE_ADDITIONAL_INCLUDES], [''])
+
+CPPFLAGS="${CPPFLAGS} -fPIC"
 
 AC_SUBST(CXXFLAGS)
 AC_SUBST(CPPFLAGS)
