@@ -15,7 +15,9 @@ Here are documentation shortcuts for installing and building the source:
 
 To get help, track release progress, ask questions, suggest improvements or otherwise contribute to the sipXcom open source project, please participate in the discussion at the <a target="_blank" href="https://groups.google.com/g/sipxcom-users">sipXcom User Group</a>!
 
-OnRelay will endeavour to respond to and resolve any issues raised at the user group, even if we don't offer independent professional support of sipXcom. We will however greatly appreciate any sponsor contributions, which can be setup via GitHub <a target="_blank" href="https://github.com/sponsors/onrelay">here</a>!
+OnRelay will endeavour to respond to issues raised at this user group as time permits. For guaranteed response times and resolutions please contact support@onrelay.net for a quote about a support contract with SLAs as described here: <a target="_blank" href="https://www.onrelay.com/service-level-agreement">OnRelay Service Level Agreement</a>.
+
+We also greatly appreciate any sponsor contributions, which can be setup via GitHub <a target="_blank" href="https://github.com/sponsors/onrelay">here</a>!
 
 
 
