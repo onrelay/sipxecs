@@ -3,7 +3,7 @@
 set -e
 
 httpd_cert=/etc/httpd/conf.d/ssl
-sipx_cert=/var/sipxdata/cfdata/1/
+sipx_cert=/var/sipxdata/cfdata/1
 
 letsencrypt_ssl_cert=$RENEWED_LINEAGE/cert.pem
 letsencrypt_ssl_key=$RENEWED_LINEAGE/privkey.pem
@@ -42,7 +42,7 @@ cp -f $httpd_chain_cert $sipx_chain_cert
 cp -f $httpd_ca_cert $sipx_ca_cert 
 
 openssl pkcs12 -export -in $letsencrypt_combined_cert -inkey $letsencrypt_ssl_key -out $sipx_p12_keystore -name ssl-web -passout pass:changeit
-keytool -importkeystore -deststorepass changeit -destkeypass changeit -destkeystore $sipx_ssl_keystore -srckeystore $sipx_p12_keystore -srcstoretype PKCS12 -srcstorepass changeit -alias ssl-web
+keytool -importkeystore -noprompt -deststorepass changeit -destkeypass changeit -destkeystore $sipx_ssl_keystore -srckeystore $sipx_p12_keystore -srcstoretype PKCS12 -srcstorepass changeit -alias ssl-web
 
 rm -f $sipx_p12_keystore
 
