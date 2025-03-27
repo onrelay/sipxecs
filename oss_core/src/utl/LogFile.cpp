@@ -18,7 +18,6 @@
 //
 
 
-#include <boost/thread.hpp>
 #include "Poco/AutoPtr.h"
 #include "Poco/ConsoleChannel.h"
 #include "Poco/SplitterChannel.h"
@@ -31,8 +30,6 @@
 #include "Poco/LogStream.h"
 #include <iostream>
 #include <sstream>
-#include <boost/lexical_cast.hpp>
-#include <boost/filesystem/operations.hpp>
 
 #include "OSS/UTL/LogFile.h"
 
