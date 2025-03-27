@@ -12,13 +12,20 @@
 // details.
 
 #include <string>
+
+#include "sipdb/MongoDB.h"
 #include "sipdb/EntityDB.h"
+
 #include "os/OsLogger.h"
+
+#include <bsoncxx/document/view.hpp>
+
 
 class EmergencyDB : public EntityDB
 {
 public:
-  EmergencyDB(const MongoDB::ConnectionInfo& info) : EntityDB(info){};
+  EmergencyDB(const MongoDB::ConnectionInfo& info) : EntityDB(info) {}
+
   bool findE911LineIdentifier(
     const std::string& userId,
     std::string& e911,
@@ -32,66 +39,69 @@ public:
     std::string& location);
 
   bool findE911Location(
-    MongoDB::ScopedDbConnectionPtr& conn,
+    MongoDB::MongoConnection& conn,
     const std::string& e911,
     std::string& address,
     std::string& location);
 };
 
 bool EmergencyDB::findE911Location(
-  MongoDB::ScopedDbConnectionPtr& conn,
-  const std::string& e911,
-  std::string& address,
-  std::string& location)
+    MongoDB::MongoConnection& conn,
+    const std::string& e911,
+    std::string& address,
+    std::string& location)
 {
-  mongo::BSONObj e911LocationQuery = BSON("ent" << "e911location" << "elin" << e911);
+    bsoncxx::builder::basic::document queryBuilder;
+    queryBuilder.append(bsoncxx::builder::basic::kvp(std::string("ent"), "e911location"));
+    queryBuilder.append(bsoncxx::builder::basic::kvp(std::string("elin"), e911));
 
-  mongo::BSONObjBuilder e911LocBuilder;
-  BaseDB::nearest(e911LocBuilder, e911LocationQuery);
+    mongocxx::options::find findOptions;
+    BaseDB::nearest(findOptions);
 
-  mongo::BSONObj e911LocationObj = conn->get()->findOne(ns(), e911LocBuilder.obj(), 0, mongo::QueryOption_SlaveOk);
-  if (!e911LocationObj.isEmpty())
-  {
-    if (e911LocationObj.hasField("addrinfo"))
-    {
-      address = e911LocationObj.getStringField("addrinfo");
+    std::optional<bsoncxx::document::value> result = conn.collection(ns()).find_one(queryBuilder.view(), findOptions);
+    if (result) {
+        bsoncxx::document::view doc = result->view();
+        bsoncxx::document::element addrinfo = doc["addrinfo"];
+        if (addrinfo && addrinfo.type() == bsoncxx::type::k_string) {
+            address = std::string(addrinfo.get_string().value);
+        }
+
+        bsoncxx::document::element loctn = doc["loctn"];
+        if (loctn && loctn.type() == bsoncxx::type::k_string) {
+            location = std::string(loctn.get_string().value);
+        }
     }
-
-    if (e911LocationObj.hasField("loctn"))
-    {
-      location = e911LocationObj.getStringField("loctn");
-    }
-  }
-  return true;
+    return true;
 }
 
 bool EmergencyDB::findE911LineIdentifier(
   const std::string& userId,
-    std::string& e911,
-    std::string& address,
-    std::string& location)
+  std::string& e911,
+  std::string& address,
+  std::string& location)
 {
-  mongo::BSONObj query = BSON(EntityRecord::identity_fld() << userId);
-  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getReadQueryTimeout()));
-  mongo::BSONObjBuilder builder;
-  BaseDB::nearest(builder, query);
+    bsoncxx::builder::basic::document queryBuilder;
+    queryBuilder.append(bsoncxx::builder::basic::kvp(std::string(EntityRecord::identity_fld()), userId));
 
-  mongo::BSONObj entityObj = conn->get()->findOne(ns(), readQueryMaxTimeMS(builder.obj()), 0, mongo::QueryOption_SlaveOk);
-  if (!entityObj.isEmpty())
-  {
-    if (entityObj.hasField("elin"))
-    {
-      e911 = entityObj.getStringField("elin");
-      if (!e911.empty())
-      {
-        findE911Location(conn, e911, address, location);
-      }
-      conn->done();
-      return !e911.empty();
+    MongoDB::MongoConnection conn(_info);
+
+    mongocxx::options::find findOptions;
+    BaseDB::nearest(findOptions);
+
+    std::optional<bsoncxx::document::value> entityObj = conn.collection(ns()).find_one(queryBuilder.view(), findOptions);
+    if (entityObj) {
+        bsoncxx::document::view doc = entityObj->view();
+
+        bsoncxx::document::element elin = doc["elin"];
+        if (elin && elin.type() == bsoncxx::type::k_string) {
+            e911 = std::string(elin.get_string().value);
+            if (!e911.empty()) {
+                findE911Location(conn, e911, address, location);
+            }
+            return !e911.empty();
+        }
     }
-  }
-  conn->done();
-  return false;
+    return false;
 }
 
 bool EmergencyDB::findE911InstrumentIdentifier(
@@ -100,30 +110,27 @@ bool EmergencyDB::findE911InstrumentIdentifier(
     std::string& address,
     std::string& location)
 {
+    OS_LOG_INFO(FAC_SIP, "");
 
-  OS_LOG_INFO(FAC_SIP, "");
-  mongo::BSONObj query = BSON("mac" << instrument);
+    bsoncxx::builder::basic::document queryBuilder;
+    queryBuilder.append(bsoncxx::builder::basic::kvp(std::string("mac"), instrument));
 
-  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getReadQueryTimeout()));
+    MongoDB::MongoConnection conn(_info);
 
-  mongo::BSONObjBuilder builder;
-  BaseDB::nearest(builder, query);
+    mongocxx::options::find findOptions;
+    BaseDB::nearest(findOptions);
 
-  mongo::BSONObj instrumentObj = conn->get()->findOne(ns(), readQueryMaxTimeMS(builder.obj()), 0, mongo::QueryOption_SlaveOk);
-  if (!instrumentObj.isEmpty())
-  {
-    if (instrumentObj.hasField("elin"))
-    {
-      e911 = instrumentObj.getStringField("elin");
-
-      if (!e911.empty())
-      {
-        findE911Location(conn, e911, address, location);
-      }
-      conn->done();
-      return !e911.empty();
+    std::optional<bsoncxx::document::value> instrumentObj = conn.collection(ns()).find_one(queryBuilder.view(), findOptions);
+    if (instrumentObj) {
+        bsoncxx::document::view doc = instrumentObj->view();
+        bsoncxx::document::element elin = doc["elin"];
+        if (elin && elin.type() == bsoncxx::type::k_string) {
+            e911 = std::string(elin.get_string().value);
+            if (!e911.empty()) {
+                findE911Location(conn, e911, address, location);
+            }
+            return !e911.empty();
+        }
     }
-  }
-  conn->done();
-  return false;
+    return false;
 }

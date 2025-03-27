@@ -12,49 +12,38 @@ Url:      http://www.pingtel.com
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: cppunit-devel
-BuildRequires: zeromq-devel = 2.2.0
-BuildRequires: pcre-devel >= 4.5
+BuildRequires: pcre-devel 
+BuildRequires: zeromq-devel
 BuildRequires: unixODBC-devel
 BuildRequires: zip
-BuildRequires: oss_core-devel
 BuildRequires: libmcrypt-devel
 BuildRequires: gtest-devel
 BuildRequires: v8-devel
 BuildRequires: leveldb-devel
-BuildRequires: hiredis-devel = 0.10.1
+BuildRequires: hiredis-devel
 BuildRequires: libpcap-devel
 BuildRequires: libevent-devel
 BuildRequires: xmlrpc-c-devel
 BuildRequires: libtool-ltdl-devel
 BuildRequires: libconfig-devel
 BuildRequires: boost-devel
-
-%if "%{_vendor}" == "suse"
-BuildRequires: pwdutils
-%else
+BuildRequires: libdb-cxx-devel
 BuildRequires: shadow-utils
-%endif
+BuildRequires: cronie
+
+BuildRequires: oss_core-devel >= %version
 BuildRequires: sipxcommserverlib-devel  >= %version
 BuildRequires: sipxportlib-devel        >= %version
 BuildRequires: sipxtacklib-devel        >= %version
 
 Source:   %name-%version.tar.gz
 
-%if "%{_vendor}" == "suse"
-Requires: pwdutils
-Requires: cron
-%else
 Requires: shadow-utils
-%if 0%{?fedora} >= 17 || 0%{?rhel} >= 7
-BuildRequires: cronie
-%else
-BuildRequires: vixie-cron
-%endif
-%endif
+Requires: zeromq
+Requires: chkconfig
+
 Requires: sipxcommserverlib >= %version
 Requires: sipxrelay >= %version
-Requires: zeromq = 2.2.0
-Requires: chkconfig
 
 Prefix:    %_prefix
 BuildRoot: %{_tmppath}/%name-%version-root
@@ -87,6 +76,7 @@ Internal class documentation for the proxy classes
 %setup -q
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make %{_smp_mflags}
@@ -119,7 +109,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/authplugins/libRequestLinter.so*
 %attr(755,root,root) %{_libdir}/authplugins/libSubscriptionAuth.so*
 %attr(755,root,root) %{_libdir}/authplugins/libTransferControl.so*
-%attr(755,root,root) %{_libdir}/authplugins/libV8Engine.so*
 %attr(755,root,root) %{_libdir}/libsipXproxy.so*
 %attr(755,root,root) %{_libdir}/transactionplugins/libGatewayDestPlugin.so*
 %attr(755,root,root) %{_libdir}/libStatisticsManager.so*
@@ -136,7 +125,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/authplugins/libRequestLinter.la
 %{_libdir}/authplugins/libSubscriptionAuth.la
 %{_libdir}/authplugins/libTransferControl.la
-%{_libdir}/authplugins/libV8Engine.la
 %{_libdir}/libsipXproxy.la
 %{_includedir}/sipxproxy/*
 %{_libdir}/transactionplugins/libGatewayDestPlugin.la

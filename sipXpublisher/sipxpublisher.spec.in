@@ -12,7 +12,7 @@ Url:      http://www.pingtel.com
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: cppunit-devel
-BuildRequires: pcre-devel >= 4.5
+BuildRequires: pcre-devel 
 BuildRequires: openssl-devel
 BuildRequires: sipxcommserverlib-devel >= %version
 BuildRequires: sipxportlib-devel >= %version
@@ -50,6 +50,7 @@ plug-in modules.
 %setup -q
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make %{_smp_mflags}

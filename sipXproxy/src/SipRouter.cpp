@@ -835,7 +835,7 @@ SipRouter::handleMessage( OsMsg& eventMessage )
      return(TRUE);
    }
    #ifdef MONGO_assert
-  catch (mongo::DBException& e)
+  catch (mongocxx::exception& e)
   {
     errorString = "Proxy - Mongo DB Exception";
     OS_LOG_ERROR( FAC_SIP, "SipRouter::handleMessage() Exception: "
@@ -1283,7 +1283,7 @@ SipRouter::ProxyAction SipRouter::proxyMessage(SipMessage& sipRequest, SipMessag
 
                  RegDB::Bindings registrations;
                  UtlString identity;
-                 unsigned long timeNow = OsDateTime::getSecsSinceEpoch();
+                 std::int64_t timeNow = OsDateTime::getSecsSinceEpoch();
                  normalizedRequestUri.getIdentity(identity);
                  mpRegDb->getUnexpiredContactsUser(identity.str(), timeNow, registrations, true);
 
@@ -1739,7 +1739,7 @@ SipRouter::ProxyAction SipRouter::proxyMessage(SipMessage& sipRequest, SipMessag
      }
    }
 #ifdef MONGO_assert
-   catch (mongo::DBException& e)
+   catch (mongocxx::exception& e)
    {
      errorString = "Proxy - Mongo DB Exception";
      OS_LOG_ERROR( FAC_SIP, "SipRouter::proxyMessage Exception: "
@@ -2439,7 +2439,7 @@ bool SipRouter::supportMultipleGatewaysPerLocation() const
 
 bool SipRouter::isRegisteredAddress(const std::string& identity, const std::string& sourceAddress)
 {
-  unsigned long timeNow = OsDateTime::getSecsSinceEpoch();
+  std::int64_t timeNow = OsDateTime::getSecsSinceEpoch();
   RegDB::Bindings bindings;
   return getRegDBInstance()->getUnexpiredContactsUserWithAddress(identity, sourceAddress, timeNow, bindings);
 }

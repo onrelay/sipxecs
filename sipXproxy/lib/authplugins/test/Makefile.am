@@ -29,7 +29,8 @@ COMMON_LIBS = \
 	$(top_builddir)/src/libsipXproxy.la \
 	@SIPXUNIT_LIBS@ \
 	@SIPXCOMMSERVER_LIBS@ \
-  -lmongoclient \
+  -lmongocxx \
+-lbsoncxx \
   -lboost_system
 
 #enforcerulestest_CXXFLAGS = \

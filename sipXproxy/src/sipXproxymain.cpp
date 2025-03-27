@@ -46,7 +46,6 @@
 //
 #include <stdexcept>
 #include <execinfo.h>
-#include <mongo/util/assert_util.h>
 #include <os/OsExceptionHandler.h>
 
 #define CONFIG_SETTING_CALL_STATE         "SIPX_PROXY_CALL_STATE"

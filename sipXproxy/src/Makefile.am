@@ -23,7 +23,8 @@ sipXproxy_LDADD = \
 	@SIPXCOMMSERVER_LIBS@ \
 	@OSSCORE_LIBS@ \
 	    -lzmq \
-        -lmongoclient \
+        -lmongocxx \
+    -lbsoncxx \
         -lboost_system
 
 sipXproxy_SOURCES =  \

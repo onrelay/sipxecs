@@ -54,7 +54,8 @@ COMMON_LIBS = \
    @SIPXUNIT_LIBS@ \
    @SIPXCOMMSERVER_LIBS@ \
    	../libsipXproxy.la \
-    -lmongoclient \
+    -lmongocxx \
+    -lbsoncxx \
     -lboost_system
 
 

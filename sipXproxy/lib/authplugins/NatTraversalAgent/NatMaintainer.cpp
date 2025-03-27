@@ -197,7 +197,7 @@ void NatMaintainer::sendKeepAliveToContactList( UtlSList& contactList )
 
 void NatMaintainer::sendKeepAliveToRegContactList(const UtlString& identityToMatch)
 {
-    unsigned long timeNow = OsDateTime::getSecsSinceEpoch();
+    std::int64_t timeNow = OsDateTime::getSecsSinceEpoch();
     RegDB::Bindings bindings;
     mpRegDb->getUnexpiredContactsUserContaining(
         identityToMatch.str(),
@@ -220,7 +220,7 @@ void NatMaintainer::sendKeepAliveToRegContactList(const UtlString& identityToMat
 
 void NatMaintainer::sendKeepAliveToSubscribeContactList(UtlString& identityToMatch)
 {
-    unsigned long timeNow = OsDateTime::getSecsSinceEpoch();
+    std::int64_t timeNow = OsDateTime::getSecsSinceEpoch();
     std::vector<std::string> bindings;
     mpSubscribeDb->getUnexpiredContactsFieldsContaining(
         identityToMatch,
