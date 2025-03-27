@@ -181,14 +181,14 @@ void OsExceptionHandler::defaultBoostGeneralExceptionHandler(boost::exception& e
 //default mongo connect exception handling : log & exit
 void OsExceptionHandler::defaultMongoConnectExceptionHandling(std::exception& e)
 {
-  catch_global_print(static_cast<mongo::DBException&>(e).toString().c_str());
+  catch_global_print(static_cast<mongocxx::exception&>(e).toString().c_str());
   _exit(1);
 }
 
 //default mongo general exception handling : log & abort
 void OsExceptionHandler::defaultMongoGeneralExceptionHandler(std::exception& e)
 {
-  catch_global_print(static_cast<mongo::DBException&>(e).toString().c_str());
+  catch_global_print(static_cast<mongocxx::exception&>(e).toString().c_str());
   std::abort();
 }
 #endif
@@ -419,7 +419,7 @@ void OsExceptionHandler::catch_global()
     }
   }
 
-  catch(mongo::DBException &e)
+  catch(mongocxx::exception &e)
   {
     // try to call general mongo exception handler
     HandlerVector handlers;

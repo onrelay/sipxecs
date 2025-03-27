@@ -23,7 +23,9 @@
 #include <vector>
 
 // Needed for backwards compatibility for Rocky Linux 9 builds
-#define BOOST_BIND_GLOBAL_PLACEHOLDERS 1
+#if !defined(BOOST_BIND_GLOBAL_PLACEHOLDERS)
+  #define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#endif
 
 #include <boost/version.hpp>
 #include <boost/noncopyable.hpp>
