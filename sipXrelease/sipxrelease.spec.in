@@ -30,6 +30,7 @@ number is installed.
 %setup -q
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 make
 

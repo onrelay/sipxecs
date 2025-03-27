@@ -11,14 +11,18 @@ Group: Telcommunications
 Vendor: ezuce
 Packager: ezuce <info@ezuce.com>
 
-Requires: bcg729
-Requires: freeswitch
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 
 BuildRequires: automake
 BuildRequires: libtool
 BuildRequires: gcc-c++
 BuildRequires: freeswitch-devel
 BuildRequires: bcg729-devel
+
+Requires: bcg729
+Requires: freeswitch
 
 Source: %name-%version.tar.gz
 
@@ -31,8 +35,10 @@ FreeSWITCH module for BCG729 codec
 %setup -q
 
 %build
-gcc -fPIC -O3 -fomit-frame-pointer -fno-exceptions -Wall -std=c99 -pedantic -m64 -mtune=generic -I/usr/include -Ibcg729/include -I/usr/include/freeswitch -c src/mod_bcg729.c
-gcc -fPIC -O3 -fomit-frame-pointer -fno-exceptions -Wall -std=c99 -pedantic -m64 -mtune=generic -I/usr/include -Ibcg729/include -I/usr/include/freeswitch -shared -Xlinker -x -o mod_bcg729.so mod_bcg729.o -lm -Wl,-static -Lbcg729/src/.libs -lbcg729 -Wl,-Bdynamic
+gcc -fPIC -O3 -fomit-frame-pointer -fno-exceptions -Wall -std=c99 -pedantic -m64 -mtune=generic \
+    $(pkg-config --cflags bcg729) -I/usr/include/freeswitch -c src/mod_bcg729.c
+
+gcc -fPIC -shared -o mod_bcg729.so mod_bcg729.o -lm $(pkg-config --libs bcg729) -Wl,-Bdynamic
 
 %install
 rm -rf $RPM_BUILD_ROOT

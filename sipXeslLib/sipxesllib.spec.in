@@ -42,6 +42,7 @@ This project provides a C++ wrapper for FreeSwitch Event Socket Layer
 %setup -q
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 make %{_smp_mflags} all
 

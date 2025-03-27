@@ -10,6 +10,9 @@ Vendor: SIPfoundry
 Packager: SIPfoundry <sipx-dev@sipfoundry.org>
 Url: http://www.sipfoundry.org
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 BuildRequires: java-1.8.0-openjdk-devel
 BuildRequires: automake
 BuildRequires: zip
@@ -40,6 +43,7 @@ IM Bot subystem that uses FreeSWITCH as a media server.
 %setup -q
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make all

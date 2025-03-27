@@ -9,6 +9,9 @@ Vendor: sipxcom
 Packager: sipxcom <sipx-dev@sipxcom.org>
 Url: http://www.sipxcom.org
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 BuildRequires: automake
 BuildRequires: java-1.8.0-openjdk-devel
 BuildRequires: zip
@@ -37,6 +40,7 @@ Authorization Code/DISA/Account Code subsystem that uses FreeSWITCH as a media s
 %setup -q
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make all

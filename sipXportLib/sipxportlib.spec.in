@@ -12,6 +12,7 @@ Url: http://www.pingtel.com
 
 BuildRequires: automake
 BuildRequires: gcc-c++
+BuildRequires: gcc-plugin-devel
 BuildRequires: cppunit-devel
 BuildRequires: openssl-devel
 BuildRequires: gperftools-devel
@@ -19,6 +20,35 @@ BuildRequires: pcre-devel
 BuildRequires: findutils
 BuildRequires: boost-devel
 BuildRequires: poco-devel
+BuildRequires: dnf-plugins-core 
+BuildRequires: krb5-devel 
+BuildRequires: cyrus-sasl-devel 
+BuildRequires: java-1.8.0-openjdk-devel 
+BuildRequires: v8-devel 
+BuildRequires: policycoreutils 
+BuildRequires: policycoreutils-python-utils
+BuildRequires: gperftools-devel 
+BuildRequires: zeromq-devel 
+BuildRequires: gtest-devel 
+BuildRequires: hiredis-devel 
+BuildRequires: leveldb-devel 
+BuildRequires: libdnet-devel 
+BuildRequires: libmcrypt-devel 
+BuildRequires: utf8proc-devel
+BuildRequires: poco-devel 
+BuildRequires: libconfig-devel 
+BuildRequires: libpcap-devel 
+BuildRequires: libsrtp-devel 
+BuildRequires: libdb-cxx-devel
+BuildRequires: mongo-c-driver-devel 
+BuildRequires: mongo-cxx-driver-devel 
+BuildRequires: libmongocrypt-devel
+BuildRequires: cfengine-community
+BuildRequires: thttpd
+BuildRequires: libdb-devel
+BuildRequires: libbson-devel
+BuildRequires: libzstd-devel
+BuildRequires: cppzmq-devel
 
 # sipXphone would require 0.9.7c to decrypt profiles to get access to
 # certain new alg.  If this is still nec., this may need to be
@@ -26,8 +56,8 @@ BuildRequires: poco-devel
 # still uses 0.9.7a, so this is used. There's a HUGE implications of
 # requiring RHEnterpise users to jeopardize their system by upgrading
 # security package to a RH uncertified version.
-Requires: openssl >= 0.9.7a
-Requires: pcre >= 4.5
+Requires: openssl
+Requires: pcre 
 Requires: boost
 Requires: poco-crypto
 Requires: poco-data
@@ -106,17 +136,21 @@ helpful to build projects from the sipX library
 
 %prep
 %setup -q
-# suse and obs build system
 mv %{_builddir}/%name-%version/%name-rpmlintrc %{_sourcedir}
 
 %build
+sed -i 's/%:find-plugindir()/-iplugindir=\/usr\/lib\/gcc\/x86_64-redhat-linux\/11\/plugin\//g' \
+    /usr/lib/rpm/redhat/redhat-annobin-cc1
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
+
 make %{_smp_mflags} all
 
 %install
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -165,3 +199,4 @@ rm -rf $RPM_BUILD_ROOT
   # no files.
   true
 ) 2>/dev/null
+

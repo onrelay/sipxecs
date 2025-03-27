@@ -9,6 +9,9 @@ Vendor:   SIPFoundry
 Packager: SIPFoundry <sipxcom-dev@googlegroups.com>
 Url:      http://www.sipfoundry.org
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 BuildRequires: automake
 BuildRequires: rubygems
 BuildRequires: ruby
@@ -24,18 +27,8 @@ Requires: chkconfig
 Requires: postgresql-odbc
 Requires: stunnel
 Requires: ruby
-Requires: ruby-dbi
 Requires: rubygems
-%if 0%{?rhel} >= 7
 Requires: rubygem-pg
-%else
-%if "%{_vendor}" == "suse"
-Requires: rubygem-postgres
-%else
-Requires: ruby-libs
-Requires: ruby-postgres
-%endif
-%endif
 
 Obsoletes: sipxproxy-cdr
 

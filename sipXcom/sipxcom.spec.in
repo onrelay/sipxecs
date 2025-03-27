@@ -9,6 +9,9 @@ Vendor: sipXcom
 Packager: Douglas Hubler <dhubler@ezuce.com>
 Url: http://www.sipxcom.org
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 %define __jar_repack %{nil}
 
 BuildRequires: automake
@@ -16,7 +19,7 @@ BuildRequires: libxml2
 BuildRequires: sipxconfig >= %version
 
 Requires: libcgroup 
-Requires: freeswitch >= 1.0.7
+Requires: freeswitch
 Requires: freeswitch-application-abstraction
 Requires: freeswitch-application-avmd
 Requires: freeswitch-application-blacklist

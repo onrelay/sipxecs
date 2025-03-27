@@ -14,8 +14,11 @@ Packager: SIPfoundry <sipx-dev@sipfoundry.org>
 Url: http://www.sipfoundry.org
 BuildArch: noarch
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 BuildRequires: automake
-BuildRequires: java-devel
+BuildRequires: java-1.8.0-openjdk-devel
 
 Source: %name-%version.tar.gz
 

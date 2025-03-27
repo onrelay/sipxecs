@@ -12,15 +12,10 @@ Url:      http://www.sipfoundry.org/sipXsaa
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: cppunit-devel
-BuildRequires: pcre-devel >= 4.5
+BuildRequires: pcre-devel
 BuildRequires: openssl-devel
-%if "%{_vendor}" == "suse"
-BuildRequires: apache2-devel
-BuildRequires: libapr1-devel
-%else
 BuildRequires: httpd-devel
 BuildRequires: apr-devel
-%endif
 BuildRequires: sipxcalllib-devel >= %version
 BuildRequires: sipxcommserverlib-devel >= %version
 BuildRequires: sipxmediaadapterlib-devel >= %version
@@ -49,6 +44,7 @@ Manages shared appearances for sipx.
 %setup -q
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make %{_smp_mflags}

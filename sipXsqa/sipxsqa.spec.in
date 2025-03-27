@@ -9,15 +9,16 @@ Vendor:   SIPfoundry
 Packager: SIPfoundry <sipxcom-dev@googlegroups.com>
 Url:      http://www.sipfoundry.org/
 
-%if "%{_vendor}" == "suse"
-BuildRequires: java-1_6_0-sun-devel
-%else
+
 BuildRequires: java-1.8.0-openjdk-devel
-%endif
 BuildRequires: automake
 BuildRequires: gcc-c++
-BuildRequires: zeromq-devel = 2.2.0
-BuildRequires: hiredis-devel = 0.10.1
+BuildRequires: cppunit-devel
+BuildRequires: openssl-devel
+BuildRequires: pcre-devel
+BuildRequires: zeromq-devel
+BuildRequires: cppzmq-devel
+BuildRequires: hiredis-devel
 BuildRequires: libev-devel
 BuildRequires: libuuid-devel
 BuildRequires: swig
@@ -62,7 +63,9 @@ Group: Development/Libraries
 Vendor: SIPfoundry
 Summary: Internal documentation for %name
 Requires: sipxcommserverlib-devel >= %version
-Requires: zeromq-devel = 2.2.0
+Requires: zeromq-devel 
+Requires: cppzmq-devel
+
 
 %description devel
 Internal class documentation for the SQA classes
@@ -71,6 +74,7 @@ Internal class documentation for the SQA classes
 %setup -q
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make %{_smp_mflags}

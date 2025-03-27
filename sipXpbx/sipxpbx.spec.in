@@ -16,7 +16,7 @@ BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: cppunit-devel
 BuildRequires: doxygen
-BuildRequires: pcre-devel >= 4.5
+BuildRequires: pcre-devel
 BuildRequires: python
 BuildRequires: sipxcalllib-devel >= %version
 BuildRequires: sipxcommserverlib-devel >= %version
@@ -24,19 +24,15 @@ BuildRequires: sipxmediaadapterlib-devel >= %version
 BuildRequires: sipxmedialib-devel >= %version
 BuildRequires: sipxportlib-devel >= %version
 BuildRequires: sipxtacklib-devel >= %version
-%if %{_vendor} == redhat
-BuildRequires: httpd-devel >= 2.0.46
-%endif
-%if "%{_vendor}" == "suse"
-BuildRequires: apache2-devel
-%endif
+BuildRequires: httpd-devel
+
 
 Source:   %name-%version.tar.gz
 Obsoletes: %name-devel
 
 Requires: alsa-utils
 Requires: expat >= 1.95
-%if %{_vendor} == redhat
+%if 0%{?rhel}
 Requires: httpd >= 2.0.46
 %endif
 %if "%{_vendor}" == "suse"
@@ -45,7 +41,7 @@ Requires: apache2-prefork
 
 Requires: bind >= 9.3.4
 
-%if %{_vendor} == redhat
+%if 0%{?rhel}
 Requires: mod_ssl
 Requires: chkconfig
 %endif
@@ -59,17 +55,17 @@ Requires: rsyslog
 # sipx-snapshot uses gdb to get backtraces and simulated core files
 # from sipXecs processes.
 Requires: gdb
-%if %{_vendor} == redhat
+%if 0%{?rhel}
 Requires: glibc-common
 %endif
 
 # for the time being, dns caching server is required.
 Requires: bind
 # there is a reference to ntp in startup script, otherwise just good practice
-Requires: ntp
+Requires: ntpsec
 
 # sending email - an smtp listener must be running on localhost
-%if %{_vendor} == redhat
+%if 0%{?rhel}
 Requires: smtpdaemon
 %endif
 %if "%{_vendor}" == "suse"
@@ -77,7 +73,7 @@ Requires: sendmail
 %endif
 
 # Required for inclusion of Python's Snack module.
-%if %{_vendor} == redhat
+%if 0%{?rhel}
 #fedora/rhel6/centos6 test
 %if  0%{?fedora} >= 6 || 0%{?rhel} >= 6
 Requires: newt-python

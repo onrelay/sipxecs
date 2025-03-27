@@ -3,6 +3,9 @@ Name:     @PACKAGE@
 Version:  @VERSION@
 Release:  @PACKAGE_REVISION@
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 Summary:  sipXecs process supervisor
 License:  Pingtel Commercial License
 Group:    Productivity/Telephony/SIP/Servers
@@ -13,45 +16,25 @@ Url:      http://www.pingtel.com
 BuildRequires: automake
 BuildRequires: checkpolicy
 BuildRequires: policycoreutils
-BuildRequires: policycoreutils-python
+BuildRequires: policycoreutils-python-utils
+Requires: policycoreutils-python-utils
 
 Source:   %name-%version.tar.gz
 Obsoletes: %name-devel
 
-Requires: cfengine >= 3.2.3
-%if %{_vendor} == redhat
+Requires: cfengine-community
 Requires: chkconfig
-%endif
-%if "%{_vendor}" == "suse"
-Requires: net-snmp >= 5.3.1
-BuildRequires: net-snmp-devel >= 5.3.1
-%else
-BuildRequires: net-snmp-devel >= 5.3.1
-Requires: net-snmp-libs >= 5.3.1
-%endif
-%if 0%{?rhel} >= 7
+BuildRequires: net-snmp-devel
+Requires: net-snmp-libs 
 Requires: NetworkManager-tui
-%else
-%if 0%{?fedora} <= 15 || 0%{?rhel} <= 6
-Requires: system-config-network-tui
-%else
-Requires: system-config-network
-%endif
-%endif
-# log watcher
 Requires: sec
 Requires: sendmail
 Requires: sendmail-cf
-Requires: ntp
+Requires: ntpsec
 Requires: make
-# backup to sftp
-Requires: rubygem-net-sftp
-# iptables
 Requires: policycoreutils
 #semanage
-Requires: policycoreutils-python
-# fail2ban
-Requires: fail2ban >= 0.9.6
+Requires: fail2ban 
 
 Prefix:    %_prefix
 BuildRoot: %{_tmppath}/%name-%version-root
@@ -64,10 +47,6 @@ Uses cfengine to securely distribute configuration. cfengine is a
 distributed configuration system.  The fact cfengine is used in this
 project should not interfere with any configuration systems an IT
 infrastruture might already have like puppet, chef or even cfengine.
-
-%if "%{_vendor}" == "suse"
-%debug_package
-%endif
 
 %package selinux
 #Group: Telcommunications
@@ -134,6 +113,13 @@ fi
 if grep -q :on <<<`/sbin/chkconfig sipxlogwatcher --list 2>&1`; then
     /sbin/chkconfig sipxlogwatcher reset
 fi
+
+%define gem_dir %(ruby -rrbconfig -e 'puts File::join(RbConfig::CONFIG["libdir"],"/ruby/gems")')
+%define rb_ver %(ruby -rrbconfig -e 'puts RbConfig::CONFIG["MAJOR"]')
+%define gem_home %{gem_dir}/%{rb_ver}
+
+gem install --no-rdoc --local --install-dir %{gem_home} %{_var}/lib/sipxpbx/sipxsupervisor-*.gem >/dev/null 2>&1
+gem install net-sftp  
 
 %post selinux
 if [ "$1" -le "1" ] ; then # First install

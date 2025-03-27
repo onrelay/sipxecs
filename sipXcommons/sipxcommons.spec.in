@@ -4,24 +4,21 @@ Name: @PACKAGE@
 Version: @VERSION@
 Release: @PACKAGE_REVISION@
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 Summary: Common server side Java packages and supporting third-parth JAR's for sipX
 License: LGPL
 Group: Productivity/Telephony/SIP/Servers
 Vendor: SIPfoundry
 Packager: SIPfoundry <sipx-dev@sipfoundry.org>
 Url: http://www.sipfoundry.org/sipXcommons
-%if "%{_vendor}" == "suse"
-BuildRequires: java-1_6_0-sun-devel
-%else
+
+
 BuildRequires: java-1.8.0-openjdk-devel
-%endif
+
 BuildRequires: automake
-%if %{_vendor} == redhat
 BuildRequires: shadow-utils
-%endif
-%if "%{_vendor}" == "suse"
-BuildRequires: pwdutils
-%endif
 BuildRequires: zip
 BuildRequires: rsync
 
@@ -30,22 +27,9 @@ BuildRequires: rsync
 
 Source: %name-%version.tar.gz
 
-%if "%{_vendor}" == "suse"
-Requires: pwdutils
-%else
 Requires: shadow-utils
-%endif
 
-%if %{?use_ibm_jvm}0
-Requires: java-ibm >= 1.6
-Requires: java-ibm-unrestricted
-%else
 Requires: java-1.8.0-openjdk
-%endif
-
-%if "%{_vendor}" == "suse"
-Requires: openssl >= 0.9.8
-%endif
 
 Requires: which
 
@@ -57,10 +41,10 @@ Common server side Java packages and supporting third-parth JAR's for sipX
 
 %prep
 %setup -q
-# suse and obs build system
 mv %{_builddir}/%name-%version/%name-rpmlintrc %{_sourcedir}
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make all

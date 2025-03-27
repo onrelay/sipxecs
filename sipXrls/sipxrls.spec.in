@@ -9,12 +9,14 @@ Vendor:   SIPfoundry
 Packager: SIPfoundry <sipxcom-dev@googlegroups.com>
 Url:      http://www.sipfoundry.org/sipXrls
 
+
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: cppunit-devel
-BuildRequires: pcre-devel >= 4.5
 BuildRequires: openssl-devel
-BuildRequires: zeromq-devel = 2.2.0
+BuildRequires: pcre-devel
+BuildRequires: zeromq-devel
+BuildRequires: cppzmq-devel
 BuildRequires: sipxcalllib-devel >= %version
 BuildRequires: sipxcommserverlib-devel >= %version
 BuildRequires: sipxmediaadapterlib-devel >= %version
@@ -34,17 +36,14 @@ Prefix:    %_prefix
 BuildRoot: %{_tmppath}/%name-%version-root
 
 %description
-TBD
-
-%if "%{_vendor}" == "suse"
-%debug_package
-%endif
+Resource list server library
 
 %prep
 %setup -q
 
 %build
-%configure @SIPX_RPM_CONFIGURE_OPTIONS@
+
+%configure @SIPX_RPM_CONFIGURE_OPTIONS@  
 cp config.log %name.configlog
 make %{_smp_mflags}
 

@@ -15,7 +15,7 @@ Url: http://www.sipfoundry.org
 
 BuildRequires: automake
 
-Requires: freeswitch >= 1.0.7
+Requires: freeswitch
 Requires: freeswitch-application-abstraction
 Requires: freeswitch-application-avmd
 Requires: freeswitch-application-blacklist
@@ -101,7 +101,7 @@ Requires: sipxclearone >= %version
 Requires: sipxconfig >= %version
 Requires: sipxconfig-ftp >= %version
 Requires: sipxconfig-tftp >= %version
-Requires: sipxcom
+Requires: sipxcom >= %version
 Requires: sipxcounterpath >= %version
 Requires: sipxgrandstream >= %version
 Requires: sipxgtek >= %version
@@ -131,7 +131,7 @@ Requires: sipxsnom >= %version
 Requires: sipxsupervisor >= %version
 Requires: sipxsqa-server >= %version
 Requires: sipxunidata >= %version
-Requires: sipxcallqueue
+Requires: sipxcallqueue >= %version
 Requires: sipxjitsi >= %version
 
 Obsoletes: %{name}-doc
@@ -147,15 +147,16 @@ sipXecs is an IP PBX with integrated voice mail, ACD, multiple auto attendents, 
 
 %prep
 %setup -q
-# suse and obs build system
 mv %{_builddir}/%name-%version/%name-rpmlintrc %{_sourcedir}
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 make
 
 %install
 rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
 
 %clean

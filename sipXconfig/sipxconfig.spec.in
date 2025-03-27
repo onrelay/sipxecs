@@ -1,6 +1,3 @@
-#!BuildIgnore: post-build-checks
-%define debug_package %{nil}
-
 Name: @PACKAGE@
 Version: @VERSION@
 Release: @PACKAGE_REVISION@
@@ -12,31 +9,25 @@ Vendor:   SIPfoundry
 Packager: SIPfoundry <sipxcom-dev@googlegroups.com>
 Url:      http://www.sipfoundry.org/
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 BuildRequires: automake
 BuildRequires: java-1.8.0-openjdk-devel
 
-%if %{_vendor} == redhat
-BuildRequires: shadow-utils
-%if 0%{?fedora} >= 17 || 0%{?rhel} >= 7
 BuildRequires: cronie
-%else
-BuildRequires: vixie-cron
-%endif
-%endif
-%if "%{_vendor}" == "suse"
-BuildRequires: pwdutils
-BuildRequires: cron
-%endif
+BuildRequires: shadow-utils
 BuildRequires: zip
 BuildRequires: libxslt
 BuildRequires: ruby-devel
-BuildRequires: dart-sdk
+
 BuildRequires: rubygems
 BuildRequires: httpd
-BuildRequires: net-snmp-libs >= 5.7.1
-BuildRequires: net-snmp-devel >= 5.7.1
-BuildRequires: net-snmp-agent-libs >= 5.7.1
+BuildRequires: net-snmp-libs 
+BuildRequires: net-snmp-devel
+BuildRequires: net-snmp-agent-libs
 BuildRequires: pcre-devel
+BuildRequires: dart-sdk
 
 BuildRequires: sipxcommons >= %version
 BuildRequires: sipxcdr >= %version
@@ -59,22 +50,13 @@ BuildRequires: sipxcdr-client >= %version
 Source: %name-%version.tar.gz
 
 Requires: postgresql-server
-Requires: mongodb-org-server = 3.6.11
-Requires: mongodb-org-shell = 3.6.11
-Requires: mongodb-org-tools = 3.6.11
+Requires: mongodb-org
 Requires: httpd
-# not installed by default on centos 6
 Requires: mod_ssl
-%if 0%{?fedora} <= 17 && 0%{?fedora} > 0
-Requires: pymongo
-%else
 Requires: python-pymongo
-%endif
-Requires: python-argparse
-Requires: js
-Requires: net-snmp >= 5.7.1
-Requires: net-snmp-sysvinit >= 5.7.1
-Requires: net-snmp-utils >= 5.7.1
+Requires: mozjs78
+Requires: net-snmp 
+Requires: net-snmp-utils
 Requires: net-snmp-python
 
 Requires: sipxcommons >= %version
@@ -87,82 +69,24 @@ Requires: chkconfig
 
 Requires: ruby
 Requires: rubygems
-Requires: freeswitch >= 1.0.7
+Requires: freeswitch
 Requires: freeswitch-sounds-en-us-callie-all
-Requires: elasticsearch >= 1.7.1
+Requires: elasticsearch
 
-Requires: certbot >= 0.39
-
-# XX-10822 Required EPEL rpms are now found in build. Pointing to this repo has
-# proven to be dangerous
-Obsoletes: epel-release
-
-Obsoletes: sipx-jasperreports-deps
-Obsoletes: sipxfreeswitch
-Obsoletes: sipx-freeswitch
-Obsoletes: sipx-freeswitch-codec-passthru-g723_1
-Obsoletes: sipx-freeswitch-codec-passthru-amr
-Obsoletes: sipx-freeswitch-codec-passthru-g729
-Obsoletes: sipxopenacd
-Obsoletes: sipxacdstatistics
-Obsoletes: sipxacdstatistics-client
-Obsoletes: openacd
-Obsoletes: erlang-oacd_dialplan
-Obsoletes: erlang-oacd_freeswitch
-Obsoletes: erlang-oacd_ouc
-Obsoletes: erlang-oacd_spx
-Obsoletes: erlang-oacd_web
-Obsoletes: erlang-openacd
-
-# 4.6 packages that turned out to not be useful as separate pkgs so
-# projects merged into sipxconfig
-Obsoletes: sipxpostgres
-Obsoletes: sipxdns
-Obsoletes: sipxmongo
-Obsoletes: sipxmongo-server
-Obsoletes: sipxtunnel
-Obsoletes: sipxsnmp
-Obsoletes: sipxhttpd
-
-# UC-1846 - sipXsbc is not supported, might be enabled later
-Obsoletes: sipxsbc
-Obsoletes: sipxsbc-config
-Obsoletes: sipxpark
-
-# XX-11486 - obsolete sipxevent (event notifier) service should be removed
-Obsoletes: sipxevent
-Obsoletes: mongodb
-Obsoletes: mongodb-server
-
-%if "%{_vendor}" == "suse"
-Requires: apache2-prefork
-Requires: pwdutils
-%endif
-
-%if %{?use_ibm_jvm}0
-Requires: java-ibm >= 1.6
-%if %{_vendor} == redhat
-Requires: java-fonts >= 1.6
-%endif
-Requires: java-ibm-unrestricted
-%endif
+Requires: certbot 
 
 # jasperreports
 Requires: fontconfig
-%if %{_vendor} == redhat
 Requires: dejavu-serif-fonts
-%endif
 
-%if %{_vendor} == redhat
 # only used to serve phone profiles under http devices
-Requires: httpd >= 2.0
-%endif
+Requires: httpd
 
 Requires: bind
 
 # Server. sipxconfig will disable server this by default automatically
 # unless admin specifically turns it on
-Requires: dhcp
+Requires: dhcp-server
 
 Prefix: %_prefix
 BuildRoot: %{_tmppath}/%name-%version-root
@@ -174,12 +98,8 @@ SOAP, postgresql and other JEE technologies to get the job done.
 
 # For phones that use TFTP to server profiles
 %package tftp
-%if %{_vendor} == redhat
 Requires: tftp-server
-%endif
-%if "%{_vendor}" == "suse"
-Requires: tftp
-%endif
+
 Requires: %{name} >= %{version}
 
 Group: Productivity/Telephony/SIP/Servers
@@ -205,7 +125,6 @@ Summary: Configures/enables FTP for devices controlled by %{name}
 
 %prep
 %setup -q
-# suse and obs build system
 mv %{_builddir}/%name-%version/%name-rpmlintrc %{_sourcedir}
 
 %build
@@ -356,7 +275,7 @@ if grep -q :on <<<`/sbin/chkconfig sipxconfig --list 2>&1`; then
 fi
 
 %triggerin -- freeswitch
-%if %{_vendor} == redhat
+%if 0%{?rhel}
 /sbin/chkconfig freeswitch off
 %endif
 # may not be running, so eat stderr

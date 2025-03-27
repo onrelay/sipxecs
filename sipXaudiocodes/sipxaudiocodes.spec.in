@@ -10,12 +10,12 @@ Packager: Engineering <sipxcom-dev@googlegroups.com>
 BuildArch: noarch
 Url: http://www.sipfoundry.org
 
-%if "%{_vendor}" == "suse"
-BuildRequires: java-1_6_0-sun-devel
-%else
-BuildRequires: java-1.8.0-openjdk-devel
-%endif
+
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 BuildRequires: automake
+BuildRequires: java-1.8.0-openjdk-devel
 BuildRequires: sipxcommons >= %version
 BuildRequires: sipxconfig >= %version
 

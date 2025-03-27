@@ -36,6 +36,7 @@ Web socket event notifier
 %setup -q
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make all

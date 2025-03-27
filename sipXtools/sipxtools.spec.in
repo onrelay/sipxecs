@@ -12,8 +12,8 @@ Url: http://www.sipfoundry.org/sipXtools
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: cppunit-devel
-BuildRequires: openssl-devel >= 0.9.7a
-BuildRequires: pcre-devel >= 4.5
+BuildRequires: openssl-devel 
+BuildRequires: pcre-devel 
 BuildRequires: sipxcommserverlib-devel >= %version
 BuildRequires: sipxtacklib-devel >= %version
 
@@ -33,6 +33,7 @@ General utilities for sipXpbx system
 %setup -q
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make %{_smp_mflags} all

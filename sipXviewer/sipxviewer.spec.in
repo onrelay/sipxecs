@@ -9,8 +9,11 @@ Vendor: SIPfoundry
 Packager: SIPfoundry <sipx-dev@sipfoundry.org>
 Url: http://www.sipfoundry.org/sipXtools
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 BuildRequires: automake
-BuildRequires: java-devel >= 1.7
+BuildRequires: java-1.8.0-openjdk-devel
 BuildRequires: sipxcommons >= %version
 
 Source: %name-%version.tar.gz
@@ -27,6 +30,7 @@ View SIP message call flow from a sipXecs system
 %setup -q
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make %{_smp_mflags} all

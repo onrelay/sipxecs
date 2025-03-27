@@ -48,10 +48,10 @@ files that define hook interfaces.
 %prep
 %setup -q
 chmod 755 *
-# suse and obs build system
 mv %{_builddir}/%name-%version/%name-rpmlintrc %{_sourcedir}
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make %{_smp_mflags}

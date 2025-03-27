@@ -9,6 +9,9 @@ Vendor: SIPfoundry
 Packager: SIPfoundry <sipx-dev@sipfoundry.org>
 Url: http://www.sipfoundry.org/sipXbridge
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 BuildRequires: automake
 BuildRequires: java-1.8.0-openjdk-devel
 BuildRequires: zip
@@ -36,6 +39,7 @@ Native ITSP and media bridging solution for SIPX PBX.
 %setup -q
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make all

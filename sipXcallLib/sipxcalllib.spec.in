@@ -12,8 +12,8 @@ Url: http://www.sipfoundry.org/sipXcallLib
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: cppunit-devel
-BuildRequires: openssl-devel >= 0.9.7a
-BuildRequires: pcre-devel >= 4.5
+BuildRequires: openssl-devel
+BuildRequires: pcre-devel 
 # why does src reference headers in mediaadapater but installation
 # doesn't require mediaadapter *.so to be installed?
 BuildRequires: sipxmediaadapterlib-devel >= %version
@@ -76,10 +76,10 @@ helpful to build projects from the sipX library
 
 %prep
 %setup -q
-# suse and obs build system
 mv %{_builddir}/%name-%version/%name-rpmlintrc %{_sourcedir}
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make
