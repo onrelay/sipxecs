@@ -110,7 +110,6 @@ sipx_all = \
 # think it's called as ruby-postgres is obsoleted.
 lib_all = \
   epel \
-  zeromq \
   rubygem-file-tail \
   hiredis \
   net-snmp \
@@ -122,6 +121,7 @@ lib_all = \
   libjsonrpccpp \
   libevent2 \
   mongo-cxx-driver \
+  dart-sdk \
   bcg729
 
 lib_exclude_fedora_16 = \
@@ -140,6 +140,19 @@ lib_exclude_fedora_20 = $(lib_exclude_fedora_19)
 lib_exclude_fedora_21 = $(lib_exclude_fedora_20)
 lib_exclude_fedora_22 = $(lib_exclude_fedora_21)
 lib_exclude_fedora_23 = $(lib_exclude_fedora_22)
+
+lib_exclude_rocky_9 = \
+  epel \
+  rubygem-file-tail \
+  hiredis \
+  net-snmp \
+  openfire \
+  rocketchat \
+  ruby-dbi \
+  jasperserver \
+  libjsonrpccpp \
+  libevent2 \
+  bcg729
 
 lib = $(filter-out $(lib_exclude_$(DISTRO_OS)_$(DISTRO_VER)),$(lib_all))
 
