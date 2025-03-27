@@ -154,13 +154,8 @@ int SipLSendCommand::execute(int argc, char* argv[])
          if (sipMessageFile)
          {
            fclose(sipMessageFile);
-           free (sipMessageFile);
          }
-        
         }
-        
-       
-
         return(commandStatus);
 }
 

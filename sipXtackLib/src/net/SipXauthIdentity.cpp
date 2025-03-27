@@ -38,7 +38,7 @@ OsTime      SipXauthIdentity::sSignatureValidityInterval;
  *   - if bound to the dialog: MD5(<timestamp><secret><from-tag><call-id><identity>)
  *   - if not:                 MD5(<timestamp><secret><identity>)
  */
-const RegEx SignatureRegEx("([0-9A-F]+):(:?)("MD5_REGEX")");
+const RegEx SignatureRegEx("([0-9A-F]+):(:?)(" MD5_REGEX ")");
 
 // method to convert a hexadecimal string value to an unsigned long
 bool SipXauthIdentity::from_string(unsigned long & value, const UtlString& s)

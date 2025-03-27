@@ -24,6 +24,10 @@
 #include <map>
 #include <sstream>
 #include <vector>
+
+#if !defined(BOOST_BIND_GLOBAL_PLACEHOLDERS)
+  #define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#endif
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/shared_ptr.hpp>
