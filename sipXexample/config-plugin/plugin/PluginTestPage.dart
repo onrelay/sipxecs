@@ -1,5 +1,5 @@
 import 'dart:html';
-import 'package:sipxconfig/sipxconfig.dart';
+import './packages/sipxconfig/sipxconfig.dart';
 
 // Api class helps load static data when back-end is down or still in development
 // see source in sipxconfig.dart for more info.  
