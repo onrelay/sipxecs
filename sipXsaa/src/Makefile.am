@@ -9,7 +9,8 @@ EXTRA_DIST =
 
 sipxsaa_LDADD = \
 	@SIPXCOMMSERVER_LIBS@ \
-        -lmongoclient \
+        -lmongocxx \
+    -lbsoncxx \
         -lboost_system	
 
 sipxsaa_CXXFLAGS = \
