@@ -10,7 +10,6 @@ require 'thread'
 
 require 'cdr'
 require 'call_state_event'
-require 'dbi'
 require 'utils/utils'
 
 # Maintains currently processed CDRs.

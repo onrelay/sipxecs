@@ -5,61 +5,51 @@
 #
 ##############################################################################
 
-require 'dbi'
-
+require 'pg'
 require 'utils/configure'
 
-module DBI
-  class Timestamp
-    include Comparable
-    
-    def <=>(other)
-      result = to_time <=> other.to_time
-      return result unless result == 0
-      return fraction <=> other.fraction
-    end
-    
-    def -(other)
-      return to_time <=> other.to_time
-    end
-    
-  end
-end
-
+require 'pg'
+require 'utils/configure'
 
 class Dao
   attr_reader :log
-  
+
   def initialize(database_url, purge_age, table_name, log)
-    @connection = database_url.to_dbi
-    @username = database_url.username
-    @password = database_url.password
+    @connection_params = {
+      dbname: database_url.database,
+      user: database_url.username,
+      password: database_url.password,
+      host: database_url.host,
+      port: database_url.port
+    }
     @purge_age = purge_age
     @table_name = table_name
     @last_purge_time = nil    
     @log = log
   end
-  
-  def connect(&block)
-    DBI.connect(@connection, @username, @password, &block)
+
+  def connect
+    PG.connect(@connection_params) do |dbh|
+      yield dbh if block_given?
+    end
   end
-  
+
   # this is run to test if DB connection is working
   def test_connection
-    connect do | dbh |
+    connect do |dbh|
       check_purge(dbh)
     end
   end
-  
+
   # purge unconditionally
   def purge(time)
-    connect do | dbh |
+    connect do |dbh|
       purge_now(dbh, time)
       vacuum_now(dbh, @table_name)
-      @last_purge_time = now
+      @last_purge_time = Time.now
     end    
   end
-  
+
   # purge at least once a day
   def check_purge(dbh)
     return unless @purge_age
@@ -70,11 +60,9 @@ class Dao
       @last_purge_time = now
     end
   end
-  
+
   def vacuum_now(dbh, table_name)
     sql = "VACUUM ANALYZE #{table_name}"
-    dbh.prepare(sql) do | sth |
-      sth.execute
-    end      
-  end    
+    dbh.exec(sql)
+  end
 end

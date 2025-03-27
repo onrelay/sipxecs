@@ -4,76 +4,74 @@
 # Licensed to the User under the LGPL license.
 #
 ##############################################################################
-
+require 'pg'
 require 'cdr'
-
 require 'db/dao'
 
 # Writes CDRs to the database
 class CdrWriter < Dao
-  
   def initialize(database_url, purge_age, log = nil)
     super(database_url, purge_age, 'cdrs', log)
   end
-  
+
   def run(queue)
-    connect do | dbh |
+    connect do |conn|
       sql = CdrWriter.insert_sql
-      dbh.prepare(sql) do | sth |
-        while cdr = queue.shift
-          if CdrWriter.getRetryCount() > 5
-            cdr = queue.shift
-            log.warn("Database error occurred for 5 times successively, skipping to the next CDR")
-          end
-          row = CdrWriter.row_from_cdr(cdr)
-          @last_row = row
-          sth.execute(*row)
-          check_purge(dbh)
-          CdrWriter.cleanRetries()
+      @log.debug("cdr_writer.rb:: Preparing SQL: #{sql}") if @log
+      conn.prepare('insert_cdr', sql)
+
+      while (cdr = queue.shift)
+        if CdrWriter.getRetryCount > 5
+          cdr = queue.shift
+          @log.warn("cdr_writer.rb:: Database error occurred 5 times successively, skipping to the next CDR") if @log
         end
+        row = CdrWriter.row_from_cdr(cdr)
+        @last_row = row
+        conn.exec_prepared('insert_cdr', row)
+        check_purge(conn)
+        CdrWriter.cleanRetries
       end
     end
-  rescue DBI::DatabaseError => e
-    log.error("cdr_writer.rb:: values = #{@last_row.join(', ')} ---- Error = #{e.err}, #{e.errstr}")
-    CdrWriter.countRetries()
-    retry        
+  rescue PG::Error => e
+    @log.error("cdr_writer.rb:: values = #{@last_row.join(', ')} ---- Error = #{e.message}") if @log
+    CdrWriter.countRetries
+    retry
   end
-  
+
   def last_cdr_start_time
-    connect do | dbh |
-      last_date = dbh.select_one(CdrWriter.last_cdr_sql)
-      unless last_date.nil? || last_date == 0
-        return last_date[0]
+    connect do |conn|
+      result = conn.exec(CdrWriter.last_cdr_sql)
+      return result.getvalue(0, 0) unless result.ntuples.zero?
+      nil
     end
-      return nil      
-    end
-    return nil    
+  rescue PG::Error => e
+    @log.error("cdr_writer.rb:: Error fetching last CDR start time: #{e.message}") if @log
+    nil
   end
-  
-  def purge_now(dbh, start_time_cdr)
-    log.debug("cdr_writer.rb:: Purging CDRs older than #{start_time_cdr}")  
+
+  def purge_now(conn, start_time_cdr)
+    @log.debug("cdr_writer.rb:: Purging CDRs older than #{start_time_cdr}") if @log
     sql = CdrWriter.delete_sql
-    dbh.prepare(sql) do | sth |
-      sth.execute(start_time_cdr)
-    end  
+    conn.prepare('delete_cdr', sql) unless conn.prepared_statements.key?('delete_cdr')
+    conn.exec_prepared('delete_cdr', [start_time_cdr])
   end
-  
+
   class << self
     def row_from_cdr(cdr)
-      Cdr::FIELDS.collect { | f | cdr.send(f) }
+      Cdr::FIELDS.map { |f| cdr.send(f) }
     end
-    
+
     def insert_sql
-      field_names = Cdr::FIELDS.collect { | f | f.to_s }
+      field_names = Cdr::FIELDS.map(&:to_s)
       field_str = field_names.join(', ')
-      value_str = (['?'] * field_names.size).join(', ')
-      "INSERT INTO cdrs ( #{field_str} ) VALUES ( #{value_str} )"
-    end        
-    
-    def delete_sql
-      "DELETE FROM cdrs WHERE start_time < ?"
+      value_str = (1..field_names.size).map { |i| "$#{i}" }.join(', ')
+      "INSERT INTO cdrs (#{field_str}) VALUES (#{value_str})"
     end
-    
+
+    def delete_sql
+      "DELETE FROM cdrs WHERE start_time < $1"
+    end
+
     def last_cdr_sql
       "SELECT start_time FROM cdrs ORDER BY start_time DESC LIMIT 1"
     end
@@ -81,7 +79,7 @@ class CdrWriter < Dao
     @@retryCount = 0
 
     def countRetries
-      @@retryCount = @@retryCount + 1
+      @@retryCount += 1
     end
 
     def cleanRetries
@@ -89,8 +87,7 @@ class CdrWriter < Dao
     end
 
     def getRetryCount
-      return @@retryCount
+      @@retryCount
     end
-
-  end  
+  end
 end

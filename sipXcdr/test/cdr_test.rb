@@ -7,7 +7,6 @@
 
 require 'test/unit'
 require 'time'
-require 'dbi'
 
 $:.unshift File.join(File.dirname(__FILE__), "..", "lib")
 require 'cdr'
@@ -21,7 +20,6 @@ def make_cse(args)
   cse = CallStateEvent.new
   # some defaults
   cse.event_seq= 1
-  #  cse.event_time=DBI::Timestamp.new(Time.parse('1990-05-17T19:30:00.000Z'))
   cse.event_time=Time.parse('1990-05-17T19:30:00.000Z')
   cse.event_type='R'
   cse.cseq=1
