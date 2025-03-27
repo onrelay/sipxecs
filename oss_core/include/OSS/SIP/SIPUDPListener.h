@@ -21,6 +21,7 @@
 #ifndef SIP_SIPUDPListener_INCLUDED
 #define SIP_SIPUDPListener_INCLUDED
 
+#include "OSS/build.h"
 
 #include <boost/asio.hpp>
 #include <boost/noncopyable.hpp>

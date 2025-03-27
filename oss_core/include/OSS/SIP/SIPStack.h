@@ -21,6 +21,7 @@
 #ifndef SIP_SIPStack_INCLUDED
 #define SIP_SIPStack_INCLUDED
 
+#include "OSS/build.h"
 
 #include <string>
 #include <sstream>

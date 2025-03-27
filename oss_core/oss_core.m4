@@ -73,7 +73,65 @@ case $host_os in
         ;;
 esac
 
+# OSS Features Disabled by Default
+
 #
+# Enable CARP compilation
+#
+AC_ARG_ENABLE([carp],
+    AC_HELP_STRING([--enable-carp], [Enable CARP Feature]),
+    [ENABLE_FEATURE(CARP)],
+    [DISABLE_FEATURE(CARP)])
+
+#
+# Enable ZeroMQ compilation
+#
+AC_ARG_ENABLE([zmq],
+    AC_HELP_STRING([--disable-zmq], [Enable ZeroMQ Feature]),
+    [ENABLE_FEATURE(ZMQ)],
+    [DISABLE_FEATURE(ZMQ)])
+
+
+# Enable V8 compilation
+#
+AC_ARG_ENABLE([v8],
+    AC_HELP_STRING([--enable-v8], [Enable V8 JavaScript Feature]),
+    [ENABLE_FEATURE(V8)],
+    [DISABLE_FEATURE(V8)])
+
+
+#
+# Enable B2BUA compilation
+#
+AC_ARG_ENABLE([b2bua],
+    AC_HELP_STRING([--enable-b2bua], [Enable B2BUA Feature]),
+    [ENABLE_FEATURE(B2BUA)],
+    [DISABLE_FEATURE(B2BUA)])
+#
+# Enable SBC compilation
+#
+AC_ARG_ENABLE([sbc],
+    AC_HELP_STRING([--enable-sbc], [Enable SBC Feature]),
+    [ENABLE_FEATURE(SBC)],
+    [DISABLE_FEATURE(SBC)])
+
+#
+# Enable Configpp Wrapper compilation
+#
+AC_ARG_ENABLE([config],
+    AC_HELP_STRING([--enable-config], [Enable Configuration File Feature]),
+    [ENABLE_FEATURE(CONFIG)],
+    [DISABLE_FEATURE(CONFIG)])
+
+#
+# Enable RTP Proxy compilation
+#
+AC_ARG_ENABLE([rtp],
+    AC_HELP_STRING([--enable-rtp], [Enable RTP Proxy Feature]),
+    [ENABLE_FEATURE(RTP)],
+    [DISABLE_FEATURE(RTP)])
+
+
 # Enable LEAK_CHECKER compilation
 #
 AC_ARG_ENABLE([leak-checker],
@@ -91,130 +149,59 @@ AC_ARG_ENABLE([crash-handler],
 
 
 #
-# Enable ALL features
+# Enable RESIPROCATE compilation
 #
-AC_ARG_ENABLE([all-features],
-    AC_HELP_STRING([--enable-all-features], [Enable ALL features]),
-    [
-        ENABLE_FEATURE(CARP)
-        ENABLE_FEATURE(V8)
-        ENABLE_FEATURE(B2BUA)
-        ENABLE_FEATURE(SBC)
-        ENABLE_FEATURE(WEBSOCKETS)
-        ENABLE_FEATURE(XOR)
-        ENABLE_FEATURE(RTP)
-        ENABLE_FEATURE(STUN)
-        ENABLE_FEATURE(ZMQ)
-        ENABLE_FEATURE(REDIS)
-        ENABLE_FEATURE(MCRYPT)
-        ENABLE_FEATURE(CONFIG)
-        ENABLE_FEATURE(INOTIFY)
-        ENABLE_FEATURE(RESIPROCATE)
-    ],
-    [
-        #
-        # Disable B2BUA compilation
-        #
-        AC_ARG_ENABLE([b2bua],
-            AC_HELP_STRING([--disable-b2bua], [Disable B2BUA Feature]),
-            [DISABLE_FEATURE(B2BUA)],
-            [ENABLE_FEATURE(B2BUA)])
-        #
-        # Disable SBC compilation
-        #
-        AC_ARG_ENABLE([sbc],
-            AC_HELP_STRING([--disable-sbc], [Disable SBC Feature]),
-            [DISABLE_FEATURE(SBC)],
-            [ENABLE_FEATURE(SBC)])
-        #
-        # Enable RESIPROCATE compilation
-        #
-        AC_ARG_ENABLE([resiprocate],
-            AC_HELP_STRING([--enable-resiprocate], [Enable Compilation of Resiprocate module]),
-            [ENABLE_FEATURE(RESIPROCATE)],
-            [DISABLE_FEATURE(RESIPROCATE)])
-        #
-        # Disable RTP Proxy compilation
-        #
-        AC_ARG_ENABLE([rtp],
-            AC_HELP_STRING([--disable-rtp], [Disable RTP Proxy Feature]),
-            [DISABLE_FEATURE(RTP)],
-            [ENABLE_FEATURE(RTP)])
-
-        #
-        # Enable UCARP compilation
-        #
-        AC_ARG_ENABLE([carp],
-            AC_HELP_STRING([--disable-carp], [Disable CARP-HA Feature]),
-            [DISABLE_FEATURE(CARP)],
-            [ENABLE_FEATURE(CARP)])
-        #
-        # Enable V8 compilation
-        #
-
-        AC_ARG_ENABLE([v8],
-            AC_HELP_STRING([--disable-v8], [Disable V8 JavaScript Feature]),
-            [DISABLE_FEATURE(V8)],
-            [ENABLE_FEATURE(V8)])
-        #
-        # Enable ZeroMQ compilation
-        #
-        AC_ARG_ENABLE([zmq],
-            AC_HELP_STRING([--disable-zmq], [Disable ZeroMQ Feature]),
-            [DISABLE_FEATURE(ZMQ)],
-            [ENABLE_FEATURE(ZMQ)])
-        #
-        # Enable Redis compilation
-        #
-        AC_ARG_ENABLE([redis],
-            AC_HELP_STRING([--enable-redis], [Disable Redis Feature]),
-            [ENABLE_FEATURE(REDIS)],
-            [DISABLE_FEATURE(REDIS)])
-        #
-        # Enable Websocket compilation
-        #
-        AC_ARG_ENABLE([websockets],
-            AC_HELP_STRING([--enable-websockets], [Disable Websockets Feature]),
-            [ENABLE_FEATURE(WEBSOCKETS)],
-            [DISABLE_FEATURE(WEBSOCKETS)])
-        #
-        # Enable XOR compilation
-        #
-        AC_ARG_ENABLE([xor],
-            AC_HELP_STRING([--enable-xor], [Enable XOR Encryption Feature]),
-            [ENABLE_FEATURE(XOR)],
-            [DISABLE_FEATURE(XOR)])
-        #
-        # Enable File Encryption compilation
-        #
-        AC_ARG_ENABLE([mcrypt],
-            AC_HELP_STRING([--enable-mcrypt], [Enable File Encryption Feature]),
-            [ENABLE_FEATURE(MCRYPT)],
-            [DISABLE_FEATURE(MCRYPT)])
-        #
-        # Enable Configpp Wrapper compilation
-        #
-        AC_ARG_ENABLE([config],
-            AC_HELP_STRING([--disable-config], [Disable Configuration File Feature]),
-            [DISABLE_FEATURE(CONFIG)],
-            [ENABLE_FEATURE(CONFIG)])
-        #
-        # Enable STUN compilation
-        #
-        AC_ARG_ENABLE([stun],
-            AC_HELP_STRING([--enable-stun], [Disable STUN Feature]),
-            [ENABLE_FEATURE(STUN)],
-            [DISABLE_FEATURE(STUN)])
+AC_ARG_ENABLE([resiprocate],
+    AC_HELP_STRING([--enable-resiprocate], [Enable Compilation of Resiprocate module]),
+    [ENABLE_FEATURE(RESIPROCATE)],
+    [DISABLE_FEATURE(RESIPROCATE)])
 
 
-        #
-        # Enable iNotify compilation
-        #
-        AC_ARG_ENABLE([inotify],
-            AC_HELP_STRING([--enable-inotify], [Disable inotify]),
-            [ENABLE_FEATURE(INOTIFY)],
-            [DISABLE_FEATURE(INOTIFY)])
-    ])
+
+#
+# Enable Redis compilation
+#
+AC_ARG_ENABLE([redis],
+    AC_HELP_STRING([--enable-redis], [Enable Redis Feature]),
+    [ENABLE_FEATURE(REDIS)],
+    [DISABLE_FEATURE(REDIS)])
+#
+# Enable Websocket compilation
+#
+AC_ARG_ENABLE([websockets],
+    AC_HELP_STRING([--enable-websockets], [Enable Websockets Feature]),
+    [ENABLE_FEATURE(WEBSOCKETS)],
+    [DISABLE_FEATURE(WEBSOCKETS)])
+#
+# Enable XOR compilation
+#
+AC_ARG_ENABLE([xor],
+    AC_HELP_STRING([--enable-xor], [Enable XOR Encryption Feature]),
+    [ENABLE_FEATURE(XOR)],
+    [DISABLE_FEATURE(XOR)])
+#
+# Enable File Encryption compilation
+#
+AC_ARG_ENABLE([mcrypt],
+    AC_HELP_STRING([--enable-mcrypt], [Enable File Encryption Feature]),
+    [ENABLE_FEATURE(MCRYPT)],
+    [DISABLE_FEATURE(MCRYPT)])
+
+#
+# Enable STUN compilation
+#
+AC_ARG_ENABLE([stun],
+    AC_HELP_STRING([--enable-stun], [Enable STUN Feature]),
+    [ENABLE_FEATURE(STUN)],
+    [DISABLE_FEATURE(STUN)])
+
+#
+# Enable iNotify compilation
+#
+AC_ARG_ENABLE([inotify],
+    AC_HELP_STRING([--enable-inotify], [Enable iNotify Feature]),
+    [ENABLE_FEATURE(INOTIFY)],
+    [DISABLE_FEATURE(INOTIFY)])
 
 #
 # Enable SIP Test compilation

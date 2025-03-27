@@ -16,6 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
+ #include "OSS/build.h"
 
 #include "OSS/RTP/RTPProxySession.h"
 #include "OSS/SDP/SDPSession.h"

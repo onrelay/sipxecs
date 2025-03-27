@@ -28,6 +28,8 @@
 #include <boost/lexical_cast.hpp>
 #include <OSS/SIP/SIPHeaderTokens.h>
 
+#include "OSS/build.h"
+
 #include "OSS/UTL/Logger.h"
 #include "OSS/SIP/SBC/SBCInviteBehavior.h"
 #include "OSS/SIP/SBC/SBCManager.h"

@@ -26,7 +26,8 @@
 #include <sstream>
 #include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>
-
+#include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 
 namespace OSS {
 namespace UTL {

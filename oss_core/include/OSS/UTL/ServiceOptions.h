@@ -36,7 +36,6 @@
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/detail/ptree_utils.hpp>
 #include <boost/exception/all.hpp>
 #include <boost/filesystem.hpp>
@@ -809,7 +808,7 @@ inline void ServiceOptions::catch_global()
     _catch_global_print(e.c_str());
   }
 #ifdef MONGO_assert
-  catch (mongo::DBException& e)
+  catch (mongocxx::exception& e)
   {
     _catch_global_print(e.toString().c_str());
   }

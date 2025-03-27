@@ -21,6 +21,7 @@
 #ifndef SIP_SIPTransaction_INCLUDED
 #define SIP_SIPTransaction_INCLUDED
 
+#include "OSS/build.h"
 
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
@@ -36,6 +37,7 @@
 #include "OSS/SIP/SIPFsm.h"
 #include "OSS/SIP/SIPStreamedConnection.h"
 
+#if ENABLE_FEATURE_B2BUA
 //
 // Forward declaration for SIPB2BTransaction
 //
@@ -47,6 +49,8 @@ namespace B2BUA {
 class SIPB2BTransaction;  
   
 } } }
+#endif // ENABLE_FEATURE_B2BUA
+
 
 namespace OSS {
 namespace SIP {
@@ -71,9 +75,12 @@ public:
   typedef boost::function<void(const SIPMessage::Ptr&, const SIPTransportSession::Ptr&, const SIPTransaction::Ptr&)> RequestCallback;
   typedef boost::function<unsigned long(const SIPMessage::Ptr&, const SIPTransportSession::Ptr&, const SIPTransaction::Ptr&)> ThrottleRequestCallback;
   typedef std::map<std::string, SIPTransaction::Ptr> Branches;
+  typedef RequestCallback ResponseCallback;
+
+#if ENABLE_FEATURE_B2BUA
   typedef boost::weak_ptr<OSS::SIP::B2BUA::SIPB2BTransaction> B2BTransactionWeakPtr;
   typedef boost::shared_ptr<OSS::SIP::B2BUA::SIPB2BTransaction> B2BTransactionSharedPtr;
-  typedef RequestCallback ResponseCallback;
+#endif // ENABLE_FEATURE_B2BUA
   
   enum Type
   {
@@ -325,17 +332,22 @@ public:
   void setResponseCallback(const ResponseCallback& responseCallback);
     /// Set a response callback for server transactions
   
+#if ENABLE_FEATURE_B2BUA
   void attachB2BTransaction(const B2BTransactionSharedPtr& pB2BTransaction);
   
   B2BTransactionSharedPtr getB2BTransaction();
-  
+#endif // ENABLE_FEATURE_B2BUA
+
   void markHasSent2xx();
   bool hasSent2xx() const;
 protected:
   SIPTransaction::Callback _responseTU;
   SIPTransaction::TerminateCallback _terminateCallback;
   SIPTransaction::ResponseCallback _responseCallback;
+
+#if ENABLE_FEATURE_B2BUA
   B2BTransactionWeakPtr _pB2BTransaction;
+#endif // ENABLE_FEATURE_B2BUA
   
   Type _type;
 private:

@@ -18,12 +18,14 @@
 //
 
 
-#include <OSS/SIP/SIPHeaderTokens.h>
+#include "OSS/build.h"
 
+#include "OSS/OSS.h"
+
+#include <OSS/SIP/SIPHeaderTokens.h>
 #include "OSS/UTL/CoreUtils.h"
 #include "OSS/Net/Net.h"
 #include "OSS/UTL/Logger.h"
-#include "v8.h"
 
 #include "OSS/SIP/SIPRequestLine.h"
 #include "OSS/SIP/SIPStatusLine.h"
@@ -33,14 +35,17 @@
 #include "OSS/SIP/SIPURI.h"
 #include "OSS/SIP/SIPContact.h"
 #include "OSS/SIP/SIPCSeq.h"
+#include "OSS/SIP/SIPMessage.h"
 #include "OSS/SIP/B2BUA/SIPB2BTransaction.h"
 
 #include "OSS/JS/JSModule.h"
 #include "OSS/JS/JSUtil.h"
 
+#include "v8.h"
+
+#include <boost/logic/tribool.hpp>
 
 using namespace OSS::SIP;
-using B2BUA::SIPB2BTransaction;
 
 JS_METHOD_IMPL(msgGetMethod)
 {
@@ -2518,6 +2523,7 @@ JS_METHOD_IMPL(msgGetAuthenticator)
 
 JS_METHOD_IMPL(msgSetTransactionProperty)
 {
+#if ENABLE_FEATURE_B2BUA
   if (_args_.Length() < 3)
   {
     js_method_set_return_false();
@@ -2532,7 +2538,7 @@ JS_METHOD_IMPL(msgSetTransactionProperty)
     return;
   }
 
-  SIPB2BTransaction* pTrn = static_cast<SIPB2BTransaction*>(pMsg->userData());
+  B2BUA::SIPB2BTransaction* pTrn = static_cast<B2BUA::SIPB2BTransaction*>(pMsg->userData());
   if (!pTrn)
   {
     js_method_set_return_false();
@@ -2551,10 +2557,16 @@ JS_METHOD_IMPL(msgSetTransactionProperty)
   pTrn->setProperty(name, value);
 
   js_method_set_return_true();
+#else
+  // B2BUA::SIPB2BTransaction not enabled
+  js_method_set_return_false();
+#endif
 }
 
 JS_METHOD_IMPL(msgGetTransactionProperty)
 {
+#if ENABLE_FEATURE_B2BUA
+
   if (_args_.Length() < 2)
   {
     js_method_set_return_undefined();
@@ -2569,7 +2581,7 @@ JS_METHOD_IMPL(msgGetTransactionProperty)
     return;
   }
 
-  SIPB2BTransaction* pTrn = static_cast<SIPB2BTransaction*>(pMsg->userData());
+  B2BUA::SIPB2BTransaction* pTrn = static_cast<B2BUA::SIPB2BTransaction*>(pMsg->userData());
   if (!pTrn)
   {
     js_method_set_return_undefined();
@@ -2590,6 +2602,10 @@ JS_METHOD_IMPL(msgGetTransactionProperty)
     pTrn->getProperty(name, value);
 
   js_method_set_return_string(value.c_str());
+#else
+  // B2BUA::SIPB2BTransaction not enabled
+  js_method_set_return_undefined();
+#endif
 }
 
 JS_METHOD_IMPL(msgSetProperty)
@@ -2654,6 +2670,7 @@ JS_METHOD_IMPL(msgGetProperty)
 
 JS_METHOD_IMPL(msgGetSourceAddress)
 {
+#if ENABLE_FEATURE_B2BUA
   if (_args_.Length() < 1)
   {
     js_method_set_return_undefined();
@@ -2668,7 +2685,7 @@ JS_METHOD_IMPL(msgGetSourceAddress)
     return;
   }
 
-  SIPB2BTransaction* pTrn = static_cast<SIPB2BTransaction*>(pMsg->userData());
+  B2BUA::SIPB2BTransaction* pTrn = static_cast<B2BUA::SIPB2BTransaction*>(pMsg->userData());
   if (!pTrn || !pTrn->serverTransport())
   {
     js_method_set_return_undefined();
@@ -2678,10 +2695,15 @@ JS_METHOD_IMPL(msgGetSourceAddress)
   OSS::Net::IPAddress addr = pTrn->serverTransport()->getRemoteAddress();
 
   js_method_set_return_string(addr.toString().c_str());
+#else 
+  // B2BUA not enabled
+  js_method_set_return_undefined();
+#endif
 }
 
 JS_METHOD_IMPL(msgGetSourcePort)
 {
+#if ENABLE_FEATURE_B2BUA
   if (_args_.Length() < 1)
   {
     js_method_set_return_undefined();
@@ -2696,7 +2718,7 @@ JS_METHOD_IMPL(msgGetSourcePort)
     return;
   }
 
-  SIPB2BTransaction* pTrn = static_cast<SIPB2BTransaction*>(pMsg->userData());
+  B2BUA::SIPB2BTransaction* pTrn = static_cast<B2BUA::SIPB2BTransaction*>(pMsg->userData());
   if (!pTrn || !pTrn->serverTransport())
   {
     js_method_set_return_undefined();
@@ -2706,10 +2728,17 @@ JS_METHOD_IMPL(msgGetSourcePort)
   OSS::Net::IPAddress addr = pTrn->serverTransport()->getRemoteAddress();
 
   js_method_set_return_integer(addr.getPort());
+
+#else 
+  // B2BUA not enabled
+  js_method_set_return_undefined();
+#endif
 }
 
 JS_METHOD_IMPL(msgGetInterfaceAddress)
 {
+#if ENABLE_FEATURE_B2BUA
+
   if (_args_.Length() < 1)
   {
     js_method_set_return_undefined();
@@ -2724,7 +2753,7 @@ JS_METHOD_IMPL(msgGetInterfaceAddress)
     return;
   }
 
-  SIPB2BTransaction* pTrn = static_cast<SIPB2BTransaction*>(pMsg->userData());
+  B2BUA::SIPB2BTransaction* pTrn = static_cast<B2BUA::SIPB2BTransaction*>(pMsg->userData());
   if (!pTrn || !pTrn->serverTransport())
   {
     js_method_set_return_undefined();
@@ -2733,10 +2762,17 @@ JS_METHOD_IMPL(msgGetInterfaceAddress)
 
   OSS::Net::IPAddress addr = pTrn->serverTransport()->getLocalAddress();
   js_method_set_return_string(addr.toString().c_str());
+
+#else 
+  // B2BUA not enabled
+  js_method_set_return_undefined();
+#endif
 }
 
 JS_METHOD_IMPL(msgGetInterfacePort)
 {
+ #if ENABLE_FEATURE_B2BUA
+
   if (_args_.Length() < 1)
   {
     js_method_set_return_undefined();
@@ -2751,7 +2787,7 @@ JS_METHOD_IMPL(msgGetInterfacePort)
     return;
   }
 
-  SIPB2BTransaction* pTrn = static_cast<SIPB2BTransaction*>(pMsg->userData());
+  B2BUA::SIPB2BTransaction* pTrn = static_cast<B2BUA::SIPB2BTransaction*>(pMsg->userData());
   if (!pTrn || !pTrn->serverTransport())
   {
     js_method_set_return_undefined();
@@ -2761,6 +2797,11 @@ JS_METHOD_IMPL(msgGetInterfacePort)
   OSS::Net::IPAddress addr = pTrn->serverTransport()->getLocalAddress();
 
   js_method_set_return_integer(addr.getPort());
+
+#else 
+  // B2BUA not enabled
+  js_method_set_return_undefined();
+#endif
 }
 
 JS_EXPORTS_INIT()

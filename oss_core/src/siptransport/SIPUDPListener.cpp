@@ -17,6 +17,8 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+#include "OSS/build.h"
+
 #include "OSS/OSS.h"
 #include "OSS/SIP/SIPUDPListener.h"
 #include "OSS/SIP/SIPTransportService.h"

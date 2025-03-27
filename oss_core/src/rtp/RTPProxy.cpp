@@ -19,6 +19,8 @@
 
 #include <boost/array.hpp>
 
+#include "OSS/build.h"
+
 #include "OSS/UTL/CoreUtils.h"
 #include "OSS/UTL/Logger.h"
 #include "OSS/RTP/RTPProxy.h"

@@ -11,7 +11,6 @@ SUBDIRS += include
 system-install:
 	mkdir -p .system-install
 	cd .system-install && ../../configure \
-	    --enable-all-features \
 	    --program-prefix= \
 	    --prefix=/usr \
 	    --exec-prefix=/usr \

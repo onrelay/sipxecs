@@ -21,6 +21,8 @@
 #ifndef SIP_SIPTransportService_INCLUDED
 #define SIP_SIPTransportService_INCLUDED
 
+#include "OSS/build.h"
+
 
 #include <map>
 #include <list>

@@ -17,6 +17,8 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+#include "OSS/build.h"
+
 #include <boost/tuple/tuple.hpp>
 #include "OSS/SIP/B2BUA/SIPB2BTransactionManager.h"
 #include "OSS/SIP/B2BUA/SIPB2BTransaction.h"

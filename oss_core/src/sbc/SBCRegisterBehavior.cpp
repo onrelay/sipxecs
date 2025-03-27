@@ -23,6 +23,8 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+#include "OSS/build.h"
+
 #include "OSS/OSS.h"
 
 #include "OSS/Net/DNS.h"

@@ -25,6 +25,9 @@
 #ifndef SIP_SBCMANAGER_INCLUDED
 #define SIP_SBCMANAGER_INCLUDED
 
+#include "OSS/build.h"
+#if ENABLE_FEATURE_SBC
+
 #include <set>
 #include "OSS/SIP/SBC/SBC.h"
 #include "OSS/SIP/SBC/SBCException.h"
@@ -551,6 +554,8 @@ inline unsigned long SBCManager::getMaxSubscribesPerSecond() const
 
 } } } /// OSS::SIP::SBC
 
+
+#endif // ENABLE_FEATURE_SBC
 
 #endif // SIP_SBCMANAGER_INCLUDED
 

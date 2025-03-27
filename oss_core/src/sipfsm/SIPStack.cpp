@@ -17,6 +17,8 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+#include "OSS/build.h"
+
 #include "OSS/OSS.h"
 #include "OSS/SIP/SIPStack.h"
 #include "OSS/SIP/SIPException.h"
@@ -1312,6 +1314,7 @@ void SIPStack::initListenersFromJSON(const OSS::JSON::Object& json, bool hasTls)
       }
     }
 
+    #if ENABLE_FEATURE_CONFIG
     if (udpEnabled)
     {
       registerConfiguredTransport(_udpListeners, _udpSubnets, ip, sipPort, external, subnets);
@@ -1336,6 +1339,7 @@ void SIPStack::initListenersFromJSON(const OSS::JSON::Object& json, bool hasTls)
     {      
       registerConfiguredTransport(_tlsListeners, _tlsSubnets, ip, tlsPort, external, subnets);
     }
+    #endif // ENABLE_FEATURE_CONFIG
   }
 
   if (!hasFoundDefault && ifaceCount > 0)

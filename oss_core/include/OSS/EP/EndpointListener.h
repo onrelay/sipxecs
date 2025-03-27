@@ -20,13 +20,16 @@
 #ifndef ENDPOINTLISTENER_H_INCLUDED
 #define	ENDPOINTLISTENER_H_INCLUDED
 
+#include "OSS/build.h"
 #include "OSS/EP/EndpointConnection.h"
 #include "OSS/SIP/SIPListener.h"
 #include "OSS/SIP/SIPTransportService.h"
 #include "OSS/SIP/SIPMessage.h"
-#include "OSS/SIP/B2BUA/SIPB2BTransaction.h"
 #include "OSS/UTL/BlockingQueue.h"
 
+#if ENABLE_FEATURE_B2BUA
+#include "OSS/SIP/B2BUA/SIPB2BTransaction.h"
+#endif // ENABLE_FEATURE_B2BUA
 
 namespace OSS {
 namespace EP {
@@ -81,14 +84,19 @@ public:
   void setDispatch(const SIPTransportSession::Dispatch& dispatch);
     /// Set the dispatch callback
   
+  
+#if ENABLE_FEATURE_B2BUA
+  /// Implementations must override this method
   virtual bool onRouteCall(
     SIPMessage::Ptr& pRequest,
     OSS::SIP::B2BUA::SIPB2BTransaction::Ptr pTransaction,
     OSS::Net::IPAddress& localInterface,
-    OSS::Net::IPAddress& target);
+    OSS::Net::IPAddress& target) {
+      return false;
+    }
     /// Returns true if this enpoint should handle the call.
-    /// Implementations must override this method
-  
+#endif // ENABLE_FEATURE_B2BUA
+
 protected:
   virtual void monitorEvents();
     /// event loop
@@ -138,14 +146,6 @@ inline void EndpointListener::setDispatch(const SIPTransportSession::Dispatch& d
   _dispatch = dispatch;
 }
 
-inline bool EndpointListener::onRouteCall(
-    SIPMessage::Ptr& pRequest,
-    OSS::SIP::B2BUA::SIPB2BTransaction::Ptr pTransaction,
-    OSS::Net::IPAddress& localInterface,
-    OSS::Net::IPAddress& target)
-{
-  return false;
-}
 
 } }  // OSS::SIP::EP
 

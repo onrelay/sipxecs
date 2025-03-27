@@ -21,6 +21,8 @@
 #ifndef OSS_H_INCLUDED
 #define OSS_H_INCLUDED
 
+#include "build.h"
+
 #define OSS_API_MAJOR_VERSION 1
 #define OSS_API_MINOR_VERSION 0
 #define OSS_API_BUILD_NUMBER 0
@@ -233,8 +235,9 @@
     #define OSS_ARCH_BIG_ENDIAN 1
 #endif
 
-#define BOOST_BIND_GLOBAL_PLACEHOLDERS 
-
+#if !defined(BOOST_BIND_GLOBAL_PLACEHOLDERS)
+  #define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#endif
 
 #include <string>
 #include <iostream>

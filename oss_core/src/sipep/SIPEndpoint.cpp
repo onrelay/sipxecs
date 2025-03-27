@@ -18,6 +18,7 @@
 // DEALINGS IN THE SOFTWARE.
 //
 
+#include "OSS/build.h"
 
 #include "OSS/SIP/EP/SIPEndpoint.h"
 #include "OSS/SIP/EP/SIPEndpointRetransmitter.h"

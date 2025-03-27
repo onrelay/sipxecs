@@ -1,3 +1,5 @@
+#include "OSS/build.h"
+
 #include <execinfo.h>
 #include <sys/resource.h>
 #include <signal.h>
@@ -87,7 +89,12 @@ int main(int argc, char** argv)
   optind = isDaemon ? 3 : 2;
 
   JS::JSIsolate::Ptr pIsolate = JS::JSIsolateManager::instance().rootIsolate();
+
+#if ENABLE_FEATURE_SBC
   OSS::SIP::SBC::SBCManager::instance()->modules().run(OSS::boost_path(path), false);
+#endif // ENABLE_FEATURE_SBC
+
   OSS::OSS_deinit();
+
   _exit(pIsolate->getExitValue());
 }

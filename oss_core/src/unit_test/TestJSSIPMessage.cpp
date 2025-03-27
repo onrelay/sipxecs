@@ -59,7 +59,7 @@ See also: For more string comparison tricks (substring, prefix, suffix, and regu
 */
 
 #include "gtest/gtest.h"
-#include "OSS/JS/JSSIPMessage.h"
+#include "OSS/SIP/SIPMessage.h"
 
 
 TEST(JSTest, test_sip_message)
@@ -95,7 +95,7 @@ TEST(JSTest, test_sip_message)
   msg << "a=sendrecv" << CRLF;
   
   OSS::SIP::SIPMessage::Ptr pMsg(new OSS::SIP::SIPMessage(msg.str()));
-  OSS::JS::JSSIPMessage jsMessage("test context");
+  OSS::SIP::SIPMessage jsMessage("test context");
   ASSERT_TRUE(jsMessage.initialize("data/js_test/jssipmessage.js", "handle_request"));
   ASSERT_TRUE(jsMessage.processRequest(pMsg));
 }
@@ -134,7 +134,7 @@ TEST(JSTest, test_sip_message_basic_auth)
 
   OSS::SIP::SIPMessage::Ptr pMsg(new OSS::SIP::SIPMessage(msg.str()));
   pMsg->setProperty("packet-source-address", "192.168.0.1");
-  OSS::JS::JSSIPMessage jsMessage("test context");
+  OSS::SIP::SIPMessage jsMessage("test context");
   ASSERT_TRUE(jsMessage.initialize("data/js_test/jssipmessageauth.js", "handle_request"));
 
   for (int i = 0; i < 10; i++)

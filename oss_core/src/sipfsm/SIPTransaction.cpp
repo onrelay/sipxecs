@@ -28,7 +28,10 @@
 #include "OSS/SIP/SIPException.h"
 #include "OSS/SIP/SIPXOR.h"
 #include "OSS/SIP/SIPFrom.h"
+
+#if ENABLE_FEATURE_B2BUA
 #include "OSS/SIP/B2BUA/SIPB2BTransaction.h"
+#endif // ENABLE_FEATURE_B2BUA
 
 
 namespace OSS {
@@ -844,6 +847,7 @@ bool SIPTransaction::allBranchesTerminated() const
   return true;
 }
 
+#if ENABLE_FEATURE_B2BUA
 void SIPTransaction::attachB2BTransaction(const B2BTransactionSharedPtr& pB2BTransaction)
 {
   _pB2BTransaction = pB2BTransaction;
@@ -853,7 +857,7 @@ SIPTransaction::B2BTransactionSharedPtr  SIPTransaction::getB2BTransaction()
 {
   return _pB2BTransaction.lock();
 }
-
+#endif // ENABLE_FEATURE_B2BUA
 
 } } // namespace OSS::SIP
 
