@@ -18,24 +18,26 @@
 #include <string>
 #include <stdlib.h>
 
-#include "IantAocBilling.h"
-#include "digitmaps/EmergencyRulesUrlMapping.h"
-#include "sipXecsService/SipXecsService.h"
 #include "os/OsLogger.h"
 #include "os/OsConfigDb.h"
 #include "os/OsFS.h"
 
+#if !defined(BOOST_BIND_GLOBAL_PLACEHOLDERS)
+  #define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#endif
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string_regex.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <mongo/client/connpool.h>
-#include <mongo/client/dbclient.h>
-#include <mongo/client/dbclient_rs.h>
-#include "sipdb/MongoMod.h"
+
+#include <bsoncxx/document/view.hpp>
+
+#include "IantAocBilling.h"
+#include "digitmaps/EmergencyRulesUrlMapping.h"
+#include "sipXecsService/SipXecsService.h"
 
 static const int SIPX_PLUGIN_PRIORITY = 991;
 static const std::string COLLECTION_IANT_BILLING = "iant_billing";
-static const std::string NAMESPACE_IANT_BILLING = "iant";
+static const std::string DATABASE_IANT_BILLING = "iant";
 
 /// Factory used by PluginHooks to dynamically link the plugin instance
 extern "C" SipBidirectionalProcessorPlugin* getTransactionPlugin(const UtlString& pluginName)
@@ -114,52 +116,78 @@ std::string IantAocBilling::aocParser(const std::string xml)
 */
 void IantAocBilling::insertDataToMongoDb(const UtlString callId, const UtlString amount, const UtlString fromField, const UtlString toField)
 {
-    OS_LOG_DEBUG(FAC_SIP,"IAB: insertDataToMongoDb: "<< "CallID: "<<callId << " Amount: "<< amount << " Timeout is "<<  getWriteQueryTimeout());
-    MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getWriteQueryTimeout()));
-    mongo::DBClientBase* dbc = conn->get();
+    OS_LOG_DEBUG(FAC_SIP, "IAB: insertDataToMongoDb: CallID: " << callId << " Amount: " << amount << " Timeout is " << getWriteQueryTimeout());
 
-    try
-    {
-	    OS_LOG_DEBUG(FAC_SIP,"IAB: insertDataToMongoDb: Trying to Query ");
-	    mongo::BSONObj query = BSON("_id" << callId);
-	    mongo::BSONObj obj = dbc->findOne(NAMESPACE_IANT_BILLING + "." + COLLECTION_IANT_BILLING, query);
-	    int oldAmount = 0;
-	    int newAmount = 0;
-	    OS_LOG_DEBUG(FAC_SIP,"IAB: insertDataToMongoDb: Query Object is " << obj.toString());
-	    if (!obj.isEmpty() && obj.hasField("amount"))
-	    {
-	        OS_LOG_DEBUG(FAC_SIP,"IAB: insertDataToMongoDb: Entry was already in MongoDB! ");
-	        oldAmount = obj.getIntField("amount");
-	    }
-	    OS_LOG_DEBUG(FAC_SIP,"IAB: insertDataToMongoDb: Old Amount is "<<oldAmount);
-	    try
-	    {
-	        OS_LOG_DEBUG(FAC_SIP,"IAB: insertDataToMongoDb: Parsing new Amount");
-	        newAmount = atoi(amount);
-	    }
-	    catch(...)
-	    {
-	        OS_LOG_DEBUG(FAC_SIP,"IAB: insertDataToMongoDb: Parsing new Amount failed");
-	    }
-		
-	    if(oldAmount<newAmount)
-	    {
-	        time_t ct = time(0);
-	        OS_LOG_DEBUG(FAC_SIP,"IAB: insertDataToMongoDb: Valid Amount ");
-			mongo::BSONObj data = BSON("_id" << callId.str() << "amount" << amount.str() << "lastupdate" << ctime(&ct) << "fromUrl" << fromField.str() << "toUrl" << toField.str());
-			dbc->update(NAMESPACE_IANT_BILLING + "." + COLLECTION_IANT_BILLING,query,data,true);
-	    }
-	    else
-	    {
-	        OS_LOG_DEBUG(FAC_SIP,"IAB: insertDataToMongoDb: Invalid Amount ");
-	    }
-	    conn->done();
-	    OS_LOG_DEBUG(FAC_SIP,"IAB: insertDataToMongoDb: Done() ");
+    try {
+		// Create MongoConnection with the configured connection information
+   	 	MongoDB::MongoConnection connection(_info);
+
+        // Access the target database and collection
+        auto database = connection.database(DATABASE_IANT_BILLING);
+        auto collection = database[COLLECTION_IANT_BILLING];
+
+        // Build the query to search for the document
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(bsoncxx::builder::basic::kvp(std::string("_id"), callId.str()));
+
+        mongocxx::options::find findOptions;
+        findOptions.max_time(std::chrono::milliseconds(_info.getReadQueryTimeoutMs()));
+
+        // Find the document matching the query
+        std::optional<bsoncxx::document::value> maybeResult = collection.find_one(queryBuilder.view(), findOptions );
+
+        int oldAmount = 0;
+        int newAmount = 0;
+
+        if (maybeResult) {
+            bsoncxx::document::view result = maybeResult->view();
+            if (result["amount"]) {
+                oldAmount = result["amount"].get_int32();
+                OS_LOG_DEBUG(FAC_SIP, "IAB: insertDataToMongoDb: Entry was already in MongoDB! Old Amount: " << oldAmount);
+            }
+        }
+
+        try {
+            newAmount = std::stoi(amount.str());
+            OS_LOG_DEBUG(FAC_SIP, "IAB: insertDataToMongoDb: Parsed new Amount: " << newAmount);
+        } catch (const std::exception& e) {
+            OS_LOG_DEBUG(FAC_SIP, "IAB: insertDataToMongoDb: Parsing new Amount failed: " << e.what());
+        }
+
+        if (oldAmount < newAmount) {
+            // Current time for last update
+            std::time_t currentTime = std::time(nullptr);
+            std::string timeString = std::ctime(&currentTime);
+            timeString.erase(timeString.find_last_not_of("\n") + 1); // Remove trailing newline
+
+            // Build the data to insert or update
+            bsoncxx::builder::basic::document dataBuilder;
+            dataBuilder.append(bsoncxx::builder::basic::kvp(std::string("_id"), callId.str()));
+            dataBuilder.append(bsoncxx::builder::basic::kvp(std::string("amount"), newAmount));
+            dataBuilder.append(bsoncxx::builder::basic::kvp(std::string("lastupdate"), timeString));
+            dataBuilder.append(bsoncxx::builder::basic::kvp(std::string("fromUrl"), fromField.str()));
+            dataBuilder.append(bsoncxx::builder::basic::kvp(std::string("toUrl"), toField.str()));
+
+            bsoncxx::document::view data = dataBuilder.view();
+
+            // Perform the upsert operation
+            collection.update_one(
+                queryBuilder.view(),
+                bsoncxx::builder::basic::make_document(
+                    bsoncxx::builder::basic::kvp(std::string("$set"), data)),
+                mongocxx::options::update{}.upsert(true)
+            );
+
+            OS_LOG_DEBUG(FAC_SIP, "IAB: insertDataToMongoDb: Valid Amount. Document updated or inserted.");
+        } else {
+            OS_LOG_DEBUG(FAC_SIP, "IAB: insertDataToMongoDb: Invalid Amount. No update performed.");
+        }
+    } catch (const std::exception& e) {
+        OS_LOG_DEBUG(FAC_SIP, "IAB: insertDataToMongoDb: Connection or operation failed: " << e.what());
+        throw; // Rethrow the exception to allow higher-level handling
     }
-    catch (...)
-    {
-	    OS_LOG_DEBUG(FAC_SIP,"IAB: insertDataToMongoDb: Connection failed! ");
-    }
+
+    OS_LOG_DEBUG(FAC_SIP, "IAB: insertDataToMongoDb: Operation completed.");
 }
 
 

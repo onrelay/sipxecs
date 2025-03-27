@@ -31,4 +31,5 @@ libsipxiantaocbilling_la_LIBADD = \
 	-lboost_system \
 	@SIPXPORT_LIBS@ \
 	@SIPXCOMMSERVER_LIBS@ \
-	-lmongoclient
+	-lmongocxx \
+	-lbsoncxx
