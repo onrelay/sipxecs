@@ -773,9 +773,11 @@ class SipUtilities {
 			String fromUser = ((SipURI) from.getAddress().getURI()).getUser();
 			String fromDomain = ((SipURI) from.getAddress().getURI()).getHost();
 			String fromDisplayName = from.getAddress().getDisplayName();
+			/*
 			if (fromDisplayName == null || fromDisplayName.isEmpty()) {
 				fromDisplayName = "sipxbridge";
 			}
+			*/
 
 			Address address = itspAccount.getCallerAlias(from.getAddress());
 			if (address != null && passertedIdentityHeader == null ) {
@@ -833,7 +835,7 @@ class SipUtilities {
 
 			fromHeader.setTag(new Long(Math.abs(new java.util.Random()
 					.nextLong())).toString());
-			if (!domain.equals("anonymous.invalid") && fromDisplayName != null ) {
+			if (!domain.equals("anonymous.invalid") && fromDisplayName != null && !fromDisplayName.isEmpty() ) {
 				// Set the from header display name.
 				fromHeader.getAddress().setDisplayName(fromDisplayName);
 			}
