@@ -8,15 +8,46 @@ config_opts['rltype'] = ''
 config_opts['use_bootstrap'] = False
 #config_opts['use_bootstrap_image'] = True
 #config_opts['bootstrap_image'] = 'rockylinux:9'
-config_opts['chroot_additional_packages'] = [
+
+# Fixes rocky linux annobin bug with find-plugindir() script, hardcoding instead
+# Ensures java 8 is default in case other jdks are pulled in
+config_opts['chroot_post_install'] = [
+    '/usr/bin/sed -i "s/%:find-plugindir()/-iplugindir=\\/usr\\/lib\\/gcc\\/x86_64-redhat-linux\\/11\\/plugin\\//g" /usr/lib/rpm/redhat/redhat-annobin-cc1',
+    'alternatives --set java java-1.8.0-openjdk.x86_64'
+    ]
+
+config_opts['build_requirements'] = [
+    'git',
+    'zip',
     'rpm-build-libs',
     'redhat-rpm-config',
+    'automake',
+    'gcc',
     'gcc-c++',
-    'krb5-devel',
+    'gcc-plugin-annobin',
+    'cppunit-devel',
+    'pcre-devel',
     'openssl-devel',
-    'v8-devel',
-    'libdb-devel',
-    'libdb-cxx-devel'
+    'krb5-devel',
+    'java-1.8.0-openjdk-devel',
+    'java-17-openjdk-devel'
+    ]
+
+config_opts['chroot_additional_packages'] = [
+    'elasticsearch',
+    'mongodb-database-tools',
+    'mongodb-mongosh',
+    'mongodb-org',
+    'mongodb-org-database',
+    'mongodb-org-database-tools-extra',
+    'mongodb-org-mongos',
+    'mongodb-org-server',
+    'mongodb-org-tools',
+    'nodejs',
+    'nodejs-libs',
+    'nodejs-docs',
+    'nodejs-full-i18n',
+    'npm'
     ]
 
 config_opts['yum.conf'] = """
@@ -74,6 +105,21 @@ gpgcheck=1
 countme=1
 gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-$releasever
 
+[elasticsearch]
+name=Elasticsearch repository for 8.x packages
+baseurl=https://artifacts.elastic.co/packages/8.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+
+[mongodb-org-8.0]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/9/mongodb-org/8.0/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://pgp.mongodb.com/server-8.0.asc
 
 [sipxcom]
 name=sipXcom
