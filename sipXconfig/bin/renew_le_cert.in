@@ -1,6 +1,6 @@
 #!/bin/sh
 
-/usr/bin/python -c 'import random; import time; time.sleep(random.random() * 3600)'
+/usr/bin/python3 -c 'import random; import time; time.sleep(random.random() * 3600)'
 /usr/bin/systemctl stop httpd.service && /usr/bin/certbot renew
 /usr/bin/systemctl start httpd.service
 
