@@ -1,13 +1,12 @@
 #include <cppunit/TestCase.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <sipxunit/TestUtilities.h>
-#include <sipdb/SubscribeDB.h>
-#include <sipdb/MongoDB.h>
-#include <os/OsDateTime.h>
-#include <mongo/util/net/hostandport.h>
-#include <mongo/client/connpool.h>
 
-#include <boost/format.hpp>
+#include <sipdb/MongoDB.h>
+#include <sipdb/SubscribeDB.h>
+
+#include <os/OsDateTime.h>
+
 
 
 using namespace std;
@@ -163,21 +162,27 @@ class SubscribeDBTest: public CppUnit::TestCase
   SubscribeDB* _db;
   const MongoDB::ConnectionInfo _info;
   unsigned long _timeNow;
-  const std::string _databaseName;
+  const std::string _ns;
 public:
-  SubscribeDBTest() : _info(MongoDB::ConnectionInfo(mongo::ConnectionString(mongo::HostAndPort(gLocalHostAddr)))),
-                      _databaseName(gDatabaseName)
+  SubscribeDBTest() : _info(MongoDB::ConnectionInfo(std::string(gLocalHostAddr))),
+                      _ns(gDatabaseName)
   {
   }
 
   void setUp()
   {
-    _timeNow = OsDateTime::getSecsSinceEpoch();
+      _timeNow = OsDateTime::getSecsSinceEpoch();
 
-    _db = new SubscribeDB(_info, NULL, _databaseName);
-    MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-    pConn->get()->remove(_databaseName, mongo::Query());
-    pConn->done();
+      _db = new SubscribeDB(_info, NULL, _ns);
+
+      // Create the MongoDB connection
+      MongoDB::MongoConnection connection(_info);
+      mongocxx::collection collection = connection.collection(_ns);
+
+      // Remove all documents from the collection
+      collection.delete_many({});
+
+      // Done with the connection (no need for `done()` with modern driver)
   }
 
   void tearDown()

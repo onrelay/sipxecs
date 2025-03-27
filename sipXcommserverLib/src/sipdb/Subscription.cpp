@@ -105,7 +105,7 @@ Subscription::Subscription(
     _expires = expires;
 }
 
-Subscription::Subscription(const mongo::BSONObj& bson)
+Subscription::Subscription(const bsoncxx::document::view& bson)
 {
     operator=(bson);
 }
@@ -121,92 +121,76 @@ Subscription& Subscription::operator=(const Subscription& subscription)
     return *this;
 }
 
-Subscription& Subscription::operator=(const mongo::BSONObj& bsonObj)
+Subscription& Subscription::operator=(const bsoncxx::document::view& bsonObj)
 {
-  //For Subscription DB object id is of type mongo::OID and not a std::string
-  mongo::BSONElement id_field;
-  if (true == bsonObj.getObjectID(id_field))
-  {
-    mongo::OID oid;
-    id_field.Val(oid);
-    _oid = oid.str();
-  }
-
-	if (bsonObj.hasField(Subscription::component_fld()))
-		_component = bsonObj.getStringField(Subscription::component_fld());
-
-	if (bsonObj.hasField(Subscription::uri_fld()))
-		_uri = bsonObj.getStringField(Subscription::uri_fld());
-
-	if (bsonObj.hasField(Subscription::callId_fld()))
-		_callId = bsonObj.getStringField(Subscription::callId_fld());
-
-	if (bsonObj.hasField(Subscription::contact_fld()))
-		_contact = bsonObj.getStringField(Subscription::contact_fld());
-
-	if (bsonObj.hasField(Subscription::notifyCseq_fld()))
-		_notifyCseq = bsonObj.getIntField(Subscription::notifyCseq_fld());
-
-	if (bsonObj.hasField(Subscription::subscribeCseq_fld()))
-		_subscribeCseq = bsonObj.getIntField(Subscription::subscribeCseq_fld());
-
-	if (bsonObj.hasField(Subscription::eventTypeKey_fld()))
-		_eventTypeKey = bsonObj.getStringField(Subscription::eventTypeKey_fld());
-
-	if (bsonObj.hasField(Subscription::eventType_fld()))
-		_eventType = bsonObj.getStringField(Subscription::eventType_fld());
-
-	if (bsonObj.hasField(Subscription::id_fld()))
-		_id = bsonObj.getStringField(Subscription::id_fld());
-
-	if (bsonObj.hasField(Subscription::toUri_fld()))
-		_toUri = bsonObj.getStringField(Subscription::toUri_fld());
-
-	if (bsonObj.hasField(Subscription::fromUri_fld()))
-		_fromUri = bsonObj.getStringField(Subscription::fromUri_fld());
-
-	if (bsonObj.hasField(Subscription::key_fld()))
-		_key = bsonObj.getStringField(Subscription::key_fld());
-
-	if (bsonObj.hasField(Subscription::recordRoute_fld()))
-		_recordRoute = bsonObj.getStringField(Subscription::recordRoute_fld());
-
-	if (bsonObj.hasField(Subscription::accept_fld()))
-		_accept = bsonObj.getStringField(Subscription::accept_fld());
-
-	if (bsonObj.hasField(Subscription::file_fld()))
-		_file = bsonObj.getStringField(Subscription::file_fld());
-
-	if (bsonObj.hasField(Subscription::version_fld()))
-		_version = bsonObj.getIntField(Subscription::version_fld());
-
-  if (bsonObj.hasField(Subscription::expires_fld()))
-  {
-    mongo::BSONElement expiresElement = bsonObj.getField(Subscription::expires_fld());
-
-    // save the time depending on its type
-    if (mongo::Date == expiresElement.type())
+    // Extract ObjectId (_id)
+    bsoncxx::document::element idElem = bsonObj[Subscription::id_fld()];
+    if (idElem && idElem.type() == bsoncxx::type::k_oid)
     {
-      _expires = static_cast<unsigned int>(expiresElement.date().toTimeT());
+        _oid = std::string(idElem.get_oid().value.to_string());
     }
-    else if (expiresElement.isNumber())
-    {
-      _expires = static_cast<unsigned int>(expiresElement.Number());
-      OS_LOG_WARNING(FAC_SIP, "Found old-style subscription"
-          << " Uri: " << _uri
-          << " Contact: " << _contact
-          << " Call-Id: " << _callId);
-    }
-    else
-    {
-      OS_LOG_ERROR(FAC_SIP, "unsupported " << expiresElement.toString() << " element for subscription"
-          << " Uri: " << _uri
-          << " Contact: " << _contact
-          << " Call-Id: " << _callId);
-    }
-  }
 
-  return *this;
+    // Extract string fields
+    bsoncxx::document::element componentElem = bsonObj[Subscription::component_fld()];
+    if (componentElem && componentElem.type() == bsoncxx::type::k_string)
+    {
+        _component = std::string(componentElem.get_string().value);
+    }
+
+    bsoncxx::document::element uriElem = bsonObj[Subscription::uri_fld()];
+    if (uriElem && uriElem.type() == bsoncxx::type::k_string)
+    {
+        _uri = std::string(uriElem.get_string().value);
+    }
+
+    bsoncxx::document::element callIdElem = bsonObj[Subscription::callId_fld()];
+    if (callIdElem && callIdElem.type() == bsoncxx::type::k_string)
+    {
+        _callId = std::string(callIdElem.get_string().value);
+    }
+
+    bsoncxx::document::element contactElem = bsonObj[Subscription::contact_fld()];
+    if (contactElem && contactElem.type() == bsoncxx::type::k_string)
+    {
+        _contact = std::string(contactElem.get_string().value);
+    }
+
+    // Extract integer fields
+    bsoncxx::document::element notifyCseqElem = bsonObj[Subscription::notifyCseq_fld()];
+    if (notifyCseqElem && notifyCseqElem.type() == bsoncxx::type::k_int32)
+    {
+        _notifyCseq = notifyCseqElem.get_int32().value;
+    }
+
+    bsoncxx::document::element subscribeCseqElem = bsonObj[Subscription::subscribeCseq_fld()];
+    if (subscribeCseqElem && subscribeCseqElem.type() == bsoncxx::type::k_int32)
+    {
+        _subscribeCseq = subscribeCseqElem.get_int32().value;
+    }
+
+    // Extract expiration time
+    bsoncxx::document::element expiresElem = bsonObj[Subscription::expires_fld()];
+    if (expiresElem)
+    {
+        if (expiresElem.type() == bsoncxx::type::k_date)
+        {
+            _expires = static_cast<unsigned int>(expiresElem.get_date().to_int64() / 1000);
+        }
+        else if (expiresElem.type() == bsoncxx::type::k_int32)
+        {
+            _expires = static_cast<unsigned int>(expiresElem.get_int32().value);
+        }
+        else if (expiresElem.type() == bsoncxx::type::k_int64)
+        {
+            _expires = static_cast<unsigned int>(expiresElem.get_int64().value);
+        }
+        else
+        {
+            OS_LOG_ERROR(FAC_SIP, "Unsupported type for Subscription::expires field");
+        }
+    }
+
+    return *this;
 }
 
 void Subscription::swap(Subscription& subscription)

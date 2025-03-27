@@ -2,8 +2,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <sipxunit/TestUtilities.h>
 #include <sipdb/Subscription.h>
-#include <mongo/util/net/hostandport.h>
-#include <mongo/client/connpool.h>
+#include <bsoncxx/document/view.hpp>
 
 
 using namespace std;
@@ -69,10 +68,10 @@ class SubscriptionTest: public CppUnit::TestCase
 
    Subscription* _db;
    const MongoDB::ConnectionInfo _info;
-   std::string _databaseName;
+   std::string _ns;
 public:
-   SubscriptionTest() : _info(MongoDB::ConnectionInfo(mongo::ConnectionString(mongo::HostAndPort(gLocalHostAddr)))),
-                       _databaseName(gDatabaseName)
+   SubscriptionTest() : _info(MongoDB::ConnectionInfo(std::string(gLocalHostAddr))),
+                       _ns(gDatabaseName)
    {
    }
 
@@ -98,9 +97,9 @@ public:
       subscription._expires = subscriptionTestData[0].expires;
    }
 
-   void createBSONObj(Subscription& subscription,  mongo::BSONObj& bsonObj)
+   void createBSONObj(Subscription& subscription,  bsoncxx::document::view& bsonObj)
    {
-      mongo::BSONObjBuilder bsonObjBuilder;
+      bsoncxx::builder::basic::document bsonObjBuilder;
 
       mongo::OID oid(subscription.oid());
 
@@ -125,13 +124,17 @@ public:
 
       bsonObj = bsonObjBuilder.obj();
    }
-
+   
    void setUp()
    {
-      MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-      pConn->get()->remove(_databaseName, mongo::Query());
+      // Create the MongoDB connection
+      MongoDB::MongoConnection connection(_info);
+      mongocxx::collection collection = connection.collection(_ns);
 
-      pConn->done();
+      // Remove all documents from the collection
+      collection.delete_many({});  // Equivalent to removing all documents
+
+      // Connection done is not needed, as it's handled by the connection object
    }
 
    void tearDown()
@@ -215,7 +218,7 @@ public:
       // init Subscription with default values
       setSubscription(subscription);
 
-      mongo::BSONObj bsonObj;
+      bsoncxx::document::view bsonObj;
       createBSONObj(subscription, bsonObj);
 
       // copy values using Subscription constructor
@@ -232,7 +235,7 @@ public:
       // init Subscription with default values
       setSubscription(subscription);
 
-      mongo::BSONObj bsonObj;
+      bsoncxx::document::view bsonObj;
       createBSONObj(subscription, bsonObj);
 
       // copy the values using the operator= function

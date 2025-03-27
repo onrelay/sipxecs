@@ -14,9 +14,28 @@
  * details.
  */
 
-#include "sipdb/MongoOpLog.h"
-#include "sipdb/MongoMod.h"
-#include <mongo/client/connpool.h>
+#include <chrono>
+#include <thread>
+#include <string>
+#include <vector>
+#include <map>
+#include <utility>
+ 
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/basic/kvp.hpp>
+#include <bsoncxx/document/value.hpp>
+#include <bsoncxx/document/view.hpp>
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/types.hpp>
+#include <bsoncxx/types/bson_value/view.hpp>
+#include <bsoncxx/types/bson_value/value.hpp>
+
+#include <mongocxx/exception/exception.hpp>
+#include <mongocxx/options/find.hpp>
+#include <mongocxx/cursor.hpp>
+
+#include <sipdb/MongoDB.h> 
+#include <sipdb/MongoOpLog.h> 
 
 #include <os/OsLogger.h>
 #include <os/OsDateTime.h>
@@ -34,24 +53,27 @@ void MongoOpLog::createOpLogDataMap(OpLogDataMap& opLogDataMap)
   opLogDataMap.insert(std::pair<std::string, OpLogType>("d", Delete));
 }
 
-MongoOpLog::MongoOpLog(const MongoDB::ConnectionInfo& info,
-                       const mongo::BSONObj& customQuery,
-                       const int querySleepTime,
-                       const unsigned long startFromTimestamp) :
-	MongoDB::BaseDB(info, NS),
-  _isRunning(false),
-  _pThread(0),
-  _querySleepTime(60),
-  _startFromTimestamp(startFromTimestamp),
-  _customQuery(customQuery)
-{
-  OS_LOG_INFO(FAC_SIP, "MongoOpLog::MongoOpLog:" <<
-                        " entering" <<
-                        " querySleepTime=" << querySleepTime <<
-                        " startFromTimestamp=" << startFromTimestamp);
 
-  _customQuery.getOwned();
-  createOpLogDataMap(_opLogDataMap);
+MongoOpLog::MongoOpLog(const MongoDB::ConnectionInfo& info,
+                      const bsoncxx::builder::basic::document& customQuery,
+                      const int querySleepTime,
+                      const unsigned long startFromTimestamp)
+                    : MongoDB::BaseDB(info, NS),
+                    _isRunning(false),
+                    _pThread(nullptr),
+                    _querySleepTime(querySleepTime > 0 ? querySleepTime : 60),  // Default to 60 if invalid
+                    _startFromTimestamp(startFromTimestamp),
+                    _lastEntry(bsoncxx::builder::basic::make_document().view())
+{ 
+    // Copy the contents of customQuery into _customQuery
+    _customQuery.append(bsoncxx::builder::basic::concatenate(customQuery.view()));
+
+    OS_LOG_INFO(FAC_SIP, "MongoOpLog::MongoOpLog:"
+                          << " entering"
+                          << " querySleepTime=" << querySleepTime
+                          << " startFromTimestamp=" << startFromTimestamp);
+
+    createOpLogDataMap(_opLogDataMap);
 }
 
 MongoOpLog::~MongoOpLog()
@@ -127,87 +149,89 @@ void MongoOpLog::stop()
 // cursor->more() for 1 or 2 seconds until new entries are added to this collection.
 // After that the entries are processed and the thread gets blocked again in
 // cursor->more function
-bool MongoOpLog::processQuery(mongo::DBClientCursor* cursor,
-                              mongo::BSONObj& lastEntry)
+bool  MongoOpLog::processQuery(mongocxx::cursor& cursor,
+                              bsoncxx::document::value& lastEntry)
 {
-  OS_LOG_INFO(FAC_SIP, "MongoOpLog::processQuery:" <<
-                        " entering");
+    OS_LOG_INFO(FAC_SIP, "MongoOpLog::processQuery: entering");
 
-  if (!cursor)
-  {
-    OS_LOG_ERROR(FAC_SIP, "MongoOpLog:processQuery - Cursor is NULL");
-    return false;
-  }
-
-  while (_isRunning)
-  {
-    if (!cursor->more())
-    {
-      if (_querySleepTime)
-      {
-        sleep(_querySleepTime);
-      }
-
-      if (cursor->isDead())
-      {
-        break;
-      }
-
-      continue; // we will try more() again
+    // Check if the cursor is empty
+    if (cursor.begin() == cursor.end()) {
+        OS_LOG_ERROR(FAC_SIP, "MongoOpLog::processQuery - Cursor is empty or invalid");
+        return false;
     }
 
-    // WARNING: BSONObj must stay in scope for the life of the BSONElement
-    lastEntry = cursor->next().getOwned();
-    runCallBacks(lastEntry);
-  }
+    for (bsoncxx::document::view doc : cursor) {
+        if (!_isRunning) {
+            break;
+        }
 
-  return true;
-}
-
-void MongoOpLog::createQuery(const mongo::BSONObj& lastEntry, mongo::BSONObj& query)
-{
-  OS_LOG_INFO(FAC_SIP, "MongoOpLog::createQuery:" <<
-                        " entering");
-
-  mongo::BSONObjBuilder queryBSONObjBuilder;
-
-  queryBSONObjBuilder.appendElements(BSON(ts_fld() << mongo::GT << lastEntry[ts_fld()]));
-  if (!_customQuery.isEmpty())
-  {
-    queryBSONObjBuilder.appendElements(_customQuery);
-  }
-  query = queryBSONObjBuilder.obj();
-}
-
-bool MongoOpLog::prepareFirstEntry(mongo::BSONObj& lastEntry)
-{
-  OS_LOG_INFO(FAC_SIP, "MongoOpLog::prepareFirstEntry:" <<
-                        " entering");
-
-  if (_startFromTimestamp == 0)
-  {
-    lastEntry = mongoMod::minKey;
-  }
-  else
-  {
-    mongo::BSONObjBuilder builder;
-    unsigned long long timeStamp = (unsigned long long)_startFromTimestamp << 32;
-    builder.appendTimestamp(ts_fld(), timeStamp);
-
-    lastEntry = builder.obj();
-
-    // Check that the created BSONElement has the correct timeStamp
-    unsigned long long lastEntryTimeStamp = lastEntry[ts_fld()].timestampTime();
-    if (_startFromTimestamp * MULTIPLIER != lastEntryTimeStamp)
-    {
-      OS_LOG_ERROR(FAC_SIP, "MongoOpLog::prepareFirstEntry" <<
-                            " time stamps are different " <<
-                            _startFromTimestamp * MULTIPLIER << lastEntryTimeStamp);
-      return false;
+        // Store the last processed document
+        lastEntry = bsoncxx::document::value(doc);
+        runCallBacks(lastEntry);
     }
-  }
 
-  return true;
+    return true;
+}
+
+void MongoOpLog::createQuery(bsoncxx::builder::basic::document& queryBuilder, const bsoncxx::document::view& lastEntry )
+{
+    OS_LOG_INFO(FAC_SIP, "MongoOpLog::createQuery: entering");
+
+    // Add the timestamp condition
+    bsoncxx::document::element tsElement = lastEntry[ts_fld()];
+    if (tsElement) {
+        queryBuilder.append(
+            bsoncxx::builder::basic::kvp(
+                std::string(ts_fld()), 
+                bsoncxx::builder::basic::make_document(
+                    bsoncxx::builder::basic::kvp(std::string("$gt"), tsElement.get_value()))));
+    }
+
+    // Add custom query elements if they exist
+    if (!_customQuery.view().empty()) {
+        for (bsoncxx::document::element element : _customQuery.view()) {
+            queryBuilder.append(bsoncxx::builder::basic::kvp(element.key(), element.get_value()));
+        }
+    }
+}
+
+bool MongoOpLog::prepareFirstEntry(bsoncxx::document::value& lastEntry)
+{
+    OS_LOG_INFO(FAC_SIP, "MongoOpLog::prepareFirstEntry: entering");
+
+    if (_startFromTimestamp == 0) 
+    {
+        // Use MongoDB's MinKey equivalent
+        lastEntry = bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp(std::string(ts_fld()), bsoncxx::types::b_minkey{})
+        );
+    } 
+    else 
+    {
+        bsoncxx::builder::basic::document builder;
+
+        // Extract the seconds part
+        uint32_t seconds = static_cast<uint32_t>(_startFromTimestamp);
+
+        // Append the timestamp with correct struct
+        builder.append(bsoncxx::builder::basic::kvp(
+            std::string(ts_fld()),
+            bsoncxx::types::b_timestamp{0, seconds} 
+        ));
+
+        lastEntry = builder.extract();
+
+        // Verify the created BSONElement has the correct timestamp
+        bsoncxx::types::b_timestamp ts = lastEntry.view()[ts_fld()].get_timestamp();
+        if (_startFromTimestamp * MULTIPLIER != ts.timestamp) 
+        {
+            OS_LOG_ERROR(FAC_SIP, "MongoOpLog::prepareFirstEntry: time stamps are different " <<
+                                      (_startFromTimestamp * MULTIPLIER) << " != " << ts.timestamp);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void MongoOpLog::internal_run_esafe()
@@ -222,7 +246,7 @@ void MongoOpLog::internal_run_esafe()
       internal_run();
     }
     #ifdef MONGO_assert
-    catch (mongo::DBException& e)
+    catch (mongocxx::exception& e)
     {
       OS_LOG_ERROR( FAC_SIP, "MongoOpLog::internal_run_esafe Mongo DB Exception: "
           << e.what());
@@ -258,35 +282,51 @@ void MongoOpLog::internal_run_esafe()
 
 void MongoOpLog::internal_run()
 {
-  OS_LOG_INFO(FAC_SIP, "MongoOpLog::internal_run:"
-              << " entering");
+    OS_LOG_INFO(FAC_SIP, "MongoOpLog::internal_run: entering");
 
-  mongo::BSONObj query;
-  // WARNING: BSONObj must stay in scope for the life of the BSONElement
-  createQuery(_lastEntry, query);
+    bsoncxx::builder::basic::document queryBuilder;
+    createQuery(queryBuilder, _lastEntry);
 
-  MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
+    // Initialize MongoConnection
+    MongoDB::MongoConnection mongoConnection(_info.getConnectionUri());
 
-  while (_isRunning)
-  {
-    // If we are at the end of the data, block for a while rather
-    // than returning no data. After a timeout period, we do return as normal
-    std::auto_ptr<mongo::DBClientCursor> cursor = pConn->get()->query(_ns, query, 0, 0, 0,
-                 mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData );
-
-    bool rc = processQuery(cursor.get(), _lastEntry);
-    if (false == rc)
+    if (!mongoConnection.ok())
     {
-      break;
+        OS_LOG_ERROR(FAC_SIP, "MongoOpLog::internal_run: Failed to connect to MongoDB");
+        return;
     }
 
-    createQuery(_lastEntry, query);
-  }
+    auto collection = mongoConnection.collection(_ns);
 
-  pConn->done();
+    while (_isRunning)
+    {
+        try
+        {
+            // Set options for a tailable cursor
+            auto options = mongocxx::options::find{};
+            options.cursor_type(mongocxx::cursor::type::k_tailable_await);
 
-  OS_LOG_INFO(FAC_SIP, "MongoOpLog::internal_run:"
-              << " exiting");
+            // Execute the query
+            auto cursor = collection.find(queryBuilder.view(), options);
+
+            bool rc = processQuery(cursor, _lastEntry);
+            if (!rc)
+            {
+                break;
+            }
+
+            // Recreate the query with the updated `_lastEntry`
+            queryBuilder.clear();
+            createQuery(queryBuilder,_lastEntry);
+        }
+        catch (const mongocxx::exception& e)
+        {
+            OS_LOG_ERROR(FAC_SIP, "MongoOpLog::internal_run: MongoDB query failed: " + std::string(e.what()));
+            break;
+        }
+    }
+
+    OS_LOG_INFO(FAC_SIP, "MongoOpLog::internal_run: exiting");
 }
 
 bool MongoOpLog::getOpLogType(const std::string& operationType,
@@ -305,41 +345,38 @@ bool MongoOpLog::getOpLogType(const std::string& operationType,
   return false;
 }
 
-void MongoOpLog::runCallBacks(const mongo::BSONObj& bSONObj)
+void MongoOpLog::runCallBacks(const bsoncxx::document::value& bSONObj)
 {
-  std::string type = bSONObj.getStringField(op_fld());
-  std::string opLog = bSONObj.toString();
+    std::string type = std::string(bSONObj[op_fld()].get_string());
+    std::string opLog = bsoncxx::to_json(bSONObj.view());
 
-  OS_LOG_DEBUG(FAC_SIP, "MongoOpLog::notifyCallBacks:" <<
-                " type=" << type <<
-                " opLog=" << opLog);
+    OS_LOG_DEBUG(FAC_SIP, "MongoOpLog::notifyCallBacks:" <<
+                  " type=" << type <<
+                  " opLog=" << opLog);
 
-  if (type.empty())
-  {
-    OS_LOG_WARNING(FAC_SIP, "MongoOpLog::notifyCallBacks:"
-                << " type is empty");
-    return;
-  }
+    if (type.empty())
+    {
+        OS_LOG_WARNING(FAC_SIP, "MongoOpLog::notifyCallBacks: type is empty");
+        return;
+    }
 
-  // Notify all subscribers
-  for(OpLogCbVector::iterator iter = _opLogCbVectors[All].begin(); iter != _opLogCbVectors[All].end(); iter++)
-  {
-    (*iter)(bSONObj);
-  }
+    // Notify all subscribers
+    for (auto& callback : _opLogCbVectors[All])
+    {
+        callback(bSONObj);
+    }
 
-  OpLogType opLogType;
-  bool found = false;
-  found = getOpLogType(type, opLogType);
-  if (false == found)
-  {
-    return;
-  }
-  
-  // Notify specific subscribers
-  for(OpLogCbVector::iterator iter = _opLogCbVectors[opLogType].begin();
-      iter != _opLogCbVectors[opLogType].end(); iter++)
-  {
-    (*iter)(bSONObj);
-  }
+    OpLogType opLogType;
+    bool found = getOpLogType(type, opLogType);
+    if (!found)
+    {
+        return;
+    }
+
+    // Notify specific subscribers
+    for (auto& callback : _opLogCbVectors[opLogType])
+    {
+        callback(bSONObj);
+    }
 }
 

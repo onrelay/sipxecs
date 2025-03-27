@@ -1,14 +1,13 @@
 #include <cppunit/TestCase.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <sipxunit/TestUtilities.h>
+
+#include <os/OsDateTime.h>
+
+#include <sipdb/MongoDB.h>
 #include <sipdb/SubscribeDB.h>
 #include <sipdb/SubscribeExpireThread.h>
-#include <sipdb/MongoDB.h>
-#include <os/OsDateTime.h>
-#include <mongo/util/net/hostandport.h>
-#include <mongo/client/connpool.h>
 
-#include <boost/format.hpp>
 
 #include "MongoDbVerifier.h"
 
@@ -93,28 +92,32 @@ class SubscribeExpireThreadTest: public CppUnit::TestCase
   SubscribeDB* _db;
   const MongoDB::ConnectionInfo _info;
   int _timeNow;
-  const std::string _databaseName;
+  const std::string _ns;
   int MAX_SECONDS_TO_WAIT;
 public:
-  SubscribeExpireThreadTest() : _info(MongoDB::ConnectionInfo(mongo::ConnectionString(mongo::HostAndPort(gLocalHostAddr)))),
-                                _databaseName(gDatabaseName)
+  SubscribeExpireThreadTest() : _info(MongoDB::ConnectionInfo(std::string(gLocalHostAddr))),
+                                _ns(gDatabaseName)
   {
   }
 
   void setUp()
   {
-    MAX_SECONDS_TO_WAIT = 10;
+      MAX_SECONDS_TO_WAIT = 10;
 
-    _db = new SubscribeDB(_info, NULL, _databaseName);
-    MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-    pConn->get()->remove(_databaseName, mongo::Query());
+      _db = new SubscribeDB(_info, NULL, _ns);
 
-    MongoDbVerifier _mongoDbVerifier(pConn, _databaseName, MAX_SECONDS_TO_WAIT * 1000);
-    _mongoDbVerifier.waitUntilEmpty();
+      // Create the MongoDB connection
+      MongoDB::MongoConnection connection(_info);
+      mongocxx::collection collection = connection.collection(_ns);
 
-    pConn->done();
+      // Remove all documents from the collection
+      collection.delete_many({});
 
-    _timeNow = (int) OsDateTime::getSecsSinceEpoch();
+      // Wait until the collection is empty using MongoDbVerifier
+      MongoDbVerifier mongoDbVerifier(connection, _ns, MAX_SECONDS_TO_WAIT * 1000);
+      mongoDbVerifier.waitUntilEmpty();
+
+      _timeNow = static_cast<int>(OsDateTime::getSecsSinceEpoch());
   }
 
   void tearDown()

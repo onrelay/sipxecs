@@ -16,10 +16,10 @@
 #ifndef REGEXPIRETHREAD_H
 #define	REGEXPIRETHREAD_H
 
-#include <boost/thread.hpp>
-#include <boost/asio.hpp>
-#include "sipdb/RegDB.h"
 #include "os/OsLogger.h"
+
+#include "sipdb/MongoDB.h"
+#include "sipdb/RegDB.h"
 
 
 class RegExpireThread

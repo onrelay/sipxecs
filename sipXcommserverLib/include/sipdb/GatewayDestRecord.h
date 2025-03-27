@@ -18,7 +18,9 @@
 
 
 #include <string>
-#include <boost/shared_ptr.hpp>
+
+#include <bsoncxx/document/view.hpp>
+
 #include "sipdb/MongoDB.h"
 
 /**
@@ -39,13 +41,13 @@ public:
   GatewayDestRecord();
   GatewayDestRecord(const std::string& callId, const std::string& toTag, const std::string& fromTag);
   GatewayDestRecord(const GatewayDestRecord& record);
-  GatewayDestRecord(const mongo::BSONObj& bson);
+  GatewayDestRecord(const bsoncxx::document::view& bson);
 
   ~GatewayDestRecord();
 
   void swap(GatewayDestRecord& record);
   GatewayDestRecord& operator=(const GatewayDestRecord& record);
-  GatewayDestRecord& operator=(const mongo::BSONObj& bson);
+  GatewayDestRecord& operator=(const bsoncxx::document::view& bson);
 
   const std::string& getCallId() const;
   static const char* callIdField();
@@ -62,7 +64,7 @@ public:
   const std::string& getLineId() const;
   static const char* lineIdField();
 
-  unsigned int getExpirationTime() const;
+  std::int64_t getExpirationTime() const;
   static const char* expirationTimeField();
 
 
@@ -71,7 +73,7 @@ public:
   void setFromTag(const std::string& fromTag);
   void setIdentity(const std::string& identity);
   void setLineId(const std::string& lineId);
-  void setExpirationTime(unsigned int expirationTime);
+  void setExpirationTime(std::int64_t expirationTime);
 
 private:
   std::string _callId;
@@ -80,7 +82,7 @@ private:
   std::string _identity;
   std::string _lineId;
 
-  unsigned int _expirationTime;
+  std::int64_t _expirationTime;
 };
 
 //
@@ -112,7 +114,7 @@ inline const std::string& GatewayDestRecord::getLineId() const
   return _lineId;
 }
 
-inline unsigned int GatewayDestRecord::getExpirationTime() const
+inline std::int64_t GatewayDestRecord::getExpirationTime() const
 {
     return _expirationTime;
 }
@@ -142,7 +144,7 @@ inline void GatewayDestRecord::setLineId(const std::string& lineId)
   _lineId = lineId;
 }
 
-inline void GatewayDestRecord::setExpirationTime(unsigned int expirationTime)
+inline void GatewayDestRecord::setExpirationTime(std::int64_t  expirationTime)
 {
   _expirationTime = expirationTime;
 }

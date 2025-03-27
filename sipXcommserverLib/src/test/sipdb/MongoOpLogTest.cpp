@@ -1,15 +1,12 @@
 #include <cppunit/TestCase.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <sipxunit/TestUtilities.h>
+
+#include <bsoncxx/document/view.hpp>
+
 #include <sipdb/MongoOpLog.h>
+
 #include <os/OsDateTime.h>
-#include <mongo/util/net/hostandport.h>
-#include <mongo/client/connpool.h>
-
-#include <boost/format.hpp>
-
-
-#include <boost/function.hpp>
 
 #include "MongoDbVerifier.h"
 
@@ -103,98 +100,140 @@ class MongoOpLogTest: public CppUnit::TestCase
   int _insertNr;
   int _allNr;
   int _deleteNr;
-  const std::string _databaseName;
+  const std::string _ns;
   int MAX_SECONDS_TO_WAIT;
 public:
-  MongoOpLogTest() : _info(MongoDB::ConnectionInfo(mongo::ConnectionString(mongo::HostAndPort(gLocalHostAddr)))),
+  MongoOpLogTest() : _info(MongoDB::ConnectionInfo(std::string(gLocalHostAddr)))),
                     _updateNr(0),
                     _insertNr(0),
                     _allNr(0),
                     _deleteNr(0),
-                    _databaseName(gDbDataOpLogName)
+                    _ns(gDbDataOpLogName)
   {
   }
 
-  void setUp()
-  {
+Here's the updated version of the setUp() method using the new MongoDB C++ driver:
+
+void setUp()
+{
     MAX_SECONDS_TO_WAIT = 10;
-    MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-    pConn->get()->dropCollection(_databaseName);
 
-    MongoDbVerifier _mongoDbVerifier(pConn, _databaseName, MAX_SECONDS_TO_WAIT * 1000);
-    _mongoDbVerifier.waitUntilEmpty();
-    pConn->done();
-  }
+    try
+    {
+        // Initialize the MongoDB connection and drop the collection
+        MongoDB::MongoConnection connection(_info);
+        mongocxx::collection collection = connection.collection(_ns);
+
+        collection.drop();
+
+        // Initialize MongoDbVerifier and wait until the collection is empty
+        MongoDbVerifier mongoDbVerifier(connection, _ns, MAX_SECONDS_TO_WAIT * 1000);
+        mongoDbVerifier.waitUntilEmpty();
+    }
+    catch (const mongocxx::exception& e)
+    {
+        OS_LOG_ERROR(FAC_SIP, "setUp - MongoDB exception: " << e.what());
+        throw;  // Re-throw for higher-level handling
+    }
+}
 
   void tearDown()
   {
   }
 
-  void waitUntilDbDataIsUpdated(MongoDB::ScopedDbConnectionPtr& pConn, DbData& dbData)
+  void waitUntilDbDataIsUpdated(MongoConnection& connection, DbData& dbData)
   {
-    mongo::BSONObj bSONObj = BSON(dbData.name_fld() << dbData.getName() <<
-                                  dbData.value_fld() << dbData.getValue());
+      bsoncxx::builder::basic::document bSONObjBuilder;
+      bSONObjBuilder.append(kvp(std::string(dbData.name_fld()), dbData.getName()));
+      bSONObjBuilder.append(kvp(std::string(dbData.value_fld()), dbData.getValue()));
 
-    MongoDbVerifier _mongoDbVerifier(pConn, _databaseName, MAX_SECONDS_TO_WAIT * 1000);
-    _mongoDbVerifier.waitUntilHaveOneEntry(bSONObj);
+      MongoDbVerifier mongoDbVerifier(connection, _ns, MAX_SECONDS_TO_WAIT * 1000);
+      mongoDbVerifier.waitUntilHaveOneEntry(bSONObjBuilder.view());
   }
 
   void updateDbDataWaitUntilReadVerified(DbData& dbData)
   {
+      try
+      {
+          // Build query and update documents
+          bsoncxx::builder::basic::document queryBuilder;
+          queryBuilder.append(kvp(std::string(dbData.id_fld()), dbData.getId()));
 
-    mongo::BSONObj query = BSON(dbData.id_fld() << dbData.getId());
+          bsoncxx::builder::basic::document bsonObjBuilder;
+          bsonObjBuilder.append(kvp(std::string(dbData.name_fld()), dbData.getName()));      // "ts"
+          bsonObjBuilder.append(kvp(std::string(dbData.value_fld()), dbData.getValue()));    // "h"
 
-    mongo::BSONObjBuilder bsonObjBuilder;
-    bsonObjBuilder <<
-        dbData.name_fld() << dbData.getName() <<                                       // "ts"
-        dbData.value_fld() << dbData.getValue();                                         // "h"
+          bsoncxx::document::view update = bsonObjBuilder.view();
 
-    mongo::BSONObj update;
-    update = BSON(gMongoSetOperator << bsonObjBuilder.obj());
+          // Initialize MongoDB connection and client
+          MongoDB::MongoConnection connection(_info);
+          mongocxx::collection collection = connection.collection(_ns);
 
-    MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-    mongo::DBClientBase* client = pConn->get();
+          // Perform the update operation
+          collection.update_one(queryBuilder.view(), bsoncxx::builder::stream::document{} << "$set" << update << bsoncxx::builder::stream::finalize);
 
-    client->update(_databaseName, query, update, true, false);
-    client->ensureIndex(_databaseName, BSON(dbData.id_fld() << 1 ));
+          // Ensure index for the dbData ID field
+          collection.create_index(
+              bsoncxx::builder::basic::make_document(
+                  bsoncxx::builder::basic::kvp(std::string(dbData.id_fld()), 1)
+              )
+          );
 
-    waitUntilDbDataIsUpdated(pConn, dbData);
-
-    pConn->done();
+          // Wait until the data is updated
+          waitUntilDbDataIsUpdated(connection, dbData);
+      }
+      catch (const mongocxx::exception& e)
+      {
+          OS_LOG_ERROR(FAC_SIP, "updateDbDataWaitUntilReadVerified - MongoDB exception: " << e.what());
+          throw;  // Re-throw for higher-level handling
+      }
   }
 
   void deleteDbDataWaitUntilReadVerified()
   {
-    MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
+      try
+      {
+          // Initialize MongoDB connection and client
+          MongoDB::MongoConnection connection(_info);
+          mongocxx::collection collection = connection.collection(_ns);
 
-    mongo::BSONObj queryBSONObj;
-    pConn->get()->remove(_databaseName, queryBSONObj);
+          // Create an empty query document
+          bsoncxx::builder::basic::document queryBuilder;
 
-    MongoDbVerifier _mongoDbVerifier(pConn, _databaseName, MAX_SECONDS_TO_WAIT * 1000);
-    _mongoDbVerifier.waitUntilEmpty();
+          // Perform the delete operation
+          collection.delete_many(queryBuilder.view());
 
-    pConn->done();
+          // Verify the deletion using MongoDbVerifier
+          MongoDbVerifier mongoDbVerifier(connection, _ns, MAX_SECONDS_TO_WAIT * 1000);
+          mongoDbVerifier.waitUntilEmpty();
+
+      }
+      catch (const mongocxx::exception& e)
+      {
+          OS_LOG_ERROR(FAC_SIP, "deleteDbDataWaitUntilReadVerified - MongoDB exception: " << e.what());
+          throw;  // Re-throw for higher-level handling
+      }
   }
 
-  void OpLogCallBackInsert(const mongo::BSONObj& bSONObj)
+  void OpLogCallBackInsert(const bsoncxx::document::view& bSONObj)
   {
     std::cout << boost::format("insert=%s\n") % bSONObj.toString();
     _insertNr++;
   }
 
-  void OpLogCallBackDelete(const mongo::BSONObj& bSONObj)
+  void OpLogCallBackDelete(const bsoncxx::document::view& bSONObj)
   {
     std::cout << boost::format("delete=%s\n") % bSONObj.toString();
     _deleteNr++;
   }
 
-  void OpLogCallBackAll(const mongo::BSONObj& bSONObj)
+  void OpLogCallBackAll(const bsoncxx::document::view& bSONObj)
   {
     std::cout << boost::format("all=%s\n") % bSONObj.toString();
     _allNr++;
   }
 
-  void OpLogCallBackUpdate(const mongo::BSONObj& bSONObj)
+  void OpLogCallBackUpdate(const bsoncxx::document::view& bSONObj)
   {
     std::cout << boost::format("update=%s\n") % bSONObj.toString();
     _updateNr++;
@@ -241,7 +280,7 @@ public:
 //    mongo::mutex::scoped_lock lk(mongo::OpTime::m);
 //    unsigned long long timestamp = mongo::OpTime::now(lk).asDate();
 
-    MongoOpLog mongoOpLog(_info, BSON("ns" << _databaseName), 0, currentTime);
+    MongoOpLog mongoOpLog(_info, BSON("ns" << _ns), 0, currentTime);
 
     // register callback for insert
     mongoOpLog.registerCallback(MongoOpLog::Insert, boost::bind(&MongoOpLogTest::OpLogCallBackInsert, this, _1));
@@ -286,7 +325,7 @@ public:
     // mongo oplog return entries with time stamp greater then currentTime
     currentTime--;
 
-    MongoOpLog mongoOpLog(_info, BSON("ns" << _databaseName), 0, currentTime);
+    MongoOpLog mongoOpLog(_info, BSON("ns" << _ns), 0, currentTime);
 
     // register callback for insert
     mongoOpLog.registerCallback(MongoOpLog::Insert, boost::bind(&MongoOpLogTest::OpLogCallBackInsert, this, _1));

@@ -1,14 +1,19 @@
 #include "sipXecsService/SipXApplication.h"
-#include <boost/bind.hpp>
 
 #include "os/OsResourceLimit.h"
-
 #include "os/OsServiceOptions.h"
+#include "os/OsLogger.h"
+#include "os/OsExceptionHandler.h"
+#include "os/shared/OsMsgQShared.h"
 
-#include <os/OsExceptionHandler.h>
+#include <mongocxx/instance.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/uri.hpp>
+#include <mongocxx/logger.hpp>
+
 
 #include <sipdb/MongoDB.h>
-#include <mongo/util/log.h>
+
 
 static bool gHasDaemonized = false;
 
@@ -128,85 +133,88 @@ void SipXApplication::doBlockSignals()
 
 bool SipXApplication::init(int argc, char* argv[], const SipXApplicationData& appData, OsServiceOptions* pOptions)
 {
-  _appData = appData;
-  _argc = argc;
-  _argv = argv;
+    _appData = appData;
+    _argc = argc;
+    _argv = argv;
 
-  // register default exception handler methods
-  // exit for mongo tcp related exceptions, core dump for others
-  OsExceptionHandler::instance();
-
-  doDaemonize(argc, argv);
-
-  if (_appData._blockSignals)
-  {
-    doBlockSignals();
-  }
-
-  registerSignalHandlers();
-
-  OsMsgQShared::setQueuePreference(_appData._queuePreference);
-
-  if (!pOptions)
-  {
-    _pOsServiceOptions->addDefaultOptions();
-
-    if (!parse(*_pOsServiceOptions, argc, argv, _appData._configFilename))
+    // Initialize the MongoDB C++ driver
+    try
     {
-      fprintf(stderr, "Failed to load configuration\n");
+
+      // Register default exception handler methods
+      OsExceptionHandler::instance();
+
+      doDaemonize(argc, argv);
+
+      if (_appData._blockSignals)
+      {
+          doBlockSignals();
+      }
+
+      registerSignalHandlers();
+      OsMsgQShared::setQueuePreference(_appData._queuePreference);
+
+      if (!pOptions)
+      {
+          _pOsServiceOptions->addDefaultOptions();
+
+          if (!parse(*_pOsServiceOptions, argc, argv, _appData._configFilename))
+          {
+              fprintf(stderr, "Failed to load configuration\n");
+              exit(1);
+          }
+      }
+      else
+      {
+          // The application owns config; it should take care of doing the stuff above
+          delete _pOsServiceOptions;
+          _pOsServiceOptions = pOptions;
+          _autoDeleteConfig = false;
+      }
+
+      // Checks version or help options
+      showVersionHelp();
+
+      // Raise the file handle limit to maximum allowable
+      if (_appData._increaseResourceLimits)
+      {
+          increaseResourceLimits();
+      }
+
+      // Initialize log file
+      initLogger();
+
+      if (_appData._enableMongoDriverLogging)
+      {
+          SipXApplication::enableMongoDriverLogging();
+
+          _clientInstance = std::make_unique<mongocxx::instance>(
+            std::unique_ptr<mongocxx::logger>(std::move(_clientLogger))
+        );
+      }
+      else {
+          _clientInstance = std::make_unique<mongocxx::instance>();
+      }
+
+      std::set_terminate(&OsExceptionHandler::catch_global);
+
+      if (_appData._checkMongo)
+      {
+          if (!testMongoDBConnection())
+          {
+              exit(1);
+          }
+      }
+
+      Os::Logger::instance().log(FAC_SIP, PRI_NOTICE, "%s initialized", _appData._appName.c_str());
+      _initialized = true;
+      return true;
+
+  } catch (const std::exception& e) {
+      fprintf(stderr, "Failed to initialize MongoDB driver: %s\n", e.what());
+      OS_LOG_ERROR(FAC_ODBC, "Failed to initialize MongoDB driver: " << e.what());
       exit(1);
-    }
   }
-  else
-  {
-    //
-    // The application owns config.  It should take care of doing the stuff above
-    //
-    delete _pOsServiceOptions;
-    _pOsServiceOptions = pOptions;
-    _autoDeleteConfig = false;
-  }
-
-  // checks version or help options
-  showVersionHelp();
-
-  // Initialize log file
-  initLogger();
-
-  std::set_terminate(&OsExceptionHandler::catch_global);
-
-  // initialize the Mongo client driver
-  mongo::Status status = mongo::client::initialize();
-  if (!status.isOK())
-  {
-    fprintf(stderr, "Failed to initialize Mongo client driver: %s\n", status.toString().c_str());
-    OS_LOG_ERROR(FAC_ODBC, "Failed to initialize Mongo client driver: " << status.toString());
-    exit(1);
-  }
-
-  // Raise the file handle limit to maximum allowable
-  if (_appData._increaseResourceLimits)
-  {
-    increaseResourceLimits();
-  }
-
-  if (_appData._checkMongo)
-  {
-   if (!testMongoDBConnection())
-   {
-     mongo::client::shutdown();
-     exit(1);
-   }
-  }
-
-  if (_appData._enableMongoDriverLogging)
-  {
-    enableMongoDriverLogging();
-  }
-
-  Os::Logger::instance().log(FAC_SIP, PRI_NOTICE, "%s initialized", _appData._appName.c_str());
-  _initialized = true;
-  return true;
 }
 
 bool SipXApplication::increaseResourceLimits(const std::string& configurationPath)
@@ -335,39 +343,30 @@ bool SipXApplication::testMongoDBConnection()
   bool ret = true;
 
   std::string errmsg;
-  MongoDB::ConnectionInfo ginfo = MongoDB::ConnectionInfo::globalInfo();
-  mongo::ConnectionString mongoConn = ginfo.getConnectionString();
-  if (false == MongoDB::ConnectionInfo::testConnection(mongoConn, errmsg))
+
+  MongoDB::ConnectionInfo globalConnectionInfo = MongoDB::ConnectionInfo::globalInfo();
+
+  if( !MongoDB::ConnectionInfo::testConnection( globalConnectionInfo.getConnectionUri(), errmsg ) )
   {
       Os::Logger::instance().log(FAC_KERNEL, PRI_CRIT,
               "Failed to connect to '%s' - %s",
-              mongoConn.toString().c_str(), errmsg.c_str());
+              globalConnectionInfo.getConnectionUri().to_string().c_str(), errmsg.c_str());
 
       ret = false;
   }
-
   return ret;
 }
 
 void SipXApplication::terminate()
 {
-  //
-  // Terminate the timer thread
-  //
-  OsTimer::terminateTimerService();
+    // Terminate the timer thread
+    OsTimer::terminateTimerService();
 
-  // Say goodnight Gracie...
-  Os::Logger::instance().log(FAC_KERNEL, PRI_NOTICE, "Exiting %s", _appData._appName.c_str()) ;
-  Os::Logger::instance().flush();
+    // Say goodnight Gracie...
+    Os::Logger::instance().log(FAC_KERNEL, PRI_NOTICE, "Exiting %s", _appData._appName.c_str());
+    Os::Logger::instance().flush();
 
-  // Clear log appenders
-  mongo::logger::globalLogDomain()->clearAppenders();
-
-  mongo::Status status = mongo::client::shutdown();
-  if (!status.isOK())
-  {
-    OS_LOG_WARNING(FAC_ODBC, "Failed to shutdown Mongo client driver: " << status.toString());
-  }
+    // No explicit shutdown required for mongocxx::instance, as it handles cleanup automatically
 }
 
 void SipXApplication::initLoggerByConfigurationFile()
@@ -547,113 +546,77 @@ void SipXApplication::waitForTerminationRequest(int seconds)
   std::cout << "Termination Signal RECEIVED" << std::endl;
 }
 
-// Converts to Mongo log severity
-// Note: PRI_INFO and PRI_NOTICE are intentionally mapped to Log() and, respectively,
-//       Info().
-static mongo::logger::LogSeverity convertToMongoLogSeverity(int priority)
-{
-  switch (priority)
-  {
-  case PRI_DEBUG:
-    return mongo::logger::LogSeverity::Debug(3);
-  case PRI_INFO:
-    return mongo::logger::LogSeverity::Log();
-  case PRI_NOTICE:
-    return mongo::logger::LogSeverity::Info();
-  case PRI_WARNING:
-    return mongo::logger::LogSeverity::Warning();
-  case PRI_ERR:
-    return mongo::logger::LogSeverity::Error();
-  default:
-    return mongo::logger::LogSeverity::Severe();
+// Converts to MongoDB C++ driver log severity
+mongocxx::log_level SipXApplication::MongoClientLogHandler::convertToMongoLogSeverity(int priority) {
+  switch (priority) {
+      case PRI_DEBUG:
+          return mongocxx::log_level::k_trace;  // Most verbose
+      case PRI_INFO:
+          return mongocxx::log_level::k_debug;  // Equivalent of Log()
+      case PRI_NOTICE:
+          return mongocxx::log_level::k_info;   // Equivalent of Info()
+      case PRI_WARNING:
+          return mongocxx::log_level::k_warning;
+      case PRI_ERR:
+          return mongocxx::log_level::k_error;
+      default:
+          return mongocxx::log_level::k_critical;
   }
 }
 
-// Converts from Mongo log severity
-// Note: PRI_INFO and PRI_NOTICE are intentionally mapped to Log() and, respectively,
-//       Info().
-static int convertFromMongoLogSeverity(mongo::logger::LogSeverity severity)
-{
-  if (mongo::logger::LogSeverity::Severe() == severity)
-  {
-    return PRI_CRIT;
-  }
-  else if (mongo::logger::LogSeverity::Error() == severity)
-  {
-    return PRI_ERR;
-  }
-  else if (mongo::logger::LogSeverity::Warning() == severity)
-  {
-    return PRI_WARNING;
-  }
-  else if (mongo::logger::LogSeverity::Info() == severity)
-  {
-    return PRI_NOTICE;
-  }
-  else if (mongo::logger::LogSeverity::Log() == severity)
-  {
-    return PRI_INFO;
-  }
-  else
-  {
-    return PRI_DEBUG;
+// Converts from MongoDB C++ driver log severity
+int SipXApplication::MongoClientLogHandler::convertFromMongoLogSeverity(mongocxx::log_level severity) {
+  switch (severity) {
+      case mongocxx::log_level::k_critical:
+          return PRI_CRIT;
+      case mongocxx::log_level::k_error:
+          return PRI_ERR;
+      case mongocxx::log_level::k_warning:
+          return PRI_WARNING;
+      case mongocxx::log_level::k_info:
+          return PRI_NOTICE;
+      case mongocxx::log_level::k_debug:
+      case mongocxx::log_level::k_trace:
+          return PRI_DEBUG;
+      default:
+          return PRI_DEBUG;  // Default to debug for unknown levels
   }
 }
 
-// Mongo Client appender used to intercept driver's logs
-mongo::Status SipXApplication::MongoClientLogAppender::append(const mongo::logger::MessageLogDomain::EventAppender::Event& event)
+void SipXApplication::MongoClientLogHandler::operator()(
+  mongocxx::log_level level, 
+  bsoncxx::stdx::string_view domain, 
+  bsoncxx::stdx::string_view message) noexcept  
 {
-  int priority = convertFromMongoLogSeverity(event.getSeverity());
+  
+  int priority = convertFromMongoLogSeverity(level);
 
-  // ignore all lower-priority logs
-  if (!Os::Logger::instance().willLog(priority))
-  {
-    return mongo::Status::OK();
+  if (!Os::Logger::instance().willLog(priority)) {
+      return;
   }
 
-  // shape the stream like: <[ContextName - ]LogMessage>
   std::ostringstream strm;
+  strm << "[" << domain << "] " << message;
 
-  // prefix the log message with its context (if any)
-  if (!event.getContextName().empty())
-  {
-    strm << event.getContextName().toString() << " - ";
-  }
-
-  // set the actual message
-  strm << event.getMessage().toString();
-
-  // log the actual message
   Os::Logger::instance().log(FAC_MONGO_CLIENT, priority, "%s", strm.str().c_str());
-
-  return mongo::Status::OK();
 }
 
-void SipXApplication::enableMongoDriverLogging() const
+void SipXApplication::enableMongoDriverLogging()  
 {
   std::string mongoClientIniFilePath = SIPX_CONFDIR "/mongo-client.ini";
   OsServiceOptions mongoClientConfig(mongoClientIniFilePath);
 
   mongoClientConfig.addOptionString(0, "enable-driver-logging", "", OsServiceOptions::ConfigOption, false);
 
-  if (mongoClientConfig.parseOptions())
-  {
-    bool enableDriverLogging = true;
-    mongoClientConfig.getOption("enable-driver-logging", enableDriverLogging);
-    OS_LOG_INFO(FAC_SIP, "SipXApplication::enableMongoDriverLogging Enable mongo driver logging = " << enableDriverLogging);
+  if (mongoClientConfig.parseOptions()) {
+      bool enableDriverLogging = true;
+      mongoClientConfig.getOption("enable-driver-logging", enableDriverLogging);
+      OS_LOG_INFO(FAC_SIP, "SipXApplication::enableMongoDriverLogging Enable mongo driver logging = " << enableDriverLogging);
 
-    if (enableDriverLogging)
-    {
-      int priority = Os::Logger::instance().getLevel();
-      mongo::logger::globalLogDomain()->setMinimumLoggedSeverity(convertToMongoLogSeverity(priority));
-
-      // clear all appenders in order to add ours
-      mongo::logger::globalLogDomain()->clearAppenders();
-      mongo::logger::globalLogDomain()->attachAppender(mongo::logger::MessageLogDomain::AppenderAutoPtr(new MongoClientLogAppender()));
-    }
-  }
-  else
-  {
-    OS_LOG_ERROR(FAC_SIP, "SipXApplication::enableMongoDriverLogging Failed parsing mongo client init file: " << mongoClientIniFilePath);
+      if (enableDriverLogging) {
+          _clientLogger = std::make_unique<SipXApplication::MongoClientLogHandler>();
+      }
+  } else {
+      OS_LOG_ERROR(FAC_SIP, "SipXApplication::enableMongoDriverLogging Failed parsing mongo client init file: " << mongoClientIniFilePath);
   }
 }

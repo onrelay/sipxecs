@@ -118,12 +118,12 @@ public:
        const UtlString& to,
        const UtlString& from,
        const UtlString& callid,
-       const unsigned long timeNow,
+       const std::int64_t timeNow,
         bool preferPrimary = true);
 
 //    void removeRows (const UtlString& key);
 
-    void removeExpired( const UtlString& component, const unsigned long timeNow );
+    void removeExpired( const UtlString& component, const std::int64_t timeNow );
 
     void getUnexpiredSubscriptions (
         const UtlString& component,
@@ -146,7 +146,7 @@ public:
         const UtlString& callid,
         const UtlString& eventTypeKey,
         const UtlString& id,
-        unsigned long timeNow,
+        std::int64_t timeNow,
         int updatedNotifyCseq,
         int version);
 
@@ -182,7 +182,7 @@ public:
     static SubscribeDB* CreateInstance(bool ensureIndexes = false);
 
 private:
-    void ensureIndexes(mongo::DBClientBase* client = NULL);
+    void ensureIndexes();
 
     SubscribeDB* _local;
     bool _isFirstEnsureIndexes;

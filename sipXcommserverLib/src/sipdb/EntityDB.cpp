@@ -13,15 +13,26 @@
  * details.
  */
 
-#include <mongo/client/connpool.h>
-#include <mongo/client/dbclient.h>
+
 #include "os/OsLogger.h"
-#include "sipdb/EntityDB.h"
+
 #include "sipdb/MongoDB.h"
-#include "sipdb/MongoMod.h"
-#include <boost/algorithm/string.hpp>
-#include <boost/asio.hpp>
+#include "sipdb/EntityDB.h"
+
 #include <vector>
+
+#include <mongocxx/client.hpp>
+#include <mongocxx/uri.hpp>
+#include <mongocxx/collection.hpp>
+#include <mongocxx/options/find.hpp>
+#include <mongocxx/cursor.hpp>
+
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/basic/kvp.hpp>
+#include <bsoncxx/document/view.hpp>
+#include <bsoncxx/types.hpp>
+#include <bsoncxx/document/view.hpp>
+#include <bsoncxx/json.hpp>             
 
 using namespace std;
 
@@ -147,119 +158,145 @@ EntityDB::EntityDB(const MongoDB::ConnectionInfo& info, const std::string& ns, s
   init();
 }
 
+void EntityDB::init()
+{
+  bsoncxx::document::value minKeyDoc = bsoncxx::builder::basic::make_document(
+      bsoncxx::builder::basic::kvp("_id", bsoncxx::types::b_minkey{}));
+
+  bsoncxx::document::view minKeyView = minKeyDoc.view();
+  _lastTailId = minKeyView["_id"];
+}
+
 
 bool EntityDB::findByIdentity(const string& ident, EntityRecord& entity) const
 {
-  MongoDB::ReadTimer readTimer(const_cast<EntityDB&>(*this));
-  std::string identity = validate_identity_string(ident);
+    MongoDB::ReadTimer readTimer(const_cast<EntityDB&>(*this)); // Start the read timer
 
-  OS_LOG_INFO(FAC_ODBC, "EntityDB::findByIdentity - Finding entity record for " << identity << " from namespace " << _ns);
-  //
-  // Check if we have it cache
-  //
-  ExpireCacheable pCacheObj = const_cast<ExpireCache&>(_cache).get(identity);
-  if (pCacheObj)
-  {
-    OS_LOG_DEBUG(FAC_ODBC, identity << " is present in namespace " << _ns << " (CACHED)");
-    entity = *pCacheObj;
-    return true;
-  }
+    std::string identity = validate_identity_string(ident);
 
-  mongo::BSONObj query = BSON(EntityRecord::identity_fld() << identity);
+    OS_LOG_INFO(FAC_ODBC, "EntityDB::findByIdentity - Finding entity record for " << identity << " from namespace " << _ns);
 
-  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getReadQueryTimeout()));
+    // Check if we have it in cache
+    ExpireCacheable pCacheObj = const_cast<ExpireCache&>(_cache).get(identity);
+    if (pCacheObj)
+    {
+        OS_LOG_DEBUG(FAC_ODBC, identity << " is present in namespace " << _ns << " (CACHED)");
+        entity = *pCacheObj;
+        return true;
+    }
 
-  readTimer.setDBConnOK(conn->ok());
+    // Try to connect to MongoDB and perform the query
+    try
+    {
+        // Create the MongoDB connection
+        MongoDB::MongoConnection connection(_info);
 
-  mongo::BSONObjBuilder builder;
-  BaseDB::nearest(builder, query);
+        readTimer.setDBConnOK(connection.ok());
 
-  mongo::BSONObj entityObj = conn->get()->findOne(_ns, readQueryMaxTimeMS(builder.obj()), 0, mongo::QueryOption_SlaveOk);
-  if (!entityObj.isEmpty())
-  {
-    OS_LOG_DEBUG(FAC_ODBC, identity << " is present in namespace " << _ns);
-    entity = entityObj;
-    conn->done();
-    //
-    // Cache the entity
-    //
-    const_cast<ExpireCache&>(_cache).add(identity, ExpireCacheable(new EntityRecord(entity)));
-    return true;
-  }
+        // Access the collection directly
+        mongocxx::collection collection = connection.collection(_ns);
 
-  OS_LOG_DEBUG(FAC_ODBC, identity << " is NOT present in namespace " << _ns);
-  OS_LOG_INFO(FAC_ODBC, "EntityDB::findByIdentity - Unable to find entity record for " << identity << " from namespace " << _ns);
-  conn->done();
-  return false;
+        // Build the BSON query
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(bsoncxx::builder::basic::kvp(std::string(EntityRecord::identity_fld()), identity));
+
+        // Execute the query with a limit of 1 document
+        mongocxx::cursor cursor = collection.find(queryBuilder.view(), mongocxx::options::find{}.limit(1));
+
+        // Check if any documents were returned
+        auto it = cursor.begin();
+        if (it == cursor.end())
+        {
+            OS_LOG_DEBUG(FAC_ODBC, identity << " is NOT present in namespace " << _ns);
+            OS_LOG_INFO(FAC_ODBC, "EntityDB::findByIdentity - Unable to find entity record for " << identity << " from namespace " << _ns);
+            return false;
+        }
+
+        // Get the first document from the cursor
+        bsoncxx::document::view doc = *it;
+        OS_LOG_DEBUG(FAC_ODBC, identity << " is present in namespace " << _ns);
+
+        // Deserialize the document into an EntityRecord
+        entity = doc;
+
+        // Cache the entity
+        const_cast<ExpireCache&>(_cache).add(identity, ExpireCacheable(new EntityRecord(entity)));
+
+        return true;
+    }
+    catch (mongocxx::exception& e)
+    {
+        // Mark the DB connection as failed if an exception occurs
+        readTimer.setDBConnOK(false);
+        OS_LOG_ERROR(FAC_ODBC, "EntityDB::findByIdentity - Error querying MongoDB: " << e.what());
+    }
+    return false;
 }
 
 void EntityDB::getEntitiesByType(const std::string& entityType, Entities& entities, bool nocache)
 {
-  MongoDB::ReadTimer readTimer(const_cast<EntityDB&>(*this));
-  OS_LOG_INFO(FAC_ODBC, "EntityDB::getEntitiesByType - Finding entity records for type " << entityType << " from namespace " << _ns);
+    MongoDB::ReadTimer readTimer(const_cast<EntityDB&>(*this));
+    OS_LOG_INFO(FAC_ODBC, "EntityDB::getEntitiesByType - Finding entity records for type " 
+                          << entityType << " from namespace " << _ns);
 
-  //
-  // Check if we have it in cache
-  //
-  if (!nocache)
-  {
-    EntityTypeCacheable pCacheObj = const_cast<EntityTypeCache&>(_typeCache).get(entityType);
-    if (pCacheObj)
+    //
+    // Check if we have it in cache
+    //
+    if (!nocache)
     {
-      OS_LOG_DEBUG(FAC_ODBC, "EntityDB::getEntitiesByType - " << entityType << " is present in namespace " << _ns << " (CACHED)");
-      entities = *pCacheObj;
-      return;
+        EntityTypeCacheable pCacheObj = const_cast<EntityTypeCache&>(_typeCache).get(entityType);
+        if (pCacheObj)
+        {
+            OS_LOG_DEBUG(FAC_ODBC, "EntityDB::getEntitiesByType - " << entityType 
+                               << " is present in namespace " << _ns << " (CACHED)");
+            entities = *pCacheObj;
+            return;
+        }
     }
-  }
 
-  mongo::BSONObj query = BSON(EntityRecord::entity_fld() << entityType);
+    // Build the query
+    bsoncxx::builder::basic::document queryBuilder;
+    queryBuilder.append(bsoncxx::builder::basic::kvp(std::string(EntityRecord::entity_fld()), entityType));
 
-  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getReadQueryTimeout()));
+    // Use MongoConnection to get a connection and database
+    MongoDB::MongoConnection connection(_info.getConnectionUri());
 
-  readTimer.setDBConnOK(conn->ok());
+    readTimer.setDBConnOK(connection.ok());
 
-  mongo::BSONObjBuilder builder;
-  BaseDB::nearest(builder, query);
+    mongocxx::collection collection = connection.collection(_ns);
 
-  /** query N objects from the database into an array.  makes sense mostly when you want a small number of results.  if a huge number, use
-            query() and iterate the cursor.
-      void findN(vector<BSONObj>& out, const string&ns, Query query, int nToReturn, int nToSkip = 0, const BSONObj *fieldsToReturn = 0, int queryOptions = 0);
-    */
+    // Use a query limit of 1024
+    mongocxx::options::find options;
+    options.limit(1024);
+    options.max_time(std::chrono::milliseconds(_info.getReadQueryTimeoutMs()));
 
-  BSONObjects objects;
-  conn->get()->findN(
-    objects, // out
-    _ns, // ns
-    readQueryMaxTimeMS(builder.obj()), // query
-    1024, // nToReturn
-    0, // nToSkip,
-    0, // fieldsToReturn
-    mongo::QueryOption_SlaveOk // queryOptions
-  );
+    // Perform the query
+    auto cursor = collection.find(queryBuilder.view(), options);
 
-  entities.clear();
-  for (BSONObjects::iterator iter = objects.begin(); iter != objects.end(); iter++)
-  {
-    if (!iter->isEmpty())
+    // Clear the existing entities
+    entities.clear();
+
+    // Process the results
+    for (auto&& doc : cursor)
     {
-      EntityRecord entity;
-      entity = (*iter);
-      entities.push_back(entity);
+        EntityRecord entity;
+        entity = doc;
+        entities.push_back(entity);
     }
-  }
 
-  if (entities.empty())
-  {
-    OS_LOG_DEBUG(FAC_ODBC, entityType << " is NOT present in namespace " << _ns);
-    OS_LOG_INFO(FAC_ODBC, "EntityDB::getEntitiesByType - Unable to find entity record for type " << entityType << " from namespace " << _ns);
-  }
-  else
-  {
-    const_cast<EntityTypeCache&>(_typeCache).add(entityType, EntityTypeCacheable(new Entities(entities)));
-    OS_LOG_DEBUG(FAC_ODBC, "EntityDB::getEntitiesByType - " << entityType << " is present in namespace " << _ns);
-  }
-
-  conn->done();
+    // Log and cache the results
+    if (entities.empty())
+    {
+        OS_LOG_DEBUG(FAC_ODBC, entityType << " is NOT present in namespace " << _ns);
+        OS_LOG_INFO(FAC_ODBC, "EntityDB::getEntitiesByType - Unable to find entity record for type " 
+                              << entityType << " from namespace " << _ns);
+    }
+    else
+    {
+        const_cast<EntityTypeCache&>(_typeCache).add(entityType, EntityTypeCacheable(new Entities(entities)));
+        OS_LOG_DEBUG(FAC_ODBC, "EntityDB::getEntitiesByType - " << entityType 
+                           << " is present in namespace " << _ns);
+    }
 }
 
 void EntityDB::getCallerLocation(CallerLocations& locations, std::string& fallbackLocation, const std::string& identity, const std::string& host, const std::string& address)
@@ -335,44 +372,58 @@ void EntityDB::getCallerLocation(CallerLocations& locations, std::string& fallba
   }
 }
 
-bool EntityDB::findByUserId(const string& uid, EntityRecord& entity) const
+bool EntityDB::findByUserId(const std::string& uid, EntityRecord& entity) const
 {
-  MongoDB::ReadTimer readTimer(const_cast<EntityDB&>(*this));
+    MongoDB::ReadTimer readTimer(const_cast<EntityDB&>(*this));
 
-  std::string userId = validate_identity_string(uid);
+    std::string userId = validate_identity_string(uid);
 
-  OS_LOG_INFO(FAC_ODBC, "EntityDB::findByUserId - Finding entity record for " << userId << " from namespace " << _ns);
-  ExpireCacheable pCacheObj = const_cast<ExpireCache&>(_cache).get(userId);
-  if (pCacheObj)
-  {
-    OS_LOG_DEBUG(FAC_ODBC, userId << " is present in namespace " << _ns << " (CACHED)");
-    entity = *pCacheObj;
-    return true;
-  }
+    OS_LOG_INFO(FAC_ODBC, "EntityDB::findByUserId - Finding entity record for " << userId << " from namespace " << _ns);
 
-  mongo::BSONObj query = BSON(EntityRecord::userId_fld() << userId);
-  mongo::BSONObjBuilder builder;
-  BaseDB::nearest(builder, query);
-  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getReadQueryTimeout()));
+    // Check if the entity is already cached
+    ExpireCacheable pCacheObj = const_cast<ExpireCache&>(_cache).get(userId);
+    if (pCacheObj) {
+        OS_LOG_DEBUG(FAC_ODBC, userId << " is present in namespace " << _ns << " (CACHED)");
+        entity = *pCacheObj;
+        return true;
+    }
+    try {
 
-  readTimer.setDBConnOK(conn->ok());
+        // Create a MongoConnection instance for the current operation
+        MongoDB::MongoConnection connection(_info);
 
-  mongo::BSONObj entityObj = conn->get()->findOne(_ns, readQueryMaxTimeMS(builder.obj()), 0, mongo::QueryOption_SlaveOk);
-  if (!entityObj.isEmpty())
-  {
-    entity = entityObj;
-    conn->done();
-    //
-    // Cache the entity
-    //
-    const_cast<ExpireCache&>(_cache).add(userId, ExpireCacheable(new EntityRecord(entity)));
+        readTimer.setDBConnOK(connection.ok());
 
-    return true;
-  }
+        // Access the target collection
+        mongocxx::collection collection = connection.collection(_ns);
 
-  OS_LOG_INFO(FAC_ODBC, "EntityDB::findByUserId - Unable to find entity record for " << userId << " from namespace " << _ns);
-  conn->done();
-  return false;
+        // Build the query to search for the entity by userId
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(bsoncxx::builder::basic::kvp(std::string(EntityRecord::userId_fld()), userId));
+
+        mongocxx::options::find findOptions;
+        findOptions.max_time(std::chrono::milliseconds(_info.getReadQueryTimeoutMs()));
+
+        // Execute the query
+        std::optional<bsoncxx::document::value> maybeResult = collection.find_one(queryBuilder.view(), findOptions);
+
+        if (maybeResult) {
+            bsoncxx::document::view result = maybeResult->view();
+            entity = result;  // Convert BSON document to EntityRecord
+            //
+            // Cache the entity
+            //
+            const_cast<ExpireCache&>(_cache).add(userId, ExpireCacheable(new EntityRecord(entity)));
+
+            OS_LOG_DEBUG(FAC_ODBC, "EntityDB::findByUserId - Found entity record for " << userId << " from namespace " << _ns);
+            return true;
+        }
+    } catch (const std::exception& e) {
+        OS_LOG_ERROR(FAC_ODBC, "EntityDB::findByUserId - Error while querying MongoDB: " << e.what());
+    }
+
+    OS_LOG_INFO(FAC_ODBC, "EntityDB::findByUserId - Unable to find entity record for " << userId << " from namespace " << _ns);
+    return false;
 }
 
 bool EntityDB::findByIdentityOrAlias(const Url& uri, EntityRecord& entity) const
@@ -397,42 +448,55 @@ bool EntityDB::findByIdentityOrAlias(const string& identity, const string& alias
 	return found;
 }
 
-bool EntityDB::findByAliasUserId(const string& alias, EntityRecord& entity) const
+bool EntityDB::findByAliasUserId(const std::string& alias, EntityRecord& entity) const
 {
+    MongoDB::ReadTimer readTimer(const_cast<EntityDB&>(*this));
 
-  MongoDB::ReadTimer readTimer(const_cast<EntityDB&>(*this));
+    // Check cache for the alias first
+    ExpireCacheable pCacheObj = const_cast<ExpireCache&>(_cache).get(alias);
+    if (pCacheObj) {
+        OS_LOG_DEBUG(FAC_ODBC, "EntityDB::findByAliasUserId - " << alias << " is present in namespace " << _ns << " (CACHED)");
+        entity = *pCacheObj;
+        return true;
+    }
 
-  ExpireCacheable pCacheObj = const_cast<ExpireCache&>(_cache).get(alias);
-  if (pCacheObj)
-  {
-    OS_LOG_DEBUG(FAC_ODBC, "EntityDB::findByAliasUserId - " << alias << " is present in namespace " << _ns << " (CACHED)");
-    entity = *pCacheObj;
-    return true;
-  }
+    try {
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(bsoncxx::builder::basic::kvp(
+            std::string(EntityRecord::aliases_fld()),
+            bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(
+              std::string(EntityRecord::aliasesId_fld()), alias ))));
 
-  mongo::BSONObj query = BSON( EntityRecord::aliases_fld() <<
-  BSON_ELEM_MATCH( BSON(EntityRecord::aliasesId_fld() << alias) ) );
+        // Create a MongoConnection instance for the current operation
+        MongoDB::MongoConnection connection(_info);
 
-  mongo::BSONObjBuilder builder;
-  BaseDB::nearest(builder, query);
-  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getReadQueryTimeout()));
+        readTimer.setDBConnOK(connection.ok());
 
-  readTimer.setDBConnOK(conn->ok());
+        // Access the target collection
+        mongocxx::collection collection = connection.collection(_ns);
 
-  mongo::BSONObj entityObj = conn->get()->findOne(_ns, readQueryMaxTimeMS(builder.obj()), 0, mongo::QueryOption_SlaveOk);
-  if (!entityObj.isEmpty())
-  {
-    entity = entityObj;
-    conn->done();
-    //
-    // Cache the entity
-    //
-    const_cast<ExpireCache&>(_cache).add(alias, ExpireCacheable(new EntityRecord(entity)));
-    return true;
-  }
-  OS_LOG_INFO(FAC_ODBC, "EntityDB::findByAliasUserId - Unable to find entity record for alias " << alias << " from namespace " << _ns);
-  conn->done();
-  return false;
+        mongocxx::options::find findOptions;
+        findOptions.max_time(std::chrono::milliseconds(_info.getReadQueryTimeoutMs()));
+
+        // Execute the query
+        std::optional<bsoncxx::document::value> maybeResult = collection.find_one(queryBuilder.view(), findOptions);
+
+        if (maybeResult) {
+            bsoncxx::document::view result = maybeResult->view();
+            entity = result;  // Convert BSON document to EntityRecord
+
+            // Cache the entity for future use
+            const_cast<ExpireCache&>(_cache).add(alias, ExpireCacheable(new EntityRecord(entity)));
+
+            OS_LOG_DEBUG(FAC_ODBC, "EntityDB::findByAliasUserId - Found entity record for alias " << alias << " from namespace " << _ns);
+            return true;
+        }
+    } catch (const std::exception& e) {
+        OS_LOG_ERROR(FAC_ODBC, "EntityDB::findByAliasUserId - Error while querying MongoDB: " << e.what());
+    }
+
+    OS_LOG_INFO(FAC_ODBC, "EntityDB::findByAliasUserId - Unable to find entity record for alias " << alias << " from namespace " << _ns);
+    return false;
 }
 
 bool EntityDB::findByAliasIdentity(const std::string& identity, EntityRecord& entity) const
@@ -528,82 +592,94 @@ bool EntityDB::findByIdentity(const Url& uri, EntityRecord& entity) const
 }
 
 
-bool  EntityDB::tail(std::vector<std::string>& opLogs) {
-  // minKey is smaller than any other possible value
+bool EntityDB::tail(std::vector<std::string>& opLogs) {
+    // minKey is smaller than any other possible value
+    static bool hasLastTailId = false;
 
-  MongoDB::ReadTimer readTimer(const_cast<EntityDB&>(*this));
+    if (!hasLastTailId) {
+        MongoDB::ReadTimer readTimer(const_cast<EntityDB&>(*this));
 
-  static bool hasLastTailId = false;
-  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
+        // Create MongoConnection instance for the operation
+        MongoDB::MongoConnection connection(_info);
+        readTimer.setDBConnOK(connection.ok());
 
-  readTimer.setDBConnOK(conn->ok());
+        // Build query to find entries greater than _lastTailId
+        bsoncxx::builder::basic::document queryBuilder;
+        bsoncxx::builder::basic::document idQuery;
+        idQuery.append(bsoncxx::builder::basic::kvp(std::string("$gt"), _lastTailId.get_oid().value));
+        queryBuilder.append(bsoncxx::builder::basic::kvp(std::string("_id"), idQuery.view()));
+        queryBuilder.append(bsoncxx::builder::basic::kvp(std::string("ns"), NS));
 
-  if (!hasLastTailId)
-  {
-    mongo::Query query = QUERY( "_id" << mongo::GT << _lastTailId
-          << "ns" << NS);
+        // Create the query document
+        bsoncxx::document::value queryDoc = queryBuilder.extract();
+        bsoncxx::document::view query = queryDoc.view();
 
-    mongo::BSONObjBuilder builder;
-    BaseDB::nearest(builder, query.obj);
+        try {
 
-    // natural order
-    //builder.append("orderby", BSON("$natural" << 1));
+            // Access the target collection
+            mongocxx::collection collection = connection.collection(_ns);
 
-    std::auto_ptr<mongo::DBClientCursor> c =
-      conn->get()->query("local.oplog", builder.obj(), 0, 0, 0,
-      mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData | mongo::QueryOption_SlaveOk);
-    while(true)
-    {
-      if( !c->more() )
-      {
-        if( c->isDead() )
-        {
-          // we need to requery
-          conn->done();
-          return false;
+            mongocxx::options::find findOptions;
+            findOptions.cursor_type(mongocxx::cursor::type::k_tailable);
+            findOptions.max_time(std::chrono::seconds(10));
+
+            mongocxx::cursor cursor = collection.find(query, findOptions);
+
+            for (bsoncxx::document::view doc : cursor) {
+                // Ensure _id exists
+                bsoncxx::document::element id_element = doc["_id"];
+                if (id_element.type() == bsoncxx::type::k_oid) {
+                    _lastTailId = id_element;
+                }
+                 else {
+                    OS_LOG_ERROR(FAC_ODBC, "Unexpected _id type in MongoDB document.");
+                    return false;
+                }
+                hasLastTailId = true;
+            }
+        } catch (const std::exception& e) {
+            OS_LOG_ERROR(FAC_ODBC, "Error while querying MongoDB: " << e.what());
+            return false;
         }
-        // No need to wait here, cursor will block for several sec with _AwaitData
-        break;
-      }
-      mongo::BSONObj o = c->next();
-      _lastTailId = o["_id"];
-      hasLastTailId = true;
     }
-  }
 
-  mongo::Query query = QUERY( "_id" << mongo::GT << _lastTailId
-          << "ns" << NS);
-  mongo::BSONObjBuilder builder;
-  BaseDB::nearest(builder, query.obj);
+    // Re-query for logs after the last tail ID has been set
+    bsoncxx::builder::basic::document queryBuilder2;
+    queryBuilder2.append(bsoncxx::builder::basic::kvp(std::string("_id"), 
+        bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(std::string("$gt"), _lastTailId.get_oid().value))
+    ));
+    queryBuilder2.append(bsoncxx::builder::basic::kvp(std::string("ns"), NS));
 
-  // natural order
-  //builder.append("orderby", BSON("$natural" << 1));
+    bsoncxx::document::value queryDoc2 = queryBuilder2.extract();
+    bsoncxx::document::view query2 = queryDoc2.view();
 
-  // capped collection insertion order
+    try {
+        MongoDB::ReadTimer readTimer(const_cast<EntityDB&>(*this));
+        
+        MongoDB::MongoConnection connection(_info);
+        readTimer.setDBConnOK(connection.ok());
 
-  std::auto_ptr<mongo::DBClientCursor> c =
-    conn->get()->query("local.oplog", builder.obj(), 0, 0, 0,
-        mongo::QueryOption_CursorTailable | mongo::QueryOption_AwaitData | mongo::QueryOption_SlaveOk);
-  while(true)
-  {
-    if( !c->more() )
-    {
-      if( c->isDead() )
-      {
-        // we need to requery
-        conn->done();
+        mongocxx::collection opLogCollection = connection.collection("local.oplog");
+
+        mongocxx::options::find findOptions;
+        findOptions.cursor_type(mongocxx::cursor::type::k_tailable);
+        findOptions.max_time(std::chrono::seconds(10));
+
+        mongocxx::cursor cursor = opLogCollection.find(query2, findOptions);
+
+        for (bsoncxx::document::view doc : cursor) {
+            bsoncxx::document::element id_element = doc["_id"];
+            if (id_element.type() == bsoncxx::type::k_oid) {
+                _lastTailId = id_element;
+            }
+
+            opLogs.push_back(bsoncxx::to_json(doc));
+        }
+    } catch (const std::exception& e) {
+        OS_LOG_ERROR(FAC_ODBC, "Error while querying MongoDB: " << e.what());
         return false;
-      }
-      // No need to wait here, cursor will block for several sec with _AwaitData
-      conn->done();
-      return !opLogs.empty();
     }
-    mongo::BSONObj o = c->next();
-    _lastTailId = o["_id"];
-    opLogs.push_back(o.toString());
-  }
-  conn->done();
-  return true;
-}
 
+    return !opLogs.empty();
+}
 

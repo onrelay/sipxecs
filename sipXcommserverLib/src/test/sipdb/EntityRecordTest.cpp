@@ -1,12 +1,14 @@
 #include <cppunit/TestCase.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <sipxunit/TestUtilities.h>
-#include <sipdb/EntityRecord.h>
-#include <os/OsDateTime.h>
-#include <mongo/util/net/hostandport.h>
-#include <mongo/client/connpool.h>
 
-#include <boost/format.hpp>
+#include <os/OsDateTime.h>
+#include <bsoncxx/document/view.hpp>
+
+#include <sipdb/MongoDB.h>
+#include <sipdb/EntityRecord.h>
+
+
 
 
 using namespace std;
@@ -125,9 +127,9 @@ public:
     entityRecord._vmOnDnd = entityRecordTestData[0].vmOnDnd;
   }
 
-  void createBSONObj(EntityRecord& entityRecord,  mongo::BSONObj& bsonObj)
+  void createBSONObj(EntityRecord& entityRecord,  bsoncxx::document::view& bsonObj)
   {
-    mongo::BSONObjBuilder bsonObjBuilder;
+    bsoncxx::builder::basic::document bsonObjBuilder;
 
 
     bsonObjBuilder << entityRecord.oid_fld() << entityRecord.oid() <<                                     // "_id"
@@ -155,7 +157,7 @@ public:
     for (std::vector<EntityRecord::Alias>::iterator iter = entityRecord._aliases.begin();
         iter != entityRecord._aliases.end(); iter++)
     {
-      mongo::BSONObjBuilder bsonObjBuilderAlias;
+      bsoncxx::builder::basic::document bsonObjBuilderAlias;
 
       bsonObjBuilderAlias << entityRecord.aliasesId_fld() << iter->id;                                // "id"
       bsonObjBuilderAlias << entityRecord.aliasesContact_fld() << iter->contact;                      // "cnt"
@@ -170,7 +172,7 @@ public:
     for (std::vector<EntityRecord::StaticUserLoc>::iterator iter = entityRecord._staticUserLoc.begin();
         iter != entityRecord._staticUserLoc.end(); iter++)
     {
-      mongo::BSONObjBuilder bsonObjBuilderStaticUserLoc;
+      bsoncxx::builder::basic::document bsonObjBuilderStaticUserLoc;
 
       bsonObjBuilderStaticUserLoc << entityRecord.staticUserLocEvent_fld() << iter->event;                    // "evt"
       bsonObjBuilderStaticUserLoc << entityRecord.staticUserLocContact_fld() << iter->contact;                // "cnt"
@@ -321,7 +323,7 @@ public:
 
     setEntityRecord(entityRecord);
 
-    mongo::BSONObj bsonObj;
+    bsoncxx::document::view bsonObj;
 
     // create BSONObj from Entity Record class
     createBSONObj(entityRecord, bsonObj);

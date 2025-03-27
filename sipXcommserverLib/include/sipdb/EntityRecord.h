@@ -19,7 +19,9 @@
 #include <string>
 #include <vector>
 #include <set>
-#include <boost/shared_ptr.hpp>
+
+#include <bsoncxx/document/view.hpp>
+
 #include "sipdb/MongoDB.h"
 
 class EntityRecord
@@ -96,7 +98,7 @@ public:
 
     void swap(EntityRecord& entity);
 
-    EntityRecord& operator=(const mongo::BSONObj& bsonObj);
+    EntityRecord& operator = (const bsoncxx::document::view& doc);
 
     //
     // The unique record object-id
@@ -232,7 +234,7 @@ public:
     static const char* vmOnDnd_fld();
     bool& vmOnDnd();
 private:
-    void fillStaticUserLoc(StaticUserLoc& userLoc, const mongo::BSONObj& innerObj);
+    void fillStaticUserLoc(StaticUserLoc& userLoc, const bsoncxx::document::view& innerObj);
 
 private:
     std::string _oid;

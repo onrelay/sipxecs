@@ -67,6 +67,8 @@ public:
 
     static RegDB* CreateInstance(bool ensureIndexes = false, int gracePeriod = 0);
 
+    static void pushOrReplaceBinding(RegDB::Bindings& bindings, const RegBinding& binding);
+
     void updateBinding(const RegBinding::Ptr& pBinding);
 
     void updateBinding(RegBinding& binding);
@@ -75,13 +77,13 @@ public:
         const std::string& identity,
         const std::string& callId,
         unsigned int cseq,
-        unsigned long timeNow);
+        std::int64_t timeNow);
 
     void expireAllBindings(
         const std::string& identity,
         const std::string& callId,
         unsigned int cseq,
-        unsigned long timeNow);
+        std::int64_t timeNow);
 
     void removeAllExpired();
 
@@ -92,33 +94,33 @@ public:
 
     bool getUnexpiredContactsUser(
         const std::string& identity,
-        unsigned long timeNow,
+        std::int64_t timeNow,
         Bindings& bindings,
         bool preferPrimary = false) const;
 
     bool getUnexpiredContactsUserContaining(
         const std::string& matchIdentity,
-        unsigned long timeNow,
+        std::int64_t timeNow,
         Bindings& bindings,
         bool preferPrimary = false) const;
     
     bool getUnexpiredContactsUserWithAddress(
       const std::string& identity,
       const std::string& address,
-      unsigned long timeNow,
+      std::int64_t timeNow,
       Bindings& bindings,
       bool preferPrimary = false) const;
 
     bool getUnexpiredContactsUserInstrument(
         const std::string& identity,
         const std::string& instrument,
-        unsigned long timeNow,
+        std::int64_t timeNow,
         Bindings& bindings,
         bool preferPrimary = false) const;
 
     bool getUnexpiredContactsInstrument(
         const std::string& instrument,
-        unsigned long timeNow,
+        std::int64_t timeNow,
         Bindings& bindings,
         bool preferPrimary = false) const;
     
@@ -155,7 +157,7 @@ public:
 protected:
 
 private:
-    void ensureIndexes(mongo::DBClientBase* client = NULL);
+    void ensureIndexes();
     std::string _localAddress;
     RegDB* _local;
     unsigned long _expireGracePeriod;

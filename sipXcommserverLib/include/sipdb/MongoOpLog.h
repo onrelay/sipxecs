@@ -16,12 +16,14 @@
 #ifndef MONGOOPLOG_H
 #define	MONGOOPLOG_H
 
-#include "sipdb/MongoDB.h"
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
+#include <bsoncxx/document/view.hpp>
+
+
 #include <vector>
 #include <string>
 #include <map>
+
+#include "sipdb/MongoDB.h"
 
 /**
  * This class creates a thread that monitors "local.oplog.rs" mongo collection.
@@ -49,9 +51,9 @@ public:
   /**
    * Callback invoked when a new entry is added to "local.oplog.rs" collection
    *
-   * @param mongo::BSONObj - describes the current operation
+   * @param bsoncxx::document::view - describes the current operation
    */
-  typedef boost::function<void(const mongo::BSONObj&)> OpLogCallBack;
+  typedef boost::function<void(const bsoncxx::document::view&)> OpLogCallBack;
   typedef std::vector<OpLogCallBack> OpLogCbVector;
   typedef std::map<std::string, OpLogType> OpLogDataMap;
 
@@ -71,7 +73,7 @@ public:
    * since the client will be notified for new entries. If not set, the client will be notified for all entries
    */
   MongoOpLog(const MongoDB::ConnectionInfo& info,
-             const mongo::BSONObj& customQuery = mongo::BSONObj(),
+             const bsoncxx::builder::basic::document& customQuery,
              const int querySleepTime = 0,
              const unsigned long startFromTimestamp = 0);
   ~MongoOpLog();
@@ -100,18 +102,17 @@ protected:
 
   // As long as the cursor is valid (not dead) this function process every new
   // entry added to "local.oplog.rs" collection beginning with the lastEntry
-  bool processQuery(mongo::DBClientCursor* cursor,
-                    mongo::BSONObj& lastEntry);
+  bool processQuery(mongocxx::cursor& cursor, bsoncxx::document::value& lastEntry);
 
   // creates query for filtering entries based on _customQuery and _startFromTimestamp
-  void createQuery(const mongo::BSONObj& lastEntry, mongo::BSONObj& query);
+void createQuery(bsoncxx::builder::basic::document& queryBuilder, const bsoncxx::document::view& lastEntry );
 
   // If startFromTimestamp is set it creates lastEntry BSONElement from it and
   // is calls createQuery
-  bool prepareFirstEntry(mongo::BSONObj& lastEntry);
+  bool prepareFirstEntry(bsoncxx::document::value& lastEntry);
 
   // Run all registered callbacks
-  void runCallBacks(const mongo::BSONObj& bSONObj);
+  void runCallBacks(const bsoncxx::document::value& bSONObj);
 
   // initializes opLogDataMap with the default values
   static void createOpLogDataMap(OpLogDataMap& opLogDataMap);
@@ -130,14 +131,12 @@ protected:
   //  since the client will be notified for new entries
   unsigned long _startFromTimestamp;
 
-  mongo::BSONObj _customQuery;// Custom query given by user
-
-
+  bsoncxx::builder::basic::document _customQuery;// Custom query given by user
 
   // An internally used map that contain a mapping between operation name and opLogType
   OpLogDataMap _opLogDataMap;
 
-  mongo::BSONObj _lastEntry;
+  bsoncxx::document::value _lastEntry;
 
 private:
   static const unsigned int EXCEPTION_RECOVER_TIME_SEC = 1;

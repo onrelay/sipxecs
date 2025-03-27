@@ -16,8 +16,8 @@
 #ifndef SUBSCRIBEEXPIRETHREAD_H
 #define	SUBSCRIBEEXPIRETHREAD_H
 
-#include <boost/thread.hpp>
-#include <boost/asio.hpp>
+
+#include "sipdb/MongoDB.h"
 #include "sipdb/SubscribeDB.h"
 
 

@@ -1,15 +1,17 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <boost/config.hpp>
-#include <boost/program_options/detail/config_file.hpp>
-#include <boost/program_options/parsers.hpp>
-#include <mongo/client/connpool.h>
+#include <memory>
+
 #include <os/OsLogger.h>
 #include <os/OsDateTime.h>
 
+#include <mongocxx/options/client.hpp>
+
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/json.hpp>
+
 #include "sipdb/MongoDB.h"
-#include "sipdb/MongoMod.h"
 
 const int READ_TIMER_SAMPLES = 5; // Number of samples for getting the read delay
 const int UPDATE_TIMER_SAMPLES = 5; // Number of samples for getting the update delay
@@ -23,7 +25,91 @@ namespace pod = boost::program_options::detail;
 
 namespace MongoDB
 {
+MongoConnection::MongoConnection(const ConnectionInfo& connectionInfo) :
+    MongoConnection( connectionInfo.getConnectionUri() ) {
+}
 
+MongoConnection::MongoConnection(const std::string& connectionString) :
+    MongoConnection(mongocxx::uri("mongodb://" + connectionString )) {
+}
+
+MongoConnection::MongoConnection(const mongocxx::uri& connectionUri) {
+
+    try {
+        mongocxx::options::client clientOptions;
+
+        // Optional: Set MongoDB API version (useful for stable behavior in MongoDB 4.x+)
+        mongocxx::options::server_api serverApi(mongocxx::options::server_api::version::k_version_1);
+        clientOptions.server_api_opts(serverApi);
+
+        // Initialize client
+        _ptr = std::make_unique<mongocxx::client>(connectionUri, clientOptions);
+    }
+    catch (const mongocxx::exception& e) {
+        throw MongoException(std::string("Failed to connect to MongoDB: ") + e.what());
+    }
+}
+
+ mongocxx::client& MongoConnection::client() {
+  if (!_ptr) {
+      throw std::runtime_error("MongoDB client is not initialized.");
+  }
+  return *_ptr;
+}
+
+bool MongoConnection::ok() {
+  return _ptr != NULL;
+}
+
+std::string MongoConnection::databaseName(const std::string& ns) {
+
+  auto pos = ns.find('.');
+  return (pos != std::string::npos) ? ns.substr(0, pos) : ns;
+}
+
+std::string MongoConnection::collectionName(const std::string& ns) {
+
+  auto pos = ns.find('.');
+
+  if (pos == std::string::npos) {
+      throw MongoException("No collection name in namespace: " + ns);
+  }
+
+  return ns.substr(pos + 1);
+}
+
+mongocxx::database MongoConnection::database(const std::string& ns) {
+  try {
+      // Ensure the client is connected before attempting to access the database
+      if (!ok()) {
+          throw MongoException("Failed to access database for " + ns);
+      }
+
+      std::string name = databaseName(ns);
+
+      return _ptr->database(name);
+  }
+  catch (const mongocxx::exception& e) {
+      throw MongoException("Failed to access database for " + ns + ": " + e.what());
+  }
+}
+
+mongocxx::collection MongoConnection::collection(const std::string& ns ) {
+  try {
+      // Ensure the client is connected before attempting to access the database
+      if (!ok()) {
+          throw MongoException("MongoDB client is not connected.");
+      }
+
+      mongocxx::database database = this->database( ns );
+      std::string name = collectionName( ns );
+
+      return database[name];
+  }
+  catch (const mongocxx::exception& e) {
+      throw MongoException("Failed to access collection for " + ns + ": " + std::string(e.what()));
+  }
+}
 
   BaseDB::BaseDB(const ConnectionInfo& info, const std::string& ns) :
     _ns(ns),
@@ -36,24 +122,25 @@ namespace MongoDB
   {
   }
 
-  bool ConnectionInfo::testConnection(const mongo::ConnectionString &connectionString, string& errmsg)
-  {
-      bool ret = false;
+bool ConnectionInfo::testConnection(const mongocxx::uri& connectionUri, std::string& errmsg)
+{
+    bool ret = false;
 
-      try
-      {
-          MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(connectionString.toString()));
-          ret = conn->ok();
-          conn->done();
-      }
-      catch( mongo::DBException& e )
-      {
-          ret = false;
-          errmsg = e.what();
-      }
+    try
+    {
+        // Using MongoConnection to test the connection
+        MongoDB::MongoConnection connection(connectionUri);
 
-      return ret;
-  }
+        ret = connection.ok();
+    }  
+    catch (const std::exception& e)
+    {
+        ret = false;
+        errmsg = e.what();
+    }
+
+    return ret;
+}
 
   ConnectionInfo ConnectionInfo::globalInfo()
   {
@@ -86,9 +173,8 @@ namespace MongoDB
 
   ConnectionInfo::ConnectionInfo(const ConnectionInfo& rhs)
 	{
-    string errmsg;
     _rawConnectionString = rhs._rawConnectionString;
-    _connectionString = mongo::ConnectionString::parse(_rawConnectionString, errmsg);
+    _connectionUri = mongocxx::uri("mongodb://" + _rawConnectionString);
     _shard = rhs._shard;
     _useReadTags = rhs._useReadTags;
     _clusterId = rhs._clusterId;
@@ -100,7 +186,7 @@ namespace MongoDB
   {
     string errmsg;
     _rawConnectionString = rhs._rawConnectionString;
-    _connectionString = mongo::ConnectionString::parse(_rawConnectionString, errmsg);
+    _connectionUri = mongocxx::uri("mongodb://" + _rawConnectionString);
     _shard = rhs._shard;
     _useReadTags = rhs._useReadTags;
     _clusterId = rhs._clusterId;
@@ -109,8 +195,17 @@ namespace MongoDB
     return *this;
   }
 
-  ConnectionInfo::ConnectionInfo(const mongo::ConnectionString& connectionString) :
-                 _connectionString(connectionString),
+  ConnectionInfo::ConnectionInfo(const std::string& connectionString) :
+                 _connectionUri(mongocxx::uri("mongodb://" + connectionString)),
+                 _shard(0),
+                 _useReadTags(false),
+                 _readQueryTimeoutMs(0),
+                 _writeQueryTimeoutMs(0)
+	{
+	}
+
+  ConnectionInfo::ConnectionInfo(const mongocxx::uri& connectionUri) :
+                 _connectionUri(mongocxx::uri(connectionUri.to_string())),
                  _shard(0),
                  _useReadTags(false),
                  _readQueryTimeoutMs(0),
@@ -119,124 +214,129 @@ namespace MongoDB
 	}
 
 
-  ConnectionInfo::ConnectionInfo(ifstream& file) :
-      _shard(0),
+  ConnectionInfo::ConnectionInfo(ifstream& file)
+      : _shard(0), 
       _useReadTags(false),
-      _readQueryTimeoutMs(0),
+      _readQueryTimeoutMs(0), 
       _writeQueryTimeoutMs(0)
   {
-    set<string> options;
-    options.insert("*");
-    for (boost::program_options::detail::config_file_iterator i(file, options), e; i != e; ++i)
-    {
-      if (i->string_key == "connectionString")
-      {
-        _rawConnectionString = i->value[0];
-      }
-      if (i->string_key == "shardId")
-      {
-        _shard = atoi(i->value[0].c_str());
-      }
-      if (i->string_key == "clusterId")
-      {
-        _clusterId = i->value[0];
-      }
-      if (i->string_key == "useReadTags")
-      {
-        Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, i->value[0].c_str());
-        if (strncmp(i->value[0].c_str(), "true", 4) == 0)
-        {
-          Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "useReadTags enabled");
-          _useReadTags = true;
-        }
-      }
+    using boost::property_tree::ptree;
+    ptree pt;
 
-      if (i->string_key == "read-query-timeout-ms")
-      {
-        _readQueryTimeoutMs = atoi(i->value[0].c_str());
-      }
+    try {
+        boost::property_tree::ini_parser::read_ini(file, pt);
 
-      if (i->string_key == "write-query-timeout-ms")
-      {
-        _writeQueryTimeoutMs = atoi(i->value[0].c_str());
-      }
+        _rawConnectionString = pt.get<std::string>("connectionString", "");
+        _shard = pt.get<int>("shardId", 0);
+        _clusterId = pt.get<std::string>("clusterId", "");
+        _useReadTags = pt.get<std::string>("useReadTags", "false") == "true";
+        _readQueryTimeoutMs = pt.get<int>("read-query-timeout-ms", 0);
+        _writeQueryTimeoutMs = pt.get<int>("write-query-timeout-ms", 0);
+    }
+    catch (const std::exception& e) {
+        BOOST_THROW_EXCEPTION(ConfigError() << errmsg_info(std::string("Failed to parse config file: ") + e.what()));
     }
 
-    OS_LOG_INFO(FAC_SIP, "ConnectionInfo::ConnectionInfo "
-        << "connectionString: " << _rawConnectionString
-        << ", shardId: " << _shard
-        << ", clusterId: " << _clusterId
-        << ", useReadTags: " << _useReadTags
-        << ", readQueryTimeoutMs: " << _readQueryTimeoutMs
-        << ", writeQueryTimeoutMs: " << _writeQueryTimeoutMs);
-
-    file.close();
-    if (_rawConnectionString.empty())
-    {
-        BOOST_THROW_EXCEPTION(ConfigError() << errmsg_info(std::string("Invalid contents, missing parameter 'connectionString' in file ")));
+    if (_rawConnectionString.empty()) {
+        BOOST_THROW_EXCEPTION(ConfigError() << errmsg_info("Missing 'connectionString' in file."));
     }
 
-    string errmsg;
-    _connectionString = mongo::ConnectionString::parse(_rawConnectionString, errmsg);
-    if (!_connectionString.isValid()) {
-        BOOST_THROW_EXCEPTION(ConfigError() << errmsg_info(errmsg));
+    try {
+        _connectionUri = mongocxx::uri("mongodb://" + _rawConnectionString);
+    } catch (const mongocxx::exception& e) {
+        BOOST_THROW_EXCEPTION(ConfigError() << errmsg_info(e.what()));
     }
-    Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "loaded db connection info for %s", _rawConnectionString.c_str());
+
+    Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "Loaded DB connection info for %s", _rawConnectionString.c_str());
   }
 
-  void BaseDB::setReadPreference(mongo::BSONObjBuilder& builder, mongo::BSONObj query, const char* readPreferrence) const
+  void BaseDB::setReadPreference(bsoncxx::builder::basic::document& builder, 
+                                  const bsoncxx::document::view& query, 
+                                  const char* readPreference) const
   {
     if (_info.useReadTags())
     {
-      Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "Using read preferences tags for ");
-      std::string shardIdStr = boost::to_string(getShardId());
-      std::string clusterId = getClusterId();
+        Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "Using read preferences tags for ");
+        
+        std::string shardIdStr = std::to_string(getShardId());
+        std::string clusterId = getClusterId();
 
-      if (clusterId.empty())
-      {
-        clusterId = "1"; // for backward compatibility with old behavior
-      }
+        if (clusterId.empty())
+        {
+            clusterId = "1"; // for backward compatibility with old behavior
+        }
 
-      mongo::BSONArray tags = BSON_ARRAY(BSON("clusterId" << clusterId) << BSON("shardId" << shardIdStr));
-      builder.append("$readPreference", BSON("mode" << readPreferrence << "tags" << tags));
+        // Create an array builder
+        bsoncxx::builder::basic::array tags;
+        {
+            // Use a temporary document builder for the inner document
+            bsoncxx::builder::basic::document tagDoc;
+            tagDoc.append(
+                bsoncxx::builder::basic::kvp("clusterId", clusterId),
+                bsoncxx::builder::basic::kvp("shardId", shardIdStr)
+            );
+            
+            // Append the created document to the array
+            tags.append(tagDoc.view());
+        }
+
+        // Use explicit document builder
+        bsoncxx::builder::basic::document readPreferenceDoc;
+        readPreferenceDoc.append(
+            bsoncxx::builder::basic::kvp("mode", readPreference),
+            bsoncxx::builder::basic::kvp("tags", tags.view())
+        );
+
+        // Append to the main builder
+        builder.append(bsoncxx::builder::basic::kvp("$readPreference", readPreferenceDoc.view()));
     }
     else
     {
-      builder.append("$readPreference", BSON("mode" << readPreferrence));
+      bsoncxx::builder::basic::document readPreferenceDoc;
+      readPreferenceDoc.append(bsoncxx::builder::basic::kvp("mode", readPreference));
+
+      builder.append(bsoncxx::builder::basic::kvp("$readPreference", readPreferenceDoc.view()));
+
     }
 
-    builder.append("query", query);
+    builder.append(bsoncxx::builder::basic::kvp(std::string("query"), query));
   }
 
-  void  BaseDB::nearest(mongo::BSONObjBuilder& builder, mongo::BSONObj query) const
+  void BaseDB::primaryPreferred(mongocxx::options::find& findOptions) const
   {
-    setReadPreference(builder, query, "nearest");
+      mongocxx::read_preference readPref;
+      readPref.mode(mongocxx::read_preference::read_mode::k_primary_preferred);
+      findOptions.read_preference(readPref);
   }
 
-  void  BaseDB::primaryPreferred(mongo::BSONObjBuilder& builder, mongo::BSONObj query) const
+  void BaseDB::nearest(mongocxx::options::find& findOptions) const
   {
-    setReadPreference(builder, query, "primaryPreferred");
+      mongocxx::read_preference readPref;
+      readPref.mode(mongocxx::read_preference::read_mode::k_nearest);
+      findOptions.read_preference(readPref);
   }
 
+void BaseDB::forEach(const bsoncxx::document::view& query, const std::string& ns, 
+                     boost::function<void(const bsoncxx::document::view&)> doSomething)
+{
+    try {
+        // Use MongoConnection to manage the database connection
+        MongoDB::MongoConnection conn(_info);
 
-  void BaseDB::forEach(mongo::BSONObj& query, const std::string& ns, boost::function<void(mongo::BSONObj)> doSomething)
-  {
-    MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getReadQueryTimeout()));
-    auto_ptr<mongo::DBClientCursor> pCursor = conn->get()->query(ns, query, 0, 0, 0, mongo::QueryOption_SlaveOk);
-    if (!pCursor.get())
-    {
-      throw mongo::DBException("mongo query returned null cursor", 0);
+        mongocxx::collection collection = conn.collection(ns);
+
+        // Retrieve cursor for the query
+        mongocxx::cursor cursor = collection.find(query);
+
+        // Iterate over the cursor
+        for (const bsoncxx::document::view& doc : cursor) {
+            doSomething(doc);
+        }
+    } 
+    catch (const std::exception& e) {
+        OS_LOG_ERROR(FAC_ODBC, "Error in forEach: " << e.what());
     }
-    else if (pCursor->more())
-    {
-      while (pCursor->more())
-      {
-        doSomething(pCursor->next());
-      }
-    }
-
-    conn->done();
-  }
+}
 
   void BaseDB::registerTimer(const UpdateTimer* pTimer)
   {
@@ -274,7 +374,6 @@ namespace MongoDB
   {
     boost::lock_guard<boost::mutex> lock(_readTimerSamplesMutex);
 
-
     _lastReadSpeed = pTimer->_end - pTimer->_start;
     _readTimerSamples.push_back(_lastReadSpeed);
 
@@ -303,12 +402,12 @@ namespace MongoDB
     }
   }
 
-  Int64 BaseDB::getUpdateAverageSpeed() const
+  std::int64_t BaseDB::getUpdateAverageSpeed() const
   {
     boost::lock_guard<boost::mutex> lock(_updateTimerSamplesMutex);
 
-    Int64 sum = 0;
-    for (boost::circular_buffer<Int64>::const_iterator iter = _updateTimerSamples.begin(); iter != _updateTimerSamples.end(); iter++)
+    std::int64_t sum = 0;
+    for (boost::circular_buffer<std::int64_t>::const_iterator iter = _updateTimerSamples.begin(); iter != _updateTimerSamples.end(); iter++)
     {
       sum += *iter;
     }
@@ -319,18 +418,18 @@ namespace MongoDB
     return sum / _updateTimerSamples.size();
   }
 
-  Int64 BaseDB::getLastUpdateSpeed() const
+  std::int64_t BaseDB::getLastUpdateSpeed() const
   {
     boost::lock_guard<boost::mutex> lock(_updateTimerSamplesMutex);
     return _lastUpdateSpeed;
   }
 
-  Int64 BaseDB::getReadAverageSpeed() const
+  std::int64_t BaseDB::getReadAverageSpeed() const
   {
     boost::lock_guard<boost::mutex> lock(_readTimerSamplesMutex);
 
-    Int64 sum = 0;
-    for (boost::circular_buffer<Int64>::const_iterator iter = _readTimerSamples.begin(); iter != _readTimerSamples.end(); iter++)
+    std::int64_t sum = 0;
+    for (boost::circular_buffer<std::int64_t>::const_iterator iter = _readTimerSamples.begin(); iter != _readTimerSamples.end(); iter++)
     {
       sum += *iter;
     }
@@ -341,88 +440,89 @@ namespace MongoDB
     return sum / _readTimerSamples.size();
   }
 
-  Int64 BaseDB::getLastReadSpeed() const
+  std::int64_t BaseDB::getLastReadSpeed() const
   {
     boost::lock_guard<boost::mutex> lock(_readTimerSamplesMutex);
     return _lastReadSpeed;
-  }
+  } 
 
-  mongo::Query BaseDB::queryMaxTimeMS(const mongo::BSONObj& obj, unsigned int maxTimeMs)
+  bsoncxx::document::value BaseDB::queryMaxTimeMS(const bsoncxx::document::view& obj, std::int64_t maxTimeMs) const
   {
-    mongo::Query query(obj);
+    bsoncxx::builder::basic::document queryBuilder;
 
-    return query.maxTimeMs(maxTimeMs);
+    // Copy the original query document
+    queryBuilder.append(bsoncxx::builder::basic::kvp("$query", obj));
+
+    // Append maxTimeMS option
+    queryBuilder.append(bsoncxx::builder::basic::kvp("$maxTimeMS", maxTimeMs));
+
+    return queryBuilder.extract();
   }
 
-  mongo::Query BaseDB::readQueryMaxTimeMS(const mongo::BSONObj& obj) const
+  bsoncxx::document::value BaseDB::readQueryMaxTimeMS(const bsoncxx::document::view& obj) const
   {
     return queryMaxTimeMS(obj, _info.getReadQueryTimeoutMs());
   }
 
-  mongo::Query BaseDB::writeQueryMaxTimeMS(const mongo::BSONObj& obj) const
+  bsoncxx::document::value BaseDB::writeQueryMaxTimeMS(const bsoncxx::document::view& obj) const
   {
     return queryMaxTimeMS(obj, _info.getWriteQueryTimeoutMs());
   }
 
-  mongo::Date_t BaseDB::dateFromSecsSinceEpoch(unsigned long timestamp)
+  bsoncxx::types::b_date BaseDB::dateFromSecsSinceEpoch(unsigned long timestamp)
   {
-    // Note: the constructor of mongo::Date_t expects the timestamp in millis
-    return mongo::Date_t(1000 * timestamp);
+      // Convert seconds to milliseconds
+      return bsoncxx::types::b_date(std::chrono::milliseconds(1000 * timestamp));
   }
 
-  bool BaseDB::safeDropIndex(mongo::DBClientBase* client, const std::string& key) const
+  bool BaseDB::safeDropIndex(mongocxx::collection& collection, const std::string& key) const
   {
-    int ret = true;
+      bool ret = true;
+      try
+      {
+          // Drop the index using the index view
+          collection.indexes().drop_one(key);
+      }
+      catch (const std::exception& e)
+      {
+          OS_LOG_WARNING(FAC_SIP, "BaseDB::safeDropIndex failed for index: " << key
+                          << ". " << e.what());
+          ret = false;
+      }
+      catch (...)
+      {
+          OS_LOG_WARNING(FAC_SIP, "BaseDB::safeDropIndex failed for index: " << key
+                          << ". Unknown Exception");
+          ret = false;
+      }
+      return ret;
+  }
 
+  bool BaseDB::safeEnsureTTLIndex(mongocxx::collection& collection, const std::string& key, int ttlSeconds) const
+  {
+    bool ret = true;
     try
     {
-      client->dropIndex(_ns, BSON(key << 1));
+        collection.create_index(
+            bsoncxx::builder::basic::make_document(
+                bsoncxx::builder::basic::kvp(key, 1)),
+            mongocxx::options::index{}.expire_after(std::chrono::seconds(ttlSeconds))
+        );
     }
-    // NOTE: we're logging with WARNING level because this function will return
-    //       an exception in case the key does not exist in the database, which
-    //       looks like a pretty common setup
-    catch (std::exception& e)
+    catch (const std::exception& e)
     {
-      OS_LOG_WARNING(FAC_SIP, "BaseDB::safeDropIndex failed for index: " << key
-              << ". " << e.what());
-      ret = false;
+        OS_LOG_ERROR(FAC_SIP, "BaseDB::safeEnsureTTLIndex failed for index: " << key
+                     << ", ttlSeconds: " << ttlSeconds
+                     << ". " << e.what());
+        ret = false;
     }
     catch (...)
     {
-      OS_LOG_WARNING(FAC_SIP, "BaseDB::safeDropIndex failed for index: " << key
-              << ". Unknown Exception");
-      ret = false;
+        OS_LOG_ERROR(FAC_SIP, "BaseDB::safeEnsureTTLIndex failed for index: " << key
+                     << ", ttlSeconds: " << ttlSeconds
+                     << ". Unknown Exception");
+        ret = false;
     }
-
-    return ret;
-  }
-
-  bool BaseDB::safeEnsureTTLIndex(mongo::DBClientBase* client, const std::string& key, int ttl) const
-  {
-    int ret = true;
-
-    try
-    {
-      // Note: the parameters from 3 to 7 are just the defaults of the function
-      client->ensureIndex(_ns, BSON(key << 1),
-                            false, "", true, false, -1, /* just the defaults */
-                            ttl);
-    }
-    catch (std::exception& e)
-    {
-      OS_LOG_ERROR(FAC_SIP, "BaseDB::safeEnsureTTLIndex failed for index: " << key
-              << ", ttl: " << ttl
-              << ". " << e.what());
-      ret = false;
-    }
-    catch (...)
-    {
-      OS_LOG_ERROR(FAC_SIP, "BaseDB::safeEnsureTTLIndex failed for index: " << key
-              << ", ttl: " << ttl
-              << ". Unknown Exception");
-      ret = false;
-    }
-
     return ret;
   }
 
@@ -433,14 +533,14 @@ namespace MongoDB
   {
     struct timeval sTimeVal;
     gettimeofday( &sTimeVal, NULL );
-    _start = (Int64)( sTimeVal.tv_sec * 1000 + ( sTimeVal.tv_usec / 1000 ) );
+    _start = (std::int64_t)( sTimeVal.tv_sec * 1000 + ( sTimeVal.tv_usec / 1000 ) );
   }
 
   UpdateTimer::~UpdateTimer()
   {
     struct timeval sTimeVal;
     gettimeofday( &sTimeVal, NULL );
-    _end = (Int64)( sTimeVal.tv_sec * 1000 + ( sTimeVal.tv_usec / 1000 ) );
+    _end = (std::int64_t)( sTimeVal.tv_sec * 1000 + ( sTimeVal.tv_usec / 1000 ) );
     _db.registerTimer(this);
   }
 
@@ -451,14 +551,14 @@ namespace MongoDB
   {
     struct timeval sTimeVal;
     gettimeofday( &sTimeVal, NULL );
-    _start = (Int64)( sTimeVal.tv_sec * 1000 + ( sTimeVal.tv_usec / 1000 ) );
+    _start = (std::int64_t)( sTimeVal.tv_sec * 1000 + ( sTimeVal.tv_usec / 1000 ) );
   }
 
   ReadTimer::~ReadTimer()
   {
     struct timeval sTimeVal;
     gettimeofday( &sTimeVal, NULL );
-    _end = (Int64)( sTimeVal.tv_sec * 1000 + ( sTimeVal.tv_usec / 1000 ) );
+    _end = (std::int64_t)( sTimeVal.tv_sec * 1000 + ( sTimeVal.tv_usec / 1000 ) );
     _db.registerTimer(this);
   }
 

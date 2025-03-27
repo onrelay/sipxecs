@@ -18,7 +18,11 @@
 
 
 #include <string>
-#include <boost/shared_ptr.hpp>
+
+#include <bsoncxx/document/view.hpp>
+#include <bsoncxx/oid-fwd.hpp>
+#include <bsoncxx/oid.hpp>
+
 #include "sipdb/MongoDB.h"
 #include "utl/UtlString.h"
 
@@ -32,7 +36,7 @@ class Subscription
 public:
     Subscription();
     Subscription(const Subscription& subscription);
-    Subscription(const mongo::BSONObj& bson);
+    Subscription(const bsoncxx::document::view& bson);
     Subscription(
         const UtlString& component,
         const UtlString& uri,
@@ -53,7 +57,7 @@ public:
 
     ~Subscription();
     Subscription& operator=(const Subscription& subscription);
-    Subscription& operator=(const mongo::BSONObj& bson);
+    Subscription& operator=(const bsoncxx::document::view& bson);
     void swap(Subscription& subscription);
     std::string& oid();
     std::string& component();
@@ -68,12 +72,12 @@ public:
     std::string& key();
     std::string& recordRoute();
     std::string& accept();
-    std::string& file();
+    std::string& file(); 
     unsigned int notifyCseq();
     unsigned int subscribeCseq();
     unsigned int version();  
     unsigned int expires();
-    void getMongoOID(mongo::OID& oid) const;
+    void  getMongoOID(bsoncxx::oid& oid) const;
 
     static const char* oid_fld();
     static const char* component_fld();
@@ -125,9 +129,9 @@ inline std::string& Subscription::oid()
     return _oid;
 }
 
-inline void Subscription::getMongoOID(mongo::OID& oid) const
+inline void Subscription::getMongoOID(bsoncxx::oid& oid) const
 {
-  oid.init(_oid);
+    oid = bsoncxx::oid{_oid};
 }
 
 inline std::string& Subscription::component()

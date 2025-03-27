@@ -18,9 +18,11 @@
 
 
 #include <string>
-#include <boost/shared_ptr.hpp>
+
+
+#include <bsoncxx/document/view.hpp>
+
 #include "sipdb/MongoDB.h"
-#include "sipdb/MongoMod.h"
 
 class RegBinding
 {
@@ -28,12 +30,12 @@ public:
     typedef boost::shared_ptr<RegBinding> Ptr;
     RegBinding();
     RegBinding(const RegBinding& binding);
-    RegBinding(const mongo::BSONObj& bson);
+    RegBinding(const bsoncxx::document::view& bson);
     ~RegBinding();
     void swap(RegBinding& binding);
     RegBinding& operator=(const RegBinding& binding);
-    RegBinding& operator=(const mongo::BSONObj& bson);
-    mongo::BSONObj toBSONObj() const;
+    RegBinding& operator=(const bsoncxx::document::view& bson);
+    bsoncxx::document::value toBSONObj() const;
     const std::string& getIdentity() const;
     const std::string& getUri() const;
     const std::string& getCallId() const;
@@ -42,13 +44,13 @@ public:
     const std::string& getQvalue() const;
     const std::string& getInstanceId() const;
     const std::string& getGruu() const;
-    unsigned int getShardId() const;
+    std::int32_t getShardId() const;
     const std::string& getPath() const;
-    unsigned int getCseq() const;
-    unsigned long getExpirationTime() const;
+    std::int32_t getCseq() const;
+    std::int64_t getExpirationTime() const;
     const std::string& getInstrument() const;
     const std::string& getLocalAddress()const;
-    unsigned long getTimestamp() const;
+    std::int64_t getTimestamp() const;
     bool getExpired() const;
 
     void setIdentity(const std::string& identity);
@@ -86,7 +88,7 @@ public:
     static const char* shardId_fld();
 
 private:
-    void fromBSONObj(const mongo::BSONObj& bson);
+    void fromBSONObj(const bsoncxx::document::view& bson);
     std::string _identity;
     std::string _uri;
     std::string _callId;
@@ -95,13 +97,13 @@ private:
     std::string _qvalue;
     std::string _instanceId;
     std::string _gruu;
-    unsigned int _shardId;
+    std::int32_t _shardId;
     std::string _path;
-    unsigned int _cseq;
-    unsigned long _expirationTime;
+    std::int32_t _cseq;
+    std::int64_t _expirationTime;
     std::string _instrument;
     std::string _localAddress;
-    unsigned long _timestamp;
+    std::int64_t _timestamp;
     bool _expired;
 };
 
@@ -150,7 +152,7 @@ inline const std::string& RegBinding::getGruu() const
   return _gruu;
 }
 
-inline unsigned int RegBinding::getShardId() const
+inline std::int32_t  RegBinding::getShardId() const
 {
   return _shardId;
 }
@@ -160,12 +162,12 @@ inline const std::string& RegBinding::getPath() const
   return _path;
 }
 
-inline unsigned int RegBinding::getCseq() const
+inline std::int32_t  RegBinding::getCseq() const
 {
   return _cseq;
 }
 
-inline unsigned long RegBinding::getExpirationTime() const
+inline std::int64_t  RegBinding::getExpirationTime() const
 {
   return _expirationTime;
 }
@@ -180,7 +182,7 @@ inline const std::string& RegBinding::getLocalAddress()const
     return _localAddress;
 }
 
-inline unsigned long RegBinding::getTimestamp() const
+inline std::int64_t  RegBinding::getTimestamp() const
 {
     return _timestamp;
 }

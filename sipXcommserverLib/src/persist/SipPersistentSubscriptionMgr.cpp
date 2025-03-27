@@ -320,7 +320,7 @@ UtlBoolean SipPersistentSubscriptionMgr::getNotifyDialogInfo(
         mDB.updateToTag(callId, localTag, remoteTag);
       }
 #ifdef MONGO_assert
-      catch (mongo::DBException& e)
+      catch (mongocxx::exception& e)
       {
 
          OS_LOG_ERROR( FAC_SIP, "SipSubscriptionMgr::getNotifyDialogInfo::mDB.updateToTag() Exception: "

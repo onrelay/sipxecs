@@ -13,6 +13,8 @@
  * details.
  */
 
+#include <bsoncxx/json.hpp>
+
 #include <os/OsLogger.h>
 
 #include "sipdb/RegBinding.h"
@@ -92,105 +94,106 @@ void RegBinding::swap(RegBinding& binding)
     std::swap(_expired, binding._expired);
 }
 
-void RegBinding::fromBSONObj(const mongo::BSONObj& bson)
+void RegBinding::fromBSONObj(const bsoncxx::document::view& bson)
 {
-  if (bson.hasField(RegBinding::identity_fld()))
-    _identity = bson.getStringField(RegBinding::identity_fld());
+    if (bson[identity_fld()] && bson[identity_fld()].type() == bsoncxx::type::k_string)
+        _identity = std::string(bson[identity_fld()].get_string().value);
 
-  if (bson.hasField(RegBinding::uri_fld()))
-    _uri = bson.getStringField(RegBinding::uri_fld());
+    if (bson[uri_fld()] && bson[uri_fld()].type() == bsoncxx::type::k_string)
+        _uri = std::string(bson[uri_fld()].get_string().value);
 
-  if (bson.hasField(RegBinding::callId_fld()))
-    _callId = bson.getStringField(RegBinding::callId_fld());
+    if (bson[callId_fld()] && bson[callId_fld()].type() == bsoncxx::type::k_string)
+        _callId = std::string(bson[callId_fld()].get_string().value);
 
-  if (bson.hasField(RegBinding::contact_fld()))
-    _contact = bson.getStringField(RegBinding::contact_fld());
+    if (bson[contact_fld()] && bson[contact_fld()].type() == bsoncxx::type::k_string)
+        _contact = std::string(bson[contact_fld()].get_string().value);
 
-  if (bson.hasField(RegBinding::binding_fld()))
-    _binding = bson.getStringField(RegBinding::binding_fld());
+    if (bson[binding_fld()] && bson[binding_fld()].type() == bsoncxx::type::k_string)
+        _binding = std::string(bson[binding_fld()].get_string().value);
 
-  if (bson.hasField(RegBinding::qvalue_fld()))
-    _qvalue = bson.getStringField(RegBinding::qvalue_fld());
+    if (bson[qvalue_fld()] && bson[qvalue_fld()].type() == bsoncxx::type::k_string)
+        _qvalue = std::string(bson[qvalue_fld()].get_string().value);
 
-  if (bson.hasField(RegBinding::instanceId_fld()))
-    _instanceId = bson.getStringField(RegBinding::instanceId_fld());
+    if (bson[instanceId_fld()] && bson[instanceId_fld()].type() == bsoncxx::type::k_string)
+        _instanceId = std::string(bson[instanceId_fld()].get_string().value);
 
-  if (bson.hasField(RegBinding::gruu_fld()))
-    _gruu = bson.getStringField(RegBinding::gruu_fld());
+    if (bson[gruu_fld()] && bson[gruu_fld()].type() == bsoncxx::type::k_string)
+        _gruu = std::string(bson[gruu_fld()].get_string().value);
 
-  if (bson.hasField(RegBinding::shardId_fld()))
-    _shardId = bson.getIntField(RegBinding::shardId_fld());
+    if (bson[shardId_fld()] && bson[shardId_fld()].type() == bsoncxx::type::k_int32)
+        _shardId = bson[shardId_fld()].get_int32().value;
 
-  if (bson.hasField(RegBinding::path_fld()))
-    _path = bson.getStringField(RegBinding::path_fld());
+    if (bson[path_fld()] && bson[path_fld()].type() == bsoncxx::type::k_string)
+        _path = std::string(bson[path_fld()].get_string().value);
 
-  if (bson.hasField(RegBinding::cseq_fld()))
-    _cseq = bson.getIntField(RegBinding::cseq_fld());
+    if (bson[cseq_fld()] && bson[cseq_fld()].type() == bsoncxx::type::k_int32)
+        _cseq = bson[cseq_fld()].get_int32().value;
 
-  if (bson.hasField(RegBinding::expirationTime_fld()))
-  {
-    mongo::BSONElement expirationTimeElement = bson.getField(RegBinding::expirationTime_fld());
-
-    // save the time depending on its type
-    if (mongo::Date == expirationTimeElement.type())
+    if (bson[expirationTime_fld()])
     {
-      _expirationTime = static_cast<unsigned long>(expirationTimeElement.date().toTimeT());
+        auto expirationTimeElement = bson[expirationTime_fld()];
+        if (expirationTimeElement.type() == bsoncxx::type::k_date)
+        {
+            _expirationTime = static_cast<unsigned long>(expirationTimeElement.get_date().to_int64() / 1000); // Convert milliseconds to seconds
+        }
+        else if (expirationTimeElement.type() == bsoncxx::type::k_int64 ||
+                 expirationTimeElement.type() == bsoncxx::type::k_double)
+        {
+            _expirationTime = static_cast<unsigned long>(expirationTimeElement.get_int64());
+            OS_LOG_WARNING(FAC_SIP, "RegBinding::fromBSONObj found old-style registration"
+                << " Identity: " << _identity
+                << " Contact: " << _contact
+                << " Call-Id: " << _callId);
+        }
+        else
+        {
+            OS_LOG_ERROR(FAC_SIP, "RegBinding::fromBSONObj "
+                "unsupported BSON element for registration"
+                << " Identity: " << _identity
+                << " Contact: " << _contact
+                << " Call-Id: " << _callId);
+        }
     }
-    else if (expirationTimeElement.isNumber())
-    {
-      _expirationTime = static_cast<unsigned long>(expirationTimeElement.Number());
-      OS_LOG_WARNING(FAC_SIP, "RegBinding::fromBSONObj found old-style registration"
-          << " Identity: " << _identity
-          << " Contact: " << _contact
-          << " Call-Id: " << _callId);
-    }
-    else
-    {
-      OS_LOG_ERROR(FAC_SIP, "RegBinding::fromBSONObj "
-          "unsupported " << expirationTimeElement.toString() << " element for registration"
-          << " Identity: " << _identity
-          << " Contact: " << _contact
-          << " Call-Id: " << _callId);
-    }
-  }
 
-  if (bson.hasField(RegBinding::instrument_fld()))
-    _instrument = bson.getStringField(RegBinding::instrument_fld());
+    if (bson[instrument_fld()] && bson[instrument_fld()].type() == bsoncxx::type::k_string)
+        _instrument = std::string(bson[instrument_fld()].get_string().value);
 
-  if (bson.hasField(RegBinding::localAddress_fld()))
-    _localAddress = bson.getStringField(RegBinding::localAddress_fld());
+    if (bson[localAddress_fld()] && bson[localAddress_fld()].type() == bsoncxx::type::k_string)
+        _localAddress = std::string(bson[localAddress_fld()].get_string().value);
 
-  if (bson.hasField(RegBinding::timestamp_fld()))
-    _timestamp = bson.getIntField(RegBinding::timestamp_fld());
+    if (bson[timestamp_fld()] && bson[timestamp_fld()].type() == bsoncxx::type::k_int64)
+        _timestamp = bson[timestamp_fld()].get_int64().value;
 
-  if (bson.hasField(RegBinding::expired_fld()))
-    _expired = bson.getBoolField(RegBinding::expired_fld());
-
-  
+    if (bson[expired_fld()] && bson[expired_fld()].type() == bsoncxx::type::k_bool)
+        _expired = bson[expired_fld()].get_bool().value;
 }
 
-mongo::BSONObj RegBinding::toBSONObj() const
+bsoncxx::document::value RegBinding::toBSONObj() const
 {
-  return BSON(
-      timestamp_fld() << static_cast<long long>(_timestamp) <<
-      localAddress_fld() << _localAddress <<
-      identity_fld() << _identity <<
-      uri_fld() << _uri <<
-      callId_fld() << _callId <<
-      contact_fld() << _contact <<
-      binding_fld() << _binding <<
-      qvalue_fld() << _qvalue <<
-      instanceId_fld() << _instanceId <<
-      gruu_fld() << _gruu <<
-      shardId_fld() << _shardId <<
-      path_fld() << _path <<
-      cseq_fld() << _cseq <<
-      expirationTime_fld() << MongoDB::BaseDB::dateFromSecsSinceEpoch(_expirationTime) <<
-      instrument_fld() << _instrument <<
-      expired_fld() << _expired);
+    bsoncxx::builder::basic::document builder;
+
+    builder.append(bsoncxx::builder::basic::kvp(std::string(timestamp_fld()), static_cast<int64_t>(_timestamp)));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(localAddress_fld()), _localAddress));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(identity_fld()), _identity));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(uri_fld()), _uri));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(callId_fld()), _callId));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(contact_fld()), _contact));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(binding_fld()), _binding));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(qvalue_fld()), _qvalue));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(instanceId_fld()), _instanceId));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(gruu_fld()), _gruu));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(shardId_fld()), _shardId));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(path_fld()), _path));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(cseq_fld()), _cseq));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(expirationTime_fld()), 
+        bsoncxx::types::b_date(MongoDB::BaseDB::dateFromSecsSinceEpoch(_expirationTime))));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(instrument_fld()), _instrument));
+    builder.append(bsoncxx::builder::basic::kvp(std::string(expired_fld()), _expired));
+
+    return builder.extract();
 }
 
-RegBinding::RegBinding(const mongo::BSONObj& bson) :
+RegBinding::RegBinding(const bsoncxx::document::view& bson) :
   _shardId(0),
   _cseq(0),
   _expirationTime(0),
@@ -200,7 +203,7 @@ RegBinding::RegBinding(const mongo::BSONObj& bson) :
   fromBSONObj(bson);
 }
 
-RegBinding& RegBinding::operator=(const mongo::BSONObj& bson)
+RegBinding& RegBinding::operator=(const bsoncxx::document::view& bson)
 {
   fromBSONObj(bson);
 

@@ -18,36 +18,43 @@
 
 #include <queue>
 #include <vector>
-#include <os/OsTime.h>
-#include <boost/circular_buffer.hpp>
-#include <boost/thread.hpp>
-
-// Avoids this error
-//   /usr/include/mongo/client/../pch.h:116:15: error: expected unqualified-id before string constant
-#undef VERSION
-
-// Avoids this error
-//.../usr/include/mongo/util/net/sock.h:62:15: error: expected unqualified-id before '-' token
-#ifdef INVALID_SOCKET
-#undef INVALID_SOCKET
-#endif
-
-#include <mongo/client/dbclient.h>
-
-
-// unfortunately mongo undefines assert and for some c++ files, that's bad
-// so we universally include it here whether c++ uses it or not.
 #include <assert.h>
+#include <exception>
 
-#include <boost/exception/all.hpp>
+#if !defined(BOOST_BIND_GLOBAL_PLACEHOLDERS)
+  #define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#endif
+#include <boost/format.hpp>
+#include <boost/bind.hpp>
+#include <boost/thread.hpp>
+#include <boost/function.hpp>
+#include <boost/asio.hpp>
+#include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_array.hpp>
-#include <exception>
-#include <boost/function.hpp>
+#include <boost/circular_buffer.hpp>
+#include <boost/program_options.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/exception/all.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/local_time_adjustor.hpp>
+#include <boost/date_time/c_local_time_adjustor.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
+#include <boost/property_tree/detail/ptree_utils.hpp>
 
 
-// is assert is undefined, just include it again
-//  include <assert.h>
+#include <os/OsTime.h>
+
+#include <mongocxx/client.hpp>  
+#include <mongocxx/database.hpp>  
+#include <mongocxx/collection.hpp>  
+#include <mongocxx/uri.hpp>  
+#include <mongocxx/exception/exception.hpp>
+
+#include <bsoncxx/document/view.hpp>
 
 // cannot seem to redfine it so safer to undefine it
 #undef VERSION
@@ -60,12 +67,15 @@
 #define BSON_ELEM_MATCH(val) BSON("$elemMatch" << val)
 #define BSON_OR(val) BSON("$or" << val)
 
+#define MONGODB_EXPIRES_AFTER_SECONDS_MINIMUM_SECS 1
+
 typedef boost::error_info<struct tag_errmsg, std::string> errmsg_info;
 
 namespace MongoDB
 {
-   //typedef boost::scoped_ptr<mongo::ScopedDbConnection> ScopedDbConnectionPtr;
-   typedef boost::scoped_ptr<mongo::ScopedDbConnection> ScopedDbConnectionPtr;
+
+
+
 
 class ConfigError: public boost::exception, public std::exception {
 public:
@@ -80,7 +90,9 @@ public:
 
 	ConnectionInfo(const ConnectionInfo& rhs);
 
-  ConnectionInfo(const mongo::ConnectionString& connectionString);
+  ConnectionInfo(const std::string& connectionString);
+
+  ConnectionInfo(const mongocxx::uri& connectionUri);
 
 	ConnectionInfo(std::ifstream& configFile);
 
@@ -90,18 +102,9 @@ public:
 
   ConnectionInfo& operator=(const ConnectionInfo& conn);
 
-
-
 	/**
 	 * Read just the connection string from a file.
 	 *
-	 * Example:
-	 *    MyDB db(ConnectionInfo(ConnectionInfo::connectionStringFromFile(), "mydb.mycollection"));
-	 *
-	 * Example:
-	 *    ConnectionString connString = ConnectionInfo::connectionStringFromFile();
-	 *    MyDB db1(ConnectionInfo(connString, "mydb.mycollection1"));
-	 *    MyDB db2(ConnectionInfo(connString, "mydb.mycollection2"));
 	 *
 	 * Example file contents:
 	 * ======================
@@ -111,48 +114,46 @@ public:
 	static ConnectionInfo globalInfo();
 	static ConnectionInfo localInfo();
 
-	static bool	testConnection(const mongo::ConnectionString &connectionString, std::string& errmsg);
+	static bool	testConnection(const mongocxx::uri& connectionUri, std::string& errmsg);
 
-    const mongo::ConnectionString& getConnectionString() const
+  const mongocxx::uri& getConnectionUri() const
 	{
-              return _connectionString;
+    return _connectionUri;
 	}
-	;
+	
 
 	const int getShardId() const
 	{
 		return _shard;
 	}
-	;
+	
 
 	const bool useReadTags() const
 	{
 		return _useReadTags;
 	}
-	;
 
 	void enableReadTags(bool enable)
 	{
 		_useReadTags = enable;
-	};
+	}
 
 	const bool isEmpty() const
 	{
-		return !_connectionString.isValid();
+		return _connectionUri.to_string().empty();
 	}
-	;
 
   const std::string& getClusterId() const
   {
     return _clusterId;
   }
 
-  const unsigned int getReadQueryTimeoutMs() const
+  const std::int64_t getReadQueryTimeoutMs() const
   {
     return _readQueryTimeoutMs;
   }
 
-  const unsigned int getWriteQueryTimeoutMs() const
+  const std::int64_t getWriteQueryTimeoutMs() const
   {
     return _writeQueryTimeoutMs;
   }
@@ -169,16 +170,44 @@ public:
     return writeQueryTimeout/1000;
   }
 
-
 private:
 
-  mongo::ConnectionString _connectionString;
-  int _shard;
+  mongocxx::uri _connectionUri; 
+  std::int32_t _shard;
   bool _useReadTags;
   std::string _clusterId;
-  unsigned int _readQueryTimeoutMs;
-  unsigned int _writeQueryTimeoutMs;
+  std::int64_t _readQueryTimeoutMs;
+  std::int64_t _writeQueryTimeoutMs;
   std::string _rawConnectionString;
+};
+
+class MongoConnection {
+  public:
+    // Constructor to initialize the client with connection info
+    MongoConnection(const ConnectionInfo& connectionInfo);
+
+    MongoConnection(const std::string& connectionString);
+
+    MongoConnection(const mongocxx::uri& connectionUri);
+
+    // Getter for the raw mongocxx::client object
+    mongocxx::client& client();
+
+    // Method to get a database from the client
+    mongocxx::database database(const std::string& ns);
+
+    // Method to get a collection from the client
+    mongocxx::collection collection(const std::string& ns);
+
+    static std::string databaseName(const std::string& ns);
+
+    static std::string collectionName(const std::string& ns);
+
+    bool ok();
+
+  private:
+    // The unique pointer that holds the mongocxx::client
+    std::unique_ptr<mongocxx::client> _ptr;
 };
 
 class UpdateTimer;
@@ -192,7 +221,6 @@ public:
 	virtual ~BaseDB()
 	{
 	}
-	;
 
 	// This does something for each record. Efficient because it doesn't store each record into a collection
 	// then pass back the collection for you to iterate over.
@@ -204,23 +232,23 @@ public:
 	//   include <boost/bind.hpp>
 	//
 	//   class X {
-	//      void y(mongo::BSONObj o) {
+	//      void y(bsoncxx::document::view o) {
 	//         println("%s\n", o.getStringField("a"));
 	//      }
 	//   };
 	//
 	//   BaseDB d(info);
 	//   X z;
-	//   mongo::BSONObj all;
+	//   bsoncxx::document::view all;
 	//   d.forEach(all, bind(&X::y, &z, _1));   // _1 is required means a single argument
 	//
-	void forEach(mongo::BSONObj& query, const std::string& ns, boost::function<void(mongo::BSONObj)> doSomething);
+	void forEach(const bsoncxx::document::view& query, const std::string& ns, boost::function<void(const bsoncxx::document::view&)> doSomething);
 
-	void  nearest(mongo::BSONObjBuilder& builder, mongo::BSONObj query) const;
+  void primaryPreferred(mongocxx::options::find& findOptions ) const;
 
-	void  primaryPreferred(mongo::BSONObjBuilder& builder, mongo::BSONObj query) const;
+  void nearest(mongocxx::options::find& findOptions ) const;
 
-	void  setReadPreference(mongo::BSONObjBuilder& builder, mongo::BSONObj query, const char* readPreferrence) const;
+	void  setReadPreference(bsoncxx::builder::basic::document& builder, const bsoncxx::document::view& query, const char* readPreferrence) const;
 
 	const int getShardId() const { return _info.getShardId(); };
 
@@ -232,13 +260,13 @@ public:
 
   void registerTimer(const ReadTimer* pTimer);
 
-  Int64 getUpdateAverageSpeed() const;
+  std::int64_t getUpdateAverageSpeed() const;
 
-  Int64 getLastUpdateSpeed() const;
+  std::int64_t getLastUpdateSpeed() const;
 
-  Int64 getReadAverageSpeed() const;
+  std::int64_t getReadAverageSpeed() const;
 
-  Int64 getLastReadSpeed() const;
+  std::int64_t getLastReadSpeed() const;
 
   const double getReadQueryTimeout() const { double readQueryTimeout = _info.getReadQueryTimeoutMs(); return readQueryTimeout/1000; }
 
@@ -248,34 +276,35 @@ public:
   // Construct final read and write queries by setting the maximum
   // time (in milliseconds) the queries will be available in the server part
   //
-  static mongo::Query queryMaxTimeMS(const mongo::BSONObj& obj, unsigned int maxTimeMS);
-  mongo::Query readQueryMaxTimeMS(const mongo::BSONObj& obj) const;
-  mongo::Query writeQueryMaxTimeMS(const mongo::BSONObj& obj) const;
+  bsoncxx::document::value queryMaxTimeMS(const bsoncxx::document::view& obj, std::int64_t maxTimeMs) const;
+  bsoncxx::document::value readQueryMaxTimeMS(const bsoncxx::document::view& obj) const;
+  bsoncxx::document::value writeQueryMaxTimeMS(const bsoncxx::document::view& obj) const;
 
   //
-  // Gets a mongo::Date_t object from the given epoch time in seconds
+  // Gets a bsoncxx::types::b_date object from the given epoch time in seconds
   //
-  static mongo::Date_t dateFromSecsSinceEpoch(unsigned long timestamp);
+  static bsoncxx::types::b_date dateFromSecsSinceEpoch(unsigned long timestamp);
 
   //
   // Drops/Removes the specified index keys in a safe way (i.e. catching mongo's possible exceptions)
   //
-  bool safeDropIndex(mongo::DBClientBase* client, const std::string& key) const;
+  bool safeDropIndex(mongocxx::collection& collection, const std::string& key) const;
 
   //
   // Ensures the creation of a TTL index in a safe way (i.e. catching mongo's possible exceptions)
   //
-  bool safeEnsureTTLIndex(mongo::DBClientBase* client, const std::string& key, int ttl) const;
+  bool safeEnsureTTLIndex(mongocxx::collection& collection, const std::string& key, int ttlSeconds) const;
+
 
 protected:
   std::string _ns;
 	mutable ConnectionInfo _info;
-  boost::circular_buffer<Int64> _updateTimerSamples;
-  boost::circular_buffer<Int64> _readTimerSamples;
+  boost::circular_buffer<std::int64_t> _updateTimerSamples;
+  boost::circular_buffer<std::int64_t> _readTimerSamples;
   mutable boost::mutex _updateTimerSamplesMutex;
   mutable boost::mutex _readTimerSamplesMutex;
-  Int64 _lastReadSpeed;
-  Int64 _lastUpdateSpeed;
+  std::int64_t _lastReadSpeed;
+  std::int64_t _lastUpdateSpeed;
   long _lastAlarmLog;
 };
 
@@ -287,8 +316,8 @@ public:
   inline void setDBConnOK(bool state) {_isDBConnOK = state;};
 
 protected:
-  Int64 _start;
-  Int64 _end;
+  std::int64_t _start;
+  std::int64_t _end;
   BaseDB& _db;
   bool _isDBConnOK;
   friend class BaseDB;
@@ -302,11 +331,17 @@ public:
   inline void setDBConnOK(bool state) {_isDBConnOK = state;};
 
 protected:
-  Int64 _start;
-  Int64 _end;
+  std::int64_t _start;
+  std::int64_t _end;
   BaseDB& _db;
   bool _isDBConnOK;
   friend class BaseDB;
+};
+
+class MongoException : public std::runtime_error {
+public:
+  explicit MongoException(const std::string& message)
+      : std::runtime_error("MongoException: " + message) {}
 };
 
 

@@ -3,9 +3,7 @@
 #include <sipxunit/TestUtilities.h>
 #include <sipdb/RegBinding.h>
 #include <os/OsDateTime.h>
-#include <mongo/util/net/hostandport.h>
-#include <mongo/client/connpool.h>
-
+#include <bsoncxx/document/view.hpp>
 
 using namespace std;
 
@@ -84,9 +82,9 @@ public:
       regBinding.setExpired(regBindingTestData[0].expired);
    }
 
-   void createBSONObj(const RegBinding& regBinding,  mongo::BSONObj& bsonObj)
+   void createBSONObj(const RegBinding& regBinding,  bsoncxx::document::view& bsonObj)
    {
-      mongo::BSONObjBuilder bsonObjBuilder;
+      bsoncxx::builder::basic::document bsonObjBuilder;
 
       bsonObjBuilder << regBinding.identity_fld() << regBinding.getIdentity() <<          // "identity"
                regBinding.uri_fld() << regBinding.getUri() <<                             // "uri"
@@ -97,7 +95,7 @@ public:
                regBinding.gruu_fld() << regBinding.getGruu() <<                           // "gruu"
                regBinding.path_fld() << regBinding.getPath() <<                           // "path"
                regBinding.cseq_fld() << regBinding.getCseq() <<                           // "cseq"
-               regBinding.expirationTime_fld() << MongoDB::BaseDB::dateFromSecsSinceEpoch((unsigned int)regBinding.getExpirationTime()) <<       // "expirationTime"
+               regBinding.expirationTime_fld() << MongoDB::BaseDB::dateFromSecsSinceEpoch((std::int64_t)regBinding.getExpirationTime()) <<       // "expirationTime"
                regBinding.instrument_fld() << regBinding.getInstrument() <<               // "instrument"
                regBinding.localAddress_fld() << regBinding.getLocalAddress() <<           // "localAddress"
                regBinding.timestamp_fld() << (unsigned int)regBinding.getTimestamp() <<                 // "timestamp"
@@ -126,7 +124,7 @@ public:
       CPPUNIT_ASSERT(regBindingTestData[0].pGruu == regBinding.getGruu());
       CPPUNIT_ASSERT(regBindingTestData[0].pPath == regBinding.getPath());
       CPPUNIT_ASSERT(regBindingTestData[0].cseq == regBinding.getCseq());
-      CPPUNIT_ASSERT((unsigned int)_timeNow + regBindingTestData[0].expirationTime == regBinding.getExpirationTime());
+      CPPUNIT_ASSERT((std::int64_t)_timeNow + regBindingTestData[0].expirationTime == regBinding.getExpirationTime());
       CPPUNIT_ASSERT(regBindingTestData[0].pInstrument == regBinding.getInstrument());
       CPPUNIT_ASSERT(regBindingTestData[0].pLocalAddress == regBinding.getLocalAddress());
       CPPUNIT_ASSERT(_timeNow + regBindingTestData[0].timeStamp == regBinding.getTimestamp());
@@ -185,7 +183,7 @@ public:
       setBinding(regBinding);
 
 
-      mongo::BSONObj bsonObj;
+      bsoncxx::document::view bsonObj;
 
       // create BSONObj from Reg binding class
       createBSONObj(regBinding, bsonObj);
@@ -204,7 +202,7 @@ public:
       // init Reg binding with default values
       setBinding(regBinding);
 
-      mongo::BSONObj bsonObj;
+      bsoncxx::document::view bsonObj;
 
       // create BSONObj from Reg binding class
       createBSONObj(regBinding, bsonObj);

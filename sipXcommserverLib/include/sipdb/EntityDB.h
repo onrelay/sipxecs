@@ -18,10 +18,11 @@
 
 #include <set>
 #include "sipdb/EntityRecord.h"
-#include "sipdb/MongoMod.h"
 #include "utl/UtlString.h"
 #include "net/Url.h"
 #include <Poco/ExpireCache.h>
+
+#include <bsoncxx/document/view.hpp>
 
 #define ENTITYDB_CACHE_EXPIRE 30
 
@@ -38,13 +39,9 @@ public:
 
 	typedef Poco::ExpireCache<std::string, Entities> EntityTypeCache;
 	typedef Poco::SharedPtr<Entities> EntityTypeCacheable;
-	typedef std::vector<mongo::BSONObj> BSONObjects;
 	typedef std::set<std::string> CallerLocations;
 
-	void init()
-	{
-	    _lastTailId = mongoMod::minKey.firstElement();
-	}
+	void init();
 
 	EntityDB(const MongoDB::ConnectionInfo& info, size_t cacheExpire = 1000 * ENTITYDB_CACHE_EXPIRE);
 	EntityDB(const MongoDB::ConnectionInfo& info, const std::string& ns, size_t cacheExpire = 1000 * ENTITYDB_CACHE_EXPIRE);
@@ -88,7 +85,7 @@ public:
 	}
 
 private:
-	mongo::BSONElement _lastTailId;
+	bsoncxx::document::element _lastTailId;
 	ExpireCache _cache;
 	EntityTypeCache _typeCache;
 };

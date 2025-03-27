@@ -7,7 +7,8 @@ AM_CPPFLAGS = \
 
 LDADD = \
 	@SIPXUNIT_LIBS@ \
-	-lmongoclient \
+	-lmongocxx \
+	-lbsoncxx \
    ../../libsipXcommserver.la
 
 # Define values used in local database unit tests. This only

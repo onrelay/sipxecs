@@ -3,8 +3,8 @@
 #include <sipxunit/TestUtilities.h>
 #include <sipdb/RegDB.h>
 #include <os/OsDateTime.h>
-#include <mongo/util/net/hostandport.h>
-#include <mongo/client/connpool.h>
+#include <bsoncxx/document/view.hpp>
+
 
 
 using namespace std;
@@ -20,16 +20,35 @@ class RegDBTest: public CppUnit::TestCase
 	RegDB* _db;
 	const MongoDB::ConnectionInfo _info;
 public:
-	RegDBTest() : _info(MongoDB::ConnectionInfo(mongo::ConnectionString(mongo::HostAndPort("localhost")), string("test.RegDBTest")))
+	RegDBTest() : _info(MongoDB::ConnectionInfo(string("localhost"), string("test.RegDBTest")))
 	{
 	}
 
 	void setUp()
 	{
-		_db = new RegDB(_info);
-		MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-		pConn->get()->remove(_info.getNS(), mongo::Query());
-		pConn->done();
+		try
+		{
+			// Initialize the RegDB instance
+			_db = new RegDB(_info);
+
+			// Initialize MongoDB connection
+			MongoDB::MongoConnection connection(_info);
+
+			// Construct an empty query
+			auto query = bsoncxx::builder::basic::make_document();
+
+			// Retrieve the collection
+			mongocxx::collection collection = connection.collection(_info.getNS());
+
+			// Remove all documents from the collection
+			collection.delete_many(query.view());
+		}
+		catch (const mongocxx::exception& e)
+		{
+			// Log and re-throw the exception for higher-level handling
+			OS_LOG_ERROR(FAC_ODBC, "setUp - MongoDB exception: " << e.what());
+			throw MongoDB::MongoException("Failed to set up test database: " + std::string(e.what()));
+		}
 	}
 
 	void tearDown()
@@ -268,22 +287,41 @@ public:
 
 	bool getAllOldBindings(int timeNow, RegDB::Bindings& bindings)
 	{
-		mongo::BSONObj query = BSON( "expirationTime" << BSON_LESS_THAN(MongoDB::BaseDB::dateFromSecsSinceEpoch(timeNow)));
-		MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-		auto_ptr<mongo::DBClientCursor> pCursor = pConn->get()->query(_info.getNS(), query);
-		if (pCursor.get() && pCursor->more())
+		try
 		{
-			while (pCursor->more())
-			{
-				RegBinding binding(pCursor->next());
-				bindings.push_back(binding);
-			}
-			pConn->done();
-			return true;
-		}
+			// Create the query document
+			auto query = bsoncxx::builder::basic::make_document(
+				bsoncxx::builder::basic::kvp(std::string("expirationTime"),
+											bsoncxx::builder::basic::make_document(
+												bsoncxx::builder::basic::kvp(std::string("$lt"),
+																			MongoDB::BaseDB::dateFromSecsSinceEpoch(timeNow)))));
 
-		pConn->done();
-		return false;
+			// Initialize MongoDB connection
+			MongoDB::MongoConnection connection(_info);
+
+			// Retrieve the collection
+			mongocxx::collection collection = connection.collection(_info.getNS());
+
+			// Execute the query
+			auto cursor = collection.find(query.view());
+			bool hasData = false;
+
+			// Iterate over the cursor and populate bindings
+			for (const auto& doc : cursor)
+			{
+				RegBinding binding(doc);
+				bindings.push_back(binding);
+				hasData = true;
+			}
+
+			return hasData;
+		}
+		catch (const mongocxx::exception& e)
+		{
+			// Log the error and re-throw as a DBException
+			OS_LOG_ERROR(FAC_ODBC, "getAllOldBindings - MongoDB exception: " << e.what());
+			throw MongoDB::MongoException("Failed to retrieve old bindings: " + std::string(e.what()));
+		}
 	}
 };
 

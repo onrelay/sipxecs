@@ -16,21 +16,24 @@
 #ifndef _MONGO_VERIFIER_H__
 #define _MONGO_VERIFIER_H__
 
+#include <bsoncxx/document/view.hpp>
+
 #include "sipdb/MongoDB.h"
+
 #include <string>
 
 class MongoDbVerifier
 {
 public:
-  MongoDbVerifier(MongoDB::ScopedDbConnectionPtr& conn,
+  MongoDbVerifier(MongoDB::MongoConnection& conn,
                 const std::string& dbName,
                 int maxTimeToWaitMs,
                 int timeToWaitBetweenRetriesMs = 1000);
   ~MongoDbVerifier();
 
-  void waitUntilEmpty(mongo::BSONObj bSONObj = mongo::BSONObj());
-  void waitUntilHaveOneEntry(mongo::BSONObj bSONObj = mongo::BSONObj());
-  void waitUntilReachNumberOfEntries(mongo::BSONObj bSONObj, unsigned long long numberOfEntries);
+  void waitUntilEmpty(bsoncxx::document::view bSONObj = bsoncxx::document::view());
+  void waitUntilHaveOneEntry(bsoncxx::document::view bSONObj = bsoncxx::document::view());
+  void waitUntilReachNumberOfEntries(bsoncxx::document::view bSONObj, unsigned long long numberOfEntries);
 private:
   //! Disabled copy constructor
   MongoDbVerifier(const MongoDbVerifier& rhs);
@@ -38,10 +41,10 @@ private:
   //! Disabled assignment operator
   MongoDbVerifier& operator=(const MongoDbVerifier& rhs);
 
-  void wait(mongo::BSONObj bSONObj, bool empty);
+  void wait(bsoncxx::document::view bSONObj, bool empty);
 
-  MongoDB::ScopedDbConnectionPtr& _conn;
-  const std::string _dbName;
+  MongoDB::MongoConnection& _conn;
+  const std::string _ns;
   int _maxTimeToWaitMs;
   int _timeToWaitBetweenRetriesMs;
 };

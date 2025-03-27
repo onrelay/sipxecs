@@ -13,20 +13,21 @@
  * details.
  */
 
-#include "sipdb/EntityDB.h"
-#include "sipdb/RegDB.h"
-
+// Standard library includes
 #include <string>
 #include <set>
+#include <vector>
+#include <iostream>
+#include <exception>
 
-#include <boost/date_time/gregorian/greg_date.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
-#include <boost/date_time/local_time_adjustor.hpp>
-#include <boost/date_time/c_local_time_adjustor.hpp>
+// MongoDB C++ driver includes
+#include <bsoncxx/document/view.hpp>
 
-#include <boost/format.hpp>
-
+// Project-specific includes
+#include "sipdb/MongoDB.h" 
+#include "sipdb/EntityDB.h"
+#include "sipdb/RegDB.h"
 
 typedef boost::error_info<struct DbHelperTag,std::string> DbHelperTagInfo;
 
@@ -58,13 +59,13 @@ public:
    * only some of them filtered by a certain field id
    *
    * @param pConnectionInfo - Pointer to a ConnectionInfo class
-   * @param databaseName - Selected database name
+   * @param ns - Selected namespace
    * @param whereOptVector - A vector that will contain the filter conditions used for listing
    *    or deleting entries
    *
    */
-  void deleteDbEntries(const MongoDB::ConnectionInfo* pConnectionInfo,
-                       const std::string& databaseName,
+  void deleteDbEntries(const MongoDB::ConnectionInfo& connectionInfo,
+                       const std::string& ns,
                        std::vector<std::string>& whereOptVector);
 
   /** Print entries from selected database. It can either print all entries or
@@ -72,18 +73,18 @@ public:
    *
    * @param strm - The stream where to print selected database
    * @param pConnectionInfo - Pointer to a ConnectionInfo class
-   * @param databaseName - Selected database name
+   * @param ns - Selected namespace
    * @param whereOptVector - A vector that will contain the filter conditions used for listing
    *    or deleting entries
    * @param dbType - Database type
    * @param multipleLines - If set true the elements will be printed on multiple lines
    *
-   * Note: Throws a DbHelperException if no databaseName is selected
+   * Note: Throws a DbHelperException if no namespace is selected
    *
    */
   void printDbEntries(std::ostream& strm,
-                      const MongoDB::ConnectionInfo* pConnectionInfo,
-                      const std::string& databaseName,
+                      const MongoDB::ConnectionInfo& connectionInfo,
+                      const std::string& ns,
                       std::vector<std::string>& whereOptVector,
                       const DbType dbType,
                       bool multipleLines);
@@ -117,7 +118,7 @@ protected:
    * @param currentNr - The current number of the entry
    * @param multipleLines - If set true the elements will be printed on multiple lines
    */
-  void printRegBindingEntry(std::ostream& strm, const mongo::BSONObj& bson, int currentNr, bool multipleLines);
+  void printRegBindingEntry(std::ostream& strm, const bsoncxx::document::view& bson, int currentNr, bool multipleLines);
 
   /**
    * Function used to print a database entry of type EntryRecord
@@ -127,7 +128,7 @@ protected:
    * @param currentNr - The current number of the entry
    * @param multipleLines - If set true the elements will be printed on multiple lines
    */
-  void printEntityRecordEntry(std::ostream& strm, const mongo::BSONObj& bson, int currentNr, bool multipleLines);
+  void printEntityRecordEntry(std::ostream& strm, const bsoncxx::document::view& bson, int currentNr, bool multipleLines);
 
   /** Utility function used to print entity record aliases vector
    * @param strm - The stream where to print the entity record aliases
@@ -152,27 +153,16 @@ protected:
                                             bool multipleLines);
 
   /**
-   * This function transform a logical operator string into a mongo::Labeler::Label
-   * structure
-   *
-   * For example:
-   *   >    mongo::GT
-   *   <    mongo::LT
-   *   <=   mongo::LTE
-   *   >=   mongo::GTE
-   *   !=   mongo::NE
    *
    * @param logicalOperator - Logical operator as a string
    * @param label - Corresponding mongo::Labeler::Label structure
    * @return true - If the logical operator was successfully transformed
-   * into associated mongo::Labeler::Label structure or false otherwise.
    *
    * Note: Throws a DbHelperException if the logicalOperator is different from any
    * of the following: ">", "<", "<=", ">=", "!=", "="
    *
    */
-  bool getLogicalOperator(const std::string& logicalOperator,
-                          mongo::Labeler::Label& label);
+  bool getLogicalOperator(const std::string& logicalOperator, std::string& label); 
 
   /**
    * Utility function used to create a query for selecting all entries or only
@@ -180,24 +170,24 @@ protected:
    * deleting entries.
    *
    * @param query - A reference to a BSON object
-   * @param pConn - A reference to a ScopedDbConnectionPtr class
+   * @param client - A reference to a MongoConnection class
    * @param whereOptVector - A vector that will contain the filter conditions used for listing
    * or deleting entries
-   * @param databaseName - Selected database name
+   * @param ns - Selected namespace
    */
-  void createQuery(mongo::BSONObj& query,
-                   MongoDB::ScopedDbConnectionPtr& pConn,
-                   std::vector<std::string>& whereOptVector,
-                   const std::string& databaseName);
+   void createQuery(bsoncxx::builder::basic::document& queryBuilder,
+                                                       MongoDB::MongoConnection& connection,
+                                                       std::vector<std::string>& whereOptVector,
+                                                       const std::string& ns );
 
 
   /**
    * Utility function used to append to query the required value type. This type
    * is computed by checking the key type.
    *
-   * @param pConn - A reference to a ScopedDbConnectionPtr class
+   * @param connection - A reference to a MongoConnection class
    * @param queryObjBuilder - A reference to a BSONObjBuilder class
-   * @param databaseName - Selected database name
+   * @param ns - Selected namespace
    * @param string - The whole condition expression: Example: expirationTime < $now
    *       cseq < 812
    *
@@ -205,9 +195,9 @@ protected:
    * can't be transformed in the required type
    *
    */
-  void appendRequiredType(MongoDB::ScopedDbConnectionPtr& pConn,
-                          mongo::BSONObjBuilder& queryObjBuilder,
-                          const std::string& databaseName,
+  void appendRequiredType(MongoDB::MongoConnection& connection,
+                          bsoncxx::builder::basic::document& queryObjBuilder,
+                          const std::string& ns,
                           const std::string& string);
 
   /**
@@ -252,6 +242,6 @@ protected:
 
 
 private:
-  typedef void (DbHelper::*FnPrintEntry_t)(std::ostream& strm, const mongo::BSONObj& bson, int currentNr, bool multipleLines);
+  typedef void (DbHelper::*FnPrintEntry_t)(std::ostream& strm, const bsoncxx::document::view& bson, int currentNr, bool multipleLines);
   FnPrintEntry_t _pFnPrintEntry;    // Callback function used to print an entry from selected database
 };

@@ -13,9 +13,10 @@
  * details.
  */
 #include <iostream>
-#include <boost/algorithm/string.hpp>
 
+#include "sipdb/MongoDB.h"
 #include "sipdb/RESTServer.h"
+
 #include "os/OsLogger.h"
 
 #include "Poco/Net/HTTPServer.h"

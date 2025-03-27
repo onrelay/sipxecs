@@ -13,14 +13,22 @@
  * details.
  */
 
-#include <fstream>
-#include <mongo/client/dbclient.h>
-#include <mongo/client/connpool.h>
+#include <mongocxx/client.hpp>
+#include <mongocxx/uri.hpp>
+#include <mongocxx/collection.hpp>
+#include <mongocxx/options/find.hpp>
+
+#include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/basic/kvp.hpp>
+#include <bsoncxx/document/view.hpp>
+#include <bsoncxx/types.hpp>
+
 #include <os/OsDateTime.h>
 #include <os/OsLogger.h>
+
 #include "sipdb/RegDB.h"
 #include "sipdb/RegExpireThread.h"
-#include "sipdb/MongoMod.h"
+
 
 using namespace std;
 
@@ -32,7 +40,7 @@ RegDB* RegDB::CreateInstance(bool ensureIndexes, int gracePeriod) {
    MongoDB::ConnectionInfo local = MongoDB::ConnectionInfo::localInfo();
    if (!local.isEmpty()) {
      Os::Logger::instance().log(FAC_SIP, PRI_INFO, "Regional database defined");
-     Os::Logger::instance().log(FAC_SIP, PRI_INFO, local.getConnectionString().toString().c_str());
+     Os::Logger::instance().log(FAC_SIP, PRI_INFO, local.getConnectionUri().to_string().c_str());
      lRegDb = new RegDB(local);
      lRegDb->setExpireGracePeriod(gracePeriod);
 
@@ -60,197 +68,263 @@ RegDB* RegDB::CreateInstance(bool ensureIndexes, int gracePeriod) {
 //
 // Creates/updates the indexes needed for RegDB
 //
-void RegDB::ensureIndexes(mongo::DBClientBase* client)
+void RegDB::ensureIndexes()
 {
-  MongoDB::ScopedDbConnectionPtr conn(0);
-  mongo::DBClientBase* clientPtr = client;
+    OS_LOG_INFO(FAC_SIP, "RegDB::ensureIndexes "
+                          << "expireGracePeriod: " << _expireGracePeriod
+                          << ", expirationTimeIndexTTL: " << _expirationTimeIndexTTL);
 
-  OS_LOG_INFO(FAC_SIP, "RegDB::ensureIndexes "
-                        << "existing client: " << (client ? "yes" : "no")
-                        << ", expireGracePeriod: " << _expireGracePeriod
-                        << ", expirationTimeIndexTTL: " << _expirationTimeIndexTTL);
+    // Use MongoConnection to manage the database connection
+    MongoDB::MongoConnection connection(_info);
 
-  // in case no client was provided, create a new connection
-  if (!clientPtr)
-  {
-    conn.reset(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getWriteQueryTimeout()));
-    clientPtr = conn->get();
-  }
+    // Access the target collection
+    mongocxx::collection collection = connection.collection(_ns);
 
-  clientPtr->ensureIndex(_ns, BSON(RegBinding::instrument_fld() << 1 ));
-  clientPtr->ensureIndex(_ns, mongo::fromjson("{\"identity\":1, \"contact\":1, \"shardId\":1}"));
+    // Create the indexes
+    collection.create_index(bsoncxx::builder::basic::make_document(
+        bsoncxx::builder::basic::kvp(std::string(RegBinding::instrument_fld()), 1)));
 
-  // shape the new expirationtime index TTL
-  int newExpirationTimeIndexTTL = (mongoMod::EXPIRES_AFTER_SECONDS_MINIMUM_SECS > static_cast<int>(_expireGracePeriod)) ? mongoMod::EXPIRES_AFTER_SECONDS_MINIMUM_SECS : static_cast<int>(_expireGracePeriod);
+    collection.create_index(bsoncxx::builder::basic::make_document(
+        bsoncxx::builder::basic::kvp(std::string(RegBinding::identity_fld()), 1),
+        bsoncxx::builder::basic::kvp(std::string(RegBinding::contact_fld()), 1),
+        bsoncxx::builder::basic::kvp(std::string(RegBinding::shardId_fld()), 1)
+    ));
 
-  // Note: Since we're not allowed to create the same index using different parameters,
-  //       we'll have to drop the existing index in case we're setting it for the first
-  //       time or in case the expireGracePeriod was changed
-  if (newExpirationTimeIndexTTL != _expirationTimeIndexTTL)
-  {
-    _expirationTimeIndexTTL = newExpirationTimeIndexTTL;
-    safeDropIndex(clientPtr, RegBinding::expirationTime_fld());
-  }
+    // Calculate the new expiration time index TTL
+    int newExpirationTimeIndexTTL = std::max(
+        MONGODB_EXPIRES_AFTER_SECONDS_MINIMUM_SECS,
+        static_cast<int>(_expireGracePeriod)
+    );
 
-  safeEnsureTTLIndex(clientPtr, RegBinding::expirationTime_fld(), _expirationTimeIndexTTL);
+    // Check and update the TTL index if necessary
+    if (newExpirationTimeIndexTTL != _expirationTimeIndexTTL)
+    {
+        _expirationTimeIndexTTL = newExpirationTimeIndexTTL;
+        safeDropIndex(collection, RegBinding::expirationTime_fld());
+    }
 
-  // close the connection, if it was created
-  if (conn)
-  {
-    conn->done();
-  }
+    safeEnsureTTLIndex(collection, RegBinding::expirationTime_fld(), _expirationTimeIndexTTL);
 }
 
 void RegDB::updateBinding(const RegBinding::Ptr& pBinding)
 {
 	updateBinding(*(pBinding.get()));
 }
-
+ 
 void RegDB::updateBinding(RegBinding& binding)
 {
-	if (_local != NULL) {
-		_local->updateBinding(binding);
-		return;
-	}
+    if (_local != nullptr)
+    {
+        _local->updateBinding(binding);
+        return;
+    }
 
-  MongoDB::UpdateTimer updateTimer(const_cast<RegDB&>(*this));
+    MongoDB::UpdateTimer updateTimer(const_cast<RegDB&>(*this));
 
-	if (binding.getTimestamp() == 0)
-	{
-		binding.setTimestamp(OsDateTime::getSecsSinceEpoch());
-	}
+    try
+    {
+        // Use MongoConnection to manage the database connection
+        MongoDB::MongoConnection connection(_info);
 
-	if (binding.getLocalAddress().empty())
-	{
-		string serverId = _localAddress;
-		binding.setLocalAddress(serverId);
-	}
+        updateTimer.setDBConnOK(connection.ok());
 
-  if (binding.getBinding().empty())
-  {
-    Url curl(binding.getContact().c_str());
-    UtlString hostPort;
-    UtlString user;
-    curl.getHostWithPort(hostPort);
-    curl.getUserId(user);
+        // Access the target collection
+        mongocxx::collection collection = connection.collection(_ns);
 
-    std::ostringstream strm;
-    strm << "sip:";
-    if (!user.isNull())
-      strm << user.data() << "@";
-    strm << hostPort.data();
+        if (binding.getTimestamp() == 0)
+        {
+            binding.setTimestamp(OsDateTime::getSecsSinceEpoch());
+        }
 
-    binding.setBinding(strm.str());
-  }
+        if (binding.getLocalAddress().empty())
+        {
+            string serverId = _localAddress;
+            binding.setLocalAddress(serverId);
+        }
 
-  binding.setShardId(getShardId());
+        if (binding.getBinding().empty())
+        {
+            Url curl(binding.getContact().c_str());
+            UtlString hostPort;
+            UtlString user;
+            curl.getHostWithPort(hostPort);
+            curl.getUserId(user);
 
-  mongo::BSONObj query = BSON(
-        RegBinding::identity_fld() << binding.getIdentity() <<
-        RegBinding::contact_fld() << binding.getContact() <<
-        RegBinding::shardId_fld() << binding.getShardId());
+            std::ostringstream strm;
+            strm << "sip:";
+            if (!user.isNull())
+            {
+                strm << user.data() << "@";
+            }
+            strm << hostPort.data();
 
-  bool isExpired = (binding.getExpirationTime() == 0);
-  binding.setExpired(isExpired);
+            binding.setBinding(strm.str());
+        }
 
-  mongo::BSONObj update = binding.toBSONObj();
+        binding.setShardId(getShardId());
 
-  mongo::BSONObjBuilder opBuilder;
-  opBuilder.append("$set", update);
+        // Create the query document
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(
+            bsoncxx::builder::basic::kvp(std::string(RegBinding::identity_fld()), binding.getIdentity()),
+            bsoncxx::builder::basic::kvp(std::string(RegBinding::contact_fld()), binding.getContact()),
+            bsoncxx::builder::basic::kvp(std::string(RegBinding::shardId_fld()), binding.getShardId()));
 
-  mongo::BSONObj updateOp = opBuilder.obj();
+        bool isExpired = (binding.getExpirationTime() == 0);
+        binding.setExpired(isExpired);
 
-  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getWriteQueryTimeout()));
-  updateTimer.setDBConnOK(conn->ok());
-  mongo::DBClientBase* client = conn->get();
+        // Create the update document
+        bsoncxx::document::value updateDoc = binding.toBSONObj();
+        bsoncxx::builder::basic::document updateOpBuilder;
+        updateOpBuilder.append(
+            bsoncxx::builder::basic::kvp("$set", updateDoc.view()));
 
-  client->update(_ns, query, updateOp, true, false);
+        mongocxx::options::update options;
+        options.upsert(true); // Enable upsert
 
-  string e = client->getLastError();
-  if ( !e.empty() )
-  {
-    Os::Logger::instance().log(FAC_SIP, PRI_ERR, e.c_str());
-  }
-  else
-  {
-    Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "Save reg ok");
-  }
+        auto result = collection.update_one(queryBuilder.view(), updateOpBuilder.view(), options);
 
-	conn->done();
+        if (result && result->modified_count() > 0)
+        {
+            OS_LOG_DEBUG(FAC_SIP, "Save reg ok");
+        }
+        else if (result && result->upserted_id())
+        {
+            OS_LOG_DEBUG(FAC_SIP, "Document was upserted");
+        }
+        else
+        {
+            OS_LOG_WARNING(FAC_SIP, "No document modified or upserted");
+        }
+    } catch (const std::exception& e) {
+        OS_LOG_ERROR(FAC_SIP, "Failed to update bindings: " << e.what());
+    } catch (...) {
+        OS_LOG_ERROR(FAC_SIP, "Unknown error occurred while updating bindings");
+    }
 }
 
-void RegDB::expireOldBindings(const string& identity, const string& callId, unsigned int cseq,
-		unsigned long timeNow)
+void RegDB::expireOldBindings(const std::string& identity, const std::string& callId, unsigned int cseq, std::int64_t timeNow)
 {
-	if (_local != NULL) {
-		_local->expireOldBindings(identity, callId, cseq, timeNow);
-		return;
-	}
+    if (_local != nullptr) {
+        _local->expireOldBindings(identity, callId, cseq, timeNow);
+        return;
+    }
 
-  MongoDB::UpdateTimer updateTimer(const_cast<RegDB&>(*this));
-	mongo::BSONObj query = BSON(
-	    RegBinding::identity_fld() << identity <<
-	    RegBinding::callId_fld() << callId <<
-	    RegBinding::cseq_fld() << BSON_LESS_THAN(cseq) <<
-	    RegBinding::shardId_fld() << getShardId());
+    MongoDB::UpdateTimer updateTimer(const_cast<RegDB&>(*this));
 
-    MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getWriteQueryTimeout()));
-    updateTimer.setDBConnOK(conn->ok());
-    mongo::DBClientBase* client = conn->get();
+    try {
+        // Build the query using bsoncxx::builder
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(
+            bsoncxx::builder::basic::kvp(std::string(RegBinding::identity_fld()), identity),
+            bsoncxx::builder::basic::kvp(std::string(RegBinding::callId_fld()), callId),
+            bsoncxx::builder::basic::kvp(
+                std::string(RegBinding::cseq_fld()),
+                [cseq](bsoncxx::builder::basic::sub_document subDoc) {
+                    subDoc.append(bsoncxx::builder::basic::kvp(std::string("$lt"), static_cast<int32_t>(cseq)));
+                }),
+            bsoncxx::builder::basic::kvp(std::string(RegBinding::shardId_fld()), getShardId()));
 
-	client->remove(_ns, query);
+        // Use MongoConnection to manage the database connection
+        MongoDB::MongoConnection connection(_info);
 
-	conn->done();
+        updateTimer.setDBConnOK(connection.ok());
+
+        // Access the target collection
+        mongocxx::collection collection = connection.collection(_ns);
+
+        // Perform the remove operation
+        collection.delete_many(queryBuilder.view());
+
+        // Logging
+        OS_LOG_INFO(FAC_SIP, "Expired old bindings for identity=" << identity
+                                                                  << ", callId=" << callId
+                                                                  << ", cseq < " << cseq);
+    } catch (const std::exception& e) {
+        OS_LOG_ERROR(FAC_SIP, "Failed to expire old bindings: " << e.what());
+    } catch (...) {
+        OS_LOG_ERROR(FAC_SIP, "Unknown error occurred while expiring old bindings");
+    }
 }
 
-void RegDB::expireAllBindings(const string& identity, const string& callId, unsigned int cseq,
-		unsigned long timeNow)
+void RegDB::expireAllBindings(const std::string& identity, const std::string& callId, unsigned int cseq, std::int64_t timeNow)
 {
-	if (_local != NULL) {
-		_local->expireAllBindings(identity, callId, cseq, timeNow);
-		return;
-	}
+    if (_local != nullptr) {
+        _local->expireAllBindings(identity, callId, cseq, timeNow);
+        return;
+    }
 
-  MongoDB::UpdateTimer updateTimer(const_cast<RegDB&>(*this));
-	mongo::BSONObj query = BSON(
-	    RegBinding::shardId_fld() << getShardId() <<
-	    RegBinding::identity_fld() << identity);
+    MongoDB::UpdateTimer updateTimer(const_cast<RegDB&>(*this));
 
-  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getWriteQueryTimeout()));
-  updateTimer.setDBConnOK(conn->ok());
-  mongo::DBClientBase* client = conn->get();
+    try {
+        // Build the query using bsoncxx::builder
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(
+            bsoncxx::builder::basic::kvp(std::string(RegBinding::shardId_fld()), getShardId()),
+            bsoncxx::builder::basic::kvp(std::string(RegBinding::identity_fld()), identity));
 
-  client->remove(_ns, query);
+        // Use MongoConnection to manage the database connection
+        MongoDB::MongoConnection connection(_info);
 
-	conn->done();
+        updateTimer.setDBConnOK(connection.ok());
+
+        // Access the target collection
+        mongocxx::collection collection = connection.collection(_ns);
+
+        // Perform the remove operation
+        collection.delete_many(queryBuilder.view());
+
+        // Logging
+        OS_LOG_INFO(FAC_SIP, "Expired all bindings for identity=" << identity
+                                                                << ", callId=" << callId);
+    } catch (const std::exception& e) {
+        OS_LOG_ERROR(FAC_SIP, "Failed to expire all bindings: " << e.what());
+    } catch (...) {
+        OS_LOG_ERROR(FAC_SIP, "Unknown error occurred while expiring all bindings");
+    }
 }
 
 void RegDB::removeAllExpired()
 {
-  if (_local != NULL)
-  {
+    if (_local != nullptr) {
+        _local->removeAllExpired();
+        return;
+    }
 
-    _local->removeAllExpired();
-    return;
-  }
+    std::int64_t timeNow = OsDateTime::getSecsSinceEpoch() - _expireGracePeriod;
 
-  unsigned long timeNow = OsDateTime::getSecsSinceEpoch() - _expireGracePeriod;
+    OS_LOG_INFO(FAC_SIP, "RegDB::removeAllExpired INVOKED for shard == " << getShardId()
+                        << " and expireTime <= " << timeNow
+                        << " gracePeriod: " << _expireGracePeriod << " sec");
 
+    MongoDB::UpdateTimer updateTimer(const_cast<RegDB&>(*this));
 
-  OS_LOG_INFO(FAC_SIP, "RegDB::removeAllExpired INVOKED for shard == " << getShardId() << " and expireTime <= " << timeNow << " gracePeriod: " << _expireGracePeriod << " sec");
+    try {
+        // Build the query using bsoncxx::builder
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(
+            bsoncxx::builder::basic::kvp(std::string(RegBinding::shardId_fld()), getShardId()),
+            bsoncxx::builder::basic::kvp(std::string(RegBinding::expirationTime_fld()), bsoncxx::builder::basic::make_document(
+                bsoncxx::builder::basic::kvp(std::string("$lte"), BaseDB::dateFromSecsSinceEpoch(timeNow)))));
 
-  MongoDB::UpdateTimer updateTimer(const_cast<RegDB&>(*this));
-  mongo::BSONObj query = BSON(
-            RegBinding::shardId_fld() << getShardId() <<
-            RegBinding::expirationTime_fld() << BSON_LESS_THAN_EQUAL(BaseDB::dateFromSecsSinceEpoch(timeNow)));
+        // Use MongoConnection to manage the database connection
+        MongoDB::MongoConnection connection(_info);
 
-  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getWriteQueryTimeout()));
-  updateTimer.setDBConnOK(conn->ok());
-  mongo::DBClientBase* client = conn->get();
+        updateTimer.setDBConnOK(connection.ok());
 
-  client->remove(_ns, query);
+        // Access the target collection
+        mongocxx::collection collection = connection.collection(_ns);
 
-  conn->done();
+        // Perform the remove operation
+        collection.delete_many(queryBuilder.view());
+
+        // Logging the result
+        OS_LOG_INFO(FAC_SIP, "Expired all bindings for shard " << getShardId() << " successfully.");
+    } catch (const std::exception& e) {
+        OS_LOG_ERROR(FAC_SIP, "Failed to remove all expired bindings: " << e.what());
+    } catch (...) {
+        OS_LOG_ERROR(FAC_SIP, "Unknown error occurred while removing all expired bindings");
+    }
 }
 
 bool RegDB::isOutOfSequence(const string& identity, const string& callId, unsigned int cseq) const
@@ -262,54 +336,58 @@ bool RegDB::isOutOfSequence(const string& identity, const string& callId, unsign
 bool RegDB::isRegisteredBinding(const Url& curl, bool preferPrimary)
 {
   bool isRegistered = false;
-  UtlString hostPort;
-  UtlString user;
-  curl.getHostWithPort(hostPort);
-  curl.getUserId(user);
 
-  std::ostringstream binding;
-  binding << "sip:";
-  if (!user.isNull())
-    binding << user.data() << "@";
-  binding << hostPort.data();
+  try {
+        UtlString hostPort;
+        UtlString user;
+        curl.getHostWithPort(hostPort);
+        curl.getUserId(user);
 
-  mongo::BSONObjBuilder query;
-	query.append(RegBinding::binding_fld(), binding.str());
+        std::ostringstream binding;
+        binding << "sip:";
+        if (!user.isNull())
+            binding << user.data() << "@";
+        binding << hostPort.data();
 
-	if (_local)
-  {
-		preferPrimary = false;
-		_local->isRegisteredBinding(curl, preferPrimary);
-		query.append(RegBinding::shardId_fld(), BSON_NOT_EQUAL(_local->getShardId()));
-	}
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(bsoncxx::builder::basic::kvp(std::string(RegBinding::binding_fld()), binding.str()));
 
-  MongoDB::ReadTimer readTimer(const_cast<RegDB&>(*this));
+        if (_local)
+        {
+            preferPrimary = false;
+            _local->isRegisteredBinding(curl, preferPrimary);
+            queryBuilder.append(bsoncxx::builder::basic::kvp(std::string(RegBinding::shardId_fld()), bsoncxx::builder::basic::make_document(
+                bsoncxx::builder::basic::kvp(std::string("$ne"), _local->getShardId()))));
+        }
 
-	mongo::BSONObjBuilder builder;
-	if (!preferPrimary)
-	  BaseDB::nearest(builder, query.obj());
-	else
-	  BaseDB::primaryPreferred(builder, query.obj());
+        MongoDB::ReadTimer readTimer(const_cast<RegDB&>(*this));
 
-	MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getReadQueryTimeout()));
-    readTimer.setDBConnOK(conn->ok());
-	auto_ptr<mongo::DBClientCursor> pCursor = conn->get()->query(_ns, readQueryMaxTimeMS(builder.obj()), 0, 0, 0, mongo::QueryOption_SlaveOk);
+        // Use MongoConnection to manage the database connection
+        MongoDB::MongoConnection connection(_info);
 
-  if (!pCursor.get())
-  {
-    throw mongo::DBException("mongo query returned null cursor", 0);
-  }
+        readTimer.setDBConnOK(connection.ok());
 
-	isRegistered = pCursor->more();
-	conn->done();
+        // Access the target collection
+        mongocxx::collection collection = connection.collection(_ns);
 
-  OS_LOG_INFO(FAC_SIP, "RegDB::isRegisteredBinding returning " << (isRegistered ? "TRUE" : "FALSE") << " for binding " <<  binding.str());
+        mongocxx::options::find findOptions;
+        findOptions.max_time(std::chrono::milliseconds(_info.getReadQueryTimeoutMs()));
 
-	return isRegistered;
+        auto cursor = collection.find(queryBuilder.view(), findOptions);
+
+        isRegistered = cursor.begin() != cursor.end(); // Check if there are any results
+
+        OS_LOG_INFO(FAC_SIP, "RegDB::isRegisteredBinding returning " << (isRegistered ? "TRUE" : "FALSE") << " for binding " << binding.str());
+    } catch (const std::exception& e) {
+        OS_LOG_ERROR(FAC_SIP, "Failed to check if binding is registered: " << e.what());
+    } catch (...) {
+        OS_LOG_ERROR(FAC_SIP, "Unknown error occurred while checking if binding is registered");
+    }
+
+    return isRegistered;
 }
 
-
-static void push_or_replace_binding(RegDB::Bindings& bindings, const RegBinding& binding)
+void RegDB::pushOrReplaceBinding(RegDB::Bindings& bindings, const RegBinding& binding)
 {
   //
   // Check if the call-id or contact of this binding has been previously pushed
@@ -348,217 +426,272 @@ static void push_or_replace_binding(RegDB::Bindings& bindings, const RegBinding&
   bindings.push_back(binding);
 }
 
-bool RegDB::getUnexpiredRegisteredBinding(
-      const Url& registeredBinding,
-      Bindings& bindings,
-      bool preferPrimary)
+bool RegDB::getUnexpiredRegisteredBinding(const Url &registeredBinding,
+                                          Bindings &bindings,
+                                          bool preferPrimary) 
 {
-  bool isRegistered = false;
-  UtlString hostPort;
-  UtlString user;
-  registeredBinding.getHostWithPort(hostPort);
-  registeredBinding.getUserId(user);
+    bool isRegistered = false;
 
-  std::ostringstream binding;
-  binding << "sip:";
-  if (!user.isNull())
+    UtlString hostPort;
+    UtlString user;
+    registeredBinding.getHostWithPort(hostPort);
+    registeredBinding.getUserId(user);
+
+    std::ostringstream binding;
+    binding << "sip:";
+    if (!user.isNull()) {
     binding << user.data() << "@";
-  binding << hostPort.data();
-
-  unsigned long timeNow = OsDateTime::getSecsSinceEpoch();
-
-  mongo::BSONObjBuilder query;
-  query.append(RegBinding::binding_fld(), binding.str());
-  query.append(RegBinding::expirationTime_fld(), BSON_GREATER_THAN(BaseDB::dateFromSecsSinceEpoch(timeNow)));
-
-	if (_local)
-  {
-		preferPrimary = false;
-		_local->getUnexpiredRegisteredBinding(registeredBinding, bindings, preferPrimary);
-		query.append(RegBinding::shardId_fld(), BSON_NOT_EQUAL(_local->getShardId()));
-	}
-
-  MongoDB::ReadTimer readTimer(const_cast<RegDB&>(*this));
-
-	mongo::BSONObjBuilder builder;
-	if (!preferPrimary)
-	  BaseDB::nearest(builder, query.obj());
-	else
-	  BaseDB::primaryPreferred(builder, query.obj());
-
-	MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getReadQueryTimeout()));
-    readTimer.setDBConnOK(conn->ok());
-	auto_ptr<mongo::DBClientCursor> pCursor = conn->get()->query(_ns, readQueryMaxTimeMS(builder.obj()), 0, 0, 0, mongo::QueryOption_SlaveOk);
-
-  if (!pCursor.get())
-  {
-   throw mongo::DBException("mongo query returned null cursor", 0);
-  }
-
-  if ((isRegistered = pCursor->more()))
-  {
-    RegBinding binding(pCursor->next());
-
-    if (binding.getExpirationTime() > timeNow)
-    {
-      OS_LOG_INFO(FAC_SIP, "RegDB::getUnexpiredRegisteredBinding "
-      << " Identity: " << binding.getIdentity()
-      << " Contact: " << binding.getContact()
-      << " Expires: " << binding.getExpirationTime() - OsDateTime::getSecsSinceEpoch() << " sec"
-      << " Call-Id: " << binding.getCallId());
-
-      push_or_replace_binding(bindings, binding);
     }
-    else
+    binding << hostPort.data();
+ 
+    try {
+        MongoDB::ReadTimer readTimer(const_cast<RegDB &>(*this));
+
+        // Use MongoConnection to manage the database connection
+        MongoDB::MongoConnection connection(_info);
+
+        readTimer.setDBConnOK(connection.ok());
+
+        // Access the target collection
+        mongocxx::collection collection = connection.collection(_ns);
+
+        std::int64_t timeNow = OsDateTime::getSecsSinceEpoch();
+
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(bsoncxx::builder::basic::kvp(
+            std::string(RegBinding::binding_fld()), binding.str()));
+        queryBuilder.append(bsoncxx::builder::basic::kvp(
+            std::string(RegBinding::expirationTime_fld()),
+            bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(
+                std::string("$gt"), BaseDB::dateFromSecsSinceEpoch(timeNow)))));
+
+        if (_local) {
+            preferPrimary = false;
+            _local->getUnexpiredRegisteredBinding(registeredBinding, bindings,
+                                                    preferPrimary);
+            queryBuilder.append(bsoncxx::builder::basic::kvp(
+                std::string(RegBinding::shardId_fld()),
+                bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(
+                    std::string("$ne"), _local->getShardId()))));
+        }
+
+        mongocxx::options::find findOptions;
+
+        if (preferPrimary) {
+            BaseDB::primaryPreferred(findOptions);
+        } 
+        else {
+            BaseDB::nearest(findOptions);
+        }
+
+        findOptions.max_time(std::chrono::milliseconds(_info.getReadQueryTimeoutMs()));
+
+        mongocxx::cursor cursor = collection.find(queryBuilder.view(), findOptions);
+
+        for (const bsoncxx::document::view &doc : cursor) 
+        {
+            isRegistered = true;
+
+            RegBinding binding(doc);
+
+            if (binding.getExpirationTime() > timeNow) {
+                OS_LOG_INFO(FAC_SIP, "RegDB::getUnexpiredRegisteredBinding "
+                                        << " Identity: " << binding.getIdentity()
+                                        << " Contact: " << binding.getContact()
+                                        << " Expires: "
+                                        << binding.getExpirationTime() -
+                                                OsDateTime::getSecsSinceEpoch()
+                                        << " sec"
+                                        << " Call-Id: " << binding.getCallId());
+
+                pushOrReplaceBinding(bindings, binding);
+            } 
+            else {
+                OS_LOG_WARNING(FAC_SIP, "RegDB::getUnexpiredRegisteredBinding returned "
+                                        "an expired record?!?!"
+                                            << " Identity: " << binding.getIdentity()
+                                            << " Contact: " << binding.getContact()
+                                            << " Call-Id: " << binding.getCallId()
+                                            << " Expires: "
+                                            << binding.getExpirationTime() << " epoch"
+                                            << " TimeNow: " << timeNow << " epoch");
+            }
+        }
+        
+    } catch(mongocxx::exception &e) {
+        OS_LOG_ERROR(
+        FAC_SIP,
+        "RegDB::getUnexpiredRegisteredBinding caught DBException: " << e.what());
+    } 
+
+    OS_LOG_INFO(FAC_SIP, "RegDB::getUnexpiredRegisteredBinding returning "
+                            << (isRegistered ? "TRUE" : "FALSE") << " for binding "
+                            << binding.str());
+
+    return isRegistered;
+}
+
+bool RegDB::getUnexpiredContactsUser(const std::string& identity, std::int64_t timeNow, Bindings& bindings, bool preferPrimary) const
+{
+    MongoDB::ReadTimer readTimer(const_cast<RegDB&>(*this));
+
+    try
     {
-      OS_LOG_WARNING(FAC_SIP, "RegDB::getUnexpiredRegisteredBinding returned an expired record?!?!"
-        << " Identity: " << binding.getIdentity()
-        << " Contact: " << binding.getContact()
-        << " Call-Id: " << binding.getCallId()
-        << " Expires: " <<  binding.getExpirationTime() << " epoch"
-        << " TimeNow: " << timeNow << " epoch");
+        MongoDB::MongoConnection connection(_info);
+        readTimer.setDBConnOK(connection.ok());
+
+        mongocxx::collection collection = connection.collection(_ns);
+
+        static std::string gruuPrefix = GRUU_PREFIX;
+
+        bool isGruu = identity.substr(0, gruuPrefix.size()) == gruuPrefix;
+
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(bsoncxx::builder::basic::kvp(
+            std::string(RegBinding::expirationTime_fld()), 
+            bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(std::string("$gt"), BaseDB::dateFromSecsSinceEpoch(timeNow)))
+        ));
+
+        if (_local)
+        {
+            preferPrimary = false;
+            _local->getUnexpiredContactsUser(identity, timeNow, bindings, preferPrimary);
+            queryBuilder.append(bsoncxx::builder::basic::kvp(
+                std::string(RegBinding::shardId_fld()),
+                bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(std::string("$ne"), _local->getShardId()))
+            ));
+        }
+
+        if (isGruu) {
+            std::string searchString = identity + ";" + SIP_GRUU_URI_PARAM;
+            queryBuilder.append(bsoncxx::builder::basic::kvp(std::string(RegBinding::gruu_fld()), searchString));
+        } else {
+            queryBuilder.append(bsoncxx::builder::basic::kvp(std::string(RegBinding::identity_fld()), identity));
+        }
+
+        mongocxx::options::find findOptions;
+        if (preferPrimary) 
+        {
+            BaseDB::primaryPreferred(findOptions);
+        } 
+        else 
+        {
+            BaseDB::nearest(findOptions);
+        }
+
+        findOptions.max_time(std::chrono::milliseconds(_info.getReadQueryTimeoutMs()));
+
+        mongocxx::cursor cursor = collection.find(queryBuilder.view(), findOptions);
+
+        for(const bsoncxx::document::view& doc : cursor)
+        {
+            RegBinding binding(doc);
+
+            if (binding.getExpirationTime() > timeNow)
+            {
+                OS_LOG_INFO(FAC_SIP, "RegDB::getUnexpiredContactsUser "
+                    << " Identity: " << identity
+                    << " Contact: " << binding.getContact()
+                    << " Expires: " << binding.getExpirationTime() - timeNow << " sec"
+                    << " Expired: " << binding.getExpired()
+                    << " Call-Id: " << binding.getCallId());
+
+                pushOrReplaceBinding(bindings, binding);
+            }
+            else
+            {
+                OS_LOG_WARNING(FAC_SIP, "RegDB::getUnexpiredContactsUser returned an expired record?!?!"
+                    << " Identity: " << identity
+                    << " Contact: " << binding.getContact()
+                    << " Call-Id: " << binding.getCallId()
+                    << " Expiration time: " << binding.getExpirationTime() << " sec since epoch"
+                    << " Expires: " << binding.getExpirationTime() - timeNow << " sec"
+                    << " Expired: " << binding.getExpired()
+                    << " TimeNow: " << timeNow << " epoch");
+            }
+        }
     }
-  }
+    catch (const mongocxx::exception& e)
+    {
+        readTimer.setDBConnOK(false);
+        OS_LOG_ERROR(FAC_SIP, "RegDB::getUnexpiredContactsUser - Error querying MongoDB: " << e.what());
+        return false;
+    }
 
-	conn->done();
+    if (bindings.empty())
+    {
+        OS_LOG_INFO(FAC_SIP, "RegDB::getUnexpiredContactsUser returned empty recordset for identity " << identity);
+    }
 
-  OS_LOG_INFO(FAC_SIP, "RegDB::getUnexpiredRegisteredBinding returning " << (isRegistered ? "TRUE" : "FALSE") << " for binding " <<  binding.str());
-
-	return isRegistered;
+    return !bindings.empty();
 }
 
-bool RegDB::getUnexpiredContactsUser(const string& identity, unsigned long timeNow, Bindings& bindings, bool preferPrimary) const
+bool RegDB::getUnexpiredContactsUserContaining(const std::string& matchIdentity, std::int64_t timeNow, Bindings& bindings, bool preferPrimary) const
 {
-	static string gruuPrefix = GRUU_PREFIX;
+    MongoDB::ReadTimer readTimer(const_cast<RegDB&>(*this));
 
-	bool isGruu = identity.substr(0, gruuPrefix.size()) == gruuPrefix;
+    try
+    {
+        MongoDB::MongoConnection connection(_info);
+        readTimer.setDBConnOK(connection.ok());
 
-	mongo::BSONObjBuilder query;
-	query.append(RegBinding::expirationTime_fld(), BSON_GREATER_THAN(BaseDB::dateFromSecsSinceEpoch(timeNow)));
+        mongocxx::collection collection = connection.collection(_ns);
 
-	if (_local)
-  {
-		preferPrimary = false;
-		_local->getUnexpiredContactsUser(identity, timeNow, bindings, preferPrimary);
-		query.append(RegBinding::shardId_fld(), BSON_NOT_EQUAL(_local->getShardId()));
-	}
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(bsoncxx::builder::basic::kvp(
+            std::string(RegBinding::expirationTime_fld()), 
+            bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(std::string("$gt"), BaseDB::dateFromSecsSinceEpoch(timeNow)))
+        ));
 
-   MongoDB::ReadTimer readTimer(const_cast<RegDB&>(*this));
+        if (_local)
+        {
+            preferPrimary = false;
+            _local->getUnexpiredContactsUserContaining(matchIdentity, timeNow, bindings, preferPrimary);
+            queryBuilder.append(bsoncxx::builder::basic::kvp(
+                std::string(RegBinding::shardId_fld()),
+                bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(std::string("$ne"), _local->getShardId()))
+            ));
+        }
 
-	if (isGruu) {
-		string searchString(identity);
-		searchString += ";";
-		searchString += SIP_GRUU_URI_PARAM;
-		query.append(RegBinding::gruu_fld(), searchString);
-	}
-	else {
-		query.append(RegBinding::identity_fld(), identity);
-	}
+        mongocxx::options::find findOptions;
+        if (preferPrimary) 
+        {
+            BaseDB::primaryPreferred(findOptions);
+        } 
+        else 
+        {
+            BaseDB::nearest(findOptions);
+        }
 
-	mongo::BSONObjBuilder builder;
-	if (!preferPrimary)
-	  BaseDB::nearest(builder, query.obj());
-	else
-	  BaseDB::primaryPreferred(builder, query.obj());
+        findOptions.max_time(std::chrono::milliseconds(_info.getReadQueryTimeoutMs()));
 
-	MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getReadQueryTimeout()));
-    readTimer.setDBConnOK(conn->ok());
-	auto_ptr<mongo::DBClientCursor> pCursor = conn->get()->query(_ns, readQueryMaxTimeMS(builder.obj()), 0, 0, 0, mongo::QueryOption_SlaveOk);
-	if (!pCursor.get())
-	{
-	  throw mongo::DBException("mongo query returned null cursor", 0);
-	}
-	else if (pCursor->more())
-	{
-		while (pCursor->more())
-		{
-      RegBinding binding(pCursor->next());
+        mongocxx::cursor cursor = collection.find(queryBuilder.view(), findOptions);
 
-      if (binding.getExpirationTime() > timeNow)
-      {
-        OS_LOG_INFO(FAC_SIP, "RegDB::getUnexpiredContactsUser "
-        << " Identity: " << identity
-        << " Contact: " << binding.getContact()
-        << " Expires: " << binding.getExpirationTime() - timeNow << " sec"
-        << " Expired: " << binding.getExpired()
-        << " Call-Id: " << binding.getCallId());
+        for(const bsoncxx::document::view& doc : cursor)
+        {
+            RegBinding binding(doc);
 
-        push_or_replace_binding(bindings, binding);
-      }
-      else
-      {
-        OS_LOG_WARNING(FAC_SIP, "RegDB::getUnexpiredContactsUser returned an expired record?!?!"
-          << " Identity: " << identity
-          << " Contact: " << binding.getContact()
-          << " Call-Id: " << binding.getCallId()
-          << " Expiration time: " << binding.getExpirationTime() << " sec since epoch"
-          << " Expires: " << binding.getExpirationTime() - timeNow << " sec"
-          << " Expired: " << binding.getExpired()
-          << " TimeNow: " << timeNow << " epoch");
-      }
+            // Check if the contact field contains the matchIdentity
+            if (binding.getContact().find(matchIdentity) == std::string::npos)
+            {
+                continue;
+            }
 
-		}
-	}
-  else
-  {
-    OS_LOG_INFO(FAC_SIP, "RegDB::getUnexpiredContactsUser returned empty recordset for identity " << identity);
-  }
-	conn->done();
+            pushOrReplaceBinding(bindings, binding);
+        }
 
-
-	return bindings.size() > 0;
+        // If we reach here, it means there were bindings added
+        return !bindings.empty();
+    }
+    catch (const mongocxx::exception& e)
+    {
+        readTimer.setDBConnOK(false);
+        OS_LOG_ERROR(FAC_SIP, "RegDB::getUnexpiredContactsUserContaining - Error querying MongoDB: " << e.what());
+        return false;
+    }
 }
 
-bool RegDB::getUnexpiredContactsUserContaining(const string& matchIdentity, unsigned long timeNow, Bindings& bindings, bool preferPrimary) const
-{
-	mongo::BSONObjBuilder query;
-	query.append(RegBinding::expirationTime_fld(), BSON_GREATER_THAN(BaseDB::dateFromSecsSinceEpoch(timeNow)));
-
-	if (_local)
-  {
-		preferPrimary = false;
-		_local->getUnexpiredContactsUserContaining(matchIdentity, timeNow, bindings, preferPrimary);
-		query.append(RegBinding::shardId_fld(), BSON_NOT_EQUAL(_local->getShardId()));
-	}
-
-  MongoDB::ReadTimer readTimer(const_cast<RegDB&>(*this));
-
-	mongo::BSONObjBuilder builder;
-	if (!preferPrimary)
-	  BaseDB::nearest(builder, query.obj());
-	else
-	  BaseDB::primaryPreferred(builder, query.obj());
-
-	MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getReadQueryTimeout()));
-    readTimer.setDBConnOK(conn->ok());
-	auto_ptr<mongo::DBClientCursor> pCursor = conn->get()->query(_ns, readQueryMaxTimeMS(builder.obj()), 0, 0, 0, mongo::QueryOption_SlaveOk);
-
-  if (!pCursor.get())
-  {
-   throw mongo::DBException("mongo query returned null cursor", 0);
-  }
-  else if (pCursor->more())
-	{
-		while (pCursor->more())
-		{
-			RegBinding binding(pCursor->next());
-      if (binding.getContact().find(matchIdentity) == string::npos)
-      {
-        continue;
-      }
-
-      push_or_replace_binding(bindings, binding);
-		}
-		conn->done();
-		return bindings.size() > 0;
-	}
-
-	conn->done();
-	return false;
-}
-
-
-bool RegDB::getUnexpiredContactsUserWithAddress(const string& identity, const std::string& address, unsigned long timeNow, Bindings& bindings, bool preferPrimary) const
+bool RegDB::getUnexpiredContactsUserWithAddress(const string& identity, const std::string& address, std::int64_t timeNow, Bindings& bindings, bool preferPrimary) const
 {
   Bindings regRecords;
 
@@ -581,127 +714,208 @@ bool RegDB::getUnexpiredContactsUserWithAddress(const string& identity, const st
 }
 
 
-bool RegDB::getUnexpiredContactsUserInstrument(const string& identity, const string& instrument, unsigned long timeNow,
-		Bindings& bindings, bool preferPrimary) const
+bool RegDB::getUnexpiredContactsUserInstrument(
+    const std::string& identity,
+    const std::string& instrument,
+    std::int64_t timeNow,
+    Bindings& bindings,
+    bool preferPrimary) const
 {
-	mongo::BSONObjBuilder query;
-	query.append(RegBinding::identity_fld(), identity);
-	query.append(RegBinding::instrument_fld(), instrument);
-	query.append(RegBinding::expirationTime_fld(), BSON_GREATER_THAN(BaseDB::dateFromSecsSinceEpoch(timeNow)));
+    MongoDB::ReadTimer readTimer(const_cast<RegDB&>(*this));
 
-	if (_local)
-  {
-		preferPrimary = false;
-		_local->getUnexpiredContactsUserInstrument(identity, instrument, timeNow, bindings, preferPrimary);
-		query.append(RegBinding::shardId_fld(), BSON_NOT_EQUAL(_local->getShardId()));
-	}
+    try
+    {
+        MongoDB::MongoConnection connection(_info);
+        readTimer.setDBConnOK(connection.ok());
 
-  MongoDB::ReadTimer readTimer(const_cast<RegDB&>(*this));
+        mongocxx::collection collection = connection.collection(_ns);
 
-	mongo::BSONObjBuilder builder;
-	if (!preferPrimary)
-	  BaseDB::nearest(builder, query.obj());
-	else
-	  BaseDB::primaryPreferred(builder, query.obj());
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(bsoncxx::builder::basic::kvp(std::string(RegBinding::identity_fld()), identity));
+        queryBuilder.append(bsoncxx::builder::basic::kvp(std::string(RegBinding::instrument_fld()), instrument));
+        queryBuilder.append(bsoncxx::builder::basic::kvp(
+            std::string(RegBinding::expirationTime_fld()),
+            bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(std::string("$gt"), BaseDB::dateFromSecsSinceEpoch(timeNow)))
+        ));
 
-	MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getReadQueryTimeout()));
-    readTimer.setDBConnOK(conn->ok());
-	auto_ptr<mongo::DBClientCursor> pCursor = conn->get()->query(_ns, readQueryMaxTimeMS(builder.obj()), 0, 0, 0, mongo::QueryOption_SlaveOk);
-  if (!pCursor.get())
-  {
-   throw mongo::DBException("mongo query returned null cursor", 0);
-  }
-  else if (pCursor->more())
-	{
-		while (pCursor->more())
-		{
-      RegBinding binding(pCursor->next());
-			push_or_replace_binding(bindings, binding);
-		}
-		conn->done();
-		return true;
-	}
+        if (_local)
+        {
+            preferPrimary = false;
+            _local->getUnexpiredContactsUserInstrument(identity, instrument, timeNow, bindings, preferPrimary);
+            queryBuilder.append(bsoncxx::builder::basic::kvp(
+                std::string(RegBinding::shardId_fld()),
+                bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(std::string("$ne"), _local->getShardId()))
+            ));
+        }
 
-	conn->done();
-	return false;
+        mongocxx::options::find findOptions;
+        if (preferPrimary) 
+        {
+            BaseDB::primaryPreferred(findOptions);
+        } 
+        else 
+        {
+            BaseDB::nearest(findOptions);
+        }
+
+        findOptions.max_time(std::chrono::milliseconds(_info.getReadQueryTimeoutMs()));
+
+        mongocxx::cursor cursor = collection.find(queryBuilder.view(), findOptions);
+
+        for(const bsoncxx::document::view& doc : cursor)
+        {
+            RegBinding binding(doc);
+            pushOrReplaceBinding(bindings, binding);
+        }
+
+        // Return true if bindings are found
+        return !bindings.empty();
+    }
+    catch (const mongocxx::exception& e)
+    {
+        readTimer.setDBConnOK(false);
+        OS_LOG_ERROR(FAC_SIP, "RegDB::getUnexpiredContactsUserInstrument - Error querying MongoDB: " << e.what());
+        return false;
+    }
 }
 
 // TODO : Unclear how big this dataset would be, decide if this should be removed
-bool RegDB::getUnexpiredContactsInstrument(const string& instrument, unsigned long timeNow, Bindings& bindings, bool preferPrimary) const
+bool RegDB::getUnexpiredContactsInstrument(
+    const std::string& instrument,
+    std::int64_t timeNow,
+    Bindings& bindings,
+    bool preferPrimary) const
 {
-	mongo::BSONObjBuilder query;
-  query.append(RegBinding::instrument_fld(), instrument);
-  query.append(RegBinding::expirationTime_fld(), BSON_GREATER_THAN(BaseDB::dateFromSecsSinceEpoch(timeNow)));
+    MongoDB::ReadTimer readTimer(const_cast<RegDB&>(*this));
 
-	if (_local)
-  {
-  		preferPrimary = false;
-		_local->getUnexpiredContactsInstrument(instrument, timeNow, bindings, preferPrimary);
-    query.append(RegBinding::shardId_fld(), BSON_NOT_EQUAL(_local->getShardId()));
-	}
-
-  MongoDB::ReadTimer readTimer(const_cast<RegDB&>(*this));
-
-  mongo::BSONObjBuilder builder;
-	if (!preferPrimary)
-	  BaseDB::nearest(builder, query.obj());
-	else
-	  BaseDB::primaryPreferred(builder, query.obj());
-
-    MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getReadQueryTimeout()));
-    readTimer.setDBConnOK(conn->ok());
-	auto_ptr<mongo::DBClientCursor> pCursor = conn->get()->query(_ns, readQueryMaxTimeMS(builder.obj()), 0, 0, 0, mongo::QueryOption_SlaveOk);
-  if (!pCursor.get())
-  {
-   throw mongo::DBException("mongo query returned null cursor", 0);
-  }
-  else if (pCursor->more())
-	{
-		while (pCursor->more())
+    try
     {
-			RegBinding binding(pCursor->next());
-			push_or_replace_binding(bindings, binding);
-		}
-		conn->done();
-		return true;
-	}
+        MongoDB::MongoConnection connection(_info);
+        readTimer.setDBConnOK(connection.ok());
 
-	conn->done();
-	return false;
+        mongocxx::collection collection = connection.collection(_ns);
+
+        bsoncxx::builder::basic::document queryBuilder;
+        queryBuilder.append(bsoncxx::builder::basic::kvp(std::string(RegBinding::instrument_fld()), instrument));
+        queryBuilder.append(bsoncxx::builder::basic::kvp(
+            std::string(RegBinding::expirationTime_fld()),
+            bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(std::string("$gt"), BaseDB::dateFromSecsSinceEpoch(timeNow)))
+        ));
+
+        if (_local)
+        {
+            preferPrimary = false;
+            _local->getUnexpiredContactsInstrument(instrument, timeNow, bindings, preferPrimary);
+            queryBuilder.append(bsoncxx::builder::basic::kvp(
+                std::string(RegBinding::shardId_fld()),
+                bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(std::string("$ne"), _local->getShardId()))
+            ));
+        }
+
+        mongocxx::options::find findOptions;
+        if (preferPrimary) 
+        {
+            BaseDB::primaryPreferred(findOptions);
+        } 
+        else 
+        {
+            BaseDB::nearest(findOptions);
+        }
+
+        findOptions.max_time(std::chrono::milliseconds(_info.getReadQueryTimeoutMs()));
+
+        mongocxx::cursor cursor = collection.find(queryBuilder.view(), findOptions);
+ 
+        for(const bsoncxx::document::view& doc : cursor)
+        {
+            RegBinding binding(doc);
+            pushOrReplaceBinding(bindings, binding);
+        }
+
+        // Return true if bindings are found
+        return !bindings.empty();
+    }
+    catch (const mongocxx::exception& e)
+    {
+        readTimer.setDBConnOK(false);
+        OS_LOG_ERROR(FAC_SIP, "RegDB::getUnexpiredContactsInstrument - Error querying MongoDB: " << e.what());
+        return false;
+    }
 }
 
 void RegDB::cleanAndPersist(int currentExpireTime)
 {
-	if (_local) {
-		_local->cleanAndPersist(currentExpireTime);
-		return;
-	}
+    if (_local)
+    {
+        _local->cleanAndPersist(currentExpireTime);
+        return;
+    }
 
-  MongoDB::UpdateTimer updateTimer(const_cast<RegDB&>(*this));
+    MongoDB::UpdateTimer updateTimer(const_cast<RegDB&>(*this));
 
-  mongo::BSONObj query = BSON(RegBinding::expirationTime_fld() << BSON_LESS_THAN(BaseDB::dateFromSecsSinceEpoch(currentExpireTime)));
-  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getWriteQueryTimeout()));
+    // Build the query to find expired records
+    bsoncxx::builder::basic::document queryBuilder;
+    queryBuilder.append(bsoncxx::builder::basic::kvp(
+        std::string(RegBinding::expirationTime_fld()),
+        bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(std::string("$lt"), BaseDB::dateFromSecsSinceEpoch(currentExpireTime)))
+    ));
 
-  updateTimer.setDBConnOK(conn->ok());
+    try
+    {
+        MongoDB::MongoConnection connection(_info);
 
-  conn->get()->remove(_ns, query);
-	conn->done();
+        // Mark the database connection as OK
+        updateTimer.setDBConnOK(connection.ok());
+
+        // Get the collection
+        mongocxx::collection collection = connection.collection(_ns);
+
+        // Remove expired records
+        auto result = collection.delete_many(queryBuilder.view());
+
+        OS_LOG_INFO(FAC_SIP, "RegDB::cleanAndPersist - Removed " 
+            << (result ? result->deleted_count() : 0) 
+            << " expired records from namespace " << _ns);
+    }
+    catch (const mongocxx::exception& e)
+    {
+        updateTimer.setDBConnOK(false);
+        OS_LOG_ERROR(FAC_SIP, "RegDB::cleanAndPersist - Error while cleaning expired records: " << e.what());
+        throw; // Re-throw the exception for higher-level handling if necessary
+    }
 }
 
 void RegDB::clearAllBindings()
 {
-	if (_local) {
-		_local->clearAllBindings();
-		return;
-	}
+    if (_local)
+    {
+        _local->clearAllBindings();
+        return;
+    }
 
-  MongoDB::UpdateTimer updateTimer(const_cast<RegDB&>(*this));
+    MongoDB::UpdateTimer updateTimer(const_cast<RegDB&>(*this));
 
-  mongo::BSONObj all;
-  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString(), getWriteQueryTimeout()));
+    try
+    {
+        // Establish connection
+        MongoDB::MongoConnection connection(_info);
 
-  updateTimer.setDBConnOK(conn->ok());
+        // Mark the database connection as OK
+        updateTimer.setDBConnOK(connection.ok());
 
-  conn->get()->remove(_ns, all);
-  conn->done();
+        // Get the collection
+        mongocxx::collection collection = connection.collection(_ns);
+
+        // Remove all documents
+        auto result = collection.delete_many({}); // Empty filter matches all documents
+
+        OS_LOG_INFO(FAC_SIP, "RegDB::clearAllBindings - Removed all bindings from namespace " 
+            << _ns << ", count: " << (result ? result->deleted_count() : 0));
+    }
+    catch (const mongocxx::exception& e)
+    {
+        updateTimer.setDBConnOK(false);
+        OS_LOG_ERROR(FAC_SIP, "RegDB::clearAllBindings - Error while clearing all bindings: " << e.what());
+        throw; // Re-throw the exception for higher-level handling if necessary
+    }
 }

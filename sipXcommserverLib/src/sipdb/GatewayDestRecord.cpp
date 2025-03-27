@@ -59,48 +59,44 @@ void GatewayDestRecord::swap(GatewayDestRecord& record)
   std::swap(_expirationTime, record._expirationTime);
 }
 
-GatewayDestRecord::GatewayDestRecord(const mongo::BSONObj& bson)
+GatewayDestRecord::GatewayDestRecord(const bsoncxx::document::view& bson)
 {
-  if (bson.hasField(callIdField()))
-    _callId = bson.getStringField(callIdField());
-
-  if (bson.hasField(toTagField()))
-    _toTag = bson.getStringField(toTagField());
-
-  if (bson.hasField(fromTagField()))
-    _fromTag = bson.getStringField(fromTagField());
-
-  if (bson.hasField(identityField()))
-    _identity = bson.getStringField(identityField());
-
-  if (bson.hasField(lineIdField()))
-    _lineId = bson.getStringField(lineIdField());
-
-  if (bson.hasField(expirationTimeField()))
-    _expirationTime = bson.getIntField(expirationTimeField());
+  *this = bson;
 }
 
 
-GatewayDestRecord& GatewayDestRecord::operator=(const mongo::BSONObj& bson)
+GatewayDestRecord& GatewayDestRecord::operator=(const bsoncxx::document::view& bson)
 {
-  if (bson.hasField(callIdField()))
-    _callId = bson.getStringField(callIdField());
+    bsoncxx::document::element callIdElement = bson[callIdField()];
+    if (callIdElement && callIdElement.type() == bsoncxx::type::k_string) {
+        _callId = std::string(callIdElement.get_string().value);
+    }
 
-  if (bson.hasField(toTagField()))
-    _toTag = bson.getStringField(toTagField());
+    bsoncxx::document::element toTagElement = bson[toTagField()];
+    if (toTagElement && toTagElement.type() == bsoncxx::type::k_string) {
+        _toTag = std::string(toTagElement.get_string().value);
+    }
 
-  if (bson.hasField(fromTagField()))
-    _fromTag = bson.getStringField(fromTagField());
+    bsoncxx::document::element fromTagElement = bson[fromTagField()];
+    if (fromTagElement && fromTagElement.type() == bsoncxx::type::k_string) {
+        _fromTag = std::string(fromTagElement.get_string().value);
+    }
 
-  if (bson.hasField(identityField()))
-    _identity = bson.getStringField(identityField());
+    bsoncxx::document::element identityElement = bson[identityField()];
+    if (identityElement && identityElement.type() == bsoncxx::type::k_string) {
+        _identity = std::string(identityElement.get_string().value);
+    }
 
-  if (bson.hasField(lineIdField()))
-    _lineId = bson.getStringField(lineIdField());
+    bsoncxx::document::element lineIdElement = bson[lineIdField()];
+    if (lineIdElement && lineIdElement.type() == bsoncxx::type::k_string) {
+        _lineId = std::string(lineIdElement.get_string().value);
+    }
 
-  if (bson.hasField(expirationTimeField()))
-    _expirationTime = bson.getIntField(expirationTimeField());
-
+    bsoncxx::document::element expirationTimeElement = bson[expirationTimeField()];
+    if (expirationTimeElement && expirationTimeElement.type() == bsoncxx::type::k_int32) {
+        _expirationTime = expirationTimeElement.get_int32().value;
+    }
+  
     return *this;
 }
 

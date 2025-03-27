@@ -15,6 +15,8 @@
 
 
 #include <algorithm>
+#include <bsoncxx/document/view.hpp>
+
 #include "sipdb/EntityRecord.h"
 
 //
@@ -129,234 +131,196 @@ void EntityRecord::swap(EntityRecord& entity)
     std::swap(_locRestrSbnet, entity._locRestrSbnet);
 }
 
-void EntityRecord::fillStaticUserLoc(StaticUserLoc& userLoc, const mongo::BSONObj& innerObj)
-{
-  if (innerObj.hasField(EntityRecord::staticUserLocEvent_fld()))
-    userLoc.event = innerObj.getStringField(EntityRecord::staticUserLocEvent_fld());
-  if (innerObj.hasField(EntityRecord::staticUserLocContact_fld()))
-    userLoc.contact = innerObj.getStringField(EntityRecord::staticUserLocContact_fld());
-  if (innerObj.hasField(EntityRecord::staticUserLocFromUri_fld()))
-    userLoc.fromUri = innerObj.getStringField(EntityRecord::staticUserLocFromUri_fld());
-  if (innerObj.hasField(EntityRecord::staticUserLocToUri_fld()))
-    userLoc.toUri = innerObj.getStringField(EntityRecord::staticUserLocToUri_fld());
-  if (innerObj.hasField(EntityRecord::staticUserLocCallId_fld()))
-    userLoc.callId = innerObj.getStringField(EntityRecord::staticUserLocCallId_fld());
+void EntityRecord::fillStaticUserLoc(EntityRecord::StaticUserLoc& userLoc, const bsoncxx::document::view& innerObj) {
+
+    bsoncxx::document::element eventElement = innerObj[EntityRecord::staticUserLocEvent_fld()];
+    if (eventElement && eventElement.type() == bsoncxx::type::k_string) {
+        userLoc.event = std::string(eventElement.get_string().value);
+    }
+
+    bsoncxx::document::element contactElement = innerObj[EntityRecord::staticUserLocContact_fld()];
+    if (contactElement && contactElement.type() == bsoncxx::type::k_string) {
+        userLoc.contact = std::string(contactElement.get_string().value);
+    }
+
+    bsoncxx::document::element fromUriElement = innerObj[EntityRecord::staticUserLocFromUri_fld()];
+    if (fromUriElement && fromUriElement.type() == bsoncxx::type::k_string) {
+        userLoc.fromUri = std::string(fromUriElement.get_string().value);
+    }
+
+    bsoncxx::document::element toUriElement = innerObj[EntityRecord::staticUserLocToUri_fld()];
+    if (toUriElement && toUriElement.type() == bsoncxx::type::k_string) {
+        userLoc.toUri = std::string(toUriElement.get_string().value);
+    }
+
+    bsoncxx::document::element callIdElement = innerObj[EntityRecord::staticUserLocCallId_fld()];
+    if (callIdElement && callIdElement.type() == bsoncxx::type::k_string) {
+        userLoc.callId = std::string(callIdElement.get_string().value);
+    }
+
 }
 
-EntityRecord& EntityRecord::operator = (const mongo::BSONObj& bsonObj)
+
+EntityRecord& EntityRecord::operator =(const bsoncxx::document::view& document)
 {
-	_oid = bsonObj.getStringField(EntityRecord::oid_fld());
+    // Access the fields from the document
+    _oid = std::string(document[EntityRecord::oid_fld()].get_string().value);
 
-	if (bsonObj.hasField(EntityRecord::userId_fld()))
-	{
-		_userId = bsonObj.getStringField(EntityRecord::userId_fld());
-	}
-
-	if (bsonObj.hasField(EntityRecord::identity_fld()))
-	{
-		_identity = bsonObj.getStringField(EntityRecord::identity_fld());
-	}
-
-	if (bsonObj.hasField(EntityRecord::realm_fld()))
-	{
-		_realm = bsonObj.getStringField(EntityRecord::realm_fld());
-	}
-
-	if (bsonObj.hasField(EntityRecord::password_fld()))
-	{
-		_password = bsonObj.getStringField(EntityRecord::password_fld());
-	}
-
-	if (bsonObj.hasField(EntityRecord::pin_fld()))
-	{
-		_pin = bsonObj.getStringField(EntityRecord::pin_fld());
-	}
-
-	if (bsonObj.hasField(EntityRecord::authType_fld()))
-	{
-		_authType = bsonObj.getStringField(EntityRecord::authType_fld());
-	}
-
-	if (bsonObj.hasField(EntityRecord::location_fld()))
-	{
-		_location = bsonObj.getStringField(EntityRecord::location_fld());
-	}
-
-	if (bsonObj.hasField(EntityRecord::callForwardTime_fld()))
-	{
-		_callForwardTime = bsonObj.getIntField(EntityRecord::callForwardTime_fld());
-	}
-
-	if (bsonObj.hasField(EntityRecord::vmOnDnd_fld()))
-	{
-		_vmOnDnd = bsonObj.getBoolField(EntityRecord::vmOnDnd_fld());
-	}
-   
-  if (bsonObj.hasField(EntityRecord::loc_restr_dom_fld()))
-	{
-		mongo::BSONElement obj = bsonObj[EntityRecord::loc_restr_dom_fld()];
-		if ( obj.isABSONObj() &&  obj.type() == mongo::Array)
-		{
-			std::vector<mongo::BSONElement> locations = obj.Array();
-			_locRestrDom.clear();
-			for (std::vector<mongo::BSONElement>::iterator iter = locations.begin();
-				iter != locations.end(); iter++)
-			{
-				_locRestrDom.push_back(iter->String());
-			}
-		}
-	}
-  
-  if (bsonObj.hasField(EntityRecord::loc_restr_sbnet_fld()))
-	{
-		mongo::BSONElement obj = bsonObj[EntityRecord::loc_restr_sbnet_fld()];
-		if ( obj.isABSONObj() &&  obj.type() == mongo::Array)
-		{
-			std::vector<mongo::BSONElement> locations = obj.Array();
-			_locRestrSbnet.clear();
-			for (std::vector<mongo::BSONElement>::iterator iter = locations.begin();
-				iter != locations.end(); iter++)
-			{
-				_locRestrSbnet.push_back(iter->String());
-			}
-		}
-	}
-
-	if (bsonObj.hasField(EntityRecord::callerId_fld()))
-	{
-		_callerId.id = bsonObj.getStringField(EntityRecord::callerId_fld());
-		_callerId.enforcePrivacy = bsonObj.getBoolField(EntityRecord::callerIdEnforcePrivacy_fld());
-		_callerId.ignoreUserCalleId = bsonObj.getBoolField(EntityRecord::callerIdIgnoreUserCalleId_fld());
-		_callerId.transformExtension = bsonObj.getBoolField(EntityRecord::callerIdTransformExtension_fld());
-		_callerId.extensionLength = bsonObj.getIntField(EntityRecord::callerIdExtensionLength_fld());
-		_callerId.extensionPrefix = bsonObj.getStringField(EntityRecord::callerIdExtensionPrefix_fld());
-		if (_userId == "~~gw")
-			_callerId.type = "gateway";
-		else
-			_callerId.type = "user";
-	}
-
-	if (bsonObj.hasField(EntityRecord::permission_fld()))
-	{
-		mongo::BSONElement obj = bsonObj[EntityRecord::permission_fld()];
-		if ( obj.isABSONObj() &&  obj.type() == mongo::Array)
-		{
-			std::vector<mongo::BSONElement> permissions = obj.Array();
-			_permissions.clear();
-			for (std::vector<mongo::BSONElement>::iterator iter = permissions.begin();
-				iter != permissions.end(); iter++)
-			{
-				_permissions.insert(iter->String());
-			}
-		}
-	}
-  
-  if (bsonObj.hasField(EntityRecord::allowed_locations_fld()))
-	{
-		mongo::BSONElement obj = bsonObj[EntityRecord::allowed_locations_fld()];
-		if ( obj.isABSONObj() &&  obj.type() == mongo::Array)
-		{
-			std::vector<mongo::BSONElement> locations = obj.Array();
-			_allowedLocations.clear();
-			for (std::vector<mongo::BSONElement>::iterator iter = locations.begin();
-				iter != locations.end(); iter++)
-			{
-				_allowedLocations.insert(iter->String());
-			}
-		}
-	}
-  
-  if (bsonObj.hasField(EntityRecord::associated_locations_fld()))
-	{
-		mongo::BSONElement obj = bsonObj[EntityRecord::associated_locations_fld()];
-		if ( obj.isABSONObj() &&  obj.type() == mongo::Array)
-		{
-			std::vector<mongo::BSONElement> locations = obj.Array();
-			_associatedLocations.clear();
-			for (std::vector<mongo::BSONElement>::iterator iter = locations.begin();
-				iter != locations.end(); iter++)
-			{
-				_associatedLocations.insert(iter->String());
-			}
-		}
-	}
-  
-  if (bsonObj.hasField(EntityRecord::inbound_associated_locations_fld()))
-	{
-		mongo::BSONElement obj = bsonObj[EntityRecord::inbound_associated_locations_fld()];
-		if ( obj.isABSONObj() &&  obj.type() == mongo::Array)
-		{
-			std::vector<mongo::BSONElement> locations = obj.Array();
-			_inboundAssociatedLocations.clear();
-			for (std::vector<mongo::BSONElement>::iterator iter = locations.begin();
-				iter != locations.end(); iter++)
-			{
-				_inboundAssociatedLocations.insert(iter->String());
-			}
-		}
-	}
-
-	if (bsonObj.hasField(EntityRecord::entity_fld()))
-	{
-	  _entity = bsonObj.getStringField(EntityRecord::entity_fld());
-	}
-  
-  if (bsonObj.hasField(EntityRecord::authc_fld()))
-	{
-	  _authc = bsonObj.getStringField(EntityRecord::authc_fld());
-	}
-  
-  if (bsonObj.hasField(EntityRecord::associated_location_fallback_fld()))
-	{
-	  _associatedLocationFallback = bsonObj.getStringField(EntityRecord::associated_location_fallback_fld());
-	}
-
-	if (bsonObj.hasField(EntityRecord::aliases_fld()))
-	{
-		mongo::BSONElement obj = bsonObj[EntityRecord::aliases_fld()];
-		if ( obj.isABSONObj() &&  obj.type() == mongo::Array)
-		{
-			std::vector<mongo::BSONElement> aliases = obj.Array();
-			for (std::vector<mongo::BSONElement>::iterator iter = aliases.begin();
-				iter != aliases.end(); iter++)
-			{
-				mongo::BSONObj innerObj = iter->Obj();
-				Alias alias;
-				if (innerObj.hasField(EntityRecord::aliasesId_fld()))
-					alias.id = innerObj.getStringField(EntityRecord::aliasesId_fld());
-				if (innerObj.hasField(EntityRecord::aliasesContact_fld()))
-					alias.contact = innerObj.getStringField(EntityRecord::aliasesContact_fld());
-				if (innerObj.hasField(EntityRecord::aliasesRelation_fld()))
-					alias.relation = innerObj.getStringField(EntityRecord::aliasesRelation_fld());
-				_aliases.push_back(alias);
-			}
-		}
-	}
-
-	if (bsonObj.hasField(EntityRecord::staticUserLoc_fld()))
-	{
-		mongo::BSONElement obj = bsonObj[EntityRecord::staticUserLoc_fld()];
-    if (obj.isABSONObj() &&  obj.type() == mongo::Array)
+    if (document[EntityRecord::userId_fld()])
     {
-      std::vector<mongo::BSONElement> userLocs = obj.Array();
-      for (std::vector<mongo::BSONElement>::iterator iter = userLocs.begin();
-        iter != userLocs.end(); iter++)
-      {
-        mongo::BSONObj innerObj = iter->Obj();
-        StaticUserLoc userLoc;
-        fillStaticUserLoc(userLoc, innerObj);
-        _staticUserLoc.push_back(userLoc);
-      }
+        _userId = std::string(document[EntityRecord::userId_fld()].get_string().value);
     }
-    else if (obj.isABSONObj())
-		{
-      //NOTE: This can be removed when config will have support for more than one static user loc
-      mongo::BSONObj innerObj = obj.embeddedObject();;
-      StaticUserLoc userLoc;
-      fillStaticUserLoc(userLoc, innerObj);
-      _staticUserLoc.push_back(userLoc);
-		}
-	}
+
+    if (document[EntityRecord::identity_fld()])
+    {
+        _identity = std::string(document[EntityRecord::identity_fld()].get_string().value);
+    }
+
+    if (document[EntityRecord::realm_fld()])
+    {
+        _realm = std::string(document[EntityRecord::realm_fld()].get_string().value);
+    }
+
+    if (document[EntityRecord::password_fld()])
+    {
+        _password = std::string(document[EntityRecord::password_fld()].get_string().value);
+    }
+
+    if (document[EntityRecord::pin_fld()])
+    {
+        _pin = std::string(document[EntityRecord::pin_fld()].get_string().value);
+    }
+
+    if (document[EntityRecord::authType_fld()])
+    {
+        _authType = std::string(document[EntityRecord::authType_fld()].get_string().value);
+    }
+
+    if (document[EntityRecord::location_fld()])
+    {
+        _location = std::string(document[EntityRecord::location_fld()].get_string().value);
+    }
+
+    if (document[EntityRecord::callForwardTime_fld()])
+    {
+        _callForwardTime = document[EntityRecord::callForwardTime_fld()].get_int32().value;
+    }
+
+    if (document[EntityRecord::vmOnDnd_fld()])
+    {
+        _vmOnDnd = document[EntityRecord::vmOnDnd_fld()].get_bool().value;
+    }
+
+    // Handling array fields like loc_restr_dom_fld
+    if (document[EntityRecord::loc_restr_dom_fld()]) {
+        bsoncxx::array::view array_elem = document[EntityRecord::loc_restr_dom_fld()].get_array();
+        _locRestrDom.clear();
+        for (bsoncxx::array::element item : array_elem) {
+            _locRestrDom.push_back(std::string(item.get_string().value));
+        }
+    }
+
+    // Handling array fields like loc_restr_sbnet_fld
+    if (document[EntityRecord::loc_restr_sbnet_fld()]) {
+        bsoncxx::array::view array_elem = document[EntityRecord::loc_restr_sbnet_fld()].get_array();
+        _locRestrSbnet.clear();
+        for (bsoncxx::array::element item : array_elem) {
+            _locRestrSbnet.push_back(std::string(item.get_string().value));
+        }
+    }
+
+    // Handling embedded object like callerId_fld
+    if (document[EntityRecord::callerId_fld()]) {
+        bsoncxx::document::view caller_id_document = document[EntityRecord::callerId_fld()].get_document();
+        _callerId.id = std::string(caller_id_document[EntityRecord::callerId_fld()].get_string().value);
+        _callerId.enforcePrivacy = caller_id_document[EntityRecord::callerIdEnforcePrivacy_fld()].get_bool().value;
+        _callerId.ignoreUserCalleId = caller_id_document[EntityRecord::callerIdIgnoreUserCalleId_fld()].get_bool().value;
+        _callerId.transformExtension = caller_id_document[EntityRecord::callerIdTransformExtension_fld()].get_bool().value;
+        _callerId.extensionLength = caller_id_document[EntityRecord::callerIdExtensionLength_fld()].get_int32().value;
+        _callerId.extensionPrefix = std::string(caller_id_document[EntityRecord::callerIdExtensionPrefix_fld()].get_string().value);
+        _callerId.type = (_userId == "~~gw") ? "gateway" : "user";
+    }
+
+    // Handling permissions (set of strings)
+    if (document[EntityRecord::permission_fld()]) {
+        bsoncxx::array::view array_elem = document[EntityRecord::permission_fld()].get_array();
+        _permissions.clear();
+        for (bsoncxx::array::element item : array_elem) {
+            _permissions.insert(std::string(item.get_string().value));
+        }
+    }
+
+    // Handling allowed_locations_fld
+    if (document[EntityRecord::allowed_locations_fld()]) {
+        bsoncxx::array::view array_elem = document[EntityRecord::allowed_locations_fld()].get_array();
+        _allowedLocations.clear();
+        for (bsoncxx::array::element item : array_elem) {
+            _allowedLocations.insert(std::string(item.get_string().value));
+        }
+    }
+
+    // Handling associated_locations_fld
+    if (document[EntityRecord::associated_locations_fld()]) {
+        bsoncxx::array::view array_elem = document[EntityRecord::associated_locations_fld()].get_array();
+        _associatedLocations.clear();
+        for (bsoncxx::array::element item : array_elem) {
+            _associatedLocations.insert(std::string(item.get_string().value));
+        }
+    }
+
+    // Handling inbound_associated_locations_fld
+    if (document[EntityRecord::inbound_associated_locations_fld()]) {
+        bsoncxx::array::view array_elem = document[EntityRecord::inbound_associated_locations_fld()].get_array();
+        _inboundAssociatedLocations.clear();
+        for (bsoncxx::array::element item : array_elem) {
+            _inboundAssociatedLocations.insert(std::string(item.get_string().value));
+        }
+    }
+
+    if (document[EntityRecord::entity_fld()]) {
+        _entity = std::string(document[EntityRecord::entity_fld()].get_string().value);
+    }
+
+    if (document[EntityRecord::authc_fld()]) {
+        _authc = std::string(document[EntityRecord::authc_fld()].get_string().value);
+    }
+
+    if (document[EntityRecord::associated_location_fallback_fld()]) {
+        _associatedLocationFallback = std::string(document[EntityRecord::associated_location_fallback_fld()].get_string().value);
+    }
+
+    // Handling aliases array of embedded objects
+    if (document[EntityRecord::aliases_fld()]) {
+        bsoncxx::array::view array_elem = document[EntityRecord::aliases_fld()].get_array();
+        for (bsoncxx::array::element item : array_elem) {
+            bsoncxx::document::view inner_document = item.get_document();
+            Alias alias;
+            if (inner_document[EntityRecord::aliasesId_fld()])
+                alias.id = std::string(inner_document[EntityRecord::aliasesId_fld()].get_string().value);
+            if (inner_document[EntityRecord::aliasesContact_fld()])
+                alias.contact = std::string(inner_document[EntityRecord::aliasesContact_fld()].get_string().value);
+            if (inner_document[EntityRecord::aliasesRelation_fld()])
+                alias.relation = std::string(inner_document[EntityRecord::aliasesRelation_fld()].get_string().value);
+            _aliases.push_back(alias);
+        }
+    }
+
+    // Handling staticUserLoc array of embedded objects
+    if (document[EntityRecord::staticUserLoc_fld()]) {
+        bsoncxx::array::view array_elem = document[EntityRecord::staticUserLoc_fld()].get_array();
+        for (bsoncxx::array::element item : array_elem) {
+            bsoncxx::document::view inner_document = item.get_document();
+            StaticUserLoc userLoc;
+            fillStaticUserLoc(userLoc, inner_document);
+            _staticUserLoc.push_back(userLoc);
+        }
+    }
+    else if (document[EntityRecord::staticUserLoc_fld()]) {
+        bsoncxx::document::view inner_document = document[EntityRecord::staticUserLoc_fld()].get_document();
+        StaticUserLoc userLoc;
+        fillStaticUserLoc(userLoc, inner_document);
+        _staticUserLoc.push_back(userLoc);
+    }
 
     return *this;
 }

@@ -13,6 +13,9 @@
 
 #include <os/OsDateTime.h>
 
+#include <bsoncxx/document/view.hpp>
+
+
 #include "net/Url.h"
 #include "sipdb/DbHelper.h"
 
@@ -125,64 +128,97 @@ class DbHelperTest : public CppUnit::TestCase
   DbHelper _dbHelper;
 
 public:
-  DbHelperTest() : _info(MongoDB::ConnectionInfo(mongo::ConnectionString(mongo::HostAndPort(gLocalHostAddr)))),
+  DbHelperTest() : _info(MongoDB::ConnectionInfo(std::string(gLocalHostAddr))),
                    _dbHelperTest_RegBinding(gTestRegBindingDbName),
                    _dbHelperTest_EntityRecord(gTestEntityRecordDbName)
   {
   }
 
-  void setUp()
-  {
-    MongoDB::ScopedDbConnectionPtr pConnRegBinding(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-    pConnRegBinding->get()->remove(_dbHelperTest_RegBinding, mongo::Query());
-    pConnRegBinding->done();
+void setUp()
+{
+    try
+    {
+        // Create a MongoConnection instance
+        MongoDB::MongoConnection connection(_info);
 
-    MongoDB::ScopedDbConnectionPtr pConnEntityRecord(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-    pConnEntityRecord->get()->remove(_dbHelperTest_EntityRecord, mongo::Query());
-    pConnEntityRecord->done();
-  }
+        // Access the collection for RegBinding and remove all documents
+        mongocxx::collection regBindingCollection = connection.collection(_dbHelperTest_RegBinding);
+        regBindingCollection.delete_many({}); // Empty query to remove all documents
+
+        // Access the collection for EntityRecord and remove all documents
+        mongocxx::collection entityRecordCollection = connection.collection(_dbHelperTest_EntityRecord);
+        entityRecordCollection.delete_many({}); // Empty query to remove all documents
+    }
+    catch (const mongocxx::exception& e)
+    {
+        OS_LOG_ERROR(FAC_SIP, "setUp - MongoDB exception: " << e.what());
+        throw; // Rethrow the exception for test setup failure
+    }
+}
 
   void tearDown()
   {
   }
 
-  void updateEntityRecord(EntityRecord& entityRecord)
-  {
+void updateEntityRecord(EntityRecord& entityRecord)
+{
+    try
+    {
+        // Create a MongoConnection instance
+        MongoDB::MongoConnection connection(_info);
 
-    mongo::BSONObj query = BSON(entityRecord.identity_fld() << entityRecord.identity());
+        // Access the collection for EntityRecord
+        mongocxx::collection collection = connection.collection(_dbHelperTest_EntityRecord);
 
+        // Build the query document
+        auto queryBuilder = bsoncxx::builder::basic::make_document();
+        queryBuilder.append(bsoncxx::builder::basic::kvp(std::string(entityRecord.identity_fld()), entityRecord.identity()));
 
-    mongo::BSONObjBuilder bsonObjBuilder;
-    bsonObjBuilder << entityRecord.userId_fld() << entityRecord.userId() <<                                           // "uid"
-        entityRecord.identity_fld() << entityRecord.identity() <<                                       // "ident"
-        entityRecord.realm_fld() << entityRecord.realm() <<                                             // "rlm"
-        entityRecord.password_fld() << entityRecord.password() <<                                       // "pstk"
-        entityRecord.pin_fld() << entityRecord.pin() <<                                                 // "pntk"
-        entityRecord.authType_fld() << entityRecord.authType() <<                                       // "authtp"
-        entityRecord.location_fld() << entityRecord.location() <<                                       // "loc"
+        // Build the update document using $set
+        auto updateBuilder = bsoncxx::builder::basic::make_document();
+        updateBuilder.append(
+            bsoncxx::builder::basic::kvp("$set",
+                bsoncxx::builder::basic::make_document(
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.userId_fld()), entityRecord.userId()),
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.identity_fld()), entityRecord.identity()),
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.realm_fld()), entityRecord.realm()),
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.password_fld()), entityRecord.password()),
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.pin_fld()), entityRecord.pin()),
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.authType_fld()), entityRecord.authType()),
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.location_fld()), entityRecord.location()),
 
-        entityRecord.callerId_fld() << entityRecord.callerId().id <<                                    // "clrid"
-        entityRecord.callerIdEnforcePrivacy_fld() << entityRecord.callerId().enforcePrivacy <<          // "blkcid"
-        entityRecord.callerIdIgnoreUserCalleId_fld() << entityRecord.callerId().ignoreUserCalleId <<    // "ignorecid"
-        entityRecord.callerIdTransformExtension_fld() << entityRecord.callerId().transformExtension <<  // "trnsfrmext"
-        entityRecord.callerIdExtensionLength_fld() << entityRecord.callerId().extensionLength <<        // "kpdgts"
-        entityRecord.callerIdExtensionPrefix_fld() << entityRecord.callerId().extensionPrefix <<        // "pfix"
-        entityRecord.callForwardTime_fld() << entityRecord.callForwardTime() <<                         // "cfwdtm"
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.callerId_fld()), entityRecord.callerId().id),
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.callerIdEnforcePrivacy_fld()), entityRecord.callerId().enforcePrivacy),
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.callerIdIgnoreUserCalleId_fld()), entityRecord.callerId().ignoreUserCalleId),
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.callerIdTransformExtension_fld()), entityRecord.callerId().transformExtension),
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.callerIdExtensionLength_fld()), entityRecord.callerId().extensionLength),
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.callerIdExtensionPrefix_fld()), entityRecord.callerId().extensionPrefix),
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.callForwardTime_fld()), entityRecord.callForwardTime()),
+                    bsoncxx::builder::basic::kvp(std::string(entityRecord.permission_fld()), entityRecord.permissions())
+                )
+            )
+        );
 
-        entityRecord.permission_fld() << entityRecord.permissions();                                    // "prm"
+        // Perform the upsert operation
+        collection.update_one(
+            queryBuilder.view(),             // Query document
+            updateBuilder.view(),            // Update document
+            mongocxx::options::update{}.upsert(true) // Upsert option
+        );
 
-    mongo::BSONObj update;
-    update = BSON(gMongoSetOperator << bsonObjBuilder.obj());
-
-    MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-    mongo::DBClientBase* client = conn->get();
-
-    //client->insert(_info.getNS(), update);
-    client->update(_dbHelperTest_EntityRecord, query, update, true, false);
-    client->ensureIndex(_dbHelperTest_EntityRecord, BSON( entityRecord.identity_fld() << 1 ));
-
-    conn->done();
-  }
+        // Create an index on the `identity` field if it doesn't already exist
+        collection.create_index(
+            bsoncxx::builder::basic::make_document(
+                bsoncxx::builder::basic::kvp(std::string(entityRecord.identity_fld()), 1)
+            )
+        );
+    }
+    catch (const mongocxx::exception& e)
+    {
+        OS_LOG_ERROR(FAC_SIP, "updateEntityRecord - MongoDB exception: " << e.what());
+        throw; // Rethrow the exception for higher-level handling
+    }
+}
 
   void setEntityRecordDefaultValues(EntityRecord& entityRecord)
   {
@@ -212,7 +248,7 @@ public:
 
     // add filter condition
     whereOptVector.push_back(filterCondition);
-    _dbHelper.printDbEntries(strm, &_info, _dbHelperTest_EntityRecord, whereOptVector, DbHelper::DbTypeEntityRecord, false);
+    _dbHelper.printDbEntries(strm, _info, _dbHelperTest_EntityRecord, whereOptVector, DbHelper::DbTypeEntityRecord, false);
 
     std::string result = (boost::format("\"Nr\":0   \"%s\":%s   \"%s\":%s   \"%s\":%s   \"%s\":%s   "
         "\"%s\":%s   \"%s\":%s   \"%s\":%s   \"%s\":%s   \"%s\":%s   \"%s\":%s   "
@@ -247,7 +283,7 @@ public:
 
     // should print no line as filter condition contain now '!='
     whereOptVector.push_back(filterCondition);
-    _dbHelper.printDbEntries(strm, &_info, _dbHelperTest_EntityRecord, whereOptVector, DbHelper::DbTypeEntityRecord, false);
+    _dbHelper.printDbEntries(strm, _info, _dbHelperTest_EntityRecord, whereOptVector, DbHelper::DbTypeEntityRecord, false);
 
     // TEST: Verify that the result is empty
     CPPUNIT_ASSERT(std::string("") == strm.str());
@@ -289,7 +325,7 @@ public:
 
     // add filter condition "cseq=1"
     whereOptVector.push_back(filterCondition);
-    _dbHelper.printDbEntries(strm, &_info, _dbHelperTest_RegBinding, whereOptVector, DbHelper::DbTypeRegBinding, false);
+    _dbHelper.printDbEntries(strm, _info, _dbHelperTest_RegBinding, whereOptVector, DbHelper::DbTypeRegBinding, false);
 
     std::string result = (boost::format("\"Nr\":0   \"%s\":%s   \"%s\":%s   \"%s\":%d   \"%s\":%d   "
         "\"%s\":%s   \"%s\":%d   \"%s\":%s   \"%s\":%s   \"%s\":%s   "
@@ -326,7 +362,7 @@ public:
     whereOptVector.push_back(filterCondition);
 
     // should print nothing as now the filter condition is 'cseq=2'
-    _dbHelper.printDbEntries(strm, &_info, _dbHelperTest_RegBinding, whereOptVector, DbHelper::DbTypeRegBinding, false);
+    _dbHelper.printDbEntries(strm, _info, _dbHelperTest_RegBinding, whereOptVector, DbHelper::DbTypeRegBinding, false);
 
     // TEST: Verify that the result is empty
     CPPUNIT_ASSERT(std::string("") == strm.str());
@@ -349,12 +385,12 @@ public:
     std::vector<std::string> whereOptVector;
 
     // should delete all alements as filter condition is empty
-    _dbHelper.deleteDbEntries(&_info, _dbHelperTest_RegBinding, whereOptVector);
+    _dbHelper.deleteDbEntries(_info, _dbHelperTest_RegBinding, whereOptVector);
 
     std::ostringstream strm;
 
     // should print nothing as all elements were deleted
-    _dbHelper.printDbEntries(strm, &_info, _dbHelperTest_RegBinding, whereOptVector, DbHelper::DbTypeRegBinding, false);
+    _dbHelper.printDbEntries(strm, _info, _dbHelperTest_RegBinding, whereOptVector, DbHelper::DbTypeRegBinding, false);
 
     // TEST: Verify that the result is empty
     CPPUNIT_ASSERT(std::string("") == strm.str());
@@ -374,12 +410,12 @@ public:
     std::vector<std::string> whereOptVector;
 
     // should delete all alements as filter condition is empty
-    _dbHelper.deleteDbEntries(&_info, _dbHelperTest_EntityRecord, whereOptVector);
+    _dbHelper.deleteDbEntries(_info, _dbHelperTest_EntityRecord, whereOptVector);
 
     std::ostringstream strm;
 
     // should print nothing as all elements were deleted
-    _dbHelper.printDbEntries(strm, &_info, _dbHelperTest_EntityRecord, whereOptVector, DbHelper::DbTypeEntityRecord, false);
+    _dbHelper.printDbEntries(strm, _info, _dbHelperTest_EntityRecord, whereOptVector, DbHelper::DbTypeEntityRecord, false);
 
     // TEST: Verify that the result is empty
     CPPUNIT_ASSERT(std::string("") == strm.str());

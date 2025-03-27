@@ -13,45 +13,29 @@ Url: http://www.pingtel.com
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: cppunit-devel
-BuildRequires: pcre-devel >= 4.5
+BuildRequires: pcre-devel
+BuildRequires: glibc-headers
+BuildRequires: xerces-c-devel
 BuildRequires: gperftools-devel
-BuildRequires: unixODBC-devel >= 2.2
+BuildRequires: unixODBC-devel 
+BuildRequires: httpd-devel
+BuildRequires: shadow-utils
+BuildRequires: mongo-cxx-driver-devel
+BuildRequires: krb5-devel
 BuildRequires: sipxportlib-devel >= %version
 BuildRequires: sipxtacklib-devel >= %version
-BuildRequires: glibc-headers
-%if %{_vendor} == redhat
-BuildRequires: httpd-devel
-BuildRequires: xerces-c-devel >= 2.6.0
-BuildRequires: shadow-utils
-%endif
-
-BuildRequires: mongo-cxx-driver-devel >= 2.6.7
 
 Source: %name-%version.tar.gz
 
 Requires: rpm
-%if "%{_vendor}" == "suse"
-BuildRequires: apache2-devel
-BuildRequires: xerces-c-devel = 2.8.0
-Requires: xerces-c >= 2.6.0
-BuildRequires: pwdutils
-Requires: pwdutils
-%endif
-%if %{_vendor} == redhat
-Requires: xerces-c >= 2.6.0
+Requires: xerces-c 
 Requires: rpm-libs
-%endif
-%if 0%{?rhel} >= 7
 Requires: net-tools
-%endif
-Requires: sipxportlib >= %version
-Requires: sipxtacklib >= %version
-Requires: unixODBC >= 2.2
+
+Requires: unixODBC 
 Requires: ruby
 Requires: patch
-# bind-utils required for dig
 Requires: bind-utils
-Requires: sipxsupervisor >= %version
 Requires: poco-crypto
 Requires: poco-data
 Requires: poco-foundation
@@ -65,6 +49,10 @@ Requires: poco-util
 Requires: poco-xml
 Requires: poco-zip
 
+Requires: sipxportlib >= %version
+Requires: sipxtacklib >= %version
+Requires: sipxsupervisor >= %version
+
 Obsoletes: %{name}-doc
 
 Prefix: %_prefix
@@ -75,23 +63,14 @@ This project is used to hold code used in common by a number of the
 sipX family servers. It is not intended to be useful as a standalone
 project.
 
-%if "%{_vendor}" == "suse"
-%debug_package
-%endif
-
 # Install header files
 %package devel
 Requires: %name
-%if "%{_vendor}" == "suse"
-Requires: xerces-c-devel >= 2.6.0
-%endif
-%if %{_vendor} == redhat
-Requires: xerces-c-devel >= 2.6.0
-%endif
+Requires: xerces-c-devel 
 Requires: sipxportlib-devel >= %version
 Requires: sipxtacklib-devel >= %version
-Requires: unixODBC-devel >= 2.2
-Requires: mongo-cxx-driver-devel >= 2.6.7
+Requires: unixODBC-devel 
+Requires: mongo-cxx-driver-devel 
 
 Group: Development/Libraries
 Vendor: SIPfoundry
@@ -103,10 +82,10 @@ helpful to build projects using the sipXcommserverLib library
 
 %prep
 %setup -q
-# suse and obs build system
 mv %{_builddir}/%name-%version/%name-rpmlintrc %{_sourcedir}
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make %{_smp_mflags}

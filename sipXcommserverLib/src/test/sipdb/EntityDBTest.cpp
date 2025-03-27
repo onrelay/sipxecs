@@ -1,13 +1,12 @@
 #include <cppunit/TestCase.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <sipxunit/TestUtilities.h>
-#include <sipdb/EntityDB.h>
-#include <sipdb/MongoDB.h>
-//#include <os/OsDateTime.h>
-#include <mongo/util/net/hostandport.h>
-#include <mongo/client/connpool.h>
 
-#include <boost/format.hpp>
+#include <sipdb/MongoDB.h>
+#include <sipdb/EntityDB.h>
+
+//#include <os/OsDateTime.h>
+#include <bsoncxx/document/view.hpp>
 
 #include "MongoDbVerifier.h"
 
@@ -195,36 +194,53 @@ class EntityDBTest: public CppUnit::TestCase
   typedef boost::scoped_ptr<EntityDB> EntityDBPtr;
 
   const MongoDB::ConnectionInfo _info;
-  std::string _entityDbName;
-  std::string _oplogDbName;
+  std::string _entityNS;
+  std::string _oplogNS;
   EntityRecordPtr _entityRecord;
-  MongoDB::ScopedDbConnectionPtr _conn;
+  MongoDB::MongoConnection _conn;
   EntityDBPtr _db;
   int MAX_SECONDS_TO_WAIT;
   MongoDbVerifier _mongoDbVerifier;
+  
 public:
-  EntityDBTest() : _info(MongoDB::ConnectionInfo(mongo::ConnectionString(mongo::HostAndPort(gLocalHostAddr)))),
-              _entityDbName(gTestEntityDbName),
-              _oplogDbName(gLocalOplogDbName),
-              _entityRecord(new EntityRecord),
-              _conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString())),
-              _db(new EntityDB(_info, _entityDbName)),
-              _mongoDbVerifier(_conn, _entityDbName, MAX_SECONDS_TO_WAIT * 1000)
+
+  EntityDBTest::EntityDBTest() :
+      _info(MongoDB::ConnectionInfo(std::string(gLocalHostAddr))),
+      _entityNS(gTestEntityDbName),
+      _oplogNS(gLocalOplogDbName),
+      _entityRecord(std::make_unique<EntityRecord>()),
+      _conn(MongoConnection(_info)),
+      _db(std::make_unique<EntityDB>(_info, _entityNS)),
+      _mongoDbVerifier(_conn, _entityNS, MAX_SECONDS_TO_WAIT * 1000)
   {
-    MAX_SECONDS_TO_WAIT = 10;
+      const int MAX_SECONDS_TO_WAIT = 10;
 
-    _conn->get()->dropCollection(_oplogDbName);
-    _conn->get()->remove(_entityDbName, mongo::Query());
+      try
+      {
+          // Drop the oplog collection and remove documents from the entity collection
+          mongocxx::collection oplogCollection = _conn.collection(_oplogNS);
+          oplogCollection.drop();
 
-    _mongoDbVerifier.waitUntilEmpty();
+          mongocxx::collection entityCollection = _conn.collection(_entityNS);
+          entityCollection.delete_many({});
 
-    // Initialise Entity record structure
-    setEntityRecord(*_entityRecord);
+          // Wait until the database is empty
+          _mongoDbVerifier.waitUntilEmpty();
 
-    // Insert Entity record entry in test.EntityDBTest
-    updateEntityRecord(*_entityRecord);
+          // Initialize EntityRecord structure
+          setEntityRecord(*_entityRecord);
 
-    _mongoDbVerifier.waitUntilHaveOneEntry();
+          // Insert the EntityRecord entry into the test database
+          updateEntityRecord(*_entityRecord);
+
+          // Wait until there's at least one entry in the collection
+          _mongoDbVerifier.waitUntilHaveOneEntry();
+      }
+      catch (const mongocxx::exception& e)
+      {
+          OS_LOG_ERROR(FAC_SIP, "EntityDBTest constructor - MongoDB exception: " << e.what());
+          throw;  // Re-throw for higher-level handling
+      }
   }
 
   ~EntityDBTest()
@@ -245,10 +261,10 @@ public:
   void updateEntityRecord(EntityRecord& entityRecord)
   {
 
-    mongo::BSONObj query = BSON(entityRecord.identity_fld() << entityRecord.identity());
+    bsoncxx::document::view query = BSON(entityRecord.identity_fld() << entityRecord.identity());
 
 
-    mongo::BSONObjBuilder bsonObjBuilder;
+    bsoncxx::builder::basic::document bsonObjBuilder;
     bsonObjBuilder << entityRecord.userId_fld() << entityRecord.userId() <<                                           // "uid"
         entityRecord.identity_fld() << entityRecord.identity() <<                                       // "ident"
         entityRecord.realm_fld() << entityRecord.realm() <<                                             // "rlm"
@@ -273,7 +289,7 @@ public:
     for (std::vector<EntityRecord::Alias>::iterator iter = entityRecord._aliases.begin();
       iter != entityRecord._aliases.end(); iter++)
     {
-      mongo::BSONObjBuilder bsonObjBuilderAlias;
+      bsoncxx::builder::basic::document bsonObjBuilderAlias;
 
       bsonObjBuilderAlias << entityRecord.aliasesId_fld() << iter->id;                                // "id"
       bsonObjBuilderAlias << entityRecord.aliasesContact_fld() << iter->contact;                      // "cnt"
@@ -283,14 +299,14 @@ public:
     }
     bsonObjBuilder.append(entityRecord.aliases_fld(), bsonArrayBuilderAliases.arr());                   // "als"
 
-    mongo::BSONObj update;
+    bsoncxx::document::view update;
     update = BSON(gMongoSetOperator << bsonObjBuilder.obj());
 
     mongo::DBClientBase* client = _conn->get();
 
     //client->insert(_info.getNS(), update);
-    client->update(_entityDbName, query, update, true, false);
-    client->ensureIndex(_entityDbName, BSON(entityRecord.identity_fld() << 1 ));
+    client->update(_entityNS, query, update, true, false);
+    client->ensureIndex(_entityNS, BSON(entityRecord.identity_fld() << 1 ));
   }
 
   void setEntityRecord(EntityRecord& entityRecord)
@@ -387,10 +403,10 @@ public:
   void updateMongoOpLog(OpLog& opLog)
   {
 
-    mongo::BSONObj query = BSON(opLog.id_fld() << opLog.getId());
+    bsoncxx::document::view query = BSON(opLog.id_fld() << opLog.getId());
 
 
-    mongo::BSONObjBuilder bsonObjBuilder;
+    bsoncxx::builder::basic::document bsonObjBuilder;
     bsonObjBuilder <<
         opLog.ts_fld() << opLog.getTs() <<                                       // "ts"
         opLog.h_fld() << opLog.getH() <<                                         // "h"
@@ -399,15 +415,15 @@ public:
         opLog.ns_fld() << opLog.getNs() <<                                       // "ns"
         opLog.o_fld() << opLog.getO();                                           // "o"
 
-    mongo::BSONObj update;
+    bsoncxx::document::view update;
     update = BSON(gMongoSetOperator << bsonObjBuilder.obj());
 
     mongo::DBClientBase* client = _conn->get();
 
     // create a capped collect in order to work with tailer cursor
-    client->createCollection(_oplogDbName, 1024*1024, true, 0, 0);
-    client->update(_oplogDbName, query, update, true, false);
-    client->ensureIndex(_oplogDbName, BSON(opLog.id_fld() << 1 ));
+    client->createCollection(_oplogNS, 1024*1024, true, 0, 0);
+    client->update(_oplogNS, query, update, true, false);
+    client->ensureIndex(_oplogNS, BSON(opLog.id_fld() << 1 ));
   }
 
   void testEntityDB_tailFunction()

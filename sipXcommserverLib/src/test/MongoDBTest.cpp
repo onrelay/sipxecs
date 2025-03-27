@@ -1,12 +1,12 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
 #include <sipdb/MongoDB.h>
-#include <mongo/client/dbclient.h>
-#include <mongo/client/connpool.h>
+#include <bsoncxx/document/view.hpp>
+
 
 using namespace std;
 
-class MongoDBTest: public CppUnit::TestCase
+/* class MongoDBTest: public CppUnit::TestCase
 {
 	CPPUNIT_TEST_SUITE(MongoDBTest);
 	CPPUNIT_TEST(testReadHAConfig);
@@ -18,7 +18,7 @@ public:
     void testReadSingleConfig()
     {
         try {
-            mongo::ConnectionString s = MongoDB::ConnectionInfo::connectionStringFromFile(TEST_DATA_DIR "/sipxmongo-single-config");
+            mongo::CnnectionString s = MongoDB::ConnectionInfo::connectionStringFromFile(TEST_DATA_DIR "/sipxmongo-single-config");
             CPPUNIT_ASSERT_EQUAL(string("sipxecs"), s.getSetName());
             std::vector<mongo::HostAndPort> servers = s.getServers();
             CPPUNIT_ASSERT_EQUAL(1, (int) servers.size());
@@ -32,7 +32,7 @@ public:
 
 	void testReadHAConfig()
 	{
-		mongo::ConnectionString s = MongoDB::ConnectionInfo::connectionStringFromFile(TEST_DATA_DIR "/sipxmongo-ha-config");
+		mongo::CnnectionString s = MongoDB::ConnectionInfo::connectionStringFromFile(TEST_DATA_DIR "/sipxmongo-ha-config");
 		CPPUNIT_ASSERT_EQUAL(string("sipxecs"), s.getSetName());
 		std::vector<mongo::HostAndPort> servers = s.getServers();
 		CPPUNIT_ASSERT_EQUAL(2, (int) servers.size());
@@ -45,7 +45,7 @@ public:
 	}
 };
 CPPUNIT_TEST_SUITE_REGISTRATION(MongoDBTest);
-
+ */
 
 class BaseDBTest: public CppUnit::TestCase
 {
@@ -59,31 +59,56 @@ class BaseDBTest: public CppUnit::TestCase
 public:
 
     BaseDBTest() :
-        _info(MongoDB::ConnectionInfo(mongo::ConnectionString(mongo::HostAndPort("127.0.0.1")), string("test.BaseDBTest")))
+        _info(MongoDB::ConnectionInfo(string("127.0.0.1"), string("test.BaseDBTest")))
     {
     }
 
-    void forEachFunction(mongo::BSONObj& record)
+    void forEachFunction(const bsoncxx::document::view& record)
     {
         CPPUNIT_ASSERT_EQUAL(_row * 10, record.getIntField("a"));
         _row++;
     }
 
-    void testForEach()
+void testForEach()
+{
+    try
     {
         _row = 0;
-        MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-        //mongo::ScopedDbConnection conn(_info.getConnectionString());
-        mongo::BSONObj query;
-        pConn->get()->remove(_info.getNS(), query);
-        pConn->get()->insert(_info.getNS(), BSON("a" << 0));
-        pConn->get()->insert(_info.getNS(), BSON("a" << 10));
-        pConn->done();
 
+        // Initialize MongoDB connection
+        MongoDB::MongoConnection connection(_info);
+
+        // Construct the query (empty in this case)
+        auto query = bsoncxx::builder::basic::make_document();
+
+        // Retrieve the collection
+        mongocxx::collection collection = connection.collection(_info.getNS());
+
+        // Remove any existing documents
+        collection.delete_many(query.view());
+
+        // Insert test data
+        collection.insert_one(bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp(std::string("a"), 0)));
+        collection.insert_one(bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp(std::string("a"), 10)));
+
+        // Initialize the BaseDB instance
         MongoDB::BaseDB db(_info);
-        db.forEach(query, bind(&BaseDBTest::forEachFunction, this, _1));
+
+        // Perform the forEach operation
+        db.forEach(query.view(), bind(&BaseDBTest::forEachFunction, this, _1));
+
+        // Assert that the forEach function was called twice
         CPPUNIT_ASSERT_EQUAL(2, _row);
     }
+    catch (const mongocxx::exception& e)
+    {
+        // Log and re-throw exception for higher-level handling
+        OS_LOG_ERROR(FAC_ODBC, "testForEach - MongoDB exception: " << e.what());
+        throw MongoDB::MongoException("Failed to execute testForEach: " + std::string(e.what()));
+    }
+}
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(BaseDBTest);

@@ -4,8 +4,7 @@
 #include <sipdb/RegDB.h>
 #include <sipdb/MongoDB.h>
 #include <os/OsDateTime.h>
-#include <mongo/util/net/hostandport.h>
-#include <mongo/client/connpool.h>
+#include <bsoncxx/document/view.hpp>
 
 
 using namespace std;
@@ -119,23 +118,37 @@ class RegDBTest: public CppUnit::TestCase
 
   RegDB* _db;
   const MongoDB::ConnectionInfo _info;
-  std::string _databaseName;
+  std::string _ns;
   unsigned long _timeNow;
 public:
-  RegDBTest() : _info(MongoDB::ConnectionInfo(mongo::ConnectionString(mongo::HostAndPort(gLocalHostAddr)))),
-  _databaseName(gTestRegDbName)
-{
-}
+  RegDBTest() : _info(MongoDB::ConnectionInfo(std::string(gLocalHostAddr))),
+  _ns(gTestRegDbName)
+  {
+  }
 
   void setUp()
   {
-    _timeNow = OsDateTime::getSecsSinceEpoch();
-    _db = new RegDB(_info, NULL, _databaseName);
+      _timeNow = OsDateTime::getSecsSinceEpoch();
+      _db = new RegDB(_info, nullptr, _ns);
 
-    MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-    //mongo::ScopedDbConnection conn(_info.getConnectionString().toString());
-    pConn->get()->remove(_databaseName, mongo::Query());
-    pConn->done();
+      try
+      {
+          // Initialize MongoDB connection and client
+          MongoDB::MongoConnection connection(_info);
+          mongocxx::collection collection = connection.collection(_ns);
+
+          // Create an empty query document to remove all documents
+          bsoncxx::builder::basic::document queryBuilder;
+
+          // Perform the delete operation to clear the collection
+          collection.delete_many(queryBuilder.view());
+
+      }
+      catch (const mongocxx::exception& e)
+      {
+          OS_LOG_ERROR(FAC_SIP, "setUp - MongoDB exception: " << e.what());
+          throw;  // Re-throw for higher-level handling
+      }
   }
 
   void tearDown()
@@ -375,22 +388,35 @@ public:
 
   bool getAllOldBindings(int timeNow, RegDB::Bindings& bindings)
   {
-    mongo::BSONObj query = BSON( RegBinding::expirationTime_fld() << BSON_LESS_THAN(MongoDB::BaseDB::dateFromSecsSinceEpoch((long long)timeNow)));
-    MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-    auto_ptr<mongo::DBClientCursor> pCursor = pConn->get()->query(_databaseName, query);
-    if (pCursor.get() && pCursor->more())
-    {
-      while (pCursor->more())
+      try
       {
-        RegBinding binding(pCursor->next());
-        bindings.push_back(binding);
-      }
-      pConn->done();
-      return bindings.size() > 0;
-    }
+          // Create a MongoDB connection and get the collection
+          MongoDB::MongoConnection connection(_info);
+          mongocxx::collection collection = connection.collection(_ns);
 
-    pConn->done();
-    return false;
+          // Build the query to find old bindings based on expirationTime
+          bsoncxx::builder::basic::document queryBuilder;
+          queryBuilder.append(kvp(std::string(RegBinding::expirationTime_fld()),
+                                  bsoncxx::builder::basic::make_document() << "$lt" << MongoDB::BaseDB::dateFromSecsSinceEpoch(static_cast<long long>(timeNow))));
+
+          // Perform the query to retrieve documents
+          auto cursor = collection.find(queryBuilder.view());
+
+          // Check if any documents were returned and process them
+          for (const auto& doc : cursor)
+          {
+              RegBinding binding(doc);
+              bindings.push_back(binding);
+          }
+
+          // Return true if we found any bindings, otherwise false
+          return !bindings.empty();
+      }
+      catch (const mongocxx::exception& e)
+      {
+          OS_LOG_ERROR(FAC_SIP, "getAllOldBindings - MongoDB exception: " << e.what());
+          return false;  // Return false in case of error
+      }
   }
 };
 

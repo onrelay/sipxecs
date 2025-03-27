@@ -1,20 +1,24 @@
-#include "sipdb/DbHelper.h"
-
-
+#include "sipdb/MongoDB.h"
 #include "sipdb/EntityRecord.h"
 #include "sipdb/EntityDB.h"
+#include "sipdb/DbHelper.h"
 
-#include "os/OsDateTime.h"
+#include <mongocxx/client.hpp>          
+#include <mongocxx/database.hpp>        
+#include <mongocxx/collection.hpp>      
+#include <mongocxx/uri.hpp>             
+#include <mongocxx/options/find.hpp>    
+#include <mongocxx/exception/exception.hpp> 
 
-#include <string>
+#include <bsoncxx/types.hpp>
+#include <bsoncxx/document/view.hpp>
+#include <bsoncxx/json.hpp>    
 
-#include <mongo/util/net/hostandport.h>
-#include <mongo/client/connpool.h>
+#include <os/OsLogger.h>
+#include <os/OsDateTime.h>
 
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 
-const char* pTimeNowMacro                                = "$now";
+const char* pTimeNowMacro = "$now";
 
 
 void DbHelper::printSetElements(std::ostream& strm,
@@ -63,7 +67,7 @@ boost::posix_time::ptime DbHelper::convertSecondsToLocalTime(unsigned int second
 }
 
 void DbHelper::printRegBindingEntry(std::ostream& strm,
-                                    const mongo::BSONObj& bson,
+                                    const bsoncxx::document::view& bson,
                                     int currentNr,
                                     bool multipleLines)
 {
@@ -94,7 +98,7 @@ void DbHelper::printRegBindingEntry(std::ostream& strm,
 }
 
 void DbHelper::printEntityRecordEntry(std::ostream& strm,
-                                      const mongo::BSONObj& bson,
+                                      const bsoncxx::document::view& bson,
                                       int currentNr,
                                       bool multipleLines)
 {
@@ -216,42 +220,43 @@ void DbHelper::printEntityRecordStaticUserLocations(std::ostream& strm,
 }
 
 bool DbHelper::getLogicalOperator(const std::string& logicalOperator,
-                               mongo::Labeler::Label& label)
-{
-  if (logicalOperator == ">")
-  {
-     label = mongo::GT;
-     return true;
-  }
-  else if (logicalOperator == "<")
-  {
-     label = mongo::LT;
-     return true;
-  }
-  else if (logicalOperator == "<=")
-  {
-     label = mongo::LTE;
-     return true;
-  }
-  else if (logicalOperator == ">=")
-  {
-     label = mongo::GTE;
-     return true;
-  }
-  else if (logicalOperator == "!=")
-  {
-     label = mongo::NE;
-     return true;
-  }
-  else if (logicalOperator == "=")
-  {
-     return false;
-  }
+                                  std::string& label) 
+                                  {
+    if (logicalOperator == ">") 
+    {
+        label = "$gt"; // Greater than
+        return true;
+    } 
+    else if (logicalOperator == "<") 
+    {
+        label = "$lt"; // Less than
+        return true;
+    } 
+    else if (logicalOperator == "<=") 
+    {
+        label = "$lte"; // Less than or equal to
+        return true;
+    } 
+    else if (logicalOperator == ">=") 
+    {
+        label = "$gte"; // Greater than or equal to
+        return true;
+    } 
+    else if (logicalOperator == "!=") 
+    {
+        label = "$ne"; // Not equal
+        return true;
+    } 
+    else if (logicalOperator == "=") 
+    {
+        return false; // No operator applied
+    }
 
-  BOOST_THROW_EXCEPTION(DbHelperException() <<
-        DbHelperTagInfo((boost::format("Unknown logical operator %s\n") % logicalOperator).str()));
+    // If the operator is unknown, throw an exception
+    BOOST_THROW_EXCEPTION(DbHelperException() <<
+                          DbHelperTagInfo((boost::format("Unknown logical operator %s\n") % logicalOperator).str()));
 
-  return false;
+    return false; // Unreachable, but ensures no compiler warnings
 }
 
 void DbHelper::extractOperands(const std::string& string,
@@ -300,107 +305,105 @@ void DbHelper::extractOperands(const std::string& string,
     while(false);
 }
 
-void DbHelper::createQuery(mongo::BSONObj& query,
-                             MongoDB::ScopedDbConnectionPtr& pConn,
-                             std::vector<std::string>& whereOptVector,
-                             const std::string& databaseName)
+void DbHelper::createQuery(bsoncxx::builder::basic::document& queryBuilder,
+    MongoDB::MongoConnection& connection,
+    std::vector<std::string>& whereOptVector,
+    const std::string& ns)
 {
-   std::size_t size = whereOptVector.size();
+    std::size_t size = whereOptVector.size();
 
-   if (size > 0)
-   {
-      mongo::BSONObjBuilder queryObjBuilder;
+    if (size > 0)
+    {
+        for (const std::string& whereOpt : whereOptVector)
+        {
+            // Temporary builder for sub-queries
+            bsoncxx::builder::basic::document queryObjBuilderTmp;
 
-      int i = 0;
+            // Call appendRequiredType, which appends to queryObjBuilderTmp
+            appendRequiredType(connection, queryObjBuilderTmp, ns, whereOpt);
 
-      while (i < (int)whereOptVector.size())
-      {
-         // temporary BSONObjBuilder object
-         mongo::BSONObjBuilder queryObjBuilderTmp;
-
-         appendRequiredType(pConn, queryObjBuilderTmp, databaseName, whereOptVector[i]);
-         queryObjBuilder.appendElements(queryObjBuilderTmp.obj());
-         i ++;
-      }
-
-      query = queryObjBuilder.obj();
-   }
-   else
-   {
-      query =  mongo::BSONObj();
-   }
+            // Append the contents of queryObjBuilderTmp to queryBuilder
+            for (const auto& element : queryObjBuilderTmp.view())
+            {
+                queryBuilder.append(bsoncxx::builder::basic::kvp(element.key(), element.get_value()));
+            }
+        }
+    }
 }
 
-void DbHelper::deleteDbEntries(const MongoDB::ConnectionInfo* pConnectionInfo,
-                                 const std::string& databaseName,
-                                 std::vector<std::string>& whereOptVector)
+void DbHelper::deleteDbEntries(const MongoDB::ConnectionInfo& connectionInfo,
+                               const std::string& ns,
+                               std::vector<std::string>& whereOptVector)
 {
-   MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(pConnectionInfo->getConnectionString().toString()));
+    try {
+         // Create a MongoConnection instance with the provided connection info
+         MongoDB::MongoConnection connection(connectionInfo);
 
-   try
-   {
-      mongo::BSONObj query;
-      createQuery(query, pConn, whereOptVector, databaseName);
+        // Access the database and collection
+        auto collection = connection.collection(ns);
 
-      pConn->get()->remove(databaseName,  query);
-   }
-   catch(...)
-   {
-      // catch any exception in order to clean mongo::ScopedDbConnection and rethrow it
-      pConn->done();
-      throw;
-   }
+        // Create the query document
+        bsoncxx::builder::basic::document queryBuilder;
+        createQuery(queryBuilder, connection, whereOptVector, ns);
 
-   pConn->done();
+        // Perform the delete operation
+        auto result = collection.delete_many(queryBuilder.view());
+
+        // Log the result
+        if (result) {
+            OS_LOG_INFO(FAC_ODBC, "Deleted " << result->deleted_count() << " entries from the collection: " << ns);
+        } else {
+            OS_LOG_WARNING(FAC_ODBC, "No entries matched the delete query in collection: " << ns);
+        }
+    } catch (const std::exception& e) {
+        // Log and rethrow any exception
+        OS_LOG_ERROR(FAC_ODBC, "Error while deleting entries from collection: " << ns << " - " << e.what());
+        throw;
+    }
 }
 
 void DbHelper::printDbEntries(std::ostream& strm,
-                                 const MongoDB::ConnectionInfo* pConnectionInfo,
-                                 const std::string& databaseName,
-                                 std::vector<std::string>& whereOptVector,
-                                 const DbType dbType,
-                                 bool multipleLines)
+                              const MongoDB::ConnectionInfo& connectionInfo,
+                              const std::string& ns,
+                              std::vector<std::string>& whereOptVector,
+                              const DbType dbType,
+                              bool multipleLines)
 {
-   MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(pConnectionInfo->getConnectionString().toString()));
+    try {
+         // Create a MongoConnection instance with the provided connection info
+         MongoDB::MongoConnection connection(connectionInfo);
 
-   try
-   {
-      if (dbType == DbTypeRegBinding)
-      {
-         _pFnPrintEntry = &DbHelper::printRegBindingEntry;
-      }
-      else if (dbType == DbTypeEntityRecord)
-      {
-         _pFnPrintEntry = &DbHelper::printEntityRecordEntry;
-      }
-      else
-      {
-        BOOST_THROW_EXCEPTION(DbHelperException() <<
-              DbHelperTagInfo(std::string("Unknown database type")));
-      }
+        // Access the database and collection
+        auto collection = connection.collection(ns);
 
-      mongo::BSONObj query;
-      createQuery(query, pConn, whereOptVector, databaseName);
+        // Set the function pointer for printing based on the database type
+        if (dbType == DbTypeRegBinding) {
+            _pFnPrintEntry = &DbHelper::printRegBindingEntry;
+        } else if (dbType == DbTypeEntityRecord) {
+            _pFnPrintEntry = &DbHelper::printEntityRecordEntry;
+        } else {
+            BOOST_THROW_EXCEPTION(DbHelperException() << 
+                DbHelperTagInfo(std::string("Unknown database type")));
+        }
 
-      int dbEntryNr = 0;
-      std::auto_ptr<mongo::DBClientCursor> pCursor = pConn->get()->query(databaseName,  query);
-      if (pCursor.get() && pCursor->more())
-      {
-         while (pCursor->more())
-         {
-            (this->*_pFnPrintEntry)(strm, pCursor->next(), dbEntryNr, multipleLines);
+        // Create the query document
+        bsoncxx::builder::basic::document queryBuilder;
+        createQuery(queryBuilder, connection, whereOptVector, ns);
+
+        // Execute the query
+        auto cursor = collection.find(queryBuilder.view());
+
+        // Iterate over the query results and print each entry
+        int dbEntryNr = 0;
+        for (const auto& doc : cursor) {
+            (this->*_pFnPrintEntry)(strm, doc, dbEntryNr, multipleLines);
             dbEntryNr++;
-         }
-      }
-   }
-   catch(...)
-   {
-      // catch any exception in order to clean mongo::ScopedDbConnection and rethrow it
-      pConn->done();
-      throw;
-   }
-
-   pConn->done();
+        }
+    } catch (const std::exception& e) {
+        // Log and rethrow any exceptions
+        OS_LOG_ERROR(FAC_ODBC, "Error while printing database entries: " << e.what());
+        throw;
+    }
 }
 
 void DbHelper::expandMacro(std::string& macro)
@@ -424,63 +427,86 @@ void DbHelper::expandMacro(std::string& macro)
 
 std::string DbHelper::getTimeNowMacro()
 {
-   unsigned long timeNow = OsDateTime::getSecsSinceEpoch();
+   std::int64_t timeNow = OsDateTime::getSecsSinceEpoch();
 
    return boost::lexical_cast<std::string>(timeNow);
 }
 
-void DbHelper::appendRequiredType(MongoDB::ScopedDbConnectionPtr& pConn,
-                                    mongo::BSONObjBuilder& queryObjBuilder,
-                                    const std::string& databaseName,
-                                    const std::string& string)
-{
-   mongo::BSONObj bsonObj;
-   std::auto_ptr<mongo::DBClientCursor> pCursor = pConn->get()->query(databaseName, mongo::BSONObj());
-   if (pCursor.get() && pCursor->more())
-   {
-      bsonObj = pCursor->next();
-   }
+void DbHelper::appendRequiredType(MongoDB::MongoConnection& connection,
+                                  bsoncxx::builder::basic::document& queryObjBuilder,
+                                  const std::string& ns,
+                                  const std::string& inputString) {
 
-   std::string key;
-   std::string value;
-   std::string logicalOperator;
+    bsoncxx::document::view bsonObj;
 
-   extractOperands(string, key, logicalOperator, value);
+    // Retrieve the collection from the client
+    mongocxx::collection collection = connection.collection(ns);
 
-   expandMacro(value);
+    // Perform a query to retrieve the first document
+    std::optional<bsoncxx::document::value> cursor = collection.find_one({});
+    if (cursor) {
+        bsonObj = cursor->view();
+    }
 
+    std::string key;
+    std::string value;
+    std::string logicalOperator;
 
-   mongo::Labeler::Label logicalOperatorLabel = mongo::BSIZE;
-   bool found = false;
+    // Extract key, logicalOperator, and value from the input string
+    extractOperands(inputString, key, logicalOperator, value);
 
-   found = getLogicalOperator(logicalOperator, logicalOperatorLabel);
+    // Perform macro expansion on the value
+    expandMacro(value);
 
-   mongo::BSONElement obj = bsonObj[key];
+    // Determine the logical operator to use
+    std::string logicalOperatorLabel;
+    bool found = getLogicalOperator(logicalOperator, logicalOperatorLabel);
 
-   if (mongo::String == obj.type())
-   {
-      found == true ?
-               queryObjBuilder << key << logicalOperatorLabel << value :
-               queryObjBuilder << key << value;
-   }
-   else if (mongo::Bool == obj.type())
-   {
-      found == true ?
-               queryObjBuilder << key << logicalOperatorLabel << boost::lexical_cast<bool>(value) :
-               queryObjBuilder << key << boost::lexical_cast<bool>(value);
-   }
-   else if (mongo::NumberInt == obj.type())
-   {
-      found == true ?
-               queryObjBuilder << key << logicalOperatorLabel << boost::lexical_cast<int>(value) :
-               queryObjBuilder << key << boost::lexical_cast<int>(value);
-   }
-   else
-   {
-      BOOST_THROW_EXCEPTION(DbHelperException() <<
-            DbHelperTagInfo((boost::format("No such type defined: %d\n") % obj.type()).str()));
-   }
+    // Get the BSON element associated with the key
+    auto element = bsonObj[key];
+
+    if (!element) {
+        throw DbHelperException() << DbHelperTagInfo(
+            (boost::format("Key '%s' not found in document\n") % key).str());
+    }
+
+    // Handle different BSON types
+    if (element.type() == bsoncxx::type::k_string) {
+        // Handle string type
+        if (found) {
+            queryObjBuilder.append(bsoncxx::builder::basic::kvp(
+                key, bsoncxx::builder::basic::make_document(
+                         bsoncxx::builder::basic::kvp(logicalOperatorLabel, value))));
+        } else {
+            queryObjBuilder.append(bsoncxx::builder::basic::kvp(key, value));
+        }
+    } else if (element.type() == bsoncxx::type::k_bool) {
+        // Handle boolean type
+        bool boolValue = boost::lexical_cast<bool>(value);
+        if (found) {
+            queryObjBuilder.append(bsoncxx::builder::basic::kvp(
+                key, bsoncxx::builder::basic::make_document(
+                         bsoncxx::builder::basic::kvp(logicalOperatorLabel, boolValue))));
+        } else {
+            queryObjBuilder.append(bsoncxx::builder::basic::kvp(key, boolValue));
+        }
+    } else if (element.type() == bsoncxx::type::k_int32) {
+        // Handle integer type
+        int intValue = boost::lexical_cast<int>(value);
+        if (found) {
+            queryObjBuilder.append(bsoncxx::builder::basic::kvp(
+                key, bsoncxx::builder::basic::make_document(
+                         bsoncxx::builder::basic::kvp(logicalOperatorLabel, intValue))));
+        } else {
+            queryObjBuilder.append(bsoncxx::builder::basic::kvp(key, intValue));
+        }
+    } else {
+        // Throw exception if type is not supported
+        throw DbHelperException()
+            << DbHelperTagInfo((boost::format("No such type defined: %d\n") % static_cast<int>(element.type())).str());
+    }
 }
+
 
 template <class T>
 void DbHelper::printCell(std::ostream& strm, const std::string& cellName, T cellValue, int currentNr, bool multipleLines)

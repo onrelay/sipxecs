@@ -5,8 +5,7 @@
 #include <sipdb/RegExpireThread.h>
 #include <sipdb/MongoDB.h>
 #include <os/OsDateTime.h>
-#include <mongo/util/net/hostandport.h>
-#include <mongo/client/connpool.h>
+#include <bsoncxx/document/view.hpp>
 
 
 using namespace std;
@@ -54,24 +53,30 @@ class RegExpireThreadTest: public CppUnit::TestCase
 
   RegDB* _db;
   const MongoDB::ConnectionInfo _info;
-  const std::string _databaseName;
+  const std::string _ns;
   unsigned long _timeNow;
 public:
-  RegExpireThreadTest() : _info(MongoDB::ConnectionInfo(mongo::ConnectionString(mongo::HostAndPort(gLocalHostAddr)))),
-                          _databaseName(gDatabaseName)
+  RegExpireThreadTest() : _info(MongoDB::ConnectionInfo(std::string(gLocalHostAddr))),
+                          _ns(gDatabaseName)
   {
   }
 
   void setUp()
   {
-    _db = new RegDB(_info, NULL, _databaseName);
-    MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-    //mongo::ScopedDbConnection conn(_info.getConnectionString().toString());
-    pConn->get()->remove(_databaseName, mongo::Query());
-    pConn->done();
+      // Initialize the RegDB object
+      _db = new RegDB(_info, nullptr, _ns);
 
-    _timeNow = OsDateTime::getSecsSinceEpoch();
+      // Create a MongoDB connection and get the collection
+      MongoDB::MongoConnection connection(_info);
+      mongocxx::collection collection = connection.collection(_ns);
+
+      // Remove all documents from the collection
+      collection.delete_many({});  // Equivalent to remove(_ns, mongo::Query())
+
+      // Get the current time in seconds
+      _timeNow = OsDateTime::getSecsSinceEpoch();
   }
+
 
   void tearDown()
   {
@@ -126,23 +131,34 @@ public:
 
   bool getAllOldBindings(int timeNow, RegDB::Bindings& bindings)
   {
-    mongo::BSONObj query = BSON(RegBinding::expirationTime_fld() << BSON_LESS_THAN(MongoDB::BaseDB::dateFromSecsSinceEpoch((long long)timeNow)));
-    MongoDB::ScopedDbConnectionPtr pConn(mongoMod::ScopedDbConnection::getScopedDbConnection(_info.getConnectionString().toString()));
-    auto_ptr<mongo::DBClientCursor> pCursor = pConn->get()->query(_databaseName, query);
-    if (pCursor.get() && pCursor->more())
-    {
-      while (pCursor->more())
+      // Create the query to find documents with expirationTime less than the current time
+      bsoncxx::document::view query = bsoncxx::builder::stream::document{}
+          << RegBinding::expirationTime_fld() 
+          << bsoncxx::builder::stream::open_document
+          << "$lt" << MongoDB::BaseDB::dateFromSecsSinceEpoch(static_cast<long long>(timeNow))
+          << bsoncxx::builder::stream::close_document
+          << bsoncxx::builder::stream::finalize;
+
+      // Create the MongoDB connection
+      MongoDB::MongoConnection connection(_info);
+      mongocxx::collection collection = connection.collection(_ns);
+
+      // Query the collection for documents matching the criteria
+      auto cursor = collection.find(query);
+
+      // Check if the cursor has documents and process them
+      if (cursor.begin() != cursor.end())
       {
-        RegBinding binding(pCursor->next());
-        bindings.push_back(binding);
+          for (auto&& doc : cursor)
+          {
+              RegBinding binding(doc);
+              bindings.push_back(binding);
+          }
+
+          return true;
       }
 
-      pConn->done();
-      return true;
-    }
-
-    pConn->done();
-    return false;
+      return false;
   }
 };
 

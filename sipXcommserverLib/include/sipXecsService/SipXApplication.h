@@ -2,7 +2,7 @@
 #define _SIPXECS_APPLICATION_H_
 
 // APPLICATION INCLUDES
-#include <mongo/logger/message_log_domain.h>
+#include <memory>
 
 #include <os/OsServiceOptions.h>
 #include <os/OsFS.h>
@@ -13,8 +13,14 @@
 #include <os/OsLoggerHelper.h>
 #include <os/OsMsgQ.h>
 #include <utl/Instrumentation.h>
+
 #include <sipXecsService/SipXecsService.h>
 #include <sipXecsService/daemon.h>
+
+#include <mongocxx/instance.hpp> 
+#include <mongocxx/logger.hpp>
+#include <bsoncxx/stdx/string_view.hpp>
+
 
 struct SipXApplicationData
 {
@@ -153,16 +159,17 @@ class SipXApplication
 
     // The purpose of this class is to register a log callback in 
     // Mongo Client Driver
-    class MongoClientLogAppender: public mongo::logger::MessageLogDomain::EventAppender
-    {
-    public:
-      MongoClientLogAppender() {}
-      virtual ~MongoClientLogAppender() {}
+    class MongoClientLogHandler : public mongocxx::logger {
+      public:
+          MongoClientLogHandler() = default;
 
-      /**
-       * Performs the actual logging for Mongo Client Driver messages
-       */
-      virtual mongo::Status append(const mongo::logger::MessageLogDomain::EventAppender::Event& event);
+          mongocxx::log_level convertToMongoLogSeverity(int priority);
+
+          int convertFromMongoLogSeverity(mongocxx::log_level severity);
+      
+          void operator()(mongocxx::log_level level, 
+            bsoncxx::stdx::string_view domain, 
+            bsoncxx::stdx::string_view message) noexcept override;
     };
 
     SipXApplication();                                       // SipXApplication constructor
@@ -238,7 +245,7 @@ class SipXApplication
       */
     void handleSIGUSR2();
 
-    void enableMongoDriverLogging() const;
+    void enableMongoDriverLogging();
 
     OsServiceOptions* _pOsServiceOptions; // Configuration Database (used for OsSysLog)
     SipXApplicationData _appData;       // SipXApplicationData structure
@@ -249,6 +256,8 @@ class SipXApplication
     bool _autoDeleteConfig;
     boost::scoped_ptr<SignalTask> _signalTask;
     int signalHandlerShutdownSignal;
+    std::unique_ptr<MongoClientLogHandler> _clientLogger;
+    std::unique_ptr<mongocxx::instance> _clientInstance;
   };
 
 inline SipXApplication& SipXApplication::instance()

@@ -1,13 +1,11 @@
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestCase.h>
+
 #include <sipdb/MongoDB.h>
-#include <mongo/client/dbclient.h>
-#include <mongo/client/connpool.h>
 
 #include "sipXecsService/SipXApplication.h"
-#include "os/OsServiceOptions.h"
 
-#include <boost/format.hpp>
+#include "os/OsServiceOptions.h"
 
 using namespace std;
 
