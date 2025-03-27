@@ -11,7 +11,7 @@ Url: http://www.sipfoundry.org/sipXtools
 
 BuildRequires: automake
 BuildRequires: nsis
-BuildRequires: java-devel >= 1.7
+BuildRequires: java-1.8.0-openjdk-devel
 BuildRequires: sipxcommons >= %version
 
 Source: %name-%version.tar.gz
@@ -29,6 +29,7 @@ General utilities for sipXpbx system
 %setup -q
 
 %build
+
 %configure @SIPX_RPM_CONFIGURE_OPTIONS@
 cp config.log %name.configlog
 make %{_smp_mflags} all
