@@ -1,99 +1,106 @@
-# for better compatibility with SCL spec file
 %global pkg_name mongo-cxx-driver
 
 Name:           mongo-cxx-driver
-Version:        2.6.7
-Release:        4%{?dist}
-Summary:        The mongoDb C++ client driver library and its include files
+Version:        4.0.0
+Release:        1%{?dist}
+Summary:        The MongoDB C++ driver library and its include files
 Group:          Development/Libraries
-License:        AGPLv3 and zlib and ASL 2.0
-URL:          	http://www.mongodb.org
-Source0:        https://github.com/mongodb/%{pkg_name}/archive/%{pkg_name}-legacy-0.0-26compat-%{version}.tar.gz
+License:        Apache 2.0
+URL:            https://github.com/mongodb/mongo-cxx-driver
+Source0:        https://github.com/mongodb/mongo-cxx-driver/releases/download/r%{version}/mongo-cxx-driver-r%{version}.tar.gz
 
-## Patch 1 - http://track.sipfoundry.org/browse/XX-11578
-Patch1:		    mongo-cxx-driver-2.6.7-logger.patch
+# do not build a debuginfo package
+%define debug_package %{nil}
 
-## Patch 2 - http://track.sipfoundry.org/browse/XX-11590 
-Patch2:		    mongo-cxx-driver-2.6.7-maxTimeMS.patch
-
-Patch3:		    mongo-cxx-driver-2.6.7-UC-4104.patch
-
-BuildRequires:  scons
-BuildRequires:  openssl-devel
-BuildRequires:  boost-devel
-
-# Mongodb must run on a little-endian CPU (see bug #630898)
-ExcludeArch:    ppc ppc64 %{sparc} s390 s390x
-
-Provides: libmongodb = %{version}-%{release}
-Obsoletes: libmongodb
+BuildRequires: cmake
+BuildRequires: gcc-c++
+BuildRequires: openssl-devel
 
 %description
-This package provides the shared library for the MongoDB legacy C++ Driver.
+This package provides the shared library for the MongoDB C++ driver.
 
 %package -n %{pkg_name}-devel
-Summary:        MongoDB header files
+Summary:        MongoDB C++ driver header files
 Group:          Development/Libraries
 Requires:       %{name}%{?_isa} = %{version}-%{release}
 
-Provides: libmongodb-devel = 2.6.7-%{release}
+Provides: libmongodb-devel = %{version}-%{release}
 Obsoletes: libmongodb-devel
 
 %description -n %{pkg_name}-devel
-This package provides the header files for MongoDB legacy C++ driver.
+This package provides the header files for the MongoDB C++ driver.
 
 %prep
-%setup -q -n %{name}-legacy-0.0-26compat-%{version}
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-
-# CRLF -> LF
-sed -i 's/\r//' README.md
-
-# Put lib dir in correct place
-# https://jira.mongodb.org/browse/SERVER-10049
-sed -i -e "s@\$INSTALL_DIR/lib@\$INSTALL_DIR/%{_lib}@g" src/SConscript.client
+%setup -D -n mongo-cxx-driver-r%{version}
+# rm -rf %{buildroot}%{_libdir}/libmongocxx*
+# rm -rf %{buildroot}%{_libdir}/libbsoncxx*
+# rm -rf %{buildroot}%{_libdir}/cmake/mongocxx-*
+# rm -rf %{buildroot}%{_libdir}/cmake/bsoncxx-*
+# rm -rf %{buildroot}%{_includedir}/mongocxx
+# rm -rf %{buildroot}%{_includedir}/bsoncxx
+# rm -rf %{buildroot}%{_libdir}/pkgconfig/libmongocxx.pc
+# rm -rf %{buildroot}%{_libdir}/pkgconfig/libbsoncxx.pc
 
 %build
-scons mongoclient \
-        %{?_smp_mflags} \
-        --sharedclient \
-        --use-system-all \
-        --prefix=%{buildroot}%{_prefix} \
-        --extrapath=%{_prefix} \
-        --usev8 \
-        --ssl \
-        --full
+cmake -S . -B build \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_CXX_STANDARD=17 \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_INSTALL_PREFIX=%{_prefix} \
+    -DCMAKE_PREFIX_PATH=%{_prefix} \
+    -DNEED_DOWNLOAD_C_DRIVER=FALSE \
+    -DCMAKE_INSTALL_LIBDIR=%{_libdir}
+    
+cmake --build build -- %{_smp_mflags}
 
 %install
-scons install-mongoclient \
-        %{?_smp_mflags} \
-        --sharedclient \
-        --use-system-all \
-        --prefix=%{buildroot}%{_prefix} \
-        --extrapath=%{_prefix} \
-        --usev8 \
-        --ssl \
-        --full 
-rm -f %{buildroot}%{_libdir}/libmongoclient.a
-rm -f %{buildroot}%{_libdir}/../lib/libmongoclient.a
+rm -rf %{buildroot}
 
+# Create necessary directories
+mkdir -p %{buildroot}%{_libdir}
+mkdir -p %{buildroot}%{_includedir}/bsoncxx/config
+mkdir -p %{buildroot}%{_includedir}/mongocxx/config
+mkdir -p %{buildroot}%{_libdir}/cmake/bsoncxx
+mkdir -p %{buildroot}%{_libdir}/cmake/mongocxx
+mkdir -p %{buildroot}%{_libdir}/pkgconfig
 
-%files
-%doc README.md APACHE-2.0.txt
-%{_libdir}/libmongoclient.so
+# Copy shared libraries
+cp -p build/src/mongocxx/libmongocxx.so* %{buildroot}%{_libdir}/
+cp -p build/src/bsoncxx/libbsoncxx.so* %{buildroot}%{_libdir}/
+
+# Copy header files
+cp -pr src/bsoncxx/include/bsoncxx/*.hpp %{buildroot}%{_includedir}/bsoncxx/
+cp -pr src/bsoncxx/include/bsoncxx/v_noabi/bsoncxx/* %{buildroot}%{_includedir}/bsoncxx/
+cp -pr src/mongocxx/include/mongocxx/v_noabi/mongocxx/* %{buildroot}%{_includedir}/mongocxx/
+cp -pr build/src/bsoncxx/lib/bsoncxx/v_noabi/bsoncxx/config/*.hpp %{buildroot}%{_includedir}/bsoncxx/config
+cp -pr build/src/mongocxx/lib/mongocxx/v_noabi/mongocxx/config/*.hpp %{buildroot}%{_includedir}/mongocxx/config
+
+# Copy CMake configuration files
+cp -pr build/src/bsoncxx/*.cmake %{buildroot}%{_libdir}/cmake/bsoncxx/
+cp -pr build/src/mongocxx/*.cmake %{buildroot}%{_libdir}/cmake/mongocxx/
+
+# Copy pkgconfig files
+cp -p build/src/bsoncxx/cmake/libbsoncxx.pc %{buildroot}%{_libdir}/pkgconfig/
+cp -p build/src/mongocxx/cmake/libmongocxx.pc %{buildroot}%{_libdir}/pkgconfig/
+
+%files -n %{pkg_name}
+%{_libdir}/libmongocxx.so
+%{_libdir}/libmongocxx.so.%{version}
+%{_libdir}/libmongocxx.so._noabi
+%{_libdir}/libbsoncxx.so
+%{_libdir}/libbsoncxx.so.%{version}
+%{_libdir}/libbsoncxx.so._noabi
+# %doc %{_datadir}/mongo-cxx-driver/*
 
 %files -n %{pkg_name}-devel
-%{_includedir}
-%{_libdir}/libmongoclient.so
+%{_libdir}/cmake/bsoncxx/*
+%{_libdir}/cmake/mongocxx/*
+%{_libdir}/pkgconfig/libmongocxx.pc
+%{_libdir}/pkgconfig/libbsoncxx.pc
+%{_includedir}/bsoncxx/**
+%{_includedir}/mongocxx/**
 
 %changelog
-* Wed Feb 18 2015 Ionut Oancea <ioancea@ezuce.com> - 2.6.7-3
-- Added 
-
- for maxTimeMS: http://track.sipfoundry.org/browse/XX-11590
-
-* Tue Feb 03 2015 Ionut Oancea <ioancea@ezuce.com> - 2.6.7-2
-- Added patch for logging: http://track.sipfoundry.org/browse/XX-11578
-
+* Mon Dec 16 2024 Your Name <your_email@example.com> - 4.0.0-1
+- Updated to MongoDB C++ driver version 4.0.0
+- Converted to CMake-based build
