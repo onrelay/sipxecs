@@ -31,7 +31,8 @@ authplugins_libsipxcustomcallerid_la_LDFLAGS = \
 
 authplugins_libsipxcustomcallerid_la_LIBADD = \
 	@SIPXCOMMSERVER_LIBS@ \
-    -lmongoclient \
+    -lmongocxx \
+	-lbsoncxx \
     -lboost_system
 
 authplugins_libsipxcustomcallerid_la_SOURCES = \

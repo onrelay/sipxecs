@@ -17,7 +17,7 @@
 #include "sipdb/MongoDB.h"
 #include <sipxproxy/SipRouter.h>
 #include <boost/shared_ptr.hpp>
-#include <mongo/client/connpool.h>
+#include <bsoncxx/document/view.hpp>
 #include <CallerID.h>
 
 extern "C" AuthPlugin* getAuthPlugin(const UtlString& pluginName)
@@ -106,22 +106,34 @@ std::string CallerMongoDB::getCallerName(const std::string& number) {
 }
 
 std::string CallerMongoDB::getRewrite(const std::string& number, const std::string& collection) {
-    
-  MongoDB::ScopedDbConnectionPtr conn(mongoMod::ScopedDbConnection::getScopedDbConnection(_connectionInfo.getConnectionString().toString()));
 
-  mongo::Query query = QUERY("from" << number);
-	std::string ns_col(_ns);
-	ns_col.append(".").append(collection);
+    // Create a MongoDB connection
+    MongoDB::MongoConnection connection(_connectionInfo);
+    mongocxx::collection coll = connection.collection(_ns + "." + collection);
 
-	mongo::BSONObj r = conn->get()->findOne(ns_col, query);
-	conn->done();
+    // Build the query
+    bsoncxx::builder::basic::document queryBuilder;
+    queryBuilder.append(bsoncxx::builder::basic::kvp(std::string("from"), number));
 
-	std::string out = r.toString();
-	if (!r.isEmpty() && r.hasField("to")) {
-		return r.getStringField("to");
+	mongocxx::options::find findOptions;
+    findOptions.max_time(std::chrono::milliseconds(_connectionInfo.getReadQueryTimeoutMs()));
+
+    // Fetch the document
+    std::optional<bsoncxx::document::value> result = coll.find_one(queryBuilder.view(), findOptions );
+
+    // If no result found, return empty string
+    if (!result) {
+        return std::string();
+    }
+
+    auto doc = result.value();
+	auto toElement = doc["to"];
+	if( toElement ) {
+		return std::string(toElement.get_string().value);
 	}
+	
 
-  return std::string();
+    return std::string();
 }
 
 void CallerID::announceAssociatedSipRouter(SipRouter* sipRouter)

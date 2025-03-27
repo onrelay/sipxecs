@@ -15,14 +15,13 @@
  */
 #include <os/OsLogger.h>
 #include <sipxproxy/SipRouter.h>
-#include <mongo/client/connpool.h>
-#include <mongo/client/dbclient.h>
+#include <bsoncxx/document/view.hpp>
 #include <CallerID.h>
 
 #include <cppunit/TestCase.h>
 #include <cppunit/extensions/HelperMacros.h>
 
-const mongo::ConnectionString connUrl(std::string("localhost"));
+const mongocxx::uri connUrl("localhost");
 const std::string testNs("test");
 
 class CallerMongoDBTest: public CppUnit::TestCase {
@@ -54,16 +53,32 @@ public:
 		CPPUNIT_ASSERT_EQUAL(std::string("turkey"), db->getCallerName("chicken"));
 	}
 
-	void insertTestData(const std::string& collection, const char* number, const char * name) {
-		boost::scoped_ptr<mongo::ScopedDbConnection> conn(mongo::ScopedDbConnection::getScopedDbConnection(connUrl.toString()));
-		std::string where = testNs + "." + collection;
-		conn->remove(where, mongo::Query());
-		mongo::BSONObj data = BSON(
-		    		"from" << std::string(number) <<
-		    		"to" << std::string(name));
-		conn->insert(where, data);
-		conn->done();
-	}
+    void insertTestData(const std::string& collection, const char* number, const char* name) {
+        try {
+            // Create a connection using MongoConnection with connUrl
+            MongoDB::MongoConnection conn(connUrl);
+
+            std::string ns = testNs + "." + collection;
+            
+            // Access the collection
+            auto coll = conn.collection(ns);
+            
+            // Prepare the data to insert
+            bsoncxx::document::value data = bsoncxx::builder::stream::document{}
+                << "from" << std::string(number)
+                << "to" << std::string(name)
+                << bsoncxx::builder::stream::finalize();
+            
+            // Remove existing data if needed (equivalent to the `remove` operation)
+            coll.delete_many({});
+            
+            // Insert the new data
+            coll.insert_one(data.view());
+            
+        } catch (const mongocxx::exception& e) {
+            std::cerr << "MongoDB Error: " << e.what() << std::endl;
+        }
+    }
 
 };
 CPPUNIT_TEST_SUITE_REGISTRATION(CallerMongoDBTest);
