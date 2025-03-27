@@ -17,6 +17,6 @@ PUB_PACKAGES = \
 	packages/sipxconfig/sipxconfig.dart
 
 pub-get $(PUB_PACKAGES) :
-	cd $(srcdir); $(DART_HOME)/bin/pub get
+	cd $(srcdir); $(DART_HOME)/bin/dart pub get
 
 install-data-hook : $(PUB_PACKAGES)

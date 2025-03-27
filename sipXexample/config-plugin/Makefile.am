@@ -45,7 +45,7 @@ $(addprefix $(JAVAROOT)/,$(DART_PKGS)) : $(DART_PKGS)
 
 $(addprefix $(JAVAROOT)/,$(DART_SRC:.dart=.js)) : $(JAVAROOT)/%.js : %.dart $(wildcard $(top_srcdir)/packages/*/*.dart)
 	test -d $(dir $@) || mkdir -p $(dir $@)
-	$(DART_HOME)/bin/dart2js -o$@ $<
+	$(DART_HOME)/bin/dart compile js -o$@ $<
 
 
 # style checks java source code coding style agains proper sipxecs conforming. Not nec.

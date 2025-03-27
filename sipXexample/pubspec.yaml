@@ -1,4 +1,7 @@
 name: sipXexample
 description: A sample application
 dependencies:
-  browser: any
+  browser: ^0.10.0
+
+environment:
+  sdk: '>=2.12.0 <4.0.0'
