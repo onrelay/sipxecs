@@ -21,14 +21,14 @@
 // custom behavior was to exit, custom one is to abort
 inline void customMongoSocketExceptionHandling(std::exception& e)
 {
-  catch_global_print(static_cast<mongo::DBException&>(e).toString().c_str());
+  catch_global_print(static_cast<mongocxx::exception&>(e).what());
   std::abort();
 }
 
 //custom mongo connect exception handling : log & abort
 inline void customMongoConnectExceptionHandling(std::exception& e)
 {
-  catch_global_print(static_cast<mongo::DBException&>(e).toString().c_str());
+  catch_global_print(static_cast<mongocxx::exception&>(e).what());
   std::abort();
 }
 

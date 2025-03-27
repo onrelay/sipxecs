@@ -238,7 +238,7 @@ StatusServer::handleMessage( OsMsg& eventMessage )
     }
   }
 #ifdef MONGO_assert
-  catch (mongo::DBException& e)
+  catch (mongocxx::exception& e)
   {
     errorString = "Proxy - Mongo DB Exception";
     OS_LOG_ERROR( FAC_SIP, "SipRouter::handleMessage() Exception: "

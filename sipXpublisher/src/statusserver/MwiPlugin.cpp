@@ -299,7 +299,7 @@ void MwiPlugin::handleMwiData(MwiPluginQueue::MwiData& mwiData)
       }
   }
 #ifdef MONGO_assert
-  catch (mongo::DBException& e)
+  catch (mongocxx::exception& e)
   {
     OS_LOG_ERROR( FAC_SIP, "SipRouter::handleMessage() Exception: "
              << e.what() );

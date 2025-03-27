@@ -7,7 +7,8 @@ INCLUDES = \
 bin_PROGRAMS = sipstatus
 
 sipstatus_LDADD = \
-	-lmongoclient \
+	-lmongocxx \
+-lbsoncxx \
 	@SIPXCOMMSERVER_LIBS@ \
 	-lboost_system \
 	-lboost_thread \

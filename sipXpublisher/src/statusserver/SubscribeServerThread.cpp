@@ -508,7 +508,7 @@ SubscribeServerThread::handleMessage(OsMsg& eventMessage)
     return TRUE;
   }
 #ifdef MONGO_assert
-  catch (mongo::DBException& e)
+  catch (mongocxx::exception& e)
   {
     errorString = "MWI - Mongo DB Exception";
     OS_LOG_ERROR( FAC_SIP, "SubscribeServerThread::handleMessage() Exception: "
