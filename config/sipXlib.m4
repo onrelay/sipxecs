@@ -827,8 +827,7 @@ AC_DEFUN([SFAC_LIB_OSS_CORE],
     fi 
 
     OSSCORELIB=$foundpath
-    LIBRE="${prefix}/opt/ossapp/librem/lib/librem.a ${prefix}/opt/ossapp/libre/lib/libre.a"
 
-    AC_SUBST(OSSCORE_LIBS,["$OSSCORELIB/liboss_core.la $OSSCORELIB/liboss_carp.la $LIBRE"])
+    AC_SUBST(OSSCORE_LIBS,["$OSSCORELIB/liboss_core.la"])
 
 ]) # SFAC_LIB_OSS_CORE

@@ -118,6 +118,7 @@ $(sipx:=.srpm) : %.srpm : %.dist $(MOCK_INIT_TEST) $(MOCK_RESULTS_DIR)
 	  --no-clean \
 	  --no-cleanup-after \
 	  --rebuild \
+	  --enable-network \
 	  $($(PROJ)_RPM_DEFS) \
 	  $(MOCK_SRPM_DIR)/$($(PROJ)_SRPM) || \
 	  (tail -100 $(MOCK_RESULTS_DIR)/build.log ; false)
