@@ -41,9 +41,9 @@ import 'dart:convert';
  *   var url = api.url("rest/myApi/", "my-dummy-data.json");
  */
 class Api {
-  bool test_flag;
+  late bool test_flag;
   
-  Api({bool test: false}) {
+  Api({bool test = false}) {
     this.test_flag = test;
   }
   
@@ -67,7 +67,7 @@ class Api {
   String baseUrl() {
     if (isDartium()) {
       var baseUrl = new RegExp(r"(.*/context)");
-      return baseUrl.stringMatch(window.location.href);
+      return baseUrl.stringMatch(window.location.href)!;
     }
     return "/sipxconfig";
   }
@@ -86,7 +86,7 @@ class Api {
  * Optional second arg is a list of parameters to insert into string and
  * replace {N} tokens where N is integer.
  */
-String getString(String rcId, [List<String> args]) {
+String getString(String rcId, [List<String>? args]) {
   if (strings == null) {
     _loadStrings();
   }
@@ -97,23 +97,23 @@ String getString(String rcId, [List<String> args]) {
     var idAndArgs = rcId.split(" ");
     return getString(idAndArgs[0], idAndArgs.sublist(1));
   }
-  String rc = strings[rcId];
+  String? rc = strings![rcId];
   if (rc == null) {
     return rcId;
   }
   if (args != null) {
     for (var i = 0; i < args.length; i++) {
-      rc = rc.replaceAll("{$i}", args[i]);        
+      rc = rc!.replaceAll("{$i}", args[i]);        
     }    
   }
-  return rc;
+  return rc!;
 }
 
-Map<String,String> strings;
+Map<String,String>? strings;
 _loadStrings() {
   strings = new HashMap<String,String>();
-  for (SpanElement e in querySelector("#rc").children) {
-    strings[e.attributes["key"]] = e.text;    
+  for (var e in querySelector("#rc")!.children) {
+    strings![e.attributes["key"]!] = (e as SpanElement).text!;    
   }
 }
 
@@ -149,20 +149,20 @@ _loadStrings() {
  *  
  * Example dart code
  *  main() {
- *    new Tabs(querySelector("#mytabs"), ["foo", "bar"]);
+ *    new Tabs(querySelector("#mytabs")!, ["foo", "bar"]);
  *  }
  */
 class Tabs {
   Element root;
-  List<String> ids;
-  TabCallback tabChangeListener;
-  String persistentStateId;
+  late List<String> ids;
+  TabCallback? tabChangeListener;
+  String? persistentStateId;
   
   Tabs(Element this.root, Iterable<String> ids, [this.tabChangeListener]) {
     this.ids = ids.toList(growable: false);
     for (String id in this.ids) {
       var linkId = "#${id}-tab-link";
-      AnchorElement link = root.querySelector(linkId);
+      AnchorElement link = root.querySelector(linkId) as AnchorElement;
       if (link == null) {
         print("ERROR: Cannot find tab link ${linkId}");
         continue;
@@ -178,7 +178,7 @@ class Tabs {
     if (tabChangeListener != null) {
       // should call tabs.showTabContent(selectedId) if listener
       // wants to change body too.
-      tabChangeListener(this, selectedId);
+      tabChangeListener!(this, selectedId);
     } else {
       showTabContent(selectedId);
     }
@@ -188,7 +188,7 @@ class Tabs {
   highlightActiveTab(String selectedId) {
     for (String id in this.ids) {
       var tabId = "${id}-tab";
-      Element tab = root.querySelector("#${tabId}");
+      Element? tab = root.querySelector("#${tabId}");
       if (tab == null) {
         print("ERROR: Cannot find tab with id ${tabId}");
       } else {
@@ -203,7 +203,7 @@ class Tabs {
   
   showTabContent(String selectedId) {
     for (String id in this.ids) {
-      Element tabContent = querySelector("#${id}");
+      Element tabContent = querySelector("#${id}")!;
       if (tabContent == null) {
         print("ERROR: Cannot find tab ${id}");
       } else {
@@ -218,7 +218,7 @@ class Tabs {
   
   persistActiveTabId(String tabId) {
     if (persistentStateId != null) {
-      window.sessionStorage[persistentStateId] = tabId;      
+      window.sessionStorage[persistentStateId!] = tabId;      
     }
   }
   
@@ -226,7 +226,7 @@ class Tabs {
     persistentStateId = persistenceId;
     var store = window.sessionStorage;
     if (window.sessionStorage.containsKey(persistentStateId)) {      
-      changeTab(store[persistentStateId]);      
+      changeTab(store[persistentStateId]!);      
     }
   }
 }
@@ -243,12 +243,12 @@ typedef void TabCallback(Tabs tabs, String id);
  * 3.) Restart timer of page is refreshed
  */
 class Refresher {
-  CheckboxInputElement on;
+  late CheckboxInputElement on;
   int refreshRate = 30;
-  RefreshCallback listener;
-  Timer timer;
+  RefreshCallback? listener;
+  Timer? timer;
   
-  Refresher(Element parent, ButtonElement button, [void listener()]) {
+  Refresher(Element parent, ButtonElement button, [void Function()? listener]) {
     this.listener = listener;
     on = new CheckboxInputElement();
     on.onChange.listen((e) {
@@ -266,7 +266,7 @@ class Refresher {
     refreshRateElem.size = 2;
     refreshRateElem.value = refreshRate.toString();
     refreshRateElem.onChange.listen((e) {
-      refreshRate = int.parse(refreshRateElem.value);
+      refreshRate = int.parse(refreshRateElem.value!);
       conditionalStart();
     });
     parent.children.add(on);
@@ -284,7 +284,7 @@ class Refresher {
     try {
       stop();
       if (listener != null) {
-        listener();
+        listener!();
       }
     } finally {
       conditionalStart();
@@ -293,16 +293,16 @@ class Refresher {
   
   void stop() {
     if (timer != null) {
-      timer.cancel();
+      timer!.cancel();
     }      
   }
   
   void conditionalStart() {
     stop();
-    if (on.checked) {
+    if (on!.checked!) {
       timer = new Timer.periodic(new Duration(seconds: refreshRate), (e) {
         if (listener != null) {                                                                            
-          listener();
+          listener!();
         }
       });
     }
@@ -317,11 +317,11 @@ typedef void RefreshCallback();
  * error, call given listener.
  */
 class DataLoader {
-  UserMessage msg;
-  DataLoaderCallback listener;
+  late UserMessage msg;
+  late DataLoaderCallback listener;
   bool confirmErrors;
-  
-  DataLoader(UserMessage msg, void listener(String), [bool this.confirmErrors = false]) {
+
+  DataLoader(this.msg, this.listener, [this.confirmErrors = false]) {
     this.msg = msg;
     this.listener = listener;
   }
@@ -329,7 +329,7 @@ class DataLoader {
   void load(url) {
     print("loading data");
     Future<String> request = HttpRequest.getString(url);
-    request.then(this.listener, onError: (e) {
+    request.then(this.listener!, onError: (e) {
       checkResponse(msg, e.currentTarget, confirmErrors);
     });      
   }
@@ -338,9 +338,9 @@ class DataLoader {
     if (request.status == 200) {
       return true;
     }
-    String userError;
+    String? userError;
     try {
-      userError = JSON.decode(request.responseText)['error'];
+      userError = jsonDecode(request.responseText!)['error'];
     } catch(notJson) {      
     }
     if (userError == null) {
@@ -351,9 +351,9 @@ class DataLoader {
       }
     }
     if (confirmErrors) {
-      msg.errorConfirm(userError);
+      msg.errorConfirm(userError!);
     } else {
-      msg.error(userError);          
+      msg.error(userError!);          
     }
     return false;
   }
@@ -379,8 +379,8 @@ typedef void DataLoaderCallback(String data);
  * }
  */
 class UserMessage {
-  Element msg;
-  Element close;
+  late Element msg;
+  late Element close;
   bool confirmError = false;
   UserMessage(Element parent) {    
     msg = new SpanElement();
@@ -437,7 +437,7 @@ class UserMessage {
 }
 
 class SettingEditor {
-  Map<String,Object> settings;
+  Map<String,Object> settings = new Map<String,Object>();
   TableSectionElement dom;
   
   SettingEditor(TableSectionElement this.dom) {    
@@ -447,14 +447,14 @@ class SettingEditor {
     var meta = new Map<String, Object>();  
     for (InputElement e in dom.querySelectorAll("input")) {
       if (e.type == 'checkbox') {
-        var trueFalse = e.value.split('~');
-        if (e.checked) {
+        var trueFalse = e.value!.split('~');
+        if (e!.checked!) {
           meta[e.id] = trueFalse[0];          
         } else {
           meta[e.id] = trueFalse[1];                    
         }
       } else {
-        meta[e.id] = e.value;
+        meta[e.id] = e!.value!;
       }
     }
     return meta;    
@@ -474,7 +474,7 @@ class SettingEditor {
   }
   
   visit(String path, Map<String, Object> setting) {
-    Map<String, String> type = setting['type'];
+    Map<String, String> type = setting['type'] as Map<String, String>;
     if (type == null) {
       print("ERR : Missing type");
       return;
@@ -493,7 +493,7 @@ class SettingEditor {
     <tr>
       <td colspan="2">
         <h3>${setting['label']}</h3>
-        ${toStr(setting['description'])}        
+        ${setting['description'] != null ? toStr(setting['description']!) : ""}        
       </td>
     </tr>
   </tbody>
@@ -507,7 +507,7 @@ class SettingEditor {
 
   visitSetting(String path, Map<String, String> type, Map<String, Object> setting) {
     String html = '';
-    String defaultValue = setting['default']; 
+    String? defaultValue = setting['default'] as String; 
     switch(type['name']) {
       case 'boolean':
         var checked = (setting['value'] == type['trueValue'] ? "checked" : "");
@@ -519,7 +519,7 @@ class SettingEditor {
         if (type['password'] as bool) {
           inputType = 'password';
         }
-        String value = setting['value'] != null ? setting['value'] : "";
+        String value = setting['value'] != null ? setting['value']! as String: "";
         html = '''<input type="${inputType}" maxlength="${type['maxLen']}" id="${path}" value="${value}"/>''';
         break;
       default:
@@ -549,7 +549,7 @@ class SettingEditor {
     <tr>
       <td></td>
       <td colspan="2">
-        <span class="settingDescription">${toStr(setting['description'])}</span>
+        <span class="settingDescription">${setting['description'] != null ? toStr(setting['description']!) : ""}</span>
       </td>
     </tr>
   </tbody>

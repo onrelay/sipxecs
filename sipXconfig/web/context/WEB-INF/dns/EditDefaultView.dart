@@ -1,6 +1,6 @@
 import 'dart:html';
 import 'dart:convert';
-import 'package:sipxconfig/sipxconfig.dart';
+import './packages/sipxconfig/sipxconfig.dart';
 
 var api = new Api(test : false);
 
@@ -9,15 +9,15 @@ main() {
 }
 
 class DnsDefaultViewEditor {
-  var msg = new UserMessage(querySelector("#message"));
-  DataLoader loader;
+  var msg = new UserMessage(querySelector("#message")!);
+  late DataLoader loader;
   
   DnsDefaultViewEditor() {
-    querySelector("#ok").onClick.listen(ok);
-    querySelector("#apply").onClick.listen(apply);
-    querySelector("#cancel").onClick.listen(cancel);
+    querySelector("#ok")!.onClick.listen(ok);
+    querySelector("#apply")!.onClick.listen(apply);
+    querySelector("#cancel")!.onClick.listen(cancel);
 
-    querySelector("#customRecordsIdsRow").onClick.listen(loadPreview);      
+    querySelector("#customRecordsIdsRow")!.onClick.listen(loadPreview);      
     loader = new DataLoader(this.msg, loadForm);    
     load();
   }
@@ -35,7 +35,7 @@ class DnsDefaultViewEditor {
   }
   
   loadPreview([e]) {
-    var elem = querySelector("#preview");
+    var elem = querySelector("#preview")!;
     if (api.test) {
       elem.text = 'preview in test mode';
       return;
@@ -44,8 +44,8 @@ class DnsDefaultViewEditor {
     HttpRequest req = new HttpRequest();
     req.open('POST', api.url("rest/dnsDefaultPreview"));
     req.setRequestHeader("Content-Type", "application/json");
-    print(JSON.encode(meta)); 
-    req.send(JSON.encode(meta));   
+    print(jsonEncode(meta)); 
+    req.send(jsonEncode(meta));   
     req.onLoad.listen((e) {
       if (DataLoader.checkResponse(msg, req)) {
         elem.text = req.responseText;
@@ -65,7 +65,7 @@ class DnsDefaultViewEditor {
     method = 'PUT';            
     req.open(method, api.url("rest/dnsDefaultView"));
     req.setRequestHeader("Content-Type", "application/json"); 
-    req.send(JSON.encode(meta));
+    req.send(jsonEncode(meta));
     req.onLoad.listen((e) {
      if (DataLoader.checkResponse(msg, req)) {
         if (onOk != null) {
@@ -81,7 +81,7 @@ class DnsDefaultViewEditor {
     var meta = new Map<String,Object>();
     List<int> customRecordsIds = [];
     meta['customRecordsIds'] = customRecordsIds;
-    SelectElement customs = querySelector("#customRecordsIds");
+    SelectElement customs = querySelector("#customRecordsIds")! as SelectElement;
     for (var option in customs.selectedOptions) {
       customRecordsIds.add(int.parse(option.value));
     }
@@ -90,7 +90,7 @@ class DnsDefaultViewEditor {
   }
   
   int safeInt(String value) {
-    return value == null || value == "" ? null : int.parse(value);
+    return value == null || value == "" ? 0 : int.parse(value);
   }
   
   load() {
@@ -102,10 +102,10 @@ class DnsDefaultViewEditor {
     if (customRecordsOptions.length == 0) {
       // If there are no custom record sets defined, don't bother showing list. It's disconcerting
       // to show select box where there's nothing to select
-      querySelector("#customRecordsIdsRow").style.display = "none";
+      querySelector("#customRecordsIdsRow")!.style.display = "none";
       return;
     }
-    SelectElement select = querySelector("#customRecordsIds");
+    SelectElement select = querySelector("#customRecordsIds")! as SelectElement;
     customRecordsOptions.forEach((id, value) {
       bool selected = (customRecordsIds != null && customRecordsIds.contains(int.parse(id)));
       select.append(new OptionElement(data: value, value: id, selected : selected));
@@ -114,12 +114,12 @@ class DnsDefaultViewEditor {
   
  
   loadForm(json) {
-    var data = JSON.decode(json);
+    var data = jsonDecode(json);
     print('$data');
-    Map<String, Object> view = data['view'];
-    List<int> customRecordsIds;
+    Map<String, Object>? view = data['view'] as Map<String, Object>;
+    List<int> customRecordsIds = [];
     if (view != null) {
-      customRecordsIds = view['customRecordsIds'];
+      customRecordsIds = view!['customRecordsIds']! as List<int>;
     }
     loadCustomRecords(data['customRecordsCandidates'], customRecordsIds);
     loadPreview();

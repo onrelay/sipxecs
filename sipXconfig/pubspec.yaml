@@ -1,5 +1,8 @@
 name: sipxconfig
-description: sipXconfig Admin UI
+description: sipXconfig Web Admin 
 dependencies:
-  browser: any
   intl: any
+
+environment:
+  sdk: '>=3.7.0'
+

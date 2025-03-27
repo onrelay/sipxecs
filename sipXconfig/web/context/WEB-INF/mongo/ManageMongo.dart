@@ -1,7 +1,7 @@
 import 'dart:html';
 import 'dart:convert';
 import 'dart:async';
-import 'package:sipxconfig/sipxconfig.dart';
+import './packages/sipxconfig/sipxconfig.dart';
 
 bool inProgressFlag = false;
 ManageGlobal global = new ManageGlobal();
@@ -11,7 +11,7 @@ ManageBase unmanage = local;
 var api = new Api(test : false);
 
 main() {
-  new Tabs(querySelector("#leftNavAbsolute"), ["global", "local"], onTabClick);
+  new Tabs(querySelector("#leftNavAbsolute")!, ["global", "local"], onTabClick);
   reload();
 }
 
@@ -35,25 +35,25 @@ reload() {
 abstract class ManageBase {
   UserMessage msg;
   String help;
+  ManageBase( this.msg, this.help );
   void load();
   void unload();
   void onServerAction(String label, String server, String action);
 }
 
 class ManageGlobal extends ManageBase {
-  Refresher refresh;
-  DataLoader loader;
-  UiBuilder builder;
-  var help = "global.help";
+  late Refresher refresh;
+  late DataLoader loader;
+  late UiBuilder builder;
   
-  ManageGlobal() {
-    help = "global.help";
-    msg = new UserMessage(querySelector("#globalMessage"));    
+  ManageGlobal() : super( new UserMessage(querySelector("#globalMessage")!), "global.help" ) {
     loader = new DataLoader(msg, loadTable, true);
     builder = new UiBuilder(this);    
-    refresh = new Refresher(querySelector("#globalRefreshWidget"), querySelector("#globalRefreshButton"), () {
-      var url = api.url("rest/mongoGlobal/", "global-test.json");
-      loader.load(url);      
+    refresh = new Refresher(
+      querySelector("#globalRefreshWidget")!, 
+      querySelector("#globalRefreshButton")! as ButtonElement, () {
+        var url = api.url("rest/mongoGlobal/", "global-test.json");
+        loader.load(url);      
     });
   }
  
@@ -67,13 +67,13 @@ class ManageGlobal extends ManageBase {
   }
   
   void loadTable(data) {    
-    var meta = JSON.decode(data);    
-    builder.addMongoNodeSelect(meta['dbCandidates'], querySelector('#globalAddDb'), 'NEW_DB', getString('addDatabase'));
-    builder.addMongoNodeSelect(meta['arbiterCandidates'], querySelector('#globalAddArbiter'), 'NEW_ARBITER', getString('addArbiter'));
-    TableSectionElement tbody = querySelector("#globalTable");
+    var meta = jsonDecode(data);    
+    builder.addMongoNodeSelect(meta['dbCandidates'], querySelector('#globalAddDb')!, 'NEW_DB', getString('addDatabase'));
+    builder.addMongoNodeSelect(meta['arbiterCandidates'], querySelector('#globalAddArbiter')!, 'NEW_ARBITER', getString('addArbiter'));
+    TableSectionElement tbody = querySelector("#globalTable") as TableSectionElement;
     tbody.children.clear();
     builder.lastError(meta['lastConfigError']);    
-    var rows = new List<TableRowElement>();
+    List<TableRowElement> rows = [];
     for (var type in ['databases', 'arbiters']) {
       if (meta[type] == null) {
         continue;
@@ -101,35 +101,35 @@ class ManageGlobal extends ManageBase {
         load();
       }
     });
-    var post = JSON.encode({'server' : server, 'action' : action });
+    var post = jsonEncode({'server' : server, 'action' : action });
     httpRequest.send(post);
   }  
 }
 
 class ManageLocal extends ManageBase {
-  Refresher refresh;
-  DataLoader loader;
-  UiBuilder builder;
+  late Refresher refresh;
+  late DataLoader loader;
+  late UiBuilder builder;
   
-  ManageLocal() {
-    help = "local.help";
-    msg = new UserMessage(querySelector("#localMessage"));    
+  ManageLocal() : super( new UserMessage(querySelector("#localMessage")!), "local.help") {
     loader = new DataLoader(msg, loadTable, true);
     builder = new UiBuilder(this);
-    refresh = new Refresher(querySelector("#localRefreshWidget"), querySelector("#localRefreshButton"), () {
-      var url = api.url("rest/mongoRegional/", "local-test.json");
-      loader.load(url);      
+    refresh = new Refresher(
+      querySelector("#localRefreshWidget")!, 
+      querySelector("#localRefreshButton")! as ButtonElement, () {
+        var url = api.url("rest/mongoRegional/", "local-test.json");
+        loader.load(url);      
     });
   }
       
   void loadTable(data) {
-    var meta = JSON.decode(data);
-    TableSectionElement tbody = querySelector("#localTable");
+    var meta = jsonDecode(data);
+    TableSectionElement tbody = querySelector("#localTable")! as TableSectionElement;
     tbody.children.clear();
     builder.lastError(meta['lastConfigError']);  
-    List candidates = meta['dbCandidates'];
-    builder.addMongoNodeSelect(candidates, querySelector('#localAddDb'), 'NEW_LOCAL', getString('addDatabase'));
-    builder.addMongoNodeSelect(meta['arbiterCandidates'], querySelector('#localAddArbiter'), 'NEW_LOCAL_ARBITER', getString('addArbiter'));
+    List<String> candidates = meta['dbCandidates'] as List<String>;
+    builder.addMongoNodeSelect(candidates, querySelector('#localAddDb')!, 'NEW_LOCAL', getString('addDatabase'));
+    builder.addMongoNodeSelect(meta['arbiterCandidates'], querySelector('#localAddArbiter')!, 'NEW_LOCAL_ARBITER', getString('addArbiter'));
     
     List shards = meta['shards'];
     if ((shards == null || shards.length == 0) && (candidates == null || candidates.length == 0)) {
@@ -141,9 +141,9 @@ regions to servers if you wish to have a local databbase
       return;
     }      
       
-    var rows = new List<TableRowElement>();
+    List<TableRowElement> rows = [];
     for (var shard in shards) {
-      var count = 0;
+      num count = 0;
       for (var type in ['databases', 'arbiters']) {
         if (shard[type] != null) {
           count += shard[type].length;
@@ -190,7 +190,7 @@ regions to servers if you wish to have a local databbase
         load();
       }
     });
-    var post = JSON.encode({'server' : server, 'action' : action });
+    var post = jsonEncode({'server' : server, 'action' : action });
     httpRequest.send(post);
   }  
 
@@ -208,10 +208,9 @@ regions to servers if you wish to have a local databbase
  * Build the HTML Components common to multiple tabs 
  */
 class UiBuilder {
-  ManageBase manage;
+  late ManageBase manage;
   
-  UiBuilder(ManageBase manage) {
-    this.manage = manage;
+  UiBuilder(this.manage){
   }
   
   void nameColumn(Element cell, node, server, type) {
@@ -219,8 +218,10 @@ class UiBuilder {
     var src = statusImage(node['status']);
     img.src = "${api.baseUrl()}/images/${src}";
     cell.append(img);
-    String typeText = dbType(type);      
-    cell.appendText(" ${node['host']} ${typeText}");  
+    String? typeText = dbType(type);   
+    if( typeText != null ) {
+      cell.appendText(" ${node['host']} ${typeText}");  
+    }
   }
 
   void statusColumn(Element cell, node, server, type) {
@@ -256,8 +257,8 @@ class UiBuilder {
     ul.children.add(actions);
     actions.onChange.listen((e) {
       SelectElement select = (e.target as SelectElement);
-      String label = optionLabel(select, select.value);
-      onServerAction(label, server, select.value);
+      String label = optionLabel(select, select.value!);
+      onServerAction(label, server, select.value!);
     });
 
     actions.children.add(new OptionElement(data: getString('options'), value: ''));
@@ -292,7 +293,7 @@ class UiBuilder {
     var addNode = new SelectElement();
     addNode.classes = ['action'];
     addNode.onChange.listen((e) {
-      onServerAction(noneSelectedLabel, addNode.value, action);
+      onServerAction(noneSelectedLabel, addNode.value!, action);
     });
     addNode.append(new OptionElement(data: noneSelectedLabel, value: "", selected: true));
     for (var candidate in candidates) {
@@ -304,7 +305,7 @@ class UiBuilder {
   String optionLabel(SelectElement e, String value) {
     for (OptionElement o in e.options) {
       if (o.value == value) {
-        return o.label;
+        return o.label!;
       }
     }
     return value;
@@ -318,12 +319,12 @@ class UiBuilder {
 
   var count = 0;
 
-  String dbType(String type) {
+  String? dbType(String type) {
     switch (type) {
       case 'databases':
-        return getString('type.db');
+        return getString('type.db')!;
       case 'arbiters':
-        return getString('type.arbiter');
+        return getString('type.arbiter')!;
     }
   }
 
@@ -363,9 +364,11 @@ class UiBuilder {
   }
 
   inProgress(bool inProg) {
-    querySelector('#inprogress').hidden = ! inProg;
-    for (var e in querySelectorAll('.action')) {    
-      e.disabled = inProg;
+    querySelector('#inprogress')!.hidden = ! inProg;
+    for (var e in querySelectorAll('.action')!) {
+      if (e is ButtonElement) {   
+        (e as ButtonElement).disabled = inProg;
+      }
     }
   }
   

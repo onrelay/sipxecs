@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/bin/env python3
 import netsnmp
 import os
 import os.path

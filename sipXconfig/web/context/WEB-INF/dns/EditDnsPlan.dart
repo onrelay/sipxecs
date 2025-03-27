@@ -15,7 +15,9 @@
 import 'dart:html';
 import 'dart:convert';
 import 'dart:math';
-import 'package:sipxconfig/sipxconfig.dart';
+import 'dart:async';
+
+import './packages/sipxconfig/sipxconfig.dart';
 
 var api = new Api(test : false);
 
@@ -24,24 +26,24 @@ main() {
 }
 
 class DnsPlanEditor {
-  var msg = new UserMessage(querySelector("#message"));
-  DataLoader loader;
+  var msg = new UserMessage(querySelector("#message")!);
+  late DataLoader loader;
   int uid = 0;
-  var groups = new List<Element>();
-  Map <int,String> targetOptions;
-  Map itemPrototype;
-  Map<String, Object> groupPrototype;
-  int dnsPlanId;
+  List<Element> groups = [];
+  Map<int,String>? targetOptions;
+  late Map<String, Object> itemPrototype;
+  late Map<String, Object> groupPrototype;
+  int? dnsPlanId;
 
   DnsPlanEditor() {
-    var planDom = querySelector("#plan-picker");
-    querySelector("#ok").onClick.listen(ok);
-    querySelector("#apply").onClick.listen(apply);
-    querySelector("#cancel").onClick.listen(cancel);
-    Location l = document.window.location;
+    var planDom = querySelector("#plan-picker")!;
+    querySelector("#ok")!.onClick.listen(ok);
+    querySelector("#apply")!.onClick.listen(apply);
+    querySelector("#cancel")!.onClick.listen(cancel);
+    Location l = document.window!.location! as Location;
     var params = Uri.parse(l.href).queryParameters;
     if (params['dnsPlanId'] != null) {
-      dnsPlanId = int.parse(params['dnsPlanId']);
+      dnsPlanId = int.parse(params['dnsPlanId']!);
     }
     loader = new DataLoader(this.msg, loadForm);
     load();
@@ -78,18 +80,18 @@ class DnsPlanEditor {
     var meta = getPlanByScrapingForm();
     var method;
     if (dnsPlanId != null) {
-      meta['id'] = dnsPlanId;
+      meta['id'] = dnsPlanId!;
       method = 'PUT';
     } else {
       method = 'POST';
     }
     req.open(method, api.url("rest/dnsPlan/${id}"));
     req.setRequestHeader("Content-Type", "application/json");
-    req.send(JSON.encode(meta));
+    req.send(jsonEncode(meta));
     req.onLoadEnd.listen((e) {
       if (DataLoader.checkResponse(msg, req)) {
-        if (dnsPlanId == null) {
-          dnsPlanId = int.parse(req.responseText);
+        if (dnsPlanId == null && req.responseText != null) {
+          dnsPlanId = int.parse(req.responseText!);
         }
         if (onOk != null) {
           msg.success("Save successful");
@@ -100,30 +102,29 @@ class DnsPlanEditor {
   }
 
   Map<String, Object> getPlanByScrapingForm() {
-    var form = querySelector("#edit-plan").querySelectorAll("input,select");
+    var form = querySelector("#edit-plan")!.querySelectorAll("input,select")!;
     var plan = new Map<String, Object>();
-    plan['name'] = (form[0] as InputElement).value;
-    var groups = new List<Map<String, Object>>();
+    plan['name'] = (form[0] as InputElement).value!;
+    List<Map<String, Object>> groups = [];
     plan['groups'] = groups;
-    List<Map<String, Object>> targets;
+    List<Map<String, Object>> targets = [];
     Map<String, Object> target;
-    for (HtmlElement i in form.sublist(1)) {
+    for (HtmlElement i in form.sublist(1) as List<HtmlElement>) {
       if (i.id.startsWith("group-")) {
         var group = new Map<String, Object>();
-        targets = new List();
         group['targets'] = targets;
         groups.add(group);
       } else if (i.id.startsWith("percentage-")) {
-        var percentage = (i as NumberInputElement).value;
+        var percentage = (i as NumberInputElement).value!;
         try {
           targets.last['percentage'] = int.parse(percentage);
         } on FormatException {
           targets.last['percentage'] = 0;
         }
       } else if (i.id.startsWith("target-")) {
-        SelectElement se = i;
+        SelectElement se = i as SelectElement;
         var target = new Map<String, Object>();
-        var targetValue = se.value.split("-");
+        var targetValue = se.value!.split("-");
         target['targetType'] = targetValue[0];
         target['targetId'] = targetValue[1];
         targets.add(target);
@@ -143,52 +144,52 @@ class DnsPlanEditor {
   }
 
   loadForm(json) {
-    var data = JSON.decode(json);
+    var data = jsonDecode(json);
     targetOptions = data['targetCandidates'];
-    Map<String, Object> plan = data['plan'];
-    (querySelector("#name") as InputElement).value = plan['name'];
-    List groups = plan['groups'];
+    Map<String, Object> plan = data['plan']!;
+    (querySelector("#name")! as InputElement).value = plan['name'] as String;
+    List<Map<String, Object>> groups = plan['groups'] as List<Map<String, Object>>;
     if (groups != null) {
-      for (Map<String, Object> group in groups) {
-        addGroup(null, group);
+      for (Map<String, Object> group in groups!) {
+        addGroup(group, null);
       }
     }
   }
 
-  void addGroup(Element sibling, Map<String, Object> group) {
+  void addGroup(Map<String, Object> group, Element? sibling) {
     var isFirst = (groups.length == 0);
     var label = getString(isFirst ? 'label.primaryPlan' : 'label.alternativePlan');
     var removeId = "remove-${++uid}";
     var addId = "add-${++uid}";
     var eGroup = new Element.html('''
-<table>
-  <tbody>
-    <tr>
-      <td colspan="3">
-        <span>${label}<span>
-        <input type="hidden" id="group-${++uid}"/>
-      </td>
-      <td></td>
-      <td>
-        <button class="subtle" id="${removeId}">-</button>
-        <button class="subtle" id="${addId}">+</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
-''').querySelector("tr");
+      <table>
+        <tbody>
+          <tr>
+            <td colspan="3">
+              <span>${label}<span>
+              <input type="hidden" id="group-${++uid}"/>
+            </td>
+            <td></td>
+            <td>
+              <button class="subtle" id="${removeId}">-</button>
+              <button class="subtle" id="${addId}">+</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      ''').querySelector("tr")!;
 
-    ButtonElement remove = eGroup.querySelector("#${removeId}");
+    ButtonElement remove = eGroup!.querySelector("#${removeId}")! as ButtonElement;
     remove.disabled = isFirst;
     remove.onClick.listen((_) {
       removeGroup(eGroup);
     });
-    eGroup.querySelector("#${addId}").onClick.listen((_) {
+    eGroup.querySelector("#${addId}")!.onClick.listen((_) {
       var nextSibling = lastItemInGroup(eGroup);
-      addGroup(nextSibling, groupPrototype);
+      addGroup(groupPrototype,nextSibling);
     });
     if (sibling == null) {
-      var tbody = querySelector("#plan-picker");
+      var tbody = querySelector("#plan-picker")!;
       tbody.children.add(eGroup);
     } else {
       sibling.insertAdjacentElement("afterEnd", eGroup);
@@ -197,18 +198,19 @@ class DnsPlanEditor {
 
     var juggler = new PercentageJuggler();
     Element lastRow = eGroup;
-    for (Map<String, Object> target in group['targets']) {
+    var targets = group['targets']! as List<Map<String, Object>>;
+    for (Map<String, Object> target in targets) {
       lastRow = addTarget(lastRow, juggler, target);
     }
   }
 
-  List<Element> removeGroup(Element group) {
+  void removeGroup(Element group) {
     while (true) {
-      Element nextRow = group.nextElementSibling;
-      if (nextRow == null || groups.contains(nextRow)) {
+      Element? nextRow = group.nextElementSibling;
+      if (nextRow == null || groups.contains(nextRow!)) {
         break;
       }
-      nextRow.remove();
+      nextRow!.remove();
     }
     group.remove();
     groups.remove(group);
@@ -217,11 +219,11 @@ class DnsPlanEditor {
   Element lastItemInGroup(Element group) {
     Element item = group;
     while (true) {
-      Element nextRow = item.nextElementSibling;
+      Element? nextRow = item.nextElementSibling;
       if (nextRow == null || groups.contains(nextRow)) {
         return item;
       }
-      item = nextRow;
+      item = nextRow!;
     }
   }
 
@@ -232,36 +234,36 @@ class DnsPlanEditor {
     var removeId = "remove-${++uid}";
     var addId = "add-${++uid}";
     var eItem = new Element.html('''
-<table>
-  <tbody>
-    <tr id="${itemId}">
-      <td></td>
-      <td>
-        <select id="target-${++uid}">
-        </select>
-      </td>
-      <td>
-        <input id='${percentageId}' type='number' min='1' max='99' size='2' value='${target['percentage']}'/> %
-      </td>
-      <td>
-         <button class="subtle" id="${removeId}">-</button>
-         <button class="subtle" id="${addId}">+</button>
-      </td>
-      <td></td>
-    </tr>
-  </tbody>
-</table>
-''').querySelector('tr');
-    SelectElement services = eItem.querySelector("select");
-    addTargetOptions(services, targetOptions, target['targetId'].toString(), target['targetType'], 'BASIC');
-    InputElement percentage = eItem.querySelector("#${percentageId}");
-    ButtonElement remove = eItem.querySelector("#${removeId}");
+      <table>
+        <tbody>
+          <tr id="${itemId}">
+            <td></td>
+            <td>
+              <select id="target-${++uid}">
+              </select>
+            </td>
+            <td>
+              <input id='${percentageId}' type='number' min='1' max='99' size='2' value='${target['percentage']}'/> %
+            </td>
+            <td>
+              <button class="subtle" id="${removeId}">-</button>
+              <button class="subtle" id="${addId}">+</button>
+            </td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+      ''').querySelector('tr')!;
+    SelectElement services = eItem.querySelector("select")! as SelectElement;
+    addTargetOptions(services, targetOptions!, target['targetId']!.toString(), target['targetType']! as String, 'BASIC');
+    InputElement percentage = eItem.querySelector("#${percentageId}")! as InputElement;
+    ButtonElement remove = eItem.querySelector("#${removeId}")! as ButtonElement;
     remove.disabled = isFirst;
     remove.onClick.listen((_) {
       juggler.remove(percentage);
       eItem.remove();
     });
-    (eItem.querySelector("#${addId}") as ButtonElement).onClick.listen((_) {
+    (eItem.querySelector("#${addId}")! as ButtonElement)!.onClick.listen((_) {
       addTarget(eItem, juggler, itemPrototype);
     });
 
@@ -270,7 +272,7 @@ class DnsPlanEditor {
     return eItem;
   }
 
-  addTargetOptions(Element select, Map options, String currentValue, String currentTargetType, String targetType) {
+  addTargetOptions(Element select, Map<int,String> options, String currentValue, String currentTargetType, String targetType) {
     options.forEach((targetId, targetValue) {
       var label = (targetType == 'BASIC' ? getString('select.${targetId}') : targetValue);
       if (targetValue is Map) {
@@ -278,7 +280,7 @@ class DnsPlanEditor {
         separator.label = label;
         select.append(separator);
         // RECURSIVE !
-        addTargetOptions(separator, (targetValue as Map), currentValue, currentTargetType, targetId);
+        addTargetOptions(separator, (targetValue as Map<int,String>), currentValue, currentTargetType, targetType);
       } else {
         var selected = (currentValue == targetId) && (currentTargetType == targetType);
         var optionId = "${targetType}-${targetId}";
@@ -289,8 +291,8 @@ class DnsPlanEditor {
 }
 
 class PercentageJuggler {
-  var listeners = new Map<InputElement,Object>();
-  InputElement last;
+  var listeners = new Map<InputElement,StreamSubscription<Event>>();
+  InputElement? last;
 
   add(InputElement percentage) {
     listeners[percentage] = percentage.onClick.listen(juggle);
@@ -302,42 +304,51 @@ class PercentageJuggler {
   }
 
   remove(InputElement percentage) {
-    listeners.remove(percentage).cancel;
-    decideWhoIsLast();
+    StreamSubscription<Event>? listener = listeners.remove(percentage)!;
+    if( listener != null ) {
+      listener.cancel;
+      decideWhoIsLast();
+    }
   }
 
   decideWhoIsLast() {
     int y = 0;
-    Element candidate;
+    InputElement? candidate;
     // we use parent because y offset can be 0 immediately
     // after adding element to dom.
     for (InputElement e in listeners.keys) {
-      if (e.parent.offsetTop >= y) {
+      if (e.parent != null && e.parent!.offsetTop != null && e.parent!.offsetTop! >= y) {
         candidate = e;
-        y = e.parent.offsetTop;
+        y = e.parent!.offsetTop!;
       }
     }
-    last = candidate;
-    for (InputElement e in listeners.keys) {
-      e.readOnly = (e == last);
+    if( candidate != null ) {
+      last = candidate!;
+      for (InputElement e in listeners.keys) {
+        e.readOnly = (e == last);
+      }
     }
   }
 
-  juggle([Event e]) {
+  juggle([Event? e]) {
     if (e != null) {
       // avoid recursion or at least redundant call
-      if (e.target == last) {
+      if (e!.target == last) {
         return;
       }
     }
     int total = 0;
     for (InputElement e in listeners.keys) {
       if (e != last) {
-        total += int.parse(e.value);
+        total += int.parse(e.value!);
       }
     }
-    // we don't show negative numbers because disconcerting to users
-    // allow total > 100 as it should work in backend implementation
-    last.value = max(0, 100 - total).toString();
+
+    if( last != null ) {
+      // we don't show negative numbers because disconcerting to users
+      // allow total > 100 as it should work in backend implementation
+      last!.value = max(0, 100 - total).toString();
+    }
+
   }
 }

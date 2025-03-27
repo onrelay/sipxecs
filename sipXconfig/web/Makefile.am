@@ -86,18 +86,22 @@ java-gwt : $(gwt_SRC)
 	mv out/gwt/org.sipfoundry.sipxconfig.userportal.contact_information/org.sipfoundry.sipxconfig.userportal.contact_information.nocache.js out/gwt/org.sipfoundry.sipxconfig.userportal.contact_information/nocache.js
 
 # file in packages get compiled in thru compiling page dart files w/main()s
-DART_SRC = $(shell cd $(srcdir)/context/WEB-INF; find . -name '*.dart' -not -regex '.*/packages/.*')
-DART_PKGS = $(shell cd $(top_srcdir); find packages/*/ -name '*.js')
+DART_HOME ?= /opt/dart-sdk
 
-java-dart : $(addprefix $(web_JAVAROOT)/,$(DART_SRC:.dart=.js) $(DART_PKGS))
+DART_SRC = $(shell cd $(srcdir)/context/WEB-INF; find . -name '*.dart' ! -path '*/packages/*')
+DART_PKGS = $(shell cd $(top_srcdir)/packages; find . -name '*.js')
 
+java-dart : $(addprefix $(web_JAVAROOT)/,$(DART_SRC:.dart=.js)) $(addprefix $(web_JAVAROOT)/,$(DART_PKGS))
+
+# Copy .js files from packages/
 $(addprefix $(web_JAVAROOT)/,$(DART_PKGS)) : $(web_JAVAROOT)/% : $(top_srcdir)/%
 	test -d $(dir $@) || mkdir -p $(dir $@)
 	cp $< $@
 
+# Compile .dart files (excluding those under packages/)
 $(addprefix $(web_JAVAROOT)/,$(DART_SRC:.dart=.js)) : $(web_JAVAROOT)/%.js : context/WEB-INF/%.dart $(wildcard $(top_srcdir)/lib/*.dart)
 	test -d $(dir $@) || mkdir -p $(dir $@)
-	$(DART_HOME)/bin/dart2js -o$@ $<
+	$(DART_HOME)/bin/dart compile js -o $@ $<
 
 # W E B
 web_COMPILE_PKGS = \

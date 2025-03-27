@@ -14,13 +14,13 @@
  */
 import 'dart:html';
 import 'dart:convert';
-import 'package:sipxconfig/sipxconfig.dart';
+import './packages/sipxconfig/sipxconfig.dart';
 
 var api = new Api(test : false);
 
 main() {
   var tabIds = [ "settings", "views", "failover", "custom", "advisor", "advisor-regions" ];
-  var tabs = new Tabs(querySelector("#leftNavAbsolute"), tabIds);
+  var tabs = new Tabs(querySelector("#leftNavAbsolute")!, tabIds);
   tabs.setPersistentStateId("editDns");
   new Views();
   new Failover();
@@ -28,11 +28,11 @@ main() {
 }
 
 class Failover {
-  var msg = new UserMessage(querySelector("#failover-message"));
-  DataLoader loader;
+  var msg = new UserMessage(querySelector("#failover-message")!);
+  late DataLoader loader;
   
   Failover() {
-    querySelector("#failover-delete").onClick.listen(deleteSelected);
+    querySelector("#failover-delete")!.onClick.listen(deleteSelected);
     loader = new DataLoader(this.msg, loadTable);
     load();
   }
@@ -62,9 +62,9 @@ class Failover {
   }  
 
   loadTable(data) {
-    var tbody = querySelector("#failover-items");
+    var tbody = querySelector("#failover-items")!;
     tbody.children.clear();
-    var meta = JSON.decode(data);
+    var meta = jsonDecode(data);
     for (var plan in meta) {
       List views = plan['views'];
       String viewsHtml = (views == null ? '' : views.join(', '));
@@ -79,20 +79,20 @@ class Failover {
   </tbody>
 </table>
 ''');
-        tbody.children.add(e.querySelector("tr"));   
+        tbody.children.add(e.querySelector("tr")!);   
     }
   }  
 }
 
 class Views {
-  var msg = new UserMessage(querySelector("#views-message"));
-  DataLoader loader;
-  List<int> selectIdsPostLoad;
+  var msg = new UserMessage(querySelector("#views-message")!);
+  late DataLoader loader;
+  List<int>? selectIdsPostLoad;
   
   Views() {
-    querySelector("#views-delete").onClick.listen(deleteSelected);
-    querySelector("#views-up").onClick.listen((_) => moveSelected(-1));
-    querySelector("#views-down").onClick.listen((_) => moveSelected(1));
+    querySelector("#views-delete")!.onClick.listen(deleteSelected);
+    querySelector("#views-up")!.onClick.listen((_) => moveSelected(-1));
+    querySelector("#views-down")!.onClick.listen((_) => moveSelected(1));
     loader = new DataLoader(this.msg, loadTable);
     load();    
   }  
@@ -104,7 +104,7 @@ class Views {
     }
     HttpRequest req = new HttpRequest();
     req.open('PUT', api.url("rest/dnsViewMove"));
-    var data = JSON.encode({"step" : step, "ids" : ids});
+    var data = jsonEncode({"step" : step, "ids" : ids});
     req.send(data);
     req.onLoadEnd.listen((_) {
       load();
@@ -138,7 +138,7 @@ class Views {
   }
 
   loadTable(data) {
-    var tbody = querySelector("#view-items");    
+    var tbody = querySelector("#view-items")!;    
     tbody.children.clear();
     var def = new Element.html('''
     <table>
@@ -152,8 +152,8 @@ class Views {
       </tbody>
 </table>
     ''');
-    tbody.children.add(def.querySelector("tr"));
-    var meta = JSON.decode(data);
+    tbody.children.add(def.querySelector("tr")!);
+    var meta = jsonDecode(data);
     for (var view in meta) {
       var e = new Element.html('''
 <table>
@@ -167,10 +167,10 @@ class Views {
   </tbody>
 </table>
 ''');
-        tbody.children.add(e.querySelector("tr"));   
+        tbody.children.add(e.querySelector("tr")!);   
     }
     if (selectIdsPostLoad != null) {
-      setSelectedIds("selected-views", selectIdsPostLoad);
+      setSelectedIds("selected-views", selectIdsPostLoad!);
       selectIdsPostLoad = null;
     }
   }  
@@ -179,7 +179,7 @@ class Views {
 setSelectedIds(String checkboxName, List<int> ids) {
   List<CheckboxInputElement> all = querySelectorAll("input[name=${checkboxName}]");  
   for (var e in all) {
-    int value = int.parse(e.defaultValue);
+    int value = int.parse(e!.value!);
     if (ids.contains(value)) {
       e.checked = true;
     }
@@ -187,11 +187,11 @@ setSelectedIds(String checkboxName, List<int> ids) {
 }
 
 class Custom {
-  var msg = new UserMessage(querySelector("#custom-message"));
-  DataLoader loader;
+  var msg = new UserMessage(querySelector("#custom-message")!);
+  late DataLoader loader;
 
   Custom() {
-    querySelector("#custom-delete").onClick.listen(deleteSelected);
+    querySelector("#custom-delete")!.onClick.listen(deleteSelected);
     loader = new DataLoader(this.msg, loadTable);
     load();        
   }
@@ -202,9 +202,9 @@ class Custom {
   }
 
   loadTable(data) {
-    var tbody = querySelector("#custom-items");    
+    var tbody = querySelector("#custom-items")!;    
     tbody.children.clear();
-    var meta = JSON.decode(data);
+    var meta = jsonDecode(data);
     for (var custom in meta) {
       List views = custom['views'];
       String viewsHtml = (views == null ? '' : views.join(', '));
@@ -219,7 +219,7 @@ class Custom {
   </tbody>
 </table>
 ''');
-        tbody.children.add(e.querySelector("tr"));   
+        tbody.children!.add(e.querySelector("tr")!);   
     }
   }
 
@@ -245,11 +245,11 @@ class Custom {
  * Utils
  */
 List<int> selectedIds(String checkboxName) {
-  var on = new List<int>();
-  List<CheckboxInputElement> all = querySelectorAll("input[name=${checkboxName}]");
+  List<int> on =[];
+  List<CheckboxInputElement> all = querySelectorAll("input[name=${checkboxName}]")!;
   for (var e in all) {
-    if (e.checked) {
-      on.add(int.parse(e.value));
+    if (e!.checked!) {
+      on.add(int.parse(e!.value!));
     }
   }
   return on;

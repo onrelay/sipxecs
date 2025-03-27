@@ -2,14 +2,14 @@ import 'dart:html';
 import 'dart:convert'; 
 import 'dart:async';
 import 'package:intl/intl.dart';
-import 'package:sipxconfig/sipxconfig.dart';
+import './packages/sipxconfig/sipxconfig.dart';
 
 var api = new Api(test : true);
-bool isInProgress;
+bool isInProgress = false;
 
 main() {
   var backup = new BackupPage();
-  var tabs = new BackupTabs(querySelector("#leftNavAbsolute"), ["local", "ftp"], backup.showContent);  
+  var tabs = new BackupTabs(querySelector("#leftNavAbsolute")!, ["local", "ftp"], backup.showContent);  
   tabs.setPersistentStateId("backup");
   var persistedTabId = window.sessionStorage["backup"];
   backup.showContent(tabs, persistedTabId == null ? "local" : persistedTabId);
@@ -25,22 +25,22 @@ class BackupTabs extends Tabs {
 }
 
 class BackupPage {
-  var msg = new UserMessage(querySelector("#message"));
-  DataLoader loader;
+  var msg = new UserMessage(querySelector("#message")!);
+  late DataLoader loader;
   String type = 'local';
-  SettingEditor dbSettings;
-  SettingEditor generalSettings;
-  SettingEditor ftpSettings;
-  var timeOfDayFormat = new DateFormat("jm");
-  Timer refresh;
+  late SettingEditor dbSettings;
+  late SettingEditor generalSettings;
+  late SettingEditor ftpSettings;
+  var timeOfDayFormat = DateFormat("jm");
+  late Timer refresh;
 
   BackupPage() {
-    querySelector("#backup-now").onClick.listen(backupNow);
-    querySelector("#apply").onClick.listen(apply);
+    querySelector("#backup-now")!.onClick.listen(backupNow);
+    querySelector("#apply")!.onClick.listen(apply);
     loader = new DataLoader(this.msg, loadForm);
-    dbSettings = new SettingEditor(querySelector("#db-settings"));
-    generalSettings = new SettingEditor(querySelector("#general-settings"));
-    ftpSettings = new SettingEditor(querySelector("#ftp-settings"));
+    dbSettings = new SettingEditor(querySelector("#db-settings")! as TableSectionElement);
+    generalSettings = new SettingEditor(querySelector("#general-settings")! as TableSectionElement);
+    ftpSettings = new SettingEditor(querySelector("#ftp-settings")! as TableSectionElement);
     inProgress(false);
     refresh = new Timer.periodic(new Duration(seconds: 30), (e) {
       if (isInProgress) {                                                                            
@@ -52,23 +52,23 @@ class BackupPage {
   load() {
     inProgress(true);
     var url = api.url("rest/backup/${type}", "backup-test.json");
-    UListElement listElem = querySelector("#backups");
+    UListElement listElem = querySelector("#backups")! as UListElement;
     listElem.children.clear();
     loader.load(url);
   }
   
   loadForm(json) {
-    var data = JSON.decode(json);
+    var data = jsonDecode(json);
     Map <String, Object> generalBackupSettings = getSetting(data['settings'], "general");
     generalSettings.render(generalBackupSettings);
     Map <String, Object> backupSettings = getSetting(data['dbSettings'], "db");
     dbSettings.render(backupSettings);
     Map <String, Object> ftpSettings = getSetting(data['settings'], "ftp");
     this.ftpSettings.render(ftpSettings);
-    var archiveIds = new List<String>();
+    List<String> archiveIds = [];
     var plan = data['backup'];
     if (plan != null) {    
-      SelectElement limit = querySelector("#backup-limit");
+      SelectElement limit = querySelector("#backup-limit")! as SelectElement;
       int count = plan['limitedCount'];
       if (count == null) {
         limit.value = null;
@@ -92,12 +92,12 @@ class BackupPage {
           timeOfDay = timeOfDayFormat.format(dt);
         }
       }
-      (querySelector("#dailyScheduledTime") as InputElement).value = timeOfDay;
-      (querySelector("#dailyScheduledDay") as SelectElement).selectedIndex = dow;
-      (querySelector("#dailyScheduleEnabled") as InputElement).checked = enabled;
+      (querySelector("#dailyScheduledTime")! as InputElement).value = timeOfDay;
+      (querySelector("#dailyScheduledDay")! as SelectElement).selectedIndex = dow;
+      (querySelector("#dailyScheduleEnabled")! as InputElement).checked = enabled;
     }
 
-    UListElement archives = querySelector("#archives");
+    UListElement archives = querySelector("#archives")! as UListElement;
     archives.children.clear();
     Map<String, String> defs = data['definitions'];
     if (defs != null) {
@@ -116,10 +116,10 @@ class BackupPage {
     
     Map<String, List<String>> backups = data['backups'];
     if (backups != null) {
-      UListElement listElem = querySelector("#backups");
+      UListElement listElem = querySelector("#backups")! as UListElement;
       listElem.children.clear();
-      var backupIdFmt = new DateFormat("yyyy-MM-dd-HH-mm");
-      var tstampFmt = new DateFormat.yMd().add_Hm();
+      var backupIdFmt = DateFormat("yyyy-MM-dd-HH-mm");
+      var tstampFmt = DateFormat.yMd().add_Hm();
       backups.forEach((backupId, backupFiles) {
         var tstamp = backupIdFmt.parse(fixDateDartBug(backupId));
         var tstampStr = tstampFmt.format(tstamp);
@@ -146,34 +146,36 @@ class BackupPage {
   
   inProgress(bool inProg) {
     isInProgress = inProg;
-    querySelector('#inprogress').hidden = ! isInProgress;
-    for (var e in querySelectorAll('.action')) {    
-      e.disabled = isInProgress;
+    querySelector('#inprogress')!.hidden = ! isInProgress;
+    for (var e in querySelectorAll('.action')!) {
+      if (e is ButtonElement) {   
+        (e as ButtonElement).disabled = isInProgress;
+      }
     }
   }
 
   Map<String, Object> getSetting(Map<String, Object> settings, String path) {
-    var selected = settings;
+    Map<String, Object> selected = settings;
     for (var segment in path.split("/")) {
-      selected = selected['value'][segment];  
+      selected = (selected['value']! as Map<String, Object>)[segment]! as Map<String, Object>;  
     }
     return selected;    
   }
   
   parseForm() {
     var form = new Map<String, Object>();
-    form['limitedCount'] = int.parse((querySelector("#backup-limit") as SelectElement).value);
-    List<String> definitionIds = new List<String>();
-    for (CheckboxInputElement c in querySelectorAll("input[name=definitionIds]")) {
-      if (c.checked) {
-        definitionIds.add(c.value);
+    form['limitedCount'] = int.parse((querySelector("#backup-limit")! as SelectElement)!.value!);
+    List<String> definitionIds = [];
+    for (CheckboxInputElement c in querySelectorAll("input[name=definitionIds]")!) {
+      if (c!.checked!) {
+        definitionIds.add(c.value!);
       }
     }
     form['definitionIds'] = definitionIds;
-    var timeStr = (querySelector("#dailyScheduledTime") as InputElement).value;
+    var timeStr = (querySelector("#dailyScheduledTime")! as InputElement).value!;
     DateTime timeOfDay = timeOfDayFormat.parse(timeStr);
-    int dayOfWeek = int.parse((querySelector("#dailyScheduledDay") as SelectElement).value);
-    var enabled = (querySelector("#dailyScheduleEnabled") as CheckboxInputElement).checked;
+    int dayOfWeek = int.parse((querySelector("#dailyScheduledDay")! as SelectElement).value!);
+    var enabled = (querySelector("#dailyScheduleEnabled")! as CheckboxInputElement).checked;
     form['schedules'] = [{
       "timeOfDay" : {
           "hrs" : timeOfDay.hour,
@@ -208,7 +210,7 @@ class BackupPage {
     HttpRequest req = new HttpRequest();
     req.open(method, api.url("rest/backup/${type}"));
     req.setRequestHeader("Content-Type", "application/json"); 
-    req.send(JSON.encode(meta));
+    req.send(jsonEncode(meta));
     req.onLoad.listen((e) {
       if (req.status == 200) {
         msg.success(getString(successMessage));
@@ -229,7 +231,7 @@ class BackupPage {
     msg.success("");
     msg.error("");
     type = selectedId;    
-    var backupElem = querySelector("#backup");
+    var backupElem = querySelector("#backup")!;
     var display = (selectedId == 'local' || selectedId == 'ftp' ? '' : 'none');
     backupElem.style.display = display;
     tabs.showTabContent(selectedId);    
