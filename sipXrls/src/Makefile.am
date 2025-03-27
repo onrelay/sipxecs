@@ -12,7 +12,7 @@ sipxrls_LDADD = \
 	@SIPXCOMMSERVER_LIBS@ \
 	@GIPS_NEQ_OBJS@ \
 	-lboost_thread \
-	-lmongoclient \
+	-lmongocxx \
 	-lzmq
 
 sipxrls_CXXFLAGS = \

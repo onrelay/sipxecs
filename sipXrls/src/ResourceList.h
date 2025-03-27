@@ -13,6 +13,9 @@
 // SYSTEM INCLUDES
 // APPLICATION INCLUDES
 
+#if !defined(BOOST_BIND_GLOBAL_PLACEHOLDERS)
+  #define BOOST_BIND_GLOBAL_PLACEHOLDERS
+#endif
 #include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -32,7 +35,6 @@
 
 class ResourceListServer;
 class ResourceListSet;
-
 
 /**
  * This class maintains information about a resource list that is needed to
@@ -210,9 +212,6 @@ class ResourceList : public UtlContainableAtomic
 
 /* ============================ INLINE METHODS ============================ */
 
-// Put #include of ResourceListSet down here to avoid circular
-// include problems.
-#include "ResourceListSet.h"
 
 // Get the parent ResourceListSet.
 inline ResourceListSet* ResourceList::getResourceListSet() const

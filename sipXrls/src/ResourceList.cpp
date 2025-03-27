@@ -156,7 +156,7 @@ void ResourceList::addResource(const char* uri,
            location++)
       {
          if (// If this element is not excluded from comparison and ...
-             !(no_check_start <= location && location <= location) &&
+             no_check_start > location &&
              // ... it has the same URI value as the new element ...
              r->getUri()->compareTo(uri) == 0)
          {

@@ -10,12 +10,9 @@
 #ifndef _ResourceListSet_h_
 #define _ResourceListSet_h_
 
-// SYSTEM INCLUDES
 #include <string>
 #include <map>
-#include <boost/thread.hpp>
 
-// APPLICATION INCLUDES
 #include "ResourceCache.h"
 #include "ResourceList.h"
 #include "ResourceSubscriptionReceiver.h"
@@ -30,6 +27,7 @@
 #include <os/OsBSem.h>
 #include <os/OsTimer.h>
 #include <os/OsTimerQueue.h>
+
 
 // DEFINES
 // MACROS

@@ -10,12 +10,12 @@
 #ifndef _ResourceNotifyReceiver_h_
 #define _ResourceNotifyReceiver_h_
 
-// SYSTEM INCLUDES
+#include "ResourceList.h"
+
 #include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
-// APPLICATION INCLUDES
 
 #include <net/SipMessage.h>
 

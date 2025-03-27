@@ -10,9 +10,7 @@
 #ifndef _RlsSubscribePolicy_h_
 #define _RlsSubscribePolicy_h_
 
-// SYSTEM INCLUDES
 
-// APPLICATION INCLUDES
 #include <net/SipSubscribeServerEventHandler.h>
 #include <sipXecsService/SipNonceDb.h>
 #include <sipdb/EntityDB.h>

@@ -10,9 +10,6 @@
 #ifndef _SubscriptionSet_h_
 #define _SubscriptionSet_h_
 
-// SYSTEM INCLUDES
-// APPLICATION INCLUDES
-
 #include "ResourceSubscriptionReceiver.h"
 #include <utl/UtlContainableAtomic.h>
 #include <utl/UtlString.h>
