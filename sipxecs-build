@@ -20,6 +20,10 @@ BUILD_DIR=${SOURCE_DIR}/build
 
 LOCAL_REPO=
 
+DEFAULT_INSTALL_OPTIONS="-y --setopt=metadata_expire=never"
+#DEFAULT_INSTALL_OPTIONS="-y --cacheonly"
+
+
 function checkUser()
 {
     echo "Begin checkUser(): SUDO_USER=${SUDO_USER}, USER=${USER}, SIPX_USER=${SIPX_USER}"
@@ -56,7 +60,7 @@ function checkUser()
 
 function checkInput()
 {
-    echo "Begin checkInput(): options=$@"
+    echo "Begin checkInput(): parameters=$@"
 
     for i in "$@"
     do
@@ -85,6 +89,10 @@ function checkInput()
             INSTALL="install"
             shift
             ;;
+            -o=*|--install-options=*)
+            INSTALL_OPTIONS="${o#*=}"
+            shift
+            ;;
             -h|--help)
                 echo "
 
@@ -95,6 +103,7 @@ function checkInput()
                 -v|--version: version to build, e.g ${DEFAULT_VERSION} (default), 24.07
                 -r|--rpm: include if building rpms
                 -i|--install: include if installing rpms locally
+                -o|--install-options: options for the install command to yum/dnf
 
             Sample:
                 sudo sipxecs-build --platform=centos-7 --subproject=sipXconfig --version=25.01 --rpm --install
@@ -198,7 +207,12 @@ function checkInput()
         esac
     fi
 
-    echo "Done checkInput(): PLATFORM=${PLATFORM}, ARCHITECTURE=${ARCHITECTURE}, SUBPROJECT=${SUBPROJECT}, VERSION=${VERSION}, INSTALL=${INSTALL}"
+    if [ -z "${INSTALL_OPTIONS}" ]
+    then
+        INSTALL_OPTIONS=${DEFAULT_INSTALL_OPTIONS}
+    fi
+
+    echo "Done checkInput(): PLATFORM=${PLATFORM}, ARCHITECTURE=${ARCHITECTURE}, SUBPROJECT=${SUBPROJECT}, VERSION=${VERSION}, INSTALL=${INSTALL}, INSTALL_OPTIONS=${INSTALL_OPTIONS}"
 }
 
 function checkSELinux()
@@ -232,9 +246,9 @@ function init()
     echo "Done init()"
 }
 
-function setupRepos() 
+function addRepos() 
 {
-    echo "Begin setupRepos()"
+    echo "Begin addRepos()"
 
     wget -O /etc/yum.repos.d/sipxcom.repo \
         https://storage.googleapis.com/sipxecs/sipxcom/${VERSION}/${PLATFORM}-${ARCHITECTURE}/sipxcom.repo
@@ -242,15 +256,15 @@ function setupRepos()
     case $PLATFORM in
 
         "centos-7")
-            LOCAL_REPO=${BUILD_DIR}/repo/CentOS_7/${ARCHITECTURE}
+            addCentOS7Repos
             ;;
 
         "centos-9")
-            LOCAL_REPO=${BUILD_DIR}/repo/CentOS_9/${ARCHITECTURE}
+            addCentOS9Repos
             ;;
 
         "rocky-9")
-            LOCAL_REPO=${BUILD_DIR}/repo/Rocky_9/${ARCHITECTURE}
+            addRocky9Repos
             ;;
 
         *)
@@ -259,8 +273,52 @@ function setupRepos()
             ;;
     esac
 
-    echo "Done setupRepos()"
+    echo "Done addRepos()"
 }
+
+function addCentOS7Repos() 
+{
+    echo "Begin addCentOS7Repos()"
+
+    LOCAL_REPO=${BUILD_DIR}/repo/CentOS_7/${ARCHITECTURE}
+
+    echo "Done addCentOS7Repos()"
+}
+
+function addCentOS9Repos() 
+{
+    echo "Begin addCentOS9Repos()"
+
+    LOCAL_REPO=${BUILD_DIR}/repo/CentOS_9/${ARCHITECTURE}
+
+    rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+    wget -O /etc/yum.repos.d/elasticsearch.repo \
+      https://storage.googleapis.com/sipxecs/artifact-registry/elasticsearch.repo
+
+    wget -O /etc/yum.repos.d/mongodb-org-8.0.repo \
+      https://storage.googleapis.com/sipxecs/artifact-registry/mongodb-org-8.0.repo
+
+    echo "Done addCentOS9Repos()"
+}
+
+function addRocky9Repos() 
+{
+    echo "Begin addRocky9Repos()"
+
+    LOCAL_REPO=${BUILD_DIR}/repo/Rocky_9/${ARCHITECTURE}
+
+    rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+
+    wget -O /etc/yum.repos.d/elasticsearch.repo \
+      https://storage.googleapis.com/sipxecs/artifact-registry/elasticsearch.repo
+
+    wget -O /etc/yum.repos.d/mongodb-org-8.0.repo \
+      https://storage.googleapis.com/sipxecs/artifact-registry/mongodb-org-8.0.repo
+
+    echo "Done addRocky9Repos()"
+}
+
 
 function setupCentOS7() 
 {
@@ -274,7 +332,7 @@ function setupCentOS7()
         exit ${ERROR}
     fi 
 
-    sudo yum install -y make autoconf automake 
+    sudo yum install ${INSTALL_OPTIONS} make autoconf automake 
 
     ERROR=$?
     if [ ${ERROR} -ne 0 ]; then 
@@ -284,11 +342,11 @@ function setupCentOS7()
 
     sed -i 's/obsoletes=1/obsoletes=0/' /etc/yum.conf
 
-    sudo yum install -y libtool gcc-c++ openssl-devel libmcrypt-devel libtool-ltdl-devel \
+    sudo yum install ${INSTALL_OPTIONS} libtool gcc-c++ openssl-devel libmcrypt-devel libtool-ltdl-devel \
         pcre-devel pcre-devel findutils  db4-devel iptables iproute boost-devel libpcap-devel libdnet-devel xmlrpc-c-devel \
         libevent-devel poco-devel libconfig-devel hiredis-devel gtest-devel leveldb-devel cppunit-devel gperftools-devel \
         c-ares-devel libdb4-cxx-devel libdb-cxx-devel popt-devel xerces-c-devel zeromq-devel libev-devel v8-devel httpd unixODBC-devel \
-        mock rsync gem systemd-sysv mongo-cxx-driver-devel libuuid-devel swig cfengine openfire resiprocate-libs \
+        mock rsync gem systemd-sysv mongo-cxx-driver-devel libuuid-devel swig openfire resiprocate-libs \
         dart-sdk createrepo unzip checkpolicy policycoreutils policycoreutils-python freeswitch-devel bcg729-devel java-1.8.0-openjdk-devel 
 
     ERROR=$?
@@ -313,7 +371,7 @@ function setupCentOS7()
     sudo echo oss_core > .modules-exclude
 
     if [ "${RPM}" != "" ]; then
-        sudo yum install -y createrepo rpm-build mock
+        sudo yum install ${INSTALL_OPTIONS} createrepo rpm-build mock
         sudo wget http://li.nux.ro/download/nux/misc/el7/x86_64/thttpd-2.25b-33.el7.nux.x86_64.rpm
         sudo rpm -ivh thttpd-2.25b-33.el7.nux.x86_64.rpm
         rm -f thttpd-2.25b-33.el7.nux.x86_64.rpm
@@ -336,7 +394,7 @@ function setupRocky9()
     echo "Begin setupRocky9()"
 
     echo "installing build tools"
-    sudo dnf install -y make autoconf automake libtool epel-release
+    sudo dnf install ${INSTALL_OPTIONS} make autoconf automake libtool epel-release cmake gem httpd
 
     ERROR=$?
     if [ ${ERROR} -ne 0 ]; then 
@@ -344,17 +402,8 @@ function setupRocky9()
         exit ${ERROR}
     fi 
 
-    echo "installing rpms from sipxcom repo"
-    # sudo dnf install -y 
-
-    ERROR=$?
-    if [ ${ERROR} -ne 0 ]; then 
-        echo "dnf install error, exiting sipxecs-build"
-        exit ${ERROR}
-    fi 
-
-    echo "installing standard OS repo tools"
-    sudo dnf install -y boost-devel dnf-plugins-core gcc-c++ krb5-devel 
+    echo "installing standard base OS repo tools"
+    #sudo dnf install ${INSTALL_OPTIONS} --setopt=metadata_expire=never boost-devel dnf-plugins-core gcc-c++ krb5-devel policycoreutils cyrus-sasl-devel java-1.8.0-openjdk-devel 
 
     ERROR=$?
     if [ ${ERROR} -ne 0 ]; then 
@@ -364,7 +413,7 @@ function setupRocky9()
 
     echo "installing standard devel repo tools"
     dnf config-manager --enable devel
-    sudo dnf install -y v8-devel 
+    #sudo dnf install ${INSTALL_OPTIONS}  v8-devel policycoreutils-python-utils gcc-plugin-devel
 
     ERROR=$?
     if [ ${ERROR} -ne 0 ]; then 
@@ -374,7 +423,7 @@ function setupRocky9()
 
     echo "installing epel repo tools"
     dnf config-manager --enable epel
-    sudo dnf install -y gperftools-devel poco-devel zeromq-devel gtest-devel hiredis-devel leveldb-devel libdnet-devel libmcrypt-devel 
+    #sudo dnf install ${INSTALL_OPTIONS} gperftools-devel poco-devel gtest-devel hiredis-devel leveldb-devel libdnet-devel libmcrypt-devel mongo-c-driver-devel utf8proc-devel
 
     ERROR=$?
     if [ ${ERROR} -ne 0 ]; then 
@@ -384,7 +433,7 @@ function setupRocky9()
 
     echo "installing crb repo tools"
     dnf config-manager --enable crb
-    sudo dnf install -y cppunit-devel  poco-devel zeromq-devel libconfig-devel libpcap-devel libsrtp-devel libdb-cxx-devel
+    # sudo dnf install ${INSTALL_OPTIONS} cppunit-devel poco-devel zeromq-devel cppzmq-devel libconfig-devel libpcap-devel libsrtp-devel libdb-cxx-devel
 
     ERROR=$?
     if [ ${ERROR} -ne 0 ]; then 
@@ -392,11 +441,77 @@ function setupRocky9()
         exit ${ERROR}
     fi 
 
+    echo "installing rpms from sipXecs repo"
+    dnf config-manager --enable sipxcom
+    sudo dnf install ${INSTALL_OPTIONS} freeswitch-devel
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "dnf install error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    if [ "${SUBPROJECT}" != "mongo-cxx-driver" ] && [ "${SUBPROJECT}" != "lib" ]; then
+        echo "installing mongo-cxx-driver from sipxcom repo"
+        sudo dnf install ${INSTALL_OPTIONS} mongo-cxx-driver-devel 
+
+        ERROR=$?
+        if [ ${ERROR} -ne 0 ]; then 
+            echo "dnf install error, exiting sipxecs-build"
+            exit ${ERROR}
+        fi 
+    fi
+
+    if [ "${SUBPROJECT}" != "cfengine" ] && [ "${SUBPROJECT}" != "lib" ]; then
+        echo "installing cfengine from sipxcom repo"
+        sudo dnf install ${INSTALL_OPTIONS} cfengine-community
+
+        ERROR=$?
+        if [ ${ERROR} -ne 0 ]; then 
+            echo "dnf install error, exiting sipxecs-build"
+            exit ${ERROR}
+        fi 
+    fi
+
+    if [ "${SUBPROJECT}" != "dart-sdk" ] && [ "${SUBPROJECT}" != "lib" ]; then
+        echo "installing dart-sdk from sipxcom repo"
+        sudo dnf install ${INSTALL_OPTIONS} dart-sdk
+
+        ERROR=$?
+        if [ ${ERROR} -ne 0 ]; then 
+            echo "dnf install error, exiting sipxecs-build"
+            exit ${ERROR}
+        fi 
+    fi
+
+    echo "installing elasticsearch from elasticsearch repo"
+    dnf config-manager --enable elasticsearch
+    sudo dnf install ${INSTALL_OPTIONS} elasticsearch
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "dnf install error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    echo "installing MongoDB from mongodb-org-8.0 repo"
+    dnf config-manager --enable mongodb-org-8.0
+    sudo dnf install ${INSTALL_OPTIONS} mongodb-org
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "dnf install error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+    
 
     if [ "${RPM}" != "" ]; then
 
+        echo "Setting rpmbuild to ${BUILD_DIR}/rpmbuild"
+	    echo "%_topdir      ${BUILD_DIR}/rpmbuild" >> ~/.rpmmacros
+
         echo "installing standard RPM tools"
-        sudo yum install -y createrepo rpm-build podman
+        sudo dnf install ${INSTALL_OPTIONS} createrepo rpm-build podman
 
         ERROR=$?
         if [ ${ERROR} -ne 0 ]; then 
@@ -406,7 +521,7 @@ function setupRocky9()
 
         echo "installing crb RPM tools"
         dnf config-manager --enable crb
-        sudo yum install -y mock
+        sudo dnf install ${INSTALL_OPTIONS} mock
 
         ERROR=$?
         if [ ${ERROR} -ne 0 ]; then 
@@ -422,7 +537,7 @@ function setupRocky9()
         fi 
 
         echo "installing  other sipxcom RPM tools"
-        sudo yum install -y thttpd 
+        #sudo dnf install ${INSTALL_OPTIONS} thttpd 
 
         ERROR=$?
         if [ ${ERROR} -ne 0 ]; then 
@@ -431,6 +546,8 @@ function setupRocky9()
         fi 
     fi
 
+    # cd ${BUILD_DIR}
+    # sudo echo oss_core > .modules-exclude
 
     echo "Done setupRocky9()"
 }
@@ -548,7 +665,7 @@ function install()
     cd ${BUILD_DIR}
 
     # 'repomanage' lists the most recent RPMs in a directory
-    sudo yum localinstall -y $(repomanage ${LOCAL_REPO})
+    sudo yum localinstall ${INSTALL_OPTIONS} $(repomanage ${LOCAL_REPO})
 
     echo "Done install()"
 }
@@ -566,7 +683,7 @@ function main()
 
     init
 
-    setupRepos
+    addRepos
 
     case $PLATFORM in
 
