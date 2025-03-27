@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #
 # Expanded expires-spread and db utilities
 # -- jnolen@ezuce.com 20 May 2013

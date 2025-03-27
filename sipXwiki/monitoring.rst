@@ -401,9 +401,9 @@ The command definitions for all commands prefixed with check_nrpe should be defi
   command[check_ui]=/usr/local/nagios/libexec/check_http -w5 -c 10 --ssl -H sipx1.example.org -u /sipxconfig/app
   command[check_sip_registration]=/usr/local/nagios/libexec/check_registrations.sh
   command[check_ntp_time]=/usr/local/nagios/libexec/check_ntp_time -H sipx1.example.org -w 0.5 -c 1
-  command[check_mongo_connect]=/usr/bin/python /usr/local/nagios/libexec/check_mongo -H sipx1.example.org -A connect
-  command[check_mongo_ops]=/usr/bin/python /usr/local/nagios/libexec/check_mongo -H sipx1.example.org -A count
-  command[check_mongo_lag]=/usr/bin/python /usr/local/nagios/libexec/check_mongo -H sipx1.example.org -A long
+  command[check_mongo_connect]=/usr/bin/python3 /usr/local/nagios/libexec/check_mongo -H sipx1.example.org -A connect
+  command[check_mongo_ops]=/usr/bin/python3 /usr/local/nagios/libexec/check_mongo -H sipx1.example.org -A count
+  command[check_mongo_lag]=/usr/bin/python3 /usr/local/nagios/libexec/check_mongo -H sipx1.example.org -A long
 
   # dns checks
   command[check_tcp_sip_srv]=/usr/local/nagios/libexec/check_dns -H _sip._tcp.example.org -s 127.0.0.1 -q SRV
