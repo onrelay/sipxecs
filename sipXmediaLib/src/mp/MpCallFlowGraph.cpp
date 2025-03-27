@@ -612,12 +612,6 @@ int MpCallFlowGraph::closeRecorders(void)
    int ret = 0;
    int i;
 
-   if (NULL == this) {
-      MpMediaTask* pMT = MpMediaTask::getMediaTask(0);
-      MpCallFlowGraph* pIF = (MpCallFlowGraph*) pMT->getFocus();
-      if (NULL != pIF) return pIF->closeRecorders();
-      return 0;
-   }
    for (i=0; i<MAX_RECORDERS; i++) {
       if (mpRecorders[i]) {
          mpRecorders[i]->closeRecorder();
@@ -665,15 +659,6 @@ OsStatus MpCallFlowGraph::Record(int ms,
    static char saved_baseName[MAXUNIXPATH] = "";
    static char saved_endName[MAXUNIXPATH] = "";
    OsStatus    res;
-
-   if (NULL == this) {
-      MpMediaTask* pMT = MpMediaTask::getMediaTask(0);
-      MpCallFlowGraph* pIF = (MpCallFlowGraph*) pMT->getFocus();
-      if (NULL != pIF) {
-         return pIF->Record(ms, playFilename, baseName, endName, recorderMask);
-      }
-      return OS_INVALID;
-   }
 
    if (ms == 0)
       ms = saved_ms;
@@ -868,17 +853,6 @@ OsStatus MpCallFlowGraph::record(int ms, int silenceLength, const char* micName,
    int repeat, OsNotification* completion,
    MprRecorder::RecordFileFormat format)
 {
-   if (NULL == this) {
-      MpMediaTask* pMT = MpMediaTask::getMediaTask(0);
-      MpCallFlowGraph* pIF = (MpCallFlowGraph*) pMT->getFocus();
-      if (NULL != pIF) {
-         return pIF-> record(ms, silenceLength, micName, echoOutName, spkrName,
-            mic32Name, spkr32Name, echoIn8Name, echoIn32Name,
-            playName, toneOptions, repeat, completion);
-      }
-      return OS_INVALID;
-   }
-
    if (NULL != micName) {
       setupRecorder(RECORDER_MIC, micName,
                     ms, silenceLength, completion, format);
