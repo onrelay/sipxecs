@@ -29,16 +29,13 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <boost/program_options.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/ini_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/detail/ptree_utils.hpp>
 #include <stdexcept>
 #include <locale>
 
 #ifndef SERVICE_NO_LOGGER
 #include "os/OsLogger.h"
+
+#include "StateQueueTypes.h"
 
 namespace Os
 {
@@ -842,7 +839,7 @@ inline void ServiceOptions::catch_global()
     catch_global_print(e.c_str());
   }
 #ifdef MONGO_assert
-  catch (mongo::DBException& e)
+  catch (mongocxx::exception& e)
   {
     catch_global_print(e.toString().c_str());
   }

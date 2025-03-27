@@ -16,14 +16,7 @@
 #ifndef STATEQUEUECONNECTION_H
 #define	STATEQUEUECONNECTION_H
 
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/shared_ptr.hpp>
-#include "sqa/StateQueueClient.h"
-
+#include "StateQueueTypes.h" 
 class StateQueueAgent;
 
 

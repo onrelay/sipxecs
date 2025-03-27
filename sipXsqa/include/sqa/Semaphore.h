@@ -16,8 +16,7 @@
 #ifndef SEMAPHORE_H
 #define	SEMAPHORE_H
 
-#include <boost/thread.hpp>
-
+#include "StateQueueTypes.h"
 
 class Semaphore
 {

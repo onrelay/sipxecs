@@ -16,20 +16,18 @@
 #ifndef STATEQUEUEDRIVERTEST_H
 #define	STATEQUEUEDRIVERTEST_H
 
+#include <sstream>
+#include <string>
+
+#include "StateQueueTypes.h"
 #include "StateQueueClient.h"
-#include "StateQueueAgent.h"
 #include "StateQueueDialogData.h"
 #include "StateQueueDialogDataClient.h"
 #include "StateQueueRegData.h"
 #include "sqaclient.h"
 
-
-#include <sstream>
-#include <string>
-#include <boost/thread.hpp>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
 #include "TimedMap.h"
+
 
 #define TEST_TCP_TIMEOUT 1000
 

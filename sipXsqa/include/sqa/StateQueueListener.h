@@ -17,8 +17,7 @@
 #ifndef STATEQUEUELISTENER_H
 #define	STATEQUEUELISTENER_H
 
-#include <boost/asio.hpp>
-#include <boost/noncopyable.hpp>
+#include "StateQueueTypes.h"
 #include "StateQueueConnection.h"
 
 class StateQueueAgent;

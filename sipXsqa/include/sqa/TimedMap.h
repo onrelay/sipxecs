@@ -16,8 +16,9 @@
 #ifndef TIMEDSET_H
 #define	TIMEDSET_H
 
-#include "TimedQueue.h"
 #include <set>
+
+#include "TimedQueue.h"
 
 class TimedMap
 {

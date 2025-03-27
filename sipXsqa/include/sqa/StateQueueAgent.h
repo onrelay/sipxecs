@@ -18,10 +18,8 @@
 
 
 #include <os/OsServiceOptions.h>
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
-#include <boost/asio.hpp>
-#include <boost/noncopyable.hpp>
+
+#include "StateQueueTypes.h"
 #include "StateQueueConnection.h"
 #include "TimedQueue.h"
 #include "StateQueuePersistence.h"
@@ -29,7 +27,6 @@
 #include "StateQueueRecord.h"
 #include "StateQueueMessage.h"
 #include "StateQueueListener.h"
-#include "zmq.hpp"
 #include "RedisClientAsync.h"
 
 

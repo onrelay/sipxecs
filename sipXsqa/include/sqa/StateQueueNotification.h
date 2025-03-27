@@ -21,10 +21,13 @@
 #include <vector>
 #include <queue>
 #include <cassert>
-#include <boost/thread.hpp>
-#include <zmq.hpp>
+
 #include <os/OsServiceOptions.h>
+
 #include "sqaclient.h"
+
+#include "StateQueueTypes.h"
+
 
 class StateQueueNotification
 {

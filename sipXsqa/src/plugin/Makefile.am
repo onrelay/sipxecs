@@ -13,7 +13,8 @@ SQAPLUGIN_COMMON_CXX_FLAGS = \
 # Current - increment if any interfaces are added, removed, or changed
 version_Current=1
 # Revision - set to 0 if Current was incremented
-#            increment if -lmongoclient \
+#            increment if -lmongocxx \
+-lbsoncxx \
     -lboost_systemany implementation has changed
 version_Revision=0
 # Age - set to 0 of any interfaces have been removed
@@ -45,7 +46,8 @@ plugin_libsqaclient_plugin_la_LIBADD = \
 	-lboost_program_options \
 	-lpthread \
 	-lzmq \
-	-lmongoclient \
+	-lmongocxx \
+-lbsoncxx \
 	../libsipXsqa.la
 
 

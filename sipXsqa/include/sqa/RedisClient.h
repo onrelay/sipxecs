@@ -21,12 +21,11 @@ extern "C"
   #include <hiredis/hiredis.h>
 }
 
-#include <boost/noncopyable.hpp>
-#include <boost/thread.hpp>
-#include <boost/shared_ptr.hpp>
 #include <map>
 #include <os/OsServiceOptions.h>
-#include "sqa/StateQueueMessage.h"
+
+#include "StateQueueTypes.h"
+#include "StateQueueMessage.h"
 
 
 //

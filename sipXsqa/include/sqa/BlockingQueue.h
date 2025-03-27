@@ -18,8 +18,9 @@
 
 #include <queue>
 #include <cassert>
-#include <boost/thread.hpp>
-#include <boost/noncopyable.hpp>
+
+#include "StateQueueTypes.h"
+
 #include "Semaphore.h"
 
 template <typename T>

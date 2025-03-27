@@ -16,12 +16,13 @@
 #ifndef STATEQUEUEPUBLISHER_H
 #define	STATEQUEUEPUBLISHER_H
 
-#include "StateQueueRecord.h"
-#include <boost/thread.hpp>
-#include "BlockingQueue.h"
-#include "TimedQueue.h"
 #include <set>
 #include <map>
+
+#include "StateQueueTypes.h"
+#include "StateQueueRecord.h"
+#include "BlockingQueue.h"
+#include "TimedQueue.h"
 
 class StateQueueAgent;
 

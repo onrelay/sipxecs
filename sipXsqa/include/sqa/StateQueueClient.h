@@ -17,16 +17,11 @@
 #define StateQueueClient_H
 
 #include <cassert>
-#include <zmq.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/asio.hpp>
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread.hpp>
-#include <boost/lexical_cast.hpp>
+#include <optional>
 
 #include <os/OsLogger.h>
 
+#include "StateQueueAgent.h"
 #include "StateQueueMessage.h"
 #include "BlockingQueue.h"
 #include "BlockingTcpClient.h"
@@ -269,13 +264,7 @@ public:
   {
     _zmqSocket = new zmq::socket_t(*_zmqContext,ZMQ_SUB);
     int linger = SQA_LINGER_TIME_MILLIS; // milliseconds
-    //int recvTimeoutMs = SQA_CONN_READ_TIMEOUT;// milliseconds
-    //int sendTimeoutMs = SQA_CONN_WRITE_TIMEOUT;// milliseconds
-    _zmqSocket->setsockopt(ZMQ_LINGER, &linger, sizeof(int));
-    // WARNING: at one test it worked only with this fix; later it worked also without
-    // this fix
-    //_zmqSocket->setsockopt(ZMQ_RCVTIMEO, &recvTimeoutMs, sizeof(int));
-    //_zmqSocket->setsockopt(ZMQ_SNDTIMEO, &sendTimeoutMs, sizeof(int));
+    _zmqSocket->set(zmq::sockopt::linger, linger);    
   }
 
   void destroyZmqSocket()
@@ -455,10 +444,9 @@ private:
     try
     {
       _zmqSocket->connect(sqaAddress.c_str());
-      _zmqSocket->setsockopt(ZMQ_SUBSCRIBE, eventId.c_str(), eventId.size());
-
+      _zmqSocket->set(zmq::sockopt::subscribe, eventId);
     }
-    catch(std::exception e)
+    catch(std::exception& e)
     {
       OS_LOG_INFO(FAC_NET, CLASS_INFO() "eventId=" << eventId << " address=" << sqaAddress << " FAILED!  Error: " << e.what());
       return false;
@@ -822,7 +810,7 @@ private:
 
         count = boost::lexical_cast<int>(strcount);
     }
-    catch(std::exception e)
+    catch(std::exception& e)
     {
       OS_LOG_ERROR(FAC_NET, CLASS_INFO() "Unknown exception: " << e.what());
       return false;
@@ -841,30 +829,33 @@ private:
     char * buff = (char*)malloc(data.size());
     memcpy(buff, data.c_str(), data.size());
     zmq::message_t message((void*)buff, data.size(), zmq_free, 0);
-    bool rc = socket.send(message);
-    return (rc);
+    std::optional<size_t> result = socket.send(message, zmq::send_flags::none);
+    return result.has_value();
   }
 
   //  Sends string as 0MQ string, as multipart non-terminal
   static bool zmq_sendmore (zmq::socket_t & socket, const std::string & data)
   {
-    char * buff = (char*)malloc(data.size());
-    memcpy(buff, data.c_str(), data.size());
-    zmq::message_t message((void*)buff, data.size(), zmq_free, 0);
-    bool rc = socket.send(message, ZMQ_SNDMORE);
-    return (rc);
+      char * buff = (char*)malloc(data.size());
+      memcpy(buff, data.c_str(), data.size());
+      zmq::message_t message((void*)buff, data.size(), zmq_free, nullptr);
+      std::optional<size_t> result = socket.send(message, zmq::send_flags::sndmore);
+      return result.has_value();
   }
 
-  static bool zmq_receive (zmq::socket_t *socket, std::string& value)
+  static bool zmq_receive(zmq::socket_t *socket, std::string& value)
   {
       zmq::message_t message;
-      socket->recv(&message);
-
-      if (!message.size())
-      {
-        return false;
+  
+      zmq::recv_result_t result = socket->recv(message, zmq::recv_flags::none);
+      if (!result.has_value()) {
+          return false;
       }
-
+  
+      if (!message.size()) {
+          return false;
+      }
+  
       value = std::string(static_cast<char*>(message.data()), message.size());
       return true;
   }

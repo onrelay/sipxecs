@@ -19,10 +19,9 @@
 #include <string>
 #include <vector>
 #include <map>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/any.hpp>
+
+#include "StateQueueTypes.h"
+
 
 //
 // DEFINE_UNIT_TEST - Define a Test Group.  Must be called prior to DEFINE_TEST

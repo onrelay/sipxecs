@@ -18,13 +18,10 @@
 
 #include <map>
 #include <string>
-#include <boost/any.hpp>
-#include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
-#include <boost/thread.hpp>
-#include <boost/lexical_cast.hpp>
 #include <set>
+
+#include "StateQueueTypes.h"
+
 
 class TimedQueue
 {

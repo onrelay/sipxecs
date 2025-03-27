@@ -19,7 +19,9 @@
 #include <vector>
 #include <string>
 #include <cstdlib>
-#include <sqa/StateQueueMessage.h>
+
+#include "StateQueueTypes.h"
+#include "StateQueueMessage.h"
 
 
 struct StateQueueRecord

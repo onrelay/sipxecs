@@ -22,6 +22,7 @@ nobase_include_HEADERS = \
 	sqa/StateQueuePublisher.h \
 	sqa/StateQueueRecord.h \
 	sqa/StateQueueRegData.h \
+	sqa/StateQueueTypes.h \
 	sqa/TimedMap.h \
 	sqa/TimedQueue.h \
 	sqa/UnitTest.h \

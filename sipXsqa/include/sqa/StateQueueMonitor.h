@@ -17,12 +17,9 @@
 #ifndef STATEQUEUEMONITOR_H
 #define	STATEQUEUEMONITOR_H
 
-
-#include <boost/thread.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
 #include "sqa/sqaclient.h"
+
+#include "StateQueueTypes.h"
 
 
 class StateQueueMonitor

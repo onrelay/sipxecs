@@ -16,14 +16,17 @@
 #ifndef SQACLIENT_H
 #define	SQACLIENT_H
 
-#ifndef EXCLUDE_SQA_INLINES
-#include "sqa/StateQueueClient.h"
-#include <boost/lexical_cast.hpp>
-#endif
 
 #include <map>
 #include <vector>
 #include <string>
+
+#include "sqa/StateQueueTypes.h"
+
+#ifndef EXCLUDE_SQA_INLINES
+#include "sqa/StateQueueClient.h"
+#endif
+
 
 #ifdef SWIG
 %module sqaclient

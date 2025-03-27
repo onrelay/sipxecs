@@ -35,7 +35,8 @@ sipxsqa_LDADD = \
 	  -lboost_program_options \
 	  -lpthread \
 	  -lzmq \
-	  -lmongoclient \
+	  -lmongocxx \
+-lbsoncxx \
 	  -lhiredis \
 	  -lev
 

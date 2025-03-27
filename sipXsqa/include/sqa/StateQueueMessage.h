@@ -21,7 +21,8 @@
 #include <cassert>
 #include <map>
 #include <string>
-#include <boost/noncopyable.hpp>
+
+#include "StateQueueTypes.h"
 
 class StateQueueMessage
 {

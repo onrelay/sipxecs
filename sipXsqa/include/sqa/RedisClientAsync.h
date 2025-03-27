@@ -25,9 +25,8 @@ extern "C"
 }
 
 #include <cassert>
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
-#include <boost/thread.hpp>
+
+#include "StateQueueTypes.h"
 #include "RedisClient.h"
 #include "Semaphore.h"
 
