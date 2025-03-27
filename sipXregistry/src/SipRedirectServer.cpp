@@ -794,7 +794,7 @@ SipRedirectServer::handleMessage(OsMsg& eventMessage)
      return handled;
    }
 #ifdef MONGO_assert
-  catch (mongo::DBException& e)
+  catch (mongocxx::exception& e)
   {
     errorString = "Registry - Mongo DB Exception";
     OS_LOG_ERROR( FAC_SIP, "SipRedirectServer::handleMessage() Exception: "

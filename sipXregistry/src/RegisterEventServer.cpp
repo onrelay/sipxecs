@@ -376,7 +376,7 @@ void RegisterEventServer::generateContent(const char* entityString,
                                           const RegDB::Bindings& bindings,
                                           HttpBody*& body)
 {
-   unsigned long now = OsDateTime::getSecsSinceEpoch();
+   std::int64_t now = OsDateTime::getSecsSinceEpoch();
 
    // Construct the body, an empty notice for the user.
    UtlString content;

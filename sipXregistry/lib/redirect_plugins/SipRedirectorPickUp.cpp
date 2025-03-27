@@ -12,6 +12,8 @@
 // SYSTEM INCLUDES
 #include <stdlib.h>
 #include <limits.h>
+#include <bsoncxx/document/view.hpp>
+
 
 // APPLICATION INCLUDES
 #include "os/OsLogger.h"
@@ -405,7 +407,7 @@ public:
     {
     }
 
-    void add(mongo::BSONObj& obj)
+    void add(const bsoncxx::document::view& obj)
     {
         EntityRecord entity;
         entity = obj;
@@ -544,7 +546,7 @@ SipRedirectorPickUp::lookUp(
          // Only the SUBSCRIBE method is acceptable for
          // ~~sp~allcredentials, to prevent "INVITE ~~sp~allcredentials@..."
          // from ringing every phone!
-          mongo::BSONObj query;
+          bsoncxx::document::view query;
           SipRedirectorAddContact add(*this, contactList);
           RegDB* regDb = SipRegistrar::getInstance(NULL)->getRegDB();
           // pass in boost function point to be called for each record. reducing memory footprint
@@ -636,7 +638,7 @@ SipRedirectorPickUp::lookUpDialog(
                 //
                 // If there are multiple bindings, get the most recent
                 //
-                unsigned long expireTime = 0;
+                std::int64_t expireTime = 0;
                 for (RegDB::Bindings::const_iterator iter = bindings.begin(); iter != bindings.end(); iter++)
                 {
                   if (iter->getExpirationTime() > expireTime)

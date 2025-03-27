@@ -297,7 +297,7 @@ SipRegistrarServer::applyRegisterToDirectory( const Url& toUrl
                                               //< the instrument identification
                                               // value from the authentication
                                               // user name, if any
-                                             ,const unsigned long timeNow
+                                             ,const std::int64_t timeNow
                                              ,const SipMessage& registerMessage
                                              ,RegistrationExpiryIntervals*& pExpiryIntervals,
                                               bool& isUnregister, std::vector<RegBinding::Ptr>& registrations
@@ -677,9 +677,9 @@ SipRegistrarServer::applyRegisterToDirectory( const Url& toUrl
                         {
                             RegBinding::Ptr pRecord = *iter;
 
-                            unsigned int expires = pRecord->getExpirationTime();
+                            std::int64_t expires = pRecord->getExpirationTime();
 
-                            int expirationTime;
+                            std::int64_t expirationTime;
                             if ( expires == 0 )
                             {
                                 // Unbind this binding
@@ -901,7 +901,7 @@ void SipRegistrarServer::handleRegister(SipMessage* pMsg)
           message.getToAddress( &address, &port, &protocol, NULL, NULL, &tag );
 
           // Add new contact values - update or insert.
-          unsigned long timeNow = OsDateTime::getSecsSinceEpoch();
+          std::int64_t timeNow = OsDateTime::getSecsSinceEpoch();
           RegistrationExpiryIntervals* pExpiryIntervalsUsed = 0;
           bool isUnregister = false;
           std::vector<RegBinding::Ptr> newBindings;
@@ -967,7 +967,7 @@ void SipRegistrarServer::handleRegister(SipMessage* pMsg)
                   // is true, and when the latter is set, commonExpirationTime
                   // is set.  But we must initialize it to stop the compiler
                   // from complaining.
-                  unsigned int commonExpirationTime = 0;
+                  std::int64_t commonExpirationTime = 0;
 
                   int contactCounter = 0;
                   for (RegDB::Bindings::const_iterator iter = registrations.begin(); iter != registrations.end(); iter++)
@@ -992,8 +992,8 @@ void SipRegistrarServer::handleRegister(SipMessage* pMsg)
                     {
 
 
-                      unsigned int expires = record.getExpirationTime();
-                      expires = expires - timeNow;
+                     std::int64_t expires = record.getExpirationTime();
+                     expires = expires - timeNow;
 
                       Os::Logger::instance().log( FAC_SIP, PRI_DEBUG,
                                     "SipRegistrarServer::handleMessage - "
@@ -1290,7 +1290,7 @@ SipRegistrarServer::handleMessage( OsMsg& eventMessage )
     return handled;
   }
 #ifdef MONGO_assert
-  catch (mongo::DBException& e)
+  catch (mongocxx::exception& e)
   {
     errorString = "Registry - Mongo DB Exception";
     OS_LOG_ERROR( FAC_SIP, "SipRegistrarServer::handleMessage() Exception: "

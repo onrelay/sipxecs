@@ -35,7 +35,6 @@
 //
 #include <stdexcept>
 #include <execinfo.h>
-#include <mongo/util/assert_util.h>
 #include "sipXecsService/SipXApplication.h"
 
 // DEFINES

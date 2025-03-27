@@ -65,7 +65,7 @@ protected:
 
 private:
    AppConfig* _pAppConfig;                         // Pointer to the AppConfig class
-   const mongo::ConnectionString _mongoConnectionString; // Mongo connection string
+   const std::string _mongoConnectionString;        // Mongo connection string
 };
 
 inline void AppPerform::setConfig(AppConfig* pAppConfig){_pAppConfig = pAppConfig;}

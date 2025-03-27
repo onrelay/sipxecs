@@ -80,7 +80,7 @@ public:
 
          // Get the updates to apply.
 
-         unsigned long timeNow = OsDateTime::getSecsSinceEpoch();
+         std::int64_t timeNow = OsDateTime::getSecsSinceEpoch();
 
          // update1 - one update with update number 11 that is in-order
          UtlSList update1;

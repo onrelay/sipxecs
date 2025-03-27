@@ -30,7 +30,8 @@ libsipXregistry_la_LIBADD = \
 
 libsipXregistry_la_LIBADD = \
 	@SIPXCOMMSERVER_LIBS@ \
-        -lmongoclient \
+        -lmongocxx \
+    -lbsoncxx \
         -lboost_system
 
 libsipXregistry_la_SOURCES = \

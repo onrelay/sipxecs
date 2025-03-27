@@ -111,7 +111,7 @@ protected:
                             *   which contains the AOR to register to. */
         const UtlString& instrument,
                            ///< instrument value to add to bindings
-        const unsigned long timeNow, ///< base time for all expiration calculations
+        const std::int64_t timeNow, ///< base time for all expiration calculations
         const SipMessage& registerMessage, ///< message containing bindings
         RegistrationExpiryIntervals*& expiryIntervalsUsed,
         bool& isUnregister, std::vector<RegBinding::Ptr>& newBindings);

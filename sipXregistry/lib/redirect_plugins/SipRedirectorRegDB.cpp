@@ -80,10 +80,10 @@ SipRedirectorRegDB::lookUp(
    SipRedirectorPrivateStorage*& privateStorage,
    ErrorDescriptor& errorDescriptor)
 {
-   unsigned long timeNow = OsDateTime::getSecsSinceEpoch();
+   std::int64_t timeNow = OsDateTime::getSecsSinceEpoch();
 
    // OR: This adjustment causes blocking lookups and call attempts towards expired contacts
-   //unsigned long timeNow = OsDateTime::getSecsSinceEpoch() - SipRegistrar::getInstance(NULL)->getRegDB()->getExpireGracePeriod();
+   //std::int64_t timeNow = OsDateTime::getSecsSinceEpoch() - SipRegistrar::getInstance(NULL)->getRegDB()->getExpireGracePeriod();
    
    // Local copy of requestUri
    Url requestUriCopy = requestUri;

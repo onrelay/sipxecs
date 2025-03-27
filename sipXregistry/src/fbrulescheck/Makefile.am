@@ -9,7 +9,8 @@ fbrulescheck_LDADD = \
 	@SIPXTACK_LIBS@ \
 	@SIPXPORT_LIBS@ \
 	@SIPXCOMMSERVER_LIBS@ \
-    -lmongoclient
+    -lmongocxx \
+    -lbsoncxx
 
 fbrulescheck_CPPFLAGS = \
 	$(AM_CFLAGS)

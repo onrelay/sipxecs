@@ -9,7 +9,8 @@ arulescheck_LDADD = \
 	@SIPXTACK_LIBS@ \
 	@SIPXPORT_LIBS@ \
 	@SIPXCOMMSERVER_LIBS@ \
-    -lmongoclient
+    -lmongocxx \
+    -lbsoncxx
 
 arulescheck_CPPFLAGS = \
 	$(AM_CFLAGS)

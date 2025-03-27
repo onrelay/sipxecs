@@ -6,7 +6,8 @@ INCLUDES = -I$(top_srcdir)/include
 bin_PROGRAMS = sipXregTool
 
 sipXregTool_LDADD = @SIPXCOMMSERVER_LIBS@ \
-		   -lmongoclient
+		   -lmongocxx \
+-lbsoncxx
 
 sipXregTool_SOURCES =  \
 	Main.cpp \

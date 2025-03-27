@@ -10,8 +10,7 @@
 // SYSTEM INCLUDES
 #include <assert.h>
 #include <stdlib.h>
-#include <mongo/client/dbclient.h>
-#include <mongo/client/connpool.h>
+
 
 // APPLICATION INCLUDES
 #include "os/OsBSem.h"

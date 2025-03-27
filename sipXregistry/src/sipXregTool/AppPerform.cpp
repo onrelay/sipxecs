@@ -24,9 +24,6 @@
 
 #include <string>
 
-#include <mongo/util/net/hostandport.h>
-#include <mongo/client/connpool.h>
-
 #include <boost/format.hpp>
 
 #include <boost/lexical_cast.hpp>
@@ -35,7 +32,7 @@
 using namespace MongoDBTool;
 
 
-AppPerform::AppPerform() : _mongoConnectionString(mongo::HostAndPort("localhost"))
+AppPerform::AppPerform() : _mongoConnectionString(std::string("localhost"))
 {
 }
 
@@ -48,7 +45,7 @@ void AppPerform::deleteDbEntries(std::vector<std::string>& whereOptVector,
 {
   MongoDB::ConnectionInfo connectionInfo(_mongoConnectionString);
 
-  DbHelper::deleteDbEntries(&connectionInfo, databaseName, whereOptVector);
+  DbHelper::deleteDbEntries(connectionInfo, databaseName, whereOptVector);
 }
 
 void AppPerform::printDbEntries(std::vector<std::string>& whereOptVector,
@@ -68,5 +65,5 @@ void AppPerform::printDbEntries(std::vector<std::string>& whereOptVector,
 
   MongoDB::ConnectionInfo connectionInfo(_mongoConnectionString);
 
-  DbHelper::printDbEntries(std::cout, &connectionInfo, databaseName, whereOptVector, dbType, multipleLines);
+  DbHelper::printDbEntries(std::cout, connectionInfo, databaseName, whereOptVector, dbType, multipleLines);
 }
