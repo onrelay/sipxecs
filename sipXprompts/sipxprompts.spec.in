@@ -9,6 +9,9 @@ Vendor: SIPfoundry
 Packager: Douglas Hubler <dhubler@ezuce.com>
 Url: http://www.sipfoundry.org
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 BuildRequires: automake
 Requires: sipxsupervisor >= %version
 
