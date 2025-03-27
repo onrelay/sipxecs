@@ -49,4 +49,6 @@ _build
 packages
 .packages
 .DS_Store
-
+.pub-cache
+.dart_tool
+*.cmake
