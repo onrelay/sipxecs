@@ -403,7 +403,7 @@ function setupRocky9()
     fi 
 
     echo "installing standard base OS repo tools"
-    #sudo dnf install ${INSTALL_OPTIONS} --setopt=metadata_expire=never boost-devel dnf-plugins-core gcc-c++ krb5-devel policycoreutils cyrus-sasl-devel java-1.8.0-openjdk-devel 
+    sudo dnf install ${INSTALL_OPTIONS} libtool gcc-c++ openssl-devel boost-devel poco-devel cppunit-devel java-1.8.0-openjdk-devel 
 
     ERROR=$?
     if [ ${ERROR} -ne 0 ]; then 
@@ -537,7 +537,7 @@ function setupRocky9()
         fi 
 
         echo "installing  other sipxcom RPM tools"
-        #sudo dnf install ${INSTALL_OPTIONS} thttpd 
+        sudo dnf install ${INSTALL_OPTIONS} thttpd 
 
         ERROR=$?
         if [ ${ERROR} -ne 0 ]; then 
