@@ -19,7 +19,7 @@
     </stop>
   </commands>
   <status>
-    <pid>/var/run/new.pid</pid>
+    <pid>/run/new.pid</pid>
   </status>
   <resources>
     <file>work/processState/newprocess.xml</file>

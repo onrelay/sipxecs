@@ -20,7 +20,7 @@ SIPX_DATADIR=/var/sipxdata
 SIPX_LIBDIR=/usr/lib
 SIPX_VARDIR=/var
 SIPX_LOGDIR=/var/log/sipxpbx
-SIPX_RUNDIR=/var/run/sipxpbx
+SIPX_RUNDIR=/run/sipxpbx
 HTTP_ROOTDIR=/usr/share/www/doc
 HTTP_MODULEDIR=/etc/httpd/modules
 

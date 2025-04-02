@@ -126,16 +126,6 @@
   <X-PRE-PROCESS cmd="set" data="global_codec_prefs=G7221@32000h,G7221@16000h,G722,PCMU,PCMA,GSM"/>
   <X-PRE-PROCESS cmd="set" data="outbound_codec_prefs=PCMU,PCMA,GSM"/>
 
-  <!--
-      xmpp_client_profile and xmpp_server_profile
-      xmpp_client_profile can be any string. 
-      xmpp_server_profile is appended to "dingaling_" to form the database name
-      containing the "subscriptions" table.
-      used by: dingaling.conf.xml enum.conf.xml 
-  --> 
-
-  <X-PRE-PROCESS cmd="set" data="xmpp_client_profile=xmppc"/>
-  <X-PRE-PROCESS cmd="set" data="xmpp_server_profile=xmpps"/>
   <!-- 
        THIS IS ONLY USED FOR DINGALING
 
@@ -145,7 +135,6 @@
        This determines an ip address available on this host to bind.
        If you are separating RTP and SIP traffic, you will want to have
        use different addresses where this variable appears.
-       Used by: dingaling.conf.xml
   -->
   <X-PRE-PROCESS cmd="set" data="bind_server_ip=auto"/>
 
@@ -163,7 +152,7 @@
        where fs.mydomain.com is a DNS A record-useful when fs is on
        a dynamic IP address, and uses a dynamic DNS updater.
        If unspecified, the bind_server_ip value is used.
-       Used by: sofia.conf.xml dingaling.conf.xml
+       Used by: sofia.conf.xml 
   -->
   <X-PRE-PROCESS cmd="set" data="external_rtp_ip=stun:stun.freeswitch.org"/>
 
@@ -176,7 +165,7 @@
        where fs.mydomain.com is a DNS A record-useful when fs is on
        a dynamic IP address, and uses a dynamic DNS updater.
        If unspecified, the bind_server_ip value is used.
-       Used by: sofia.conf.xml dingaling.conf.xml
+       Used by: sofia.conf.xml 
   -->
   <X-PRE-PROCESS cmd="set" data="external_sip_ip=stun:stun.freeswitch.org"/>
 

@@ -1116,7 +1116,7 @@ class OSSServerApplication: public OSSApplication
 	///     }
 	///
 	/// When running as a daemon, specifying the --pidfile option (e.g.,
-	/// --pidfile=/var/run/sample.pid) may be useful to record the process ID of
+	/// --pidfile=/run/sample.pid) may be useful to record the process ID of
 	/// the daemon in a file. The PID file will be removed when the daemon process
 	/// terminates (but not, if it crashes).
 {

@@ -51,7 +51,7 @@ bundle agent snmp_config {
         comment => "SNMP service settings, $(this.promiser)",
         perms => m("644"),
         edit_defaults => empty,
-        edit_line => insert_lines("OPTIONS=\"-A -Lf $(sipx.SIPX_LOGDIR)/snmpd.log -p /var/run/snmpd.pid\""),
+        edit_line => insert_lines("OPTIONS=\"-A -Lf $(sipx.SIPX_LOGDIR)/snmpd.log -p /run/snmpd.pid\""),
         classes => if_repaired("reload_snmpd");
 }
 

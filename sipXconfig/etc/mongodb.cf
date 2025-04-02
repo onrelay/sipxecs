@@ -91,7 +91,7 @@ bundle agent mongodb_arbiter_config {
     mongod_arbiter::
       "dirs" slist => {
         "/var/lib/mongod-arbiter",
-        "/var/run/$(mongodb.id)",
+        "/run/$(mongodb.id)",
         "/var/log/mongodb/arbiter"
       };
 
@@ -134,7 +134,7 @@ bundle edit_line mongodb_arbiter_config_contents {
       "    smallFiles: true";
       "processManagement:";
       "  fork: true";
-      "  pidFilePath: /var/run/mongodb/mongod.pid";
+      "  pidFilePath: /run/mongodb/mongod.pid";
       "net:";
       "  port: 27018";
       "  bindIp: 0.0.0.0";
@@ -156,7 +156,7 @@ bundle edit_line mongo_arbiter_logrotate_contents {
        notifempty
        missingok
        postrotate
-          /bin/kill -USR1 `cat /var/run/$(mongodb.id)/mongodb-arbiter.pid 2>/dev/null` 2> /dev/null|| true
+          /bin/kill -USR1 `cat /run/$(mongodb.id)/mongodb-arbiter.pid 2>/dev/null` 2> /dev/null|| true
        endscript
 }
 ";
@@ -168,7 +168,7 @@ bundle agent mongo_local_config {
     any::
       "dirs" slist => {
         "/var/lib/mongo-local",
-        "/var/run/$(mongodb.id)",
+        "/run/$(mongodb.id)",
         "/var/log/mongodb/local"
       };
 
@@ -220,7 +220,7 @@ bundle edit_line mongo_local_config_contents {
       "  path: /var/log/$(mongodb.id)/local/mongodb.log";
       "processManagement:";
       "  fork: true";
-      "  pidFilePath: /var/run/mongodb/local.pid";
+      "  pidFilePath: /run/mongodb/local.pid";
       "net:";
       "  port: 27019";
       "  bindIp: 0.0.0.0";
@@ -287,7 +287,7 @@ bundle edit_line mongo_local_logrotate_contents {
        notifempty
        missingok
        postrotate
-          /bin/kill -USR1 `cat /var/run/$(mongodb.id)/local.pid 2>/dev/null` 2> /dev/null|| true
+          /bin/kill -USR1 `cat /run/$(mongodb.id)/local.pid 2>/dev/null` 2> /dev/null|| true
        endscript
 }
 ";
@@ -298,7 +298,7 @@ bundle agent mongo_local_arbiter_config {
     any::
       "dirs" slist => {
         "/var/lib/mongo-local-arbiter",
-        "/var/run/$(mongodb.id)",
+        "/run/$(mongodb.id)",
         "/var/log/mongodb/local"
       };
 
@@ -334,7 +334,7 @@ bundle edit_line mongo_local_arbiter_config_contents {
       "    smallFiles: true";
       "processManagement:";
       "  fork: true";
-      "  pidFilePath: /var/run/mongodb/local-arbiter.pid";
+      "  pidFilePath: /run/mongodb/local-arbiter.pid";
       "net:";
       "  port: 27020";
       "  bindIp: 0.0.0.0";
@@ -385,7 +385,7 @@ bundle edit_line mongodb_config_contents {
       "  path: /var/log/mongodb/mongod.log";
       "processManagement:";
       "  fork: true";
-      "  pidFilePath: /var/run/mongodb/mongod.pid";
+      "  pidFilePath: /run/mongodb/mongod.pid";
       "net:";
       "  port: 27017";
       "  bindIp: 0.0.0.0";

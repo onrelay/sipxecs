@@ -5,6 +5,6 @@
 #
 # Example
 #    vars:
-#      "pid" string => execresult("/var/run/foo.pid", "noshell");
+#      "pid" string => execresult("/run/foo.pid", "noshell");
 #
 test -f $1 && cat $1

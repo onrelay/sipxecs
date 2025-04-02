@@ -8,7 +8,7 @@
 # processname: /usr/sbin/snmptrapd
 # config: /etc/snmp/snmptrapd.conf
 # config: /usr/share/snmp/snmptrapd.conf
-# pidfile: /var/run/snmptrapd.pid
+# pidfile: /run/snmptrapd.pid
 
 
 ### BEGIN INIT INFO
@@ -26,7 +26,7 @@
 # source function library
 . /etc/init.d/functions
 
-OPTIONS="-Lsd -p /var/run/snmptrapd.pid"
+OPTIONS="-Lsd -p /run/snmptrapd.pid"
 if [ -e /etc/sysconfig/snmptrapd ]; then
   . /etc/sysconfig/snmptrapd
 fi
@@ -34,7 +34,7 @@ fi
 RETVAL=0
 prog="snmptrapd"
 binary=/usr/sbin/snmptrapd
-pidfile=/var/run/snmptrapd.pid
+pidfile=/run/snmptrapd.pid
 
 start() {
 	[ -x $binary ] || exit 5

@@ -32,7 +32,7 @@ missingok
 @SIPX_LOGDIR@/phone/*.log {
     sharedscripts             
     postrotate
-       test -f @SIPX_LOGDIR@/phone/var/run/syslog.pid || kill -HUP $(cat @SIPX_LOGDIR@/phone/var/run/syslog.pid) 2> /dev/null || true
+       test -f @SIPX_LOGDIR@/phone/run/syslog.pid || kill -HUP $(cat @SIPX_LOGDIR@/phone/run/syslog.pid) 2> /dev/null || true
     endscript
 }
 

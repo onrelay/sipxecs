@@ -14,7 +14,7 @@
     </stop>
   </commands>
   <status>
-    <pid>/var/run/someprocess.pid</pid>
+    <pid>/run/someprocess.pid</pid>
   </status>
   <resources>
     <file>/etc/sipxpbx/someprocess.xml</file>

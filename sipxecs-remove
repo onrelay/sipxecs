@@ -37,7 +37,7 @@ function remove()
 
     rm -rf /var/lib/pgsql/data/*
 
-    rm -rf /var/run/sipxpbx
+    rm -rf /run/sipxpbx
 
     service mongod stop
 

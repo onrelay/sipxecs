@@ -12,7 +12,7 @@
 # Source function library.
 . /etc/init.d/functions
 
-exec="/usr/sbin/cf-serverd"
+exec="/usr/local/sbin/cf-serverd"
 prog=$(basename $exec)
 
 [ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog

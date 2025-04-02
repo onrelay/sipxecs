@@ -24,7 +24,6 @@ require {
 	type unconfined_service_t;
 	type etc_mail_t;
 	type tuned_t;
-	type cgroup_t;
 	type snmpd_t;
 	type tmp_t;
 	type cfengine_initrc_exec_t;
@@ -174,9 +173,6 @@ allow cfengine_serverd_t cfengine_initrc_exec_t:file open;
 allow cfengine_serverd_t cfengine_initrc_exec_t:file { getattr read };
 
 allow cfengine_serverd_t cgrules_etc_t:file { getattr write read open };
-
-allow cfengine_serverd_t cgroup_t:dir { getattr search };
-allow cfengine_serverd_t cgroup_t:filesystem getattr;
 
 allow cfengine_serverd_t chronyd_t:dir getattr;
 

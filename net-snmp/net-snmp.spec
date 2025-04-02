@@ -266,7 +266,7 @@ MIBS="$MIBS ucd-snmp/lmsensorsMib"
     --with-perl-modules="INSTALLDIRS=vendor" \
     --enable-mfd-rewrites \
     --enable-local-smux \
-    --with-temp-file-pattern=/var/run/net-snmp/snmp-tmp-XXXXXX \
+    --with-temp-file-pattern=/run/net-snmp/snmp-tmp-XXXXXX \
     --with-transports="DTLSUDP TLSTCP" \
     --with-security-modules=tsm  \
     --with-mysql \
@@ -613,7 +613,7 @@ rm -rf ${RPM_BUILD_ROOT}
 - updated to net-snmp-5.6.1
 
 * Mon Dec  6 2010 Jan Safranek <jsafrane@redhat.com> - 1:5.6-5
-- re-create /var/run/net-snmp on boot using tmpfiles.d (#656637)
+- re-create /run/net-snmp on boot using tmpfiles.d (#656637)
 - move snmp-bridge-mib and net-snmp-cert utilities to net-snmp-perl
   subpackage, net-snmp-utils subpackage does not depend on Perl now
 
@@ -657,7 +657,7 @@ rm -rf ${RPM_BUILD_ROOT}
 - Mass rebuild with perl-5.12.0
 
 * Tue Feb  2 2010 Jan Safranek <jsafrane@redhat.com> - 1:5.5-12
-- store temporary files in /var/run/net-snmp instead of /tmp -
+- store temporary files in /run/net-snmp instead of /tmp -
   SELinux does not like it.
 
 * Tue Jan 12 2010 Stepan Kasal <skasal@redhat.com> - 1:5.5-11
@@ -916,7 +916,7 @@ rm -rf ${RPM_BUILD_ROOT}
 * Mon Nov 27 2006 Radek Vokal <rvokal@redhat.com> - 5.4-1
 - upgrade to 5.4
 - patch cleanup
-- snmpd uses /var/run/snmpd.pid (#211264)
+- snmpd uses /run/snmpd.pid (#211264)
 
 * Sun Oct 01 2006 Jesse Keating <jkeating@redhat.com> - 5.3.1-11
 - rebuilt for unwind info generation, broken in gcc-4.1.1-21

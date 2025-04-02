@@ -39,7 +39,7 @@ bundle agent snmptrap_config {
         comment => "SNMP trap service $(this.promiser)",
         perms => m("644"),
         edit_defaults => empty,
-        edit_line => insert_lines("OPTIONS=\"-A -Lf $(sipx.SIPX_LOGDIR)/snmptrapd.log -p /var/run/snmptrapd.pid\""),
+        edit_line => insert_lines("OPTIONS=\"-A -Lf $(sipx.SIPX_LOGDIR)/snmptrapd.log -p /run/snmptrapd.pid\""),
         classes => if_repaired("reload_snmptrapd");
 
     snmp.src::

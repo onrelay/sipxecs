@@ -19,7 +19,7 @@
     </stop>
   </commands>
   <status>
-    <pid>/var/run/firstprocess.pid</pid>
+    <pid>/run/firstprocess.pid</pid>
     <log>/var/log/firstprocess.log</log>
   </status>
   <resources>

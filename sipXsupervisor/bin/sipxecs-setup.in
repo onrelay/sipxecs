@@ -38,24 +38,27 @@ $prompt = {:primary => true}
 
 def run_command(cmd)
   puts cmd if $verbose
-  ok = system("#{cmd} #{' >/dev/null' unless $verbose}")
-  if (!ok)
+  output = `#{cmd} 2>&1`
+  ok = $?.success?
+
+  unless ok
     puts
-    puts  "Failure to run command #{cmd}. See #{$log} for details. After you"
-    puts  "have addressed the issue, you may rerun this script."
+    puts "run command #{cmd} failed with output:"
+    puts output
     puts
   end
+
   return ok
 end
 
 def set_root_keys
   #harmless if re-run  
-  exit 1 unless run_command "/usr/sbin/cf-key"
+  run_command "/usr/local/sbin/cf-key"
 end
 
 def set_nonroot_keys
   #harmless if re-run
-  exit 1 unless run_command "su - #{$user} sh -c '/usr/sbin/cf-key'"
+  run_command "su - #{$user} sh -c '/usr/local/sbin/cf-key'"
 end
 
 def disable_selinux

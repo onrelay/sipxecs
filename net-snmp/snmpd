@@ -7,7 +7,7 @@
 # processname: /usr/sbin/snmpd
 # config: /etc/snmp/snmpd.conf
 # config: /usr/share/snmp/snmpd.conf
-# pidfile: /var/run/snmpd.pid
+# pidfile: /run/snmpd.pid
 
 ### BEGIN INIT INFO
 # Provides: snmpd
@@ -25,7 +25,7 @@
 . /etc/init.d/functions
 
 
-OPTIONS="-LS0-6d -Lf /dev/null -p /var/run/snmpd.pid"
+OPTIONS="-LS0-6d -Lf /dev/null -p /run/snmpd.pid"
 if [ -e /etc/sysconfig/snmpd ]; then
   . /etc/sysconfig/snmpd
 fi
@@ -33,7 +33,7 @@ fi
 RETVAL=0
 prog="snmpd"
 binary=/usr/sbin/snmpd
-pidfile=/var/run/snmpd.pid
+pidfile=/run/snmpd.pid
 
 start() {
         [ -x $binary ] || exit 5

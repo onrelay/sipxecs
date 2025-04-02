@@ -6,7 +6,7 @@
 # description: Mongodb local db
 # processname: mongod
 # config: /etc/mongo-local.conf
-# pidfile: /var/run/mongodb/local.pid
+# pidfile: /run/mongodb/local.pid
 
 . /etc/rc.d/init.d/functions
 

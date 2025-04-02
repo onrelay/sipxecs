@@ -14,13 +14,13 @@
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; echo; exit $ENOENT; }
 
 config="@SIPX_CFINPUTS@/sipxsupervisord.cf"
-exec="/usr/sbin/cf-serverd"
+exec="/usr/local/sbin/cf-serverd"
 prog=$(basename $exec)
 progName="cf-serverd"
 # used to tell which config is in use.
-configid=/var/run/sipxsupervisor-configid
+configid=/run/sipxsupervisor-configid
 
-pidfolder="/var/run/sipxpbx/sipxsupervisor"
+pidfolder="/run/sipxpbx/sipxsupervisor"
 
 [ -e /etc/sysconfig/sipxsupervisor ] && . /etc/sysconfig/sipxsupervisor
 

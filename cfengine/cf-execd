@@ -11,7 +11,7 @@
 # Source function library.
 . /etc/init.d/functions
 
-exec="/usr/sbin/cf-execd"
+exec="/usr/local/sbin/cf-execd"
 prog=$(basename $exec)
 
 [ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog

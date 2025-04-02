@@ -133,8 +133,8 @@ bundle edit_line conf_contents {
     "[Definition]
 loglevel = INFO
 logtarget = $(sipx.SIPX_LOGDIR)/sipxsecurity.log
-socket = /var/run/fail2ban/fail2ban.sock
-pidfile = /var/run/fail2ban/fail2ban.pid
+socket = /run/fail2ban/fail2ban.sock
+pidfile = /run/fail2ban/fail2ban.pid
 syslogsocket = auto
 dbfile = /var/lib/fail2ban/fail2ban.sqlite3
 dbpurgeage = 86400";

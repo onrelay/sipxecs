@@ -110,7 +110,6 @@ RUNTIME_EPEL = \
 		f/freeswitch-asrtts-flite-1.10.1* \
 		f/freeswitch-asrtts-pocketsphinx-1.10.1* \
 		f/freeswitch-asrtts-tts-commandline-1.10.1* \
-		f/freeswitch-asrtts-unimrcp-1.10.1* \
 		f/freeswitch-codec-bv-1.10.1* \
 		f/freeswitch-codec-codec2-1.10.1* \
 		f/freeswitch-codec-h26x-1.10.1* \
@@ -129,7 +128,6 @@ RUNTIME_EPEL = \
 		f/freeswitch-database-pgsql-1.10.1* \
 		f/freeswitch-debuginfo-1.10.1* \
 		f/freeswitch-devel-1.10.1* \
-		f/freeswitch-endpoint-dingaling-1.10.1* \
 		f/freeswitch-endpoint-portaudio-1.10.1* \
 		f/freeswitch-endpoint-rtc-1.10.1* \
 		f/freeswitch-endpoint-rtmp-1.10.1* \
@@ -138,7 +136,6 @@ RUNTIME_EPEL = \
 		f/freeswitch-event-cdr-mongodb-1.10.1* \
 		f/freeswitch-event-cdr-pg-csv-1.10.1* \
 		f/freeswitch-event-cdr-sqlite-1.10.1* \
-		f/freeswitch-event-erlang-event-1.10.1* \
 		f/freeswitch-event-format-cdr-1.10.1* \
 		f/freeswitch-event-json-cdr-1.10.1* \
 		f/freeswitch-event-multicast-1.10.1* \

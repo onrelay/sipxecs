@@ -16,10 +16,10 @@
     </stop>
   </commands>
   <status>
-    <pid>/var/run/sipxpbx/bogus.pid</pid>
-    <log>/var/run/sipxpbx/bogus1.log</log>
+    <pid>/run/sipxpbx/bogus.pid</pid>
+    <log>/run/sipxpbx/bogus1.log</log>
     <bogusstatelement/>
-    <log>/var/run/sipxpbx/bogus2.log</log>
+    <log>/run/sipxpbx/bogus2.log</log>
   </status>
   <resources>
   </resources>

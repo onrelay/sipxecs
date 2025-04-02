@@ -22,6 +22,7 @@ Requires: policycoreutils-python-utils
 Source:   %name-%version.tar.gz
 Obsoletes: %name-devel
 
+Requires: initscripts
 Requires: cfengine-community
 Requires: chkconfig
 BuildRequires: net-snmp-devel

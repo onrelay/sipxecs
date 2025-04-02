@@ -19,7 +19,7 @@
     </stop>
   </commands>
   <status>
-    <pid>/var/run/goodprocess.pid</pid>
+    <pid>/run/goodprocess.pid</pid>
     <log>/var/log/goodprocess.log</log>
   </status>
   <resources>

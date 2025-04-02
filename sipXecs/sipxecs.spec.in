@@ -53,7 +53,6 @@ Requires: freeswitch-application-voicemail-ivr
 Requires: freeswitch-asrtts-flite
 Requires: freeswitch-asrtts-pocketsphinx
 Requires: freeswitch-asrtts-tts-commandline
-Requires: freeswitch-asrtts-unimrcp
 Requires: freeswitch-codec-bv
 Requires: freeswitch-codec-codec2
 Requires: freeswitch-codec-h26x
@@ -69,12 +68,10 @@ Requires: freeswitch-codec-silk
 Requires: freeswitch-codec-siren
 Requires: freeswitch-codec-theora
 Requires: freeswitch-config-vanilla
-Requires: freeswitch-endpoint-dingaling
 Requires: freeswitch-endpoint-portaudio
 Requires: freeswitch-endpoint-rtmp
 Requires: freeswitch-endpoint-skinny
 Requires: freeswitch-event-cdr-sqlite
-Requires: freeswitch-event-erlang-event
 Requires: freeswitch-event-json-cdr
 Requires: freeswitch-event-multicast
 Requires: freeswitch-event-rayo
@@ -135,7 +132,6 @@ Requires: sipxcallqueue >= %version
 Requires: sipxjitsi >= %version
 
 Obsoletes: %{name}-doc
-Obsoletes: epel-release
 
 Source: %name-%version.tar.gz
 

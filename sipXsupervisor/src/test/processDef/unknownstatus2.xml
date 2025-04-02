@@ -16,7 +16,7 @@
     </stop>
   </commands>
   <status>
-    <pid>/var/run/sipxpbx/bogus.pid</pid>
+    <pid>/run/sipxpbx/bogus.pid</pid>
     <bogusstatelement/>
   </status>
   <resources>

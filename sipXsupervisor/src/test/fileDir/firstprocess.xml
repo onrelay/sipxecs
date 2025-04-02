@@ -19,7 +19,7 @@
     </stop>
   </commands>
   <status>
-    <pid>/var/run/filedir.pid</pid>
+    <pid>/run/filedir.pid</pid>
     <log>/var/log/filedir.log</log>
   </status>
   <resources>

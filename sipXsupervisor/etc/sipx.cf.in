@@ -82,7 +82,7 @@ bundle common sipx {
       # established assumption
       "primary" expression => strcmp("$(location_id)", "1");
 
-    fedora|centos::
+    fedora|centos|rocky::
       "fedora16_or_greater" expression => "fedora_16|fedora_17|fedora_18|fedora_19|fedora_20|centos_7|centos_9|rocky_9";
 }
 
