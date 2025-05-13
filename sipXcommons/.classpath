@@ -3,38 +3,42 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" output="bin.eclipse/test-classes" path="src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-mock-2.0.8.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-ws-core-4.0.13.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-data-mongodb-4.4.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-data-commons-3.4.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-boot-3.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-boot-starter-3.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-boot-autoconfigure-3.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-boot-starter-web-3.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-boot-starter-logging-3.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-data-redis-3.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-ldap-3.2.12.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-beans-6.2.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-context-6.2.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-core-6.2.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-expression-6.2.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-aop-6.2.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-beans-6.2.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-boot-3.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-boot-autoconfigure-3.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-boot-starter-3.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-boot-starter-logging-3.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-boot-starter-web-3.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-context-6.2.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-context-support-6.2.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-webmvc-6.2.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-websocket-6.2.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-messaging-6.2.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-web-6.2.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-orm-6.2.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-tx-6.2.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-core-6.2.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-data-commons-3.4.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-data-mongodb-4.4.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-data-redis-3.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-expression-6.2.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-jdbc-6.2.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-xml-4.0.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-ldap-core-3.2.12.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-messaging-6.2.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-mock-2.0.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-orm-6.2.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-security-cas-6.4.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-security-config-6.4.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-security-core-6.4.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-security-crypto-6.4.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-security-jwt-1.1.1.RELEASE.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-security-ldap-6.4.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-security-web-6.4.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-security-jwt-1.1.1.RELEASE.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-tx-6.2.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-web-6.2.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-webmvc-6.2.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-websocket-6.2.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-ws-core-4.0.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/spring-xml-4.0.13.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/tapestry-annotations-4.1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/tapestry-contrib-4.1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/tapestry-framework-4.1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/validation-api-2.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-deploy-12.0.18.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-http-12.0.18.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-io-12.0.18.jar"/>
@@ -45,15 +49,19 @@
 	<classpathentry exported="true" kind="lib" path="lib/jetty-ee10-servlet-12.0.19.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-ee10-servlets-12.0.19.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jetty-ee10-webapp-12.0.19.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jakarta.mail-2.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta-oro-2.0.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta-regexp-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jakarta.activation-api-2.1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jakarta.mail-2.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.servlet-api-6.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jakarta.servlet.jsp-api-4.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jakarta.servlet.jsp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.xml.bind-api-4.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxb-api-2.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxb-core-4.0.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxb-impl-4.0.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-collections-3.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-collections4-4.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-digester-2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-discovery-0.5.jar"/>
@@ -65,15 +73,17 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils-core-1.9.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-cli-1.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-codec-1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/geronimo-servlet_3.0_spec-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/activation-1.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ant-1.7.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ant-apache-oro.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ant-apache-regexp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ant-launcher-1.6.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/aopalliance-1.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/asm-2.2.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/asm-commons-2.2.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/asm-util-2.2.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/asm-9.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/asm-commons-9.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/asm-util-9.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/colt-1.2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/axis-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/axis-schema-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/backport-util-concurrent-3.1.jar"/>
@@ -97,8 +107,18 @@
 	<classpathentry exported="true" kind="lib" path="lib/gdata-contacts-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gdata-core-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/guessencoding-1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/gwt-user-2.1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/gwt-dev-2.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gwt-user-2.12.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gwt-dev-2.12.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smartgwt-14.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smartgwt-skins-14.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jsinterop-annotations-2.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lucene-highlighter-4.10.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lucene-join-4.10.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lucene-memory-4.10.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lucene-queries-4.10.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/lucene-sandbox-4.10.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hivemind-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hivemind-lib-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/htmlunit-2.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/htmlunit-core-js-2.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ice4j-1.0.0.jar"/>
@@ -109,7 +129,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jasperreports-pdf-7.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javamail-1.4.2.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javassist-3.30.2-GA.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jakarta.servlet.jsp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxen-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javax.ws.rs-api-2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxrpc.jar"/>
@@ -191,7 +210,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/velocity-1.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jasper-compiler-5.5.23.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jasper-runtime-5.5.23.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jakarta.servlet.jsp-api-2.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.7.33.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/slf4j-log4j12-1.7.33.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jcl-over-slf4j-1.7.33.jar"/>
