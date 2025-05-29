@@ -47,7 +47,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/dnsjava-3.5.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/easymock-5.6.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/easymockclassextension-3.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/elasticsearch-1.7.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ez-vcard-0.9.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/freemarker-2.3.19.jar"/>
