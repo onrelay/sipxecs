@@ -48,12 +48,13 @@ import org.jivesoftware.util.cache.CacheFactory;
 import org.sipfoundry.commons.util.UnfortunateLackOfSpringSupportFactory;
 import org.xmpp.packet.JID;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.QueryOperators;
-import com.mongodb.WriteResult;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
 public class MongoPubSubProvider extends BasePubSubProvider {
     private static final Logger log = Logger.getLogger(MongoPubSubProvider.class);
@@ -68,46 +69,47 @@ public class MongoPubSubProvider extends BasePubSubProvider {
 
     @Override
     public void createNode(Node node) {
-        DBObject toInsert = nodeToDBObject(node);
+        Document toInsert = nodeToDocument(node);
 
-        getDefaultCollection().insert(toInsert);
+        getDefaultCollection().insertOne(toInsert);
 
         saveAssociatedElements(node);
     }
 
     @Override
     public void updateNode(Node node) {
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
         query.put("serviceId", node.getService().getServiceID());
         query.put("nodeId", node.getNodeID());
 
-        DBObject update = nodeToDBObject(node);
+        Document update = nodeToDocument(node);
 
-        getDefaultCollection().update(query, update);
+        // Replace the entire document matching the query
+        getDefaultCollection().replaceOne(query, update);
 
-        DBObject toDelete = new BasicDBObject();
+        Document toDelete = new Document();
         toDelete.put("serviceId", node.getService().getServiceID());
         toDelete.put("nodeId", node.getNodeID());
 
-        // delete old associated elements
-        getCollection(NODE_JID_COLLECTION_NAME).remove(toDelete);
-        getCollection(NODE_GROUP_COLLECTION_NAME).remove(toDelete);
+        // Delete associated elements
+        getCollection(NODE_JID_COLLECTION_NAME).deleteOne(toDelete);
+        getCollection(NODE_GROUP_COLLECTION_NAME).deleteOne(toDelete);
 
         saveAssociatedElements(node);
     }
 
     @Override
     public boolean removeNode(Node node) {
-        DBObject toDelete = new BasicDBObject();
+        Document toDelete = new Document();
         toDelete.put("serviceId", node.getService().getServiceID());
         toDelete.put("nodeId", node.getNodeID());
 
-        getDefaultCollection().remove(toDelete);
-        getCollection(NODE_JID_COLLECTION_NAME).remove(toDelete);
-        getCollection(NODE_GROUP_COLLECTION_NAME).remove(toDelete);
-        getCollection(ITEM_COLLECTION_NAME).remove(toDelete);
-        getCollection(AFFILIATION_COLLECTION_NAME).remove(toDelete);
-        getCollection(SUBSCRIPTIONS_COLLECTION_NAME).remove(toDelete);
+        getDefaultCollection().deleteOne(toDelete);
+        getCollection(NODE_JID_COLLECTION_NAME).deleteOne(toDelete);
+        getCollection(NODE_GROUP_COLLECTION_NAME).deleteOne(toDelete);
+        getCollection(ITEM_COLLECTION_NAME).deleteOne(toDelete);
+        getCollection(AFFILIATION_COLLECTION_NAME).deleteOne(toDelete);
+        getCollection(SUBSCRIPTIONS_COLLECTION_NAME).deleteOne(toDelete);
 
         return true;
     }
@@ -116,11 +118,11 @@ public class MongoPubSubProvider extends BasePubSubProvider {
     public void loadNodes(PubSubService service) {
         Map<String, Node> nodes = new HashMap<String, Node>();
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
 
         query.put("serviceId", service.getServiceID());
 
-        for (DBObject nodeObj : getDefaultCollection().find(query)) {
+        for (Document nodeObj : getDefaultCollection().find(query)) {
             loadNode(service, nodes, nodeObj);
         }
 
@@ -133,7 +135,7 @@ public class MongoPubSubProvider extends BasePubSubProvider {
 
         // Get all non-leaf nodes (to ensure parent nodes are loaded before
         // their children)
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
 
         query.put("serviceID", service.getServiceID());
         query.put("nodeID", nodeId);
@@ -141,7 +143,7 @@ public class MongoPubSubProvider extends BasePubSubProvider {
         Map<String, String> parentMapping = new HashMap<String, String>();
 
         // Rebuild loaded non-leaf nodes
-        for (DBObject node : getDefaultCollection().find(query)) {
+        for (Document node : getDefaultCollection().find(query)) {
             loadNode(service, nodes, parentMapping, node);
         }
         String parentId = parentMapping.get(nodeId);
@@ -161,62 +163,59 @@ public class MongoPubSubProvider extends BasePubSubProvider {
 
     @Override
     public void saveAffiliation(Node node, NodeAffiliate affiliate, boolean create) {
-        if (create) {
-            DBObject toInsert = new BasicDBObject();
+        MongoCollection<Document> collection = getCollection(AFFILIATION_COLLECTION_NAME);
 
-            toInsert.put("serviceId", node.getService().getServiceID());
-            toInsert.put("nodeId", node.getNodeID());
-            toInsert.put("jid", affiliate.getJID().toString());
+        Document filter = new Document();
+        filter.put("serviceId", node.getService().getServiceID());
+        filter.put("nodeId", node.getNodeID());
+        filter.put("jid", affiliate.getJID().toString());
+
+        if (create) {
+            Document toInsert = new Document(filter);
             toInsert.put("affiliation", affiliate.getAffiliation().name());
 
-            getCollection(AFFILIATION_COLLECTION_NAME).insert(toInsert);
+            collection.insertOne(toInsert);
         } else {
-            DBObject query = new BasicDBObject();
+            Document update = new Document("$set",
+                new Document("affiliation", affiliate.getAffiliation().name()));
 
-            query.put("serviceId", node.getService().getServiceID());
-            query.put("nodeId", node.getNodeID());
-            query.put("jid", affiliate.getJID().toString());
-
-            DBObject update = new BasicDBObject();
-
-            update.put("affiliation", affiliate.getAffiliation().name());
-
-            getCollection(AFFILIATION_COLLECTION_NAME).update(query, new BasicDBObject("$set", update));
+            collection.updateOne(filter, update);
         }
     }
 
     @Override
     public void removeAffiliation(Node node, NodeAffiliate affiliate) {
-        DBObject toDelete = new BasicDBObject();
+        Document toDelete = new Document();
 
         toDelete.put("serviceId", node.getService().getServiceID());
         toDelete.put("nodeId", node.getNodeID());
         toDelete.put("jid", affiliate.getJID().toString());
 
-        getCollection(AFFILIATION_COLLECTION_NAME).remove(toDelete);
+        getCollection(AFFILIATION_COLLECTION_NAME).deleteOne(toDelete);
     }
 
     @Override
     public void saveSubscription(Node node, NodeSubscription subscription, boolean create) {
-        if (create) {
-            DBObject toInsert = subscriptionToDBObject(node, subscription);
+        MongoCollection<Document> collection = getCollection(SUBSCRIPTIONS_COLLECTION_NAME);
 
-            getCollection(SUBSCRIPTIONS_COLLECTION_NAME).insert(toInsert);
+        if (create) {
+            Document toInsert = subscriptionToDocument(node, subscription);
+
+            collection.insertOne(toInsert);
 
             subscription.setSavedToDB(true);
         } else {
             if (NodeSubscription.State.none == subscription.getState()) {
                 removeSubscription(subscription);
             } else {
-                DBObject query = new BasicDBObject();
+                Document filter = new Document();
+                filter.put("serviceId", node.getService().getServiceID());
+                filter.put("nodeId", node.getNodeID());
+                filter.put("id", subscription.getID());
 
-                query.put("serviceId", node.getService().getServiceID());
-                query.put("nodeId", node.getNodeID());
-                query.put("id", subscription.getID());
+                Document update = subscriptionToDocument(node, subscription);
 
-                DBObject update = subscriptionToDBObject(node, subscription);
-
-                getCollection(SUBSCRIPTIONS_COLLECTION_NAME).update(query, new BasicDBObject("$set", update));
+                collection.updateOne(filter, new Document("$set", update));
             }
         }
     }
@@ -224,24 +223,24 @@ public class MongoPubSubProvider extends BasePubSubProvider {
     @Override
     public void removeSubscription(NodeSubscription subscription) {
         Node node = subscription.getNode();
-        DBObject toDelete = new BasicDBObject();
+        Document toDelete = new Document();
 
         toDelete.put("serviceId", node.getService().getServiceID());
         toDelete.put("nodeId", node.getNodeID());
         toDelete.put("id", subscription.getID());
 
-        getCollection(SUBSCRIPTIONS_COLLECTION_NAME).remove(toDelete);
+        getCollection(SUBSCRIPTIONS_COLLECTION_NAME).deleteOne(toDelete);
     }
 
     @Override
     public DefaultNodeConfiguration loadDefaultConfiguration(PubSubService service, boolean isLeafType) {
         DefaultNodeConfiguration config = null;
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
 
         query.put("serviceId", service.getServiceID());
         query.put("leaf", isLeafType);
 
-        DBObject confObj = getCollection(DEFAULT_CFG_COLLECTION_NAME).findOne(query);
+        Document confObj = getCollection(DEFAULT_CFG_COLLECTION_NAME).find(query).first();
 
         if (confObj != null) {
             config = dbObjectToConfig(confObj, isLeafType);
@@ -253,15 +252,17 @@ public class MongoPubSubProvider extends BasePubSubProvider {
     @Override
     public String loadPEPServiceFromDB(String jid) {
         String id = null;
-        DBObject query = new BasicDBObject();
-
+        Document query = new Document();
         query.put("serviceId", jid);
 
-        DBObject fields = new BasicDBObject();
+        Document projection = new Document();
+        projection.put("serviceId", 1);
 
-        fields.put("serviceId", 1);
+        Document result = getDefaultCollection().find(query)
+                            .projection(projection)
+                            .first();
 
-        if (getDefaultCollection().findOne(query, fields) != null) {
+        if (result != null) {
             // if there's a node, we already know the service id
             id = jid;
         }
@@ -271,20 +272,21 @@ public class MongoPubSubProvider extends BasePubSubProvider {
 
     @Override
     public void createDefaultConfiguration(PubSubService service, DefaultNodeConfiguration config) {
-        DBObject toInsert = configToDBObject(service, config);
+        Document toInsert = configToDocument(service, config);
 
-        getCollection(DEFAULT_CFG_COLLECTION_NAME).insert(toInsert);
+        getCollection(DEFAULT_CFG_COLLECTION_NAME).insertOne(toInsert);
     }
 
     @Override
     public void updateDefaultConfiguration(PubSubService service, DefaultNodeConfiguration config) {
-        DBObject query = new BasicDBObject();
-        query.put("serviceId", service.getServiceID());
-        query.put("leaf", config.isLeaf());
+        Document filter = new Document();
+        filter.put("serviceId", service.getServiceID());
+        filter.put("leaf", config.isLeaf());
 
-        DBObject update = configToDBObject(service, config);
+        Document update = configToDocument(service, config);
 
-        getCollection(DEFAULT_CFG_COLLECTION_NAME).update(query, new BasicDBObject("$set", update));
+        getCollection(DEFAULT_CFG_COLLECTION_NAME)
+            .updateOne(filter, new Document("$set", update));
     }
 
     /**
@@ -317,29 +319,29 @@ public class MongoPubSubProvider extends BasePubSubProvider {
 
         movePendingToAdd();
 
-        DBCollection itemCollection = getCollection(ITEM_COLLECTION_NAME);
+        MongoCollection<Document> itemCollection = getCollection(ITEM_COLLECTION_NAME);
         if (delItem != null) {
             LinkedListNode<PublishedItem> delHead = delLast.next;
 
             // delete first (to remove possible duplicates), then add new items
             while (delItem != delHead) {
-                DBObject toDelete = new BasicDBObject();
+                Document toDelete = new Document();
                 PublishedItem item = delItem.object;
 
                 toDelete.put("serviceID", item.getNode().getService().getServiceID());
                 toDelete.put("nodeID", item.getNode().getNodeID());
                 toDelete.put("id", item.getID());
 
-                itemCollection.remove(toDelete);
+                itemCollection.deleteOne(toDelete);
             }
         }
 
         if (addItem != null) {
             LinkedListNode<PublishedItem> addHead = addLast.next;
-            Set<DBObject> toInsertSet = new HashSet<DBObject>();
+            List<Document> toInsertList = new ArrayList<>();
 
             while (addItem != addHead) {
-                DBObject toInsert = new BasicDBObject();
+                Document toInsert = new Document();
                 PublishedItem item = addItem.object;
 
                 toInsert.put("serviceID", item.getNode().getService().getServiceID());
@@ -348,14 +350,14 @@ public class MongoPubSubProvider extends BasePubSubProvider {
                 toInsert.put("jid", item.getPublisher().toString());
                 toInsert.put("creationDate", item.getCreationDate().getTime());
                 toInsert.put("payload", item.getPayloadXML());
-                itemCollection.insert(toInsert);
 
-                toInsertSet.add(toInsert);
-
+                toInsertList.add(toInsert);
                 addItem = addItem.next;
             }
 
-            itemCollection.insert(toInsertSet.toArray(new BasicDBObject[toInsertSet.size()]));
+            if (!toInsertList.isEmpty()) {
+                itemCollection.insertMany(toInsertList);
+            }
         }
     }
 
@@ -364,13 +366,13 @@ public class MongoPubSubProvider extends BasePubSubProvider {
         Map<String, Node> nodes = new HashMap<String, Node>();
         nodes.put(node.getNodeID(), node);
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
 
         query.put("serviceID", node.getService().getServiceID());
         query.put("nodeID", node.getNodeID());
         query.put("id", subId);
 
-        DBObject subscriptionObj = getDefaultCollection().findOne(query);
+        Document subscriptionObj = getDefaultCollection().find(query).first();
         if (subscriptionObj != null) {
             loadSubscriptions(nodes, subscriptionObj);
         }
@@ -387,17 +389,17 @@ public class MongoPubSubProvider extends BasePubSubProvider {
         boolean descending = JiveGlobals.getBooleanProperty("xmpp.pubsub.order.descending", false);
 
         // Get published items of the specified node
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
 
         query.put("serviceID", node.getService().getServiceID());
         query.put("nodeID", node.getNodeID());
 
-        DBObject nodeSort = new BasicDBObject("creationDate", -1);
+        Document nodeSort = new Document("creationDate", -1);
 
         int counter = 0;
 
         // Rebuild loaded published items
-        for (DBObject itemObj : getCollection(ITEM_COLLECTION_NAME).find(query).sort(nodeSort)) {
+        for (Document itemObj : getCollection(ITEM_COLLECTION_NAME).find(query).sort(nodeSort)) {
             String itemID = (String) itemObj.get("id");
             JID publisher = new JID((String) itemObj.get("jid"));
             Date creationDate = new Date((Long) itemObj.get("creationDate"));
@@ -428,13 +430,16 @@ public class MongoPubSubProvider extends BasePubSubProvider {
 
         PublishedItem item = null;
 
-        DBObject query = new BasicDBObject();
-
+        Document query = new Document();
         query.put("serviceID", node.getService().getServiceID());
         query.put("nodeID", node.getNodeID());
 
-        DBObject nodeSort = new BasicDBObject("creationDate", -1);
-        DBObject itemObj = getCollection(ITEM_COLLECTION_NAME).findOne(query, null, nodeSort);
+        Document nodeSort = new Document("creationDate", -1);
+
+        Document itemObj = getCollection(ITEM_COLLECTION_NAME)
+                            .find(query)
+                            .sort(nodeSort)
+                            .first();
 
         if (itemObj != null) {
             String itemID = (String) itemObj.get("id");
@@ -458,13 +463,13 @@ public class MongoPubSubProvider extends BasePubSubProvider {
 
         flushPendingItems();
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
 
         query.put("serviceID", node.getService().getServiceID());
         query.put("nodeID", node.getNodeID());
         query.put("id", itemID);
 
-        DBObject itemObj = getCollection(ITEM_COLLECTION_NAME).findOne(query);
+        Document itemObj = getCollection(ITEM_COLLECTION_NAME).find(query).first();
 
         if (itemObj != null) {
             JID publisher = new JID((String) itemObj.get("jid"));
@@ -486,17 +491,17 @@ public class MongoPubSubProvider extends BasePubSubProvider {
     protected boolean purgeNodeFromDB(LeafNode leafNode) {
         flushPendingItems(ClusterManager.isClusteringEnabled());
 
-        DBObject toDelete = new BasicDBObject();
+        Document toDelete = new Document();
 
         toDelete.put("serviceID", leafNode.getService().getServiceID());
         toDelete.put("nodeID", leafNode.getNodeID());
 
-        WriteResult result = getCollection(ITEM_COLLECTION_NAME).remove(toDelete);
-        if (result.getError() != null) {
+        DeleteResult result = getCollection(ITEM_COLLECTION_NAME).deleteOne(toDelete);
+        if (result.getDeletedCount() > 0) {
             evictFromCache(leafNode);
+            return true;
         }
-
-        return result.getError() != null;
+        return false;
     }
 
     /**
@@ -504,73 +509,77 @@ public class MongoPubSubProvider extends BasePubSubProvider {
      */
     @Override
     protected void purgeItems() {
-        DBObject nodeQuery = new BasicDBObject();
+        MongoCollection<Document> defaultCollection = getDefaultCollection();
+        MongoCollection<Document> itemCollection = getCollection(ITEM_COLLECTION_NAME);
 
-        nodeQuery.put("leaf", true);
-        nodeQuery.put("persistItems", true);
-        nodeQuery.put("maxItems", new BasicDBObject(QueryOperators.GT, 0));
+        // nodeQuery: leaf == true, persistItems == true, maxItems > 0
+        Bson nodeQuery = Filters.and(
+            Filters.eq("leaf", true),
+            Filters.eq("persistItems", true),
+            Filters.gt("maxItems", 0)
+        );
 
-        for (DBObject nodeObj : getDefaultCollection().find(nodeQuery)) {
-            String svcId = (String) nodeObj.get("serviceID");
-            String nodeId = (String) nodeObj.get("nodeID");
-            int maxItems = (Integer) nodeObj.get("maxItems");
+        for (Document nodeObj : defaultCollection.find(nodeQuery)) {
+            String svcId = nodeObj.getString("serviceID");
+            String nodeId = nodeObj.getString("nodeID");
+            int maxItems = nodeObj.getInteger("maxItems", 0);
 
-            DBObject itemQuery = new BasicDBObject();
+            Bson itemQuery = Filters.and(
+                Filters.eq("serviceID", svcId),
+                Filters.eq("nodeID", nodeId)
+            );
 
-            itemQuery.put("serviceID", svcId);
-            itemQuery.put("nodeID", nodeId);
+            Bson itemSort = new Document("creationDate", 1);
 
-            DBObject itemSort = new BasicDBObject();
-
-            itemSort.put("creationDate", 1);
-
-            // skip oldest maxItems items, delete the rest
-            for (DBObject itemObject : getCollection(ITEM_COLLECTION_NAME).find(itemQuery).sort(itemSort)
+            // Skip oldest maxItems items, delete the rest
+            for (Document itemObj : itemCollection
+                    .find(itemQuery)
+                    .sort(itemSort)
                     .skip(maxItems)) {
-                getCollection(ITEM_COLLECTION_NAME).remove(itemObject);
+                itemCollection.deleteOne(Filters.eq("_id", itemObj.getObjectId("_id")));
             }
         }
     }
 
     private static void saveAssociatedElements(Node node) {
-        DBCollection nodeJidCollection = getCollection(NODE_JID_COLLECTION_NAME);
+        MongoCollection<Document> nodeJidCollection = getCollection(NODE_JID_COLLECTION_NAME);
 
         for (JID jid : node.getContacts()) {
-            DBObject toInsert = nodeJidToDBObject(node, jid, "contacts");
+            Document toInsert = nodeJidToDocument(node, jid, "contacts");
 
-            nodeJidCollection.insert(toInsert);
+            nodeJidCollection.insertOne(toInsert);
         }
         for (JID jid : node.getReplyRooms()) {
-            DBObject toInsert = nodeJidToDBObject(node, jid, "replyRooms");
+            Document toInsert = nodeJidToDocument(node, jid, "replyRooms");
 
-            nodeJidCollection.insert(toInsert);
+            nodeJidCollection.insertOne(toInsert);
         }
         for (JID jid : node.getReplyTo()) {
-            DBObject toInsertContact = nodeJidToDBObject(node, jid, "replyTo");
+            Document toInsertContact = nodeJidToDocument(node, jid, "replyTo");
 
-            nodeJidCollection.insert(toInsertContact);
+            nodeJidCollection.insertOne(toInsertContact);
         }
         if (node.isCollectionNode()) {
             for (JID jid : ((CollectionNode) node).getAssociationTrusted()) {
-                DBObject toInsert = nodeJidToDBObject(node, jid, "associationTrusted");
+                Document toInsert = nodeJidToDocument(node, jid, "associationTrusted");
 
-                nodeJidCollection.insert(toInsert);
+                nodeJidCollection.insertOne(toInsert);
             }
         }
 
         for (String groupName : node.getRosterGroupsAllowed()) {
-            DBObject toInsert = new BasicDBObject();
+            Document toInsert = new Document();
 
             toInsert.put("serviceId", node.getService().getServiceID());
             toInsert.put("nodeId", node.getNodeID());
             toInsert.put("rosterGroup", groupName);
 
-            getCollection(NODE_GROUP_COLLECTION_NAME).insert(toInsert);
+            getCollection(NODE_GROUP_COLLECTION_NAME).insertOne(toInsert);
         }
     }
 
-    private static DBObject nodeToDBObject(Node node) {
-        DBObject nodeObj = new BasicDBObject();
+    private static Document nodeToDocument(Node node) {
+        Document nodeObj = new Document();
 
         nodeObj.put("serviceId", node.getService().getServiceID());
         if (!StringUtils.isEmpty(node.getNodeID())) {
@@ -621,8 +630,8 @@ public class MongoPubSubProvider extends BasePubSubProvider {
         return nodeObj;
     }
 
-    private static DBObject configToDBObject(PubSubService service, DefaultNodeConfiguration config) {
-        DBObject dbObj = new BasicDBObject();
+    private static Document configToDocument(PubSubService service, DefaultNodeConfiguration config) {
+        Document dbObj = new Document();
 
         dbObj.put("serviceId", service.getServiceID());
         dbObj.put("leaf", config.isLeaf());
@@ -646,7 +655,7 @@ public class MongoPubSubProvider extends BasePubSubProvider {
         return dbObj;
     }
 
-    private static DefaultNodeConfiguration dbObjectToConfig(DBObject confObj, boolean isLeafType) {
+    private static DefaultNodeConfiguration dbObjectToConfig(Document confObj, boolean isLeafType) {
         DefaultNodeConfiguration config = new DefaultNodeConfiguration(isLeafType);
 
         Boolean deliverPayloads = (Boolean) confObj.get("deliverPayloads");
@@ -686,8 +695,8 @@ public class MongoPubSubProvider extends BasePubSubProvider {
         return config;
     }
 
-    private static DBObject nodeJidToDBObject(Node node, JID jid, String type) {
-        DBObject nodeObj = new BasicDBObject();
+    private static Document nodeJidToDocument(Node node, JID jid, String type) {
+        Document nodeObj = new Document();
 
         nodeObj.put("serviceId", node.getService().getServiceID());
         nodeObj.put("nodeId", node.getNodeID());
@@ -697,8 +706,8 @@ public class MongoPubSubProvider extends BasePubSubProvider {
         return nodeObj;
     }
 
-    private static DBObject subscriptionToDBObject(Node node, NodeSubscription subscription) {
-        DBObject subscrObj = new BasicDBObject();
+    private static Document subscriptionToDocument(Node node, NodeSubscription subscription) {
+        Document subscrObj = new Document();
 
         subscrObj.put("serviceId", node.getService().getServiceID());
         subscrObj.put("nodeId", node.getNodeID());
@@ -719,12 +728,12 @@ public class MongoPubSubProvider extends BasePubSubProvider {
         return subscrObj;
     }
 
-    private static void loadNode(PubSubService service, Map<String, Node> nodes, DBObject nodeObj) {
+    private static void loadNode(PubSubService service, Map<String, Node> nodes, Document nodeObj) {
         loadNode(service, nodes, null, nodeObj);
     }
 
     private static void loadNode(PubSubService service, Map<String, Node> nodes, Map<String, String> parentMappings,
-            DBObject nodeObj) {
+            Document nodeObj) {
         String nodeId = (String) nodeObj.get("nodeId");
         boolean leaf = (Boolean) nodeObj.get("leaf");
         String parent = (String) nodeObj.get("parent");
@@ -807,20 +816,20 @@ public class MongoPubSubProvider extends BasePubSubProvider {
         nodes.put(nodeId, node);
     }
 
-    private static void loadNodeDependencies(PubSubService service, Map<String, Node> nodes, DBObject query) {
-        for (DBObject nodeJidObj : getCollection(NODE_JID_COLLECTION_NAME).find(query)) {
+    private static void loadNodeDependencies(PubSubService service, Map<String, Node> nodes, Document query) {
+        for (Document nodeJidObj : getCollection(NODE_JID_COLLECTION_NAME).find(query)) {
             loadAssociatedJids(nodes, nodeJidObj);
         }
 
-        for (DBObject nodeGroupObj : getCollection(NODE_GROUP_COLLECTION_NAME).find(query)) {
+        for (Document nodeGroupObj : getCollection(NODE_GROUP_COLLECTION_NAME).find(query)) {
             loadAssociatedGroups(nodes, nodeGroupObj);
         }
 
-        for (DBObject affiliationObj : getCollection(AFFILIATION_COLLECTION_NAME).find(query)) {
+        for (Document affiliationObj : getCollection(AFFILIATION_COLLECTION_NAME).find(query)) {
             loadAffiliations(nodes, affiliationObj);
         }
 
-        for (DBObject subscriptionObj : getCollection(SUBSCRIPTIONS_COLLECTION_NAME).find(query)) {
+        for (Document subscriptionObj : getCollection(SUBSCRIPTIONS_COLLECTION_NAME).find(query)) {
             loadSubscriptions(nodes, subscriptionObj);
         }
 
@@ -830,7 +839,7 @@ public class MongoPubSubProvider extends BasePubSubProvider {
         }
     }
 
-    private static void loadAssociatedJids(Map<String, Node> nodes, DBObject nodeJidObj) {
+    private static void loadAssociatedJids(Map<String, Node> nodes, Document nodeJidObj) {
         String nodeId = (String) nodeJidObj.get("nodeId");
         Node node = nodes.get(nodeId);
         if (node != null) {
@@ -850,7 +859,7 @@ public class MongoPubSubProvider extends BasePubSubProvider {
         }
     }
 
-    private static void loadAssociatedGroups(Map<String, Node> nodes, DBObject nodeGroupObj) {
+    private static void loadAssociatedGroups(Map<String, Node> nodes, Document nodeGroupObj) {
         String nodeId = (String) nodeGroupObj.get("nodeId");
         Node node = nodes.get(nodeId);
         if (node != null) {
@@ -860,7 +869,7 @@ public class MongoPubSubProvider extends BasePubSubProvider {
         }
     }
 
-    private static void loadAffiliations(Map<String, Node> nodes, DBObject affiliationObj) {
+    private static void loadAffiliations(Map<String, Node> nodes, Document affiliationObj) {
         String nodeId = (String) affiliationObj.get("nodeId");
         Node node = nodes.get(nodeId);
         if (node != null) {
@@ -876,7 +885,7 @@ public class MongoPubSubProvider extends BasePubSubProvider {
 
     }
 
-    private static void loadSubscriptions(Map<String, Node> nodes, DBObject subscriptionObj) {
+    private static void loadSubscriptions(Map<String, Node> nodes, Document subscriptionObj) {
         String nodeId = (String) subscriptionObj.get("nodeId");
         Node node = nodes.get(nodeId);
         if (node != null) {
@@ -946,12 +955,12 @@ public class MongoPubSubProvider extends BasePubSubProvider {
         return decoded;
     }
 
-    private static DBCollection getDefaultCollection() {
+    private static MongoCollection<Document> getDefaultCollection() {
         return getCollection(COLLECTION_NAME);
     }
 
-    private static DBCollection getCollection(String collectionName) {
-        DB db = UnfortunateLackOfSpringSupportFactory.getOpenfiredb();
+    private static MongoCollection<Document> getCollection(String collectionName) {
+        MongoDatabase db = UnfortunateLackOfSpringSupportFactory.getOpenfiredb();
 
         return db.getCollection(collectionName);
     }

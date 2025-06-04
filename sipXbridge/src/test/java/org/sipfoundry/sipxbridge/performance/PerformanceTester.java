@@ -6,11 +6,8 @@ import java.util.Timer;
 
 import javax.sdp.SdpFactory;
 import javax.sdp.SessionDescription;
-import javax.sip.Dialog;
-import javax.sip.PeerUnavailableException;
 import javax.sip.SipFactory;
 import javax.sip.address.AddressFactory;
-import javax.sip.header.Header;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -22,7 +19,6 @@ import org.sipfoundry.commons.log4j.StackLoggerImpl;
 import org.sipfoundry.sipxbridge.AccountManagerImpl;
 import org.sipfoundry.sipxbridge.BridgeConfiguration;
 import org.sipfoundry.sipxbridge.ConfigurationParser;
-import org.sipfoundry.sipxbridge.Gateway;
 import org.sipfoundry.sipxbridge.ItspAccountInfo;
 
 import junit.framework.TestCase;

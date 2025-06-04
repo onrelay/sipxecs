@@ -8,8 +8,6 @@
  */
 package org.sipfoundry.commons.freeswitch;
 
-import org.sipfoundry.commons.freeswitch.TextToPrompts;
-import org.sipfoundry.commons.freeswitch.TextToPrompts_en;
 import org.sipfoundry.commons.freeswitch.TextToPrompts.Types;
 
 import junit.framework.TestCase;

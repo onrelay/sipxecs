@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.search;
 
 import java.util.List;
 
-import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections4.Transformer;
 import org.sipfoundry.sipxconfig.common.User;
 
 public interface UserSearchManager {

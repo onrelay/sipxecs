@@ -49,7 +49,6 @@ import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
 import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class OpenfireImpl implements ImManager, FeatureProvider, AddressProvider, ProcessProvider, Openfire,
     FirewallProvider, DnsProvider {
@@ -195,7 +194,7 @@ public class OpenfireImpl implements ImManager, FeatureProvider, AddressProvider
         return getSettings().isPresenceEnabled();
     }
 
-    @Required
+    
     public void setConfigManager(ConfigManager configManager) {
         m_configManager = configManager;
     }

@@ -15,5 +15,5 @@ import java.util.Map;
 interface TestFunctions {
     String multiplyTest(String test, int times);
     int calculateTest(String[] names);
-    Map create(Map param);
+    Map<String,Object> create(Map<String,Object> param);
 }

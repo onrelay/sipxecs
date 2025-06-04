@@ -27,16 +27,17 @@ import java.util.List;
 
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.cdr.Cdr;
 import org.sipfoundry.sipxconfig.cdr.CdrManager;
 import org.sipfoundry.sipxconfig.common.User;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -53,16 +54,18 @@ public class UserActiveCdrsResource extends UserResource {
         getVariants().add(new Variant(APPLICATION_JSON));
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         List<Representable> representableList = null;
         try {
             List<Cdr> cdrs = m_cdrManager.getActiveCallsREST(getUserToQuery());
             representableList = convertCdrs(cdrs);
-        } catch (IOException ex) {
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, ex);
+            return new CdrRepresentation(variant.getMediaType(), representableList);
+        } catch (InterruptedException iex) {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, iex);
+        } catch (IOException ioex) {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, ioex);
         }
-        return new CdrRepresentation(variant.getMediaType(), representableList);
     }
 
     protected User getUserToQuery() {
@@ -78,16 +81,27 @@ public class UserActiveCdrsResource extends UserResource {
     }
 
     static class Representable implements Serializable {
+        @SuppressWarnings("unused")
         private String m_caller;
+        @SuppressWarnings("unused")
         private String m_callerAor;
+        @SuppressWarnings("unused")
         private String m_callee;
+        @SuppressWarnings("unused")
         private String m_calleeAor;
+        @SuppressWarnings("unused")
         private String m_calleeRoute;
+        @SuppressWarnings("unused")
         private String m_callDirection;
+        @SuppressWarnings("unused")
         private String m_recipient;
+        @SuppressWarnings("unused")
         private boolean m_callerInternal;
+        @SuppressWarnings("unused")
         private String m_callTypeName;
+        @SuppressWarnings("unused")
         private long m_startTime;
+        @SuppressWarnings("unused")
         private long m_duration;
 
         public Representable(Cdr cdr) {
@@ -134,7 +148,7 @@ public class UserActiveCdrsResource extends UserResource {
         }
     }
 
-    @Required
+    
     public void setCdrManager(CdrManager cdrManager) {
         m_cdrManager = cdrManager;
     }

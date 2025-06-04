@@ -146,7 +146,7 @@ public class LdapManagerTestIntegration extends IntegrationTestCase {
         m_ldapManager.setSchedule(schedule,params.getId());
 
         commit();
-        assertEquals(1, db().queryForLong("select count(*) from cron_schedule where cron_string = '0 15 * ? * *'"));
+        assertEquals(Long.valueOf(1), db().queryForObject("select count(*) from cron_schedule where cron_string = '0 15 * ? * *'", Long.class));
     }
 
     public void testSetScheduleEnabled() throws Exception {
@@ -161,8 +161,8 @@ public class LdapManagerTestIntegration extends IntegrationTestCase {
         m_ldapManager.setSchedule(schedule,params.getId());
 
         commit();
-        assertEquals(1, db().queryForLong("select count(*) from cron_schedule where "
-                + " cron_string = '0 15 0 ? * 3' and enabled = 'true'"));
+        assertEquals(Long.valueOf(1), db().queryForObject("select count(*) from cron_schedule where "
+                + " cron_string = '0 15 0 ? * 3' and enabled = 'true'", Long.class));
     }
 
     public void testGetSetSchedule() throws Exception {

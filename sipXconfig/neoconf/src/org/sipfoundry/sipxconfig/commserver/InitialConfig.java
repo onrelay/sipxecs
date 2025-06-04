@@ -15,11 +15,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.common.UserException;
-import org.springframework.beans.factory.annotation.Required;
 
 public class InitialConfig {
     private static final String INITIAL_CONFIG = "/initial-config";
@@ -32,12 +31,12 @@ public class InitialConfig {
      * Set the directory where the initial-config script is located. Note that despite the name,
      * this may not acutally be the "bin" dir
      */
-    @Required
+    
     public void setBinDirectory(String binDirectory) {
         m_binDirectory = binDirectory;
     }
 
-    @Required
+    
     public void setTmpDirectory(String tmpDirectory) {
         m_tmpDirectory = tmpDirectory;
     }

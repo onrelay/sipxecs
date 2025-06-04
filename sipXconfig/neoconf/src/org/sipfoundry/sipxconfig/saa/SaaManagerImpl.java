@@ -41,7 +41,6 @@ import org.sipfoundry.sipxconfig.setting.PersistableSettings;
 import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class SaaManagerImpl implements FeatureProvider, SaaManager, ProcessProvider, FirewallProvider,
         AddressProvider {
@@ -67,7 +66,7 @@ public class SaaManagerImpl implements FeatureProvider, SaaManager, ProcessProvi
         return Collections.singleton(FEATURE);
     }
 
-    @Required
+    
     public void setSettingsDao(BeanWithSettingsDao<PersistableSettings> settingsDao) {
         m_settingsDao = settingsDao;
     }

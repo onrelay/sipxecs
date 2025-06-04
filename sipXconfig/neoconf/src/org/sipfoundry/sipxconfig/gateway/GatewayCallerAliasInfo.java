@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.gateway;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.sipfoundry.sipxconfig.common.User;
 

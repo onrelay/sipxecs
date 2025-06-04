@@ -60,8 +60,8 @@ public class BulkManagerImplTestIntegration extends IntegrationTestCase {
         assertEquals(3, countRowsInTable("line"));
         assertEquals(2, countRowsInTable("user_group"));
         assertEquals(3, countRowsInTable("phone_group"));
-        assertEquals(1, db().queryForLong("select count(*) from group_storage where resource = 'phone'"));
-        assertEquals(2, db().queryForLong("select count(*) from group_storage where resource = 'user'"));
+        assertEquals(Long.valueOf(1), db().queryForObject("select count(*) from group_storage where resource = 'phone'", Long.class));
+        assertEquals(Long.valueOf(2), db().queryForObject("select count(*) from group_storage where resource = 'user'", Long.class));
     }
 
     public void testInsertFromCsvAliasDuplication() throws Exception {
@@ -76,8 +76,8 @@ public class BulkManagerImplTestIntegration extends IntegrationTestCase {
         assertEquals(2, countRowsInTable("line"));
         assertEquals(2, countRowsInTable("user_group"));
         assertEquals(2, countRowsInTable("phone_group"));
-        assertEquals(1, db().queryForLong("select count(*) from group_storage where resource = 'phone'"));
-        assertEquals(2, db().queryForLong("select count(*) from group_storage where resource = 'user'"));
+        assertEquals(Long.valueOf(1), db().queryForObject("select count(*) from group_storage where resource = 'phone'", Long.class));
+        assertEquals(Long.valueOf(2), db().queryForObject("select count(*) from group_storage where resource = 'user'", Long.class));
     }
 
     public void testInsertFromCsvPhoneDuplication() throws Exception {
@@ -89,8 +89,8 @@ public class BulkManagerImplTestIntegration extends IntegrationTestCase {
         assertEquals(5, countRowsInTable("line"));
         assertEquals(5, countRowsInTable("user_group"));
         assertEquals(4, countRowsInTable("phone_group"));
-        assertEquals(2, db().queryForLong("select count(*) from group_storage where resource = 'phone'"));
-        assertEquals(2, db().queryForLong("select count(*) from group_storage where resource = 'user'"));
+        assertEquals(Long.valueOf(2), db().queryForObject("select count(*) from group_storage where resource = 'phone'", Long.class));
+        assertEquals(Long.valueOf(2), db().queryForObject("select count(*) from group_storage where resource = 'user'", Long.class));
     }
 
     public void testInsertFromCsv() throws Exception {
@@ -101,8 +101,8 @@ public class BulkManagerImplTestIntegration extends IntegrationTestCase {
         assertEquals(5, countRowsInTable("line"));
         assertEquals(5, countRowsInTable("user_group"));
         assertEquals(5, countRowsInTable("phone_group"));
-        assertEquals(2, db().queryForLong("select count(*) from group_storage where resource = 'phone'"));
-        assertEquals(2, db().queryForLong("select count(*) from group_storage where resource = 'user'"));
+        assertEquals(Long.valueOf(2), db().queryForObject("select count(*) from group_storage where resource = 'phone'", Long.class));
+        assertEquals(Long.valueOf(2), db().queryForObject("select count(*) from group_storage where resource = 'user'", Long.class));
     }
 
     public void testInsertFromCsvDuplicate() throws Exception {
@@ -118,8 +118,8 @@ public class BulkManagerImplTestIntegration extends IntegrationTestCase {
         assertEquals(5, countRowsInTable("line"));
         assertEquals(5, countRowsInTable("user_group"));
         assertEquals(5, countRowsInTable("phone_group"));
-        assertEquals(2, db().queryForLong("select count(*) from group_storage where resource = 'phone'"));
-        assertEquals(2, db().queryForLong("select count(*) from group_storage where resource = 'user'"));
+        assertEquals(Long.valueOf(2), db().queryForObject("select count(*) from group_storage where resource = 'phone'", Long.class));
+        assertEquals(Long.valueOf(2), db().queryForObject("select count(*) from group_storage where resource = 'user'", Long.class));
     }
 
     public void testInsertFromCsvUserNameAliasConflict() throws Exception {

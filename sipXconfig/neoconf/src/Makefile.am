@@ -37,13 +37,11 @@ neoconf_COMPILE_PKGS = \
 	xmlunit \
 	dbunit \
 	easymock \
-	easymockclassextension \
 	spring-mock
 
 neoconf_DEPS = \
 	$(JAVAROOT) \
-	$(call JavaDep, @SIPX_JAVADIR@/sipXcommons, $(neoconf_COMPILE_PKGS)) \
-	@SIPX_JAVADIR@/sipXconfig/cdr-bindings.jar
+	$(call JavaDep, @SIPX_JAVADIR@/sipXcommons, $(neoconf_COMPILE_PKGS))
 
 neoconf_SRC = \
 	$(shell cd $(srcdir); find org -type f -name '*.java')

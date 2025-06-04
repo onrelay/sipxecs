@@ -14,7 +14,7 @@
  */
 package org.sipfoundry.sipxconfig.dns;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonPropertyOrder;
 
 // order is

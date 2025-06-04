@@ -33,14 +33,18 @@ import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.secure.SecureXmlRpcClient;
 import org.sipfoundry.sipxconfig.common.SipxCollectionUtils;
 import org.springframework.beans.factory.BeanInitializationException;
-import org.springframework.remoting.support.UrlBasedRemoteAccessor;
+import org.springframework.beans.factory.InitializingBean;
 
-public class XmlRpcClientInterceptor extends UrlBasedRemoteAccessor implements MethodInterceptor {
+public class XmlRpcClientInterceptor implements MethodInterceptor, InitializingBean {
     private static final Log LOG = LogFactory.getLog(XmlRpcClientInterceptor.class);
 
     private XmlRpcClient m_xmlRpcClient;
 
     private boolean m_secure;
+
+    private String m_serviceUrl;
+
+    private Class<?> serviceInterface;
 
     private XmlRpcMarshaller m_marshaller = new DefaultMarshaller(null);
 
@@ -84,9 +88,8 @@ public class XmlRpcClientInterceptor extends UrlBasedRemoteAccessor implements M
         }
     }
 
-    @Override
     public void afterPropertiesSet() {
-        super.afterPropertiesSet();
+        
         if (getServiceInterface() == null) {
             throw new IllegalArgumentException("serviceInterface is required");
         }
@@ -113,7 +116,7 @@ public class XmlRpcClientInterceptor extends UrlBasedRemoteAccessor implements M
      * @return result of XML/RPC call
      */
     private Object executeWithTimeout(final XmlRpcClientRequest request) throws Throwable {
-        Callable execute = new Callable() {
+        Callable<Object> execute = new Callable<Object>() {
             public Object call() throws IOException {
                 try {
                     Object result = m_xmlRpcClient.execute(request);
@@ -130,7 +133,7 @@ public class XmlRpcClientInterceptor extends UrlBasedRemoteAccessor implements M
                 }
             }
         };
-        FutureTask task = new FutureTask(execute);
+        FutureTask<Object> task = new FutureTask<Object>(execute);
         m_service.execute(task);
         try {
             return task.get(m_timeout, TimeUnit.MILLISECONDS);
@@ -224,5 +227,25 @@ public class XmlRpcClientInterceptor extends UrlBasedRemoteAccessor implements M
         public Object[] parameters(String name, Object... args) {
             return args;
         }
+    }
+
+    public void setServiceInterface(Class<?> serviceInterface) {
+        if (serviceInterface != null && !serviceInterface.isInterface()) {
+           throw new IllegalArgumentException("'serviceInterface' must be an interface");
+        } else {
+           this.serviceInterface = serviceInterface;
+        }
+     }
+  
+    public Class<?> getServiceInterface() {
+        return this.serviceInterface;
+    }
+
+    String getServiceUrl() {
+        return m_serviceUrl;
+    }
+
+    void setServiceUrl( String serviceUrl ) {
+        m_serviceUrl = serviceUrl;
     }
 }

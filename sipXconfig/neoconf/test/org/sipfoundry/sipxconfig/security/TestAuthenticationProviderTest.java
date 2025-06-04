@@ -13,7 +13,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 import static org.sipfoundry.sipxconfig.security.TestAuthenticationProvider.DUMMY_ADMIN_USER_NAME;
 
 import java.util.Collection;

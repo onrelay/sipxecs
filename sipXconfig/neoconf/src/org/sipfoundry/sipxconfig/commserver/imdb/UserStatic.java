@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.commserver.imdb;
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 import org.sipfoundry.sipxconfig.common.Replicable;
 import org.sipfoundry.sipxconfig.common.User;
@@ -25,7 +25,7 @@ public class UserStatic extends AbstractDataSetGenerator {
     }
 
     @Override
-    public void generate(Replicable entity, DBObject top) {
+    public void generate(Replicable entity, Document top) {
         if (entity instanceof User) {
             User user = (User) entity;
             String domainName = getSipDomain();
@@ -33,7 +33,7 @@ public class UserStatic extends AbstractDataSetGenerator {
             if (externalMwi != null) {
                 top.put(STATIC, new UserStaticMapping(domainName, user.getUserName(), externalMwi));
             } else {
-                top.removeField(STATIC);
+                top.remove(STATIC);
             }
         }
     }

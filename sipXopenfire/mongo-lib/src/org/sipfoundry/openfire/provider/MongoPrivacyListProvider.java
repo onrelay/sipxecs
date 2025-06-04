@@ -29,9 +29,14 @@ import org.dom4j.io.SAXReader;
 import org.jivesoftware.openfire.privacy.PrivacyList;
 import org.jivesoftware.openfire.provider.PrivacyListProvider;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
+import com.mongodb.client.FindIterable;
+
 
 public class MongoPrivacyListProvider extends BaseMongoProvider implements PrivacyListProvider {
     private static final Logger log = Logger.getLogger(MongoPrivacyListProvider.class);
@@ -47,34 +52,30 @@ public class MongoPrivacyListProvider extends BaseMongoProvider implements Priva
 
     public MongoPrivacyListProvider() {
         setDefaultCollectionName(COLLECTION_NAME);
-        DBCollection prvListCollection = getDefaultCollection();
-        DBObject index = new BasicDBObject();
+        MongoCollection<Document> prvListCollection = getDefaultCollection();
 
-        index.put("username", 1);
-        prvListCollection.ensureIndex(index);
+        // Modern index creation using Indexes helper
+        prvListCollection.createIndex(Indexes.ascending("username"));
 
         for (int i = 0; i < POOL_SIZE; i++) {
             SAXReader xmlReader = new SAXReader();
             xmlReader.setEncoding("UTF-8");
             m_xmlReaders.add(xmlReader);
         }
-
     }
 
     @Override
     public Map<String, Boolean> getPrivacyLists(String username) {
-        Map<String, Boolean> privacyLists = new HashMap<String, Boolean>();
-        DBCollection prvListCollection = getDefaultCollection();
+        Map<String, Boolean> privacyLists = new HashMap<>();
+        MongoCollection<Document> prvListCollection = getDefaultCollection();
 
-        DBObject query = new BasicDBObject();
-        query.put("username", username);
-        DBObject fields = new BasicDBObject();
-        fields.put("name", 1);
-        fields.put("isDefault", 1);
+        Bson query = Filters.eq("username", username);
+        Bson projection = Projections.include("name", "isDefault");
 
-        for (DBObject dbObj : prvListCollection.find(query, fields)) {
-            String name = (String) dbObj.get("name");
-            Boolean isDefault = (Boolean) dbObj.get("isDefault");
+        FindIterable<Document> results = prvListCollection.find(query).projection(projection);
+        for (Document dbObj : results) {
+            String name = dbObj.getString("name");
+            Boolean isDefault = dbObj.getBoolean("isDefault");
 
             privacyLists.put(name, isDefault);
         }
@@ -85,15 +86,15 @@ public class MongoPrivacyListProvider extends BaseMongoProvider implements Priva
     @Override
     public PrivacyList loadPrivacyList(String username, String listName) {
         PrivacyList privacyList = null;
-        DBCollection prvListCollection = getDefaultCollection();
+        MongoCollection<Document> prvListCollection = getDefaultCollection();
 
-        DBObject query = new BasicDBObject();
-        query.put("username", username);
-        query.put("name", listName);
-        DBObject fields = new BasicDBObject();
-        fields.put("list", 1);
-        fields.put("isDefault", 1);
-        DBObject grpPropsObj = prvListCollection.findOne(query, fields);
+        Bson query = Filters.and(
+            Filters.eq("username", username),
+            Filters.eq("name", listName)
+        );
+        Bson projection = Projections.include("list", "isDefault");
+
+        Document grpPropsObj = prvListCollection.find(query).projection(projection).first();
 
         if (grpPropsObj != null) {
             privacyList = buildPrivacyList(username, listName, grpPropsObj);
@@ -104,17 +105,18 @@ public class MongoPrivacyListProvider extends BaseMongoProvider implements Priva
 
     @Override
     public PrivacyList loadDefaultPrivacyList(String username) {
+        MongoCollection<Document> prvListCollection = getDefaultCollection();
 
-        DBCollection prvListCollection = getDefaultCollection();
+        Bson query = Filters.and(
+            Filters.eq("username", username),
+            Filters.eq("isDefault", true)
+        );
+        Bson projection = Projections.include("list", "name");
 
-        DBObject query = new BasicDBObject();
-        query.put("username", username);
-        query.put("isDefault", true);
-        DBObject fields = new BasicDBObject();
-        fields.put("list", 1);
-        fields.put("name", 1);
+        Document grpPropsObj = prvListCollection.find(query)
+                                                .projection(projection)
+                                                .first();
 
-        DBObject grpPropsObj = prvListCollection.findOne(query, fields);
         PrivacyList privacyList = null;
 
         if (grpPropsObj != null) {
@@ -126,54 +128,53 @@ public class MongoPrivacyListProvider extends BaseMongoProvider implements Priva
 
     @Override
     public void createPrivacyList(String username, PrivacyList list) {
-        DBCollection prvListCollection = getDefaultCollection();
+        MongoCollection<Document> prvListCollection = getDefaultCollection();
 
-        DBObject toInsert = new BasicDBObject();
-        toInsert.put("username", username);
-        toInsert.put("name", list.getName());
-        toInsert.put("isDefault", list.isDefault());
-        toInsert.put("list", list.asElement().asXML());
+        Document toInsert = new Document()
+            .append("username", username)
+            .append("name", list.getName())
+            .append("isDefault", list.isDefault())
+            .append("list", list.asElement().asXML());
 
-        prvListCollection.insert(toInsert);
+        prvListCollection.insertOne(toInsert);
     }
 
     @Override
     public void updatePrivacyList(String username, PrivacyList list) {
-        DBCollection prvListCollection = getDefaultCollection();
+        MongoCollection<Document> prvListCollection = getDefaultCollection();
 
-        DBObject query = new BasicDBObject();
-        query.put("username", username);
-        query.put("name", list.getName());
+        Document query = new Document()
+            .append("username", username)
+            .append("name", list.getName());
 
-        DBObject update = new BasicDBObject();
-        update.put("isDefault", list.isDefault());
-        update.put("list", list.asElement().asXML());
+        Document update = new Document("$set", new Document()
+            .append("isDefault", list.isDefault())
+            .append("list", list.asElement().asXML()));
 
-        prvListCollection.findAndModify(query, new BasicDBObject("$set", update));
+        prvListCollection.updateOne(query, update);
     }
 
     @Override
     public void deletePrivacyList(String username, String listName) {
-        DBCollection prvListCollection = getDefaultCollection();
+        MongoCollection<Document> prvListCollection = getDefaultCollection();
 
-        DBObject toDelete = new BasicDBObject();
-        toDelete.put("username", username);
-        toDelete.put("name", listName);
+        Document query = new Document()
+            .append("username", username)
+            .append("name", listName);
 
-        prvListCollection.insert(toDelete);
+        prvListCollection.deleteOne(query);
     }
 
     @Override
     public void deletePrivacyLists(String username) {
-        DBCollection prvListCollection = getDefaultCollection();
+        MongoCollection<Document> prvListCollection = getDefaultCollection();
 
-        DBObject toDelete = new BasicDBObject();
-        toDelete.put("username", username);
+        Document query = new Document("username", username);
 
-        prvListCollection.insert(toDelete);
+        prvListCollection.deleteMany(query);
     }
 
-    private PrivacyList buildPrivacyList(String username, String listName, DBObject dbObj) {
+    private PrivacyList buildPrivacyList(String username, String listName, Document dbObj) {
         PrivacyList privacyList = null;
         String list = (String) dbObj.get("list");
         Boolean isDefault = (Boolean) dbObj.get("isDefault");

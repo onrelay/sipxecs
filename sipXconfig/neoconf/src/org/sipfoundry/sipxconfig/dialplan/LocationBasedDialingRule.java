@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.dialplan.config.FullTransform;
 import org.sipfoundry.sipxconfig.dialplan.config.Transform;
 import org.sipfoundry.sipxconfig.branch.Branch;

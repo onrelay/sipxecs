@@ -29,8 +29,8 @@ public class EnumPropertySelectionModel implements IPropertySelectionModel {
         m_options = options;
     }
 
-    public void setEnumClass(Class enumeration) {
-        List list = EnumUtils.getEnumList(enumeration);
+    public void setEnumClass(Class<?> enumeration) {
+        List<?> list = EnumUtils.getEnumList(enumeration);
         m_options = (Enum[]) list.toArray(new Enum[list.size()]);
     }
 
@@ -47,7 +47,7 @@ public class EnumPropertySelectionModel implements IPropertySelectionModel {
     }
 
     public String getValue(int index) {
-        return new Integer(index).toString();
+        return Integer.valueOf(index).toString();
     }
 
     public Object translateValue(String value) {

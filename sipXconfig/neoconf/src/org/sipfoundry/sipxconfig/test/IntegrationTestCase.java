@@ -38,8 +38,8 @@ import org.sipfoundry.sipxconfig.common.event.DaoEventPublisherImpl;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.orm.hibernate3.HibernateTransactionManager;
+import org.springframework.orm.hibernate5.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.test.annotation.AbstractAnnotationAwareTransactionalTests;
 
 public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransactionalTests {

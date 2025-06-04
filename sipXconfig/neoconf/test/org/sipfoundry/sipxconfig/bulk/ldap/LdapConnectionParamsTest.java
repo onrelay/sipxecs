@@ -16,7 +16,7 @@ import javax.naming.Context;
 
 import junit.framework.TestCase;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.springframework.ldap.core.support.LdapContextSource;
 
 public class LdapConnectionParamsTest extends TestCase {

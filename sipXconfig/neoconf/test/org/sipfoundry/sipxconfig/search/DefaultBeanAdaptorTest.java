@@ -40,7 +40,7 @@ public class DefaultBeanAdaptorTest extends TestCase {
 
         Identity beanIdentity = m_adaptor.getBeanIdentity(doc);
         assertSame(User.class, beanIdentity.getBeanClass());
-        assertEquals(new Integer(36), beanIdentity.getBeanId());
+        assertEquals(Integer.valueOf(36), beanIdentity.getBeanId());
     }
 
     public void testGetBeanIndentityWrongClass() throws Exception {

@@ -13,9 +13,9 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections4.Transformer;
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 
 /**
  * BeanWithId - simplify implementation of the model layer
@@ -28,7 +28,7 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
  * which is also bad. We feel that the unsaved object problems are easier to deal with.
  */
 public class BeanWithId implements PrimaryKeySource, Cloneable {
-    public static final Integer UNSAVED_ID = new Integer(-1);
+    public static final Integer UNSAVED_ID = Integer.valueOf(-1);
     public static final String ID_PROPERTY = "id";
 
     private static int s_id = 1;
@@ -109,7 +109,7 @@ public class BeanWithId implements PrimaryKeySource, Cloneable {
      * @return the same object - to allow for chaining calls
      */
     public BeanWithId setUniqueId() {
-        setId(new Integer(s_id++));
+        setId(Integer.valueOf(s_id++));
         return this;
     }
 
@@ -123,7 +123,7 @@ public class BeanWithId implements PrimaryKeySource, Cloneable {
      */
 
     public BeanWithId setUniqueId(int val) {
-        setId(new Integer(val));
+        setId(Integer.valueOf(val));
         return this;
     }
 

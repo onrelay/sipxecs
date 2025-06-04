@@ -19,7 +19,7 @@ public interface JasperReportContext {
 
     String getTmpDirectory();
 
-    JasperPrint getJasperPrint(String jasperPath, Map parameters, List< ? > dataSource);
+    JasperPrint getJasperPrint(String jasperPath, Map<String, Object> parameters, List< ? > dataSource);
 
     void generateHtmlReport(JasperPrint jasperPrint, String htmlFile);
 

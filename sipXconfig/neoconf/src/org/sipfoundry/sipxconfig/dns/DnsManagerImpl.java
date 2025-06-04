@@ -19,8 +19,11 @@ package org.sipfoundry.sipxconfig.dns;
 import static java.lang.String.format;
 import static org.sipfoundry.sipxconfig.dns.DnsFailoverPlan.FALLBACK;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -35,7 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.address.Address;
@@ -159,7 +162,7 @@ public class DnsManagerImpl implements DnsManager, AddressProvider, FeatureProvi
     public void savePlan(DnsFailoverPlan plan) {
         String saveSql;
         if (plan.isNew()) {
-            int id = m_db.queryForInt("select nextval('dns_plan_seq')");
+            int id = m_db.queryForObject("select nextval('dns_plan_seq')", Integer.class);
             plan.setUniqueId(id);
             saveSql = "insert into dns_plan (name, dns_plan_id) values (?,?)";
         } else {
@@ -172,7 +175,7 @@ public class DnsManagerImpl implements DnsManager, AddressProvider, FeatureProvi
         int position = 0;
         Object[] targetParams = new Object[3];
         for (DnsFailoverGroup g : plan.getGroups()) {
-            int gid = m_db.queryForInt("select nextval('dns_group_seq')");
+            int gid = m_db.queryForObject("select nextval('dns_group_seq')", Integer.class);
             g.setUniqueId(gid);
             m_db.update("insert into dns_group (dns_plan_id, dns_group_id, position) values (?,?,?)", plan.getId(),
                     gid, position++);
@@ -491,29 +494,54 @@ public class DnsManagerImpl implements DnsManager, AddressProvider, FeatureProvi
 
     void setInitialExternalDnsServer(File stashFile) {
         String externalDns = null;
+
         if (stashFile.exists()) {
             try {
-                externalDns = FileUtils.readFileToString(stashFile);
+                externalDns = FileUtils.readFileToString(stashFile).trim();
             } catch (IOException e) {
                 LOG.warn("Could not read from DNS forwarder stash file.", e);
             }
         } else {
-            // only works on Sun/Open JDK >= 1.5
-            List< ? > nameservers = sun.net.dns.ResolverConfiguration.open().nameservers();
+            List<String> nameservers = getSystemDnsServers();
             if (!nameservers.isEmpty()) {
-                externalDns = nameservers.get(0).toString();
+                externalDns = nameservers.get(0);
             }
         }
+
         if (StringUtils.isNotBlank(externalDns)) {
             try {
-                FileUtils.writeStringToFile(stashFile, externalDns);
+                FileUtils.writeStringToFile(stashFile, externalDns, StandardCharsets.UTF_8);
             } catch (IOException e) {
                 LOG.warn("Could not write to DNS forwarder stash file.", e);
             }
+
             DnsSettings settings = getSettings();
             settings.setDnsForwarder(externalDns, 0);
             saveSettings(settings);
         }
+    }
+
+    public List<String> getSystemDnsServers() {
+        List<String> dnsServers = new ArrayList<>();
+        File resolvConf = new File("/etc/resolv.conf");
+
+        if (resolvConf.exists()) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(resolvConf))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.startsWith("nameserver")) {
+                        String[] parts = line.split("\\s+");
+                        if (parts.length >= 2) {
+                            dnsServers.add(parts[1]);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                LOG.warn("Failed to read /etc/resolv.conf for DNS servers", e);
+            }
+        }
+
+        return dnsServers;
     }
 
     @Override
@@ -614,7 +642,7 @@ public class DnsManagerImpl implements DnsManager, AddressProvider, FeatureProvi
             REGION_ID, ENABLED, NAME, DNS_PLAN_ID, EXCLUDED
         };
         if (view.isNew()) {
-            int id = m_db.queryForInt("select nextval('dns_view_seq')");
+            int id = m_db.queryForObject("select nextval('dns_view_seq')", Integer.class);
             view.setUniqueId(id);
             sql = format("insert into dns_view (%s, position, dns_view_id) values (%s %d, ?)",
                     StringUtils.join(fields, ", "), StringUtils.repeat("?,", fields.length), id);
@@ -737,7 +765,7 @@ public class DnsManagerImpl implements DnsManager, AddressProvider, FeatureProvi
     public void saveCustomRecords(DnsCustomRecords custom) {
         String sql;
         if (custom.isNew()) {
-            int id = m_db.queryForInt("select nextval('dns_custom_seq')");
+            int id = m_db.queryForObject("select nextval('dns_custom_seq')", Integer.class);
             custom.setUniqueId(id);
             sql = "insert into dns_custom (name, records, dns_custom_id) values (?, ?, ?)";
         } else {

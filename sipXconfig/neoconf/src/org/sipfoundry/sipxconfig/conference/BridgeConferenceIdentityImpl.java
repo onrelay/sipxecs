@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.conference;
 
 import java.io.Serializable;
 
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 
 public class BridgeConferenceIdentityImpl extends HibernateDaoSupport  implements BridgeConferenceIdentity {
     private Bridge m_bridge;

@@ -22,11 +22,13 @@ import java.util.regex.Pattern;
 import org.sipfoundry.commons.mongo.MongoConstants;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.commserver.LocationsManager;
+import org.sipfoundry.sipxconfig.dialplan.DialingRule;
 import org.sipfoundry.sipxconfig.dialplan.config.FullTransform;
 import org.sipfoundry.sipxconfig.test.ImdbTestCase;
 
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
+import org.bson.Document;
+import com.mongodb.client.model.Filters;
+import org.bson.conversions.Bson;
 
 public class MusicOnHoldManagerTestIntegration extends ImdbTestCase {
 
@@ -45,10 +47,10 @@ public class MusicOnHoldManagerTestIntegration extends ImdbTestCase {
     public void testReplicateAliasMoh() throws Exception {
         m_mohManager.saveSettings(m_settings);
         Pattern mohPattern = Pattern.compile("MohSettings*");
-        DBObject query = QueryBuilder.start(ID).is(mohPattern).get();
-        assertEquals(1, getEntityCollection().count(query));
-        DBObject obj = getEntityCollection().findOne(query);
-        List<DBObject> aliases = (List<DBObject>) obj.get(MongoConstants.ALIASES);
+        Bson query = Filters.regex(ID, mohPattern);
+        assertEquals(1, getEntityCollection().countDocuments(query));
+        Document obj = getEntityCollection().find(query).first();
+        List<Document> aliases = (List<Document>) obj.get(MongoConstants.ALIASES);
         assertEquals(4, aliases.size());
         assertEquals("~~mh~", aliases.get(0).get(MongoConstants.ALIAS_ID));
         assertEquals("<sip:IVR@vm.example.org;action=moh;moh=l>", aliases.get(0).get(MongoConstants.CONTACT));
@@ -69,7 +71,7 @@ public class MusicOnHoldManagerTestIntegration extends ImdbTestCase {
 
     public void testDialingRule() throws Exception {
         Location location = m_locationsManager.getLocation(102);
-        List rules = m_mohManager.getDialingRules(location);
+        List<MohRule> rules = (List<MohRule>)m_mohManager.getDialingRules(location);
         assertEquals(1, rules.size());
         MohRule rule = (MohRule) rules.get(0);
         FullTransform transform = (FullTransform) rule.getTransforms()[0];
@@ -79,7 +81,7 @@ public class MusicOnHoldManagerTestIntegration extends ImdbTestCase {
         assertEquals("action=moh", transform.getUrlParams()[0]);
         assertEquals("moh=u{vdigits}", transform.getUrlParams()[1]);
         location = m_locationsManager.getLocation(101);
-        rules = m_mohManager.getDialingRules(location);
+        rules = (List<MohRule>)m_mohManager.getDialingRules(location);
         assertEquals(1, rules.size());
         rule = (MohRule) rules.get(0);
         transform = (FullTransform) rule.getTransforms()[0];

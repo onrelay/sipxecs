@@ -21,7 +21,6 @@ import org.sipfoundry.sipxconfig.feature.Feature;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchFeature;
 import org.sipfoundry.sipxconfig.setting.PersistableSettings;
 import org.sipfoundry.sipxconfig.setting.Setting;
-import org.springframework.beans.factory.annotation.Required;
 
 public class RegistrarSettings extends PersistableSettings implements DeployConfigOnEdit, AliasOwner {
     private static final String PICKUP_CODE = "call-pick-up/SIP_REDIRECT.100-PICKUP.DIRECTED_CALL_PICKUP_CODE";
@@ -72,7 +71,7 @@ public class RegistrarSettings extends PersistableSettings implements DeployConf
         return getModelFilesContext().loadModelFile("sipxregistrar/sipxregistrar.xml");
     }
 
-    @Required
+    
     public void setAliasManager(AliasManager aliasManager) {
         m_aliasManager = aliasManager;
     }

@@ -14,7 +14,7 @@
  */
 package org.sipfoundry.sipxconfig.backup;
 
-import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections4.Transformer;
 
 public class ArchiveDefinition implements Comparable {
     public static final Transformer GET_IDS = new Transformer() {

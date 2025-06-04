@@ -16,7 +16,6 @@
  */
 package org.sipfoundry.commons.userdb.profile;
 
-@SuppressWarnings("serial")
 public class AvatarUploadException extends Exception {
 
     public AvatarUploadException(Throwable cause) {

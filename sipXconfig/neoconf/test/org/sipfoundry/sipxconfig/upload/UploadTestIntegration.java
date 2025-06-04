@@ -18,7 +18,7 @@ import org.dbunit.dataset.IDataSet;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
 import org.sipfoundry.sipxconfig.test.TestHelper;
-import org.springframework.orm.hibernate3.HibernateObjectRetrievalFailureException;
+import org.springframework.orm.hibernate5.HibernateObjectRetrievalFailureException;
 
 public class UploadTestIntegration extends IntegrationTestCase {
     private UploadManager m_uploadManager;
@@ -54,7 +54,7 @@ public class UploadTestIntegration extends IntegrationTestCase {
 
     public void testLoadAndDelete() throws Exception {
         loadDataSet("upload/UploadSeed.db.xml");
-        Upload f = m_uploadManager.loadUpload(new Integer(1000));
+        Upload f = m_uploadManager.loadUpload(Integer.valueOf(1000));
         assertEquals("test upload", f.getName());
         assertEquals(UploadTest.UNMANAGED.getSpecificationId(), f.getSpecification().getSpecificationId());
 

@@ -26,16 +26,18 @@ import java.util.List;
 
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.conference.Conference;
 import org.sipfoundry.sipxconfig.conference.ConferenceBridgeContext;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -51,9 +53,8 @@ public class UserConferenceResource extends UserResource {
         getVariants().add(new Variant(APPLICATION_JSON));
     }
 
-    // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         Representation r = null;
         String name = getNameFromRequest();
 
@@ -72,9 +73,8 @@ public class UserConferenceResource extends UserResource {
         return r;
     }
 
-    // PUT
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         String name = getNameFromRequest();
 
         if (name != null) {
@@ -129,6 +129,7 @@ public class UserConferenceResource extends UserResource {
 
             m_conferenceBridgeContext.saveConference(conf);
         }
+        return null;
     }
 
     private static List<Representable> convertConferences(List<Conference> conferences) {
@@ -143,12 +144,11 @@ public class UserConferenceResource extends UserResource {
         return (String) getRequest().getAttributes().get(NAME);
     }
 
-    @Required
+    
     public void setConferenceBridgeContext(ConferenceBridgeContext conferenceBridgeContext) {
         m_conferenceBridgeContext = conferenceBridgeContext;
     }
 
-    @SuppressWarnings("serial")
     private static class RepresentableFull implements Serializable {
         private final Boolean m_enabled;
         private final String m_name;
@@ -201,7 +201,6 @@ public class UserConferenceResource extends UserResource {
         }
     }
 
-    @SuppressWarnings("serial")
     private static class Representable implements Serializable {
         @SuppressWarnings("unused")
         private final boolean m_enabled;

@@ -22,6 +22,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -34,7 +35,6 @@ import org.sipfoundry.sipxconfig.cfgmgt.ConfigProvider;
 import org.sipfoundry.sipxconfig.cfgmgt.ConfigRequest;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.domain.Domain;
-import org.springframework.beans.factory.annotation.Required;
 
 public class CertificateConfig implements ConfigProvider {
     private static final String OPENFIRE_KEY = "ssl-openfire.key";
@@ -67,7 +67,7 @@ public class CertificateConfig implements ConfigProvider {
             JavaKeyStore store = new JavaKeyStore( new FileInputStream( CertificateManager.JAVA_CACERTS ) );
             for (String authority : m_certificateManager.getAuthorities()) {
                 String authCert = m_certificateManager.getAuthorityCertificate(authority);
-                FileUtils.writeStringToFile(new File(authDir, authority + ".crt"), authCert);
+                FileUtils.writeStringToFile(new File(authDir, authority + ".crt"), authCert, Charset.defaultCharset());
                 store.addAuthority(authority, authCert);
             }
             OutputStream authoritiesStore = null;
@@ -80,11 +80,11 @@ public class CertificateConfig implements ConfigProvider {
             // Rebuild internal SIP extension certificate
             String sipCert = m_certificateManager.getCommunicationsCertificate();
 
-            FileUtils.writeStringToFile(new File(dir, "ssl.crt"), sipCert);
+            FileUtils.writeStringToFile(new File(dir, "ssl.crt"), sipCert, Charset.defaultCharset());
 
             String sipKey = m_certificateManager.getCommunicationsPrivateKey();
 
-            FileUtils.writeStringToFile(new File(dir, "ssl.key"), sipKey);
+            FileUtils.writeStringToFile(new File(dir, "ssl.key"), sipKey, Charset.defaultCharset());
 
             JavaKeyStore sslSip = new JavaKeyStore();
 
@@ -107,23 +107,23 @@ public class CertificateConfig implements ConfigProvider {
 
                 String webCert = m_certificateManager.getWebCertificate();
 
-                FileUtils.writeStringToFile(new File(dir, "ssl-web.crt"), webCert);
+                FileUtils.writeStringToFile(new File(dir, "ssl-web.crt"), webCert, Charset.defaultCharset());
 
                 String webKey = m_certificateManager.getWebPrivateKey();
 
                 File sslWebKey = new File(dir, "ssl-web.key");
 
-                FileUtils.writeStringToFile(sslWebKey, webKey);
+                FileUtils.writeStringToFile(sslWebKey, webKey, Charset.defaultCharset());
 
                 String chainCert = m_certificateManager.getChainCertificate();
                 if (chainCert != null) {
-                    FileUtils.writeStringToFile(new File(dir, "server-chain.crt"), chainCert);
+                    FileUtils.writeStringToFile(new File(dir, "server-chain.crt"), chainCert, Charset.defaultCharset());
                     chainCertificate = true;
                 }
 
                 String caCert = m_certificateManager.getCACertificate();
                 if (caCert != null) {
-                    FileUtils.writeStringToFile(new File(dir, "ca-bundle.crt"), caCert);
+                    FileUtils.writeStringToFile(new File(dir, "ca-bundle.crt"), caCert, Charset.defaultCharset());
                     caCertificate = true;
                 }
 
@@ -150,12 +150,12 @@ public class CertificateConfig implements ConfigProvider {
                 String openfireSslKey = CertificateUtils.convertSslKeyToRSA(sslWebKey);
 
                 if (openfireSslKey != null) {
-                    FileUtils.writeStringToFile(new File(dir, OPENFIRE_KEY), openfireSslKey);
+                    FileUtils.writeStringToFile(new File(dir, OPENFIRE_KEY), openfireSslKey, Charset.defaultCharset());
                 } else {
-                    FileUtils.writeStringToFile(new File(dir, OPENFIRE_KEY), webKey);
+                    FileUtils.writeStringToFile(new File(dir, OPENFIRE_KEY), webKey, Charset.defaultCharset());
                 }
 
-                FileUtils.writeStringToFile(new File(dir, "ssl-openfire.crt"), openfireCert.toString());
+                FileUtils.writeStringToFile(new File(dir, "ssl-openfire.crt"), openfireCert.toString(), Charset.defaultCharset());
 
                 //store the full chain for openfire certificate
 
@@ -208,12 +208,12 @@ public class CertificateConfig implements ConfigProvider {
         }
     }
 
-    @Required
+    
     public void setCertificateManager(CertificateManager certificateManager) {
         m_certificateManager = certificateManager;
     }
 
-    @Required
+    
     public void setVelocityEngine(VelocityEngine velocityEngine) {
         m_velocityEngine = velocityEngine;
     }

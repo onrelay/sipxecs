@@ -3,7 +3,6 @@ package org.sipfoundry.commons.extendedcdr;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -32,7 +31,7 @@ public class ExtendedCdrServiceImpl implements ExtendedCdrService {
     	}
     }
         
-    @Required
+    
 	public void setProfiles(MongoTemplate profiles) {
 		m_profiles = profiles;
 	}

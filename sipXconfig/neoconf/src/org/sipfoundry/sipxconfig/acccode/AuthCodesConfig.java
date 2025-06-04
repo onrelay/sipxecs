@@ -28,7 +28,6 @@ import org.sipfoundry.sipxconfig.domain.Domain;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchFeature;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingUtil;
-import org.springframework.beans.factory.annotation.Required;
 
 public class AuthCodesConfig implements ConfigProvider, PostConfigListener {
     private AuthCodesImpl m_authCodes;
@@ -82,7 +81,7 @@ public class AuthCodesConfig implements ConfigProvider, PostConfigListener {
         config.write("freeswitch.eventSocketPort", freeswithPort);
     }
 
-    @Required
+    
     public void setAuthCodes(AuthCodesImpl authCodes) {
         m_authCodes = authCodes;
     }

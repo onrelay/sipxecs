@@ -27,10 +27,10 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.restlet.data.MediaType;
-import org.restlet.resource.InputRepresentation;
-import org.restlet.resource.Representation;
+import org.restlet.representation.InputRepresentation;
+import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
+import org.restlet.representation.StringRepresentation;
 
 public class JacksonConvertTest {
 

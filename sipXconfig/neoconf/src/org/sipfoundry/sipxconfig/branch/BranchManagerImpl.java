@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
@@ -35,9 +35,8 @@ import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setup.SetupListener;
 import org.sipfoundry.sipxconfig.setup.SetupManager;
 import org.sipfoundry.sipxconfig.time.NtpManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate5.HibernateCallback;
 
 public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
         implements BranchManager, SetupListener, DaoEventListener {
@@ -148,7 +147,7 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
     private Branch loadBranchByUniqueProperty(String propName, String propValue) {
         final Criterion expression = Restrictions.eq(propName, propValue);
 
-        HibernateCallback callback = new HibernateCallback() {
+        HibernateCallback<Object> callback = new HibernateCallback<>() {
             @Override
             public Object doInHibernate(Session session) {
                 Criteria criteria = session.createCriteria(Branch.class).add(expression);
@@ -156,9 +155,8 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
             }
         };
 
-        List branches = getHibernateTemplate().executeFind(callback);
+        List<Branch> branches = (List<Branch>)getHibernateTemplate().execute(callback);
         Branch branch = (Branch) DaoUtils.requireOneOrZero(branches, expression.toString());
-
         return branch;
     }
 
@@ -222,12 +220,12 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
         return replicables;
     }
 
-    @Required
+    
     public void setReplicationManager(ReplicationManager replicationManager) {
         m_replicationManager = replicationManager;
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }

@@ -23,7 +23,6 @@ import java.util.concurrent.LinkedTransferQueue;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.search.SearchableBean;
 import org.sipfoundry.sipxconfig.search.SearchableService;
-import org.springframework.beans.factory.annotation.Required;
 
 public class ConfigChangeLoader {
 
@@ -47,12 +46,12 @@ public class ConfigChangeLoader {
         m_configChangeQueue.add(configChange);
     }
 
-    @Required
+    
     public void setSearchableService(SearchableService searchableService) {
         m_searchableService = searchableService;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }

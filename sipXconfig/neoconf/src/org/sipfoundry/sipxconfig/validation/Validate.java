@@ -16,7 +16,7 @@ package org.sipfoundry.sipxconfig.validation;
 
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Common validation for commons field types.  Not to used for validating

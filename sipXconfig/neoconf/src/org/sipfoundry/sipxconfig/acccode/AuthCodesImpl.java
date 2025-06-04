@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.address.Address;
@@ -47,7 +47,6 @@ import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
 import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class AuthCodesImpl implements DialingRuleProvider, FeatureProvider, AuthCodes, ProcessProvider {
     private static final Log LOG = LogFactory.getLog(AuthCodesImpl.class);
@@ -127,7 +126,7 @@ public class AuthCodesImpl implements DialingRuleProvider, FeatureProvider, Auth
         return replicables;
     }
 
-    @Required
+    
     public void setAuthCodeManager(AuthCodeManager authCodeManager) {
         m_authCodeManager = authCodeManager;
     }
@@ -142,17 +141,17 @@ public class AuthCodesImpl implements DialingRuleProvider, FeatureProvider, Auth
         return Collections.singleton(FEATURE);
     }
 
-    @Required
+    
     public void setAddressManager(AddressManager addressManager) {
         m_addressManager = addressManager;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }
 
-    @Required
+    
     public void setSettingsDao(BeanWithSettingsDao<AuthCodeSettings> settingsDao) {
         m_settingsDao = settingsDao;
     }

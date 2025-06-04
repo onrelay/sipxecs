@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.callgroup.AbstractRing.Type;
 import org.sipfoundry.sipxconfig.commserver.imdb.AliasMapping;
 import org.sipfoundry.sipxconfig.dialplan.ForkQueueValue;
@@ -40,7 +40,7 @@ public class AbstractCallSequence extends BeanWithId {
     @Override
     protected Object clone() throws CloneNotSupportedException {
         AbstractCallSequence clone = (AbstractCallSequence) super.clone();
-        clone.m_rings = new ArrayList(m_rings.size());
+        clone.m_rings = new ArrayList<>(m_rings.size());
         DataCollectionUtil.duplicate(m_rings, clone.m_rings);
         return clone;
     }

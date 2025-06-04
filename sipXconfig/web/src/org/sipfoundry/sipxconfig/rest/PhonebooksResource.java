@@ -16,16 +16,17 @@ import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.phonebook.Phonebook;
 import org.sipfoundry.sipxconfig.phonebook.PhonebookManager;
 
-public class PhonebooksResource extends Resource {
+public class PhonebooksResource extends ServerResource {
     private PhonebookManager m_phonebookManager;
 
     @Override
@@ -35,8 +36,9 @@ public class PhonebooksResource extends Resource {
         getVariants().add(new Variant(APPLICATION_ALL_XML));
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
+        
         if (TEXT_XML.equals(variant.getMediaType())) {
             return new Dom4jRepresentation(getDom());
         }

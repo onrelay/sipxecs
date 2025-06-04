@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.cdr;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class CdrMinutesGraphBean implements Comparable<CdrMinutesGraphBean> {
     private String m_extension;

@@ -15,7 +15,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.Predicate;
 import org.easymock.EasyMock;
 import org.sipfoundry.sipxconfig.phone.PhoneModel;
 

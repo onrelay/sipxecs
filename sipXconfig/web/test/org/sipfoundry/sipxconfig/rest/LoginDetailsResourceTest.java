@@ -18,7 +18,7 @@ package org.sipfoundry.sipxconfig.rest;
 
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -30,9 +30,9 @@ import org.apache.commons.io.IOUtils;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.MediaType;
 import org.restlet.data.Reference;
-import org.restlet.data.Request;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
+import org.restlet.Request;
+import org.restlet.representation.Representation;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.bulk.ldap.LdapManager;
 import org.sipfoundry.sipxconfig.bulk.ldap.LdapSystemSettings;
 import org.sipfoundry.sipxconfig.cfgmgt.ConfigManager;

@@ -32,7 +32,6 @@ import org.sipfoundry.sipxconfig.proxy.ProxyManager;
 import org.sipfoundry.sipxconfig.sbc.SbcDevice;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingEntry;
-import org.springframework.beans.factory.annotation.Required;
 
 public class BridgeSbc extends SbcDevice implements DeployConfigOnEdit {
     public static final String LOG_SETTING = "bridge-configuration/log-level";
@@ -50,12 +49,12 @@ public class BridgeSbc extends SbcDevice implements DeployConfigOnEdit {
     private Location m_location;
     private ConfigManager m_configManager;
 
-    @Required
+    
     public void setGatewayContext(GatewayContext gatewayContext) {
         m_gatewayContext = gatewayContext;
     }
 
-    @Required
+    
     public void setLocationsManager(LocationsManager locationsManager) {
         m_locationsManager = locationsManager;
     }

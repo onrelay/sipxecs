@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.address.Address;
@@ -816,7 +816,7 @@ public class YealinkPhone extends Phone {
             } else if (getModel().getModelId().matches(SIPT13_PATTERN) && (i > -1 && i < (0 + getMaxLineCount()))) {
                 return i + 1;
             }
-            return new Integer(getModel().getModelId().matches(SIPT4_PATTERN) ? 1 : 0);
+            return Integer.valueOf(getModel().getModelId().matches(SIPT4_PATTERN) ? 1 : 0);
         }
 
         private Integer getLineKeyType(Integer i) {

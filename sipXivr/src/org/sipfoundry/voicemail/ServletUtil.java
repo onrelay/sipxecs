@@ -18,7 +18,7 @@ package org.sipfoundry.voicemail;
 
 import java.security.Principal;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class ServletUtil {
     public static boolean isForbidden(HttpServletRequest request, String userName, int requestPort, int port) {

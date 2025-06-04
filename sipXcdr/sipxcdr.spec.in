@@ -103,4 +103,3 @@ fi
 
 %files client
 %defattr(644,root,root,755)
-%{_datadir}/java/sipXecs/sipXconfig/cdr-bindings.jar

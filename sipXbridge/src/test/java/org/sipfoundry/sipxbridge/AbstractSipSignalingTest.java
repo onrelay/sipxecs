@@ -10,12 +10,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-import javax.sip.header.ServerHeader;
-import javax.sip.header.UserAgentHeader;
-
 import org.cafesip.sipunit.SipTestCase;
 import org.sipfoundry.sipxrelay.SymmitronServer;
-import org.sipfoundry.sipxbridge.xmlrpc.SipXbridgeXmlRpcClient;
 
 public abstract class AbstractSipSignalingTest extends SipTestCase {
 	protected int sipxProxyPort = 5060;

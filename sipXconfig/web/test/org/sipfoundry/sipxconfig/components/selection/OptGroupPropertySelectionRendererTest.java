@@ -25,11 +25,10 @@ public class OptGroupPropertySelectionRendererTest extends TestCase {
     }
 
     public void testBeginRender() {
-        IMocksControl propertySelectionCtrl = org.easymock.classextension.EasyMock
-                .createControl();
+        IMocksControl propertySelectionCtrl = EasyMock.createControl();
         PropertySelection propertySelection = propertySelectionCtrl.createMock(PropertySelection.class);
-        propertySelection.getName();
-        propertySelectionCtrl.andReturn("bongo");
+        EasyMock.expect(propertySelection.getName()).andReturn("bongo");
+        propertySelectionCtrl.replay();
 
         propertySelectionCtrl.replay();
 
@@ -57,13 +56,11 @@ public class OptGroupPropertySelectionRendererTest extends TestCase {
         writerCtrl.replay();
 
         String option = "kuku";
-
         IMocksControl modelCtrl = EasyMock.createControl();
         IPropertySelectionModel model = modelCtrl.createMock(IPropertySelectionModel.class);
-        model.getValue(1);
-        modelCtrl.andReturn("1");
-        model.getLabel(1);
-        modelCtrl.andReturn("kuku");
+        EasyMock.expect(model.getValue(1)).andReturn("1");
+        EasyMock.expect(model.getLabel(1)).andReturn(option);
+        modelCtrl.replay();
 
         modelCtrl.replay();
 
@@ -74,26 +71,25 @@ public class OptGroupPropertySelectionRendererTest extends TestCase {
     }
 
     public void testRenderDisabledAndSelectedOption() {
+        String option = "kuku";
+
         IMocksControl writerCtrl = EasyMock.createStrictControl();
         IMarkupWriter writer = writerCtrl.createMock(IMarkupWriter.class);
         writer.begin("option");
         writer.attribute("value", "1");
         writer.attribute("selected", true);
         writer.attribute("disabled", true);
-        writer.attribute("label", "kuku");
+        writer.attribute("label", option);
 
-        writer.print("kuku");
+        writer.print(option);
         writer.end();
         writer.println();
         writerCtrl.replay();
 
         IMocksControl modelCtrl = EasyMock.createControl();
         IPropertySelectionModel model = modelCtrl.createMock(IPropertySelectionModel.class);
-        model.getValue(1);
-        modelCtrl.andReturn("1");
-        model.getLabel(1);
-        modelCtrl.andReturn("kuku");
-
+        EasyMock.expect(model.getValue(1)).andReturn("1");
+        EasyMock.expect(model.getLabel(1)).andReturn(option);
         modelCtrl.replay();
 
         m_renderer.renderOption(null, writer, null, model, null, 1, true);
@@ -125,7 +121,7 @@ public class OptGroupPropertySelectionRendererTest extends TestCase {
     }
 
     public void testEndRender() {
-        IMocksControl propertySelectionCtrl = org.easymock.classextension.EasyMock.createControl();
+        IMocksControl propertySelectionCtrl = org.easymock.EasyMock.createControl();
         PropertySelection propertySelection = propertySelectionCtrl.createMock(PropertySelection.class);
 
         propertySelectionCtrl.replay();

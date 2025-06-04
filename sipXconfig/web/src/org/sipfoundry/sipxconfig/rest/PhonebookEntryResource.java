@@ -9,21 +9,24 @@
  */
 package org.sipfoundry.sipxconfig.rest;
 
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.restlet.data.MediaType.TEXT_XML;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Delete;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.phonebook.Address;
 import org.sipfoundry.sipxconfig.phonebook.AddressBookEntry;
 import org.sipfoundry.sipxconfig.phonebook.PhonebookEntry;
@@ -45,7 +48,7 @@ import ezvcard.property.StructuredName;
 import ezvcard.property.Telephone;
 import ezvcard.property.TextProperty;
 
-public class PhonebookEntryResource extends Resource {
+public class PhonebookEntryResource extends ServerResource {
     private static final Logger LOG = Logger.getLogger(PhonebookEntryResource.class);
     private PhonebookManager m_phonebookManager;
     private String m_internalId;
@@ -57,7 +60,7 @@ public class PhonebookEntryResource extends Resource {
         m_internalId = (String) getRequest().getAttributes().get("internalId");
     }
 
-    @Override
+    @Delete
     public void removeRepresentations() throws ResourceException {
         PhonebookEntry pbe = m_phonebookManager.findPhonebookEntryByInternalId(m_internalId);
         if (pbe == null) {
@@ -71,8 +74,8 @@ public class PhonebookEntryResource extends Resource {
         m_phonebookManager.deletePhonebookEntry(pbe);
     }
 
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         PrivatePhonebookEntry privatePbe = new PhonebookEntryRepresentation(entity).getObject();
         String uid = privatePbe.getUid();
         String internalId = privatePbe.getVcardId();
@@ -102,6 +105,7 @@ public class PhonebookEntryResource extends Resource {
         pbe.setPhonebook(m_phonebookManager.getPrivatePhonebookCreateIfRequired(userName));
         vcardToPhonebook(pbe, abe, vcard);
         m_phonebookManager.savePhonebookEntry(pbe);
+        return null;
     }
 
 
@@ -231,21 +235,25 @@ public class PhonebookEntryResource extends Resource {
         public String getVcardId() {
             return m_internalId;
         }
+        @SuppressWarnings("unused")
         public void setVcardId(String vcardId) {
             m_internalId = vcardId;
         }
         public String getUid() {
             return m_uid;
         }
+        @SuppressWarnings("unused")
         public void setUid(String uid) {
             m_uid = uid;
         }
         public String getVcard() {
             return m_vcard;
         }
+        @SuppressWarnings("unused")
         public void setVcard(String vcard) {
             m_vcard = vcard;
         }
+        @SuppressWarnings("unused")
         public void setUserName(String userName) {
             m_userName = userName;
         }

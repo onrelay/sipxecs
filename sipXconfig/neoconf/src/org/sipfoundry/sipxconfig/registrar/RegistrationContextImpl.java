@@ -21,23 +21,24 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sipfoundry.commons.userdb.profile.UserProfile;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.commserver.imdb.RegistrationItem;
 import org.sipfoundry.sipxconfig.commserver.imdb.TimeRegistrationStatistics;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
+import org.bson.Document;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Sorts;
+
+import org.bson.conversions.Bson;
 
 public class RegistrationContextImpl implements RegistrationContext {
     public static final Log LOG = LogFactory.getLog(RegistrationContextImpl.class);
@@ -61,13 +62,13 @@ public class RegistrationContextImpl implements RegistrationContext {
 
     @Override
     public long getRegistrationsCount() {
-        return getRegistrarCollection().find(getRegistrationsQuery()).size();
-    } 
+        return getRegistrarCollection().countDocuments(getRegistrationsQuery());
+    }
     
     @Override
     public List<RegistrationItem> getRegistrations(Integer start, Integer count) {
         return getItems(getRegistrarCollection().find(getRegistrationsQuery())
-                .sort(new BasicDBObject(EXPIRATION_TIME, -1)).skip(start).limit(count));
+                .sort(new Document(EXPIRATION_TIME, -1)).skip(start).limit(count));
     }
 
     @Override
@@ -83,13 +84,13 @@ public class RegistrationContextImpl implements RegistrationContext {
     @Override
     public List<RegistrationItem> getRegistrationsByUser(User user, Integer start, Integer count) {
         return getItems(getRegistrarCollection().find(getUserQuery(user))
-                .sort(new BasicDBObject(EXPIRATION_TIME, -1)).skip(start).limit(count));
+                .sort(new Document(EXPIRATION_TIME, -1)).skip(start).limit(count));
     }
     
     @Override
     public List<RegistrationItem> getRegistrationsByUsers(Collection<User> users, Integer start, Integer count) {
         return getItems(getRegistrarCollection().find(getUsersQuery(users))
-                .sort(new BasicDBObject(EXPIRATION_TIME, -1)).skip(start).limit(count));
+                .sort(new Document(EXPIRATION_TIME, -1)).skip(start).limit(count));
     }
 
     @Override
@@ -115,7 +116,7 @@ public class RegistrationContextImpl implements RegistrationContext {
     @Override
     public List<RegistrationItem> getRegistrationsByServer(String server, Integer start, Integer limit) {
         return getItems(getRegistrarCollection().find(getServerQuery(server))
-                .sort(new BasicDBObject("expirationTime", -1)).skip(start).limit(limit));
+                .sort(new Document("expirationTime", -1)).skip(start).limit(limit));
     }
 
     @Override
@@ -125,42 +126,41 @@ public class RegistrationContextImpl implements RegistrationContext {
 
     @Override
     public void dropRegistrationsByUser(User user) {
-        getRegistrarCollection().remove(getUserQuery(user));
-
+        getRegistrarCollection().deleteMany(getUserQuery(user));
     }
-
+    
     @Override
     public void dropRegistrationsByMac(String mac) {
-        getRegistrarCollection().remove(getMacQuery(mac));
+        getRegistrarCollection().deleteMany(getMacQuery(mac));
     }
-
+    
     @Override
     public void dropRegistrationsByIp(String ip) {
-        getRegistrarCollection().remove(getIpQuery(ip));
+        getRegistrarCollection().deleteMany(getIpQuery(ip));
     }
-
+    
     @Override
     public void dropRegistrationsByServer(String server) {
-        getRegistrarCollection().remove(getServerQuery(server));
+        getRegistrarCollection().deleteMany(getServerQuery(server));
     }
-
+    
     @Override
     public void dropRegistrationsByCallId(String callId) {
-        getRegistrarCollection().remove(getCallIdQuery(callId));
+        getRegistrarCollection().deleteMany(getCallIdQuery(callId));
     }
 
     @Override
-    public DBCursor getMongoDbCursorRegistrationsByLineId(String line) {
+    public FindIterable<Document> getMongoDbCursorRegistrationsByLineId(String line) {
         return getRegistrarCollection().find(getLineQuery(line));
     }
 
     @Override
-    public DBCursor getMongoDbCursorRegistrationsByMac(String mac) {
+    public FindIterable<Document> getMongoDbCursorRegistrationsByMac(String mac) {
         return getRegistrarCollection().find(getMacQuery(mac));
     }
 
     @Override
-    public DBCursor getMongoDbCursorRegistrationsByIp(String ip) {
+    public FindIterable<Document> getMongoDbCursorRegistrationsByIp(String ip) {
         return getRegistrarCollection().find(getIpQuery(ip));
     }
     
@@ -171,15 +171,16 @@ public class RegistrationContextImpl implements RegistrationContext {
     
     @Override
     public long getTimeRegStatCount() {
-        return getTimeRegStatCollection().count();
+        return getTimeRegStatCollection().countDocuments();
+
     }
     
     @Override
     public List<TimeRegistrationStatistics> getTimeRegStats() {
-        List<DBObject> statsDbObjects = getTimeRegStatCollection().find().toArray();
+        List<Document> statsDbObjects = getTimeRegStatCollection().find().into(new ArrayList<>());
         List<TimeRegistrationStatistics> listStats = new ArrayList<TimeRegistrationStatistics>();
         TimeRegistrationStatistics timeRegStats = null;
-        for (DBObject object : statsDbObjects) {
+        for (Document object : statsDbObjects) {
             timeRegStats = new TimeRegistrationStatistics();
             timeRegStats.setActive((Integer)object.get("m_active"));
             timeRegStats.setTime((Date)object.get("m_time"));
@@ -204,15 +205,22 @@ public class RegistrationContextImpl implements RegistrationContext {
         trs.setTime(Calendar.getInstance().getTime());
         saveTimeRegistrationStatistics(trs);
         if (getTimeRegStatCount() > 1440) {
-            getTimeRegStatCollection().remove(getTimeRegStatCollection().findOne());
+            Document oldest = getTimeRegStatCollection()
+                .find()
+                .sort(Sorts.ascending("_id")) // or use a timestamp field if available
+                .limit(1)
+                .first();
+
+            if (oldest != null) {
+                getTimeRegStatCollection().deleteOne(Filters.eq("_id", oldest.getObjectId("_id")));
+            }
         }
         LOG.debug("Finished running registration statistics");
     }
 
-    private static List<RegistrationItem> getItems(DBCursor cursor) {
-        List<RegistrationItem> items = new ArrayList<RegistrationItem>(cursor.size());
-        while (cursor.hasNext()) {
-            DBObject registration = cursor.next();
+    private static List<RegistrationItem> getItems(FindIterable<Document> cursor ) {
+        List<RegistrationItem> items = new ArrayList<RegistrationItem>();
+        for( Document registration : cursor ) {
             RegistrationItem item = new RegistrationItem();
             item.setContact((String) registration.get(REG_CONTACT));
             item.setPrimary(StringUtils.substringBefore((String) registration.get(LOCAL_ADDRESS), "/"));
@@ -232,55 +240,54 @@ public class RegistrationContextImpl implements RegistrationContext {
         return items;
     }
 
-    private DBObject getRegistrationsQuery() {
-        return QueryBuilder.start(EXPIRED).is(Boolean.FALSE).get();
+    private Bson getRegistrationsQuery() {
+        return Filters.eq(EXPIRED, false);
     }
 
-    private DBObject getUserQuery(User user) {
-        return QueryBuilder.start(IDENTITY).is(user.getIdentity(m_domainManager.getDomainName())).and(EXPIRED)
-                .is(Boolean.FALSE).get();
+    private Bson getUserQuery(User user) {
+        String identity = user.getIdentity(m_domainManager.getDomainName());
+        return Filters.and(Filters.eq(IDENTITY, identity), Filters.eq(EXPIRED, false));
     }
     
-    private DBObject getUsersQuery(Collection<User> users) {
-    	List<String> identities = new ArrayList<String>();
-    	for (User user : users) {
-    		identities.add(user.getIdentity(m_domainManager.getDomainName()));
-    	}
-        return QueryBuilder.start(IDENTITY).in(identities).and(EXPIRED)
-                .is(Boolean.FALSE).get();
+    private Bson getUsersQuery(Collection<User> users) {
+        List<String> identities = new ArrayList<>();
+        for (User user : users) {
+            identities.add(user.getIdentity(m_domainManager.getDomainName()));
+        }
+        return Filters.and(Filters.in(IDENTITY, identities), Filters.eq(EXPIRED, false));
     }
 
-    private DBObject getLineQuery(String line) {
+    private Bson getLineQuery(String line) {
         Pattern linePattern = Pattern.compile("sip:" + line + "@.*");
-        return QueryBuilder.start(URI).regex(linePattern).and(EXPIRED).is(Boolean.FALSE).get();
+        return Filters.and(Filters.regex(URI, linePattern), Filters.eq(EXPIRED, false));
     }
 
-    private DBObject getMacQuery(String mac) {
-        return QueryBuilder.start(INSTRUMENT).is(mac).and(EXPIRED).is(Boolean.FALSE).get();
+    private Bson getMacQuery(String mac) {
+        return Filters.and(Filters.eq(INSTRUMENT, mac), Filters.eq(EXPIRED, false));
     }
 
-    private DBObject getIpQuery(String ip) {
+    private Bson getIpQuery(String ip) {
         Pattern ipPattern = Pattern.compile(PATTERN_ALL + ip + PATTERN_ALL);
-        return QueryBuilder.start("binding").regex(ipPattern).and(EXPIRED).is(Boolean.FALSE).get();
+        return Filters.and(Filters.regex("binding", ipPattern), Filters.eq(EXPIRED, false));
     }
 
-    private DBCollection getRegistrarCollection() {
-        DB datasetDb = m_nodedb.getDb();
-        return datasetDb.getCollection(DB_COLLECTION_NAME);
+    private MongoCollection<Document> getRegistrarCollection() {
+        MongoDatabase db = m_nodedb.getDb();
+        return db.getCollection(DB_COLLECTION_NAME);
     }
     
-    private DBCollection getTimeRegStatCollection() {
-        DB datasetDb = m_nodedb.getDb();
-        return datasetDb.getCollection(DB_STATISTICS_COLLECTION_NAME);
+    private MongoCollection<Document> getTimeRegStatCollection() {
+        MongoDatabase db = m_nodedb.getDb();
+        return db.getCollection(DB_STATISTICS_COLLECTION_NAME);
     }
 
-    private DBObject getServerQuery(String server) {
+    private Bson getServerQuery(String server) {
         Pattern serverPattern = Pattern.compile(PATTERN_ALL + server + PATTERN_ALL);
-        return QueryBuilder.start(LOCAL_ADDRESS).regex(serverPattern).and(EXPIRED).is(Boolean.FALSE).get();
+        return Filters.and(Filters.regex(LOCAL_ADDRESS, serverPattern), Filters.eq(EXPIRED, false));
     }
 
-    private DBObject getCallIdQuery(String callId) {
-        return QueryBuilder.start(CALL_ID).is(callId).get();
+    private Bson getCallIdQuery(String callId) {
+        return Filters.eq(CALL_ID, callId);
     }
 
     public MongoTemplate getNodedb() {

@@ -66,8 +66,7 @@ public class EditGatewayTest extends TestCase {
         GatewayContext context = contextControl.createMock(GatewayContext.class);
 
         context.saveGateway(g);
-        dialPlanContext.getRule(rule.getId());
-        dialPlanContextControl.andReturn(rule);
+        EasyMock.expect(dialPlanContext.getRule(rule.getId())).andReturn(rule);
         dialPlanContext.storeRule(rule);
 
         dialPlanContextControl.replay();
@@ -95,8 +94,7 @@ public class EditGatewayTest extends TestCase {
 
         IMocksControl contextControl = EasyMock.createStrictControl();
         GatewayContext context = contextControl.createMock(GatewayContext.class);
-        context.newGateway(gateway.getModel());
-        contextControl.andReturn(gateway);
+        EasyMock.expect(context.newGateway(gateway.getModel())).andReturn(gateway);
         contextControl.replay();
 
         PropertyUtils.write(m_editGatewayPage, "gatewayContext", context);
@@ -118,8 +116,7 @@ public class EditGatewayTest extends TestCase {
 
         IMocksControl contextControl = EasyMock.createStrictControl();
         GatewayContext context = contextControl.createMock(GatewayContext.class);
-        context.getGateway(id);
-        contextControl.andReturn(gateway);
+        EasyMock.expect(context.getGateway(id)).andReturn(gateway);
         contextControl.replay();
 
         PropertyUtils.write(m_editGatewayPage, "gatewayContext", context);

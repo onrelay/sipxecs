@@ -10,7 +10,7 @@
 package org.sipfoundry.sipxconfig.commserver.imdb;
 
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 import org.sipfoundry.sipxconfig.forwarding.CallSequence;
 import org.sipfoundry.sipxconfig.common.Replicable;
@@ -26,13 +26,13 @@ public class UserForward extends AbstractDataSetGenerator {
     }
 
     @Override
-    public void generate(Replicable entity, DBObject top) {
+    public void generate(Replicable entity, Document top) {
         if (entity instanceof User) {
             generateUser((User) entity, top);
         }
     }
 
-    private static void generateUser(User user, DBObject top) {
+    private static void generateUser(User user, Document top) {
         top.put(CFWDTIME, user.getSettingTypedValue(CallSequence.CALL_FWD_TIMER_SETTING));
     }
 

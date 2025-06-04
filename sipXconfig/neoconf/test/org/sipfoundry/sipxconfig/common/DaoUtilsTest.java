@@ -35,17 +35,17 @@ public class DaoUtilsTest extends TestCase {
     }
 
     public void testCheckDuplicatesFoundItself() {
-        objs.add(new Integer(subject.getId().intValue()));
+        objs.add(Integer.valueOf(subject.getId().intValue()));
         DaoUtils.checkDuplicates(subject, objs, new UserException());
     }
 
     public void testCheckDuplicatesFoundItselfWithoutException() {
-        objs.add(new Integer(subject.getId().intValue()));
+        objs.add(Integer.valueOf(subject.getId().intValue()));
         assertFalse(DaoUtils.checkDuplicates(subject, objs, null));
     }
 
     public void testCheckDuplicatesFoundDuplicate() {
-        objs.add(new Integer(subject.getId().intValue() + 1));
+        objs.add(Integer.valueOf(subject.getId().intValue() + 1));
         try {
             DaoUtils.checkDuplicates(subject, objs, new UserException());
             fail();
@@ -70,7 +70,7 @@ public class DaoUtilsTest extends TestCase {
     }
 
     public void testCheckDuplicatesFoundDuplicateWithoutException() {
-        objs.add(new Integer(subject.getId().intValue() + 1));
+        objs.add(Integer.valueOf(subject.getId().intValue() + 1));
         assertTrue(DaoUtils.checkDuplicates(subject, objs, null));
     }
 

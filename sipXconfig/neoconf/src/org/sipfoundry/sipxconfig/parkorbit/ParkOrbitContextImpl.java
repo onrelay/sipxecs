@@ -39,11 +39,10 @@ import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setting.SettingDao;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class ParkOrbitContextImpl extends SipxHibernateDaoSupport implements ParkOrbitContext, BeanFactoryAware,
+public class ParkOrbitContextImpl extends SipxHibernateDaoSupport<Object> implements ParkOrbitContext, BeanFactoryAware,
         FeatureProvider, DaoEventListener {
     private static final String VALUE = "value";
     private static final String QUERY_PARK_ORBIT_IDS_WITH_ALIAS = "parkOrbitIdsWithAlias";
@@ -119,7 +118,7 @@ public class ParkOrbitContextImpl extends SipxHibernateDaoSupport implements Par
         return new BackgroundMusic();
     }
 
-    @Required
+    
     public void setAliasManager(AliasManager aliasManager) {
         m_aliasManager = aliasManager;
     }
@@ -216,7 +215,7 @@ public class ParkOrbitContextImpl extends SipxHibernateDaoSupport implements Par
 
     @Override
     public ParkOrbit loadParkOrbitByName(String name) {
-        List<ParkOrbit> conferences = getHibernateTemplate().findByNamedQueryAndNamedParam(PARK_ORBIT_BY_NAME,
+        List<ParkOrbit> conferences = (List<ParkOrbit>)getHibernateTemplate().findByNamedQueryAndNamedParam(PARK_ORBIT_BY_NAME,
                 VALUE, name);
         return (ParkOrbit) DataAccessUtils.singleResult(conferences);
     }
@@ -231,17 +230,17 @@ public class ParkOrbitContextImpl extends SipxHibernateDaoSupport implements Par
         return Collections.EMPTY_LIST;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }
 
-    @Required
+    
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
         m_jdbcTemplate = jdbcTemplate;
     }
 
-    @Required
+    
     public void setReplicationManager(ReplicationManager replicationManager) {
         m_replicationManager = replicationManager;
     }
@@ -249,7 +248,8 @@ public class ParkOrbitContextImpl extends SipxHibernateDaoSupport implements Par
     @Override
     public void onDelete(Object entity) {
         if (entity instanceof Location) {
-            int count = m_jdbcTemplate.queryForInt("select count(*) from park_orbit where location_id = ?",
+            int count = m_jdbcTemplate.queryForObject("select count(*) from park_orbit where location_id = ?",
+                    Integer.class,
                     ((Location) entity).getId());
             if (count >= 1) {
                 throw new UserException("&err.location.orbitAssigned");

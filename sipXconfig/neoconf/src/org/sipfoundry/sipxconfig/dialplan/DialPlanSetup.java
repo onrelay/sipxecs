@@ -15,7 +15,6 @@ import org.sipfoundry.sipxconfig.localization.RegionUpdatedEvent;
 import org.sipfoundry.sipxconfig.setup.MigrationListener;
 import org.sipfoundry.sipxconfig.setup.SetupListener;
 import org.sipfoundry.sipxconfig.setup.SetupManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationListener;
 
 public class DialPlanSetup implements SetupListener, MigrationListener, ApplicationListener<RegionUpdatedEvent> {
@@ -24,12 +23,12 @@ public class DialPlanSetup implements SetupListener, MigrationListener, Applicat
     private DialPlanContext m_dialPlanContext;
     private String m_defaultDialPlanId = "na.dialPlan";
 
-    @Required
+    
     public void setDialPlanContext(DialPlanContext dialPlanContext) {
         m_dialPlanContext = dialPlanContext;
     }
 
-    @Required
+    
     public void setAutoAttendantManager(AutoAttendantManager autoAttendantManager) {
         m_autoAttendantManager = autoAttendantManager;
     }

@@ -83,10 +83,10 @@ public class MailboxPreferencesTest extends XMLTestCase {
         assertEquals("en", user.getSettingValue(UNIFIED_MESSAGING_LANGUAGE));
         assertEquals(MailboxPreferences.AttachType.YES.getValue(), user.getPrimaryEmailNotification());
         assertEquals(MailboxPreferences.MailFormat.MEDIUM.name(), user.getPrimaryEmailFormat());
-        assertEquals(new Boolean(true), user.isPrimaryEmailAttachAudio());
+        assertEquals(Boolean.valueOf(true), user.isPrimaryEmailAttachAudio());
         assertEquals(MailboxPreferences.AttachType.NO.getValue(), user.getAlternateEmailNotification());
         assertEquals(MailboxPreferences.MailFormat.FULL.name(), user.getAlternateEmailFormat());
-        assertEquals(new Boolean(false), user.isAlternateEmailAttachAudio());
+        assertEquals(Boolean.valueOf(false), user.isAlternateEmailAttachAudio());
     }
 
     public void testUserTui() {

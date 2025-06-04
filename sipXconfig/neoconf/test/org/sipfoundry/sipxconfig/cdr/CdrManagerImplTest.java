@@ -27,8 +27,8 @@ import java.util.TimeZone;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.easymock.IArgumentMatcher;
 import org.easymock.internal.matchers.InstanceOf;
 import org.joda.time.DateTime;
@@ -68,7 +68,7 @@ public class CdrManagerImplTest extends TestCase {
     }
 
     public void testProcessRow() throws Exception {
-        TimeZone tz = DateUtils.UTC_TIME_ZONE;
+        TimeZone tz = TimeZone.getTimeZone("UTC");
         Calendar calendar = Calendar.getInstance(tz);
 
         ResultSet rs = createMock(ResultSet.class);
@@ -167,7 +167,7 @@ public class CdrManagerImplTest extends TestCase {
     }
 
     public void testCdrsCsvWriter() throws Exception {
-        TimeZone tz = DateUtils.UTC_TIME_ZONE;
+        TimeZone tz = TimeZone.getTimeZone("UTC");
         Calendar calendar = Calendar.getInstance(tz);
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -218,7 +218,7 @@ public class CdrManagerImplTest extends TestCase {
     }
 
     public void testCdrsJsonWriter() throws Exception {
-        TimeZone tz = DateUtils.UTC_TIME_ZONE;
+        TimeZone tz = TimeZone.getTimeZone("UTC");
         Calendar calendar = Calendar.getInstance(tz);
 
         Timestamp timestamp = new Timestamp(0);
@@ -281,7 +281,7 @@ public class CdrManagerImplTest extends TestCase {
     }
 
     public void testCdrsCsvWriterNullConnectTime() throws Exception {
-        TimeZone tz = DateUtils.UTC_TIME_ZONE;
+        TimeZone tz = TimeZone.getTimeZone("UTC");
         Calendar calendar = Calendar.getInstance(tz);
 
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());

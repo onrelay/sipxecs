@@ -61,7 +61,7 @@ public class PagingContextImplTestIntegration extends IntegrationTestCase {
     }
 
     public void testGetPagingGroupById() throws Exception {
-        PagingGroup group = m_pagingContext.getPagingGroupById(new Integer(101));
+        PagingGroup group = m_pagingContext.getPagingGroupById(Integer.valueOf(101));
         assertEquals(112, group.getPageGroupNumber());
         assertEquals("Engineering", group.getDescription());
         assertEquals(false, group.isEnabled());

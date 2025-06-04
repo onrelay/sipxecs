@@ -61,7 +61,6 @@ public abstract class XmlUnitHelper {
      *
      * @param doc DOM4J document
      * @return String containing XML document
-     * @deprecated Use {@link TestHelper#asString(Document)} instead
      */
     public static String asString(Document doc) {
         return TestHelper.asString(doc);
@@ -93,16 +92,16 @@ public abstract class XmlUnitHelper {
         return writer.write(doc);
     }
 
-    public static void style(Reader xsl, Reader xml, Writer out, Map params) throws TransformerException {
+    public static void style(Reader xsl, Reader xml, Writer out, Map<String,Object> params) throws TransformerException {
         Source xmlSource = new javax.xml.transform.stream.StreamSource(xml);
         TransformerFactory factory = TransformerFactory.newInstance();
         Source xslSource = new javax.xml.transform.stream.StreamSource(xsl);
         Transformer transformer;
         transformer = factory.newTransformer(xslSource);
         if (params != null && !params.isEmpty()) {
-            Iterator entries = params.entrySet().iterator();
+            Iterator<Map.Entry<String,Object>> entries = params.entrySet().iterator();
             while (entries.hasNext()) {
-                Map.Entry entry = (Map.Entry) entries.next();
+                Map.Entry<String,Object> entry = entries.next();
                 transformer.setParameter((String) entry.getKey(), entry.getValue());
             }
         }
@@ -117,7 +116,7 @@ public abstract class XmlUnitHelper {
      * @param name name of the file in the same directory as klass
      * @return newly read DOM4J document
      */
-    public static Document loadDocument(Class klass, String name) throws DocumentException {
+    public static Document loadDocument(Class<?> klass, String name) throws DocumentException {
         InputStream stream = klass.getResourceAsStream(name);
         SAXReader reader = new SAXReader();
         reader.setValidation(false);

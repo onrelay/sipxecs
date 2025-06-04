@@ -22,26 +22,24 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.restlet.Context;
-import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.resource.Get;
+import org.restlet.resource.ServerResource;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
 import org.sipfoundry.sipxconfig.device.DeviceVersion;
 import org.sipfoundry.sipxconfig.device.ProfileManager;
 import org.sipfoundry.sipxconfig.phone.Phone;
 import org.sipfoundry.sipxconfig.phone.PhoneContext;
 
 /**
- * REST service to update Polycom phone with correct firmware version in Postgres DB. This service
- * is called by the provision servlet. Phones will be restarted after 1 minute. See wiki for more
- * details.
+ * REST service to update Polycom phone with correct firmware version in Postgres DB.
+ * This service is called by the provision servlet. Phones will be restarted after 1 minute.
  */
-public class PhoneUpdateResource extends Resource {
+public class PhoneUpdateResource extends ServerResource {
     private static final Log LOG = LogFactory.getLog(PhoneUpdateResource.class);
     private static final String EMPTY = "empty";
 
@@ -51,40 +49,49 @@ public class PhoneUpdateResource extends Resource {
     @Override
     public void init(Context context, Request request, Response response) {
         super.init(context, request, response);
-        getVariants().add(new Variant(MediaType.ALL));
+        // No need for variants; if necessary, add response headers directly
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    // Using @Get to map HTTP GET requests to this method
+    @Get
+    public Representation updatePhone() throws ResourceException {
         String serialNumber = (String) getRequest().getAttributes().get("mac");
         String version = (String) getRequest().getAttributes().get("version");
         String model = (String) getRequest().getAttributes().get("model");
+
         if (serialNumber == null || version == null || model == null) {
             getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
             return new StringRepresentation(EMPTY);
         }
-        LOG.info(String.format("Trying to updating phone %s to version %s...", serialNumber, version));
-        Phone phone = m_phoneContext.loadPhone((m_phoneContext.getPhoneIdBySerialNumber(serialNumber)));
+
+        LOG.info(String.format("Trying to update phone %s to version %s...", serialNumber, version));
+
+        Phone phone = m_phoneContext.loadPhone(m_phoneContext.getPhoneIdBySerialNumber(serialNumber));
         if (phone == null) {
             getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
             return new StringRepresentation(EMPTY);
         }
+
         if (!(phone instanceof PolycomPhone)) {
             getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
             return new StringRepresentation(EMPTY);
         }
+
         DeviceVersion deviceVersion = PolycomModel.getPhoneDeviceVersion(version);
         if (!phone.getDeviceVersion().equals(deviceVersion) || !StringUtils.equals(phone.getModelId(), model)) {
             phone.setDeviceVersion(deviceVersion);
             phone.setModelId(model);
             m_phoneContext.storePhone(phone);
+
             Calendar c = Calendar.getInstance();
             c.roll(Calendar.MINUTE, 1);
             m_profileManager.generateProfile(phone.getId(), true, c.getTime());
-            LOG.info(String.format("Updated phone ID: %d. It will be rebooted in 1 "
-                    + "minute from now in order to pick up correct config.", phone.getId()));
+
+            LOG.info(String.format("Updated phone ID: %d. It will be rebooted in 1 minute from now in order to pick up the correct config.", phone.getId()));
+        } else {
+            LOG.info("Phone not updated - no change.");
         }
-        LOG.info("Phone not updated - no change.");
+
         return new StringRepresentation(EMPTY);
     }
 

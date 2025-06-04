@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.sipfoundry.commons.freeswitch.Set;
 import org.sipfoundry.commons.freeswitch.Speak;
 import org.sipfoundry.commons.freeswitch.eslrequest.AbstractEslRequestController;
-import org.springframework.beans.factory.annotation.Required;
 
 public class UnassignedDidEslRequestController extends AbstractEslRequestController {
     static final Logger LOG = Logger.getLogger("org.sipfoundry.sipxivr");
@@ -31,7 +30,7 @@ public class UnassignedDidEslRequestController extends AbstractEslRequestControl
         new Set(getFsEventSocket(), "playback_terminators", "#").go();        
     }
 
-    @Required
+    
     public void setTtsVoice(String ttsVoice) {
         m_ttsVoice = ttsVoice;
     }

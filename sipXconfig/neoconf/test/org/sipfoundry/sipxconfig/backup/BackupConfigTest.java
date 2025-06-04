@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.sipfoundry.commons.security.Util;
 import org.sipfoundry.sipxconfig.cfgmgt.YamlConfiguration;

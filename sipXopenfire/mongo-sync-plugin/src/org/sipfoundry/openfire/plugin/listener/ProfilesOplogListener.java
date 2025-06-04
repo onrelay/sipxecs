@@ -25,8 +25,9 @@ import org.sipfoundry.openfire.plugin.job.JobFactory;
 import org.sipfoundry.openfire.sync.MongoOperation;
 import org.sipfoundry.openfire.sync.listener.MongoOplogListener;
 
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
+import org.bson.Document;
+import com.mongodb.client.model.Filters;
+import org.bson.conversions.Bson;
 
 public class ProfilesOplogListener extends MongoOplogListener<JobFactory> {
     private static final Logger log = Logger.getLogger(ProfilesOplogListener.class);
@@ -39,8 +40,8 @@ public class ProfilesOplogListener extends MongoOplogListener<JobFactory> {
     }
 
     @Override
-    protected DBObject buildOpLogQuery() {
-        DBObject nsQuery = QueryBuilder.start(NAMESPACE).is(WATCHED_NAMESPACE).get();
+    protected Bson buildOpLogQuery() {
+        Bson nsQuery = Filters.eq(NAMESPACE, WATCHED_NAMESPACE);
         log.debug("Oplog query: " + nsQuery.toString());
         return nsQuery;
     }

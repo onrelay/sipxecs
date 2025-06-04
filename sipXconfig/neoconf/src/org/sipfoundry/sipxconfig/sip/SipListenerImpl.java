@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.sip;
 
-import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;

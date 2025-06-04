@@ -25,7 +25,6 @@ import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.commons.userdb.profile.AvatarUploadException;
 import org.sipfoundry.commons.userdb.profile.UserProfile;
 import org.sipfoundry.commons.userdb.profile.UserProfileService;
-import org.springframework.beans.factory.annotation.Required;
 
 public class SyncExtAvatarTimer {
     public static final Log LOG = LogFactory.getLog(SyncExtAvatarTimer.class);
@@ -44,12 +43,12 @@ public class SyncExtAvatarTimer {
         }
     }
 
-    @Required
+    
     public void setUserProfileService(UserProfileService userProfileService) {
         m_userProfileService = userProfileService;
     }
 
-    @Required
+    
     public void setAdminContext(AdminContext adminContext) {
         m_adminContext = adminContext;
     }

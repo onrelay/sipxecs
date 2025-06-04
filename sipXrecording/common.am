@@ -7,7 +7,7 @@ cfg_PKGS = \
 	dom4j \
 	spring-beans \
 	spring-core \
-	org.springframework.transaction \
+	spring-tx \
 	xercesImpl \
 	sipxconfig-neoconf \
 	sipxconfig-web \
@@ -22,17 +22,17 @@ recording_PKGS = \
 	slf4j-log4j12 \
 	commons-io \
 	commons-codec \
-	commons-httpclient \
+	commons-httpclient5 \
 	commons-logging \
-	javax.servlet \
+	jakarta.servlet \
 	mongo \
 	spring-data-mongodb \
 	spring-data-commons \
 	spring-core \
 	spring-beans \
 	spring-context \
-	org.springframework.transaction \
+	spring-tx \
 	spring-expression \
 	commons-lang \
-	jetty \
+	jetty-server \
 	hazelcast-all

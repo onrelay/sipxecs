@@ -16,10 +16,10 @@ BuildRequires: gcc-c++
 BuildRequires: sipxconfig >= %version
 BuildRequires: sipxproxy-devel >= %version
 BuildRequires: libxml2
-BuildRequires: java-1.8.0-openjdk-devel
+BuildRequires: java-17-openjdk-devel
 
 Requires: boost
-Requires: java-1.8.0-openjdk
+Requires: java-17-openjdk
 Requires: sipxconfig >= %version
 Requires: sipxproxy >= %version
 

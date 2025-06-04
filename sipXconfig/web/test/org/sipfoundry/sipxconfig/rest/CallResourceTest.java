@@ -2,13 +2,13 @@ package org.sipfoundry.sipxconfig.rest;
 
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 import junit.framework.TestCase;
 
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.Method;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
@@ -81,7 +81,7 @@ public class CallResourceTest extends TestCase {
         resource.init(null, request, response);
         resource.put(null);
         Status status = response.getStatus();
-        assertEquals("OK", status.getName());
+        assertEquals("OK", status.getReasonPhrase());
 
         request.getAttributes().put("to", "123*we@sip");
         response = new Response(request);
@@ -89,7 +89,7 @@ public class CallResourceTest extends TestCase {
         resource.init(null, request, response);
         resource.put(null);
         status = response.getStatus();
-        assertEquals("Bad Request", status.getName());
+        assertEquals("Bad Request", status.getReasonPhrase());
 
     }
 }

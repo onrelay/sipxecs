@@ -29,8 +29,8 @@ iantaocbilling_PKGS = \
 	tapestry-annotations \
 	tapestry-framework \
 	spring-core \
-	org.springframework.transaction \
-	org.springframework.jdbc \
+	spring-tx \
+	spring-jdbc \
 	spring-context \
 	spring-beans \
 	jedis \

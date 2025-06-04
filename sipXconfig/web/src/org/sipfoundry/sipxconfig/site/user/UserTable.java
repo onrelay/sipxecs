@@ -24,7 +24,7 @@ import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.components.SelectMap;
 import org.sipfoundry.sipxconfig.im.ImAccount;
 
-import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 
 @ComponentClass(allowBody = false, allowInformalParameters = false)
 public abstract class UserTable extends BaseComponent implements PageBeginRenderListener {

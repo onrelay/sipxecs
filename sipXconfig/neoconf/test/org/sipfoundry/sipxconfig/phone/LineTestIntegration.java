@@ -42,7 +42,7 @@ public class LineTestIntegration extends IntegrationTestCase {
     public void testAddingLine() throws Exception {
         loadDataSet("phone/AddLineSeed.xml");
 
-        Phone phone = m_phoneContext.loadPhone(new Integer(1000));
+        Phone phone = m_phoneContext.loadPhone(Integer.valueOf(1000));
         assertEquals(2, phone.getLines().size());
         User user = m_coreContext.loadUserByUserName("testuser");
 
@@ -55,7 +55,7 @@ public class LineTestIntegration extends IntegrationTestCase {
         // reload data to get updated ids
         m_phoneContext.flush();
         
-        Phone reloadedPhone = m_phoneContext.loadPhone(new Integer(1000));
+        Phone reloadedPhone = m_phoneContext.loadPhone(Integer.valueOf(1000));
         Line reloadedThirdLine = reloadedPhone.getLine(2);
         ResultDataGrid actual = new ResultDataGrid();
         db().query("select line_id, position, user_id from line where phone_id = ? order by position", actual, 1000);
@@ -70,7 +70,7 @@ public class LineTestIntegration extends IntegrationTestCase {
     public void testAddingLineByContext() throws Exception {
         loadDataSet("phone/AddLineSeed.xml");
 
-        Integer phoneId = new Integer(1000);
+        Integer phoneId = Integer.valueOf(1000);
         Phone phone = m_phoneContext.loadPhone(phoneId);
         assertEquals(2, phone.getLines().size());
         User user = m_coreContext.loadUserByUserName("testuser");
@@ -96,7 +96,7 @@ public class LineTestIntegration extends IntegrationTestCase {
     public void testSave() throws Exception {
         loadDataSet("phone/EndpointSeed.xml");
 
-        Phone phone = m_phoneContext.loadPhone(new Integer(1000));
+        Phone phone = m_phoneContext.loadPhone(Integer.valueOf(1000));
         assertEquals(0, phone.getLines().size());
         User user = m_coreContext.loadUserByUserName("testuser");
 
@@ -107,7 +107,7 @@ public class LineTestIntegration extends IntegrationTestCase {
 
         // reload data to get updated ids
         m_phoneContext.flush();
-        Phone reloadedPhone = m_phoneContext.loadPhone(new Integer(1000));
+        Phone reloadedPhone = m_phoneContext.loadPhone(Integer.valueOf(1000));
         Line reloadedLine = reloadedPhone.getLine(0);
 
         ResultDataGrid actual = new ResultDataGrid();
@@ -121,7 +121,7 @@ public class LineTestIntegration extends IntegrationTestCase {
     public void testLoadAndDelete() throws Exception {
         loadDataSet("phone/LineSeed.xml");
 
-        Phone phone = m_phoneContext.loadPhone(new Integer(1000));
+        Phone phone = m_phoneContext.loadPhone(Integer.valueOf(1000));
         Collection lines = phone.getLines();
         assertEquals(1, lines.size());
 
@@ -132,14 +132,14 @@ public class LineTestIntegration extends IntegrationTestCase {
         lines.clear();
         m_phoneContext.storePhone(phone);
 
-        Phone cleared = m_phoneContext.loadPhone(new Integer(1000));
+        Phone cleared = m_phoneContext.loadPhone(Integer.valueOf(1000));
         assertEquals(0, cleared.getLines().size());
     }
 
     public void testMoveLine() throws Exception {
         loadDataSet("phone/MoveLineSeed.xml");
 
-        Phone phone = m_phoneContext.loadPhone(new Integer(1000));
+        Phone phone = m_phoneContext.loadPhone(Integer.valueOf(1000));
         Line l1 = phone.getLine(0);
         Object[] ids = new Object[] {
             l1.getPrimaryKey()
@@ -165,11 +165,11 @@ public class LineTestIntegration extends IntegrationTestCase {
     public void testDeleteLinesWithSettings() throws Exception {
         loadDataSet("phone/DeleteLineWithSettingsSeed.xml");
 
-        Phone phone = m_phoneContext.loadPhone(new Integer(1000));
+        Phone phone = m_phoneContext.loadPhone(Integer.valueOf(1000));
         Collection lines = phone.getLines();
         assertEquals(3, lines.size());
         DataCollectionUtil.removeByPrimaryKey(lines, new Object[] {
-            new Integer(1001)
+            Integer.valueOf(1001)
         });
         m_phoneContext.storePhone(phone);
         commit();

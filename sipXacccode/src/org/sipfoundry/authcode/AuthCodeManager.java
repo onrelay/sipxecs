@@ -23,9 +23,9 @@ import java.util.regex.Pattern;
 import org.sipfoundry.commons.mongo.MongoConstants;
 import org.sipfoundry.commons.util.UnfortunateLackOfSpringSupportFactory;
 
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
+import com.mongodb.client.model.Filters;
 
 public final class AuthCodeManager {
 
@@ -34,10 +34,18 @@ public final class AuthCodeManager {
     }
 
     public static AuthCodeConfig getAuthCode(String code) {
-        DBCollection entityCol = UnfortunateLackOfSpringSupportFactory.getImdb().getCollection("entity");
+        MongoCollection<Document> entityCol = 
+                UnfortunateLackOfSpringSupportFactory.getImdb().getCollection("entity");
+
         Pattern codePattern = Pattern.compile("AuthCode.*");
-        DBObject query = QueryBuilder.start(ID).is(codePattern).and(MongoConstants.AUTH_CODE).is(code).get();
-        DBObject result = entityCol.findOne(query);
+
+        Document result = entityCol.find(
+                Filters.and(
+                        Filters.regex(ID, codePattern),  // Matches documents where ID matches regex "AuthCode.*"
+                        Filters.eq(MongoConstants.AUTH_CODE, code)  // Matches documents where AUTH_CODE == code
+                )
+        ).first();  // Equivalent to findOne()
+
         if (result != null) {
             AuthCodeConfig conf = new AuthCodeConfig();
             conf.setAuthCode(getStringValue(result, MongoConstants.AUTH_CODE));
@@ -48,7 +56,7 @@ public final class AuthCodeManager {
         return null;
     }
 
-    private static String getStringValue(DBObject obj, String key) {
+    private static String getStringValue(Document obj, String key) {
         if (obj.keySet().contains(key)) {
             if (obj.get(key) != null) {
                 return obj.get(key).toString();

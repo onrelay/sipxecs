@@ -16,7 +16,7 @@
  */
 package org.sipfoundry.sipxcallback;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.sipfoundry.commons.freeswitch.BridgeCommand;
 import org.sipfoundry.commons.freeswitch.Broadcast;
@@ -27,7 +27,6 @@ import org.sipfoundry.commons.freeswitch.Set;
 import org.sipfoundry.sipxcallback.common.CallbackException;
 import org.sipfoundry.sipxcallback.common.CallbackLegs;
 import org.sipfoundry.sipxcallback.common.CallbackService;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.hazelcast.core.IAtomicReference;
 
@@ -70,9 +69,9 @@ public class CallbackExecutor {
         LOG.debug("Originating call to " + m_calleeUID);
         // mark callee and caller as processing (so as not to receive other callbacks)
         IAtomicReference<Boolean> calleeReference = m_callbackService.getAtomicReference(m_callbackLegs.getCalleeName());
-        calleeReference.set(new Boolean(true));
+        calleeReference.set(Boolean.valueOf(true));
         IAtomicReference<Boolean> callerReference = m_callbackService.getAtomicReference(m_callbackLegs.getCallerName());
-        callerReference.set(new Boolean(true));
+        callerReference.set(Boolean.valueOf(true));
         boolean callbackSuccessful = false;
 
         try {
@@ -132,22 +131,22 @@ public class CallbackExecutor {
         return responseContent.split(" ")[1].replace("\n","");
     }
 
-    @Required
+    
     public void setCallbackService(CallbackService callbackService) {
         m_callbackService = callbackService;
     }
 
-    @Required
+    
     public void setCallerPrompt(String callerPrompt) {
         this.m_callerPrompt = callerPrompt;
     }
 
-    @Required
+    
     public void setRequestedCallbackPrompt(String requestedCallbackPrompt) {
         this.m_requestedCallbackPrompt = requestedCallbackPrompt;
     }
 
-    @Required
+    
     public void setSipxchangeDomainName(String sipxchangeDomainName) {
         this.sipxchangeDomainName = sipxchangeDomainName;
     }

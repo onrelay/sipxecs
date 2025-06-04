@@ -203,7 +203,7 @@ public class SettingTypesTest extends TestCase {
         }
 
         assertTrue(enumSetting.getTypedValue() instanceof Integer);
-        assertEquals(new Integer(0), enumSetting.getTypedValue());
+        assertEquals(Integer.valueOf(0), enumSetting.getTypedValue());
     }
 
     public void testDefaultBooleanType() {

@@ -140,7 +140,7 @@ public abstract class HolidaysEditor extends BaseComponent {
         ListEditMap map = new ListEditMap();
         List<HolidayPeriod> dates = getHoliday().getPeriods();
         for (int i = 0; i < dates.size(); i++) {
-            map.add(new Integer(i), dates.get(i));
+            map.add(Integer.valueOf(i), dates.get(i));
         }
         setListEditMap(map);
     }

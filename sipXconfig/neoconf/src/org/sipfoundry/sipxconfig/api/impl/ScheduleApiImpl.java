@@ -17,8 +17,8 @@ package org.sipfoundry.sipxconfig.api.impl;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.sipfoundry.sipxconfig.api.ScheduleApi;
 import org.sipfoundry.sipxconfig.api.model.ScheduleBean;
@@ -33,7 +33,6 @@ import org.sipfoundry.sipxconfig.forwarding.GeneralSchedule;
 import org.sipfoundry.sipxconfig.forwarding.Schedule;
 import org.sipfoundry.sipxconfig.forwarding.UserGroupSchedule;
 import org.sipfoundry.sipxconfig.forwarding.UserSchedule;
-import org.springframework.beans.factory.annotation.Required;
 
 public class ScheduleApiImpl implements ScheduleApi {
     private ForwardingContext m_forwardingContext;
@@ -183,12 +182,12 @@ public class ScheduleApiImpl implements ScheduleApi {
         schedule.setWorkingTime(WorkingTimeBean.convertToWorkingTime(scheduleBean.getWorkingTime()));
     }
 
-    @Required
+    
     public void setForwardingContext(ForwardingContext forwardingContext) {
         m_forwardingContext = forwardingContext;
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }

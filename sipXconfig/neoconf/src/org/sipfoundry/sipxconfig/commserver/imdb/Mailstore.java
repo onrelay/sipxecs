@@ -61,7 +61,7 @@ import static org.sipfoundry.sipxconfig.vm.DistributionList.SETTING_PATH_DISTRIB
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.common.DialPad;
 import org.sipfoundry.sipxconfig.common.Replicable;
 import org.sipfoundry.sipxconfig.common.SipUri;
@@ -74,8 +74,7 @@ import org.sipfoundry.sipxconfig.vm.MailboxManager;
 import org.sipfoundry.sipxconfig.vm.MailboxPreferences;
 import org.sipfoundry.sipxconfig.vm.attendant.PersonalAttendant;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 //TODO: this one is included in group dataset (ReplicationManagerImpl.GROUP_DATASETS)
 //Make sure all are needed, and break this apart if necessary
@@ -85,7 +84,7 @@ public class Mailstore extends AbstractDataSetGenerator {
     private MusicOnHoldManager m_mohManager;
 
     @Override
-    public void generate(Replicable entity, DBObject top) {
+    public void generate(Replicable entity, Document top) {
         if (!(entity instanceof User)) {
             return;
         }
@@ -169,7 +168,7 @@ public class Mailstore extends AbstractDataSetGenerator {
         }
         PersonalAttendant pa = m_mailboxManager.loadPersonalAttendantForUser(user);
         if (pa != null) {
-            DBObject pao = new BasicDBObject();
+            Document pao = new Document();
             if (StringUtils.isNotEmpty(user.getOperator())) {
                 pao.put(OPERATOR, SipUri.fix(user.getOperator(), getSipDomain()));
             }
@@ -179,9 +178,9 @@ public class Mailstore extends AbstractDataSetGenerator {
                 pao.put(LANGUAGE, m_localizationContext.getCurrentLanguage());
             }
             if (pa.getMenu() != null && !pa.getMenu().getMenuItems().isEmpty()) {
-                List<DBObject> buttonsList = new ArrayList<DBObject>();
+                List<Document> buttonsList = new ArrayList<Document>();
                 for (DialPad dialPad : pa.getMenu().getMenuItems().keySet()) {
-                    DBObject menuItem = new BasicDBObject();
+                    Document menuItem = new Document();
                     menuItem.put(DIALPAD, dialPad.getName());
                     menuItem.put(ITEM,
                             SipUri.fix(pa.getMenu().getMenuItems().get(dialPad).getParameter(), getSipDomain()));
@@ -195,12 +194,12 @@ public class Mailstore extends AbstractDataSetGenerator {
         putOnlyIfNotNull(top, UNIFIED_MESSAGING_LANGUAGE,
                 user.getSettingValue(MailboxPreferences.UNIFIED_MESSAGING_LANGUAGE));
         // DL
-        List<DBObject> dLists = new ArrayList<DBObject>();
+        List<Document> dLists = new ArrayList<Document>();
         for (int i = 1; i < DistributionList.MAX_SIZE; i++) {
             String extensions = user.getSettingValue(new StringBuilder(SETTING_PATH_DISTRIBUTION_LIST).append(i)
                     .toString());
             if (extensions != null) {
-                DBObject dlist = new BasicDBObject();
+                Document dlist = new Document();
                 dlist.put(DIALPAD, i);
                 dlist.put(ITEM, extensions);
                 dLists.add(dlist);

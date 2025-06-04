@@ -16,14 +16,17 @@ import java.util.Date;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.converters.DateConverter;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.commons.userdb.profile.UserProfile;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.common.User;
@@ -41,8 +44,9 @@ public class ContactInformationResource extends UserResource {
         ConvertUtils.register(new DateConverter(null), Date.class);
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
+        
         User user = getUser();
         UserProfile userProfile = user.getUserProfile();
 
@@ -53,8 +57,9 @@ public class ContactInformationResource extends UserResource {
         return new UserProfileRepresentation(variant.getMediaType(), representable);
     }
 
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
+        
         UserProfileRepresentation representation = new UserProfileRepresentation(entity);
         Representable representable = representation.getObject();
 
@@ -83,6 +88,7 @@ public class ContactInformationResource extends UserResource {
         user.setLastName(representable.getLastName());
 
         getCoreContext().saveUser(user);
+        return null;
     }
 
     static class Representable extends UserProfile implements Serializable {

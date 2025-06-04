@@ -32,10 +32,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.address.Address;
@@ -55,7 +55,6 @@ import org.sipfoundry.sipxconfig.proxy.ProxyManager;
 import org.sipfoundry.sipxconfig.region.Region;
 import org.sipfoundry.sipxconfig.region.RegionManager;
 import org.sipfoundry.sipxconfig.registrar.Registrar;
-import org.springframework.beans.factory.annotation.Required;
 
 public class DnsConfig implements ConfigProvider {
     private static final String LINE_SEP = "\n";
@@ -362,7 +361,7 @@ public class DnsConfig implements ConfigProvider {
         m_dnsManager = dnsManager;
     }
 
-    @Required
+    
     public void setRegionManager(RegionManager regionManager) {
         m_regionManager = regionManager;
     }

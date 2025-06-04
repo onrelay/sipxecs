@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.device;
 
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.address.Address;
@@ -28,7 +28,6 @@ import org.sipfoundry.sipxconfig.paging.PagingContext;
 import org.sipfoundry.sipxconfig.proxy.ProxyManager;
 import org.sipfoundry.sipxconfig.registrar.Registrar;
 import org.sipfoundry.sipxconfig.time.NtpManager;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Sets up phone and line objects with system defaults.
@@ -195,7 +194,7 @@ public class DeviceDefaults {
         m_domainManager = domainManager;
     }
 
-    @Required
+    
     public void setMusicOnHoldManager(MusicOnHoldManager musicOnHoldManager) {
         setMohAddressFactory(musicOnHoldManager.getAddressFactory());
     }
@@ -204,7 +203,7 @@ public class DeviceDefaults {
         m_musicOnHold = musicOnHold;
     }
 
-    @Required
+    
     public void setRouteEmergencyCallsDirectly(boolean routeEmergencyCallsDirectly) {
         m_routeEmergencyCallsDirectly = routeEmergencyCallsDirectly;
     }

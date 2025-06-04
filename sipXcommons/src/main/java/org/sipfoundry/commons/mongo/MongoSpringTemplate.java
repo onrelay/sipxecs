@@ -1,10 +1,9 @@
 package org.sipfoundry.commons.mongo;
 
-import org.springframework.beans.factory.annotation.Required;
-import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.DB;
+import com.mongodb.client.MongoDatabase;
 
 
 /**
@@ -13,23 +12,22 @@ import com.mongodb.DB;
  */
 public class MongoSpringTemplate extends MongoTemplate {
     private String m_dbname;
-    private MongoDbFactory m_factory;    
+    private MongoDatabaseFactory m_factory;    
     
-    public MongoSpringTemplate(MongoDbFactory factory) {
+    public MongoSpringTemplate(MongoDatabaseFactory factory) {
         super(factory);
         m_factory = factory;
     }
     
-    @Override
-    public DB getDb() {
-        return m_factory.getDb(m_dbname);
+    public MongoDatabase getDb() {
+        return m_factory.getMongoDatabase(m_dbname);
     }
 
     public String getDbname() {
         return m_dbname;
     }
 
-    @Required
+    
     public void setDbname(String dbname) {
         m_dbname = dbname;
     }

@@ -5,11 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
-import org.sipfoundry.sipxconfig.api.impl.ResponseUtils;
 import org.sipfoundry.sipxconfig.api.model.SettingBean;
 import org.sipfoundry.sipxconfig.api.model.SettingsList;
 import org.sipfoundry.sipxconfig.branch.Branch;
@@ -20,9 +19,7 @@ import org.sipfoundry.sipxconfig.callqueue.CallQueueContext;
 import org.sipfoundry.sipxconfig.callqueue.CallQueueSettings;
 import org.sipfoundry.sipxconfig.callqueue.CallQueueTier;
 import org.sipfoundry.sipxconfig.callqueue.CallQueueTiers;
-import org.sipfoundry.sipxconfig.common.User;
-import org.sipfoundry.sipxconfig.setting.Setting;
-import org.springframework.beans.factory.annotation.Required;
+
 
 public class CallQueueApiImpl implements CallQueueApi {
     private CallQueueContext m_callQueueContext;
@@ -206,12 +203,12 @@ public class CallQueueApiImpl implements CallQueueApi {
         }
     }
     
-    @Required
+    
     public void setCallQueueContext(CallQueueContext callQueueContext) {
         m_callQueueContext = callQueueContext;
     }
     
-    @Required
+    
     public void setBranchManager(BranchManager branchManager) {
         m_branchManager = branchManager;
     }

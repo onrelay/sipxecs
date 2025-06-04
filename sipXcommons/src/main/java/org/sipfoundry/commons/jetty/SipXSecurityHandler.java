@@ -16,23 +16,31 @@
  */
 package org.sipfoundry.commons.jetty;
 
-import java.io.IOException;
+import org.eclipse.jetty.ee10.servlet.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.util.Callback;
 
-import org.mortbay.http.HttpException;
-import org.mortbay.http.HttpRequest;
-import org.mortbay.http.HttpResponse;
-import org.mortbay.http.handler.SecurityHandler;
-
-public class SipXSecurityHandler extends SecurityHandler {
+public class SipXSecurityHandler extends ConstraintSecurityHandler {
+    @SuppressWarnings("unused")
     private int m_publicHttpPort;
 
     public SipXSecurityHandler(int port) {
         m_publicHttpPort = port;
     }
-    public void handle(String pathInContext, String pathParams, HttpRequest request, HttpResponse response)
-            throws HttpException, IOException {
-        if (request.getPort() == m_publicHttpPort) {
-            getHttpContext().checkSecurityConstraints(pathInContext, request, response);
+
+    @Override
+    public boolean handle(Request request, Response response, Callback callback) throws Exception {
+
+        Handler handler = getHandler();
+        if (handler != null) {
+            // Delegate to the wrapped handler
+            return handler.handle(request, response, callback);
+        } else {
+            // No handler set; just signal completion
+            callback.succeeded();
+            return true; // Handled
         }
     }
 }

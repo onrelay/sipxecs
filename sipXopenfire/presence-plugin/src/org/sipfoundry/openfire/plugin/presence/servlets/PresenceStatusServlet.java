@@ -7,8 +7,8 @@
 
 package org.sipfoundry.openfire.plugin.presence.servlets;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 
 import org.jivesoftware.openfire.XMPPServer;
 import org.sipfoundry.openfire.plugin.presence.XmlRpcPresenceProvider;

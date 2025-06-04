@@ -44,7 +44,6 @@ import org.sipfoundry.sipxconfig.phone.Line;
 import org.sipfoundry.sipxconfig.phone.Phone;
 import org.sipfoundry.sipxconfig.phone.PhoneContext;
 import org.sipfoundry.sipxconfig.setting.PersistableSettings;
-import org.springframework.beans.factory.annotation.Required;
 
 public class SaaConfiguration implements ConfigProvider, DaoEventListener, ResLimitPluginConfig {
     private VelocityEngine m_velocityEngine;
@@ -128,7 +127,7 @@ public class SaaConfiguration implements ConfigProvider, DaoEventListener, ResLi
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setConfigManager(ConfigManager configManager) {
         m_configManager = configManager;
     }
@@ -163,7 +162,7 @@ public class SaaConfiguration implements ConfigProvider, DaoEventListener, ResLi
         }
     }
 
-    @Required
+    
     public void setSaaLimitsConfig(AbstractResLimitsConfig saaLimitsConfig) {
         m_saaLimitsConfig = saaLimitsConfig;
     }
@@ -188,7 +187,7 @@ public class SaaConfiguration implements ConfigProvider, DaoEventListener, ResLi
         m_saaManager.saveSettings(settings);
     }
 
-    @Required
+    
     public void setPhoneContext(PhoneContext phoneContext) {
         m_phoneContext = phoneContext;
     }

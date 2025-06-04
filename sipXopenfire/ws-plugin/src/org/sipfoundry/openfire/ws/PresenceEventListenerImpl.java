@@ -16,15 +16,14 @@
  */
 package org.sipfoundry.openfire.ws;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.io.IOUtils;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.jivesoftware.openfire.session.ClientSession;
 import org.jivesoftware.openfire.user.PresenceEventListener;
@@ -77,28 +76,31 @@ public class PresenceEventListenerImpl implements PresenceEventListener {
         return String.format("https://%s:%d/receiver", fqdn, port);
     }
 
-    private String invokePost(String userId, String message) throws Exception {
-        String response = null;
-        InputStream stream = null;
-        String websocketAddress = System.getProperty("websocket.address");
-        String websocketPort = System.getProperty("websocket.port");
-        if (websocketAddress != null && websocketPort != null) {
-            PostMethod method = new PostMethod(getRestServerUrl(websocketAddress, new Integer(websocketPort)));
-            RequestEntity re = new InputStreamRequestEntity(new ByteArrayInputStream(message.getBytes()), "text/x-json");
-            method.setRequestEntity(re);
-            method.addRequestHeader("user_id", userId);
-            try {
-                HttpClient client = new HttpClient();
-                client.executeMethod(method);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } finally {
-                if (method != null) {
-                    method.releaseConnection();
-                }
-                IOUtils.closeQuietly(stream);
-            }
+private String invokePost(String userId, String message) throws Exception {
+    String response = null;
+    String websocketAddress = System.getProperty("websocket.address");
+    String websocketPort = System.getProperty("websocket.port");
+
+    if (websocketAddress != null && websocketPort != null) {
+        String url = getRestServerUrl(websocketAddress, Integer.parseInt(websocketPort));
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("user_id", userId)
+                .header("Content-Type", "text/x-json")
+                .POST(HttpRequest.BodyPublishers.ofString(message, StandardCharsets.UTF_8))
+                .build();
+
+        try {
+            HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+            response = httpResponse.body();
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
-        return response;
     }
+
+    return response;
+}
 }

@@ -12,18 +12,18 @@ package org.sipfoundry.sipxconfig.rest;
 
 import static org.restlet.data.MediaType.APPLICATION_JSON;
 import static org.restlet.data.MediaType.TEXT_XML;
-import static org.sipfoundry.sipxconfig.permission.PermissionName.RECORD_SYSTEM_PROMPTS;
 
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Delete;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.dialplan.AutoAttendant;
 import org.sipfoundry.sipxconfig.dialplan.AutoAttendantManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class SelectSpecialAttendantResource extends UserResource {
     private AutoAttendantManager m_autoAttendantManager;
@@ -34,34 +34,24 @@ public class SelectSpecialAttendantResource extends UserResource {
         super.init(context, request, response);
         getVariants().add(new Variant(TEXT_XML));
         getVariants().add(new Variant(APPLICATION_JSON));
-        setModifiable(getUser().hasPermission(RECORD_SYSTEM_PROMPTS));
         m_attendantId = (String) request.getAttributes().get("attendant");
     }
 
-    @Override
-    public boolean allowPut() {
-        return true;
-    }
-
-    @Override
-    public boolean allowDelete() {
-        return true;
-    }
-
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         AutoAttendant aa = m_autoAttendantManager.getAutoAttendantBySystemName(m_attendantId);
         if (aa == null) {
             getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-            return;
+            return null;
         }
 
         boolean specialMode = m_autoAttendantManager.getSpecialMode();
         m_autoAttendantManager.setAttendantSpecialMode(specialMode, aa);
         getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
+        return null;
     }
 
-    @Override
+    @Delete
     public void removeRepresentations() throws ResourceException {
         AutoAttendant aa = m_autoAttendantManager.getAutoAttendantBySystemName(m_attendantId);
         if (aa == null) {
@@ -78,7 +68,7 @@ public class SelectSpecialAttendantResource extends UserResource {
         getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
     }
 
-    @Required
+    
     public void setAutoAttendantManager(AutoAttendantManager autoAttendantManager) {
         m_autoAttendantManager = autoAttendantManager;
     }

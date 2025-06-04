@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.sipfoundry.sipxconfig.address.Address;
 import org.sipfoundry.sipxconfig.address.AddressManager;
 import org.sipfoundry.sipxconfig.address.AddressType;

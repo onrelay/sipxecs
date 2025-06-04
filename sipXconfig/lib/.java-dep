@@ -7,26 +7,23 @@ sipXconfig_dependency() {
     # packages that sipxconfig related unit tests will need to add to classpath
     pkg_push \
        cglib-nodep \
-       com.noelios.restlet \
-       com.noelios.restlet.ext.servlet \
-       commons-beanutils \
+       commons-beanutils-core \
        commons-collections \
        commons-digester \
        commons-logging \
        dbunit \
        dom4j \
        easymock \
-       easymockclassextension \
        hibernate \
-       javax.servlet \
+       jakarta.servlet \
        jaxen \
        junit \
        org.restlet \
        spring-context \
        spring-context-support \
        spring-core \
-       org.springframework.orm \
-       org.springframework.transaction \
+       spring-orm \
+       spring-tx \
        sipxcommons \
        velocity \
        velocity-tools-generic \

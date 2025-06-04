@@ -18,8 +18,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.common.BeanId;
@@ -32,7 +32,6 @@ import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.permission.Permission;
 import org.sipfoundry.sipxconfig.permission.Permission.Type;
 import org.sipfoundry.sipxconfig.permission.PermissionName;
-import org.springframework.beans.factory.annotation.Required;
 
 public class AuthCodeManagerImpl extends SipxHibernateDaoSupport<AuthCode> implements AuthCodeManager  {
     private static final String AUTH_CODE_CODE = "code";
@@ -130,7 +129,7 @@ public class AuthCodeManagerImpl extends SipxHibernateDaoSupport<AuthCode> imple
     @Override
     public AuthCode getAuthCodeByCode(String code) {
         String query = "authCodeByCode";
-        Collection<AuthCode> codes = getHibernateTemplate().findByNamedQueryAndNamedParam(query, AUTH_CODE_CODE,
+        Collection<AuthCode> codes =(Collection<AuthCode>)getHibernateTemplate().findByNamedQueryAndNamedParam(query, AUTH_CODE_CODE,
                 code);
         return requireOneOrZero(codes, query);
     }
@@ -208,7 +207,7 @@ public class AuthCodeManagerImpl extends SipxHibernateDaoSupport<AuthCode> imple
         return false;
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }

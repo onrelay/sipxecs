@@ -35,8 +35,8 @@ public class LenSelectionModelTest extends TestCase {
     }
 
     public void testGetOption() {
-        assertEquals(new Integer(4), m_model.getOption(1));
-        assertEquals(new Integer(5), m_model.getOption(2));
+        assertEquals(Integer.valueOf(4), m_model.getOption(1));
+        assertEquals(Integer.valueOf(5), m_model.getOption(2));
     }
 
     public void testGetLabel() {
@@ -51,7 +51,7 @@ public class LenSelectionModelTest extends TestCase {
 
     public void testTranslateValue() {
         String value = m_model.getValue(2);
-        assertEquals(new Integer(5), m_model.translateValue(value));
+        assertEquals(Integer.valueOf(5), m_model.translateValue(value));
     }
 
     public void testInvalidState() {

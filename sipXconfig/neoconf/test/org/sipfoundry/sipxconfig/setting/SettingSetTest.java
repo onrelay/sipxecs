@@ -46,23 +46,26 @@ public class SettingSetTest extends TestCase {
     public void testVisitSettingGroup() {
         IMocksControl settingVisitorControl = EasyMock.createControl();
         SettingVisitor settingVisitor = settingVisitorControl.createMock(SettingVisitor.class);
-        settingVisitor.visitSettingGroup(m_set);
-        settingVisitorControl.andReturn(false);
+
+        // First visit: visitor returns false
+        EasyMock.expect(settingVisitor.visitSettingGroup(m_set)).andReturn(false);
         settingVisitorControl.replay();
         m_set.acceptVisitor(settingVisitor);
         settingVisitorControl.verify();
 
+        // Second visit: visitor returns true, deeper traversal
         settingVisitorControl.reset();
-        settingVisitor.visitSettingGroup(m_set);
-        settingVisitorControl.andReturn(true);
-        settingVisitor.visitSetting(m_settings[0]);
-        settingVisitor.visitSettingGroup((SettingSet) m_settings[1]);
-        settingVisitorControl.andReturn(true);
 
-        settingVisitor.visitSettingGroup(m_settingA);
-        settingVisitorControl.andReturn(false);
+        EasyMock.expect(settingVisitor.visitSettingGroup(m_set)).andReturn(true);
+        settingVisitor.visitSetting(m_settings[0]);
+        EasyMock.expectLastCall();
+
+        EasyMock.expect(settingVisitor.visitSettingGroup((SettingSet) m_settings[1])).andReturn(true);
+        EasyMock.expect(settingVisitor.visitSettingGroup(m_settingA)).andReturn(false);
 
         settingVisitor.visitSetting(m_settings[2]);
+        EasyMock.expectLastCall();
+
         settingVisitorControl.replay();
         m_set.acceptVisitor(settingVisitor);
         settingVisitorControl.verify();

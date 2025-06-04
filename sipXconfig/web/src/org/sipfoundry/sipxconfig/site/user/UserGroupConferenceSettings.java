@@ -29,7 +29,7 @@ import org.sipfoundry.sipxconfig.conference.ConferenceBridgeContext;
 import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.site.setting.GroupSettings;
-import org.springframework.orm.hibernate3.HibernateObjectRetrievalFailureException;
+import org.springframework.orm.hibernate5.HibernateObjectRetrievalFailureException;
 
 @ComponentClass(allowBody = false, allowInformalParameters = false)
 public abstract class UserGroupConferenceSettings extends BaseComponent {

@@ -16,7 +16,7 @@
  */
 package org.sipfoundry.sipxconfig.vm;
 
-import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 
 import java.util.Date;
 import java.util.TimeZone;
@@ -26,7 +26,7 @@ import org.joda.time.LocalDateTime;
 import org.sipfoundry.commons.util.TimeZoneUtils;
 import org.w3c.dom.Element;
 
-public class RemoteVoicemail implements Voicemail, Comparable {
+public class RemoteVoicemail implements Voicemail, Comparable<Object> {
     private String m_folderId;
     private String m_userId;
     private String m_messageId;
@@ -49,7 +49,7 @@ public class RemoteVoicemail implements Voicemail, Comparable {
         m_messageId = node.getAttribute("id");
         m_heard = Boolean.valueOf(node.getAttribute("heard"));
         m_durationSecs = Integer.valueOf(node.getAttribute("duration"));
-        m_timestamp = TimeZoneUtils.convertJodaTimezone(new LocalDateTime(new Long(node.getAttribute("received"))),
+        m_timestamp = TimeZoneUtils.convertJodaTimezone(new LocalDateTime(Long.valueOf(node.getAttribute("received"))),
                 DateTimeZone.getDefault().getID(), tz.getID());
         m_from = node.getAttribute("fromUri");
         m_fromBrief = node.getAttribute("author");

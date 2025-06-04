@@ -20,12 +20,16 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Delete;
+import org.restlet.resource.Get;
+import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.phonebook.Phonebook;
 import org.sipfoundry.sipxconfig.phonebook.PhonebookEntry;
@@ -43,8 +47,8 @@ public class UserPhonebookResource extends UserPhonebookSearchResource {
         getVariants().add(new Variant(TEXT_VCARD));
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         Collection<Phonebook> phonebooks = getPhonebookManager().getAllPhonebooksByUser(getUser());
         Collection<PhonebookEntry> entries = getPhonebookManager().getEntries(phonebooks, getUser());
         Representation reprObj;
@@ -59,12 +63,12 @@ public class UserPhonebookResource extends UserPhonebookSearchResource {
         return reprObj;
     }
 
-    @Override
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {        
         PrivatePhonebookRepresentation representation = new PrivatePhonebookRepresentation(entity);
         Collection<PhonebookEntry> newEntries = representation.getObject();
         if (newEntries.isEmpty()) {
-            return;
+            return null;
         }
 
         User user = getUser();
@@ -75,9 +79,10 @@ public class UserPhonebookResource extends UserPhonebookSearchResource {
             entry.setPhonebook(privatePhonebook);
         }
         getPhonebookManager().savePhonebook(privatePhonebook);
+        return null;
     }
 
-    @Override
+    @Delete
     public void removeRepresentations() throws ResourceException {
         User user = getUser();
         getPhonebookManager().removePrivatePhonebook(user);

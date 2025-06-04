@@ -70,7 +70,7 @@ public class UploadManagerImpl extends SipxHibernateDaoSupport<Upload> implement
     }
 
     public Collection<Upload> getUpload() {
-        return getHibernateTemplate().findByNamedQuery("upload");
+        return (Collection<Upload>)getHibernateTemplate().findByNamedQuery("upload");
     }
 
     public void clearMissingUploads(Collection<Upload> uploads) {
@@ -126,18 +126,18 @@ public class UploadManagerImpl extends SipxHibernateDaoSupport<Upload> implement
     }
 
     private List<Upload> getActiveUpload(UploadSpecification spec) {
-        List<Upload> existing = getHibernateTemplate().findByNamedQueryAndNamedParam(
+        List<Upload> existing = (List<Upload>)getHibernateTemplate().findByNamedQueryAndNamedParam(
                 "deployedUploadBySpecification", "spec", spec.getSpecificationId());
         return existing;
     }
 
     private List<Upload> getUploadName(String name) {
-        List<Upload> existing = getHibernateTemplate().findByNamedQueryAndNamedParam("uploadName", NAME, name);
+        List<Upload> existing = (List<Upload>)getHibernateTemplate().findByNamedQueryAndNamedParam("uploadName", NAME, name);
         return existing;
     }
 
     private List<Upload> getUploadNameAndId(String name, int id) {
-        List<Upload> existing = getHibernateTemplate().findByNamedQueryAndNamedParam("uploadNameAndId",
+        List<Upload> existing = (List<Upload>)getHibernateTemplate().findByNamedQueryAndNamedParam("uploadNameAndId",
                 new String[] {
                     NAME, "id"
                 }, new Object[] {

@@ -1,17 +1,27 @@
 ivr_PKGS = \
 	commons-codec \
 	commons-digester \
-	commons-beanutils \
+	commons-beanutils-core \
 	commons-io \
 	commons-logging \
 	commons-lang \
 	dom4j \
 	iText \
 	jaudiotagger \
-	javamail \
-	javax.servlet \
+	jakarta.mail \
+	jakarta.servlet \
+	jakarta.activation-api \
 	jaxen \
-	jetty \
+	jetty-server \
+	jetty-util \
+	jetty-http \
+	jetty-xml \
+	jetty-ee10-servlet \
+	jetty-ee10-servlets \
+	jetty-security \
+	jetty-deploy \
+	jetty-io \
+	jetty-ee10-webapp \
 	log4j \
 	mongo \
 	org.restlet \
@@ -25,16 +35,20 @@ ivr_PKGS = \
 	xmlrpc-client \
 	xmlrpc-server \
 	spring-beans \
-	org.springframework.web \
-	org.springframework.web.servlet \
+	spring-web \
+	spring-webmvc \
 	spring-context \
 	spring-context-support \
 	spring-core \
-	org.springframework.jdbc \
-	org.springframework.transaction \
+	spring-jdbc \
+	spring-tx \
 	spring-expression \
 	spring-aop \
 	spring-data-commons \
 	spring-data-mongodb \
 	joda-time \
-	hazelcast-all
+	hazelcast-all \
+	mongodb-driver-core \
+	mongodb-driver-sync \
+	bson
+

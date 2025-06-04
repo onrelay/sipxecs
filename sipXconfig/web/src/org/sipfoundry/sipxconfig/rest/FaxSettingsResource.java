@@ -14,30 +14,35 @@
  */
 package org.sipfoundry.sipxconfig.rest;
 
-import static org.sipfoundry.sipxconfig.rest.JacksonConvert.toRepresentation;
-
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 
 public class FaxSettingsResource extends UserResource {
     private static final Log LOG = LogFactory.getLog(FaxSettingsResource.class);
 
-    // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        Map<String, String> faxSettings = new HashMap<String, String>();
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {     
+        
+        try {
+            Map<String, String> faxSettings = new HashMap<String, String>();
 
-        faxSettings.put("extension", getUser().getFaxExtension());
-        faxSettings.put("did", getUser().getFaxDid());
+            faxSettings.put("extension", getUser().getFaxExtension());
+            faxSettings.put("did", getUser().getFaxDid());
 
-        LOG.debug("Returning fax prefs:\t" + faxSettings);
+            LOG.debug("Returning fax prefs:\t" + faxSettings);
 
-        return toRepresentation(faxSettings);
+            return toRepresentation(faxSettings);
+
+        } catch( IOException ex ) {
+            throw new ResourceException( ex );
+        }
     }
 }

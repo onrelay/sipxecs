@@ -44,7 +44,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Required;
 /**
  * There are three resource limits to configure:
  * fd-soft
@@ -220,42 +219,42 @@ public class ResLimitsConfiguration implements ConfigProvider, BeanFactoryAware 
         m_resLimitsConfigs = resLimitsConfigs;
     }
 
-    @Required
+    
     public void setMwi(Mwi mwi) {
         m_mwi = mwi;
     }
 
-    @Required
+    
     public void setProxyManager(ProxyManager proxyManager) {
         m_proxyManager = proxyManager;
     }
 
-    @Required
+    
     public void setRegistrar(Registrar registrar) {
         m_registrar = registrar;
     }
 
-    @Required
+    
     public void setSaaManager(SaaManager saaManager) {
         m_saaManager = saaManager;
     }
 
-    @Required
+    
     public void setAdminContext(AdminContext adminContext) {
         m_adminContext = adminContext;
     }
 
-    @Required
+    
     public void setProxyLimitsConfig(AbstractResLimitsConfig proxyLimitsConfig) {
         m_proxyLimitsConfig = proxyLimitsConfig;
     }
 
-    @Required
+    
     public void setPublisherLimitsConfig(AbstractResLimitsConfig publisherLimitsConfig) {
         m_publisherLimitsConfig = publisherLimitsConfig;
     }
 
-    @Required
+    
     public void setRegistrarLimitsConfig(AbstractResLimitsConfig registrarLimitsConfig) {
         m_registrarLimitsConfig = registrarLimitsConfig;
     }

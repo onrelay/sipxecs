@@ -10,8 +10,9 @@
 package org.sipfoundry.sipxconfig.phone;
 
 import static org.apache.commons.collections.CollectionUtils.select;
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,8 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
@@ -59,19 +60,18 @@ import org.sipfoundry.sipxconfig.speeddial.SpeedDial;
 import org.sipfoundry.sipxconfig.speeddial.SpeedDialManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 
 /**
  * Context for entire sipXconfig framework. Holder for service layer bean factories.
  */
-public class PhoneContextImpl extends SipxHibernateDaoSupport implements BeanFactoryAware, PhoneContext,
-        ApplicationListener, AlarmProvider, DaoEventListener {
+public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements BeanFactoryAware, PhoneContext,
+        ApplicationListener<ApplicationEvent>, AlarmProvider, DaoEventListener {
     private static final String SERIAL_NUMBER = "serial_number";
     private static final String MODEL_ID = "model_id";
     private static final String PHONE_ID = "phone_id";
@@ -120,27 +120,27 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport implements BeanFac
 
     private ProfileManager m_profileManager;
 
-    @Required
+    
     public void setPhonebookManager(PhonebookManager phonebookManager) {
         m_phonebookManager = phonebookManager;
     }
 
-    @Required
+    
     public void setSettingDao(SettingDao settingDao) {
         m_settingDao = settingDao;
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setIntercomManager(IntercomManager intercomManager) {
         m_intercomManager = intercomManager;
     }
 
-    @Required
+    
     public void setSpeedDialManager(SpeedDialManager speedDialManager) {
         m_speedDialManager = speedDialManager;
     }
@@ -149,7 +149,7 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport implements BeanFac
         m_jdbcTemplate = template;
     }
 
-    @Required
+    
     public void setProfileManager(ProfileManager profileManager) {
         m_profileManager = profileManager;
     }
@@ -253,26 +253,30 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport implements BeanFac
 
     @Override
     public List<Integer> getAllPhoneIds() {
-        return getHibernateTemplate().findByNamedQuery("phoneIds");
+        return (List<Integer>)getHibernateTemplate().findByNamedQuery("phoneIds");
     }
 
     @Override
     public Phone loadPhone(Integer id) {
         Phone phone = getHibernateTemplate().load(Phone.class, id);
-
         return phone;
     }
 
     @Override
+    public Phone load(Class c, Serializable id) {
+        return loadPhone( (Integer)id );
+    }
+
+    @Override
     public Integer getPhoneIdBySerialNumber(String serialNumber) {
-        List objs = getHibernateTemplate().findByNamedQueryAndNamedParam(QUERY_PHONE_ID_BY_SERIAL_NUMBER, VALUE,
+        List<Integer> objs = (List<Integer>)getHibernateTemplate().findByNamedQueryAndNamedParam(QUERY_PHONE_ID_BY_SERIAL_NUMBER, VALUE,
                 serialNumber);
         return (Integer) DaoUtils.requireOneOrZero(objs, QUERY_PHONE_ID_BY_SERIAL_NUMBER);
     }
 
     @Override
     public Phone getPhoneBySerialNumber(String serialNumber) {
-        List<Phone> objs = getHibernateTemplate().findByNamedQueryAndNamedParam(QUERY_PHONE_BY_SERIAL_NUMBER, VALUE,
+        List<Phone> objs = (List<Phone>)getHibernateTemplate().findByNamedQueryAndNamedParam(QUERY_PHONE_BY_SERIAL_NUMBER, VALUE,
                 serialNumber);
         return DaoUtils.requireOneOrZero(objs, QUERY_PHONE_BY_SERIAL_NUMBER);
     }
@@ -317,7 +321,7 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport implements BeanFac
     }
 
     private void deleteAll(String query) {
-        Collection c = getHibernateTemplate().find(query);
+        Collection<Object> c = (Collection<Object>)getHibernateTemplate().find(query);
         getHibernateTemplate().deleteAll(c);
     }
 
@@ -360,14 +364,14 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport implements BeanFac
 
     @Override
     public Collection<Phone> getPhonesByGroupId(Integer groupId) {
-        Collection<Phone> phones = getHibernateTemplate().findByNamedQueryAndNamedParam("phonesByGroupId",
+        Collection<Phone> phones = (Collection<Phone>)getHibernateTemplate().findByNamedQueryAndNamedParam("phonesByGroupId",
                 "groupId", groupId);
         return phones;
     }
 
     @Override
     public Collection<Phone> getPhonesByGroupName(String groupName) {
-        Collection<Phone> phones = getHibernateTemplate().findByNamedQueryAndNamedParam("phonesByGroupName",
+        Collection<Phone> phones = (Collection<Phone>)getHibernateTemplate().findByNamedQueryAndNamedParam("phonesByGroupName",
             "groupName", groupName);
         return phones;
     }
@@ -466,12 +470,12 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport implements BeanFac
 
     @Override
     public Collection<Phone> getPhonesByUserId(Integer userId) {
-        return getHibernateTemplate().findByNamedQueryAndNamedParam("phonesByUserId", USER_ID, userId);
+        return (Collection<Phone>)getHibernateTemplate().findByNamedQueryAndNamedParam("phonesByUserId", USER_ID, userId);
     }
 
     @Override
     public Collection<Phone> getPhonesByUserName(String userName) {
-        return getHibernateTemplate().findByNamedQueryAndNamedParam("phonesByUserName", USER_NAME, userName);
+        return (Collection<Phone>)getHibernateTemplate().findByNamedQueryAndNamedParam("phonesByUserName", USER_NAME, userName);
     }
 
     @Override
@@ -482,7 +486,7 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport implements BeanFac
         Object[] paramsValues = {
             userId, modelId
         };
-        Collection<Phone> phones = getHibernateTemplate().findByNamedQueryAndNamedParam(
+        Collection<Phone> phones = (Collection<Phone>)getHibernateTemplate().findByNamedQueryAndNamedParam(
                 "phonesByUserIdAndPhoneModel", paramsNames, paramsValues);
         return phones;
     }
@@ -525,7 +529,7 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport implements BeanFac
     }
 
     private Collection<PhonebookEntry> filterPhonebookEntries(Collection<PhonebookEntry> entries) {
-        Collection entriesToRemove = select(entries, new InvalidGoogleEntrySearchPredicate());
+        Collection<PhonebookEntry> entriesToRemove = select(entries, new InvalidGoogleEntrySearchPredicate());
         entries.removeAll(entriesToRemove);
         return entries;
     }
@@ -590,7 +594,7 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport implements BeanFac
                 c.addOrder(order);
             }
         }
-        return getHibernateTemplate().findByCriteria(c, firstRow, pageSize);
+        return (List<Phone>)getHibernateTemplate().findByCriteria(c, firstRow, pageSize);
     }
 
     @Override
@@ -606,10 +610,10 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport implements BeanFac
     public List<Phone> getPhonesWithLinesLike(String value) {
         DetachedCriteria crit = DetachedCriteria.forClass(Phone.class);
         addByFilteredInternalLinesCriteria(crit, value);
-        List<Phone> phones = getHibernateTemplate().findByCriteria(crit);
+        List<Phone> phones = (List<Phone>)getHibernateTemplate().findByCriteria(crit);
         crit = DetachedCriteria.forClass(Phone.class);
         addByExternalLinesCriteria(crit);
-        List<Phone> extLinePhones = getHibernateTemplate().findByCriteria(crit);
+        List<Phone> extLinePhones = (List<Phone>)getHibernateTemplate().findByCriteria(crit);
         List<Phone> phonesToRemove = new ArrayList<Phone>();
         for (Phone phone : extLinePhones) {
             boolean remove = true;

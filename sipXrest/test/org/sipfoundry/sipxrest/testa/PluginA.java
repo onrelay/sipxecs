@@ -8,12 +8,11 @@ package org.sipfoundry.sipxrest.testa;
 
 
 import org.restlet.Context;
-import org.restlet.Filter;
-import org.restlet.Route;
-import org.restlet.Router;
-import org.restlet.data.Request;
+import org.restlet.routing.Filter;
+import org.restlet.routing.Route;
+import org.restlet.routing.Router;
+import org.restlet.Request;
 import org.sipfoundry.sipxrest.Plugin;
-import org.sipfoundry.sipxrest.testa.RestletA;
 
 public class PluginA extends Plugin {
 
@@ -22,7 +21,7 @@ public class PluginA extends Plugin {
     public void attachContext(Filter filter, Context context, Router router) {
        filter.setNext(new RestletA());
        Route route = router.attach(getMetaInf().getUriPrefix() + "/{param}",filter);
-       route.extractQuery("agent", "agent", true);
+       extractQuery(route,"agent", "agent", true);
     }
 
     @Override

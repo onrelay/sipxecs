@@ -12,18 +12,18 @@ package org.sipfoundry.sipxconfig.rest;
 import static org.restlet.data.MediaType.TEXT_PLAIN;
 
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.vm.MailboxPreferences;
 import org.sipfoundry.sipxconfig.vm.MailboxPreferences.ActiveGreeting;
 
-public class ActiveGreetingResource extends Resource {
+public class ActiveGreetingResource extends ServerResource {
     private CoreContext m_coreContext;
     private String m_userName;
 

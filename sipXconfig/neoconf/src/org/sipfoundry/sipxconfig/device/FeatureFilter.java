@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.device;
 
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.Predicate;
 
 public class FeatureFilter implements Predicate {
     private final String m_feature;

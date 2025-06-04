@@ -14,9 +14,9 @@ import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -56,7 +56,6 @@ public class UpdateServlet extends ProvisioningServlet {
      * user if successful, otherwise throws a Exception.
      */
     protected static User authenticateRequest(HttpServletRequest req) {
-        @SuppressWarnings("unchecked")
         Map<String, String[]> parameters = req.getParameterMap();
         if (!parameters.containsKey(USERNAME) || !parameters.containsKey(PASSWORD)) {
             throw new FailureDataException(USERNAME_PASSWORD_CANNOT_BE_MISSING_ERROR);

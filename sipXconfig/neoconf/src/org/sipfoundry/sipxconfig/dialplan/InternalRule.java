@@ -12,11 +12,10 @@ package org.sipfoundry.sipxconfig.dialplan;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.dialplan.config.Transform;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchFeature;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * InternalRule
@@ -171,7 +170,7 @@ public class InternalRule extends DialingRule {
         m_did = did;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager manager) {
         m_featureManager = manager;
     }

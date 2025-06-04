@@ -14,9 +14,9 @@
  */
 package org.sipfoundry.sipxconfig.api;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.model.wadl.Description;
 

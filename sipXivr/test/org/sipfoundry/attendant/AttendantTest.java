@@ -10,7 +10,6 @@
 package org.sipfoundry.attendant;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.ListResourceBundle;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -18,8 +17,6 @@ import java.util.Vector;
 
 import org.sipfoundry.commons.freeswitch.FreeSwitchEvent;
 import org.sipfoundry.commons.freeswitch.FreeSwitchEventSocketEmulator;
-import org.sipfoundry.commons.freeswitch.Localization;
-import org.sipfoundry.commons.freeswitch.TextToPrompts_en;
 
 import junit.framework.TestCase;
 
@@ -62,7 +59,7 @@ public class AttendantTest extends TestCase {
      */
 
     public void _testGoodbye() throws Exception {
-        Hashtable<String, String> params = new Hashtable<String, String>();
+//        Hashtable<String, String> params = new Hashtable<String, String>();
 //        IvrConfiguration ivrConfig = IvrConfiguration.getTest();
         FreeSwitchEventSocketEmulator fses = new FreeSwitchEventSocketEmulator(null);
 
@@ -73,7 +70,7 @@ public class AttendantTest extends TestCase {
         //a.setMailstoreDirectory(ivrConfig.getMailstoreDirectory());
         HashMap<Locale, ResourceBundle> resourcesByLocale = new HashMap<Locale, ResourceBundle>();
         resourcesByLocale.put(Locale.ENGLISH, new MyResources());
-        Localization loc = new Localization("dog", Locale.ENGLISH.toString(), null, fses);
+//        Localization loc = new Localization("dog", Locale.ENGLISH.toString(), null, fses);
 //        a.setLocalization(loc);
 //        a.setAttendantConfig(org.sipfoundry.attendant.Configuration.update(false));
 //        a.setSchedules(new Schedule());

@@ -17,7 +17,6 @@ import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchRecordingContext;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchRecordingSettings;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchSettings;
-import org.springframework.beans.factory.annotation.Required;
 
 public class ModShoutConfiguration extends AbstractFreeswitchConfiguration {
 
@@ -43,7 +42,7 @@ public class ModShoutConfiguration extends AbstractFreeswitchConfiguration {
         write(writer, context);
     }
 
-    @Required
+    
     public void setFsRecordingContext(FreeswitchRecordingContext context) {
         m_fsRecording = context;
     }

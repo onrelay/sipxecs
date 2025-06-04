@@ -23,7 +23,6 @@ import org.sipfoundry.commons.freeswitch.eslrequest.EslRequestScopeRunnable;
 import org.sipfoundry.sipxcallback.common.CallbackException;
 import org.sipfoundry.sipxcallback.common.CallbackLegs;
 import org.sipfoundry.sipxcallback.common.CallbackService;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  *  Class used to register callback requests in the system
@@ -97,27 +96,27 @@ public abstract class CallbackCallHandler extends EslRequestScopeRunnable {
         new Broadcast(fses, fses.getVariable("variable_sip_call_id"), m_welcomePrompt, false).startResponse();
     }
 
-    @Required
+    
     public void setClient(Socket clientSocket) {
         m_clientSocket = clientSocket;
     }
 
-    @Required
+    
     public void setPrefix(String prefix) {
         m_prefix = prefix;
     }
 
-    @Required
+    
     public void setCallbackService(CallbackService callbackService) {
         m_callbackService = callbackService;
     }
 
-    @Required
+    
     public void setWelcomePrompt(String welcomePrompt) {
         this.m_welcomePrompt = welcomePrompt;
     }
 
-    @Required
+    
     public void setErrorPrompt(String errorPrompt) {
         this.m_errorPrompt = errorPrompt;
     }

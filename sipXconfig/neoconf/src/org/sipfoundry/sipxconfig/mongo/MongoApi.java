@@ -30,14 +30,16 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Get;
+import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.common.DataCollectionUtil;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.commserver.Location;
@@ -45,9 +47,11 @@ import org.sipfoundry.sipxconfig.commserver.LocationsManager;
 import org.sipfoundry.sipxconfig.region.Region;
 import org.sipfoundry.sipxconfig.region.RegionManager;
 
-import com.mongodb.util.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-class MongoApi extends Resource {
+
+class MongoApi extends ServerResource {
     private static final Log LOG = LogFactory.getLog(MongoApi.class);
 
     private static final String HOST = "host";
@@ -62,38 +66,33 @@ class MongoApi extends Resource {
         getVariants().add(new Variant(APPLICATION_JSON));
     }
 
-    @Override
-    public boolean allowGet() {
-        return true;
+
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {  
+        try {     
+            getResponse().setStatus(Status.SUCCESS_OK);
+            Collection<Location> locations = m_mongoManager.getConfigManager().getRegisteredLocations(
+                    m_locationsManager.getLocationsList());
+            Map<String, Object> meta = metaMap(m_mongoManager, m_mongoManager.getMeta(), locations);
+            
+            String json = new ObjectMapper().writeValueAsString(meta);        
+            return new StringRepresentation(json);
+        } catch (JsonProcessingException ex) {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, ex.getMessage());
+        }
     }
 
-    @Override
-    public boolean allowPost() {
-        return true;
-    }
-
-    // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        getResponse().setStatus(Status.SUCCESS_OK);
-        Collection<Location> locations = m_mongoManager.getConfigManager().getRegisteredLocations(
-                m_locationsManager.getLocationsList());
-        Map<String, Object> meta = metaMap(m_mongoManager, m_mongoManager.getMeta(), locations);
-        String json = JSON.serialize(meta);
-        return new StringRepresentation(json);
-    }
-
-    // POST
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {
         String json;
         try {
             json = IOUtils.toString(entity.getStream());
-            @SuppressWarnings("unchecked")
-            Map<String, Object> form = (Map<String, Object>) JSON.parse(json);
+            Map<String, Object> form = new ObjectMapper().readValue(json, Map.class);
             String action = (String) form.get("action");
             String hostPort = (String) form.get("server");
             MongoMeta meta = m_mongoManager.getMeta();
             takeAction(m_mongoManager, meta, action, hostPort);
+            return null;
         } catch (IOException e) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage());
         } catch (UserException ex) {
@@ -221,7 +220,6 @@ class MongoApi extends Resource {
         return map;
     }
 
-    @SuppressWarnings("unchecked")
     public Map<String, Object> getMemberConfig(Map<String, Object> primaryMeta, String hostPort) {
         if (primaryMeta != null) {
             Map<String, Object> config = (Map<String, Object>) primaryMeta.get("config");

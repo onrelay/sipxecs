@@ -11,48 +11,56 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.HttpServer;
-import org.mortbay.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+
 import org.sipfoundry.sipxivr.rest.RestfulRequest;
+
 
 public class RestfulRequestTest extends TestCase {
     static final Logger LOG = Logger.getLogger("org.sipfoundry.sipxivr");
-    HttpServer m_server;
-    boolean dontBother = true;
-    
+    Server m_server;
+    boolean dontBother = false;
+
     protected void setUp() throws Exception {
         super.setUp();
-        // Configure log4j
+        // Configure log4j (unchanged)
         Properties props = new Properties();
         props.setProperty("log4j.rootLogger", "debug, cons");
         props.setProperty("log4j.appender.cons", "org.apache.log4j.ConsoleAppender");
         props.setProperty("log4j.appender.cons.layout", "org.sipfoundry.commons.log4j.SipFoundryLayout");
         props.setProperty("log4j.appender.cons.layout.facility", "sipXivr");
-
         PropertyConfigurator.configure(props);
 
-     // Start up jetty
         try {
-            m_server = new HttpServer();
-            m_server.addListener("localhost:" + 12345);
-            HttpContext httpContext = new HttpContext();
-            httpContext.setContextPath("/");
-            ServletHandler servletHandler = new ServletHandler();
-            servletHandler.addServlet("RestfulRequestTest", "/woof/*", RestfulRequestTestServlet.class.getName());
-            httpContext.addHandler(servletHandler);
-            m_server.addContext(httpContext);
+            m_server = new Server();
+            ServerConnector connector = new ServerConnector(m_server);
+            connector.setHost("localhost");
+            connector.setPort(12345);
+            m_server.addConnector(connector);
+
+            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+            context.setContextPath("/");
+            m_server.setHandler(context);
+
+            ServletHolder holder = new ServletHolder(new RestfulRequestTestServlet());
+            context.addServlet(holder, "/woof/*");
+
             m_server.start();
         } catch (Exception e) {
-            dontBother = true ;
+            dontBother = true;
             LOG.warn("Problem starting Jetty.  Skip tests.", e);
         }
-
     }
 
     protected void tearDown() throws Exception {
         super.tearDown();
-        m_server.stop(true);
+        if (m_server != null) {
+            m_server.stop();
+            m_server.join();
+        }
     }
 
     public void testPut() {

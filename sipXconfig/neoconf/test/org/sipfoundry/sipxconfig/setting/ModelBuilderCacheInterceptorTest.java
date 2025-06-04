@@ -29,8 +29,8 @@ public class ModelBuilderCacheInterceptorTest extends TestCase {
 
     // FIXME: FAILED WHILE PORTING TO SPRING 2.0
     public void DISABLED_testInterceptor() throws Exception {
-        Setting abc = new SettingSet("abc");
-        Setting cde = new SettingSet("cde");
+        SettingSet abc = new SettingSet("abc");
+        SettingSet cde = new SettingSet("cde");
 
         File file1 = new File("abc");
         File file2 = new File("cde");
@@ -38,25 +38,27 @@ public class ModelBuilderCacheInterceptorTest extends TestCase {
 
         Element el1 = new Element(file1.getPath(), (Serializable) abc);
 
-        IMocksControl cacheControl = org.easymock.classextension.EasyMock.createControl();
+        IMocksControl cacheControl = EasyMock.createControl();
         Cache cache = cacheControl.createMock(Cache.class);
-        cache.get(file1.getPath());
-        cacheControl.andReturn(null);
+
+        EasyMock.expect(cache.get(file1.getPath())).andReturn(null);
         cache.put(ElementEquals.matches("abc"));
-        cache.get(file2.getPath());
-        cacheControl.andReturn(null);
+        EasyMock.expectLastCall();
+
+        EasyMock.expect(cache.get(file2.getPath())).andReturn(null);
         cache.put(ElementEquals.matches("cde"));
-        cache.get(file3.getPath());
-        cacheControl.andReturn(el1);
+        EasyMock.expectLastCall();
+
+        EasyMock.expect(cache.get(file3.getPath())).andReturn(el1);
 
         cacheControl.replay();
 
         IMocksControl modelBuilderControl = EasyMock.createControl();
         ModelBuilder modelBuilder = modelBuilderControl.createMock(ModelBuilder.class);
-        modelBuilder.buildModel(file1);
-        modelBuilderControl.andReturn(abc);
-        modelBuilder.buildModel(file2);
-        modelBuilderControl.andReturn(cde);
+
+        EasyMock.expect(modelBuilder.buildModel(file1)).andReturn(abc);
+        EasyMock.expect(modelBuilder.buildModel(file2)).andReturn(cde);
+
         modelBuilderControl.replay();
 
         ProxyFactory proxyFactory = new ProxyFactory(modelBuilder);

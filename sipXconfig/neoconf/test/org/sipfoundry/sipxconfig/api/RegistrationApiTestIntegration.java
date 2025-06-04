@@ -11,9 +11,10 @@ import org.sipfoundry.sipxconfig.test.RestApiIntegrationTestCase;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import java.util.Arrays;
+
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
 
 public class RegistrationApiTestIntegration extends RestApiIntegrationTestCase {
     private MongoTemplate m_nodeDb;
@@ -44,14 +45,14 @@ public class RegistrationApiTestIntegration extends RestApiIntegrationTestCase {
         }
     };
 
-    private DBCollection getRegistrarCollection() {
+    private MongoCollection<Document> getRegistrarCollection() {
         return m_nodeDb.getDb().getCollection("registrar");
     }
 
     @Override
     protected void onSetUpInTransaction() throws Exception {
         super.onSetUpInTransaction();
-        DBObject reg1 = new BasicDBObject();
+        Document reg1 = new Document();
         reg1.put("contact", DATA[0][3]);
         reg1.put("expirationTime", DATA[0][6]);
         reg1.put("uri", DATA[0][2]);
@@ -60,7 +61,7 @@ public class RegistrationApiTestIntegration extends RestApiIntegrationTestCase {
         reg1.put("identity", DATA[0][5]);
         reg1.put("_id", DATA[0][9]);
         reg1.put("callId", DATA[0][10]);
-        DBObject reg2 = new BasicDBObject();
+        Document reg2 = new Document();
         reg2.put("contact", DATA[1][3]);
         reg2.put("expirationTime", DATA[1][6]);
         reg2.put("uri", DATA[1][2]);
@@ -72,7 +73,7 @@ public class RegistrationApiTestIntegration extends RestApiIntegrationTestCase {
 
         // this one has the same contact , it will in the retrieved list
         // which filters unique regs by contact and it chooses the newer one
-        DBObject reg3 = new BasicDBObject();
+        Document reg3 = new Document();
         reg3.put("contact", DATA[2][3]);
         reg3.put("expirationTime", DATA[2][6]);
         reg3.put("uri", DATA[2][2]);
@@ -83,7 +84,7 @@ public class RegistrationApiTestIntegration extends RestApiIntegrationTestCase {
         reg3.put("callId", DATA[2][10]);
         reg3.put("localAddress", DATA[2][11]);
 
-        DBObject reg4 = new BasicDBObject();
+        Document reg4 = new Document();
         reg4.put("contact", DATA[3][3]);
         reg4.put("expirationTime", DATA[3][6]);
         reg4.put("uri", DATA[3][2]);
@@ -93,8 +94,8 @@ public class RegistrationApiTestIntegration extends RestApiIntegrationTestCase {
         reg4.put("_id", DATA[3][9]);
         reg4.put("callId", DATA[3][10]);
 
-        m_nodeDb.getDb().dropDatabase();
-        getRegistrarCollection().insert(reg1, reg2, reg3, reg4);
+        m_nodeDb.getDb().drop();
+        getRegistrarCollection().insertMany(Arrays.asList( reg1, reg2, reg3, reg4 ) );
     }
 
     public void testGetRegistrations() throws Exception {

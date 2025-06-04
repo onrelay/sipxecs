@@ -3,7 +3,6 @@ package org.sipfoundry.commons.extendedcdr;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.springframework.data.annotation.Id;

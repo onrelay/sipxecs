@@ -15,7 +15,7 @@ public interface LoginContext {
 
     User checkCredentials(String userName, String password);
 
-    String getEncodedPassword(String userName, String password);
+    String getEncodedPassword(String password);
 
     boolean isAdmin(Integer userId);
 

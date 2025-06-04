@@ -28,9 +28,10 @@ import org.jivesoftware.openfire.security.SecurityAuditEvent;
 import org.jivesoftware.util.JiveConstants;
 import org.jivesoftware.util.StringUtils;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Indexes;
+
 
 public class MongoSecurityAuditProvider extends BaseMongoProvider implements SecurityAuditProvider {
     private static final String COLLECTION_NAME = "ofSecurityAuditLog";
@@ -38,17 +39,15 @@ public class MongoSecurityAuditProvider extends BaseMongoProvider implements Sec
     public MongoSecurityAuditProvider() {
         setDefaultCollectionName(COLLECTION_NAME);
 
-        DBCollection saLogCollection = getDefaultCollection();
-        DBObject index = new BasicDBObject();
+        MongoCollection<Document> saLogCollection = getDefaultCollection();
 
-        index.put("msgID", 1);
-        saLogCollection.ensureIndex(index);
+        saLogCollection.createIndex(Indexes.ascending("msgID"));
     }
 
     @Override
     public void logEvent(String username, String summary, String details) {
-        DBCollection saLogCollection = getDefaultCollection();
-        DBObject toInsert = new BasicDBObject();
+        MongoCollection<Document> saLogCollection = getDefaultCollection();
+        Document toInsert = new Document();
         long msgID = SequenceManager.nextID(JiveConstants.SECURITY_AUDIT);
 
         toInsert.put("msgID", msgID);
@@ -58,15 +57,15 @@ public class MongoSecurityAuditProvider extends BaseMongoProvider implements Sec
         toInsert.put("node", XMPPServer.getInstance().getServerInfo().getHostname());
         toInsert.put("details", details);
 
-        saLogCollection.insert(toInsert);
+        saLogCollection.insertOne(toInsert);
     }
 
     @Override
     public List<SecurityAuditEvent> getEvents(String username, Integer skipEvents, Integer numEvents,
             Date startTime, Date endTime) {
         List<SecurityAuditEvent> events = new ArrayList<SecurityAuditEvent>();
-        DBCollection saLogCollection = getDefaultCollection();
-        DBObject query = new BasicDBObject();
+        MongoCollection<Document> saLogCollection = getDefaultCollection();
+        Document query = new Document();
 
         if (username != null) {
             query.put("username", username);
@@ -81,7 +80,7 @@ public class MongoSecurityAuditProvider extends BaseMongoProvider implements Sec
         int skip = skipEvents != null ? skipEvents : 0;
         int limit = numEvents != null ? numEvents : Integer.MAX_VALUE;
 
-        for (DBObject evtObj : saLogCollection.find(query).skip(skip).limit(limit)) {
+        for (Document evtObj : saLogCollection.find(query).skip(skip).limit(limit)) {
             SecurityAuditEvent event = new SecurityAuditEvent();
             event.setMsgID((Long) evtObj.get("msgID"));
             event.setUsername((String) evtObj.get("username"));
@@ -98,11 +97,11 @@ public class MongoSecurityAuditProvider extends BaseMongoProvider implements Sec
     @Override
     public SecurityAuditEvent getEvent(Integer msgID) throws EventNotFoundException {
         SecurityAuditEvent event = null;
-        DBCollection saLogCollection = getDefaultCollection();
-        DBObject query = new BasicDBObject();
+        MongoCollection<Document> saLogCollection = getDefaultCollection();
+        Document query = new Document();
 
         query.put("msgID", msgID);
-        DBObject evtObj = saLogCollection.findOne(query);
+        Document evtObj = saLogCollection.find(query).first();
 
         if (evtObj != null) {
             event = new SecurityAuditEvent();
@@ -119,7 +118,7 @@ public class MongoSecurityAuditProvider extends BaseMongoProvider implements Sec
 
     @Override
     public Integer getEventCount() {
-        return (int) getDefaultCollection().count();
+        return (int) getDefaultCollection().countDocuments();
     }
 
     @Override

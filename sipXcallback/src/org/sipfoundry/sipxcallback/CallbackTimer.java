@@ -30,7 +30,6 @@ import org.sipfoundry.sipxcallback.common.CallbackLegs;
 import org.sipfoundry.sipxcallback.common.CallbackService;
 import org.sipfoundry.sipxcallback.common.CallbackServiceImpl;
 import org.sipfoundry.sipxcallback.common.FreeSwitchConfigurationImpl;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  *  Daemon task class that handles callback requests registered in the system
@@ -120,17 +119,17 @@ public class CallbackTimer {
         return socket;
     }
 
-    @Required
+    
     public void setCallbackService(CallbackService callbackService) {
         m_callbackService = callbackService;
     }
 
-    @Required
+    
     public void setCallbackExecutor(CallbackExecutor callbackExecutor) {
         m_callbackExecutor = callbackExecutor;
     }
 
-    @Required
+    
     public void setExpires(int expires) {
         m_expires = expires;
     }

@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.sipfoundry.sipxconfig.common.BeanId;
-import org.springframework.beans.factory.annotation.Required;
 
 public class MusicOnHoldManagerImpl extends AbstractMusicOnHoldManagerImpl {
 
@@ -27,7 +26,7 @@ public class MusicOnHoldManagerImpl extends AbstractMusicOnHoldManagerImpl {
         return Collections.emptyList();
     }
 
-    @Required
+    
     public void setMohUser(String mohUser) {
         m_mohUser = mohUser;
     }

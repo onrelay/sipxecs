@@ -15,7 +15,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class SipServiceImpl extends SipStackBean implements SipService {
 
@@ -54,7 +53,7 @@ public class SipServiceImpl extends SipStackBean implements SipService {
         sendRefer(user, sourceAddrSpec, displayName, sourceAddrSpec, destinationAddrSpec, m_allowForwarding);
     }
 
-    @Required
+    
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }

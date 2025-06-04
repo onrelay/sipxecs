@@ -25,7 +25,6 @@ import org.sipfoundry.sipxconfig.domain.Domain;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchFeature;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingUtil;
-import org.springframework.beans.factory.annotation.Required;
 
 public class CallbackConfiguration implements ConfigProvider {
     private CallbackOnBusyImpl m_callbackImpl;
@@ -69,7 +68,7 @@ public class CallbackConfiguration implements ConfigProvider {
         config.write("freeswitch.eventSocketPort", freeswithPort);
     }
 
-    @Required
+    
     public void setCallbackImpl(CallbackOnBusyImpl callbackImpl) {
         m_callbackImpl = callbackImpl;
     }

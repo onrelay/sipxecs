@@ -10,8 +10,6 @@ package org.sipfoundry.commons.freeswitch;
 
 import java.util.Vector;
 
-import org.sipfoundry.commons.freeswitch.FreeSwitchEvent;
-
 import junit.framework.TestCase;
 
 public class FreeSwitchEventTest extends TestCase {

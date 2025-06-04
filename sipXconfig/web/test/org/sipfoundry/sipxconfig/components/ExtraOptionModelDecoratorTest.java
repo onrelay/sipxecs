@@ -29,9 +29,9 @@ public class ExtraOptionModelDecoratorTest extends TestCase {
     }
 
     public void testGetOption() {
-        assertEquals(new Integer(-1), m_model.getOption(0));
-        assertEquals(new Integer(4), m_model.getOption(2));
-        assertEquals(new Integer(5), m_model.getOption(3));
+        assertEquals(Integer.valueOf(-1), m_model.getOption(0));
+        assertEquals(Integer.valueOf(4), m_model.getOption(2));
+        assertEquals(Integer.valueOf(5), m_model.getOption(3));
     }
 
     public void testGetLabel() {
@@ -48,9 +48,9 @@ public class ExtraOptionModelDecoratorTest extends TestCase {
 
     public void testTranslateValue() {
         String value0 = m_model.getValue(0);
-        assertEquals(new Integer(-1), m_model.translateValue(value0));
+        assertEquals(Integer.valueOf(-1), m_model.translateValue(value0));
         String value = m_model.getValue(3);
-        assertEquals(new Integer(5), m_model.translateValue(value));
+        assertEquals(Integer.valueOf(5), m_model.translateValue(value));
     }
 
     public void testSetExtraOptionNull() {

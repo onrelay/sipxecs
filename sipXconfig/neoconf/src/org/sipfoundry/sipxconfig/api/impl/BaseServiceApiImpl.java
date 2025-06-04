@@ -14,9 +14,9 @@
  */
 package org.sipfoundry.sipxconfig.api.impl;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.sipfoundry.sipxconfig.api.ServiceSettingsApi;
 import org.sipfoundry.sipxconfig.api.model.SettingsList;

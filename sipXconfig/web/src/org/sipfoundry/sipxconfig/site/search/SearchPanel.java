@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.site.search;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.BaseComponent;
 import org.apache.tapestry.IAsset;
 import org.apache.tapestry.IPage;

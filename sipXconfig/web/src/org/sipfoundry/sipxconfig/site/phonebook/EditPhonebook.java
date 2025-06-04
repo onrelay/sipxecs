@@ -35,7 +35,7 @@ import org.sipfoundry.sipxconfig.setting.BeanWithGroups;
 import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setting.SettingDao;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public abstract class EditPhonebook extends PageWithCallback implements PageBeginRenderListener {
     public static final String PAGE = "phonebook/EditPhonebook";

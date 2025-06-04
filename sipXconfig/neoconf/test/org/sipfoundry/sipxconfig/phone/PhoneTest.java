@@ -49,8 +49,12 @@ public class PhoneTest extends TestCase {
         defaults.setDomainManager(TestHelper.getTestDomainManager("sipfoundry.org"));
         IMocksControl phoneContextCtrl = EasyMock.createControl();
         PhoneContext phoneContext = phoneContextCtrl.createMock(PhoneContext.class);
-        phoneContext.getPhoneDefaults();
-        phoneContextCtrl.andReturn(defaults).atLeastOnce();
+
+        // Expect getPhoneDefaults() to be called at least once and return 'defaults'
+        EasyMock.expect(phoneContext.getPhoneDefaults())
+                .andReturn(defaults)
+                .atLeastOnce();
+
         phoneContextCtrl.replay();
 
         Phone phone = new AcmePhone();

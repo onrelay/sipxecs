@@ -18,7 +18,12 @@ package org.sipfoundry.sipxivr.rest;
 
 import java.util.Map;
 
-import org.mortbay.jetty.servlet.ServletHandler;
+
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.util.Callback;
+
+import org.eclipse.jetty.ee10.servlet.ServletHandler;
 import org.sipfoundry.commons.freeswitch.FreeSwitchConfigurationInterface;
 import org.sipfoundry.commons.userdb.ValidUsers;
 import org.sipfoundry.sipxivr.SipxIvrConfiguration;
@@ -40,16 +45,14 @@ public class SipxIvrServletHandler extends ServletHandler {
     private Mwi m_mwi;
 
     @Override
-    public void handle(java.lang.String pathInContext, java.lang.String pathParams,
-            org.mortbay.http.HttpRequest httpRequest, org.mortbay.http.HttpResponse httpResponse)
-            throws java.io.IOException {
-        httpRequest.setAttribute(IVR_CONFIG_ATTR, m_ivrConfig);
-        httpRequest.setAttribute(VALID_USERS_ATTR, m_validUsers);
-        httpRequest.setAttribute(FS_CONFIG_ATTR, m_fsConfig);
-        httpRequest.setAttribute(DEPOSIT_MAP_ATTR, m_depositMap);
-        httpRequest.setAttribute(MAILBOX_MANAGER, m_mailboxManager);
-        httpRequest.setAttribute(MWI_MANAGER, m_mwi);
-        super.handle(pathInContext, pathParams, httpRequest, httpResponse);
+   public boolean handle(Request request, Response response, Callback callback) throws Exception {
+        request.setAttribute(IVR_CONFIG_ATTR, m_ivrConfig);
+        request.setAttribute(VALID_USERS_ATTR, m_validUsers);
+        request.setAttribute(FS_CONFIG_ATTR, m_fsConfig);
+        request.setAttribute(DEPOSIT_MAP_ATTR, m_depositMap);
+        request.setAttribute(MAILBOX_MANAGER, m_mailboxManager);
+        request.setAttribute(MWI_MANAGER, m_mwi);
+        return super.handle(request, response, callback );
     }
 
     public void setIvrConfig(SipxIvrConfiguration config) {
@@ -64,7 +67,7 @@ public class SipxIvrServletHandler extends ServletHandler {
         m_fsConfig = fsConfig;
     }
 
-    public void setDepositMap(Map depositMap) {
+    public void setDepositMap(Map<String, String> depositMap) {
         m_depositMap = depositMap;
     }
 

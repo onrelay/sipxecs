@@ -38,7 +38,7 @@ public class SetupTestIntegration extends IntegrationTestCase {
         assertTrue(m_setupManager.isTrue(newlySetup));
         m_setupManagerImpl.saveSetupIds();
         flush();
-        db().queryForInt("select 1 from setup where setup_id = ?", newlySetup);
+        db().queryForObject("select 1 from setup where setup_id = ?", Integer.class, newlySetup);
     }
 
     public void setSetupManager(SetupManager setupManager) {

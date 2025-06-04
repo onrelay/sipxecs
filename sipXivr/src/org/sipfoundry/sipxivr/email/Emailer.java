@@ -15,14 +15,14 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 
 import org.apache.log4j.Logger;
 import org.sipfoundry.commons.userdb.User;
@@ -30,7 +30,6 @@ import org.sipfoundry.commons.userdb.User.EmailFormats;
 import org.sipfoundry.voicemail.mailbox.Folder;
 import org.sipfoundry.voicemail.mailbox.MailboxManager;
 import org.sipfoundry.voicemail.mailbox.VmMessage;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.ClassPathResource;
@@ -49,7 +48,7 @@ public class Emailer implements ApplicationContextAware {
         // Setup mail server
         Properties props = System.getProperties();
         props.put("mail.smtp.host", "localhost");
-        props.put("mail.smtp.user", "postmaster"); // TODO get from ivrConfig
+        props.put("mail.smtp.user", "postmaster");
         m_session = Session.getDefaultInstance(props, null);
     }
 
@@ -92,7 +91,7 @@ public class Emailer implements ApplicationContextAware {
          * @throws AddressException
          * @throws MessagingException
          */
-        javax.mail.Message buildMessage(EmailFormatter emf, boolean attachAudio) throws AddressException,
+        jakarta.mail.Message buildMessage(EmailFormatter emf, boolean attachAudio) throws AddressException,
                 MessagingException, IOException {
             MimeMessage message = new MimeMessage(m_session);
             message.setFrom(new InternetAddress(emf.getSender()));
@@ -189,7 +188,7 @@ public class Emailer implements ApplicationContextAware {
                     LOG.info(String.format("Emailer::run sending message %s as %s email to %s %s audio",
                             m_vmessage.getMessageId(), fmt.toString(), to, attachAudio ? "with" : "without"));
                     EmailFormatter emf = getEmailFormatter(fmt, m_user, m_vmessage);
-                    javax.mail.Message message = buildMessage(emf, attachAudio);
+                    jakarta.mail.Message message = buildMessage(emf, attachAudio);
                     message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(to));
                     Transport.send(message);
                     if (attachAudio && m_user.isForwardDeleteVoicemail()) {
@@ -211,7 +210,7 @@ public class Emailer implements ApplicationContextAware {
                     LOG.info(String.format("Emailer::run sending message %s as %s email to %s %s audio",
                             m_vmessage.getMessageId(), fmt.toString(), alt, attachAudio ? "with" : "without"));
                     EmailFormatter emf = getEmailFormatter(fmt, m_user, m_vmessage);
-                    javax.mail.Message message = buildMessage(emf, attachAudio);
+                    jakarta.mail.Message message = buildMessage(emf, attachAudio);
 
                     message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(alt));
                     Transport.send(message);
@@ -254,7 +253,7 @@ public class Emailer implements ApplicationContextAware {
         m_audioFormat = format;
     }
 
-    @Required
+    
     public void setMailboxManager(MailboxManager mgr) {
         m_mailboxManager = mgr;
     }

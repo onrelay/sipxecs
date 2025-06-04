@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.commons.mongo.MongoConstants;
@@ -54,23 +54,23 @@ import org.sipfoundry.sipxconfig.permission.Permission;
 import org.sipfoundry.sipxconfig.phone.Phone;
 import org.sipfoundry.sipxconfig.phone.PhoneContext;
 import org.sipfoundry.sipxconfig.setting.Group;
-import org.sipfoundry.sipxconfig.setup.SetupListener;
-import org.sipfoundry.sipxconfig.setup.SetupManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.FindIterable;
 import com.mongodb.MongoException;
-import com.mongodb.QueryBuilder;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Updates;
+
+import org.bson.conversions.Bson;
 
 /**
  * This class manages all effective replications.The replication is triggered by
@@ -78,7 +78,7 @@ import com.mongodb.QueryBuilder;
  * all the work load needed to replicate {@link Replicable}s in Mongo and
  * {@link ConfigurationFile}s on different locations.
  */
-public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements ReplicationManager, BeanFactoryAware,
+public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> implements ReplicationManager, BeanFactoryAware,
          ApplicationContextAware {
     private static final Log LOG = LogFactory.getLog(ReplicationManagerImpl.class);
     private static final String REPLICATION_FAILED = "Replication: insert/update failed - ";
@@ -160,12 +160,12 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
         }
     };
 
-    @Required
+    
     public void setLocationsManager(LocationsManager locationsManager) {
         m_locationsManager = locationsManager;
     }
 
-    @Required
+    
     public void setAuditLogContext(AuditLogContext auditLogContext) {
         m_auditLogContext = auditLogContext;
     }
@@ -339,8 +339,8 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
             if (dataSets != null && !dataSets.isEmpty()) {
                 replicateEntity(entity, dataSets.toArray(new DataSet[dataSets.size()]));
             } else {
-                DBObject top = new BasicDBObject();
-                DBObject cleanCopy = new BasicDBObject();
+                Document top = new Document();
+                Document cleanCopy = new Document();
                 boolean isNew = findOrCreate(entity, top, cleanCopy);
                 replicate(top, cleanCopy, name, isNew);
             }
@@ -362,8 +362,8 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
         String name = (entity.getName() != null) ? entity.getName() : entity.toString();
         try {
             Long start = System.currentTimeMillis();
-            DBObject top = new BasicDBObject();
-            DBObject cleanCopy = new BasicDBObject();
+            Document top = new Document();
+            Document cleanCopy = new Document();
             boolean isNew = findOrCreate(entity, top, cleanCopy);
             for (DataSet dataSet : dataSets) {
                 replicateEntity(entity, dataSet, top);
@@ -377,14 +377,14 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
         }
     }
 
-    private void replicate(DBObject top, DBObject cleanCopy, String name, boolean isNew) {
+    private void replicate(Document top, Document cleanCopy, String name, boolean isNew) {
         if (isNew) {
-            getDbCollection().save(top);
+            getDbCollection().insertOne(top);
         } else {
-            DBObject toUpdate = new BasicDBObject();
+            Document toUpdate = new Document();
             toUpdate.put(ID, top.get(ID));
-            DBObject updateQ = new BasicDBObject();
-            DBObject removeQ = new BasicDBObject();
+            Document updateQ = new Document();
+            Document removeQ = new Document();
             for (String field : cleanCopy.keySet()) {
                 Object oldValue = cleanCopy.get(field);
                 Object newValue = top.get(field);
@@ -407,8 +407,8 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
             }
             LOG.debug(String.format("Update query: %s: ", updateQ));
             LOG.debug(String.format("Remove query: %s: ", removeQ));
-            BasicDBObject set = new BasicDBObject();
-            BasicDBObject emptyObject = new BasicDBObject();
+            Document set = new Document();
+            Document emptyObject = new Document();
             boolean isUpdated = false;
             if (!updateQ.equals(emptyObject)) {
                 set.append("$set", updateQ);
@@ -420,13 +420,13 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
             }
             if (isUpdated) {
                 LOG.debug(String.format("Final query: %s: ", set));
-                getDbCollection().update(toUpdate, set);
+                getDbCollection().replaceOne(toUpdate, set);
             }
         }
 
     }
 
-    private void replicateEntity(Replicable entity, DataSet dataSet, DBObject top) {
+    private void replicateEntity(Replicable entity, DataSet dataSet, Document top) {
         String beanName = dataSet.getBeanName();
         try {
             final AbstractDataSetGenerator generator = m_beanFactory.getBean(beanName,
@@ -521,9 +521,9 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
     @Override
     public void deleteBranch(Branch branch) {
         LOG.info("Starting regeneration of branch members.");
-        DBCursor users = m_validUsers.getUsersInBranch(branch.getName());
+        FindIterable<Document> users = m_validUsers.getUsersInBranch(branch.getName());
         try {
-            for (DBObject user : users) {
+            for (Document user : users) {
                 String uid = user.get(MongoConstants.UID).toString();
                 User u = m_coreContext.loadUserByUserName(uid);
                 replicateEntity(u, BRANCH_DATASETS);
@@ -533,18 +533,16 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
         } catch (Exception e) {
             LOG.error(ERROR_PERMISSION, e);
             throw new UserException(ERROR_PERMISSION, e);
-        } finally {
-            users.close();
-        }
+        } 
     }
 
     @Override
     public void deleteGroup(Group group) {
         LOG.info("Starting regeneration of group members.");
         if (User.GROUP_RESOURCE_ID.equals(group.getResource())) {
-            DBCursor users = m_validUsers.getUsersInGroup(group.getName());
+            FindIterable<Document> users = m_validUsers.getUsersInGroup(group.getName());
             try {
-                for (DBObject user : users) {
+                for (Document user : users) {
                     String uid = user.get(MongoConstants.UID).toString();
                     User u = m_coreContext.loadUserByUserName(uid);
                     replicateEntity(u, GROUP_DATASETS);
@@ -554,15 +552,17 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
             } catch (Exception e) {
                 LOG.error(ERROR_PERMISSION, e);
                 throw new UserException(ERROR_PERMISSION, e);
-            } finally {
-                users.close();
-            }
+            } 
 
         } else if (Phone.GROUP_RESOURCE_ID.equals(group.getResource())) {
-            DBObject query = QueryBuilder.start(ENTITY_NAME).is("phone").and(GROUPS).is(group.getName()).get();
-            DBCursor phones = getEntityCollection().find(query);
+
+            Bson query = Filters.and(
+                Filters.eq(ENTITY_NAME, "phone"),
+                Filters.eq(GROUPS, group.getName())
+            );
+            FindIterable<Document> phones = getEntityCollection().find(query);
             try {
-                for (DBObject phone : phones) {
+                for (Document phone : phones) {
                     String serialNumber = phone.get(MongoConstants.SERIAL_NUMBER).toString();
                     Phone p = m_phoneContext.getPhoneBySerialNumber(serialNumber);
                     replicateEntity(p, PHONE_GROUP_DATASETS);
@@ -571,11 +571,8 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
             } catch (Exception e) {
                 LOG.error(e);
                 throw new UserException(e);
-            } finally {
-                phones.close();
             }
         }
-
     }
 
     /*
@@ -590,7 +587,7 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
         if (m_useDynamicPageSize) {
             pageSize = membersCount / m_nThreads + 1;
         }
-        int pages = new Double(Math.ceil(membersCount / pageSize)).intValue() + 1;
+        int pages = Double.valueOf(Math.ceil(membersCount / pageSize)).intValue() + 1;
         Constructor< ? extends ReplicationWorker> ct = (Constructor< ? extends ReplicationWorker>) cls
                 .getConstructors()[0];
         List<Future<Void>> futures = new ArrayList<Future<Void>>();
@@ -639,7 +636,7 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
         }
     }
 
-    private DBCollection getEntityCollection() {
+    private MongoCollection<Document> getEntityCollection() {
         return m_imdb.getDb().getCollection(MongoConstants.ENTITY_COLLECTION);
     }
 
@@ -647,14 +644,11 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
      * shortcut to remove objects from mongo's imdb database
      */
     private void remove(String collectionName, Object id) {
-        DBCollection collection = m_imdb.getDb().getCollection(collectionName);
-        DBObject search = new BasicDBObject();
-        search.put(ID, id);
-        DBObject node = collection.findOne(search);
-        // necessary only in case of CallSequences
-        // (user delete will trigger CS delete but CS for user may not exist)
+        MongoCollection<Document> collection = m_imdb.getDb().getCollection(collectionName);
+        Bson filter = Filters.eq(ID, id);
+        Document node = collection.find(filter).first();
         if (node != null) {
-            collection.remove(node);
+            collection.deleteOne(filter);
         }
     }
 
@@ -665,19 +659,16 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
      */
     @Override
     public void addPermission(Permission permission) {
-        DBCursor users = m_validUsers.getEntitiesWithPermissions();
+        FindIterable<Document> users = m_validUsers.getEntitiesWithPermissions();
         try {
-            for (DBObject user : users) {
-                Collection<String> prms = (Collection<String>) user.get(MongoConstants.PERMISSIONS);
-                prms.add(permission.getName());
-                user.put(MongoConstants.PERMISSIONS, prms);
-                getEntityCollection().save(user);
+            for (Document user : users) {
+                Bson filter = Filters.eq("_id", user.get("_id"));
+                Bson update = Updates.addToSet(MongoConstants.PERMISSIONS, permission.getName());
+                getEntityCollection().updateOne(filter, update);
             }
         } catch (Exception e) {
             LOG.error(ERROR_PERMISSION, e);
             throw new UserException(ERROR_PERMISSION, e);
-        } finally {
-            users.close();
         }
     }
 
@@ -686,19 +677,19 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
      */
     @Override
     public void removePermission(Permission permission) {
-        DBCursor users = m_validUsers.getEntitiesWithPermission(permission.getName());
+        FindIterable<Document> users = m_validUsers.getEntitiesWithPermission(permission.getName());
         try {
-            for (DBObject user : users) {
+            for (Document user : users) {
                 Collection<String> prms = (Collection<String>) user.get(MongoConstants.PERMISSIONS);
                 prms.remove(permission.getName());
                 user.put(MongoConstants.PERMISSIONS, prms);
-                getEntityCollection().save(user);
+    
+                Bson filter = Filters.eq("_id", user.get("_id"));
+                getEntityCollection().replaceOne(filter, user);
             }
         } catch (Exception e) {
             LOG.error(ERROR_PERMISSION, e);
             throw new UserException(ERROR_PERMISSION, e);
-        } finally {
-            users.close();
         }
     }
 
@@ -712,33 +703,43 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
      * @param obj
      * @return
      */
-    protected boolean findOrCreate(Replicable entity, DBObject obj, DBObject cleanCopy) {
-        DBCollection collection = getDbCollection();
+    protected boolean findOrCreate(Replicable entity, Document obj, Document cleanCopy) {
+        MongoCollection<Document> collection = getDbCollection();
         String id = getEntityId(entity);
         boolean isNew = false;
-        DBObject search = new BasicDBObject();
-        search.put(ID, id);
-        DBObject top = collection.findOne(search);
+    
+        Document search = new Document(ID, id);
+        Document top = collection.find(search).first();  // replaces findOne()
+    
         if (top == null) {
             isNew = true;
-            top = new BasicDBObject();
-            top.put(ID, id);
+            top = new Document(ID, id);
         }
-        cleanCopy.putAll(top.toMap());
+    
+        // Copy contents of 'top' to 'cleanCopy'
+        cleanCopy.clear();
+        cleanCopy.putAll(top);  
+    
         String sipDomain = m_coreContext.getDomainName();
         if (entity.getIdentity(sipDomain) != null) {
             top.put(IDENTITY, entity.getIdentity(sipDomain));
         }
+    
         Map<String, Object> mongoProps = entity.getMongoProperties(sipDomain);
-
         for (Map.Entry<String, Object> property : mongoProps.entrySet()) {
             top.put(property.getKey(), property.getValue());
         }
+    
         if (entity.isValidUser()) {
             top.put(VALID_USER, true);
         }
+    
         top.put(ENTITY_NAME, entity.getEntityName().toLowerCase());
-        obj.putAll(top.toMap());
+    
+        // Copy updated 'top' into 'obj'
+        obj.clear();
+        obj.putAll(top);
+    
         return isNew;
     }
 
@@ -771,37 +772,19 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport implements R
         }
     }
 
-    public DBCollection getDbCollection() {
-        DBCollection entity = m_imdb.getDb().getCollection(MongoConstants.ENTITY_COLLECTION);
-        DBObject index1 = new BasicDBObject();
-        index1.put(MongoConstants.ALIASES + "." + MongoConstants.ALIAS_ID, 1);
-        DBObject index2 = new BasicDBObject();
-        index2.put(MongoConstants.UID, 1);
-        DBObject index3 = new BasicDBObject();
-        index3.put(MongoConstants.IDENTITY, 1);
-        DBObject index4 = new BasicDBObject();
-        index4.put(MongoConstants.GROUPS, 1);
-        DBObject index5 = new BasicDBObject();
-        index5.put(MongoConstants.CONF_OWNER, 1);
-        DBObject index6 = new BasicDBObject();
-        index6.put(MongoConstants.IM_ID, 1);
-        DBObject index7 = new BasicDBObject();
-        index7.put(MongoConstants.ALT_IM_ID, 1);
-        DBObject index8 = new BasicDBObject();
-        index8.put(MongoConstants.IM_GROUP, 1);
-        DBObject index9 = new BasicDBObject();
-        index9.put(MongoConstants.ENTITY_NAME, 1);
-
-        entity.ensureIndex(index1);
-        entity.ensureIndex(index2);
-        entity.ensureIndex(index3);
-        entity.ensureIndex(index4);
-        entity.ensureIndex(index5);
-        entity.ensureIndex(index6);
-        entity.ensureIndex(index7);
-        entity.ensureIndex(index8);
-        entity.ensureIndex(index9);
-
+    public MongoCollection<Document> getDbCollection() {
+        MongoCollection<Document> entity = m_imdb.getDb().getCollection(MongoConstants.ENTITY_COLLECTION);
+    
+        entity.createIndex(Indexes.ascending(MongoConstants.ALIASES + "." + MongoConstants.ALIAS_ID));
+        entity.createIndex(Indexes.ascending(MongoConstants.UID));
+        entity.createIndex(Indexes.ascending(MongoConstants.IDENTITY));
+        entity.createIndex(Indexes.ascending(MongoConstants.GROUPS));
+        entity.createIndex(Indexes.ascending(MongoConstants.CONF_OWNER));
+        entity.createIndex(Indexes.ascending(MongoConstants.IM_ID));
+        entity.createIndex(Indexes.ascending(MongoConstants.ALT_IM_ID));
+        entity.createIndex(Indexes.ascending(MongoConstants.IM_GROUP));
+        entity.createIndex(Indexes.ascending(MongoConstants.ENTITY_NAME));
+    
         return entity;
     }
 

@@ -26,10 +26,8 @@ public class MailboxPageEncoderTest extends TestCase {
     public void testDecode() {
         IMocksControl encodingControl = EasyMock.createControl();
         ServiceEncoding encoding = encodingControl.createMock(ServiceEncoding.class);
-        encoding.getServletPath();
-        encodingControl.andReturn("myapp");
-        encoding.getPathInfo();
-        encodingControl.andReturn("userid/inbox");
+        EasyMock.expect(encoding.getServletPath()).andReturn("myapp");
+        EasyMock.expect(encoding.getPathInfo()).andReturn("userid/inbox");
         encoding.setParameterValue("service", "external");
         encoding.setParameterValue("page", ManageVoicemail.PAGE);
         encoding.setParameterValue("sp", "Suserid/inbox");
@@ -41,14 +39,12 @@ public class MailboxPageEncoderTest extends TestCase {
     }
 
     public void testEncode() {
+        
         IMocksControl encodingControl = EasyMock.createControl();
         ServiceEncoding encoding = encodingControl.createMock(ServiceEncoding.class);
-        encoding.getParameterValue("service");
-        encodingControl.andReturn("external");
-        encoding.getParameterValue("page");
-        encodingControl.andReturn(ManageVoicemail.PAGE);
-        encoding.getParameterValues("sp");
-        encodingControl.andReturn(new String[] {"userid", "folderid"});
+        EasyMock.expect(encoding.getParameterValue("service")).andReturn("external");
+        EasyMock.expect(encoding.getParameterValue("page")).andReturn(ManageVoicemail.PAGE);
+        EasyMock.expect(encoding.getParameterValues("sp")).andReturn(new String[] {"userid", "folderid"});
         encoding.setServletPath("myapp/userid/folderid");
         encoding.setParameterValue("service", null);
         encoding.setParameterValue("page", null);

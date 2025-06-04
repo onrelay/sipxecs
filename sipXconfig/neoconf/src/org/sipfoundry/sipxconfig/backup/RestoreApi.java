@@ -21,17 +21,18 @@ import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.commserver.LocationsManager;
 
-public class RestoreApi extends Resource {
+public class RestoreApi extends ServerResource {
     private static final Log LOG = LogFactory.getLog(RestoreApi.class);
 
     private BackupRunner m_backupRunner;
@@ -39,17 +40,13 @@ public class RestoreApi extends Resource {
     private BackupConfig m_backupConfig;
     private BackupApi m_backupApi;
 
-    @Override
-    public boolean allowPost() {
-        return true;
-    }
-
     /**
      * POST : Restore
      */
-    @Override
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {        
         m_backupApi.putOrPost(entity);
+        return null;
     }
 
     public void restore(BackupPlan plan, BackupSettings settings, Collection<String> selections)

@@ -23,19 +23,20 @@ import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.OutputRepresentation;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.OutputRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.bulk.csv.SimpleCsvWriter;
 import org.sipfoundry.sipxconfig.phonebook.Phonebook;
 import org.sipfoundry.sipxconfig.phonebook.PhonebookEntry;
 import org.sipfoundry.sipxconfig.phonebook.PhonebookManager;
 
-public class PhonebookResource extends Resource {
+public class PhonebookResource extends ServerResource {
     private static final MediaType CSV = new MediaType("text/comma-separated-values");
     private static final String[] HEADERS = new String[] {
         "First name", "Last name", "Number"
@@ -48,16 +49,14 @@ public class PhonebookResource extends Resource {
         super.init(context, request, response);
         String name = (String) getRequest().getAttributes().get("name");
         m_phonebook = m_phonebookManager.getPhonebookByName(name);
-        if (m_phonebook == null) {
-            setAvailable(false);
-        }
         getVariants().add(new Variant(CSV));
         getVariants().add(new Variant(TEXT_XML));
         getVariants().add(new Variant(APPLICATION_ALL_XML));
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
+        
         final Collection<PhonebookEntry> entries = m_phonebookManager.getEntries(m_phonebook);
         MediaType mediaType = variant.getMediaType();
         if (CSV.equals(mediaType)) {

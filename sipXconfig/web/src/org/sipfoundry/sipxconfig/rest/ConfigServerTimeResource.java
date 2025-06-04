@@ -20,12 +20,13 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.OutputRepresentation;
-import org.restlet.resource.Representation;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.OutputRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 
 public class ConfigServerTimeResource extends UserResource {
 
@@ -35,13 +36,9 @@ public class ConfigServerTimeResource extends UserResource {
         getVariants().add(new Variant(TEXT_PLAIN));
     }
 
-    @Override
-    public boolean allowGet() {
-        return true;
-    }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         TimeTextRepresentation timeRest = new TimeTextRepresentation();
         return timeRest;
     }

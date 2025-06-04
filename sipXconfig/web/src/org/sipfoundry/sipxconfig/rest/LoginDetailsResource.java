@@ -23,14 +23,15 @@ import java.io.Serializable;
 
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.bulk.ldap.LdapManager;
 import org.sipfoundry.sipxconfig.common.User;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -45,8 +46,8 @@ public class LoginDetailsResource extends UserResource {
         getVariants().add(new Variant(APPLICATION_JSON));
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         User user = getUser();
         boolean ldapAuth = m_ldapManager.getSystemSettings().isEnableOpenfireConfiguration();
 
@@ -54,7 +55,7 @@ public class LoginDetailsResource extends UserResource {
             ldapAuth, user.getSipPassword()));
     }
 
-    @Required
+    
     public void setLdapManager(LdapManager ldapManager) {
         m_ldapManager = ldapManager;
     }

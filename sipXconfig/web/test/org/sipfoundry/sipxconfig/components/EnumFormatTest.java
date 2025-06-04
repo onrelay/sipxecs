@@ -26,12 +26,11 @@ public class EnumFormatTest extends TestCase {
     }
 
     public void testLocizedFormat() throws Exception {
+        
         IMocksControl messagesCtrl = EasyMock.createControl();
         Messages messages = messagesCtrl.createMock(Messages.class);
-        messages.getMessage("fake.bongo");
-        messagesCtrl.andReturn("localized bongo");
-        messages.getMessage("fake.kuku");
-        messagesCtrl.andReturn("localized kuku");
+        EasyMock.expect(messages.getMessage("fake.bongo")).andReturn("localized bongo");
+        EasyMock.expect(messages.getMessage("fake.kuku")).andReturn("localized kuku");
         messagesCtrl.replay();
 
         EnumFormat format = new EnumFormat();
@@ -44,10 +43,10 @@ public class EnumFormatTest extends TestCase {
     }
 
     public void testSpaceInEnumName() throws Exception {
+
         IMocksControl messagesCtrl = EasyMock.createControl();
         Messages messages = messagesCtrl.createMock(Messages.class);
-        messages.getMessage("fake.kuku_bongo");
-        messagesCtrl.andReturn("localized space");
+        EasyMock.expect(messages.getMessage("fake.kuku_bongo")).andReturn("localized space");
         messagesCtrl.replay();
 
         EnumFormat format = new EnumFormat();

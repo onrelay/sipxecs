@@ -10,11 +10,11 @@
 package org.sipfoundry.sipxconfig.bulk.ldap;
 
 
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.apache.commons.lang.StringUtils.defaultString;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.join;
-import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.split;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -152,7 +152,7 @@ public class LdapConnectionParams extends BeanWithSettings implements DeployConf
         config.setUserDn(defaultString(m_principal, EMPTY));
         config.setPassword(defaultString(m_secret, EMPTY));
         config.setUrl(getUrl());
-        Map<String, String> otherParams = new HashMap<String, String>();
+        Map<String, Object> otherParams = new HashMap<String, Object>();
         otherParams.put(LDAP_TIMEOUT, String.valueOf(m_timeout));
         otherParams.put(Context.REFERRAL, m_referral);
         config.setBaseEnvironmentProperties(otherParams);

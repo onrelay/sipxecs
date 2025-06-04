@@ -19,7 +19,7 @@ import java.util.TreeSet;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchResult;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.bulk.RowInserter;
@@ -36,7 +36,6 @@ import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setting.GroupAutoAssign;
 import org.sipfoundry.sipxconfig.setting.SettingDao;
 import org.sipfoundry.sipxconfig.vm.MailboxManager;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Specialized version of row inserter for inserting users from LDAP searches LdapRowinserter
@@ -136,7 +135,7 @@ public class LdapRowInserter extends RowInserter<SearchResult> {
             Set<Group> groups = user.getGroups();
             List<Group> groupsToDelete = new ArrayList<Group>();
             for (Group group : groups) {
-                if (new Boolean(group.getSettingValue(LDAP_SETTING))) {
+                if (Boolean.valueOf(group.getSettingValue(LDAP_SETTING))) {
                     groupsToDelete.add(group);
                 }
             }
@@ -209,7 +208,7 @@ public class LdapRowInserter extends RowInserter<SearchResult> {
         return sr.getName();
     }
 
-    @Required
+    
     public void setSettingDao(SettingDao settingDao) {
         m_settingDao = settingDao;
     }
@@ -292,7 +291,7 @@ public class LdapRowInserter extends RowInserter<SearchResult> {
         m_domain = domain;
     }
 
-    @Required
+    
     public void setPermissionManager(PermissionManager permissionManager) {
         m_permissionManager = permissionManager;
     }

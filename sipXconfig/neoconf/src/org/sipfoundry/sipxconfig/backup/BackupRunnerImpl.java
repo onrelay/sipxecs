@@ -30,7 +30,6 @@ import org.sipfoundry.sipxconfig.alarm.AlarmServerManager;
 import org.sipfoundry.sipxconfig.common.SimpleCommandRunner;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.job.JobContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.util.StringUtils;
 
 public class BackupRunnerImpl implements BackupRunner, AlarmProvider {
@@ -134,7 +133,7 @@ public class BackupRunnerImpl implements BackupRunner, AlarmProvider {
         }
     }
 
-    @Required
+    
     public void setJobContext(JobContext jobContext) {
         m_jobContext = jobContext;
     }

@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.bulk.ldap;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,7 +24,7 @@ import javax.naming.directory.SearchResult;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Assert;
@@ -65,7 +65,7 @@ public class LdapRowInserterTest extends TestCase {
         newGroupNamePrefix.setValue("grPrefix_");
         AbstractSetting stripUsername = (AbstractSetting) ldapManagement.addSetting(new SettingImpl("stripUserName"));
         stripUsername.setType(new IntegerSetting());
-        stripUsername.setTypedValue(new Integer(0));
+        stripUsername.setTypedValue(Integer.valueOf(0));
         AbstractSetting regex = (AbstractSetting) ldapManagement.addSetting(new SettingImpl("regex"));
         regex.setTypedValue("");
         AbstractSetting prefix = (AbstractSetting) ldapManagement.addSetting(new SettingImpl("prefix"));
@@ -91,36 +91,34 @@ public class LdapRowInserterTest extends TestCase {
     }
 
     private User insertRow(boolean existingUser, boolean ldapManaged) throws Exception {
-        IMocksControl control = org.easymock.classextension.EasyMock.createNiceControl();
+        IMocksControl control = EasyMock.createNiceControl();
         UserMapper userMapper = control.createMock(UserMapper.class);
         SearchResult searchResult = control.createMock(SearchResult.class);
-        
+
         Attributes attributes = control.createMock(Attributes.class);
         Attribute attribute = control.createMock(Attribute.class);
-        searchResult.getAttributes();
-        control.andReturn(attributes);
-        attributes.get("identity");
-        control.andReturn(attribute);
-        userMapper.getUserName(attributes);
-        control.andReturn(m_joe);
-        
-        userMapper.getUserName(attributes);
-        control.andReturn(m_joe);
-        userMapper.getGroupNames(searchResult);
-        
-        control.andReturn(Collections.singleton(SALES));
-        control.replay();       
-        
+
+        EasyMock.expect(searchResult.getAttributes()).andReturn(attributes);
+        EasyMock.expect(attributes.get("identity")).andReturn(attribute);
+        EasyMock.expect(userMapper.getUserName(attributes)).andReturn(m_joe).times(2);
+        EasyMock.expect(userMapper.getGroupNames(searchResult)).andReturn(Collections.singleton(SALES));
+        control.replay();
+
         User joe = new User();
-        PermissionManager pManager = createMock(PermissionManager.class);
-        pManager.getPermissionModel();
-        expectLastCall().andReturn(TestHelper.loadSettings("commserver/user-settings.xml")).anyTimes();
-        replay(pManager);
+
+        PermissionManager pManager = EasyMock.createMock(PermissionManager.class);
+        EasyMock.expect(pManager.getPermissionModel())
+                .andReturn(TestHelper.loadSettings("commserver/user-settings.xml"))
+                .anyTimes();
+        EasyMock.replay(pManager);
+
         joe.setPermissionManager(pManager);
         joe.setUserProfile(new UserProfile());
+
         Group salesGroup = new Group();
         salesGroup.setName(SALES);
         salesGroup.setUniqueId();
+
         Group importGroup = new Group();
         importGroup.setName("import");
         importGroup.setUniqueId();
@@ -134,40 +132,37 @@ public class LdapRowInserterTest extends TestCase {
         CoreContext coreContext = coreContextControl.createMock(CoreContext.class);
         LdapManager ldapManager = coreContextControl.createMock(LdapManager.class);
 
-        coreContext.loadUserByUserName(JOE);
+        EasyMock.expect(coreContext.loadUserByUserName(JOE)).andReturn(existingUser ? joe : null);
+
         if (!existingUser) {
-            coreContextControl.andReturn(null);
-            coreContext.newUser();
-            coreContextControl.andReturn(joe);
+            EasyMock.expect(coreContext.newUser()).andReturn(joe);
         } else {
             Group ldapGroup = new Group();
             ldapGroup.setName(LDAP);
             ldapGroup.setUniqueId();
             ldapGroup.setSettingValue(LdapRowInserter.LDAP_SETTING, "true");
+
             Group noLdapGroup = new Group();
             noLdapGroup.setUniqueId();
             noLdapGroup.setName(NO_LDAP);
-            Set<Group> groups = new HashSet<Group>();
+
+            Set<Group> groups = new HashSet<>();
             groups.add(salesGroup);
             groups.add(ldapGroup);
             groups.add(noLdapGroup);
+
             joe.setGroups(groups);
             joe.setLdapManaged(ldapManaged);
-            coreContextControl.andReturn(joe);
         }
 
-        coreContext.getGroupByName(SALES, true);
-        coreContextControl.andReturn(salesGroup);
-        coreContext.saveUser(joe);
-        coreContextControl.andReturn(true).atLeastOnce();
-        ldapManager.retriveOverwritePin();
-        coreContextControl.andReturn(new OverwritePinBean(100, true)).anyTimes();
+        EasyMock.expect(coreContext.getGroupByName(SALES, true)).andReturn(salesGroup);
+        EasyMock.expect(coreContext.saveUser(joe)).andReturn(true).atLeastOnce();
+        EasyMock.expect(ldapManager.retriveOverwritePin()).andReturn(new OverwritePinBean(100, true)).anyTimes();
         coreContextControl.replay();
 
         IMocksControl mailboxManagerControl = EasyMock.createControl();
         MailboxManager mailboxManager = mailboxManagerControl.createMock(MailboxManager.class);
-        mailboxManager.isEnabled();
-        mailboxManagerControl.andReturn(true);
+        EasyMock.expect(mailboxManager.isEnabled()).andReturn(true);
         mailboxManager.deleteMailbox(JOE);
         mailboxManagerControl.replay();
 
@@ -179,7 +174,7 @@ public class LdapRowInserterTest extends TestCase {
         m_rowInserter.setAttrMap(map);
         m_rowInserter.setDomain("example.com");
         m_rowInserter.setPermissionManager(pManager);
-        m_rowInserter.beforeInserting(null);
+        m_rowInserter.beforeInserting((Object[]) null);
         m_rowInserter.checkRowData(searchResult);
         m_rowInserter.insertRow(searchResult, attributes);
         m_rowInserter.afterInserting();
@@ -196,9 +191,9 @@ public class LdapRowInserterTest extends TestCase {
         //existing ldap group have been deleted and replaced with new ldap group
         for (Group group : joe.getGroups()) {
             if (StringUtils.equals(group.getName(), SALES)) {
-                assertTrue(new Boolean(group.getSettingValue(LdapRowInserter.LDAP_SETTING)));
+                assertTrue(Boolean.valueOf(group.getSettingValue(LdapRowInserter.LDAP_SETTING)));
             } else if (StringUtils.equals(group.getName(), NO_LDAP)) {
-                assertFalse(new Boolean(group.getSettingValue(LdapRowInserter.LDAP_SETTING)));
+                assertFalse(Boolean.valueOf(group.getSettingValue(LdapRowInserter.LDAP_SETTING)));
             }
         }
     }
@@ -218,7 +213,7 @@ public class LdapRowInserterTest extends TestCase {
         //ldap group was saved
         for (Group group : joe.getGroups()) {
             if (StringUtils.equals(group.getName(), SALES)) {
-                assertTrue(new Boolean(group.getSettingValue(LdapRowInserter.LDAP_SETTING)));
+                assertTrue(Boolean.valueOf(group.getSettingValue(LdapRowInserter.LDAP_SETTING)));
             }
         }
     }
@@ -227,31 +222,29 @@ public class LdapRowInserterTest extends TestCase {
      * Test applies in cases when username is valid no matter if is formatted or not @see LdapRowInserter.formatUserName
      */
     public void testCheckRowDataValid() throws Exception {
-        IMocksControl control = org.easymock.classextension.EasyMock.createNiceControl();
+        IMocksControl control = org.easymock.EasyMock.createNiceControl();
         UserMapper userMapper = control.createMock(UserMapper.class);
         SearchResult searchResult = control.createMock(SearchResult.class);
         Attributes attributes = control.createMock(Attributes.class);
         Attribute attribute = control.createMock(Attribute.class);
 
-        searchResult.getAttributes();
-        control.andReturn(attributes);
-        attributes.get("identity");
-        control.andReturn(null);
+        // First run: identity is null
+        EasyMock.expect(searchResult.getAttributes()).andReturn(attributes);
+        EasyMock.expect(attributes.get("identity")).andReturn(null);
         control.replay();
+
         m_rowInserter.setUserMapper(userMapper);
-        m_rowInserter.beforeInserting(null);
+        m_rowInserter.beforeInserting((Object[]) null);
         assertEquals(RowStatus.FAILURE, m_rowInserter.checkRowData(searchResult).getRowStatus());
 
+        // Second run: identity is found, username and group names retrieved
         control.reset();
-        searchResult.getAttributes();
-        control.andReturn(attributes);
-        attributes.get("identity");
-        control.andReturn(attribute);
-        userMapper.getUserName(attributes);
-        control.andReturn("McQueen");
-        userMapper.getGroupNames(searchResult);
-        control.andReturn(Collections.singleton(SALES));
+        EasyMock.expect(searchResult.getAttributes()).andReturn(attributes);
+        EasyMock.expect(attributes.get("identity")).andReturn(attribute);
+        EasyMock.expect(userMapper.getUserName(attributes)).andReturn("McQueen");
+        EasyMock.expect(userMapper.getGroupNames(searchResult)).andReturn(Collections.singleton(SALES));
         control.replay();
+
         m_rowInserter.setUserMapper(userMapper);
         assertEquals(RowStatus.SUCCESS, m_rowInserter.checkRowData(searchResult).getRowStatus());
     }
@@ -260,23 +253,20 @@ public class LdapRowInserterTest extends TestCase {
      * Test applies in cases when username is not valid when not formatted and valid otherwise not @see LdapRowInserter.formatUserName
      */    
     public void testCheckRowDataNotValid() throws Exception {
-        IMocksControl control = org.easymock.classextension.EasyMock.createNiceControl();
+        IMocksControl control = org.easymock.EasyMock.createNiceControl();
         UserMapper userMapper = control.createMock(UserMapper.class);
         SearchResult searchResult = control.createMock(SearchResult.class);
         Attributes attributes = control.createMock(Attributes.class);
         Attribute attribute = control.createMock(Attribute.class);
         
-        searchResult.getAttributes();
-        control.andReturn(attributes);
-        attributes.get("identity");
-        control.andReturn(attribute);
-        userMapper.getUserName(attributes);
-        control.andReturn("@McQueen");
-        userMapper.getGroupNames(searchResult);
-        control.andReturn(Collections.singleton(SALES));
+        EasyMock.expect(searchResult.getAttributes()).andReturn(attributes);
+        EasyMock.expect(attributes.get("identity")).andReturn(attribute);
+        EasyMock.expect(userMapper.getUserName(attributes)).andReturn("@McQueen");
+        EasyMock.expect(userMapper.getGroupNames(searchResult)).andReturn(Collections.singleton(SALES));
+        
         control.replay();
         m_rowInserter.setUserMapper(userMapper);
-        m_rowInserter.beforeInserting(null);
+        m_rowInserter.beforeInserting((Object[]) null);
         assertEquals(RowStatus.FAILURE, m_rowInserter.checkRowData(searchResult).getRowStatus());
-    }    
+    }  
 }

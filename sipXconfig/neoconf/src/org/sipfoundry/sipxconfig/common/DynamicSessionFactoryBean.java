@@ -20,14 +20,12 @@ import org.apache.commons.io.IOUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
-public class DynamicSessionFactoryBean extends LocalSessionFactoryBean implements
-        BeanFactoryAware {
+public class DynamicSessionFactoryBean extends LocalSessionFactoryBean  {
     public static final String HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             + "<!DOCTYPE hibernate-mapping PUBLIC \"-//Hibernate/Hibernate Mapping DTD 3.0//EN\" "
             + "   \"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd\">";
@@ -96,6 +94,7 @@ public class DynamicSessionFactoryBean extends LocalSessionFactoryBean implement
         StringBuilder mapping = new StringBuilder(HEADER);
         Formatter formatter = new Formatter(mapping);
         formatter.format(MAPPING_PATTERN, subClass.getName(), baseClass.getName(), discriminator);
+        formatter.close();
         return mapping.toString();
     }
 
@@ -111,7 +110,6 @@ public class DynamicSessionFactoryBean extends LocalSessionFactoryBean implement
         m_baseClassBeanIds = baseClassBeanIds;
     }
 
-    @Override
     public void postProcessMappings(Configuration config) throws HibernateException {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         Map<String, HibernateConfigurationPlugin> beans = m_beanFactory

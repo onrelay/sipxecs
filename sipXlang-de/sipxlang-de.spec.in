@@ -18,7 +18,7 @@ BuildArch: noarch
 %define debug_package %{nil}
 
 BuildRequires: automake
-BuildRequires: java-1.8.0-openjdk-devel
+BuildRequires: java-17-openjdk-devel
 
 Source: %name-%version.tar.gz
 

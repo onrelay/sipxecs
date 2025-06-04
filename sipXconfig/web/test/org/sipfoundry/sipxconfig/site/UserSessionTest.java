@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.site;
 
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 
 import java.util.ArrayList;
 import java.util.Collection;

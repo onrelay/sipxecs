@@ -130,7 +130,7 @@
   <!--
     - T R A N S A C T I O N  S U P P O R T
   -->
-  <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+  <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
     <property name="sessionFactory">
       <ref local="sessionFactory" />
     </property>
@@ -211,6 +211,9 @@
         <value>settingsWithLocation</value>
       </list>
     </property>
+    <property name="entityInterceptor">
+      <ref bean="springInstantiator"/>
+    </property>
   </bean>
 
   <bean name="preInitializeSessionFactory" class="org.sipfoundry.sipxconfig.common.SpringBeanPreInitializer">
@@ -220,7 +223,7 @@
   <!--
     - H I B E R N A T E   S E S S I O N
   -->
-  <bean id="hibernateInterceptor" class="org.springframework.orm.hibernate3.HibernateInterceptor">
+  <bean id="hibernateInterceptor" class="org.springframework.orm.hibernate5.HibernateInterceptor">
     <property name="sessionFactory">
       <ref bean="sessionFactory" />
     </property>
@@ -239,11 +242,13 @@
     <property name="indexer" ref="fastIndexer" />
     <property name="beanIndexHelper" ref="beanIndexHelper"/>
   </bean>
+
   
   <bean id="abstractDaoImpl" abstract="true">
     <property name="sessionFactory" ref="sessionFactory"/>
     <property name="daoEventPublisher" ref="daoEventPublisher"/>    
   </bean>
+
   
   <!--
     - Use this instead of 'hibernateInterceptor' when you want to

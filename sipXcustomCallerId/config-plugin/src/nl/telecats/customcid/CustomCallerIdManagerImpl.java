@@ -23,10 +23,9 @@ import java.util.List;
 import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.FindIterable;
 
 public class CustomCallerIdManagerImpl implements CustomCallerIdManager {
     public static final String DNIS_COL = "cci_dnis";
@@ -62,11 +61,11 @@ public class CustomCallerIdManagerImpl implements CustomCallerIdManager {
     }
 
     private void setRewrites(String collection, Collection<CustomCallerAlias> rewrites) {
-        DBCollection col = m_db.getDb().getCollection(collection);
-        BasicDBObject[] dbo = new BasicDBObject[rewrites.size()];
+        MongoCollection<Document> col = m_db.getDb().getCollection(collection);
+        Document[] dbo = new Document[rewrites.size()];
         Iterator<CustomCallerAlias> iRewrites = rewrites.iterator();
         for (int i = 0; i < rewrites.size(); i++) {
-            dbo[i] = new BasicDBObject();
+            dbo[i] = new Document();
             CustomCallerAlias cca = iRewrites.next();
             dbo[i].put(FROM_ATTR, cca.getFrom());
             dbo[i].put(TO_ATTR, cca.getTo());
@@ -76,10 +75,10 @@ public class CustomCallerIdManagerImpl implements CustomCallerIdManager {
     }
 
     private Collection<CustomCallerAlias> getRewrites(String collection) {
-        DBCursor csr = m_db.getDb().getCollection(collection).find();
+        FindIterable<Document> csr = m_db.getDb().getCollection(collection).find();
         List<CustomCallerAlias> rw = new ArrayList<CustomCallerAlias>();
         while (csr.hasNext()) {
-            DBObject o = csr.next();
+            Document o = csr.next();
             rw.add(new CustomCallerAlias(o.get(FROM_ATTR).toString(), o.get(TO_ATTR).toString()));
         }
 

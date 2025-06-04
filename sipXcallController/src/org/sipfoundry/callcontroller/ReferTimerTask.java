@@ -9,15 +9,11 @@
  */
 package org.sipfoundry.callcontroller;
 
-import gov.nist.javax.sip.DialogExt;
-
 import java.util.TimerTask;
 
-import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
-import javax.sip.SipProvider;
-import javax.sip.message.Request;
+
 
 import org.apache.log4j.Logger;
 

@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.job;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.commserver.Location;
@@ -98,7 +98,7 @@ public class Job extends BeanWithId implements Serializable {
 
     public String getErrorMsg() {
         if (!m_status.equals(JobStatus.FAILED) && !m_status.equals(JobStatus.WARNING)) {
-            return org.apache.commons.lang.StringUtils.EMPTY;
+            return org.apache.commons.lang3.StringUtils.EMPTY;
         }
         StringBuffer error = new StringBuffer();
         if (m_errorMsg != null) {

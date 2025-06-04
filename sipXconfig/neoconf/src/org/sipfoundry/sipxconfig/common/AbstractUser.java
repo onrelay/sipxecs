@@ -8,15 +8,15 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.apache.commons.lang.StringUtils.defaultString;
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.apache.commons.lang.StringUtils.join;
-import static org.apache.commons.lang.StringUtils.lowerCase;
-import static org.apache.commons.lang.StringUtils.split;
-import static org.apache.commons.lang.StringUtils.trim;
-import static org.apache.commons.lang.StringUtils.trimToNull;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.lowerCase;
+import static org.apache.commons.lang3.StringUtils.split;
+import static org.apache.commons.lang3.StringUtils.trim;
+import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.sipfoundry.sipxconfig.common.UserCallerAliasInfo.ANONYMOUS_CALLER_ALIAS;
 import static org.sipfoundry.sipxconfig.common.UserCallerAliasInfo.EXTERNAL_NUMBER;
 import static org.sipfoundry.sipxconfig.permission.PermissionName.EXCHANGE_VOICEMAIL;
@@ -41,7 +41,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.commons.security.Md5Encoder;
 import org.sipfoundry.commons.userdb.profile.UserProfile;
 import org.sipfoundry.sipxconfig.address.AddressManager;

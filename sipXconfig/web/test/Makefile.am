@@ -28,10 +28,8 @@ noinst_DATA = javac-test
 
 test_PKGS = \
 	$(web_PKGS) \
-	cssparser \
 	dbunit \
 	easymock \
-	easymockclassextension \
 	htmlunit \
 	htmlunit-core-js \
 	js \

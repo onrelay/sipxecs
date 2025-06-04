@@ -1,13 +1,22 @@
 relay_PKGS = \
 	ice4j \
-	commons-beanutils \
+	commons-beanutils-core \
 	commons-collections \
 	commons-digester \
 	commons-logging \
 	dnsjava \
 	jain-sip-sdp \
-	javax.servlet \
-	jetty \
+	jakarta.servlet \
+	jetty-server \
+	jetty-util \
+	jetty-http \
+	jetty-xml \
+	jetty-ee10-servlet \
+	jetty-ee10-servlets \
+	jetty-security \
+	jetty-deploy \
+	jetty-io \
+	jetty-ee10-webapp \
 	log4j \
 	sipxcommons \
 	ws-commons-util \

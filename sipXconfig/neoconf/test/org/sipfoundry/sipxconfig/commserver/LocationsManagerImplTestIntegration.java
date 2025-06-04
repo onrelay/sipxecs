@@ -77,7 +77,7 @@ public class LocationsManagerImplTestIntegration extends ImdbTestCase {
         loadDataSetXml("commserver/seedLocationsAndServices.xml");
 
         Location l = m_locationsManager.getLocationByFqdn("remotehost.example.org");
-        assertEquals(new Integer(102), l.getId());
+        assertEquals(Integer.valueOf(102), l.getId());
     }
 
     public void testGetLocationByAddress() throws Exception {
@@ -85,7 +85,7 @@ public class LocationsManagerImplTestIntegration extends ImdbTestCase {
         loadDataSetXml("commserver/seedLocationsAndServices.xml");
 
         Location l = m_locationsManager.getLocationByAddress("10.1.1.1");
-        assertEquals(new Integer(101), l.getId());
+        assertEquals(Integer.valueOf(101), l.getId());
     }
 
     public void testFindById() throws Exception {
@@ -219,12 +219,12 @@ public class LocationsManagerImplTestIntegration extends ImdbTestCase {
         loadDataSetXml("commserver/seedLocationsSort.xml");
         
         List<Location> locations = m_locationsManager.getLocationsList();
-        assertEquals(new Integer(4), locations.get(0).getId());
-        assertEquals(new Integer(1), locations.get(1).getId());
-        assertEquals(new Integer(2), locations.get(2).getId());
-        assertEquals(new Integer(5), locations.get(3).getId());
-        assertEquals(new Integer(6), locations.get(4).getId());
-        assertEquals(new Integer(7), locations.get(5).getId());
+        assertEquals(Integer.valueOf(4), locations.get(0).getId());
+        assertEquals(Integer.valueOf(1), locations.get(1).getId());
+        assertEquals(Integer.valueOf(2), locations.get(2).getId());
+        assertEquals(Integer.valueOf(5), locations.get(3).getId());
+        assertEquals(Integer.valueOf(6), locations.get(4).getId());
+        assertEquals(Integer.valueOf(7), locations.get(5).getId());
     }
     
     public void setLocationsManager(LocationsManager locationsManager) {

@@ -6,24 +6,14 @@
 package org.sipfoundry.sipxrest;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.jar.JarInputStream;
 
-import org.restlet.Restlet;
 import org.apache.log4j.Logger;
 
 public class RestServiceFinder {
@@ -96,7 +86,7 @@ public class RestServiceFinder {
                         break;
                     }
                 }
-
+                jarFile.close();
             }
         }
 

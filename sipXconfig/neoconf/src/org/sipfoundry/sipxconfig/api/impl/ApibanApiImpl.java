@@ -1,7 +1,7 @@
 package org.sipfoundry.sipxconfig.api.impl;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.sipfoundry.sipxconfig.api.ApibanApi;
 import org.sipfoundry.sipxconfig.apiban.BannedApi;

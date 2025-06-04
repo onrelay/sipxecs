@@ -5,7 +5,6 @@
  */
 package com.pingtel.sipviewer ;
 
-import javax.swing.* ;
 import java.io.* ;
 
 /**
@@ -78,8 +77,6 @@ public class SIPViewer
         boolean bError = false ;
         for (int i=0; i<args.length; i++)
         {
-            String f ;
-
             if (args[i].toUpperCase().startsWith(CMDLINE_ALIASES))
             {
                 if (s_strAliasesFile == null)

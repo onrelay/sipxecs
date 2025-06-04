@@ -23,7 +23,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.ftp.FTP;
@@ -98,11 +98,11 @@ public class FtpExternalServerImpl implements FtpExternalServer {
     }
 
     public String[] listDirectories(String path) {
-        return listByType(path, new Integer(FTPFile.DIRECTORY_TYPE));
+        return listByType(path, Integer.valueOf(FTPFile.DIRECTORY_TYPE));
     }
 
     public String[] listFiles(String path) {
-        return listByType(path, new Integer(FTPFile.FILE_TYPE));
+        return listByType(path, Integer.valueOf(FTPFile.FILE_TYPE));
     }
 
     public void upload(String... names) {

@@ -17,7 +17,6 @@ import org.sipfoundry.sipxconfig.address.Address;
 import org.sipfoundry.sipxconfig.commserver.ServiceStatus;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
 import org.sipfoundry.sipxconfig.xmlrpc.ApiProvider;
-import org.springframework.beans.factory.annotation.Required;
 
 public class BridgeSbcStatistics {
     private ApiProvider<BridgeSbcXmlRpcApi> m_bridgeSbcApiProvider;
@@ -85,12 +84,12 @@ public class BridgeSbcStatistics {
         return registrationRecords;
     }
 
-    @Required
+    
     public void setBridgeSbcApiProvider(ApiProvider bridgeSbcApiProvider) {
         m_bridgeSbcApiProvider = bridgeSbcApiProvider;
     }
 
-    @Required
+    
     public void setSnmpManager(SnmpManager snmpManager) {
         m_snmpManager = snmpManager;
     }

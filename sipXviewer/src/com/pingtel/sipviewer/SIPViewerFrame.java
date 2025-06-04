@@ -34,7 +34,7 @@ import javax.swing.KeyStroke;
 
 import com.pingtel.sipviewer.PopUpUtils.TimeDisplayMode;
 
-//import org.apache.commons.lang.StringUtils;
+//import org.apache.commons.lang3.StringUtils;
 
 public class SIPViewerFrame extends JFrame implements AdjustmentListener
 {

@@ -55,7 +55,7 @@ public class BannedHost implements Serializable {
     }
 
     public String getBanTime() {
-        long ts = (long) (new Double(m_timeStamp).doubleValue() * 1000);
+        long ts = (long) (Double.valueOf(m_timeStamp).doubleValue() * 1000);
 
         return dateFormatter.format(new Date(ts));
     }

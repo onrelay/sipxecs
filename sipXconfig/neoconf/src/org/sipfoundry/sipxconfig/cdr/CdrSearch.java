@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.cdr;
 
-import static org.apache.commons.lang.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.join;
 
 import java.util.ArrayList;
 import java.util.HashMap;

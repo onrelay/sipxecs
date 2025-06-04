@@ -107,7 +107,7 @@ public class TestUtilities {
 
             FromHeader fromHeader = SipFactories.headerFactory
                     .createFromHeader(SipFactories.addressFactory
-                            .createAddress(fromUri), new Long(Math
+                            .createAddress(fromUri), Long.valueOf(Math
                             .abs(new java.util.Random().nextLong())).toString());
 
             SipURI toUri = SipFactories.addressFactory.createSipURI(toUser,

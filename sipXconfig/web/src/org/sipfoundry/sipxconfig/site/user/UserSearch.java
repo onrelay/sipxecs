@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.BaseComponent;
 import org.apache.tapestry.IMarkupWriter;
 import org.apache.tapestry.IRequestCycle;
@@ -73,10 +73,10 @@ public abstract class UserSearch extends BaseComponent {
         if (delegate instanceof SipxValidationDelegate) {
             SipxValidationDelegate validator = (SipxValidationDelegate) delegate;
             if (results.size() < MAX_RESULT) {
-                String msg = getMessages().format("msg.found", new Integer(results.size()));
+                String msg = getMessages().format("msg.found", Integer.valueOf(results.size()));
                 validator.recordSuccess(msg);
             } else {
-                String msg = getMessages().format("msg.foundTooMany", new Integer(results.size()));
+                String msg = getMessages().format("msg.foundTooMany", Integer.valueOf(results.size()));
                 validator.record(msg, ValidationConstraint.TOO_LARGE);
             }
 

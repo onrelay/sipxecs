@@ -14,7 +14,6 @@ import java.util.Properties;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 
 import gov.nist.core.StackLogger;
 
@@ -29,13 +28,13 @@ public class StackLoggerImpl implements StackLogger {
     private Properties stackProperties;
  
     static {
-        levelMap.put(Level.DEBUG.toString(), new Integer(TRACE_DEBUG));
-        levelMap.put(Level.INFO.toString(), new Integer(TRACE_INFO));
-        levelMap.put(Level.TRACE.toString(), new Integer(TRACE_TRACE));
-        levelMap.put(Level.ERROR.toString(), new Integer(TRACE_ERROR));
-        levelMap.put(Level.WARN.toString(), new Integer(TRACE_WARN));
-        levelMap.put(Level.FATAL.toString(), new Integer(TRACE_FATAL));
-        levelMap.put(Level.OFF.toString(), new Integer(TRACE_NONE));
+        levelMap.put(Level.DEBUG.toString(), Integer.valueOf(TRACE_DEBUG));
+        levelMap.put(Level.INFO.toString(), Integer.valueOf(TRACE_INFO));
+        levelMap.put(Level.TRACE.toString(), Integer.valueOf(TRACE_TRACE));
+        levelMap.put(Level.ERROR.toString(), Integer.valueOf(TRACE_ERROR));
+        levelMap.put(Level.WARN.toString(), Integer.valueOf(TRACE_WARN));
+        levelMap.put(Level.FATAL.toString(), Integer.valueOf(TRACE_FATAL));
+        levelMap.put(Level.OFF.toString(), Integer.valueOf(TRACE_NONE));
     }
     
     
@@ -154,7 +153,7 @@ public class StackLoggerImpl implements StackLogger {
     public void setStackProperties(Properties properties) {
         logger.info("StackProperties " + properties);
         this.stackProperties = properties;
-        Enumeration appenders = this.logger.getAllAppenders();
+        Enumeration<?> appenders = this.logger.getAllAppenders();
         Logger newLogger = Logger.getLogger(properties.getProperty("javax.sip.STACK_NAME"));
         if (appenders != null) {
             while (appenders.hasMoreElements() ) {

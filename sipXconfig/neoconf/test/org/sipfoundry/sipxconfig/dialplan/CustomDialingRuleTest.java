@@ -23,7 +23,7 @@ import java.util.TimeZone;
 
 import junit.framework.JUnit4TestAdapter;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.sipfoundry.sipxconfig.common.ScheduledDay;

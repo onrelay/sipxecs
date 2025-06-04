@@ -12,9 +12,7 @@
   <property name="sipviewer.lib.dir" value="${lib.dir}/sipviewer"/>
   <property name="sipviewer.data.dir" value="${data.dir}/sipxecs"/>
 
-  <path id="base.path" >
-    <pathelement location="${jdom.jar}"/>
-  </path>
+  <path id="base.path" ></path>
   <property name="classpath" refid="base.path" />
 
   <target name="execs" depends="jar,installer" description="create jar and installer"/>
@@ -26,7 +24,6 @@
         <include name="**/*.class" />
       </fileset>
         <manifest>
-               <attribute name="Class-Path" value="jdom.jar" />
                <attribute name="Created-By" value="1.6.0_14 (Sun Microsystems Inc.)" />
                <attribute name="Main-Class" value="com.pingtel.sipviewer.SIPViewer" />
         </manifest>
@@ -36,7 +33,6 @@
   <!-- Run installer build. Not part of the default build target.  -->
   <target name="installer" depends="jar" >
      <!-- A bit ugly - the spec file for IZ-pack does not handle substititions -->
-     <copy file="${jdom.jar}" tofile="${build.dir}/jdom.jar" />
      <copy toDir="${build.dir}" >
 	<fileset dir="${src.dir}/../installer" excludes="**/*.jar" />
      </copy>

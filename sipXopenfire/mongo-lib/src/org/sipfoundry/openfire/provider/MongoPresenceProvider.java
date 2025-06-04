@@ -21,57 +21,58 @@ import java.util.Date;
 import org.jivesoftware.openfire.provider.PresenceProvider;
 import org.jivesoftware.util.StringUtils;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.FindIterable;
 import com.mongodb.WriteConcern;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
+import com.mongodb.client.model.ReplaceOptions;
+
 
 public class MongoPresenceProvider extends BaseMongoProvider implements PresenceProvider {
     private static final String COLLECTION_NAME = "ofPresence";
 
     public MongoPresenceProvider() {
         setDefaultCollectionName(COLLECTION_NAME);
-        DBCollection presenceCollection = getDefaultCollection();
+        MongoCollection<Document> presenceCollection = getDefaultCollection();
 
-        presenceCollection.ensureIndex("username");
+        Document index = new Document("username", 1);
+        presenceCollection.createIndex(index);
     }
 
     @Override
     public void deleteOfflinePresenceFromDB(String username) {
-        DBCollection presenceCollection = getDefaultCollection();
-        DBObject toRemove = new BasicDBObject();
-        toRemove.put("username", username);
+        MongoCollection<Document> presenceCollection = getDefaultCollection();
+        Document toRemove = new Document("username", username);
 
-        presenceCollection.remove(toRemove);
+        presenceCollection.deleteMany(toRemove);
     }
 
     @Override
     public void insertOfflinePresenceIntoDB(String username, String offlinePresence, Date offlinePresenceDate) {
-        DBCollection presenceCollection = getDefaultCollection();
-        DBObject query = new BasicDBObject();
-        query.put("username", username);
+        MongoCollection<Document> presenceCollection = getDefaultCollection();
+        Document query = new Document("username", username);
 
-        DBObject toInsert = new BasicDBObject();
-        toInsert.put("username", username);
-        toInsert.put("offlinePresence", offlinePresence);
-        String inMillis = StringUtils.dateToMillis(offlinePresenceDate);
-        toInsert.put("offlinePresenceDate", inMillis);
+        Document updateDoc = new Document()
+            .append("username", username)
+            .append("offlinePresence", offlinePresence)
+            .append("offlinePresenceDate", StringUtils.dateToMillis(offlinePresenceDate));
 
-        presenceCollection.update(query, toInsert, true, false, WriteConcern.NONE);
+        ReplaceOptions options = new ReplaceOptions().upsert(true);
+
+        presenceCollection.replaceOne(query, updateDoc, options);
     }
 
     @Override
     public TimePresence loadOfflinePresence(String username) {
+        MongoCollection<Document> presenceCollection = getDefaultCollection();
+        Document toFind = new Document("username", username);
+
+        Document entry = presenceCollection.find(toFind).first();
         TimePresence tp;
-        DBCollection presenceCollection = getDefaultCollection();
-        DBObject toFind = new BasicDBObject();
-        toFind.put("username", username);
-        DBCursor cursor = presenceCollection.find(toFind);
 
-        if (cursor.hasNext()) {
-            DBObject entry = cursor.next();
-
+        if (entry != null) {
             String lastActivity = (String) entry.get("offlinePresenceDate");
             String presence = (String) entry.get("offlinePresence");
 
@@ -79,8 +80,6 @@ public class MongoPresenceProvider extends BaseMongoProvider implements Presence
         } else {
             tp = new TimePresence(NULL_LONG, "NULL");
         }
-
-        cursor.close();
 
         return tp;
     }

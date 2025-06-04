@@ -9,9 +9,6 @@
  */
 package org.sipfoundry.callcontroller;
 
-import java.text.ParseException;
-import java.util.Iterator;
-
 import gov.nist.javax.sip.ClientTransactionExt;
 import gov.nist.javax.sip.ResponseEventExt;
 import gov.nist.javax.sip.TransactionExt;
@@ -19,24 +16,15 @@ import gov.nist.javax.sip.message.SIPResponse;
 
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
-import javax.sip.DialogState;
 import javax.sip.DialogTerminatedEvent;
-import javax.sip.IOExceptionEvent;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
 import javax.sip.ServerTransaction;
-import javax.sip.SipException;
-import javax.sip.SipListener;
 import javax.sip.SipProvider;
 import javax.sip.TimeoutEvent;
 import javax.sip.TransactionTerminatedEvent;
-import javax.sip.address.SipURI;
 import javax.sip.address.URI;
 import javax.sip.header.ContactHeader;
-import javax.sip.header.ContentLengthHeader;
-import javax.sip.header.ContentTypeHeader;
-import javax.sip.header.Header;
-import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 

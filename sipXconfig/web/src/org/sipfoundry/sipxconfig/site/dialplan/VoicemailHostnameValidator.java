@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.site.dialplan;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.form.IFormComponent;
 import org.apache.tapestry.form.ValidationMessages;
 import org.apache.tapestry.form.validator.BaseValidator;

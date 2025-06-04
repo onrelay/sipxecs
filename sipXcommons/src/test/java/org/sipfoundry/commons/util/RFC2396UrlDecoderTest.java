@@ -40,9 +40,9 @@ public class RFC2396UrlDecoderTest extends TestCase {
    
    public void testSampling() throws IOException {
        InputStream urisIn = RFC2396UrlDecoderTest.class.getResourceAsStream("sample-uris.txt");
-       List uris = IOUtils.readLines(urisIn);
-       for (Object uri : uris) {
-           RFC2396UrlDecoder.decode((String)uri);
+       List<String> uris = IOUtils.readLines(urisIn);
+       for (String uri : uris) {
+           RFC2396UrlDecoder.decode(uri);
        }
        IOUtils.closeQuietly(urisIn);
    }

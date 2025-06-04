@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.phone;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.Predicate;
 
 public class EmergencyPhoneModelSourceTest extends TestCase {
 

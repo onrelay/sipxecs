@@ -31,7 +31,7 @@ public class EnumSettingTest extends TestCase {
     }
 
     public void testConvertToTypedValue() {
-        assertEquals(new Integer(1), m_intEnum.convertToTypedValue("1"));
+        assertEquals(Integer.valueOf(1), m_intEnum.convertToTypedValue("1"));
         assertNull(m_intEnum.convertToTypedValue("bongo"));
         assertNull(m_intEnum.convertToTypedValue(null));
 
@@ -41,8 +41,8 @@ public class EnumSettingTest extends TestCase {
     }
 
     public void testConvertToStringValue() {
-        assertEquals("2", m_intEnum.convertToStringValue(new Integer(2)));
-        assertNull(m_intEnum.convertToStringValue(new Integer(5)));
+        assertEquals("2", m_intEnum.convertToStringValue(Integer.valueOf(2)));
+        assertNull(m_intEnum.convertToStringValue(Integer.valueOf(5)));
         assertNull(m_intEnum.convertToStringValue(null));
 
         assertEquals("two", m_stringEnum.convertToStringValue("two"));

@@ -89,7 +89,7 @@ AC_DEFUN([CHECK_JDK],
         AC_MSG_ERROR([Cannot find dt.jar in expected location. You may try setting the JAVA_HOME environment variable if you haven't already done so])
     fi
 
-    AC_SUBST(JAVA, [$JAVA_HOME/jre/bin/java])
+    AC_PATH_PROG(JAVA, java)
 
     AC_ARG_VAR(JAVAC_OPTIMIZED, [Java compiler option for faster performance. Default is on])
     test -z $JAVAC_OPTIMIZED && JAVAC_OPTIMIZED=on

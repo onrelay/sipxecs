@@ -18,46 +18,41 @@ package org.sipfoundry.openfire.provider;
 
 import org.jivesoftware.openfire.provider.UIDProvider;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.UpdateOptions;
 
 public class MongoUIDProvider extends BaseMongoProvider implements UIDProvider {
     private static final String COLLECTION_NAME = "ofId";
 
     public MongoUIDProvider() {
         setDefaultCollectionName(COLLECTION_NAME);
-        DBCollection idCollection = getDefaultCollection();
-        DBObject index = new BasicDBObject();
+        MongoCollection<Document> idCollection = getDefaultCollection();
 
-        index.put("idType", 1);
-
-        idCollection.ensureIndex(index);
+        // Create an index on the "idType" field ascending
+        idCollection.createIndex(Indexes.ascending("idType"));
     }
 
     @Override
     public long[] getNextBlock(int type, int blockSize) {
         long[] result = new long[2]; // we just return the min and max ids
-        DBCollection idCollection = getDefaultCollection();
-        DBObject query = new BasicDBObject();
+        MongoCollection<Document> idCollection = getDefaultCollection();
 
-        query.put("idType", type);
+        Document query = new Document("idType", type);
 
-        DBObject idObj = idCollection.findOne(query);
+        Document existing = idCollection.find(query).first();
 
-        if (idObj != null) {
-            result[0] = (Long) idObj.get("id");
+        if (existing != null && existing.get("id") != null) {
+            result[0] = ((Number) existing.get("id")).longValue();
         } else {
-            result[0] = 1;
+            result[0] = 1L;
         }
         result[1] = result[0] + blockSize;
 
-        DBObject update = new BasicDBObject();
-        update.put("idType", type);
-        update.put("id", result[1]);
+        Document update = new Document("$set", new Document("idType", type).append("id", result[1]));
 
-        // update if exists, otherwise insert
-        idCollection.findAndModify(query, null, null, false, new BasicDBObject("$set", update), false, true);
+        idCollection.updateOne(query, update, new UpdateOptions().upsert(true));
 
         return result;
     }

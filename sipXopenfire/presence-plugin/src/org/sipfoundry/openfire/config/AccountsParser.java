@@ -350,9 +350,9 @@ public class AccountsParser {
             chatRoom.setOwner(user.getJid());
             chatRoom.setDescription(conference.getConfDescription());
             chatRoom.setPassword(conference.getPin());
-            chatRoom.setModerated(new Boolean(conference.isModerated()).toString());
-            chatRoom.setIsPublicRoom(new Boolean(conference.isPublic()).toString());
-            chatRoom.setMembersOnly(new Boolean(conference.isMembersOnly()).toString());
+            chatRoom.setModerated(Boolean.valueOf(conference.isModerated()).toString());
+            chatRoom.setIsPublicRoom(Boolean.valueOf(conference.isPublic()).toString());
+            chatRoom.setMembersOnly(Boolean.valueOf(conference.isMembersOnly()).toString());
             chatRoom.setPersistent(Boolean.TRUE.toString());
             chatRoom.setConferenceExtension(conference.getExtension());
 

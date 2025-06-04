@@ -67,7 +67,7 @@ public class PermissionManagerImplTestIntegration extends IntegrationTestCase {
         sql("commserver/locations.sql");
         m_permissionManager.saveCallPermission(permission);
         commit();
-        assertEquals(1, db().queryForLong("select count(*) from permission where label = 'abc'"));
+        assertEquals(Long.valueOf(1), db().queryForObject("select count(*) from permission where label = 'abc'", Long.class));
     }
 
     public void testAddCallPermissionDup() throws Exception {
@@ -155,10 +155,6 @@ public class PermissionManagerImplTestIntegration extends IntegrationTestCase {
 
     public void testRemoveCallPermissions() throws Exception {
         sql("permission/permission.sql");
-        Integer[] names = {
-            1002, 1001
-        };
-
         m_permissionManager.deleteCallPermission(m_permissionManager.load(Permission.class, 1001));
         m_permissionManager.deleteCallPermission(m_permissionManager.load(Permission.class, 1002));
         commit();
@@ -184,7 +180,7 @@ public class PermissionManagerImplTestIntegration extends IntegrationTestCase {
 
         m_dialPlanContext.storeRule(rule);
         commit();
-        CustomDialingRule loaded = (CustomDialingRule) m_dialPlanContext.load(DialingRule.class, rule.getId());
+        DialingRule loaded = (DialingRule) m_dialPlanContext.load(DialingRule.class, rule.getId());
         assertEquals(1, rule.getPermissionNames().size());
         List<Permission> loadedPermissions = loaded.getPermissions();
         assertEquals(1, loadedPermissions.size());

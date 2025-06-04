@@ -30,12 +30,13 @@ import java.util.TimeZone;
 
 import javax.xml.rpc.ServiceException;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.commons.lang.time.DateUtils;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -72,7 +73,6 @@ import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
 import org.sipfoundry.sipxconfig.time.NtpManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -107,7 +107,7 @@ public class CdrManagerImpl extends JdbcDaoSupport implements CdrManager, Featur
      * interpret as local time. We pass TimeZone explicitely to force interpreting zoneless
      * timestamp as UTC timestamps.
      */
-    private final TimeZone m_tz = DateUtils.UTC_TIME_ZONE;
+    private final TimeZone m_tz = TimeZone.getTimeZone("UTC");    
     private AddressManager m_addressManager;
     private FeatureManager m_featureManager;
     private BeanWithSettingsDao<CdrSettings> m_settingsDao;
@@ -249,8 +249,8 @@ public class CdrManagerImpl extends JdbcDaoSupport implements CdrManager, Featur
     @Override
     public int getCdrCount(Date from, Date to, CdrSearch search, User user, boolean recipient) {
         CdrsStatementCreator psc = new SelectCount(from, to, search, user, m_tz, recipient);
-        RowMapper rowMapper = new SingleColumnRowMapper(Integer.class);
-        List results = getJdbcTemplate().query(psc, rowMapper);
+        RowMapper<Integer> rowMapper = new SingleColumnRowMapper<Integer>(Integer.class);
+        List<Integer> results = getJdbcTemplate().query(psc, rowMapper);
         return (Integer) DataAccessUtils.requiredUniqueResult(results);
     }
     
@@ -261,7 +261,7 @@ public class CdrManagerImpl extends JdbcDaoSupport implements CdrManager, Featur
     }
 
     @Override
-    public List<Cdr> getActiveCalls() {
+    public List<Cdr> getActiveCalls() throws IOException, InterruptedException {
         try {
             // Now we use REST calls for this too
             return getActiveCallsRESTCall(null);
@@ -271,7 +271,7 @@ public class CdrManagerImpl extends JdbcDaoSupport implements CdrManager, Featur
     }
 
     @Override
-    public List<Cdr> getActiveCallsREST(User user) throws IOException {
+    public List<Cdr> getActiveCallsREST(User user) throws IOException, InterruptedException  {
         // We need this for security... if user is null in this case
         // we do not want to show any informations
         if (null == user) {
@@ -281,15 +281,17 @@ public class CdrManagerImpl extends JdbcDaoSupport implements CdrManager, Featur
         }
     }
 
-    private List<Cdr> getActiveCallsRESTCall(User user) throws IOException {
-        HttpClient client = new HttpClient();
-        GetMethod getMethod = new GetMethod(getActiveCdrsRestUrl(user));
-        int statusCode = HttpStatus.SC_OK;
-        ArrayList<Cdr> cdrs = new ArrayList<Cdr>();
-        Calendar c = Calendar.getInstance();
-        statusCode = client.executeMethod(getMethod);
-        if (statusCode == HttpStatus.SC_OK) {
-            String xml = getMethod.getResponseBodyAsString();
+    private List<Cdr> getActiveCallsRESTCall(User user) throws IOException, InterruptedException {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(getActiveCdrsRestUrl(user)))
+                .GET()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        List<Cdr> cdrs = new ArrayList<>();
+        Calendar c = Calendar.getInstance(); // still used as in original snippet
+        if (response.statusCode() == 200) {
+            String xml = response.body();
             List<ActiveCallREST> list = mapActiveCalls(xml);
             for (ActiveCallREST call : list) {
                 ActiveCallCdr cdr = new ActiveCallCdr();
@@ -329,18 +331,6 @@ public class CdrManagerImpl extends JdbcDaoSupport implements CdrManager, Featur
         } else {
             return String.format("http://%s:%d/activecdrs?name=%s", address.getAddress(), address.getPort(),
                 user.getUserName());
-        }
-    }
-
-    public CdrService getCdrService() {
-        try {
-            Address address = getCdrAgentAddress();
-            URL url = new URL("http", address.getAddress(), address.getPort(), StringUtils.EMPTY);
-            return new CdrImplServiceLocator().getCdrService(url);
-        } catch (ServiceException e) {
-            throw new UserException(e);
-        } catch (MalformedURLException e) {
-            throw new UserException(e);
         }
     }
     
@@ -514,7 +504,6 @@ public class CdrManagerImpl extends JdbcDaoSupport implements CdrManager, Featur
 
         private final Calendar m_calendar;
         private final Calendar m_calendarGMT = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
-        private TimeZone m_systemTimeZone;
 
         private boolean m_privacy;
         private int m_privacyLimit;
@@ -771,7 +760,7 @@ public class CdrManagerImpl extends JdbcDaoSupport implements CdrManager, Featur
         return Collections.singleton(def);
     }
 
-    @Required
+    
     public void setNtpManager(NtpManager ntpManager) {
         m_ntpManager = ntpManager;
     }

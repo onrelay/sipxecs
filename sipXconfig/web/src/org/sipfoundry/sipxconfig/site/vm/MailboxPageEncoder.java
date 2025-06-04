@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.site.vm;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.Tapestry;
 import org.apache.tapestry.engine.ServiceEncoder;
 import org.apache.tapestry.engine.ServiceEncoding;

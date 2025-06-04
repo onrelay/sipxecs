@@ -7,7 +7,7 @@
  */
 package org.sipfoundry.sipxconfig.setting;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * This filter will escape the 5 XML entities; It will leave other characters as they are, since

@@ -16,66 +16,62 @@
  */
 package org.sipfoundry.sipxconfig.rest;
 
-import static org.sipfoundry.sipxconfig.rest.JacksonConvert.toRepresentation;
+import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.restlet.resource.Representation;
+import org.restlet.data.Status;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.ivr.Ivr;
 import org.sipfoundry.sipxconfig.vm.MailboxPreferences;
 import org.sipfoundry.sipxconfig.vm.MailboxPreferences.ActiveGreeting;
 import org.sipfoundry.sipxconfig.vm.MailboxPreferences.AttachType;
 import org.sipfoundry.sipxconfig.vm.MailboxPreferences.MailFormat;
-import org.springframework.beans.factory.annotation.Required;
 
 public class VoicemailPreferencesResource extends UserResource {
     private static final Log LOG = LogFactory.getLog(VoicemailPreferencesResource.class);
     
     private Ivr m_ivr;
 
-    @Override
-    public boolean allowDelete() {
-        return false;
-    }
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {    
+        
+        try {       
+            MailboxPreferences prefs = new MailboxPreferences(getUser());
+            VMPreferencesBean bean = new VMPreferencesBean();
 
-    @Override
-    public boolean allowPost() {
-        return false;
-    }
+            bean.setVoicemailPermission(getUser().hasVoicemailPermission());
+            bean.setGreeting(prefs.getActiveGreeting());
+            bean.setVoicemailFormat(m_ivr.getAudioFormat());
+            if (prefs.isEmailNotificationEnabled()) {
+                bean.setEmail(prefs.getEmailAddress());
+                bean.setEmailAttachType(prefs.getAttachVoicemailToEmail());
+                bean.setEmailFormat(prefs.getEmailFormat());
+                bean.setEmailIncludeAudioAttachment(prefs.isIncludeAudioAttachment());
+            }
+            if (prefs.isEmailNotificationAlternateEnabled()) {
+                bean.setAltEmail(prefs.getAlternateEmailAddress());
+                bean.setAltEmailAttachType(prefs.getVoicemailToAlternateEmailNotification());
+                bean.setAltEmailFormat(prefs.getAlternateEmailFormat());
+                bean.setAltEmailIncludeAudioAttachment(prefs.isIncludeAudioAttachmentAlternateEmail());
+            }
 
-    // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        MailboxPreferences prefs = new MailboxPreferences(getUser());
-        VMPreferencesBean bean = new VMPreferencesBean();
+            LOG.debug("Returning VM settings:\t" + bean);
 
-        bean.setVoicemailPermission(getUser().hasVoicemailPermission());
-        bean.setGreeting(prefs.getActiveGreeting());
-        bean.setVoicemailFormat(m_ivr.getAudioFormat());
-        if (prefs.isEmailNotificationEnabled()) {
-            bean.setEmail(prefs.getEmailAddress());
-            bean.setEmailAttachType(prefs.getAttachVoicemailToEmail());
-            bean.setEmailFormat(prefs.getEmailFormat());
-            bean.setEmailIncludeAudioAttachment(prefs.isIncludeAudioAttachment());
+            return toRepresentation(bean);
+
+        } catch (IOException e) {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage());
         }
-        if (prefs.isEmailNotificationAlternateEnabled()) {
-            bean.setAltEmail(prefs.getAlternateEmailAddress());
-            bean.setAltEmailAttachType(prefs.getVoicemailToAlternateEmailNotification());
-            bean.setAltEmailFormat(prefs.getAlternateEmailFormat());
-            bean.setAltEmailIncludeAudioAttachment(prefs.isIncludeAudioAttachmentAlternateEmail());
-        }
-
-        LOG.debug("Returning VM settings:\t" + bean);
-
-        return toRepresentation(bean);
     }
 
-    // PUT
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         if (Boolean.TRUE == getUser().hasVoicemailPermission()) {
             VMPreferencesBean bean = JacksonConvert.fromRepresentation(entity, VMPreferencesBean.class);
             MailboxPreferences prefs = new MailboxPreferences(getUser());
@@ -114,9 +110,10 @@ public class VoicemailPreferencesResource extends UserResource {
             prefs.updateUser(user);
             getCoreContext().saveUser(user);
         }
+        return null;
     }
     
-    @Required
+    
     public void setIvr(Ivr ivr) {
         m_ivr = ivr;
     }
@@ -226,6 +223,7 @@ public class VoicemailPreferencesResource extends UserResource {
                 + ", m_voicemailFormat=" + m_voicemailFormat + "]";
         }
                 
+        @SuppressWarnings("unused")
         public String getVoicemailFormat() {
             return m_voicemailFormat;
         }

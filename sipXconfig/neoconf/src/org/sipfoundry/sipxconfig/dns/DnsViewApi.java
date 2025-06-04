@@ -32,21 +32,25 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ObjectNode;
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Delete;
+import org.restlet.resource.Get;
+import org.restlet.resource.Post;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+import org.restlet.resource.ServerResource;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.cfgmgt.JsonConfigurationFile;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.common.DataCollectionUtil;
 import org.sipfoundry.sipxconfig.region.Region;
 import org.sipfoundry.sipxconfig.region.RegionManager;
 
-public class DnsViewApi extends Resource {
+public class DnsViewApi extends ServerResource {
     private static final String ID = "id";
     private static final Integer BLANK_ID = BeanWithId.UNSAVED_ID;
     private Integer m_viewId;
@@ -68,33 +72,13 @@ public class DnsViewApi extends Resource {
         }
     }
 
-    @Override
-    public boolean allowGet() {
-        return true;
-    }
-
-    @Override
-    public boolean allowPost() {
-        return true;
-    };
-
-    @Override
-    public boolean allowDelete() {
-        return true;
-    };
-
-    @Override
-    public boolean allowPut() {
-        return true;
-    };
 
     ObjectMapper getJsonMapper() {
         return m_jsonMapper;
     }
 
-    // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         StringWriter json = new StringWriter();
         try {
             if (m_viewId != null) {
@@ -111,29 +95,28 @@ public class DnsViewApi extends Resource {
         return new StringRepresentation(json.toString());
     }
 
-    // DELETE
-    @Override
+    @Delete
     public void removeRepresentations() throws ResourceException {
         DnsView view = m_dnsManager.getViewById(m_viewId);
         m_dnsManager.deleteView(view);
     }
 
-    // POST
-    @Override
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {        
         DnsView view = readViewHandleErrors(entity);
         view.setUniqueId(BeanWithId.UNSAVED_ID);
         m_dnsManager.saveView(view);
 
         // caller needs the object id so it can follow-up calls
         getResponse().setEntity(new StringRepresentation(view.getId().toString()));
+        return null;
     }
 
-    // PUT
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         DnsView view = readViewHandleErrors(entity);
         m_dnsManager.saveView(view);
+        return null;
     }
 
     DnsView readViewHandleErrors(Representation entity) throws ResourceException {

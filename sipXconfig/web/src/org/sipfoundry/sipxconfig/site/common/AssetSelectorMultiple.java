@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.site.common;
 import java.io.File;
 
 import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.tapestry.annotations.ComponentClass;
 import org.apache.tapestry.annotations.Parameter;
 import org.apache.tapestry.form.IPropertySelectionModel;

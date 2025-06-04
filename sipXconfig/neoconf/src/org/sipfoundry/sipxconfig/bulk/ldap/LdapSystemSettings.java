@@ -19,7 +19,7 @@ package org.sipfoundry.sipxconfig.bulk.ldap;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang.enums.Enum;
 import org.sipfoundry.sipxconfig.cfgmgt.DeployConfigOnEdit;
 import org.sipfoundry.sipxconfig.common.BeanWithId;

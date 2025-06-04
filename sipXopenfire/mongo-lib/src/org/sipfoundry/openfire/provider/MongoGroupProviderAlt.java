@@ -39,11 +39,9 @@ import org.jivesoftware.openfire.group.GroupNotFoundException;
 import org.sipfoundry.commons.util.UnfortunateLackOfSpringSupportFactory;
 import org.xmpp.packet.JID;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
 
 public class MongoGroupProviderAlt extends AbstractGroupProvider {
     private static final Logger log = Logger.getLogger(MongoGroupProviderAlt.class);
@@ -73,29 +71,27 @@ public class MongoGroupProviderAlt extends AbstractGroupProvider {
     public Group getGroup(String name) throws GroupNotFoundException {
         log.debug("Getting group: " + name);
 
-        DBCollection groupsCollection = getCollection();
+        MongoCollection<Document> groupsCollection = getCollection();
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document()
+            .append("ent", "group")
+            .append("uid", name)
+            .append("imgrp", "1");
 
-        query.put("ent", "group");
-        query.put("uid", name);
-        query.put("imgrp", "1");
-
-        DBObject groupObj = groupsCollection.findOne(query);
+        Document groupObj = groupsCollection.find(query).first();
 
         if (groupObj == null) {
             throw new GroupNotFoundException(name);
         }
         log.debug("Found group: " + groupObj);
-        
 
         String id = (String) groupObj.get("_id");
-        //initialize cache with the actual value of group - this method is called when openfire starts
+        // initialize cache with the actual value of group - this method is called when openfire starts
         if (CacheHolder.getGroupName(id) == null) {
             CacheHolder.putGroup(id, name);
         }
-        
-        return fromDBObject(groupObj);
+
+        return fromDocument(groupObj);
     }
 
     @Override
@@ -110,14 +106,15 @@ public class MongoGroupProviderAlt extends AbstractGroupProvider {
 
     @Override
     public int getGroupCount() {
-        DBCollection groupsCollection = getCollection();
+        MongoCollection<Document> groupsCollection = getCollection();
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document()
+            .append("ent", "group")
+            .append("imgrp", "1");
 
-        query.put("ent", "group");
-        query.put("imgrp", "1");
+        long count = groupsCollection.countDocuments(query);
 
-        return (int) groupsCollection.count(query);
+        return (int) count;
     }
 
     @Override
@@ -128,14 +125,14 @@ public class MongoGroupProviderAlt extends AbstractGroupProvider {
     @Override
     public Collection<String> getGroupNames(int startIndex, int numResults) {
         List<String> groupNames = new ArrayList<String>();
-        DBCollection groupsCollection = getCollection();
+        MongoCollection<Document> groupsCollection = getCollection();
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
 
         query.put("ent", "group");
         query.put("imgrp", "1");
 
-        for (DBObject groupObj : groupsCollection.find(query).skip(startIndex).limit(numResults)) {
+        for (Document groupObj : groupsCollection.find(query).skip(startIndex).limit(numResults)) {
             groupNames.add((String) groupObj.get("uid"));
         }
 
@@ -178,16 +175,16 @@ public class MongoGroupProviderAlt extends AbstractGroupProvider {
     @Override
     public Collection<String> search(String query, int startIndex, int numResults) {
         Set<String> groupNames = new HashSet<String>();
-        DBCollection groupsCollection = getCollection();
+        MongoCollection<Document> groupsCollection = getCollection();
 
         String asPattern = query.replaceAll("\\*", "\\.*");
         Pattern p = Pattern.compile(asPattern);
-        DBObject queryObj = new BasicDBObject();
+        Document queryObj = new Document();
 
         queryObj.put("ent", "group");
         queryObj.put("uid", p);
 
-        for (DBObject groupObj : groupsCollection.find(queryObj).skip(startIndex).limit(numResults)) {
+        for (Document groupObj : groupsCollection.find(queryObj).skip(startIndex).limit(numResults)) {
             groupNames.add((String) groupObj.get("uid"));
         }
 
@@ -197,14 +194,14 @@ public class MongoGroupProviderAlt extends AbstractGroupProvider {
     @Override
     public Collection<String> search(String key, String value) {
         Set<String> groupNames = new HashSet<String>();
-        DBCollection groupsCollection = getCollection();
+        MongoCollection<Document> groupsCollection = getCollection();
 
-        DBObject queryObj = new BasicDBObject();
+        Document queryObj = new Document();
 
         queryObj.put("ent", "group");
         queryObj.put(key, value);
 
-        for (DBObject groupObj : groupsCollection.find(queryObj)) {
+        for (Document groupObj : groupsCollection.find(queryObj)) {
             groupNames.add((String) groupObj.get("uid"));
         }
 
@@ -221,7 +218,7 @@ public class MongoGroupProviderAlt extends AbstractGroupProvider {
         return true;
     }
 
-    private static Group fromDBObject(DBObject groupObj) {
+    private static Group fromDocument(Document groupObj) {
         Group g = null;
 
         if (groupObj != null) {
@@ -232,7 +229,7 @@ public class MongoGroupProviderAlt extends AbstractGroupProvider {
             Collection<JID> administrators = Collections.emptyList();
 
             if (imBotEnabled) {
-                DBObject imBotObj = getImBot(null);
+                Document imBotObj = getImBot(null);
                 if (imBotObj != null) {
                     String imBotName = (String) imBotObj.get(IM_ID);
                     String xmppDomain = XMPPServer.getInstance().getServerInfo().getXMPPDomain();
@@ -242,7 +239,7 @@ public class MongoGroupProviderAlt extends AbstractGroupProvider {
                 }
             }
 
-            log.debug("fromDBObject: for group " + name + " with members " + members);
+            log.debug("fromDocument: for group " + name + " with members " + members);
             g = new Group(name, description, members, administrators);
         }
 
@@ -251,45 +248,45 @@ public class MongoGroupProviderAlt extends AbstractGroupProvider {
 
     private static Collection<JID> getMembers(String groupName) {
         Collection<JID> members = new ArrayList<JID>();
-        DBCollection usersCollection = getCollection();
+        MongoCollection<Document> usersCollection = getCollection();
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
         query.put("ent", "user");
         query.put(IM_ENABLED, true);
         query.put("gr", groupName);
         String domain = XMPPServer.getInstance().getServerInfo().getXMPPDomain();
 
-        for (DBObject userObj : usersCollection.find(query)) {
+        for (Document userObj : usersCollection.find(query)) {
             members.add(new JID((String) userObj.get(IM_ID) + "@" + domain));
         }
 
         return members;
     }
 
-    private static DBObject getImBot(String name) {
-        DBCollection usersCollection = getUsersCollection();
-        DBObject query = new BasicDBObject();
+    private static Document getImBot(String name) {
+        MongoCollection<Document> usersCollection = getUsersCollection();
+        Document query = new Document()
+            .append("ent", "imbotsettings")
+            .append(IM_ENABLED, true);
 
-        query.put("ent", "imbotsettings");
-        query.put(IM_ENABLED, true);
         if (name != null) {
             query.put(IM_ID, name);
         }
 
-        return usersCollection.findOne(query);
+        return usersCollection.find(query).first();
     }
 
     private static boolean isImBot(String name) {
         return getImBot(name) != null;
     }
 
-    private static DBCollection getUsersCollection() {
+    private static MongoCollection<Document> getUsersCollection() {
         // both users and groups are stored together
         return getCollection();
     }
 
-    private static DBCollection getCollection() {
-        DB db = UnfortunateLackOfSpringSupportFactory.getImdb();
+    private static MongoCollection<Document> getCollection() {
+        MongoDatabase db = UnfortunateLackOfSpringSupportFactory.getImdb();
 
         return db.getCollection(COLLECTION_NAME);
     }

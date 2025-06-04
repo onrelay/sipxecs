@@ -17,11 +17,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.device.DeviceVersion;
 import org.sipfoundry.sipxconfig.device.ModelSource;
@@ -31,7 +33,7 @@ import org.sipfoundry.sipxconfig.phone.PhoneModel;
 
 import com.thoughtworks.xstream.XStream;
 
-public class PhonesResource extends Resource {
+public class PhonesResource extends ServerResource {
 
     private static final Log LOG = LogFactory.getLog(PhonesResource.class);
 
@@ -44,8 +46,8 @@ public class PhonesResource extends Resource {
         super.init(context, request, response);
     }
 
-    @Override
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {        
         PrivatePhoneRepresentation representation = new PrivatePhoneRepresentation(entity);
         Collection<PrivatePhone> newEntries = representation.getObject();
 
@@ -61,6 +63,7 @@ public class PhonesResource extends Resource {
                 LOG.error("Failed to add phone - duplicated serial number.", e);
             }
         }
+        return null;
     }
 
     static class PrivatePhone {

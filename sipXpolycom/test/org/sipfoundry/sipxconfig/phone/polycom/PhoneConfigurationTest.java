@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.phone.polycom;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.EasyMock.replay;
 
 import java.io.File;
 import java.io.FileReader;
@@ -26,7 +26,7 @@ import org.dom4j.Document;
 import org.dom4j.dom.DOMDocumentFactory;
 import org.dom4j.dom.DOMElement;
 import org.dom4j.io.SAXReader;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.sipfoundry.sipxconfig.common.SpecialUser.SpecialUserType;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.device.FileSystemProfileLocation;

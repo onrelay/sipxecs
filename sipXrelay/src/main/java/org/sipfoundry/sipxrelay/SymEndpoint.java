@@ -54,7 +54,7 @@ abstract class SymEndpoint implements SymEndpointInterface {
             Map<String,Object> retval = new HashMap<String,Object>();
             retval.put("id", this.getId());
             retval.put("ipAddress", ipAddress);
-            retval.put("port", new Integer(getPort()) );
+            retval.put("port", Integer.valueOf(getPort()) );
             return retval;
 
 

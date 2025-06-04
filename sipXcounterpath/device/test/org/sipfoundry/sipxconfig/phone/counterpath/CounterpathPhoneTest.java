@@ -9,6 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.phone.counterpath;
 
+import org.easymock.EasyMock;
 import static org.easymock.EasyMock.expectLastCall;
 
 import java.util.ArrayList;
@@ -17,7 +18,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
-import org.easymock.EasyMock;
 import org.sipfoundry.sipxconfig.address.Address;
 import org.sipfoundry.sipxconfig.address.AddressManager;
 import org.sipfoundry.sipxconfig.common.User;

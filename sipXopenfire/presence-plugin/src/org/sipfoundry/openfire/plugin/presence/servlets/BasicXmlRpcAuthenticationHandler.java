@@ -58,8 +58,8 @@ public class BasicXmlRpcAuthenticationHandler implements AuthenticationHandler {
     }
 
     @Override
-    public boolean isAuthorized(XmlRpcRequest pRequest) throws XmlRpcException {
-        XmlRpcHttpRequestConfig config = (XmlRpcHttpRequestConfig) pRequest.getConfig();
+    public boolean isAuthorized(XmlRpcRequest request) throws XmlRpcException {
+        XmlRpcHttpRequestConfig config = (XmlRpcHttpRequestConfig) request.getConfig();
         return isAuthenticated(config.getBasicUserName(), config.getBasicPassword());
     }
 

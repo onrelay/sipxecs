@@ -147,7 +147,7 @@ public class SipUtilities {
 
             Address address = ProtocolObjects.addressFactory.createAddress(fromUri);
 
-            String tag = new Long(Math.abs(new java.util.Random().nextLong())).toString();
+            String tag = Long.valueOf(Math.abs(new java.util.Random().nextLong())).toString();
 
             FromHeader fromHeader = ProtocolObjects.headerFactory.createFromHeader(address, tag);
 

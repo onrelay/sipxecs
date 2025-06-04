@@ -50,8 +50,8 @@ public class SymmitronConfig {
 		}
 		String lowBound = ports[0];
 		String highBound = ports[1];
-		this.portRangeLowerBound = new Integer(lowBound).intValue();
-		this.portRangeUpperBound = new Integer(highBound).intValue();
+		this.portRangeLowerBound = Integer.valueOf(lowBound).intValue();
+		this.portRangeUpperBound = Integer.valueOf(highBound).intValue();
 		if (this.portRangeLowerBound >= this.portRangeUpperBound
 				|| this.portRangeLowerBound < 0 || this.portRangeUpperBound < 0) {
 			throw new IllegalArgumentException(

@@ -5,7 +5,6 @@
  */
 package com.pingtel.sipviewer;
 
-import java.applet.Applet;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,9 +14,9 @@ import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
+@SuppressWarnings("removal") // Some applet methods marked for removal here
 public class SIPViewerApplet extends JApplet {
     SIPViewerFrame frame ;
-    
     
     @Override
     public void init() {

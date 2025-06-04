@@ -40,7 +40,6 @@ import org.sipfoundry.sipxconfig.localization.LocalizationContext;
 import org.sipfoundry.sipxconfig.restserver.RestServer;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingUtil;
-import org.springframework.beans.factory.annotation.Required;
 
 public class ImBotConfiguration implements ConfigProvider {
     private ImBot m_imbot;
@@ -108,7 +107,7 @@ public class ImBotConfiguration implements ConfigProvider {
         config.write("imbot.hzEnabled", hzEnabled);
     }
 
-    @Required
+    
     public void setImbot(ImBot imbot) {
         m_imbot = imbot;
     }

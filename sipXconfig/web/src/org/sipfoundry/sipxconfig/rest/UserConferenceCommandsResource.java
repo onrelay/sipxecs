@@ -16,20 +16,20 @@
  */
 package org.sipfoundry.sipxconfig.rest;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.conference.ActiveConferenceContext;
 import org.sipfoundry.sipxconfig.conference.Conference;
 import org.sipfoundry.sipxconfig.conference.ConferenceBridgeContext;
-import org.springframework.beans.factory.annotation.Required;
 
 public class UserConferenceCommandsResource extends UserResource {
     private static final String INVITATION_SENT = "<command-response>Invitation sent</command-response>";
@@ -49,8 +49,8 @@ public class UserConferenceCommandsResource extends UserResource {
         getVariants().add(new Variant(MediaType.TEXT_ALL));
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         Conference conference = m_conferenceBridgeContext.findConferenceByName(m_confName);
         if (conference == null) {
             throw new ResourceException(Status.CLIENT_ERROR_NOT_FOUND, "Conference not found");
@@ -80,12 +80,12 @@ public class UserConferenceCommandsResource extends UserResource {
         return new StringRepresentation(response);
     }
 
-    @Required
+    
     public void setConferenceBridgeContext(ConferenceBridgeContext conferenceBridgeContext) {
         m_conferenceBridgeContext = conferenceBridgeContext;
     }
 
-    @Required
+    
     public void setActiveConferenceContext(ActiveConferenceContext activeConferenceContext) {
         m_activeConferenceContext = activeConferenceContext;
     }

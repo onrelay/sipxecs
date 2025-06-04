@@ -14,19 +14,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.Closure;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.functors.ConstantFactory;
-import org.apache.commons.collections.map.LazyMap;
-import org.apache.commons.collections.map.LinkedMap;
+import org.apache.commons.collections4.Closure;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.FactoryUtils;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.map.LazyMap;
+import org.apache.commons.collections4.map.LinkedMap;
 import org.sipfoundry.sipxconfig.commserver.imdb.RegistrationItem;
 
 /**
  * Metrics about registration distributions
  */
 public class RegistrationMetrics {
-    private Collection m_uniqueRegistrations;
+    private Collection<UniqueRegistrations> m_uniqueRegistrations;
     private long m_startTime;
 
     /**
@@ -34,7 +34,7 @@ public class RegistrationMetrics {
      * registrations from clients that reregister w/slighlty different uri
      * w/o unregistering last uri.
      */
-    public void setRegistrations(List registrations) {
+    public void setRegistrations(List<RegistrationItem> registrations) {
         UniqueRegistrations unique = new UniqueRegistrations();
         CollectionUtils.forAllDo(registrations, unique);
         setUniqueRegistrations(unique.getRegistrations());
@@ -59,11 +59,11 @@ public class RegistrationMetrics {
         return count;
     }
 
-    public Collection getUniqueRegistrations() {
+    public Collection<UniqueRegistrations> getUniqueRegistrations() {
         return m_uniqueRegistrations;
     }
 
-    void setUniqueRegistrations(Collection registrations) {
+    void setUniqueRegistrations(Collection<UniqueRegistrations> registrations) {
         m_uniqueRegistrations = registrations;
     }
 
@@ -71,19 +71,23 @@ public class RegistrationMetrics {
      * Filter out multiple registrations for a single contact
      */
     static class UniqueRegistrations implements Closure {
-        private Map<String, RegistrationItem> m_contact2registration = new LinkedMap();
+        private LinkedMap<String, UniqueRegistrations> m_contact2registration = new LinkedMap<>();
 
-        public Collection getRegistrations() {
+        public Collection<UniqueRegistrations> getRegistrations() {
             return m_contact2registration.values();
+        }
+
+        public Collection<String> getContacts() {
+            return m_contact2registration.keySet();
         }
 
         public void execute(Object input) {
             RegistrationItem ri = (RegistrationItem) input;
             String contact = ri.getContact();
-            RegistrationItem riOld = m_contact2registration.get(contact);
+            UniqueRegistrations riOld = m_contact2registration.get(contact);
             // replace older registrations
             if (riOld == null || ri.compareTo(riOld) > 0) {
-                m_contact2registration.put(contact, ri);
+                m_contact2registration.put(contact, riOld);
             }
         }
     }
@@ -114,8 +118,8 @@ public class RegistrationMetrics {
 
         private long m_total;
 
-        private Map<String, Integer> m_distribution = LazyMap.decorate(
-                new HashMap<String, Integer>(), ConstantFactory.getInstance(0));
+        private Map<String, Integer> m_distribution =
+            LazyMap.lazyMap(new HashMap<>(), FactoryUtils.constantFactory(0));
 
         public int getRegistrationCount(String server) {
             return m_distribution.get(server);

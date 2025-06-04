@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.dom4j.Document;
@@ -195,28 +195,18 @@ public class MappingRulesTest extends XMLTestCase {
 
         IMocksControl control = EasyMock.createNiceControl();
         IDialingRule rule = control.createMock(IDialingRule.class);
-        rule.isInternal();
-        control.andReturn(true);
-        rule.getHostPatterns();
-        control.andReturn(ArrayUtils.EMPTY_STRING_ARRAY);
-        rule.getName();
-        control.andReturn(null);
-        rule.getDescription();
-        control.andReturn("my rule description");
-        rule.getPatterns();
-        control.andReturn(new String[] {
-            "x."
-        }).anyTimes();
-        rule.isTargetPermission();
-        control.andReturn(true);
-        rule.getPermissionNames();
-        control.andReturn(Arrays.asList(new String[] {
-            PermissionName.VOICEMAIL.getName()
-        }));
-        rule.getTransforms();
-        control.andReturn(new Transform[] {
-            voicemail, voicemail2
-        });
+
+        EasyMock.expect(rule.isInternal()).andReturn(true);
+        EasyMock.expect(rule.getHostPatterns()).andReturn(ArrayUtils.EMPTY_STRING_ARRAY);
+        EasyMock.expect(rule.getName()).andReturn(null);
+        EasyMock.expect(rule.getDescription()).andReturn("my rule description");
+        EasyMock.expect(rule.getPatterns()).andReturn(new String[] { "x." }).anyTimes();
+        EasyMock.expect(rule.isTargetPermission()).andReturn(true);
+        EasyMock.expect(rule.getPermissionNames()).andReturn(
+            Arrays.asList(new String[] { PermissionName.VOICEMAIL.getName() })
+        );
+        EasyMock.expect(rule.getTransforms()).andReturn(new Transform[] { voicemail, voicemail2 });
+
         control.replay();
 
         m_out.begin();
@@ -239,12 +229,13 @@ public class MappingRulesTest extends XMLTestCase {
     }
 
     public void testGenerateRuleWithGateways() throws Exception {
+
         IMocksControl control = EasyMock.createControl();
         IDialingRule rule = control.createMock(IDialingRule.class);
-        rule.isInternal();
-        control.andReturn(false);
-        rule.getCallTag();
-        control.andReturn(CallTag.UNK).anyTimes();
+
+        EasyMock.expect(rule.isInternal()).andReturn(false);
+        EasyMock.expect(rule.getCallTag()).andReturn(CallTag.UNK).anyTimes();
+
         control.replay();
 
         m_out.begin();
@@ -365,24 +356,16 @@ public class MappingRulesTest extends XMLTestCase {
     }
 
     public void testHostPatternProvider() throws Exception {
+
         IMocksControl control = EasyMock.createNiceControl();
         IDialingRule rule = control.createMock(IDialingRule.class);
-        rule.isInternal();
-        control.andReturn(true);
-        rule.isTargetPermission();
-        control.andReturn(true);
-        rule.getHostPatterns();
-        control.andReturn(new String[] {
-            "gander"
-        });
-        rule.getPatterns();
-        control.andReturn(new String[] {
-            "dot"
-        });
-        rule.getPermissionNames();
-        control.andReturn(Collections.EMPTY_LIST);
-        rule.getTransforms();
-        control.andReturn(new Transform[0]);
+
+        EasyMock.expect(rule.isInternal()).andReturn(true);
+        EasyMock.expect(rule.isTargetPermission()).andReturn(true);
+        EasyMock.expect(rule.getHostPatterns()).andReturn(new String[] { "gander" });
+        EasyMock.expect(rule.getPatterns()).andReturn(new String[] { "dot" });
+        EasyMock.expect(rule.getPermissionNames()).andReturn(Collections.EMPTY_LIST);
+        EasyMock.expect(rule.getTransforms()).andReturn(new Transform[0]);
 
         control.replay();
 
@@ -403,24 +386,18 @@ public class MappingRulesTest extends XMLTestCase {
     }
 
     public void testGenerateInternalRuleWithSourcePermission() throws Exception {
+
         IMocksControl control = EasyMock.createNiceControl();
         IDialingRule rule = control.createMock(IDialingRule.class);
-        rule.isInternal();
-        control.andReturn(true);
-        rule.getHostPatterns();
-        control.andReturn(ArrayUtils.EMPTY_STRING_ARRAY);
-        rule.getName();
-        control.andReturn(null);
-        rule.getDescription();
-        control.andReturn("my rule description");
-        rule.getPatterns();
-        control.andReturn(new String[] {
-            "xxx"
-        }).anyTimes();
-        rule.isTargetPermission();
-        control.andReturn(false);
-        rule.getTransforms();
-        control.andReturn(new Transform[0]);
+
+        EasyMock.expect(rule.isInternal()).andReturn(true);
+        EasyMock.expect(rule.getHostPatterns()).andReturn(ArrayUtils.EMPTY_STRING_ARRAY);
+        EasyMock.expect(rule.getName()).andReturn(null);
+        EasyMock.expect(rule.getDescription()).andReturn("my rule description");
+        EasyMock.expect(rule.getPatterns()).andReturn(new String[] { "xxx" }).anyTimes();
+        EasyMock.expect(rule.isTargetPermission()).andReturn(false);
+        EasyMock.expect(rule.getTransforms()).andReturn(new Transform[0]);
+
         control.replay();
 
         m_out.begin();

@@ -18,11 +18,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.api.PhoneApi;
 import org.sipfoundry.sipxconfig.api.model.GroupBean;
 import org.sipfoundry.sipxconfig.api.model.GroupList;
@@ -41,7 +41,6 @@ import org.sipfoundry.sipxconfig.phone.PhoneModel;
 import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingDao;
-import org.springframework.beans.factory.annotation.Required;
 
 public class PhoneApiImpl implements PhoneApi {
     private static final String ID = "id";
@@ -396,7 +395,7 @@ public class PhoneApiImpl implements PhoneApi {
         m_settingDao = settingDao;
     }
 
-    @Required
+    
     public void setProfileManager(ProfileManager profileManager) {
         m_profileManager = profileManager;
     }

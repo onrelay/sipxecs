@@ -34,7 +34,6 @@ import org.sipfoundry.sipxconfig.setup.SetupListener;
 import org.sipfoundry.sipxconfig.setup.SetupManager;
 import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class SipxServices implements SetupListener, FeatureListener, ConfigProvider {
     private static final Log LOG = LogFactory.getLog(SipxServices.class);
@@ -82,12 +81,12 @@ public class SipxServices implements SetupListener, FeatureListener, ConfigProvi
         }
     }
 
-    @Required
+    
     public void setConfigManager(ConfigManager configManager) {
         m_configManager = configManager;
     }
 
-    @Required
+    
     public void setSnmpManager(SnmpManager snmpManager) {
         m_snmpManager = snmpManager;
     }

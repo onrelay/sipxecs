@@ -7,14 +7,14 @@ import org.jivesoftware.openfire.provider.UIDProvider;
 import org.junit.After;
 import org.junit.Test;
 
-import com.mongodb.BasicDBObject;
+import org.bson.Document;
 
 @SuppressWarnings("static-method")
 public class UIDProviderTest extends BaseMongoTest {
 
     @After
     public void teardown() {
-        getOpenfireDb().getCollection("ofId").remove(new BasicDBObject());
+        getOpenfireDb().getCollection("ofId").remove(new Document());
     }
 
     @Test

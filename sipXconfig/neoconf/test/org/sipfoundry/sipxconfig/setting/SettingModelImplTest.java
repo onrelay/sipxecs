@@ -26,10 +26,10 @@ public class SettingModelImplTest extends TestCase {
 
         IMocksControl handlerCtrl = EasyMock.createControl();
         SettingValueHandler handler = handlerCtrl.createMock(SettingValueHandler.class);
-        handler.getSettingValue(peewee);
-        handlerCtrl.andReturn(ten);
-        handler.getSettingValue(canyonTowhee);
-        handlerCtrl.andReturn(null);
+
+        EasyMock.expect(handler.getSettingValue(peewee)).andReturn(ten);
+        EasyMock.expect(handler.getSettingValue(canyonTowhee)).andReturn(null);
+
         handlerCtrl.replay();
 
         BeanWithSettings bean = new BirdWithSettings();

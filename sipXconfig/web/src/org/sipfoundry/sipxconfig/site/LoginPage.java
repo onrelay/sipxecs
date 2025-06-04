@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.site;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.PageRedirectException;
 import org.apache.tapestry.annotations.Bean;
 import org.apache.tapestry.annotations.InjectObject;

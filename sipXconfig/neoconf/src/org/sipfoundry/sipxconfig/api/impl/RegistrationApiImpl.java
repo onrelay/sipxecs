@@ -17,10 +17,10 @@ package org.sipfoundry.sipxconfig.api.impl;
 import java.util.Collection;
 import java.util.List;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.sipfoundry.sipxconfig.api.RegistrationApi;
 import org.sipfoundry.sipxconfig.api.model.RegistrationBean.RegistrationList;
 import org.sipfoundry.sipxconfig.common.CoreContext;
@@ -155,7 +155,7 @@ public class RegistrationApiImpl implements RegistrationApi {
         RegistrationMetrics metrics = buildRegistrationMetrics(items, now);
         if (metrics != null) {
             return Response.ok()
-                    .entity(RegistrationList.convertRegistrationList(metrics.getUniqueRegistrations(), now)).build();
+                    .entity(RegistrationList.convertRegistrationList(items, now)).build();
         }
         return Response.status(Status.NOT_FOUND).build();
     }

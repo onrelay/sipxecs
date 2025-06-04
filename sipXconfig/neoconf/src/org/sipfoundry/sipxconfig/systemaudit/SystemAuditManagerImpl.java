@@ -44,7 +44,6 @@ import org.sipfoundry.sipxconfig.setup.SetupManager;
 import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
@@ -160,22 +159,22 @@ public class SystemAuditManagerImpl implements SystemAuditManager, FeatureListen
         }
     }
 
-    @Required
+    
     public void setGeneralAuditHandler(GeneralAuditHandler generalAuditHandler) {
         m_generalAuditHandler = generalAuditHandler;
     }
 
-    @Required
+    
     public void setFeatureAuditHandler(FeatureAuditHandler featureAuditHandler) {
         m_featureAuditHandler = featureAuditHandler;
     }
 
-    @Required
+    
     public void setLoginLogoutAuditHandler(LoginLogoutAuditHandler loginLogoutAuditHandler) {
         m_loginLogoutAuditHandler = loginLogoutAuditHandler;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }

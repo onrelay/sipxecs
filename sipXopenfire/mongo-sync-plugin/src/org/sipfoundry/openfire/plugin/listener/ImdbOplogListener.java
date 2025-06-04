@@ -25,8 +25,9 @@ import org.sipfoundry.openfire.plugin.job.JobFactory;
 import org.sipfoundry.openfire.sync.MongoOperation;
 import org.sipfoundry.openfire.sync.listener.MongoOplogListener;
 
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
+import org.bson.Document;
+import com.mongodb.client.model.Filters;
+import org.bson.conversions.Bson;
 
 public class ImdbOplogListener extends MongoOplogListener<JobFactory> {
     private static final String WATCHED_NAMESPACE = "imdb.entity";
@@ -42,13 +43,13 @@ public class ImdbOplogListener extends MongoOplogListener<JobFactory> {
     }
 
     @Override
-    protected DBObject buildOpLogQuery() {
-        DBObject nsQuery = QueryBuilder.start(NAMESPACE).is(WATCHED_NAMESPACE).get();
-        DBObject ent1Query = QueryBuilder.start(RECORD + "." + ID).in(WATCHED_ENTITIES).get();
-        DBObject ent2Query = QueryBuilder.start(RECORD2 + "." + ID).in(WATCHED_ENTITIES).get();
-        DBObject entQuery = QueryBuilder.start().or(ent1Query, ent2Query).get();
+    protected Bson buildOpLogQuery() {
+        Bson nsQuery = Filters.eq(NAMESPACE, WATCHED_NAMESPACE);
+        Bson ent1Query = Filters.in(RECORD + "." + ID, WATCHED_ENTITIES);
+        Bson ent2Query = Filters.in(RECORD2 + "." + ID, WATCHED_ENTITIES);
+        Bson entQuery = Filters.or(ent1Query, ent2Query);
 
-        return QueryBuilder.start().and(nsQuery, entQuery).get();
+        return Filters.and(nsQuery, entQuery);
     }
 
     @Override

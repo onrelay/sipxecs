@@ -16,13 +16,6 @@ import junit.framework.TestCase;
 
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
-import org.sipfoundry.sipxrelay.SymEndpointImpl;
-import org.sipfoundry.sipxrelay.SymImpl;
-import org.sipfoundry.sipxrelay.SymInterface;
-import org.sipfoundry.sipxrelay.Symmitron;
-import org.sipfoundry.sipxrelay.SymmitronConfig;
-import org.sipfoundry.sipxrelay.SymmitronConfigParser;
-import org.sipfoundry.sipxrelay.SymmitronServer;
 
 public abstract class AbstractSymmitronTestCase extends TestCase {
     protected static String serverAddress;
@@ -84,7 +77,7 @@ public abstract class AbstractSymmitronTestCase extends TestCase {
         int count = 1;
         Object[] args = new Object[3];
         args[0] = clientHandle;
-        args[1] = new Integer(count);
+        args[1] = Integer.valueOf(count);
         args[2] = Symmitron.EVEN;
 
         Map retval = (Map) client.execute("sipXrelay.createSyms", args);
@@ -120,7 +113,7 @@ public abstract class AbstractSymmitronTestCase extends TestCase {
         int count = 1;
         Object[] args = new Object[3];
         args[0] = clientHandle;
-        args[1] = new Integer(count);
+        args[1] = Integer.valueOf(count);
         args[2] = Symmitron.ODD;
 
         Map retval = (Map) client.execute("sipXrelay.createSyms", args);
@@ -136,8 +129,8 @@ public abstract class AbstractSymmitronTestCase extends TestCase {
         params[0] = clientHandle;
         params[1] = sym;
         params[2] = serverAddress;
-        params[3] = new Integer(destinationPort);
-        params[4] = new Integer(500);
+        params[3] = Integer.valueOf(destinationPort);
+        params[4] = Integer.valueOf(500);
         params[5] = "USE-EMPTY-PACKET";
 
         Map retval = (Map) client.execute("sipXrelay.setDestination", params);
@@ -151,8 +144,8 @@ public abstract class AbstractSymmitronTestCase extends TestCase {
         params[0] = clientHandle;
         params[1] = sym;
         params[2] = serverAddress;
-        params[3] = new Integer(destinationPort);
-        params[4] = new Integer(500);
+        params[3] = Integer.valueOf(destinationPort);
+        params[4] = Integer.valueOf(500);
         params[5] = "NONE";
 
         Map retval = (Map) client.execute("sipXrelay.setDestination", params);
@@ -166,8 +159,8 @@ public abstract class AbstractSymmitronTestCase extends TestCase {
         params[0] = clientHandle;
         params[1] = sym;
         params[2] = serverAddress;
-        params[3] = new Integer(destinationPort);
-        params[4] = new Integer(500);
+        params[3] = Integer.valueOf(destinationPort);
+        params[4] = Integer.valueOf(500);
         params[5] = "NONE";
 
         Map retval = (Map) client.execute("sipXrelay.setDestination", params);
@@ -183,8 +176,8 @@ public abstract class AbstractSymmitronTestCase extends TestCase {
         params[1] = sym;
      
         params[2] = clientAddress;
-        params[3] = new Integer(destinationPort);
-        params[4] = new Integer(500);
+        params[3] = Integer.valueOf(destinationPort);
+        params[4] = Integer.valueOf(500);
         params[5] = "NONE";
 
         Map retval = (Map) client.execute("sipXrelay.setDestination", params);
@@ -200,7 +193,7 @@ public abstract class AbstractSymmitronTestCase extends TestCase {
         params[1] = sym;
         params[2] = "";
         params[3] = 0;
-        params[4] = new Integer(500);
+        params[4] = Integer.valueOf(500);
         params[5] = "USE-EMPTY-PACKET";
 
         Map retval = (Map) client.execute("sipXrelay.setDestination", params);

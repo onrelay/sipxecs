@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hivemind.Messages;
 import org.apache.tapestry.BaseComponent;
 import org.apache.tapestry.IMarkupWriter;

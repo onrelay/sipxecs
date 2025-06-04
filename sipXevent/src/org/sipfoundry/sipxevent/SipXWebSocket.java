@@ -16,10 +16,9 @@
  */
 package org.sipfoundry.sipxevent;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.io.Connection;
 import org.sipfoundry.commons.security.MongoUserDetailsService;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -75,17 +74,17 @@ public class SipXWebSocket {
 		return m_connection;
 	}
 
-    @Required
+    
 	public void setRegisteredClients(RegisteredClients registeredClients) {
         m_registeredClients = registeredClients;
     }
 
-    @Required
+    
 	public void setUserDetailsService(MongoUserDetailsService userDetailsService) {
 		m_userDetailsService = userDetailsService;
 	}
 
-	@Required
+	
 	public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
 		m_passwordEncoder = passwordEncoder;
 	}

@@ -26,7 +26,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.cxf.common.jaxb.JAXBUtils.S2JJAXBModel;
 import org.apache.tapestry.annotations.Bean;
 import org.apache.tapestry.annotations.InjectObject;

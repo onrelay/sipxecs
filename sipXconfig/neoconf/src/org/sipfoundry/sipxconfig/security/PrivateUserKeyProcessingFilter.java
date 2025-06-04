@@ -16,19 +16,18 @@ import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.login.PrivateUserKeyManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -98,7 +97,7 @@ public class PrivateUserKeyProcessingFilter implements Filter {
         return result;
     }
 
-    @Required
+    
     public void setPrivateUserKeyManager(PrivateUserKeyManager privateUserKeyManager) {
         m_privateUserKeyManager = privateUserKeyManager;
     }

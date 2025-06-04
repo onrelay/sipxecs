@@ -27,7 +27,6 @@ import org.sipfoundry.sipxconfig.phone.Line;
 import org.sipfoundry.sipxconfig.phone.Phone;
 import org.sipfoundry.sipxconfig.phone.PhoneContext;
 import org.sipfoundry.sipxconfig.vm.MailboxPreferences;
-import org.springframework.beans.factory.annotation.Required;
 
 public class ExportCsv {
     private static final int DEFAULT_PAGE_SIZE = 250;
@@ -36,12 +35,12 @@ public class ExportCsv {
 
     private PhoneContext m_phoneContext;
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setPhoneContext(PhoneContext phoneContext) {
         m_phoneContext = phoneContext;
     }

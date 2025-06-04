@@ -11,10 +11,10 @@ package org.sipfoundry.sipxconfig.phonebook;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.addAll;
-import static org.apache.commons.collections.CollectionUtils.filter;
-import static org.apache.commons.collections.CollectionUtils.find;
-import static org.apache.commons.collections.CollectionUtils.select;
-import static org.apache.commons.lang.StringUtils.join;
+import static org.apache.commons.collections4.CollectionUtils.filter;
+import static org.apache.commons.collections4.CollectionUtils.find;
+import static org.apache.commons.collections4.CollectionUtils.select;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.sipfoundry.sipxconfig.common.DaoUtils.checkDuplicates;
 import static org.sipfoundry.sipxconfig.common.DaoUtils.requireOneOrZero;
 import static org.springframework.dao.support.DataAccessUtils.singleResult;
@@ -43,9 +43,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.CompareToBuilder;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
@@ -81,7 +81,6 @@ import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.common.event.DaoEventListener;
 import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
 import org.sipfoundry.sipxconfig.setting.Group;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -177,7 +176,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     @Override
     public PhonebookEntry findPhonebookEntryByInternalId(String internalId) {
         String query = "phonebookEntryByInternalId";
-        List<PhonebookEntry> entries = getHibernateTemplate().findByNamedQueryAndNamedParam(query,
+        List<PhonebookEntry> entries = (List<PhonebookEntry>)getHibernateTemplate().findByNamedQueryAndNamedParam(query,
                 PARAM_INTERNAL_ID, internalId);
         return requireOneOrZero(entries, query);
     }
@@ -219,22 +218,22 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
         return null;
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setCsvParser(BulkParser csvParser) {
         m_csvParser = csvParser;
     }
 
-    @Required
+    
     public void setVcardParser(BulkParser vcardParser) {
         m_vcardParser = vcardParser;
     }
 
-    @Required
+    
     public void setVcardEncoding(String vcardEncoding) {
         m_vcardEncoding = vcardEncoding;
     }
@@ -249,7 +248,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
         return m_externalUsersDirectory;
     }
 
-    @Required
+    
     public void setExternalUsersDirectory(String externalUsersDirectory) {
         m_externalUsersDirectory = externalUsersDirectory;
     }
@@ -257,13 +256,13 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     @Override
     public Phonebook getPhonebookByName(String name) {
         String query = "phoneBookByName";
-        Collection<Phonebook> books = getHibernateTemplate().findByNamedQueryAndNamedParam(query, NAME, name);
+        Collection<Phonebook> books = (Collection<Phonebook>)getHibernateTemplate().findByNamedQueryAndNamedParam(query, NAME, name);
         return requireOneOrZero(books, query);
     }
 
     @Override
     public Collection<Phonebook> getPublicPhonebooksByUser(User consumer) {
-        Collection<Phonebook> books = getHibernateTemplate().findByNamedQueryAndNamedParam("phoneBooksByUser",
+        Collection<Phonebook> books = (Collection<Phonebook>)getHibernateTemplate().findByNamedQueryAndNamedParam("phoneBooksByUser",
                 PARAM_USER_ID, consumer.getId());
         return books;
     }
@@ -282,7 +281,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     @Override
     public Phonebook getPrivatePhonebook(User user) {
         String query = "privatePhoneBookByUser";
-        List<Phonebook> privateBooks = getHibernateTemplate().findByNamedQueryAndNamedParam(query, PARAM_USER_ID,
+        List<Phonebook> privateBooks = (List<Phonebook>)getHibernateTemplate().findByNamedQueryAndNamedParam(query, PARAM_USER_ID,
                 user.getId());
         return requireOneOrZero(privateBooks, query);
     }
@@ -303,7 +302,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
 
     @Override
     public Collection<PhonebookEntry> getEntries(Collection<Phonebook> phonebooks, User user) {
-        Map<String, PhonebookEntry> entries = new TreeMap();
+        Map<String, PhonebookEntry> entries = new TreeMap<>();
         if (!phonebooks.isEmpty()) {
             for (Phonebook phonebook : phonebooks) {
                 for (PhonebookEntry entry : getEntries(phonebook)) {
@@ -682,7 +681,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
 
     }
 
-    static class PhonebookEntryMaker implements org.apache.commons.collections.Closure {
+    static class PhonebookEntryMaker implements org.apache.commons.collections4.Closure {
         private final Map<String, PhonebookEntry> m_entries;
         private PhonebookFileEntryHelper m_header = new InternalPhonebookVcardHeader();
         private boolean m_extractHeader;
@@ -945,7 +944,6 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void removeTableColumns() {
         try {
             m_jdbcTemplate.execute("alter table phonebook drop column members_csv_filename");
@@ -1060,7 +1058,9 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
         for (FilePhonebookEntry entry : fileEntries) {
             entry.setInternalId(getEntryKey(entry));
         }
-        getHibernateTemplate().saveOrUpdateAll(fileEntries);
+        for (FilePhonebookEntry entry : fileEntries) {
+            getHibernateTemplate().saveOrUpdate(entry);
+        }
     }
 
     @Override
@@ -1098,7 +1098,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
         m_jdbcTemplate = template;
     }
 
-    @Required
+    
     public void setSettingsDao(BeanWithSettingsDao<GeneralPhonebookSettings> settingsDao) {
         m_settingsDao = settingsDao;
     }

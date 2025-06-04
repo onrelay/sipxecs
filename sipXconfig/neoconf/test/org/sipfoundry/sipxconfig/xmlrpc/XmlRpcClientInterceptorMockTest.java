@@ -17,7 +17,7 @@ import org.apache.xmlrpc.XmlRpcClient;
 import org.apache.xmlrpc.XmlRpcClientRequest;
 import org.apache.xmlrpc.XmlRpcException;
 import org.easymock.IMocksControl;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.springframework.aop.framework.ProxyFactory;
 
 public class XmlRpcClientInterceptorMockTest extends TestCase {
@@ -28,10 +28,10 @@ public class XmlRpcClientInterceptorMockTest extends TestCase {
         if (System.getProperty("java.version").startsWith("1.7")) {
             return;
         }
+
         IMocksControl mcClient = EasyMock.createControl();
         XmlRpcClient client = mcClient.createMock(XmlRpcClient.class);
-        client.execute(anyRequest());
-        mcClient.andReturn("xxxxx");
+        EasyMock.expect(client.execute(anyRequest())).andReturn("xxxxx");
         mcClient.replay();
 
         XmlRpcClientInterceptor interceptor = new XmlRpcClientInterceptor();
@@ -53,10 +53,11 @@ public class XmlRpcClientInterceptorMockTest extends TestCase {
         if (System.getProperty("java.version").startsWith("1.7")) {
             return;
         }
-        IMocksControl mcClient = org.easymock.classextension.EasyMock.createControl();
+
+        IMocksControl mcClient = org.easymock.EasyMock.createControl();
         XmlRpcClient client = mcClient.createMock(XmlRpcClient.class);
-        client.execute(anyRequest());
-        mcClient.andThrow(new XmlRpcException(2, "message"));
+        EasyMock.expect(client.execute(anyRequest()))
+                .andThrow(new XmlRpcException(2, "message"));
         mcClient.replay();
 
         XmlRpcClientInterceptor interceptor = new XmlRpcClientInterceptor();
@@ -83,10 +84,11 @@ public class XmlRpcClientInterceptorMockTest extends TestCase {
         if (System.getProperty("java.version").startsWith("1.7")) {
             return;
         }
-        IMocksControl mcClient = org.easymock.classextension.EasyMock.createControl();
+
+        IMocksControl mcClient = org.easymock.EasyMock.createControl();
         XmlRpcClient client = mcClient.createMock(XmlRpcClient.class);
-        client.execute(anyRequest());
-        mcClient.andThrow(new NullPointerException());
+        EasyMock.expect(client.execute(anyRequest()))
+                .andThrow(new NullPointerException());
         mcClient.replay();
 
         XmlRpcClientInterceptor interceptor = new XmlRpcClientInterceptor();
@@ -112,10 +114,10 @@ public class XmlRpcClientInterceptorMockTest extends TestCase {
         if (System.getProperty("java.version").startsWith("1.7")) {
             return;
         }
-        IMocksControl mcClient = org.easymock.classextension.EasyMock.createControl();
+        IMocksControl mcClient = org.easymock.EasyMock.createControl();
         XmlRpcClient client = mcClient.createMock(XmlRpcClient.class);
-        client.execute(anyRequest());
-        mcClient.andThrow(new ConnectException("test"));
+        EasyMock.expect(client.execute(anyRequest()))
+                .andThrow(new ConnectException("test"));
         mcClient.replay();
 
         XmlRpcClientInterceptor interceptor = new XmlRpcClientInterceptor();
@@ -143,11 +145,13 @@ public class XmlRpcClientInterceptorMockTest extends TestCase {
         if (System.getProperty("java.version").startsWith("1.7")) {
             return;
         }
-        IMocksControl mcClient = org.easymock.classextension.EasyMock.createControl();
+        IMocksControl mcClient = org.easymock.EasyMock.createControl();
         XmlRpcClient client = mcClient.createMock(XmlRpcClient.class);
-        client.execute(anyRequest());
-        // sometimes client will return exception instead of throwing it
-        mcClient.andReturn(new XmlRpcException(2, "message"));
+
+        // Expect execute() to be called with any request and return an exception object (not throw it)
+        EasyMock.expect(client.execute(anyRequest()))
+                .andReturn(new XmlRpcException(2, "message"));
+
         mcClient.replay();
 
         XmlRpcClientInterceptor interceptor = new XmlRpcClientInterceptor();

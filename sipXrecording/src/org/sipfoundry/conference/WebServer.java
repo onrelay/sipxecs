@@ -39,7 +39,7 @@ public class WebServer {
      * add a servlet for the Web server to use
      * @param name
      * @param pathSpec
-     * @param servletClass must be of type javax.servlet.Servlet
+     * @param servletClass must be of type jakarta.servlet.Servlet
      */
     private void addServlet(ServletHandler handler, String name, String pathSpec, String servletClass) {
         handler.addServlet(name, pathSpec, servletClass);

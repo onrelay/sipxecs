@@ -41,7 +41,6 @@ import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.WorkingHours;
 import org.sipfoundry.sipxconfig.dialplan.config.XmlFile;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.sipfoundry.sipxconfig.setting.BeanWithSettings;
-import org.springframework.beans.factory.annotation.Required;
 
 public class AutoAttendantXmlConfig {
     // please note: US locale always...
@@ -239,12 +238,12 @@ public class AutoAttendantXmlConfig {
         return SipUri.fix(voiceMail, m_domainManager.getDomainName());
     }
 
-    @Required
+    
     public void setAutoAttendantManager(AutoAttendantManager autoAttendantManager) {
         m_autoAttendantManager = autoAttendantManager;
     }
 
-    @Required
+    
     public void setDialPlanContext(DialPlanContext dialPlanContext) {
         m_dialPlanContext = dialPlanContext;
     }

@@ -16,7 +16,7 @@ package org.sipfoundry.sipxconfig.rest;
 
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,9 +27,9 @@ import junit.framework.TestCase;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.InputRepresentation;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.InputRepresentation;
 import org.restlet.resource.ResourceException;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;

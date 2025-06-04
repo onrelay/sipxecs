@@ -21,7 +21,6 @@ import org.sipfoundry.sipxconfig.phonebook.PhonebookEntry;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.speeddial.SpeedDial;
 import org.sipfoundry.sipxconfig.speeddial.SpeedDialManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class SnomPhone extends Phone {
     public static final String BEAN_ID = "snom";
@@ -31,7 +30,7 @@ public class SnomPhone extends Phone {
     public SnomPhone() {
     }
 
-    @Required
+    
     public void setSpeedDialManager(SpeedDialManager speedDialManager) {
         m_speedDialManager = speedDialManager;
     }

@@ -27,7 +27,6 @@ import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 public class AddressManagerImpl implements AddressManager, BeanFactoryAware {
     public static final AddressType NTP_ADDRESS = new AddressType("ntp", 123);
@@ -95,7 +94,7 @@ public class AddressManagerImpl implements AddressManager, BeanFactoryAware {
         return m_featureManager;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }

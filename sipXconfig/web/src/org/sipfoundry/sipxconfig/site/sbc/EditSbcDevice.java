@@ -8,7 +8,7 @@
  */
 package org.sipfoundry.sipxconfig.site.sbc;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hivemind.util.PropertyUtils;
 import org.apache.tapestry.IPage;
 import org.apache.tapestry.IRequestCycle;

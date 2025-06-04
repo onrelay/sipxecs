@@ -18,9 +18,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,7 +45,6 @@ import org.sipfoundry.sipxconfig.gateway.Gateway.AddressTransport;
 import org.sipfoundry.sipxconfig.gateway.GatewayContext;
 import org.sipfoundry.sipxconfig.gateway.GatewayModel;
 import org.sipfoundry.sipxconfig.setting.Setting;
-import org.springframework.beans.factory.annotation.Required;
 
 public class GatewayApiImpl implements GatewayApi {
 
@@ -358,7 +357,7 @@ public class GatewayApiImpl implements GatewayApi {
         m_modelSource = modelSource;
     }
 
-    @Required
+    
     public void setBranchManager(BranchManager branchManager) {
         m_branchManager = branchManager;
     }

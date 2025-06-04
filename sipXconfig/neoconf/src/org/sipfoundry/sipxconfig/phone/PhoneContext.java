@@ -26,7 +26,7 @@ import org.sipfoundry.sipxconfig.speeddial.SpeedDial;
 /**
  * Context for entire sipXconfig framework. Holder for service layer bean factories.
  */
-public interface PhoneContext extends DataObjectSource {
+public interface PhoneContext extends DataObjectSource<Phone> {
     public static final AlarmDefinition ALARM_PHONE_ADDED = new AlarmDefinition("PHONE_ADDED");
     public static final AlarmDefinition ALARM_PHONE_CHANGED = new AlarmDefinition("PHONE_CHANGED");
     public static final AlarmDefinition ALARM_PHONE_DELETED = new AlarmDefinition("PHONE_DELETED");
@@ -66,8 +66,9 @@ public interface PhoneContext extends DataObjectSource {
 
     Integer getPhoneIdBySerialNumber(String serialNumber);
 
+    @SuppressWarnings("rawtypes")
     @Override
-    Object load(Class c, Serializable id);
+    Phone load(Class c, Serializable id);
 
     void storePhone(Phone phone);
 

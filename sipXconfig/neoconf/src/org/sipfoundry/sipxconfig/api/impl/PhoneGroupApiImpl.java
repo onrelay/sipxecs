@@ -17,9 +17,9 @@ package org.sipfoundry.sipxconfig.api.impl;
 import java.util.Collection;
 import java.util.Collections;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.sipfoundry.sipxconfig.api.PhoneGroupApi;
 import org.sipfoundry.sipxconfig.api.model.GroupBean;
@@ -35,7 +35,6 @@ import org.sipfoundry.sipxconfig.phone.PhoneModel;
 import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingDao;
-import org.springframework.beans.factory.annotation.Required;
 
 public class PhoneGroupApiImpl extends GroupApiImpl  implements PhoneGroupApi {
     private PhoneContext m_phoneContext;
@@ -190,17 +189,17 @@ public class PhoneGroupApiImpl extends GroupApiImpl  implements PhoneGroupApi {
         return Response.status(Status.NOT_FOUND).build();
     }
 
-    @Required
+    
     public void setPhoneContext(PhoneContext phoneContext) {
         m_phoneContext = phoneContext;
     }
 
-    @Required
+    
     public void setSettingDao(SettingDao settingDao) {
         m_settingDao = settingDao;
     }
 
-    @Required
+    
     public void setPhoneModelSource(ModelSource<PhoneModel> phoneModelSource) {
         m_phoneModelSource = phoneModelSource;
     }

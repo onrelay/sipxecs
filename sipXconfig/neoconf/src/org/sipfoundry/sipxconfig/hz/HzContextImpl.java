@@ -26,7 +26,6 @@ import org.sipfoundry.sipxconfig.admin.AdminContext;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.XmlConfigBuilder;
@@ -41,7 +40,7 @@ public class HzContextImpl implements HzContext, BeanFactoryAware {
     private AdminContext m_adminContext;
 
     @Override
-    @Required
+    
     public void setBeanFactory(BeanFactory beanFactory) {
         m_beanFactory = (ListableBeanFactory) beanFactory;
     }

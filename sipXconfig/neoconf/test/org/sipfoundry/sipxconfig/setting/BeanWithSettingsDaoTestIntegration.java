@@ -54,7 +54,7 @@ public class BeanWithSettingsDaoTestIntegration extends IntegrationTestCase {
         BirdSettings settings = new BirdSettings();
         m_dao.upsert(settings);
         flush();
-        db().queryForLong("select 1 from bean_with_settings where bean_id = 'birdSettings'");
+        db().queryForObject("select 1 from bean_with_settings where bean_id = 'birdSettings'", Long.class);
     }
 
     public void testSaveWithSettings() {
@@ -62,7 +62,7 @@ public class BeanWithSettingsDaoTestIntegration extends IntegrationTestCase {
         settings.setSettingValue(PASSENGER_PIGEON, "1");
         m_dao.upsert(settings);
         flush();
-        db().queryForLong("select 1 from setting_value where value = '1' and path = ?", PASSENGER_PIGEON);
+        db().queryForObject("select 1 from setting_value where value = '1' and path = ?", Long.class, PASSENGER_PIGEON);
     }    
 
     public void setBirdSettingsDao(BeanWithSettingsDao<BirdSettings> birdSettingsDao) {

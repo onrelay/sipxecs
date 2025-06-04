@@ -8,8 +8,8 @@
 package org.sipfoundry.sipxconfig.freeswitch.config;
 
 import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
 import java.io.StringWriter;
@@ -161,8 +161,7 @@ public class DefaultContextConfigurationTest {
         List<FreeswitchExtension> extensions = Collections.emptyList();
         IMocksControl mc = EasyMock.createControl();
         FeatureManager mgr = mc.createMock(FeatureManager.class);
-        mgr.getLocationsForEnabledFeature(Ivr.FEATURE);
-        mc.andReturn(null);
+        EasyMock.expect(mgr.getLocationsForEnabledFeature(Ivr.FEATURE)).andReturn(null);
         mc.replay();
         m_configuration.setFeatureManager(mgr);
         m_configuration.write(actual, location, bridge, false, false, false, null, extensions, false, true, null);
@@ -178,8 +177,7 @@ public class DefaultContextConfigurationTest {
         Bridge bridge = new Bridge();
         IMocksControl mc = EasyMock.createControl();
         FeatureManager mgr = mc.createMock(FeatureManager.class);
-        mgr.getLocationsForEnabledFeature(Ivr.FEATURE);
-        mc.andReturn(null);
+        EasyMock.expect(mgr.getLocationsForEnabledFeature(Ivr.FEATURE)).andReturn(null);
         mc.replay();
         m_configuration.setFeatureManager(mgr);
         List<FreeswitchExtension> extensions = getExtensions();
@@ -195,8 +193,7 @@ public class DefaultContextConfigurationTest {
         Location location = TestHelper.createDefaultLocation();
         IMocksControl mc = EasyMock.createControl();
         FeatureManager mgr = mc.createMock(FeatureManager.class);
-        mgr.getLocationsForEnabledFeature(Ivr.FEATURE);
-        mc.andReturn(null);
+        EasyMock.expect(mgr.getLocationsForEnabledFeature(Ivr.FEATURE)).andReturn(null);
         mc.replay();
         m_configuration.setFeatureManager(mgr);
         Bridge bridge = createBridge();
@@ -212,8 +209,7 @@ public class DefaultContextConfigurationTest {
         Location location = TestHelper.createDefaultLocation();
         IMocksControl mc = EasyMock.createControl();
         FeatureManager mgr = mc.createMock(FeatureManager.class);
-        mgr.getLocationsForEnabledFeature(Ivr.FEATURE);
-        mc.andReturn(null);
+        EasyMock.expect(mgr.getLocationsForEnabledFeature(Ivr.FEATURE)).andReturn(null);
         mc.replay();
         m_configuration.setFeatureManager(mgr);
         Bridge bridge = createBridgeWithPrompts();
@@ -229,8 +225,7 @@ public class DefaultContextConfigurationTest {
         Location location = TestHelper.createDefaultLocation();
         IMocksControl mc = EasyMock.createControl();
         FeatureManager mgr = mc.createMock(FeatureManager.class);
-        mgr.getLocationsForEnabledFeature(Ivr.FEATURE);
-        mc.andReturn(null);
+        EasyMock.expect(mgr.getLocationsForEnabledFeature(Ivr.FEATURE)).andReturn(null);
         mc.replay();
         m_configuration.setFeatureManager(mgr);
         Bridge bridge = new Bridge();
@@ -246,8 +241,7 @@ public class DefaultContextConfigurationTest {
         Location location = TestHelper.createDefaultLocation();
         IMocksControl mc = EasyMock.createControl();
         FeatureManager mgr = mc.createMock(FeatureManager.class);
-        mgr.getLocationsForEnabledFeature(Ivr.FEATURE);
-        mc.andReturn(null);
+        EasyMock.expect(mgr.getLocationsForEnabledFeature(Ivr.FEATURE)).andReturn(null);
         mc.replay();
         m_configuration.setFeatureManager(mgr);
         Bridge bridge = new Bridge();
@@ -272,8 +266,7 @@ public class DefaultContextConfigurationTest {
         locations.add(bucharest);
         IMocksControl mc = EasyMock.createControl();
         FeatureManager mgr = mc.createMock(FeatureManager.class);
-        mgr.getLocationsForEnabledFeature(Ivr.FEATURE);
-        mc.andReturn(locations);
+        EasyMock.expect(mgr.getLocationsForEnabledFeature(Ivr.FEATURE)).andReturn(locations);
         mc.replay();
         m_configuration.setFeatureManager(mgr);
         Bridge bridge = new Bridge();
@@ -289,8 +282,7 @@ public class DefaultContextConfigurationTest {
         Location location = TestHelper.createDefaultLocation();
         IMocksControl mc = EasyMock.createControl();
         FeatureManager mgr = mc.createMock(FeatureManager.class);
-        mgr.getLocationsForEnabledFeature(Ivr.FEATURE);
-        mc.andReturn(null);
+        EasyMock.expect(mgr.getLocationsForEnabledFeature(Ivr.FEATURE)).andReturn(null);
         mc.replay();
         m_configuration.setFeatureManager(mgr);
         Bridge bridge = new Bridge();

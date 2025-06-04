@@ -12,26 +12,24 @@ package org.sipfoundry.sipxconfig.update;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.io.IOUtils;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.commserver.LocationsManager;
 import org.sipfoundry.sipxconfig.commserver.SoftwareAdminApi;
 import org.sipfoundry.sipxconfig.xmlrpc.ApiProvider;
-import org.springframework.beans.factory.annotation.Required;
 
-import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang3.StringUtils.split;
 
 /**
  * Implementation of update API based on XML/RPC methods provided by sipXsupervisor
@@ -48,12 +46,12 @@ public class UpdateApiXmlRpc implements UpdateApi {
 
     private ApiProvider<SoftwareAdminApi> m_softwareAdminApiProvider;
 
-    @Required
+    
     public void setLocationsManager(LocationsManager locationsManager) {
         m_locationsManager = locationsManager;
     }
 
-    @Required
+    
     public void setSoftwareAdminApiProvider(ApiProvider<SoftwareAdminApi> softwareAdminApiProvider) {
         m_softwareAdminApiProvider = softwareAdminApiProvider;
     }
@@ -148,35 +146,39 @@ public class UpdateApiXmlRpc implements UpdateApi {
      *
      * FIXME: this method does not belong here, it's a generic utility
      */
-    protected List<String> retrieveRemoteFile(String fileUrl) {
-        InputStream responseStream = null;
-        BufferedReader responseReader = null;
-        List<String> lines = new ArrayList<String>();
-        GetMethod method = new GetMethod(fileUrl);
+
+     protected List<String> retrieveRemoteFile(String fileUrl) {
+        List<String> lines = new ArrayList<>();
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(fileUrl))
+                .GET()
+                .build();
 
         try {
-            HttpClient client = new HttpClient();
-            int statusCode = client.executeMethod(method);
-            if (statusCode != HttpStatus.SC_OK) {
-                LOG.error("HTTP GET failed: " + method.getStatusLine());
+            HttpResponse<java.io.InputStream> response = client.send(
+                    request, HttpResponse.BodyHandlers.ofInputStream());
+
+            if (response.statusCode() != 200) {
+                LOG.error("HTTP GET failed: status code " + response.statusCode());
+                return lines;
             }
-            responseStream = method.getResponseBodyAsStream();
-            responseReader = new BufferedReader(new InputStreamReader(responseStream, method.getResponseCharSet()));
-            String line = null;
-            while ((line = responseReader.readLine()) != null) {
-                lines.add(line);
+
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(response.body()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    lines.add(line);
+                }
             }
-        } catch (HttpException e) {
+        } catch (IOException | InterruptedException e) {
             LOG.error("HTTP error", e);
-        } catch (IOException e) {
-            LOG.error("Connectivity error", e);
-        } finally {
-            IOUtils.closeQuietly(responseReader);
-            IOUtils.closeQuietly(responseStream);
-            method.releaseConnection();
+            Thread.currentThread().interrupt(); // Restore interrupt status if needed
         }
+
         return lines;
     }
+
 
     private SoftwareAdminApi getApi(Location location) {
         return m_softwareAdminApiProvider.getApi(location.getProcessMonitorUrl());

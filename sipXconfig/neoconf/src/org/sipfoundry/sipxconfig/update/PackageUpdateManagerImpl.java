@@ -19,9 +19,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.sipfoundry.sipxconfig.common.UserException;
-import org.springframework.beans.factory.annotation.Required;
 
 public class PackageUpdateManagerImpl implements Serializable, PackageUpdateManager {
     private static final String EXCEPTION_MESSAGE = "&xml.rpc.error.operation";
@@ -153,7 +152,7 @@ public class PackageUpdateManagerImpl implements Serializable, PackageUpdateMana
     }
 
 
-    @Required
+    
     public void setUpdateApi(UpdateApi updateApi) {
         m_updateApi = updateApi;
     }

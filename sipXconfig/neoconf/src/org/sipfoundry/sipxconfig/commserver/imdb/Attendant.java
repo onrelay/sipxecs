@@ -41,18 +41,18 @@ import static org.sipfoundry.commons.mongo.MongoConstants.USERBUSYPROMPT;
 import static org.sipfoundry.commons.mongo.MongoConstants.VMONDND;
 import static org.sipfoundry.commons.mongo.MongoConstants.VOICEMAILTUI;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.common.Replicable;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.im.ImAccount;
 import org.sipfoundry.sipxconfig.vm.MailboxPreferences;
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 public class Attendant extends AbstractDataSetGenerator {
 
     @Override
-    public void generate(Replicable entity, DBObject top) {
+    public void generate(Replicable entity, Document top) {
         if (!(entity instanceof User)) {
             return;
         }

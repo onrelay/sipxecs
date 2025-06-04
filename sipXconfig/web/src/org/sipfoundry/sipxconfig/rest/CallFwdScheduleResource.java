@@ -15,8 +15,8 @@
 package org.sipfoundry.sipxconfig.rest;
 
 import static org.sipfoundry.sipxconfig.rest.JacksonConvert.fromRepresentation;
-import static org.sipfoundry.sipxconfig.rest.JacksonConvert.toRepresentation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,9 +24,13 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Delete;
+import org.restlet.resource.Get;
+import org.restlet.resource.Post;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
 import org.sipfoundry.sipxconfig.common.TimeOfDay;
 import org.sipfoundry.sipxconfig.common.UserException;
@@ -38,40 +42,49 @@ import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
 import org.sipfoundry.sipxconfig.forwarding.Schedule;
 import org.sipfoundry.sipxconfig.forwarding.Schedule.ScheduleException;
 import org.sipfoundry.sipxconfig.forwarding.UserSchedule;
-import org.springframework.beans.factory.annotation.Required;
 
 public class CallFwdScheduleResource extends UserResource {
     private static final Log LOG = LogFactory.getLog(CallFwdScheduleResource.class);
 
+    public static final Status CLIENT_ERROR_UNPROCESSABLE_ENTITY = 
+        new Status(422, 
+            "Unprocessable Entity", 
+            "The server understands the content type and syntax, but it was semantically incorrect.");
+
     private ForwardingContext m_forwardingContext;
 
-    // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        Representation r;
-        Integer id = getIdFromRequest();
-        if (id == null) {
-            List<Schedule> schedules = m_forwardingContext.getAllAvailableSchedulesForUser(getUser());
-            List<ScheduleBean> beans = toScheduleBeanList(schedules);
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {       
+     
+        try {
+            Representation r;
+            Integer id = getIdFromRequest();
+            if (id == null) {
+                List<Schedule> schedules = m_forwardingContext.getAllAvailableSchedulesForUser(getUser());
+                List<ScheduleBean> beans = toScheduleBeanList(schedules);
 
-            LOG.debug("Returning call fwd schedules:\t" + beans);
+                LOG.debug("Returning call fwd schedules:\t" + beans);
 
-            r = toRepresentation(beans);
-        } else {
-            Schedule sch = m_forwardingContext.getScheduleById(id);
-            ScheduleBean bean = toScheduleBean(sch);
+                r = toRepresentation(beans);
+            } else {
+                Schedule sch = m_forwardingContext.getScheduleById(id);
+                ScheduleBean bean = toScheduleBean(sch);
 
-            LOG.debug("Returning call fwd schedule:\t" + bean);
+                LOG.debug("Returning call fwd schedule:\t" + bean);
 
-            r = toRepresentation(bean);
+                r = toRepresentation(bean);
+            }
+
+            return r;
+
+        } catch( IOException ex ) {
+            throw new ResourceException( ex );
         }
-
-        return r;
     }
 
-    // POST
-    @Override
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {        
+        
         ScheduleBean bean = fromRepresentation(entity, ScheduleBean.class);
         LOG.debug("Creating call fwd schedule bean:\t" + bean);
 
@@ -83,14 +96,15 @@ public class CallFwdScheduleResource extends UserResource {
 
         try {
             m_forwardingContext.saveSchedule(sch);
+            return null;
         } catch (UserException e) {
-            throw new ResourceException(Status.CLIENT_ERROR_UNPROCESSABLE_ENTITY, e.getMessage());
+            throw new ResourceException(CLIENT_ERROR_UNPROCESSABLE_ENTITY, e.getMessage());
         }
     }
 
-    // PUT
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {       
+        
         Integer id = getIdFromRequest();
 
         if (id != null) {
@@ -104,16 +118,16 @@ public class CallFwdScheduleResource extends UserResource {
 
             try {
                 m_forwardingContext.saveSchedule(sch);
+                return null;
             } catch (UserException e) {
-                throw new ResourceException(Status.CLIENT_ERROR_UNPROCESSABLE_ENTITY, e.getMessage());
+                throw new ResourceException(CLIENT_ERROR_UNPROCESSABLE_ENTITY, e.getMessage());
             }
         } else {
             throw new ResourceException(Status.CLIENT_ERROR_FORBIDDEN);
         }
     }
 
-    // DELETE
-    @Override
+    @Delete
     public void removeRepresentations() throws ResourceException {
         Integer id = getIdFromRequest();
         if (id != null) {
@@ -156,11 +170,11 @@ public class CallFwdScheduleResource extends UserResource {
         try {
             sch.checkForValidSchedule();
         } catch (ScheduleException e) {
-            throw new ResourceException(Status.CLIENT_ERROR_UNPROCESSABLE_ENTITY);
+            throw new ResourceException(CLIENT_ERROR_UNPROCESSABLE_ENTITY);
         } catch (InvalidPeriodException e) {
-            throw new ResourceException(Status.CLIENT_ERROR_UNPROCESSABLE_ENTITY);
+            throw new ResourceException(CLIENT_ERROR_UNPROCESSABLE_ENTITY);
         } catch (OverlappingPeriodsException e) {
-            throw new ResourceException(Status.CLIENT_ERROR_UNPROCESSABLE_ENTITY);
+            throw new ResourceException(CLIENT_ERROR_UNPROCESSABLE_ENTITY);
         }
     }
 
@@ -179,7 +193,7 @@ public class CallFwdScheduleResource extends UserResource {
         return id;
     }
 
-    @Required
+    
     public void setForwardingContext(ForwardingContext forwardingContext) {
         m_forwardingContext = forwardingContext;
     }

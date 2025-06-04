@@ -17,22 +17,22 @@ package org.sipfoundry.sipxconfig.firewall;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.commons.util.IPAddressUtil;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class CallRateManagerImpl extends SipxHibernateDaoSupport implements CallRateManager {
+public class CallRateManagerImpl extends SipxHibernateDaoSupport<CallRateRule> implements CallRateManager {
     private JdbcTemplate m_jdbc;
 
     @Override
     public List<CallRateRule> getCallRateRules() {
-        return getHibernateTemplate().findByNamedQuery("orderedCallRates");
+        return (List<CallRateRule>)getHibernateTemplate().findByNamedQuery("orderedCallRates");
     }
 
     public Integer countCallRateRules() {
-        return m_jdbc.queryForInt("select max(position) from call_rate_rule");
+        return m_jdbc.queryForObject("select max(position) from call_rate_rule", Integer.class);
     }
 
     @Override

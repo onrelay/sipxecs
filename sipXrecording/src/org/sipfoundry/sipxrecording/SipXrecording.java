@@ -30,7 +30,7 @@ import org.springframework.data.mongodb.core.convert.CustomConversions;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 
 import com.hazelcast.core.Hazelcast;
-import com.mongodb.DBObject;
+import org.bson.Document;
 import com.mongodb.Mongo;
 
 public class SipXrecording implements Runnable {
@@ -101,7 +101,7 @@ public class SipXrecording implements Runnable {
 
     private static void initConferenceService() throws Exception {
         Mongo mongo = MongoFactory.fromConnectionFile();
-        List<Converter<DBObject, Conference>> converters = new ArrayList<Converter<DBObject, Conference>>();
+        List<Converter<Document, Conference>> converters = new ArrayList<Converter<Document, Conference>>();
         ConfReadConverter confReadConverter = new ConfReadConverter();
         converters.add(confReadConverter);
         CustomConversions cc = new CustomConversions(converters);

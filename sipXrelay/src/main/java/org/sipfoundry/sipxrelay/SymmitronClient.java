@@ -171,7 +171,7 @@ public class SymmitronClient {
 		int count = 1;
 		Object[] args = new Object[3];
 		args[0] = clientHandle;
-		args[1] = new Integer(count);
+		args[1] = Integer.valueOf(count);
 		args[2] = Symmitron.EVEN;
 
 		Map retval;
@@ -287,8 +287,8 @@ public class SymmitronClient {
 			params[0] = clientHandle;
 			params[1] = sym.getId();
 			params[2] = ipAddress;
-			params[3] = new Integer(destinationPort);
-			params[4] = new Integer(keepAliveInterval);
+			params[3] = Integer.valueOf(destinationPort);
+			params[4] = Integer.valueOf(keepAliveInterval);
 			params[5] = keepAliveMethod.toString();
 
 			logger.debug(String.format("setRemoteEndpoint " +
@@ -550,7 +550,7 @@ public class SymmitronClient {
 	    Object[] args = new Object[3];
         args[0] = clientHandle;
         args[1] = host;
-        args[2] = new Integer(port);
+        args[2] = Integer.valueOf(port);
         Map retval;
         
         logger.debug("pingAndTest " + host + ":" + port);

@@ -23,7 +23,6 @@ import org.sipfoundry.sipxconfig.job.JobContext;
 import org.sipfoundry.sipxconfig.localization.LanguageUpdatedEvent;
 import org.sipfoundry.sipxconfig.setup.SetupListener;
 import org.sipfoundry.sipxconfig.setup.SetupManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -114,23 +113,23 @@ public class SipxReplicationContextImpl implements ApplicationEventPublisherAwar
         void replicate();
     }
 
-    @Required
+    
     public void setReplicationManager(ReplicationManager replicationManager) {
         m_replicationManager = replicationManager;
     }
 
-    @Required
+    
     public void setJobContext(JobContext jobContext) {
         m_jobContext = jobContext;
     }
 
-    @Required
+    
     public void setLocationsManager(LocationsManager locationsManager) {
         m_locationsManager = locationsManager;
     }
 
     @Override
-    @Required
+    
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
         m_applicationEventPublisher = applicationEventPublisher;
     }

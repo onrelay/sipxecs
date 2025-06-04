@@ -24,7 +24,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 public class UserTestIntegration extends ImdbTestCase {
     private CoreContext m_coreContext;
     private SettingDao m_settingDao;
-    private final Integer userId = new Integer(1000);
+    private final Integer userId = Integer.valueOf(1000);
     private ValidUsers m_validUsers;
 
     @Override
@@ -88,7 +88,7 @@ public class UserTestIntegration extends ImdbTestCase {
         sql("common/TestUserSeed.sql");
         assertEquals(1, getConnection().getRowCount("user_alias", "where user_id = 1000"));
 
-        Integer id = new Integer(1000);
+        Integer id = Integer.valueOf(1000);
         User user = m_coreContext.loadUser(id);
         user.setAliasesString("bongo, kuku");
         m_coreContext.saveUser(user);
@@ -98,41 +98,41 @@ public class UserTestIntegration extends ImdbTestCase {
 
     public void testUserGroups() throws Exception {
         sql("common/UserGroupSeed.sql");
-        User user = m_coreContext.loadUser(new Integer(1001));
-        Set groups = user.getGroups();
+        User user = m_coreContext.loadUser(Integer.valueOf(1001));
+        Set<Group> groups = user.getGroups();
         assertEquals(1, groups.size());
     }
 
     public void testUserSettings() throws Exception {
         sql("common/UserGroupSeed.sql");
-        User user = m_coreContext.loadUser(new Integer(1001));
+        User user = m_coreContext.loadUser(Integer.valueOf(1001));
         Setting settings = user.getSettings();
         assertNotNull(settings);
     }
 
     public void testGroupMembers() throws Exception {
         sql("common/UserGroupSeed.sql");
-        Group group = m_settingDao.getGroup(new Integer(1001));
-        Collection users = m_coreContext.getGroupMembers(group);
+        Group group = m_settingDao.getGroup(Integer.valueOf(1001));
+        Collection<User> users = m_coreContext.getGroupMembers(group);
         assertEquals(1, users.size());
-        User actualUser = m_coreContext.loadUser(new Integer(1001));
+        User actualUser = m_coreContext.loadUser(Integer.valueOf(1001));
         User expectedUser = (User) users.iterator().next();
         assertEquals(actualUser.getDisplayName(), expectedUser.getDisplayName());
     }
 
     public void testGroupMembersNames() throws Exception {
         sql("common/UserGroupSeed.sql");
-        Group group = m_settingDao.getGroup(new Integer(1001));
+        Group group = m_settingDao.getGroup(Integer.valueOf(1001));
         Collection<String> users = m_coreContext.getGroupMembersNames(group);
         assertEquals(1, users.size());
-        User actualUser = m_coreContext.loadUser(new Integer(1001));
+        User actualUser = m_coreContext.loadUser(Integer.valueOf(1001));
         String expected = users.iterator().next();
         assertEquals(actualUser.getUserName(), expected);
     }
 
     public void testDeleteUserGroups() throws Exception {
         sql("common/UserGroupSeed.sql");
-        m_settingDao.deleteGroups(Collections.singletonList(new Integer(1001)));
+        m_settingDao.deleteGroups(Collections.singletonList(Integer.valueOf(1001)));
         // link table references removed
         assertEquals(0, countRowsInTable("user_group"));
     }
@@ -166,7 +166,7 @@ public class UserTestIntegration extends ImdbTestCase {
 
         m_coreContext.saveUser(user);
         flush();
-        assertEquals(1, db().queryForLong("select count(*) from supervisor where user_id = 1001"));
+        assertEquals(Long.valueOf(1), db().queryForObject("select count(*) from supervisor where user_id = 1001", Long.class));
     }
 
     public void testSupervisorSaveNewGroup() throws Exception {

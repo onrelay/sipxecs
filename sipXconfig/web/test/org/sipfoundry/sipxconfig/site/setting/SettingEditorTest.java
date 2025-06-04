@@ -124,10 +124,8 @@ public class SettingEditorTest extends TestCase {
 
         IMocksControl settingCtrl = EasyMock.createControl();
         Setting setting = settingCtrl.createMock(Setting.class);
-        setting.getDefaultValue();
-        settingCtrl.andReturn("bongo");
-        setting.getType();
-        settingCtrl.andReturn(type);
+        EasyMock.expect(setting.getDefaultValue()).andReturn("bongo");
+        EasyMock.expect(setting.getType()).andReturn(type);
         settingCtrl.replay();
 
         m_editor.setSetting(setting);
@@ -143,10 +141,8 @@ public class SettingEditorTest extends TestCase {
 
         IMocksControl settingCtrl = EasyMock.createControl();
         Setting setting = settingCtrl.createMock(Setting.class);
-        setting.getDefaultValue();
-        settingCtrl.andReturn("bongo");
-        setting.getType();
-        settingCtrl.andReturn(type);
+        EasyMock.expect(setting.getDefaultValue()).andReturn("bongo");
+        EasyMock.expect(setting.getType()).andReturn(type);
         settingCtrl.replay();
 
         m_editor.setSetting(setting);
@@ -200,10 +196,8 @@ public class SettingEditorTest extends TestCase {
         IMocksControl settingCtrl = EasyMock.createStrictControl();
         Setting setting = settingCtrl.createMock(Setting.class);
 
-        setting.getType();
-        settingCtrl.andReturn(type);
-        setting.getDefaultValue();
-        settingCtrl.andReturn("bongo");
+        EasyMock.expect(setting.getType()).andReturn(type);
+        EasyMock.expect(setting.getDefaultValue()).andReturn("bongo");
         settingCtrl.replay();
 
         m_editor.setSetting(setting);
@@ -257,10 +251,8 @@ public class SettingEditorTest extends TestCase {
         IMocksControl settingCtrl = EasyMock.createStrictControl();
         Setting setting = settingCtrl.createMock(Setting.class);
 
-        setting.getType();
-        settingCtrl.andReturn(type);
-        setting.getDefaultValue();
-        settingCtrl.andReturn("bongo");
+        EasyMock.expect(setting.getType()).andReturn(type);
+        EasyMock.expect(setting.getDefaultValue()).andReturn("bongo");
         settingCtrl.replay();
 
         m_editor.setSetting(setting);

@@ -5,8 +5,8 @@ import java.net.UnknownHostException;
 import org.sipfoundry.commons.mongo.MongoFactory;
 import org.sipfoundry.commons.userdb.ValidUsers;
 
-import com.mongodb.DB;
-import com.mongodb.Mongo;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
 
 /**
  * Connection factory to mongo.  Need to call this before using
@@ -16,8 +16,8 @@ import com.mongodb.Mongo;
  */
 public class UnfortunateLackOfSpringSupportFactory {
     private static ValidUsers s_validUsers;
-    private static DB s_imdb;
-    private static DB s_openfiredb;
+    private static MongoDatabase s_imdb;
+    private static MongoDatabase s_openfiredb;
 
     public synchronized static void initialize() throws UnknownHostException {
         if (s_validUsers == null) {
@@ -26,10 +26,10 @@ public class UnfortunateLackOfSpringSupportFactory {
             String imdbNs = System.getProperty("mongo_ns", "imdb");
             String openfireNs = System.getProperty("openfire_ns", "openfiredb");
 
-            Mongo mongo = MongoFactory.fromConnectionFile();
+            MongoClient mongoClient = MongoFactory.fromConnectionFile();
             try {
-                s_imdb = mongo.getDB(imdbNs);
-                s_openfiredb = mongo.getDB(openfireNs);
+                s_imdb = mongoClient.getDatabase(imdbNs);
+                s_openfiredb = mongoClient.getDatabase(openfireNs);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -46,12 +46,12 @@ public class UnfortunateLackOfSpringSupportFactory {
         return s_validUsers;
     }
 
-    public static DB getImdb() {
+    public static MongoDatabase getImdb() {
         checkinit();
         return s_imdb;
     }
 
-    public static DB getOpenfiredb() {
+    public static MongoDatabase getOpenfiredb() {
         checkinit();
         return s_openfiredb;
     }
@@ -66,7 +66,6 @@ public class UnfortunateLackOfSpringSupportFactory {
             try {
 				initialize();
 			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         }

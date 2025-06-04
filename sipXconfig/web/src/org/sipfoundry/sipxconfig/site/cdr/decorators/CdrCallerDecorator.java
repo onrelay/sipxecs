@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.site.cdr.decorators;
 
 import java.util.Locale;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hivemind.Messages;
 import org.sipfoundry.sipxconfig.cdr.Cdr;
 

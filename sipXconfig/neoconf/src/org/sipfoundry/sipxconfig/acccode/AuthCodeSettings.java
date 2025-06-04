@@ -16,8 +16,8 @@
  */
 package org.sipfoundry.sipxconfig.acccode;
 
-import static org.apache.commons.lang.StringUtils.split;
-import static org.apache.commons.lang.StringUtils.trim;
+import static org.apache.commons.lang3.StringUtils.split;
+import static org.apache.commons.lang3.StringUtils.trim;
 
 import java.util.ArrayList;
 import java.util.Arrays;

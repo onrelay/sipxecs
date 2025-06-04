@@ -46,7 +46,7 @@
 
    0. The Jetty Package is Copyright (c) Mort Bay Consulting Pty. Ltd.
    (Australia) and others. Individual files in this package may contain
-   additional copyright notices. The javax.servlet packages are copyright
+   additional copyright notices. The jakarta.servlet packages are copyright
    Sun Microsystems Inc.
 
    1. The Standard Version of the Jetty package is available from

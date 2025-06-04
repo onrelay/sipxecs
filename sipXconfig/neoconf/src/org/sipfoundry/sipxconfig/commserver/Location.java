@@ -10,7 +10,7 @@
 package org.sipfoundry.sipxconfig.commserver;
 
 
-import static org.apache.commons.lang.StringUtils.substringBefore;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -21,8 +21,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang.enums.Enum;
 import org.sipfoundry.sipxconfig.address.Address;
 import org.sipfoundry.sipxconfig.address.AddressType;

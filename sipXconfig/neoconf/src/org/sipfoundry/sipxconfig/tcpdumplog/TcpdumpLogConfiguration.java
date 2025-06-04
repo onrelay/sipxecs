@@ -33,7 +33,6 @@ import org.sipfoundry.sipxconfig.cfgmgt.KeyValueConfiguration;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.setting.Setting;
-import org.springframework.beans.factory.annotation.Required;
 
 public class TcpdumpLogConfiguration implements ConfigProvider {
 
@@ -92,7 +91,7 @@ public class TcpdumpLogConfiguration implements ConfigProvider {
         config.writeSettings(root.getSetting("tcpdumpParameters"));
     }
 
-    @Required
+    
     public void setTcpdumpLog(TcpdumpLog tcpdumplog) {
         m_tcpdumplog = tcpdumplog;
     }

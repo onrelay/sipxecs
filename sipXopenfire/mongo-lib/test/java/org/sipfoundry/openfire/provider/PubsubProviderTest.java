@@ -9,7 +9,7 @@ import org.jivesoftware.openfire.pubsub.PubSubService;
 import org.junit.After;
 import org.junit.Test;
 
-import com.mongodb.BasicDBObject;
+import org.bson.Document;
 
 @SuppressWarnings("static-method")
 public class PubsubProviderTest extends BaseMongoTest {
@@ -17,7 +17,7 @@ public class PubsubProviderTest extends BaseMongoTest {
 
     @After
     public void teardown() {
-        getOpenfireDb().getCollection("ofPubsubDefaultConf").remove(new BasicDBObject());
+        getOpenfireDb().getCollection("ofPubsubDefaultConf").remove(new Document());
     }
 
     @Test

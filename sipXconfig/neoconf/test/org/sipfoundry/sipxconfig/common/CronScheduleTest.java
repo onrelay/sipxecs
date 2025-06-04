@@ -13,10 +13,8 @@ import java.util.Calendar;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.lang.time.DateUtils;
-import org.sipfoundry.sipxconfig.common.CronSchedule;
-import org.sipfoundry.sipxconfig.common.ScheduledDay;
-import org.sipfoundry.sipxconfig.common.TimeOfDay;
+import org.apache.commons.lang3.time.DateUtils;
+
 
 public class CronScheduleTest extends TestCase {
 

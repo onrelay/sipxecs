@@ -24,7 +24,6 @@ import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.sipfoundry.sipxconfig.proxy.ProxyManager;
 import org.sipfoundry.sipxconfig.restserver.RestServer;
 import org.sipfoundry.sipxconfig.speeddial.SpeedDial;
-import org.springframework.beans.factory.annotation.Required;
 
 public class SipxOpenfireConfiguration {
     private CoreContext m_coreContext;
@@ -62,7 +61,7 @@ public class SipxOpenfireConfiguration {
         }
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }

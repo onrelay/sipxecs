@@ -21,7 +21,7 @@ import static java.lang.String.format;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.setting.Setting;
 
 /**

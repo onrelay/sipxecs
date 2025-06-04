@@ -3,8 +3,8 @@ sipxzopier_PKGS = \
 	commons-lang \
 	commons-io \
 	commons-logging \ 
-	commons-beanutils \
-	javax.servlet-api \
+	commons-beanutils-core \
+	jakarta.servlet-api \
 	commons-collections \
 	spring-security-config \
 	spring-security-core \
@@ -19,5 +19,6 @@ sipxzopier_PKGS = \
 	velocity \
 	spring-data-commons \
 	spring-data-mongodb \
-	mongo-java-driver \
+	mongodb-driver-sync \
+	bson \
 	dom4j

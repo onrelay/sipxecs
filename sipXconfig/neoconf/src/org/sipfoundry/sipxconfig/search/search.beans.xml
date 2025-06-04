@@ -40,7 +40,7 @@
   </bean>
 
   <bean id="loadIndexingHibernateTemplate"
-    class="org.springframework.orm.hibernate3.HibernateTemplate">
+    class="org.springframework.orm.hibernate5.HibernateTemplate">
     <property name="sessionFactory" ref="sessionFactory"/>
     <property name="entityInterceptor" ref="loadIndexingInterceptor"/>
     <property name="alwaysUseNewSession" value="true"/>

@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.freeswitch.api;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.sipfoundry.sipxconfig.xmlrpc.XmlRpcMarshaller;
 
 /**

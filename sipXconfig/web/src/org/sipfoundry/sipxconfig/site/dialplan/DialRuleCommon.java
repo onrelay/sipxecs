@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.site.dialplan;
 
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.BaseComponent;
 import org.apache.tapestry.IComponent;
 import org.apache.tapestry.callback.ICallback;

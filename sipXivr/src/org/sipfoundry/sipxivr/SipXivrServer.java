@@ -23,7 +23,6 @@ import java.net.Socket;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.sipfoundry.commons.log4j.SipFoundryLayout;
-import org.sipfoundry.voicemail.mailbox.MailboxManager;
 import org.sipfoundry.voicemail.mailbox.MailboxManagerMigrator;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

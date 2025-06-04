@@ -12,7 +12,6 @@ package org.sipfoundry.sipxrelay;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 

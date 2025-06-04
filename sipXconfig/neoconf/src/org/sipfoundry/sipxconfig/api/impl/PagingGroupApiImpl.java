@@ -17,8 +17,8 @@ package org.sipfoundry.sipxconfig.api.impl;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Collections;
 import org.sipfoundry.sipxconfig.api.PagingGroupApi;

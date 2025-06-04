@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.site.setting;
 
-import static org.apache.commons.lang.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 import org.apache.tapestry.BaseComponent;
 import org.apache.tapestry.IBinding;
@@ -48,7 +48,7 @@ public abstract class EditGroupForm extends BaseComponent {
     private void markGroupId(int id) {
         IBinding groupId = getBinding("groupId");
         if (groupId != null) {
-            groupId.setObject(new Integer(id));
+            groupId.setObject(Integer.valueOf(id));
         }
     }
 

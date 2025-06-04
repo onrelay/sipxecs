@@ -3,7 +3,7 @@ cmcprov_PKGS = \
 	commons-lang \
 	commons-io \
 	commons-logging \
-	javax.servlet-api \
+	jakarta.servlet-api \
 	commons-collections \
 	spring-security-config \
 	spring-security-core \

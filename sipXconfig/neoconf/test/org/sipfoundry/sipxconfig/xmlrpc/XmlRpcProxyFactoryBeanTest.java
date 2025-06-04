@@ -11,10 +11,9 @@ package org.sipfoundry.sipxconfig.xmlrpc;
 
 import junit.framework.TestCase;
 
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 public class XmlRpcProxyFactoryBeanTest extends TestCase {
     private Server m_server;
@@ -28,12 +27,11 @@ public class XmlRpcProxyFactoryBeanTest extends TestCase {
     }
 
     public void testProxy() {
-        Resource beans = new ClassPathResource("beans.xml", getClass());
-        BeanFactory beanFactory = new XmlBeanFactory(beans);
+        GenericApplicationContext context = new GenericApplicationContext();
+        new XmlBeanDefinitionReader(context).loadBeanDefinitions(new ClassPathResource("beans.xml", getClass()));
+        context.refresh();
 
-
-        TestFunctions testFunctions = (TestFunctions) beanFactory.getBean("testXmlRpcFunctions");
-
+        TestFunctions testFunctions = context.getBean("testXmlRpcFunctions", TestFunctions.class);
         String result = testFunctions.multiplyTest("ab", 2);
         assertEquals("abab", result);
     }

@@ -14,15 +14,15 @@ import static org.springframework.web.context.support.WebApplicationContextUtils
 import java.io.IOException;
 import java.util.Locale;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.restlet.Router;
+import org.restlet.routing.Router;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sipfoundry.sipxconfig.common.UserException;
@@ -30,8 +30,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 
-import com.noelios.restlet.ext.servlet.ServletConverter;
-
+import org.restlet.ext.servlet.ServletAdapter;
 /**
  * Style II of RESTlet integration where you keep Spring as ApplicationContext and pull in
  * restlets.
@@ -44,7 +43,7 @@ import com.noelios.restlet.ext.servlet.ServletConverter;
 @SuppressWarnings("serial")
 public class RestSpringAdapterServlet extends HttpServlet {
     private static final Log LOG = LogFactory.getLog(RestSpringAdapterServlet.class);
-    private ServletConverter m_converter;
+    private ServletAdapter m_adapter;
     private MessageSource m_messageSource;
 
     @Override
@@ -52,16 +51,16 @@ public class RestSpringAdapterServlet extends HttpServlet {
         super.init();
         final ServletContext servletContext = getServletContext();
         ApplicationContext app = getRequiredWebApplicationContext(servletContext);
-        m_converter = new ServletConverter(servletContext);
+        m_adapter = new ServletAdapter(servletContext);
         Router router = (Router) app.getBean("restletSpringBeanRouter", Router.class);
-        m_converter.setTarget(router);
+        m_adapter.setNext(router);
         m_messageSource = (MessageSource) app.getBean("globalMessageSource");
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         try {
-            m_converter.service(req, res);
+            m_adapter.service(req, res);
         } catch (UserException e) {
             String msg = l8n(e.getMessage(), e.getRawParams(), req.getLocale());
             onError(req, res, Status.CLIENT_ERROR_BAD_REQUEST, e, msg);

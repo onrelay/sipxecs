@@ -71,11 +71,11 @@ public class ProfileContext<T extends Device> {
     /**
      * Velocity macro convenience method. Recursive list of all settings, ignoring groups
      */
-    public Collection getRecursiveSettings(Setting group) {
+    public Collection<Setting> getRecursiveSettings(Setting group) {
         return SettingUtil.filter(RECURSIVE_SETTINGS, group);
     }
 
-    public Collection getSettings(Setting group) {
+    public Collection<Setting> getSettings(Setting group) {
         return SettingUtil.filter(SETTINGS, group);
     }
 

@@ -538,7 +538,7 @@ class SipUtilities {
 				.createAddress(fromUri);
 
 		FromHeader fromHeader = ProtocolObjects.headerFactory.createFromHeader(
-				fromAddress, new Long(Math.abs(new java.util.Random()
+				fromAddress, Long.valueOf(Math.abs(new java.util.Random()
 						.nextLong())).toString());
 
 		Address toAddress = ProtocolObjects.addressFactory.createAddress(toUri);
@@ -664,7 +664,7 @@ class SipUtilities {
 					.createAddress(fromUri);
 
 			FromHeader fromHeader = ProtocolObjects.headerFactory
-					.createFromHeader(fromAddress, new Long(Math
+					.createFromHeader(fromAddress, Long.valueOf(Math
 							.abs(new java.util.Random().nextLong())).toString());
 
 			Address toAddress = ProtocolObjects.addressFactory
@@ -831,9 +831,9 @@ class SipUtilities {
                            fromUser, domain);
            fromHeader = ProtocolObjects.headerFactory.createFromHeader(
                    ProtocolObjects.addressFactory.createAddress(fromUri),
-				   new Long(Math.abs(new java.util.Random().nextLong())).toString());
+				   Long.valueOf(Math.abs(new java.util.Random().nextLong())).toString());
 
-			fromHeader.setTag(new Long(Math.abs(new java.util.Random()
+			fromHeader.setTag(Long.valueOf(Math.abs(new java.util.Random()
 					.nextLong())).toString());
 			if (!domain.equals("anonymous.invalid") && fromDisplayName != null && !fromDisplayName.isEmpty() ) {
 				// Set the from header display name.
@@ -860,7 +860,7 @@ class SipUtilities {
 
 			requestUri.removePort();
 
-			fromHeader.setTag(new Long(Math.abs(new java.util.Random()
+			fromHeader.setTag(Long.valueOf(Math.abs(new java.util.Random()
 					.nextLong())).toString());
 
 			SipURI toUri = ProtocolObjects.addressFactory.createSipURI(toUser,
@@ -1031,7 +1031,7 @@ class SipUtilities {
 				for (Iterator it1 = formats.iterator(); it1.hasNext();) {
 					Object format = it1.next();
 					try{
-						int fmt = new Integer(format.toString());
+						int fmt = Integer.valueOf(format.toString());
 						retval.add(fmt);
 					} catch (NumberFormatException nfex) {
 						logger.warn("Unexpected format:" + format + " - No Need to kill the call", nfex);
@@ -1089,7 +1089,7 @@ class SipUtilities {
 							.getMediaFormats(true);
 					for (Iterator it1 = formats.iterator(); it1.hasNext();) {
 						Object format = it1.next();
-						int fmt = new Integer(format.toString());
+						int fmt = Integer.valueOf(format.toString());
 						if (fmt != 100 && fmt != 101 && fmt != 19) {
 							retval.add(fmt);
 						}
@@ -1298,7 +1298,7 @@ class SipUtilities {
 						
 						Object format = it1.next();
 						try {
-							Integer fmt = new Integer(format.toString());
+							Integer fmt = Integer.valueOf(format.toString());
 							if (filteredCodecs.contains(fmt)) {
 								
 								 if ( logger.isDebugEnabled())   logger.debug("Removing filtered codec from media formats: " + fmt );
@@ -2469,7 +2469,7 @@ class SipUtilities {
 			if (message instanceof Request) {
 				triggeredBy = "request";
 			} else {
-				responseCode = new Integer(((Response) message).getStatusCode())
+				responseCode = Integer.valueOf(((Response) message).getStatusCode())
 						.toString();
 			}
 			return SipUtilities.createReferencesHeader(callId, branchId,

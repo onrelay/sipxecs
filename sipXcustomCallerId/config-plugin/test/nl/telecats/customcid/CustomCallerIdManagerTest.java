@@ -26,9 +26,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.FindIterable;
+import org.bson.Document;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 
@@ -58,9 +58,9 @@ public class CustomCallerIdManagerTest {
     public void testDdiWrite() {
         Collection<CustomCallerAlias> seed = Arrays.asList(new CustomCallerAlias("x", "y"));
         m_ccim.setDdiRewrites(seed);
-        DBCursor csr = getDdiCollection().find();
+        FindIterable<Document> csr = getDdiCollection().find();
         assertEquals(1, csr.count());
-        DBObject actual = (DBObject) csr.next();
+        Document actual = (Document) csr.next();
         assertEquals("x", actual.get("from"));
         assertEquals("y", actual.get("to"));
     }
@@ -73,11 +73,11 @@ public class CustomCallerIdManagerTest {
         assertEquals(expected, actual);
     }
 
-    private DBCollection getDdiCollection() {
+    private MongoCollection<Document> getDdiCollection() {
         return m_db.getDb().getCollection(CustomCallerIdManagerImpl.DDI_COL);
     }
 
-    private DBCollection getDnisCollection() {
+    private MongoCollection<Document> getDnisCollection() {
         return m_db.getDb().getCollection(CustomCallerIdManagerImpl.DNIS_COL);
     }
 }

@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
-import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections4.Transformer;
 
 public interface NamedObject {
     public String getName();

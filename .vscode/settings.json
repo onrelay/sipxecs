@@ -1,3 +1,4 @@
 {
-    "esbonio.sphinx.confDir": ""
+    "esbonio.sphinx.confDir": "",
+    "java.compile.nullAnalysis.mode": "disabled"
 }

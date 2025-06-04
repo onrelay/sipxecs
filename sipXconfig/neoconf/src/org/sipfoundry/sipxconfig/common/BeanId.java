@@ -19,9 +19,9 @@ import java.util.Iterator;
  */
 public class BeanId {
     private Integer m_id;
-    private Class m_beanClass;
+    private Class<?> m_beanClass;
 
-    public BeanId(Integer id, Class beanClass) {
+    public BeanId(Integer id, Class<?> beanClass) {
         m_id = id;
         m_beanClass = beanClass;
     }
@@ -34,13 +34,13 @@ public class BeanId {
      * Given a Collection of IDs and a Java class, create and return a Collection of BeanIds.
      * Throw an exception if any ID is negative (unsaved object) or is not unique.
      */
-    public static Collection createBeanIdCollection(Collection ids, Class beanClass) {
+    public static Collection<BeanId> createBeanIdCollection(Collection<Integer> ids, Class <?>beanClass) {
         if (SipxCollectionUtils.safeIsEmpty(ids)) {
-            return new ArrayList<Integer>();
+            return new ArrayList<BeanId>();
         }
-        Collection bids = new ArrayList(ids.size());
-        Collection idCheck = new ArrayList(ids.size());     // for uniqueness checking
-        for (Iterator iter = ids.iterator(); iter.hasNext();) {
+        Collection<BeanId> bids = new ArrayList<>(ids.size());
+        Collection<Integer> idCheck = new ArrayList<>(ids.size());     // for uniqueness checking
+        for (Iterator<Integer> iter = ids.iterator(); iter.hasNext();) {
             Integer id = (Integer) iter.next();
             if (id == null) {
                 throw new IllegalArgumentException("The ID collection contains a null ID");
@@ -61,10 +61,10 @@ public class BeanId {
         return bids;
     }
 
-    public Class getBeanClass() {
+    public Class<?> getBeanClass() {
         return m_beanClass;
     }
-    public void setBeanClass(Class beanClass) {
+    public void setBeanClass(Class<?> beanClass) {
         m_beanClass = beanClass;
     }
     public Integer getId() {

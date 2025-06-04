@@ -72,30 +72,20 @@ public class AuthRulesTest {
 
         IMocksControl control = EasyMock.createControl();
         IDialingRule rule = control.createMock(IDialingRule.class);
-        rule.getName();
-        control.andReturn("test rule");
-        rule.getDescription();
-        control.andReturn("test rule description");
-        rule.isAuthorizationChecked();
-        control.andReturn(true);
-        rule.isExternalAuthorizationChecked();
-        control.andReturn(false);
-        rule.getRuleType();
-        control.andReturn(null);
-        rule.getTransformedPatterns(gateway);
-        control.andReturn(new String[] {
-            "555", "666", "777"
-        });
-        rule.getPermissionNames();
-        control.andReturn(Arrays.asList(new String[] {
+
+        EasyMock.expect(rule.getName()).andReturn("test rule");
+        EasyMock.expect(rule.getDescription()).andReturn("test rule description");
+        EasyMock.expect(rule.isAuthorizationChecked()).andReturn(true);
+        EasyMock.expect(rule.isExternalAuthorizationChecked()).andReturn(false);
+        EasyMock.expect(rule.getRuleType()).andReturn(null);
+        EasyMock.expect(rule.getTransformedPatterns(gateway)).andReturn(new String[] { "555", "666", "777" });
+        EasyMock.expect(rule.getPermissionNames()).andReturn(Arrays.asList(new String[] {
             PermissionName.VOICEMAIL.getName()
         }));
-        rule.getEnabledGateways();
-        control.andReturn(gateways);
-        rule.getExternalHostname();
-        control.andReturn(null);
-        rule.getExternalPermissionNames();
-        control.andReturn(null);
+        EasyMock.expect(rule.getEnabledGateways()).andReturn(gateways);
+        EasyMock.expect(rule.getExternalHostname()).andReturn(null);
+        EasyMock.expect(rule.getExternalPermissionNames()).andReturn(null);
+
         control.replay();
 
         MockAuthRules authRules = new MockAuthRules();
@@ -126,30 +116,20 @@ public class AuthRulesTest {
 
         IMocksControl control = EasyMock.createControl();
         IDialingRule rule = control.createMock(IDialingRule.class);
-        rule.getName();
-        control.andReturn("test rule");
-        rule.getDescription();
-        control.andReturn("test rule description");
-        rule.isAuthorizationChecked();
-        control.andReturn(true);
-        rule.isExternalAuthorizationChecked();
-        control.andReturn(true);
-        rule.getPermissionNames();
-        control.andReturn(Collections.emptyList());
-        rule.getEnabledGateways();
-        control.andReturn(Collections.EMPTY_LIST);
-        rule.getTransformedPatterns(null);
-        control.andReturn(new String[] {
-            "101"
-        });
-        rule.getExternalHostname();
-        control.andReturn("10.1.2.3:5080");
-        rule.getExternalPermissionNames();
-        control.andReturn(Arrays.asList(new String[] {
+
+        EasyMock.expect(rule.getName()).andReturn("test rule");
+        EasyMock.expect(rule.getDescription()).andReturn("test rule description");
+        EasyMock.expect(rule.isAuthorizationChecked()).andReturn(true);
+        EasyMock.expect(rule.isExternalAuthorizationChecked()).andReturn(true);
+        EasyMock.expect(rule.getPermissionNames()).andReturn(Collections.emptyList());
+        EasyMock.expect(rule.getEnabledGateways()).andReturn(Collections.EMPTY_LIST);
+        EasyMock.expect(rule.getTransformedPatterns(null)).andReturn(new String[] { "101" });
+        EasyMock.expect(rule.getExternalHostname()).andReturn("10.1.2.3:5080");
+        EasyMock.expect(rule.getExternalPermissionNames()).andReturn(Arrays.asList(
             PermissionName.VOICEMAIL.getName()
-        }));
-        rule.isTargetPermission();
-        control.andReturn(false);
+        ));
+        EasyMock.expect(rule.isTargetPermission()).andReturn(false);
+
         control.replay();
 
         MockAuthRules authRules = new MockAuthRules();
@@ -185,33 +165,26 @@ public class AuthRulesTest {
 
         IMocksControl control = EasyMock.createControl();
         IDialingRule rule = control.createMock(IDialingRule.class);
-        rule.isAuthorizationChecked();
-        control.andReturn(true);
-        rule.isExternalAuthorizationChecked();
-        control.andReturn(false);
-        rule.getEnabledGateways();
-        control.andReturn(Arrays.asList(gateways));
-        rule.getName();
-        control.andReturn("testrule").times(gateways.length);
-        rule.getDescription();
-        control.andReturn(null).times(gateways.length);
-        rule.getRuleType();
-        control.andReturn(null).times(gateways.length);
+
+        EasyMock.expect(rule.isAuthorizationChecked()).andReturn(true);
+        EasyMock.expect(rule.isExternalAuthorizationChecked()).andReturn(false);
+        EasyMock.expect(rule.getEnabledGateways()).andReturn(Arrays.asList(gateways));
+        EasyMock.expect(rule.getName()).andReturn("testrule").times(gateways.length);
+        EasyMock.expect(rule.getDescription()).andReturn(null).times(gateways.length);
+        EasyMock.expect(rule.getRuleType()).andReturn(null).times(gateways.length);
+
         for (int i = 0; i < gateways.length; i++) {
-            rule.getTransformedPatterns(gateways[i]);
             String prefix = gateways[i].getPrefix();
-            control.andReturn(new String[] {
-                prefix + "555", prefix + "666", prefix + "777"
-            });
+            EasyMock.expect(rule.getTransformedPatterns(gateways[i]))
+                    .andReturn(new String[] { prefix + "555", prefix + "666", prefix + "777" });
         }
-        rule.getPermissionNames();
-        control.andReturn(Arrays.asList(new String[] {
+
+        EasyMock.expect(rule.getPermissionNames()).andReturn(Arrays.asList(
             PermissionName.VOICEMAIL.getName()
-        }));
-        rule.getExternalHostname();
-        control.andReturn(null);
-        rule.getExternalPermissionNames();
-        control.andReturn(null);
+        ));
+        EasyMock.expect(rule.getExternalHostname()).andReturn(null);
+        EasyMock.expect(rule.getExternalPermissionNames()).andReturn(null);
+
         control.replay();
 
         AuthRules authRules = new AuthRules();
@@ -261,30 +234,23 @@ public class AuthRulesTest {
 
         IMocksControl control = EasyMock.createControl();
         IDialingRule rule = control.createMock(IDialingRule.class);
-        rule.isAuthorizationChecked();
-        control.andReturn(true);
-        rule.isExternalAuthorizationChecked();
-        control.andReturn(false);
-        rule.getName();
-        control.andReturn("testrule").times(gateways.length);
-        rule.getDescription();
-        control.andReturn(null).times(gateways.length);
-        rule.getRuleType();
-        control.andReturn(null).times(gateways.length);
+
+        EasyMock.expect(rule.isAuthorizationChecked()).andReturn(true);
+        EasyMock.expect(rule.isExternalAuthorizationChecked()).andReturn(false);
+        EasyMock.expect(rule.getName()).andReturn("testrule").times(gateways.length);
+        EasyMock.expect(rule.getDescription()).andReturn(null).times(gateways.length);
+        EasyMock.expect(rule.getRuleType()).andReturn(null).times(gateways.length);
+
         for (int i = 0; i < gateways.length; i++) {
-            rule.getTransformedPatterns(gateways[i]);
-            control.andReturn(new String[] {
-                "555", "666", "777"
-            });
+            EasyMock.expect(rule.getTransformedPatterns(gateways[i]))
+                    .andReturn(new String[] { "555", "666", "777" });
         }
-        rule.getPermissionNames();
-        control.andReturn(Arrays.asList(new String[] {}));
-        rule.getEnabledGateways();
-        control.andReturn(Arrays.asList(gateways));
-        rule.getExternalHostname();
-        control.andReturn(null);
-        rule.getExternalPermissionNames();
-        control.andReturn(null);
+
+        EasyMock.expect(rule.getPermissionNames()).andReturn(Collections.emptyList());
+        EasyMock.expect(rule.getEnabledGateways()).andReturn(Arrays.asList(gateways));
+        EasyMock.expect(rule.getExternalHostname()).andReturn(null);
+        EasyMock.expect(rule.getExternalPermissionNames()).andReturn(null);
+
         control.replay();
 
         MockAuthRules authRules = new MockAuthRules();
@@ -322,30 +288,23 @@ public class AuthRulesTest {
 
         IMocksControl control = EasyMock.createControl();
         IDialingRule rule = control.createMock(IDialingRule.class);
-        rule.isAuthorizationChecked();
-        control.andReturn(true);
-        rule.isExternalAuthorizationChecked();
-        control.andReturn(false);
-        rule.getName();
-        control.andReturn("test emerg rule").times(gateways.length);
-        rule.getDescription();
-        control.andReturn("test emerg rule description").times(gateways.length);
-        rule.getRuleType();
-        control.andReturn("Emergency").times(gateways.length);
+
+        EasyMock.expect(rule.isAuthorizationChecked()).andReturn(true);
+        EasyMock.expect(rule.isExternalAuthorizationChecked()).andReturn(false);
+        EasyMock.expect(rule.getName()).andReturn("test emerg rule").times(gateways.length);
+        EasyMock.expect(rule.getDescription()).andReturn("test emerg rule description").times(gateways.length);
+        EasyMock.expect(rule.getRuleType()).andReturn("Emergency").times(gateways.length);
+
         for (int i = 0; i < gateways.length; i++) {
-            rule.getTransformedPatterns(gateways[i]);
-            control.andReturn(new String[] {
-                "911", "9911", "sos"
-            });
+            EasyMock.expect(rule.getTransformedPatterns(gateways[i]))
+                    .andReturn(new String[] { "911", "9911", "sos" });
         }
-        rule.getPermissionNames();
-        control.andReturn(Arrays.asList(new String[] {}));
-        rule.getEnabledGateways();
-        control.andReturn(Arrays.asList(gateways));
-        rule.getExternalHostname();
-        control.andReturn(null);
-        rule.getExternalPermissionNames();
-        control.andReturn(null);
+
+        EasyMock.expect(rule.getPermissionNames()).andReturn(Collections.emptyList());
+        EasyMock.expect(rule.getEnabledGateways()).andReturn(Arrays.asList(gateways));
+        EasyMock.expect(rule.getExternalHostname()).andReturn(null);
+        EasyMock.expect(rule.getExternalPermissionNames()).andReturn(null);
+
         control.replay();
 
         MockAuthRules authRules = new MockAuthRules();

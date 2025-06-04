@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.sipfoundry.sipxconfig.address.Address;
 import org.sipfoundry.sipxconfig.address.AddressManager;
 import org.sipfoundry.sipxconfig.address.AddressProvider;
@@ -58,7 +58,6 @@ import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
 import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class IvrImpl implements FeatureProvider, AddressProvider, Ivr, ProcessProvider, DnsProvider,
         FirewallProvider, ArchiveProvider {
@@ -288,7 +287,7 @@ public class IvrImpl implements FeatureProvider, AddressProvider, Ivr, ProcessPr
         return Collections.singleton(def);
     }
 
-    @Required
+    
     public void setSipxReplicationContext(SipxReplicationContext replicationContext) {
         m_sipxReplicationContext = replicationContext;
     }

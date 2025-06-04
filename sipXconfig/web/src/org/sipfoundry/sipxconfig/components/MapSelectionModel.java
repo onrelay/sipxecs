@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.components;
 
 import java.util.Map;
 
-import org.apache.commons.collections.map.LinkedMap;
+import org.apache.commons.collections4.map.LinkedMap;
 import org.apache.tapestry.form.IPropertySelectionModel;
 
 /**

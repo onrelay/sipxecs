@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.site.user;
 import java.text.MessageFormat;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hivemind.util.PropertyUtils;
 import org.apache.tapestry.BaseComponent;
 import org.apache.tapestry.IComponent;

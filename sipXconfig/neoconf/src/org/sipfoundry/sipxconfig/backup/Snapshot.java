@@ -29,7 +29,6 @@ import org.sipfoundry.sipxconfig.cfgmgt.ConfigManager;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.commserver.LocationsManager;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Interface to command line sipx-snapshot utility
@@ -65,7 +64,7 @@ public class Snapshot {
 
     private ConfigCommands m_configCommands;
 
-    @Required
+    
     public void setLocationsManager(LocationsManager locationsManager) {
         m_locationsManager = locationsManager;
     }
@@ -74,7 +73,7 @@ public class Snapshot {
         return m_destDirectory;
     }
 
-    @Required
+    
     public void setConfigCommands(ConfigCommands configCommands) {
         m_configCommands = configCommands;
     }

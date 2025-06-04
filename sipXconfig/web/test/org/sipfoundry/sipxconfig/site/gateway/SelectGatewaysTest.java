@@ -56,10 +56,8 @@ public class SelectGatewaysTest extends TestCase {
         IMocksControl contextControl = EasyMock.createStrictControl();
         GatewayContext context = contextControl.createMock(GatewayContext.class);
 
-        dialPlanContext.getRule(rule.getId());
-        dialPlanContextControl.andReturn(rule);
-        context.getGatewayByIds(gatewaysToAdd);
-        contextControl.andReturn(gateways);
+        EasyMock.expect(dialPlanContext.getRule(rule.getId())).andReturn(rule);
+        EasyMock.expect(context.getGatewayByIds(gatewaysToAdd)).andReturn(gateways);
         dialPlanContext.storeRule(rule);
         dialPlanContextControl.replay();
         contextControl.replay();

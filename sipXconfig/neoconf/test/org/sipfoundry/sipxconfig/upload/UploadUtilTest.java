@@ -53,14 +53,12 @@ public class UploadUtilTest extends TestCase {
 
         IMocksControl uploadTypesControl = EasyMock.createControl();
         ModelSource<UploadSpecification> uploadTypes = uploadTypesControl.createMock(ModelSource.class);
-        uploadTypes.getModel("upload-id");
-        uploadTypesControl.andReturn(spec);
+        EasyMock.expect(uploadTypes.getModel("upload-id")).andReturn(spec);
         uploadTypesControl.replay();
 
         IMocksControl uploadManagerControl = EasyMock.createControl();
         UploadManager uploadManager = uploadManagerControl.createMock(UploadManager.class);
-        uploadManager.newUpload(spec);
-        uploadManagerControl.andReturn(upload);
+        EasyMock.expect(uploadManager.newUpload(spec)).andReturn(upload);
         uploadManager.saveUpload(upload);
         uploadManagerControl.replay();
 

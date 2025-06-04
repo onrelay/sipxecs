@@ -16,7 +16,7 @@ package org.sipfoundry.sipxconfig.test;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;

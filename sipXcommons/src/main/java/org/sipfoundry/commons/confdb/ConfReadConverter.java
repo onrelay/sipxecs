@@ -27,11 +27,11 @@ import static org.sipfoundry.commons.mongo.MongoConstants.CONF_URI;
 import org.sipfoundry.commons.mongo.MongoConstants;
 import org.springframework.core.convert.converter.Converter;
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
-public class ConfReadConverter implements Converter<DBObject, Conference> {
+public class ConfReadConverter implements Converter<Document, Conference> {
     @Override
-    public Conference convert(DBObject source) {
+    public Conference convert(Document source) {
         Conference conf = new Conference();
         conf.setId((String) source.get(MongoConstants.ID));
         conf.setConfName((String) source.get(CONF_NAME));

@@ -9,9 +9,9 @@
  */
 package org.sipfoundry.sipxconfig.bulk.csv;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.sipfoundry.commons.security.Util.isHashed;
 
 import java.util.ArrayList;
@@ -19,8 +19,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.commons.security.Md5Encoder;
 import org.sipfoundry.sipxconfig.bulk.RowInserter;
 import org.sipfoundry.sipxconfig.common.CoreContext;
@@ -40,7 +40,6 @@ import org.sipfoundry.sipxconfig.setting.SettingDao;
 import org.sipfoundry.sipxconfig.setting.type.SipUriSetting;
 import org.sipfoundry.sipxconfig.vm.MailboxManager;
 import org.sipfoundry.sipxconfig.vm.MailboxPreferences;
-import org.springframework.beans.factory.annotation.Required;
 
 public class CsvRowInserter extends RowInserter<String[]> {
 
@@ -58,32 +57,32 @@ public class CsvRowInserter extends RowInserter<String[]> {
 
     private MailboxManager m_mailboxManager;
 
-    @Required
+    
     public void setMailboxManager(MailboxManager mailboxManager) {
         m_mailboxManager = mailboxManager;
     }
 
-    @Required
+    
     public void setPhoneModelSource(ModelSource<PhoneModel> modelSource) {
         m_modelSource = modelSource;
     }
 
-    @Required
+    
     public void setConferenceBridgeContext(ConferenceBridgeContext conferenceBridgeContext) {
         m_conferenceBridgeContext = conferenceBridgeContext;
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setForwardingContext(ForwardingContext forwardingContext) {
         m_forwardingContext = forwardingContext;
     }
 
-    @Required
+    
     public void setPhoneContext(PhoneContext phoneContext) {
         m_phoneContext = phoneContext;
     }

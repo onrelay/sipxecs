@@ -9,40 +9,54 @@
  */
 package org.sipfoundry.sipxconfig.search;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 
 public class IndexManagerImpl extends HibernateDaoSupport implements IndexManager {
     private static final Log LOG = LogFactory.getLog(IndexManagerImpl.class);
 
     private Indexer m_indexer;
-
     private BeanAdaptor m_beanAdaptor;
+    private Class<?>[] m_indexedClasses;
 
-    private Class[] m_indexedClasses;
+    private SessionFactory sessionFactory;
 
     /**
      * Loads all entities to be indexed.
      */
     public void indexAll() {
+        Session session = null;
         try {
-            LOG.info("creating database index...");
+            LOG.info("Creating database index...");
             m_indexer.open();
-            // load all classes that need to be indexed
+    
+            session = getSessionFactory().openSession();
+    
             for (int i = 0; i < m_indexedClasses.length; i++) {
-                m_beanAdaptor.setIndexedClasses(new Class[] {
-                    m_indexedClasses[i]
-                });
-                getHibernateTemplate().loadAll(m_indexedClasses[i]);
+                Class<?> clazz = m_indexedClasses[i];
+                m_beanAdaptor.setIndexedClasses(new Class[] { clazz });
+    
+                @SuppressWarnings("unused")
+                List<?> entities = session.createQuery("from " + clazz.getName()).list();
+    
+                // if the indexer or bean adaptor needs to process the list, pass it here
             }
+        } catch (Exception e) {
+            LOG.error("Error during indexing", e);
         } finally {
             m_indexer.close();
-            LOG.info("index created");
+            if (session != null) {
+                session.close();
+            }
+            LOG.info("Index created");
         }
     }
+    
 
     public void setIndexer(Indexer indexer) {
         m_indexer = indexer;
@@ -54,16 +68,5 @@ public class IndexManagerImpl extends HibernateDaoSupport implements IndexManage
     public void setBeanAdaptor(BeanAdaptor beanAdaptor) {
         m_beanAdaptor = beanAdaptor;
         m_indexedClasses = m_beanAdaptor.getIndexedClasses();
-    }
-
-    /**
-     * Make sure that we always create a new session.
-     *
-     * We need to use our entity interceptor for indexing to work.
-     */
-    protected HibernateTemplate createHibernateTemplate(SessionFactory sessionFactory) {
-        HibernateTemplate hibernate = super.createHibernateTemplate(sessionFactory);
-        hibernate.setAlwaysUseNewSession(true);
-        return hibernate;
     }
 }

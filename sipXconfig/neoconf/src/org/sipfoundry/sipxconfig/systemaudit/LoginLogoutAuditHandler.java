@@ -17,7 +17,7 @@
 
 package org.sipfoundry.sipxconfig.systemaudit;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.sipfoundry.sipxconfig.common.User;

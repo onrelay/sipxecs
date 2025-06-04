@@ -22,16 +22,17 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
 
-public class DnsDefaultPreviewApi extends Resource {
+public class DnsDefaultPreviewApi extends ServerResource {
     private DnsPreview m_dnsPreview;
     private DnsManager m_dnsManager;
     private final ObjectMapper m_jsonMapper = new ObjectMapper();
@@ -42,14 +43,10 @@ public class DnsDefaultPreviewApi extends Resource {
         getVariants().add(new Variant(APPLICATION_JSON));
     }
 
-    @Override
-    public boolean allowPost() {
-        return true;
-    };
 
     // POST
-    @Override
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {        
         DnsView view = m_dnsManager.getDefaultView();
         try {
             //parse request to get the custom records
@@ -62,7 +59,7 @@ public class DnsDefaultPreviewApi extends Resource {
         } catch (IOException e) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage());
         }
-        getResponse().setEntity(new StringRepresentation(m_dnsPreview.getZone(view, DnsPreview.Show.ALL)));
+        return new StringRepresentation(m_dnsPreview.getZone(view, DnsPreview.Show.ALL));
     }
 
     public void setDnsPreview(DnsPreview dnsPreview) {

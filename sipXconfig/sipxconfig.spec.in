@@ -13,7 +13,7 @@ Url:      http://www.sipfoundry.org/
 %define debug_package %{nil}
 
 BuildRequires: automake
-BuildRequires: java-1.8.0-openjdk-devel
+BuildRequires: java-17-openjdk-devel
 
 BuildRequires: cronie
 BuildRequires: shadow-utils
@@ -255,8 +255,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %dir %attr(755,sipx,sipx) %{_localstatedir}/sipxdata/cfdata
 %{_localstatedir}/sipxdata/cfdata/defaults/*.cfdat
-%dir %attr(775,sipx,sipx) %{_localstatedir}/sipxdata/reports
-%config(noreplace) %{_localstatedir}/sipxdata/reports/*
 %dir %attr(775,sipx,sipx) %{_localstatedir}/sipxdata/upload
 %dir %attr(775,sipx,sipx) %{_localstatedir}/sipxdata/backup
 %dir %attr(775,sipx,sipx) %{_localstatedir}/sipxdata/configserver/web-cert

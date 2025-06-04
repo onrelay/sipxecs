@@ -25,16 +25,15 @@ import java.util.List;
 import java.util.Set;
 
 import javax.activation.DataHandler;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.converters.DateConverter;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -58,7 +57,6 @@ import org.sipfoundry.sipxconfig.phone.PhoneContext;
 import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingDao;
-import org.springframework.beans.factory.annotation.Required;
 
 public class UserApiImpl implements UserApi {
     private static final String COMMA = ",";
@@ -146,7 +144,7 @@ public class UserApiImpl implements UserApi {
             users = m_coreContext.loadUsers();
         }
         if (email != null) {
-            users = (List<User>) CollectionUtils.select(users, new org.apache.commons.collections.Predicate() {
+            users = (List<User>) CollectionUtils.select(users, new org.apache.commons.collections4.Predicate() {
                 public boolean evaluate(Object userObject) {
                     User validUser = (User) userObject;
                     return (StringUtils.contains(validUser.getEmailAddress(), email)
@@ -160,7 +158,7 @@ public class UserApiImpl implements UserApi {
     
 	@Override
 	public Response getUsersInGroup(String groupName, Integer startId, Integer pageSize, final String email) {
-        List<User> users = new ArrayList();
+        List<User> users = new ArrayList<>();
         if (groupName != null) {
         	Group group = m_coreContext.getGroupByName(groupName, false);
         	if (group != null) {
@@ -170,10 +168,10 @@ public class UserApiImpl implements UserApi {
         				users.add(m_coreContext.loadUser(userId));
         			}
         		} else {
-        			users = new ArrayList(m_coreContext.getGroupMembers(group));
+        			users = new ArrayList<>(m_coreContext.getGroupMembers(group));
         		}
         		if (email != null) {
-        			users = (List<User>) CollectionUtils.select(users, new org.apache.commons.collections.Predicate() {
+        			users = (List<User>) CollectionUtils.select(users, new org.apache.commons.collections4.Predicate() {
         				public boolean evaluate(Object userObject) {
         					User validUser = (User) userObject;
         					return (StringUtils.contains(validUser.getEmailAddress(), email)
@@ -374,17 +372,17 @@ public class UserApiImpl implements UserApi {
         return Response.status(Status.NOT_FOUND).build();
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
     
-    @Required
+    
     public void setPermissionManager(PermissionManager permissionManager) {
 		m_permissionManager = permissionManager;
 	}
 
-	@Required
+	
     public void setSettingDao(SettingDao settingDao) {
         m_settingDao = settingDao;
     }
@@ -393,7 +391,7 @@ public class UserApiImpl implements UserApi {
         m_branchManager = branchManager;
     }
 
-    @Required
+    
     public void setPhoneContext(PhoneContext phoneContext) {
         m_phoneContext = phoneContext;
     }

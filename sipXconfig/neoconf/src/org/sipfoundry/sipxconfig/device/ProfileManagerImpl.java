@@ -18,7 +18,6 @@ import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.job.JobContext;
 import org.sipfoundry.sipxconfig.systemaudit.ConfigChangeAction;
 import org.sipfoundry.sipxconfig.systemaudit.SystemAuditManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class ProfileManagerImpl implements ProfileManager {
     private static final Log LOG = LogFactory.getLog(ProfileManagerImpl.class);
@@ -75,22 +74,22 @@ public class ProfileManagerImpl implements ProfileManager {
         }
     }
 
-    @Required
+    
     public void setJobContext(JobContext jobContext) {
         m_jobContext = jobContext;
     }
 
-    @Required
+    
     public void setRestartManager(RestartManager restartManager) {
         m_restartManager = restartManager;
     }
 
-    @Required
+    
     public void setDeviceSource(DeviceSource deviceSource) {
         m_deviceSource = deviceSource;
     }
 
-    @Required
+    
     public void setSystemAuditManager(SystemAuditManager systemAuditManager) {
         m_systemAuditManager = systemAuditManager;
     }

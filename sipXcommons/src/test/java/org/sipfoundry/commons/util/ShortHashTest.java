@@ -5,12 +5,7 @@
  */
 package org.sipfoundry.commons.util;
 
-import java.util.Arrays;
-import java.util.List;
-
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Basic test of the ShortHash class.

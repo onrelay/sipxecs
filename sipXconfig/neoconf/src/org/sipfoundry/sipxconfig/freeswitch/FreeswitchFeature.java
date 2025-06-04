@@ -46,7 +46,6 @@ import org.sipfoundry.sipxconfig.proxy.ProxyManager;
 import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class FreeswitchFeature implements FeatureProvider, AddressProvider, ProcessProvider, FirewallProvider {
     public static final LocationFeature FEATURE = new LocationFeature("freeSwitch");
@@ -162,7 +161,7 @@ public class FreeswitchFeature implements FeatureProvider, AddressProvider, Proc
     public void featureChangePostcommit(FeatureManager manager, FeatureChangeRequest request) {
     }
 
-    @Required
+    
     public void setSipxReplicationContext(SipxReplicationContext sipxReplicationContext) {
         m_sipxReplicationContext = sipxReplicationContext;
     }

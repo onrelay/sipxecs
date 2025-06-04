@@ -28,23 +28,26 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Get;
+import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.commserver.LocationsManager;
 import org.sipfoundry.sipxconfig.region.Region;
 import org.sipfoundry.sipxconfig.region.RegionManager;
 
-import com.mongodb.util.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class MongoLocalApi extends Resource {
+public class MongoLocalApi extends ServerResource {
     private MongoManager m_mongoManager;
     private RegionManager m_regionManager;
     private LocationsManager m_locationsManager;
@@ -56,23 +59,13 @@ public class MongoLocalApi extends Resource {
         getVariants().add(new Variant(APPLICATION_JSON));
     }
 
-    @Override
-    public boolean allowGet() {
-        return true;
-    }
 
-    @Override
-    public boolean allowPost() {
-        return true;
-    }
-
-    // POST
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {
         String json;
         try {
             json = IOUtils.toString(entity.getStream());
-            @SuppressWarnings("unchecked")
-            Map<String, Object> form = (Map<String, Object>) JSON.parse(json);
+            Map<String, Object> form = new ObjectMapper().readValue(json, Map.class);
             String action = (String) form.get("action");
             String hostPort = (String) form.get("server");
             String fqdn = MongoNode.fqdn(hostPort);
@@ -105,6 +98,9 @@ public class MongoLocalApi extends Resource {
                     m_globalApi.takeAction(rsMgr, meta, action, hostPort);
                 }
             }
+            return null;
+        } catch (JsonProcessingException ex) {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, ex.getMessage());
         } catch (IOException e) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage());
         } catch (UserException ex) {
@@ -112,57 +108,60 @@ public class MongoLocalApi extends Resource {
         }
     };
 
-    // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        Map<String, Object> meta = new HashMap<String, Object>();
-        getResponse().setStatus(Status.SUCCESS_OK);
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        Map<String, Object> meta = new HashMap<String, Object>();
+       
+        try {
+            getResponse().setStatus(Status.SUCCESS_OK);
 
-        Collection<Location> locations = m_mongoManager.getConfigManager().getRegisteredLocations(
-                m_locationsManager.getLocationsList());
-        Collection<Location> locals = m_mongoManager.getFeatureManager().getLocationsForEnabledFeature(
-                MongoManager.LOCAL_FEATURE);
-        Collection<Location> localArbs = m_mongoManager.getFeatureManager().getLocationsForEnabledFeature(
-                MongoManager.LOCAL_ARBITER_FEATURE);
+            Collection<Location> locations = m_mongoManager.getConfigManager().getRegisteredLocations(
+                    m_locationsManager.getLocationsList());
+            Collection<Location> locals = m_mongoManager.getFeatureManager().getLocationsForEnabledFeature(
+                    MongoManager.LOCAL_FEATURE);
+            Collection<Location> localArbs = m_mongoManager.getFeatureManager().getLocationsForEnabledFeature(
+                    MongoManager.LOCAL_ARBITER_FEATURE);
 
-        List<String> candidateDbs = new ArrayList<String>();
-        List<String> candidateArbs = new ArrayList<String>();
-        for (Location location : locations) {
-            // Make strict requirement to define a region for any location otherwise
-            // logic gets messy w/o region object
-            if (location.getRegionId() != null) {
-                if (!locals.contains(location)) {
-                    candidateDbs.add(location.getFqdn() + ':' + MongoSettings.LOCAL_PORT);
-                }
-                if (!localArbs.contains(location)) {
-                    candidateArbs.add(location.getFqdn() + ':' + MongoSettings.LOCAL_ARBITER_PORT);
+            List<String> candidateDbs = new ArrayList<String>();
+            List<String> candidateArbs = new ArrayList<String>();
+            for (Location location : locations) {
+                // Make strict requirement to define a region for any location otherwise
+                // logic gets messy w/o region object
+                if (location.getRegionId() != null) {
+                    if (!locals.contains(location)) {
+                        candidateDbs.add(location.getFqdn() + ':' + MongoSettings.LOCAL_PORT);
+                    }
+                    if (!localArbs.contains(location)) {
+                        candidateArbs.add(location.getFqdn() + ':' + MongoSettings.LOCAL_ARBITER_PORT);
+                    }
                 }
             }
-        }
-        Collections.sort(candidateDbs);
-        meta.put("dbCandidates", candidateDbs);
-        meta.put("arbiterCandidates", candidateArbs);
+            Collections.sort(candidateDbs);
+            meta.put("dbCandidates", candidateDbs);
+            meta.put("arbiterCandidates", candidateArbs);
 
-        List<Map<String, Object>> shards = new ArrayList<Map<String, Object>>();
-        Set<Location> localsAndArbs = new HashSet<Location>();
-        localsAndArbs.addAll(locals);
-        localsAndArbs.addAll(localArbs);
-        boolean inProgress = false;
-        Map<Integer, List<Location>> regionLocations = Region.locationsByRegion(localsAndArbs);
-        for (Region region : m_regionManager.getRegions()) {
-            List<Location> miniCluster = regionLocations.get(region.getId());
-            if (miniCluster != null && miniCluster.size() > 0) {
-                MongoReplSetManager rsMgr = m_mongoManager.getShardManager(region);
-                Map<String, Object> localMeta = m_globalApi.metaMap(rsMgr, rsMgr.getMeta(), miniCluster);
-                inProgress = inProgress | rsMgr.isInProgress();
-                shards.add(localMeta);
+            List<Map<String, Object>> shards = new ArrayList<Map<String, Object>>();
+            Set<Location> localsAndArbs = new HashSet<Location>();
+            localsAndArbs.addAll(locals);
+            localsAndArbs.addAll(localArbs);
+            boolean inProgress = false;
+            Map<Integer, List<Location>> regionLocations = Region.locationsByRegion(localsAndArbs);
+            for (Region region : m_regionManager.getRegions()) {
+                List<Location> miniCluster = regionLocations.get(region.getId());
+                if (miniCluster != null && miniCluster.size() > 0) {
+                    MongoReplSetManager rsMgr = m_mongoManager.getShardManager(region);
+                    Map<String, Object> localMeta = m_globalApi.metaMap(rsMgr, rsMgr.getMeta(), miniCluster);
+                    inProgress = inProgress | rsMgr.isInProgress();
+                    shards.add(localMeta);
+                }
             }
-        }
-        meta.put("shards", shards);
-        meta.put("inProgress", inProgress);
+            meta.put("shards", shards);
+            meta.put("inProgress", inProgress);
 
-        String json = JSON.serialize(meta);
-        return new StringRepresentation(json);
+            String json = new ObjectMapper().writeValueAsString(meta);        
+            return new StringRepresentation(json);
+        } catch( JsonProcessingException ex ) {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, ex.getMessage());
+        }
     }
 
     public void setMongoManager(MongoManager mongoManager) {

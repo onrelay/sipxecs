@@ -5,9 +5,6 @@
  */
 package com.pingtel.sipviewer;
 
-import javax.swing.* ;
-import javax.swing.table.* ;
-import javax.swing.border.* ;
 import java.awt.* ;
 import java.awt.event.* ;
 import java.util.* ;

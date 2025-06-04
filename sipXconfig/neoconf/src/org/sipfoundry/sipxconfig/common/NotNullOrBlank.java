@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Example.PropertySelector;
 import org.hibernate.type.Type;
 

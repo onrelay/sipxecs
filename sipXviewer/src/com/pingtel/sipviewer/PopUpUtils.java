@@ -31,7 +31,6 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 import javax.swing.filechooser.FileNameExtensionFilter;
 

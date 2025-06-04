@@ -3,7 +3,7 @@ package org.sipfoundry.commons.extendedcdr;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-public class VideoStatistics implements Comparable {
+public class VideoStatistics implements Comparable<String> {
 	@Field("TimeStampUtc")	
 	private String m_timeStampUtc;	
 	
@@ -60,7 +60,7 @@ public class VideoStatistics implements Comparable {
 	}
 	
 	@Override
-	public int compareTo(Object arg0) {		
+	public int compareTo(String arg0) {		
 		return m_timeStampUtc.compareTo((String)arg0);
 	}	
 }

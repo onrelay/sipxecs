@@ -18,7 +18,7 @@ import org.sipfoundry.sipxconfig.common.ReplicableProvider;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.feature.GlobalFeature;
 
-public interface DialPlanContext extends DataObjectSource, AliasOwner, ReplicableProvider {
+public interface DialPlanContext extends DataObjectSource<DialingRule>, AliasOwner, ReplicableProvider {
     public static GlobalFeature FEATURE = new GlobalFeature("dialPlans");
 
     String CONTEXT_BEAN_NAME = "dialPlanContext";
@@ -75,7 +75,7 @@ public interface DialPlanContext extends DataObjectSource, AliasOwner, Replicabl
 
     void setOperator(AutoAttendant attendant);
     
-    public Collection getInternalRulesWithVoiceMailExtension(String extension);
+    public Collection<InternalRule> getInternalRulesWithVoiceMailExtension(String extension);
     
-    public Collection getAttendantRulesWithExtensionOrDid(String extension);
+    public Collection<AttendantRule> getAttendantRulesWithExtensionOrDid(String extension);
 }

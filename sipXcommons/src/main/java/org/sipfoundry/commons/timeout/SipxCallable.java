@@ -26,7 +26,6 @@ public class SipxCallable implements Callable<Object>{
     }
     @Override
     public Result call() throws Exception {
-        // TODO Auto-generated method stub
         return m_timeout.timeoutMethod();
     }
 

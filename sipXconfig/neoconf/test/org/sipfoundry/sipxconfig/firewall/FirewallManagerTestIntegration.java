@@ -38,7 +38,8 @@ public class FirewallManagerTestIntegration extends IntegrationTestCase {
         boolean def = rule.isPriority();
         rule.setPriority(!def);
         m_firewallManager.saveRules(rules);
-        db().queryForInt("select 1 from firewall_rule where prioritize = true and address_type = ?",
+        db().queryForObject("select 1 from firewall_rule where prioritize = true and address_type = ?",
+                Integer.class,
                 rule.getAddressType().getId());
         
         List<EditableFirewallRule> saved = m_firewallManager.getEditableFirewallRules();
@@ -51,11 +52,11 @@ public class FirewallManagerTestIntegration extends IntegrationTestCase {
         String servers = "1.1.1.1/32";
         g.setServerList(servers);
         m_firewallManager.saveServerGroup(g);
-        int id = db().queryForInt("select firewall_server_group_id from firewall_server_group where servers = ?", servers);
+        int id = db().queryForObject("select firewall_server_group_id from firewall_server_group where servers = ?", Integer.class, servers);
         g = m_firewallManager.getServerGroup(id);
         g.setName("test2");
         m_firewallManager.saveServerGroup(g);
-        int id2 = db().queryForInt("select firewall_server_group_id from firewall_server_group where name = 'test2'");
+        int id2 = db().queryForObject("select firewall_server_group_id from firewall_server_group where name = 'test2'", Integer.class);
         assertEquals(id, id2);
     }
 

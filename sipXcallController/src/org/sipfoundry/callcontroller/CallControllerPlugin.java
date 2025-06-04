@@ -5,12 +5,11 @@
  */
 package org.sipfoundry.callcontroller;
 
-import org.apache.log4j.Logger;
 import org.restlet.Context;
-import org.restlet.Filter;
-import org.restlet.Route;
-import org.restlet.Router;
-import org.restlet.data.Request;
+import org.restlet.routing.Filter;
+import org.restlet.routing.Route;
+import org.restlet.routing.Router;
+import org.restlet.Request;
 import org.sipfoundry.sipxrest.Plugin;
 
 
@@ -23,15 +22,15 @@ public class CallControllerPlugin extends Plugin {
         filter.setNext(new CallControllerRestlet(context));
         String suffix = String.format("/{%s}/{%s}", CallControllerParams.CALLING_PARTY, CallControllerParams.CALLED_PARTY);
         Route route = router.attach(this.getMetaInf().getUriPrefix() + suffix,filter);
-        route.extractQuery(CallControllerParams.AGENT,CallControllerParams.AGENT,true);
-        route.extractQuery(CallControllerParams.FORWARDING_ALLOWED, CallControllerParams.FORWARDING_ALLOWED, true);
-        route.extractQuery(CallControllerParams.SUBJECT, CallControllerParams.SUBJECT, true);
-        route.extractQuery(CallControllerParams.TIMEOUT, CallControllerParams.TIMEOUT, true);
-        route.extractQuery(CallControllerParams.CONFERENCE_PIN, CallControllerParams.CONFERENCE_PIN, true);
-        route.extractQuery(CallControllerParams.RESULTCACHETIME, CallControllerParams.RESULTCACHETIME, true );
-        route.extractQuery(CallControllerParams.METHOD, CallControllerParams.METHOD, true);
-        route.extractQuery(CallControllerParams.ACTION,CallControllerParams.ACTION,true);
-        route.extractQuery(CallControllerParams.TARGET, CallControllerParams.TARGET, true);
+        extractQuery(route,CallControllerParams.AGENT,CallControllerParams.AGENT,true);
+        extractQuery(route,CallControllerParams.FORWARDING_ALLOWED, CallControllerParams.FORWARDING_ALLOWED, true);
+        extractQuery(route,CallControllerParams.SUBJECT, CallControllerParams.SUBJECT, true);
+        extractQuery(route,CallControllerParams.TIMEOUT, CallControllerParams.TIMEOUT, true);
+        extractQuery(route,CallControllerParams.CONFERENCE_PIN, CallControllerParams.CONFERENCE_PIN, true);
+        extractQuery(route,CallControllerParams.RESULTCACHETIME, CallControllerParams.RESULTCACHETIME, true );
+        extractQuery(route,CallControllerParams.METHOD, CallControllerParams.METHOD, true);
+        extractQuery(route,CallControllerParams.ACTION,CallControllerParams.ACTION,true);
+        extractQuery(route,CallControllerParams.TARGET, CallControllerParams.TARGET, true);
     }
 
     @Override

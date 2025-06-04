@@ -209,7 +209,6 @@ public class ChartBody extends JComponent implements Scrollable, ActionListener
 
             if (rectAreaArrow.width < 0)
             {
-                int oldX = rectAreaArrow.x;
                 rectAreaArrow.x = rectAreaArrow.x + rectAreaArrow.width;
                 rectAreaArrow.width = rectAreaArrow.width * -1;
 
@@ -413,8 +412,6 @@ public class ChartBody extends JComponent implements Scrollable, ActionListener
         // Draw vertical lines
         if ((dimRowSize.width > 0) && (iNumKeys > 0))
         {
-            int iOffset = dimSize.width / iNumKeys;
-
             for (int i = 0; i < iNumKeys; i++)
             {
                 // if there are no messages "attached" to a column

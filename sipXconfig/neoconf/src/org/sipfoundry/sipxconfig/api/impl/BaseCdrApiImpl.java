@@ -25,19 +25,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.StreamingOutput;
 
-import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.api.BaseCdrApi;
@@ -50,7 +52,6 @@ import org.sipfoundry.sipxconfig.cdr.CdrSettings;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.setting.PersistableSettings;
-import org.springframework.ui.jasperreports.JasperReportsUtils;
 
 public class BaseCdrApiImpl extends BaseServiceApiImpl implements BaseCdrApi {
     private static final Log LOG = LogFactory.getLog(BaseCdrApiImpl.class);
@@ -73,8 +74,14 @@ public class BaseCdrApiImpl extends BaseServiceApiImpl implements BaseCdrApi {
 
     @Override
     public Response getActiveCdrs(HttpServletRequest request) {
-        return Response.ok().entity(CdrList.convertCdrList(m_cdrManager.getActiveCalls(), request.getLocale()))
-                .build();
+
+        try {
+            return Response.ok().entity(CdrList.convertCdrList(m_cdrManager.getActiveCalls(), request.getLocale()))
+                    .build();
+
+        } catch (Exception ex) {
+            return Response.status(Status.NO_CONTENT).build();
+        } 
     }
 
     @Override
@@ -93,9 +100,9 @@ public class BaseCdrApiImpl extends BaseServiceApiImpl implements BaseCdrApi {
             try {
                 List<Cdr> cdrs = m_cdrManager.getActiveCallsREST(user);
                 return Response.ok().entity(CdrList.convertCdrList(cdrs, request.getLocale())).build();
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 return Response.serverError().entity(userId).build();
-            }
+            } 
         }
         return Response.status(Status.NOT_FOUND).build();
     }
@@ -158,24 +165,31 @@ public class BaseCdrApiImpl extends BaseServiceApiImpl implements BaseCdrApi {
             @Override
             public void write(OutputStream os) throws IOException, WebApplicationException {
                 try {
-                    JasperReport report = (JasperReport) JRLoader.loadObject(new File(getPath(),
-                            "cdr-table-report.jasper"));
-                    JRDataSource source = JasperReportsUtils.convertReportData(cdrList.getCdrs());
-                    Map<String, Object> parameters = new HashMap<String, Object>();
+                    JasperReport report = (JasperReport) JRLoader.loadObject(new File(getPath(), "cdr-table-report.jasper"));
+
+                    // Replaces: JasperReportsUtils.convertReportData(...)
+                    JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(cdrList.getCdrs());
+
+                    Map<String, Object> parameters = new HashMap<>();
                     parameters.put("name", "CDR Table Report");
                     parameters.put("start", dateFormat.format(fromDate));
                     parameters.put("end", dateFormat.format(toDate));
-                    JasperReportsUtils.renderAsPdf(report, parameters, source, os);
+
+                    // Replaces: JasperReportsUtils.renderAsPdf(...)
+                    JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataSource);
+                    JasperExportManager.exportReportToPdfStream(jasperPrint, os);
+
                 } catch (JRException ex) {
-                    LOG.error("Failed to generate report " + ex.getMessage());
-                    throw new WebApplicationException(Response.serverError().entity("Failed to gerenate report")
-                            .build());
+                    LOG.error("Failed to generate report", ex);
+                    throw new WebApplicationException(
+                        Response.serverError().entity("Failed to generate report").build()
+                    );
                 }
             }
         };
-        ResponseBuilder responseBuilder = Response.ok(stream, "application/pdf");
-        responseBuilder.header(ResponseUtils.CONTENT_DISPOSITION, "attachment; filename=cdr-table-report.pdf");
-        return responseBuilder.build();
+        return Response.ok(stream, "application/pdf")
+                .header(ResponseUtils.CONTENT_DISPOSITION, "attachment; filename=cdr-table-report.pdf")
+                .build();
     }
 
     protected User getUserByIdOrUserName(String id) {

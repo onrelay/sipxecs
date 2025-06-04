@@ -49,7 +49,6 @@ import org.sipfoundry.sipxconfig.setting.Group;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 public abstract class AbstractMusicOnHoldManagerImpl implements MusicOnHoldManager, DaoEventListener,
         BeanFactoryAware, FeatureProvider {
@@ -118,7 +117,7 @@ public abstract class AbstractMusicOnHoldManagerImpl implements MusicOnHoldManag
     public void onSave(Object entity) {
     }
 
-    @Required
+    
     public void setAudioDirectory(String audioDirectory) {
         m_audioDirectory = audioDirectory;
     }

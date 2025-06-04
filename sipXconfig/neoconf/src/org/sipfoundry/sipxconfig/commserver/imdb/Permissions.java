@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.commserver.imdb;
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 import org.sipfoundry.sipxconfig.callgroup.CallGroup;
 import org.sipfoundry.sipxconfig.common.BeanWithUserPermissions;
@@ -62,7 +62,7 @@ public class Permissions extends AbstractDataSetGenerator {
     }
 
     @Override
-    public void generate(Replicable entity, DBObject top) {
+    public void generate(Replicable entity, Document top) {
         if (entity instanceof User) {
             User user = (User) entity;
             insertDbObject(user, top);
@@ -93,7 +93,7 @@ public class Permissions extends AbstractDataSetGenerator {
         }
     }
 
-    private static void insertDbObject(User user, DBObject top) {
+    private static void insertDbObject(User user, Document top) {
         top.put(PERMISSIONS, user.getPermissions());
     }
 

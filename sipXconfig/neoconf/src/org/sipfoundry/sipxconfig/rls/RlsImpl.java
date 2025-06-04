@@ -45,7 +45,6 @@ import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
 import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class RlsImpl implements AddressProvider, FeatureProvider, Rls, ProcessProvider, FirewallProvider {
     private static final Collection<AddressType> ADDRESSES = Arrays.asList(UDP_SIP, TCP_SIP);
@@ -136,7 +135,7 @@ public class RlsImpl implements AddressProvider, FeatureProvider, Rls, ProcessPr
         }
     }
 
-    @Required
+    
     public void setConfigManager(ConfigManager configManager) {
         m_configManager = configManager;
     }

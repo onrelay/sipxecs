@@ -21,10 +21,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+import org.bson.Document;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.common.Replicable;
 import org.sipfoundry.sipxconfig.common.SipUri;
 import org.sipfoundry.sipxconfig.common.SpecialUser;
@@ -61,15 +60,15 @@ public class SpeedDials extends AbstractDataSetGenerator {
     }
 
     @Override
-    public void generate(Replicable entity, DBObject top) {
+    public void generate(Replicable entity, Document top) {
         if (entity instanceof User) {
             User user = (User) entity;
-            DBObject speedDialDBO = new BasicDBObject();
+            Document speedDialDBO = new Document();
             SpeedDial speedDial = m_speedDialManager.getSpeedDialForUser(user, false);
             if (speedDial != null) {
                 speedDialDBO.put(USER, speedDial.getResourceListId(false));
                 speedDialDBO.put(USER_CONS, speedDial.getResourceListId(true));
-                List<DBObject> buttonsList = new ArrayList<DBObject>();
+                List<Document> buttonsList = new ArrayList<Document>();
                 List<Button> buttons = speedDial.getButtons();
                 for (Button button : buttons) {
                     //do not allow presence subscriptions to self
@@ -77,7 +76,7 @@ public class SpeedDials extends AbstractDataSetGenerator {
                             && user.equals(button.getNumber()))) {
                         continue;
                     }
-                    DBObject buttonDBO = new BasicDBObject();
+                    Document buttonDBO = new Document();
                     buttonDBO.put(URI, buildUri(button.getNumber(), getSipDomain()));
                     String name = StringUtils.defaultIfEmpty(button.getLabel(), button.getNumber());
                     buttonDBO.put(NAME, name);
@@ -88,15 +87,15 @@ public class SpeedDials extends AbstractDataSetGenerator {
                 }
                 top.put(SPEEDDIAL, speedDialDBO);
             } else {
-                top.removeField(SPEEDDIAL);
+                top.remove(SPEEDDIAL);
             }
         } else if (entity instanceof SpecialUser) {
             SpecialUser u = (SpecialUser) entity;
             if (u.getUserName().equals(SpecialUserType.XMPP_SERVER.getUserName())) {
-                DBObject speedDialDBO = new BasicDBObject();
+                Document speedDialDBO = new Document();
                 speedDialDBO.put(USER, SpeedDial.getResourceListId(u.getUserName(), false));
                 speedDialDBO.put(USER_CONS, SpeedDial.getResourceListId(u.getUserName(), true));
-                final List<DBObject> buttonsList = new ArrayList<DBObject>();
+                final List<Document> buttonsList = new ArrayList<Document>();
                 m_jdbcTemplate.query(QUERY, new RowCallbackHandler() {
 
                     @Override
@@ -104,7 +103,7 @@ public class SpeedDials extends AbstractDataSetGenerator {
                         if (StringUtils.isNotBlank(rs.getString(IM_ENABLED))
                                 && rs.getString(IM_ENABLED).equals("1") || rs.getInt("group_im_enabled") >= 1) {
                             String userName = rs.getString("user_name");
-                            DBObject buttonDBO = new BasicDBObject();
+                            Document buttonDBO = new Document();
                             buttonDBO.put(URI, buildUri(userName, getSipDomain()));
                             buttonDBO.put(NAME, userName);
                             buttonsList.add(buttonDBO);

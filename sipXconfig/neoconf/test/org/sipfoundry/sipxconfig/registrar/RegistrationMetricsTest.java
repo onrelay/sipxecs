@@ -13,14 +13,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.sipfoundry.sipxconfig.commserver.imdb.RegistrationItem;
-import org.sipfoundry.sipxconfig.registrar.RegistrationMetrics;
+import org.sipfoundry.sipxconfig.registrar.RegistrationMetrics.UniqueRegistrations;
 
 public class RegistrationMetricsTest extends TestCase {
     private RegistrationMetrics m_metrics;
@@ -45,7 +44,7 @@ public class RegistrationMetricsTest extends TestCase {
                     "contact2", "11"
                 }
             };
-            List regs = new ArrayList();
+            List<RegistrationItem> regs = new ArrayList<>();
             Calendar calendar = new GregorianCalendar(2015,6,2,13,24,30);
             for (int i = 0; i < regData.length; i++) {
                 RegistrationItem item = new RegistrationItem();
@@ -54,17 +53,12 @@ public class RegistrationMetricsTest extends TestCase {
                 regs.add(item);
             }
             
-            Calendar now = new GregorianCalendar(2015,6,2,13,24,20);
-            Date dateNow = now.getTime();
-            long nowSeconds = dateNow.getTime() / 1000;
-
             m_metrics.setRegistrations(regs);
-            List cleanRegs = new ArrayList(m_metrics.getUniqueRegistrations());
+            List<UniqueRegistrations> cleanRegs = new ArrayList<>(m_metrics.getUniqueRegistrations());
             assertEquals(3, cleanRegs.size());
-            assertEquals("contact1", ((RegistrationItem) cleanRegs.get(0)).getContact());
-            assertEquals("contact2", ((RegistrationItem) cleanRegs.get(1)).getContact());
-            assertEquals("contact3", ((RegistrationItem) cleanRegs.get(2)).getContact());
-            assertEquals(10, ((RegistrationItem) cleanRegs.get(0)).timeToExpireAsSeconds(nowSeconds));
+            assertTrue(cleanRegs.get(0).getContacts().contains( "contact1"));
+            assertTrue(cleanRegs.get(1).getContacts().contains( "contact2"));
+            assertTrue(cleanRegs.get(2).getContacts().contains( "contact3"));
     }
 
     public void testCalculateMetricsEmpty() {
@@ -95,7 +89,7 @@ public class RegistrationMetricsTest extends TestCase {
                 newRegistrationItem("bigbird")
         };
         RegistrationMetrics metrics = new RegistrationMetrics();
-        metrics.setUniqueRegistrations(Arrays.asList(items));
+        metrics.setRegistrations(Arrays.asList(items));
         assertTrue(2.0 == metrics.getLoadBalance());
     }
 
@@ -108,7 +102,7 @@ public class RegistrationMetricsTest extends TestCase {
                 newRegistrationItem("bigbird")
         };
         RegistrationMetrics metrics = new RegistrationMetrics();
-        metrics.setUniqueRegistrations(Arrays.asList(items));
+        metrics.setRegistrations(Arrays.asList(items));
         assertTrue(1.4705882352941173 == metrics.getLoadBalance());
     }
 

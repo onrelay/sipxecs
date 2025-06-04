@@ -12,8 +12,8 @@ package org.sipfoundry.sipxconfig.site.setting;
 import java.text.DecimalFormat;
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tapestry.BaseComponent;

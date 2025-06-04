@@ -16,7 +16,7 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.sipfoundry.sipxconfig.common.ScheduledDay;

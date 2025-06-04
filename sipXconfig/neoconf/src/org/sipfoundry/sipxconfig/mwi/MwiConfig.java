@@ -37,7 +37,6 @@ import org.sipfoundry.sipxconfig.cfgmgt.KeyValueConfiguration;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.domain.Domain;
 import org.sipfoundry.sipxconfig.ivr.Ivr;
-import org.springframework.beans.factory.annotation.Required;
 
 public class MwiConfig implements ConfigProvider {
     private Mwi m_mwi;
@@ -116,7 +115,7 @@ public class MwiConfig implements ConfigProvider {
         }
     }
 
-    @Required
+    
     public void setMwi(Mwi mwi) {
         m_mwi = mwi;
     }
@@ -125,7 +124,7 @@ public class MwiConfig implements ConfigProvider {
         m_velocityEngine = velocityEngine;
     }
 
-    @Required
+    
     public void setPublisherLimitsConfig(AbstractResLimitsConfig publisherLimitsConfig) {
         m_publisherLimitsConfig = publisherLimitsConfig;
     }

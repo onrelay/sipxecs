@@ -16,7 +16,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
-import com.smartgwt.client.util.SC;
+import com.google.gwt.user.client.Window;
 
 import org.sipfoundry.sipxconfig.userportal.locale.SearchConstants;
 
@@ -108,20 +108,20 @@ public final class HttpRequestBuilder extends RequestBuilder {
                             errorMsg.append(s_searchConstants.requestFailed() + "\n");
                             errorMsg.append(String.valueOf(httpStatusCode) + " " + response.getStatusText());
                         }
-                        SC.warn(errorMsg.toString());
+                        Window.alert(errorMsg.toString());
                     } else {
                         if (successMessage != null) {
-                            SC.say(successMessage);
+                            Window.alert(successMessage);
                         }
                     }
                 }
 
                 public void onError(Request request, Throwable exception) {
-                    SC.warn(s_searchConstants.requestFailed() + exception.getMessage());
+                    Window.alert(s_searchConstants.requestFailed() + exception.getMessage());
                 }
             });
         } catch (RequestException e) {
-            SC.warn(s_searchConstants.requestFailed() + e.getMessage());
+            Window.alert(s_searchConstants.requestFailed() + e.getMessage());
         }
     }
 }

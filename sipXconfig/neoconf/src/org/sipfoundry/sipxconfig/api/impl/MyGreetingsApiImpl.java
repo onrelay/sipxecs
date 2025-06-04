@@ -16,6 +16,8 @@ package org.sipfoundry.sipxconfig.api.impl;
 
 import static java.lang.String.format;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -23,23 +25,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.sipfoundry.sipxconfig.api.MyGreetingsApi;
 import org.sipfoundry.sipxconfig.common.SimpleCommandRunner;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.MessageSource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.DB;
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
-import com.mongodb.gridfs.GridFS;
-import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.gridfs.GridFSFindIterable;
+import com.mongodb.client.gridfs.model.GridFSFile;
+
+import com.mongodb.client.model.Filters;
+import org.bson.conversions.Bson;
+
 
 public class MyGreetingsApiImpl extends PromptsApiImpl implements MyGreetingsApi {
 
@@ -105,20 +109,30 @@ public class MyGreetingsApiImpl extends PromptsApiImpl implements MyGreetingsApi
     @Override
     public Response streamGreeting(String name, String extension, HttpServletRequest request) {
         if (!isSipxcom(request)) {
-            DB vmDb = m_vmdbTemplate.getDb();
-            GridFS vmFS = new GridFS(vmDb);
-            String fileName = (new StringBuilder().append(name).append(DOT).append(extension)).toString();
-            DBObject query = QueryBuilder.start(USER_QUERY).is(getCurrentUser().getUserName()).
-                and(FILENAME_PROP).is(fileName).get();
-            GridFSDBFile promptFile = vmFS.findOne(query);
+            MongoDatabase vmDb = m_vmdbTemplate.getDb();
+            GridFSBucket gridFSBucket = GridFSBuckets.create(vmDb);
 
-            if (promptFile != null) {
-                String contentType = promptFile.getContentType();
-                if (StringUtils.isEmpty(contentType)) {
-                    contentType = StringUtils.equals(extension, "wav") ? "audio/x-wav" : "audio/mpeg";
-                }
-                return ResponseUtils.buildStreamFileResponse(promptFile.getInputStream(),
-                    promptFile.getLength(), contentType);
+            String fileName = name + DOT + extension;
+
+            // Find the file using metadata query
+            Bson query = Filters.and(
+                Filters.eq("metadata." + USER_QUERY, getCurrentUser().getUserName()),
+                Filters.eq("filename", fileName)
+            );
+
+            GridFSFindIterable files = gridFSBucket.find(query);
+            GridFSFile file = files.first();
+
+            if (file != null) {
+                String contentType = file.getMetadata() != null && file.getMetadata().getString("contentType") != null
+                    ? file.getMetadata().getString("contentType")
+                    : ("wav".equalsIgnoreCase(extension) ? "audio/x-wav" : "audio/mpeg");
+
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                gridFSBucket.downloadToStream(file.getObjectId(), outputStream);
+                ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+
+                return ResponseUtils.buildStreamFileResponse(inputStream, file.getLength(), contentType);
             } else {
                 return Response.serverError().entity("File not found").build();
             }
@@ -133,20 +147,28 @@ public class MyGreetingsApiImpl extends PromptsApiImpl implements MyGreetingsApi
     @Override
     public Response isCustomGreeting(String name, String extension, HttpServletRequest request) {
         boolean exists = false;
+    
         if (!isSipxcom(request)) {
-            DB vmDb = m_vmdbTemplate.getDb();
-            GridFS vmFS = new GridFS(vmDb);
-            String fileName = (new StringBuilder().append(name).append(DOT).append(extension)).toString();
-            DBObject query = QueryBuilder.start(USER_QUERY).is(getCurrentUser().getUserName()).
-                and(FILENAME_PROP).is(fileName).get();
-            GridFSDBFile promptFile = vmFS.findOne(query);
-            exists = promptFile != null ? true : false;
+            MongoDatabase vmDb = m_vmdbTemplate.getDb();
+            GridFSBucket gridFSBucket = GridFSBuckets.create(vmDb);
+    
+            String fileName = name + DOT + extension;
+    
+            Bson query = Filters.and(
+                Filters.eq("metadata." + USER_QUERY, getCurrentUser().getUserName()),
+                Filters.eq("filename", fileName)
+            );
+    
+            GridFSFindIterable files = gridFSBucket.find(query);
+            exists = files.first() != null;
+    
         } else {
             File greetingFile = new File(getAbsoluteFilePath(name, extension));
-            exists = greetingFile.exists() ? true : false;
+            exists = greetingFile.exists();
         }
-        return exists ? Response.ok().entity("{\"exists\":true}").build()
-            : Response.ok().entity("{\"exists\":false}").build();
+    
+        String responseJson = exists ? "{\"exists\":true}" : "{\"exists\":false}";
+        return Response.ok().entity(responseJson).build();
     }
 
     @Override
@@ -283,32 +305,32 @@ public class MyGreetingsApiImpl extends PromptsApiImpl implements MyGreetingsApi
         return m_messages.getMessage("product.name", null, request.getLocale()).equalsIgnoreCase(SIPXCOM);
     }
 
-    @Required
+    
     public void setMailstorePath(String mailstorePath) {
         m_mailstorePath = mailstorePath;
     }
 
-    @Required
+    
     public void setCommandReplace(String commandReplace) {
         m_commandReplace = commandReplace;
     }
 
-    @Required
+    
     public void setCommandReplaceWithFilename(String commandReplaceWithFilename) {
         m_commandReplaceWithFilename = commandReplaceWithFilename;
     }
 
-    @Required
+    
     public void setCommandDelete(String commandDelete) {
         m_commandDelete = commandDelete;
     }
 
-    @Required
+    
     public void setMessages(MessageSource messages) {
         m_messages = messages;
     }
 
-    @Required
+    
     public void setCommandGetMigratedFilename(String commandGetMigratedFilename) {
         m_commandGetMigratedFilename = commandGetMigratedFilename;
     }

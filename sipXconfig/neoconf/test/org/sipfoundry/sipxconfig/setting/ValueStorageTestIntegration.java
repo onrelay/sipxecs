@@ -44,7 +44,7 @@ public class ValueStorageTestIntegration extends IntegrationTestCase {
     public void testUpdate() throws Exception {
         loadDataSet("setting/UpdateValueStorageSeed.xml");
 
-        ValueStorage vs = m_settingDao.loadValueStorage(new Integer(1));
+        ValueStorage vs = m_settingDao.loadValueStorage(Integer.valueOf(1));
         m_bean.setValueStorage(vs);
 
         m_bean.setSettingValue("towhee/canyon", null);

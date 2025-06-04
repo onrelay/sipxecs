@@ -12,16 +12,15 @@ package org.sipfoundry.sipxrelay;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.XmlRpcServletServer;
 
-@SuppressWarnings("serial")
 public class SymmitronServlet extends HttpServlet {
     private XmlRpcServletServer server;
 
@@ -29,7 +28,7 @@ public class SymmitronServlet extends HttpServlet {
     /*
      * (non-Javadoc)
      * 
-     * @see javax.servlet.GenericServlet#init()
+     * @see jakarta.servlet.GenericServlet#init()
      */
     public void init() throws ServletException {
     	 try {
@@ -57,8 +56,8 @@ public class SymmitronServlet extends HttpServlet {
     /*
      * (non-Javadoc)
      * 
-     * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
-     *      javax.servlet.http.HttpServletResponse)
+     * @see jakarta.servlet.http.HttpServlet#doPost(jakarta.servlet.http.HttpServletRequest,
+     *      jakarta.servlet.http.HttpServletResponse)
      */
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

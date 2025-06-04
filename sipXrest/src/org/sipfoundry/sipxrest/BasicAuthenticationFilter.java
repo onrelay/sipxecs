@@ -5,17 +5,19 @@
  */
 package org.sipfoundry.sipxrest;
 
+import java.util.List;
+
 import javax.sip.address.SipURI;
 
 import org.apache.log4j.Logger;
-import org.restlet.Filter;
+import org.restlet.routing.Filter;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
 import org.sipfoundry.commons.userdb.User;
 
@@ -24,7 +26,6 @@ public class BasicAuthenticationFilter extends Filter {
     private static Logger logger = Logger.getLogger(BasicAuthenticationFilter.class);
 
     private SipURI sipUri;
-
 
     private Plugin plugin;
 
@@ -71,7 +72,7 @@ public class BasicAuthenticationFilter extends Filter {
               logger.debug("Cannot find challenge response");
               ChallengeRequest challengeRequest = new ChallengeRequest(ChallengeScheme.HTTP_BASIC,
                       RestServer.getRealm());
-              response.setChallengeRequest(challengeRequest);
+              response.setChallengeRequests(List.of(challengeRequest));
               response.setStatus(Status.CLIENT_ERROR_PROXY_AUTHENTIFICATION_REQUIRED);
               return Filter.STOP;
           }
@@ -81,7 +82,7 @@ public class BasicAuthenticationFilter extends Filter {
               logger.debug("Requesting BASIC credentials");
               ChallengeRequest challengeRequest = new ChallengeRequest(ChallengeScheme.HTTP_BASIC,
                       RestServer.getRealm());
-              response.setChallengeRequest(challengeRequest);
+              response.setChallengeRequests(List.of(challengeRequest));
               response.setStatus(Status.CLIENT_ERROR_PROXY_AUTHENTIFICATION_REQUIRED);
               return Filter.STOP;
           }

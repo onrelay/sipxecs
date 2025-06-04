@@ -1017,7 +1017,7 @@ AC_DEFUN([CHECK_RAKE],
 ])
 
 ##
-##  pass module path (e.g. wsdl/soap/wsl2ruby)
+##  pass module path (e.g. soap/wsl2ruby)
 ##
 AC_DEFUN([CHECK_RUBY_MODULE],
 [
@@ -1033,7 +1033,7 @@ AC_DEFUN([CHECK_RUBY_MODULE],
 ])
 
 ##
-##  pass module path (e.g. wsdl/soap/wsl2ruby)
+##  pass module path (e.g. soap/wsl2ruby)
 ##
 AC_DEFUN([CHECK_RUBY_GEM],
 [

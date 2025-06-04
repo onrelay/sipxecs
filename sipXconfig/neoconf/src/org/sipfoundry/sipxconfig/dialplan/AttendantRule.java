@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.commons.mongo.MongoConstants;
 import org.sipfoundry.sipxconfig.branch.Branch;
 import org.sipfoundry.sipxconfig.common.Replicable;
@@ -39,7 +39,6 @@ import org.sipfoundry.sipxconfig.dialplan.config.Transform;
 import org.sipfoundry.sipxconfig.feature.Feature;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchFeature;
-import org.springframework.beans.factory.annotation.Required;
 
 public class AttendantRule extends DialingRule implements Replicable {
 
@@ -254,12 +253,12 @@ public class AttendantRule extends DialingRule implements Replicable {
         m_locations.addAll(locations);
     }
 
-    @Required
+    
     public void setMediaServer(MediaServer mediaServer) {
         m_mediaServer = mediaServer;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager manager) {
         m_featureManager = manager;
     }

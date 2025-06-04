@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.sipfoundry.sipxconfig.alias.AliasManager;
 import org.sipfoundry.sipxconfig.common.BeanId;
@@ -29,7 +29,7 @@ import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.common.event.DaoEventListener;
 import org.sipfoundry.sipxconfig.commserver.SipxReplicationContext;
 import org.sipfoundry.sipxconfig.forwarding.CallSequence;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 
 /**
  * Hibernate implementation of the call group context
@@ -281,8 +281,11 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport implements Cal
                 changed.add(callGroup);
             }
         }
-        // no need to trigger replication - do not use storeCallGroup
-        getHibernateTemplate().saveOrUpdateAll(changed);
+
+        for (CallGroup callGroup : changed) {
+            // no need to trigger replication - do not use storeCallGroup
+            getHibernateTemplate().saveOrUpdate(callGroup);
+        }
     }
 
     @Override

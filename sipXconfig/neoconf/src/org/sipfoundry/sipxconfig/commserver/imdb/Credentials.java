@@ -9,14 +9,14 @@
  */
 package org.sipfoundry.sipxconfig.commserver.imdb;
 
-import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.sipfoundry.commons.mongo.MongoConstants.AUTHTYPE;
 import static org.sipfoundry.commons.mongo.MongoConstants.PASSTOKEN;
 import static org.sipfoundry.commons.mongo.MongoConstants.PINTOKEN;
 import static org.sipfoundry.commons.mongo.MongoConstants.REALM;
 import static org.sipfoundry.commons.mongo.MongoConstants.VOICEMAIL_PINTOKEN;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.callgroup.CallGroup;
 import org.sipfoundry.sipxconfig.common.BeanWithUserPermissions;
 import org.sipfoundry.sipxconfig.common.InternalUser;
@@ -24,7 +24,7 @@ import org.sipfoundry.sipxconfig.common.Replicable;
 import org.sipfoundry.sipxconfig.common.SpecialUser;
 import org.sipfoundry.sipxconfig.common.User;
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 public class Credentials extends AbstractDataSetGenerator {
     public static final String DIGEST = "DIGEST";
@@ -35,7 +35,7 @@ public class Credentials extends AbstractDataSetGenerator {
     }
 
     @Override
-    public void generate(Replicable entity, DBObject top) {
+    public void generate(Replicable entity, Document top) {
         String realm = getCoreContext().getAuthorizationRealm();
         if (entity instanceof User) {
             User user = (User) entity;
@@ -56,7 +56,7 @@ public class Credentials extends AbstractDataSetGenerator {
         }
     }
 
-    private static void insertCredential(DBObject top, String realm, String passtoken, String pintoken,
+    private static void insertCredential(Document top, String realm, String passtoken, String pintoken,
             String authtype) {
         top.put(REALM, realm);
         top.put(PASSTOKEN, passtoken);
@@ -66,7 +66,7 @@ public class Credentials extends AbstractDataSetGenerator {
         top.put(AUTHTYPE, authtype);
     }
 
-    private static void insertVoicemailPin(DBObject top, String vpintoken) {
+    private static void insertVoicemailPin(Document top, String vpintoken) {
         if (!StringUtils.isEmpty(vpintoken)) {
             top.put(VOICEMAIL_PINTOKEN, vpintoken);
         }

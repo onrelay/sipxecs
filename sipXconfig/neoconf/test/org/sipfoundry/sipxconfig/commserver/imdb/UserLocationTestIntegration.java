@@ -39,7 +39,7 @@ public class UserLocationTestIntegration extends ImdbTestCase {
         for (String[] ud : USER_DATA) {
             User user = getCoreContext().newUser();
 
-            user.setUniqueId(new Integer(ud[0]));
+            user.setUniqueId(Integer.valueOf(ud[0]));
             user.setFirstName(ud[1]);
             user.setLastName(ud[2]);
             user.setUserName(ud[3]);

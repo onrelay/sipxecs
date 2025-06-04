@@ -28,7 +28,6 @@ import org.sipfoundry.commons.userdb.profile.UserProfileService;
 import org.sipfoundry.sipxconfig.admin.AdminContext;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.annotation.Required;
 
 public class LdapTimer implements BeanFactoryAware {
     public static final Log LOG = LogFactory.getLog(LdapTimer.class);
@@ -80,22 +79,22 @@ public class LdapTimer implements BeanFactoryAware {
     }
 
     @Override
-    @Required
+    
     public void setBeanFactory(BeanFactory beanFactory) {
         m_beanFactory = beanFactory;
     }
 
-    @Required
+    
     public void setUserProfileService(UserProfileService userProfileService) {
         m_userProfileService = userProfileService;
     }
 
-    @Required
+    
     public void setAdminContext(AdminContext adminContext) {
         m_adminContext = adminContext;
     }
 
-    @Required
+    
     public void setLdapManager(LdapManager ldapManager) {
         m_ldapManager = ldapManager;
     }

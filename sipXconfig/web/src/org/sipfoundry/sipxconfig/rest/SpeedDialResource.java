@@ -15,17 +15,19 @@
 package org.sipfoundry.sipxconfig.rest;
 
 import static org.sipfoundry.sipxconfig.rest.JacksonConvert.fromRepresentation;
-import static org.sipfoundry.sipxconfig.rest.JacksonConvert.toRepresentation;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.common.DataCollectionUtil;
 import org.sipfoundry.sipxconfig.device.ProfileManager;
 import org.sipfoundry.sipxconfig.permission.PermissionName;
@@ -42,50 +44,44 @@ public class SpeedDialResource extends UserResource {
     private PhoneContext m_phoneCtx;
     private ProfileManager m_profileMgr;
 
-    @Override
-    public boolean allowPost() {
-        return false;
-    }
 
-    @Override
-    public boolean allowDelete() {
-        return false;
-    }
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {  
+        
+        try {
+            List<SpeedDial> dials = m_mgr.findSpeedDialForUserId(getUser().getId());
+            List<Button> buttons;
+            boolean groupSpeedDial;
 
-    // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        List<SpeedDial> dials = m_mgr.findSpeedDialForUserId(getUser().getId());
-        List<Button> buttons;
-        boolean groupSpeedDial;
-
-        if (!dials.isEmpty()) {
-            SpeedDial dial = dials.get(0);
-            buttons = dial.getButtons();
-            groupSpeedDial = false;
-        } else {
-            groupSpeedDial = true;
-            SpeedDial dial = m_mgr.getGroupSpeedDialForUser(getUser(), false);
-            if (dial != null) {
+            if (!dials.isEmpty()) {
+                SpeedDial dial = dials.get(0);
                 buttons = dial.getButtons();
+                groupSpeedDial = false;
             } else {
-                buttons = Collections.emptyList();
+                groupSpeedDial = true;
+                SpeedDial dial = m_mgr.getGroupSpeedDialForUser(getUser(), false);
+                if (dial != null) {
+                    buttons = dial.getButtons();
+                } else {
+                    buttons = Collections.emptyList();
+                }
             }
+
+            SpeedDialBean bean = new SpeedDialBean();
+            bean.setCanSubscribeToPresence(getUser().hasPermission(PermissionName.SUBSCRIBE_TO_PRESENCE));
+            bean.setButtons(buttons);
+            bean.setGroupSpeedDial(groupSpeedDial);
+
+            LOG.debug("Returning speed dial:\t" + bean);
+
+            return toRepresentation(bean);
+        } catch( IOException ex ) {
+            throw new ResourceException( ex );
         }
-
-        SpeedDialBean bean = new SpeedDialBean();
-        bean.setCanSubscribeToPresence(getUser().hasPermission(PermissionName.SUBSCRIBE_TO_PRESENCE));
-        bean.setButtons(buttons);
-        bean.setGroupSpeedDial(groupSpeedDial);
-
-        LOG.debug("Returning speed dial:\t" + bean);
-
-        return toRepresentation(bean);
     }
 
-    // PUT
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         SpeedDialBean bean = fromRepresentation(entity, SpeedDialBean.class);
         // do not update if this was not explicitly requested
         boolean updatePhones = bean.isUpdatePhones() != null ? bean.isUpdatePhones() : false;
@@ -132,10 +128,10 @@ public class SpeedDialResource extends UserResource {
         if (updatePhones) {
             Collection<Phone> phones = m_phoneCtx.getPhonesByUserId(getUser().getId());
             LOG.debug("Updating phones: " + phones);
-            @SuppressWarnings("unchecked")
             Collection<Integer> ids = DataCollectionUtil.extractPrimaryKeys(phones);
             m_profileMgr.generateProfiles(ids, true, null);
         }
+        return null;
     }
 
     public void setMgr(SpeedDialManager mgr) {
@@ -188,6 +184,7 @@ public class SpeedDialResource extends UserResource {
             m_updatePhones = updatePhones;
         }
 
+        @SuppressWarnings("unused")
         public Boolean isCanSubscribeToPresence() {
             return m_canSubscribeToPresence;
         }

@@ -17,8 +17,8 @@ package org.sipfoundry.sipxconfig.api.impl;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.sipfoundry.sipxconfig.api.model.GroupList;
 import org.sipfoundry.sipxconfig.setting.Group;

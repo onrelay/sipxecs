@@ -12,7 +12,7 @@ import org.sipfoundry.sipxconfig.device.DeviceDefaults;
 import org.sipfoundry.sipxconfig.device.DeviceTimeZone;
 import org.sipfoundry.sipxconfig.setting.SettingEntry;
 
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 public class AastraPhoneDefaults {
     private static final String DEFAULTTIME = "US-Eastern";

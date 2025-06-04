@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class DataCollectionUtilTest extends TestCase {
 
@@ -28,14 +28,14 @@ public class DataCollectionUtilTest extends TestCase {
 
     @Override
     protected void setUp() {
-        m_items = new ArrayList();
+        m_items = new ArrayList<>();
         for (int i = 0; i < 40; i++) {
             m_items.add(new TestCollectionItem(i));
         }
 
         // out of order on purpose
         m_primaryKeys = new Integer[] {
-            new Integer(30), new Integer(10), new Integer(20)
+            Integer.valueOf(30), Integer.valueOf(10), Integer.valueOf(20)
         };
 
         m_originalSize = m_items.size();
@@ -46,7 +46,7 @@ public class DataCollectionUtilTest extends TestCase {
         assertEquals(m_primaryKeys.length, found.size());
         Iterator<PrimaryKeySource> ifound = found.iterator();
         Arrays.sort(m_primaryKeys);
-        for (int i = 0; ifound.hasNext(); i++) {
+        while (ifound.hasNext()) {
             PrimaryKeySource item = ifound.next();
             assertTrue(Arrays.binarySearch(m_primaryKeys, item.getPrimaryKey()) >= 0);
         }
@@ -54,7 +54,7 @@ public class DataCollectionUtilTest extends TestCase {
 
     public void testRemoveByPrimaryKey() {
         // assumes findByPrimaryKey works
-        Iterator find = DataCollectionUtil.findByPrimaryKey(m_items, m_primaryKeys).iterator();
+        Iterator<Object> find = DataCollectionUtil.findByPrimaryKey(m_items, m_primaryKeys).iterator();
 
         DataCollectionUtil.removeByPrimaryKey(m_items, m_primaryKeys);
         while (find.hasNext()) {
@@ -66,27 +66,27 @@ public class DataCollectionUtilTest extends TestCase {
     public void testMoveUpByPrimaryKey() {
         DataCollectionUtil.moveByPrimaryKey(m_items, m_primaryKeys, -1);
         PrimaryKeySource[] items = m_items.toArray(new PrimaryKeySource[0]);
-        assertEquals(new Integer(10), items[9].getPrimaryKey());
-        assertEquals(new Integer(9), items[10].getPrimaryKey());
-        assertEquals(new Integer(20), items[19].getPrimaryKey());
-        assertEquals(new Integer(19), items[20].getPrimaryKey());
-        assertEquals(new Integer(30), items[29].getPrimaryKey());
-        assertEquals(new Integer(29), items[30].getPrimaryKey());
+        assertEquals(Integer.valueOf(10), items[9].getPrimaryKey());
+        assertEquals(Integer.valueOf(9), items[10].getPrimaryKey());
+        assertEquals(Integer.valueOf(20), items[19].getPrimaryKey());
+        assertEquals(Integer.valueOf(19), items[20].getPrimaryKey());
+        assertEquals(Integer.valueOf(30), items[29].getPrimaryKey());
+        assertEquals(Integer.valueOf(29), items[30].getPrimaryKey());
     }
 
     public void testMoveDownByPrimaryKey() {
         DataCollectionUtil.moveByPrimaryKey(m_items, m_primaryKeys, 1);
         PrimaryKeySource[] items = m_items.toArray(new PrimaryKeySource[0]);
-        assertEquals(new Integer(10), items[11].getPrimaryKey());
-        assertEquals(new Integer(11), items[10].getPrimaryKey());
-        assertEquals(new Integer(20), items[21].getPrimaryKey());
-        assertEquals(new Integer(21), items[20].getPrimaryKey());
-        assertEquals(new Integer(30), items[31].getPrimaryKey());
-        assertEquals(new Integer(31), items[30].getPrimaryKey());
+        assertEquals(Integer.valueOf(10), items[11].getPrimaryKey());
+        assertEquals(Integer.valueOf(11), items[10].getPrimaryKey());
+        assertEquals(Integer.valueOf(20), items[21].getPrimaryKey());
+        assertEquals(Integer.valueOf(21), items[20].getPrimaryKey());
+        assertEquals(Integer.valueOf(30), items[31].getPrimaryKey());
+        assertEquals(Integer.valueOf(31), items[30].getPrimaryKey());
     }
 
     public void testExtractPrimaryKeys() {
-        Collection c = DataCollectionUtil.extractPrimaryKeys(m_items);
+        Collection<Integer> c = DataCollectionUtil.extractPrimaryKeys(m_items);
         Integer[] pks = (Integer[]) c.toArray(new Integer[0]);
         Arrays.equals(m_primaryKeys, pks);
     }
@@ -97,9 +97,9 @@ public class DataCollectionUtilTest extends TestCase {
         };
         DataCollectionUtil.moveByPrimaryKey(m_items, ArrayUtils.toObject(keys), -1);
         PrimaryKeySource[] items = m_items.toArray(new PrimaryKeySource[0]);
-        assertEquals(new Integer(0), items[0].getPrimaryKey());
-        assertEquals(new Integer(1), items[1].getPrimaryKey());
-        assertEquals(new Integer(3), items[2].getPrimaryKey());
+        assertEquals(Integer.valueOf(0), items[0].getPrimaryKey());
+        assertEquals(Integer.valueOf(1), items[1].getPrimaryKey());
+        assertEquals(Integer.valueOf(3), items[2].getPrimaryKey());
     }
 
     public void testMoveDownByPrimaryKeySqueezeHoles() {
@@ -108,23 +108,23 @@ public class DataCollectionUtilTest extends TestCase {
         };
         DataCollectionUtil.moveByPrimaryKey(m_items, keys, 10);
         PrimaryKeySource[] items = m_items.toArray(new PrimaryKeySource[0]);
-        assertEquals(new Integer(35), items[37].getPrimaryKey());
-        assertEquals(new Integer(38), items[38].getPrimaryKey());
-        assertEquals(new Integer(39), items[39].getPrimaryKey());
+        assertEquals(Integer.valueOf(35), items[37].getPrimaryKey());
+        assertEquals(Integer.valueOf(38), items[38].getPrimaryKey());
+        assertEquals(Integer.valueOf(39), items[39].getPrimaryKey());
     }
 
     public void testDuplicate() {
         int size = 5;
-        Collection from = new ArrayList();
+        Collection<BeanWithId> from = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             BeanWithId bean = new BeanWithId();
             bean.setUniqueId();
             from.add(bean);
         }
-        Collection to = new ArrayList();
+        Collection<BeanWithId> to = new ArrayList<>();
         DataCollectionUtil.duplicate(from, to);
         assertEquals(size, to.size());
-        for (Iterator i = to.iterator(); i.hasNext();) {
+        for (Iterator<BeanWithId> i = to.iterator(); i.hasNext();) {
             BeanWithId clonedBean = (BeanWithId) i.next();
             assertTrue(clonedBean.isNew());
         }
@@ -146,14 +146,14 @@ public class DataCollectionUtilTest extends TestCase {
         assertEquals(0, DataCollectionUtil.move(list, 0, -1));
         assertEquals(0, DataCollectionUtil.move(list, 0, -2));
         assertEquals(0, DataCollectionUtil.move(list, 1, -1));
-        assertEquals(new Character('b'), list.get(0));
-        assertEquals(new Character('a'), list.get(1));
+        assertEquals(Character.valueOf('b'), list.get(0));
+        assertEquals(Character.valueOf('a'), list.get(1));
         assertEquals(2, DataCollectionUtil.move(list, 0, 3));
-        assertEquals(new Character('b'), list.get(2));
+        assertEquals(Character.valueOf('b'), list.get(2));
         assertEquals(2, DataCollectionUtil.move(list, 0, 2));
-        assertEquals(new Character('a'), list.get(2));
-        assertEquals(new Character('b'), list.get(1));
-        assertEquals(new Character('c'), list.get(0));
+        assertEquals(Character.valueOf('a'), list.get(2));
+        assertEquals(Character.valueOf('b'), list.get(1));
+        assertEquals(Character.valueOf('c'), list.get(0));
     }
 
     static class TestCollectionItem implements PrimaryKeySource {
@@ -161,7 +161,7 @@ public class DataCollectionUtilTest extends TestCase {
         private final Integer m_id;
 
         TestCollectionItem(int id) {
-            m_id = new Integer(id);
+            m_id = Integer.valueOf(id);
         }
 
         public Object getPrimaryKey() {

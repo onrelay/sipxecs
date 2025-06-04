@@ -47,10 +47,6 @@ import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.clientauthutils.AuthenticationHelper;
 
 import org.ice4j.Transport;
-import org.ice4j.TransportAddress;
-import org.ice4j.stack.StunStack;
-import org.ice4j.stunclient.NetworkConfigurationDiscoveryProcess;
-import org.ice4j.stunclient.StunDiscoveryReport;
 
 /**
  * The main class

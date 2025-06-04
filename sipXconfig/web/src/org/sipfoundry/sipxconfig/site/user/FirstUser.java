@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.site.user;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.IAsset;
 import org.apache.tapestry.PageRedirectException;
 import org.apache.tapestry.annotations.Asset;
@@ -75,7 +75,7 @@ public abstract class FirstUser extends SipxBasePage implements PageBeginRenderL
     public List<Integer> getLicensesNumber() {
         List<Integer> list = new ArrayList<Integer>();
         for (int i = 0; i < getTapestry().getLicensesNumber(); i++) {
-            list.add(new Integer(i));
+            list.add(Integer.valueOf(i));
         }
         return list;
     }

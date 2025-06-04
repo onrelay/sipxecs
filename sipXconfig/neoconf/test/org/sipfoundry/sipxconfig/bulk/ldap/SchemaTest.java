@@ -14,8 +14,8 @@ import java.util.Collections;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.bulk.ldap.Schema.ClassDefinition;
 
 public class SchemaTest extends TestCase {

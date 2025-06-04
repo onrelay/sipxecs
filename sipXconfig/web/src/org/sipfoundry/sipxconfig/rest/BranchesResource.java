@@ -40,16 +40,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.tapestry.contrib.table.model.common.ReverseComparator;
+import org.apache.commons.collections4.comparators.ReverseComparator;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Delete;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
+import org.restlet.resource.ServerResource;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.branch.Branch;
 import org.sipfoundry.sipxconfig.branch.BranchManager;
 import org.sipfoundry.sipxconfig.phonebook.Address;
@@ -60,11 +64,10 @@ import org.sipfoundry.sipxconfig.rest.RestUtilities.PaginationInfo;
 import org.sipfoundry.sipxconfig.rest.RestUtilities.SortInfo;
 import org.sipfoundry.sipxconfig.rest.RestUtilities.ValidationInfo;
 import org.sipfoundry.sipxconfig.rest.RestUtilities.ValidationInfo.StringConstraint;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.thoughtworks.xstream.XStream;
 
-public class BranchesResource extends Resource {
+public class BranchesResource extends ServerResource {
 
     private static final String ELEMENT_NAME_BRANCH = "branch";
     private static final String ELEMENT_NAME_BRANCHBUNDLE = ELEMENT_NAME_BRANCH;
@@ -102,8 +105,8 @@ public class BranchesResource extends Resource {
     // GET - Retrieve all and single Branch
     // ------------------------------------
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         IntParameterInfo parameterInfo;
         Branch branch;
         BranchRestInfoFull branchRestInfo;
@@ -153,8 +156,8 @@ public class BranchesResource extends Resource {
     // PUT - Update or Add single Branch
     // ---------------------------------
 
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         IntParameterInfo parameterInfo;
 
         // get item from request body
@@ -168,7 +171,7 @@ public class BranchesResource extends Resource {
         if (!validationInfo.getValid()) {
             RestUtilities.setResponseError(getResponse(), validationInfo.getResponseCode(), validationInfo
                     .getMessage());
-            return;
+            return null;
         }
 
         // if have id then update single item
@@ -176,14 +179,14 @@ public class BranchesResource extends Resource {
         if (parameterInfo.getExists()) {
             if (!parameterInfo.getValid()) {
                 RestUtilities.setResponseError(getResponse(), ERROR_ID_INVALID, parameterInfo.getValueString());
-                return;
+                return null;
             }
 
             try {
                 branch = m_branchManager.retrieveBranch(parameterInfo.getValue());
                 if (branch == null) {
                     RestUtilities.setResponseError(getResponse(), ERROR_OBJECT_NOT_FOUND, parameterInfo.getValue());
-                    return;
+                    return null;
                 }
 
                 // copy values over to existing item
@@ -192,11 +195,11 @@ public class BranchesResource extends Resource {
             } catch (Exception exception) {
                 RestUtilities.setResponseError(getResponse(), ERROR_UPDATE_FAILED, parameterInfo.getValue(),
                         exception.getLocalizedMessage());
-                return;
+                return null;
             }
 
             RestUtilities.setResponse(getResponse(), SUCCESS_UPDATED, branch.getId());
-            return;
+            return null;
         }
 
         // if not single, add new item
@@ -205,16 +208,17 @@ public class BranchesResource extends Resource {
             m_branchManager.saveBranch(branch);
         } catch (Exception exception) {
             RestUtilities.setResponseError(getResponse(), ERROR_CREATE_FAILED, exception.getLocalizedMessage());
-            return;
+            return null;
         }
 
         RestUtilities.setResponse(getResponse(), SUCCESS_CREATED, branch.getId());
+        return null;
     }
 
     // DELETE - Delete single Branch
     // -----------------------------
 
-    @Override
+    @Delete
     public void removeRepresentations() throws ResourceException {
         IntParameterInfo parameterInfo;
         Branch branch;
@@ -297,7 +301,6 @@ public class BranchesResource extends Resource {
         return metadata;
     }
 
-    @SuppressWarnings("unchecked")
     private void sortBranches(List<Branch> branches) {
         // sort if requested
         SortInfo sortInfo = RestUtilities.calculateSorting(m_form);
@@ -314,7 +317,7 @@ public class BranchesResource extends Resource {
             if (sortForward) {
                 Collections.sort(branches, new CityComparator());
             } else {
-                Collections.sort(branches, new ReverseComparator(new CityComparator()));
+                Collections.sort(branches, new ReverseComparator<Branch>(new CityComparator()));
             }
             break;
 
@@ -322,7 +325,7 @@ public class BranchesResource extends Resource {
             if (sortForward) {
                 Collections.sort(branches, new OfficeDesignationComparator());
             } else {
-                Collections.sort(branches, new ReverseComparator(new OfficeDesignationComparator()));
+                Collections.sort(branches, new ReverseComparator<Branch>(new OfficeDesignationComparator()));
             }
             break;
 
@@ -330,7 +333,7 @@ public class BranchesResource extends Resource {
             if (sortForward) {
                 Collections.sort(branches, new NameComparator());
             } else {
-                Collections.sort(branches, new ReverseComparator(new NameComparator()));
+                Collections.sort(branches, new ReverseComparator<Branch>(new NameComparator()));
             }
             break;
 
@@ -338,7 +341,7 @@ public class BranchesResource extends Resource {
             if (sortForward) {
                 Collections.sort(branches, new DescriptionComparator());
             } else {
-                Collections.sort(branches, new ReverseComparator(new DescriptionComparator()));
+                Collections.sort(branches, new ReverseComparator<Branch>(new DescriptionComparator()));
             }
             break;
 
@@ -473,7 +476,7 @@ public class BranchesResource extends Resource {
     // Injected objects
     // ----------------
 
-    @Required
+    
     public void setBranchManager(BranchManager branchManager) {
         m_branchManager = branchManager;
     }

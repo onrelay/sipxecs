@@ -8,26 +8,26 @@
  *
  */
 
-package org.sipfoundry.sipxconfig.security;
+ package org.sipfoundry.sipxconfig.security;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
-
-public enum UserRole {
-    User("ROLE_USER"), Admin("ROLE_ADMIN"),
-        AttendantAdmin("ROLE_ATTENDANT_ADMIN"), Rest("ROLE_REST");
-
-    private String m_role;
-
-    UserRole(String role) {
-        m_role = role;
-    }
-
-    public GrantedAuthority toAuth() {
-        return new GrantedAuthorityImpl(m_role);
-    }
-
-    public String toRole() {
-        return m_role;
-    }
-}
+ import org.springframework.security.core.GrantedAuthority;
+ import org.springframework.security.core.authority.SimpleGrantedAuthority;
+ 
+ public enum UserRole {
+     User("ROLE_USER"), Admin("ROLE_ADMIN"),
+     AttendantAdmin("ROLE_ATTENDANT_ADMIN"), Rest("ROLE_REST");
+ 
+     private String m_role;
+ 
+     UserRole(String role) {
+         m_role = role;
+     }
+ 
+     public GrantedAuthority toAuth() {
+         return new SimpleGrantedAuthority(m_role);
+     }
+ 
+     public String toRole() {
+         return m_role;
+     }
+ }

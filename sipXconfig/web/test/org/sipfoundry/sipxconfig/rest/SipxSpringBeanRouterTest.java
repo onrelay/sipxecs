@@ -17,7 +17,9 @@ import org.restlet.ext.spring.SpringBeanFinder;
 
 import junit.framework.TestCase;
 import org.restlet.Restlet;
-import org.restlet.Route;
+import org.restlet.routing.TemplateRoute;
+import org.restlet.resource.Finder;
+
 
 public class SipxSpringBeanRouterTest extends TestCase {
 
@@ -27,10 +29,9 @@ public class SipxSpringBeanRouterTest extends TestCase {
 
         SipxSpringBeanRouter router = new SipxSpringBeanRouter() {
             @Override
-            public Route attach(String uriPattern, Restlet target) {
+            public void attachFinder(String uri, Finder target) {
                 assertSame(finder, target);
-                uris.add(uriPattern);
-                return null;
+                uris.add(uri);
             }
         };
 

@@ -8,7 +8,7 @@ event_PKGS = \
 	spring-context \
 	spring-aop \
 	spring-core \
-	org.springframework.transaction \
+	spring-tx \
 	spring-expression \
 	spring-web \
 	spring-webmvc \
@@ -17,12 +17,12 @@ event_PKGS = \
 	jetty-io \
 	jetty-security \
 	jetty-server \
-	jetty-servlet \
-	jetty-servlets \
+	jetty-ee10-servlet \
+	jetty-ee10-servlets \
 	jetty-util \
-	jetty-webapp \
+	jetty-ee10-webapp \
 	jetty-xml \
-	javax.servlet-api \
+	jakarta.servlet-api \
 	sipxcommons \
 	spring-security-config \
 	spring-security-core \

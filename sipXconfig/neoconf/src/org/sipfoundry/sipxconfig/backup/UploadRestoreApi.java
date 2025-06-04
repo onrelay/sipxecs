@@ -22,16 +22,19 @@ import java.io.StringWriter;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Get;
+import org.restlet.resource.Post;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
 
-public class UploadRestoreApi extends Resource {
+public class UploadRestoreApi extends ServerResource {
     private String m_definitionId;
     private BackupManager m_backupManager;
     private RestoreApi m_restoreApi;
@@ -47,8 +50,8 @@ public class UploadRestoreApi extends Resource {
      * GET
      *  Return list of files already uploaded
      */
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         File d = m_backupManager.getRestoreStagingDirectory();
         d.list();
         StringWriter json = new StringWriter();
@@ -69,9 +72,10 @@ public class UploadRestoreApi extends Resource {
     /**
      * POST : Restore
      */
-    @Override
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {        
         m_restoreApi.acceptRepresentation(entity);
+        return null;
     }
 
     /**
@@ -79,8 +83,8 @@ public class UploadRestoreApi extends Resource {
      *  With no definition id : reset uploads
      *  With definition id : Upload file
      */
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         if (m_definitionId == null) {
             m_backupManager.getCleanRestoreStagingDirectory();
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Missing definition id");
@@ -96,20 +100,7 @@ public class UploadRestoreApi extends Resource {
                 IOUtils.closeQuietly(dstStream);
             }
         }
-    }
-
-    public boolean allowGet() {
-        return true;
-    }
-
-    @Override
-    public boolean allowPut() {
-        return true;
-    };
-
-    @Override
-    public boolean allowPost() {
-        return true;
+        return null;
     }
 
     public void setBackupManager(BackupManager backupManager) {

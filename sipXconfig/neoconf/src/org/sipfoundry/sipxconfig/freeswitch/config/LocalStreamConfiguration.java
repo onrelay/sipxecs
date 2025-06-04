@@ -14,13 +14,12 @@ import org.apache.velocity.VelocityContext;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchSettings;
 import org.sipfoundry.sipxconfig.moh.MusicOnHoldManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class LocalStreamConfiguration extends AbstractFreeswitchConfiguration {
     private MusicOnHoldManager m_musicOnHoldManager;
     private String m_docDir;
 
-    @Required
+    
     public void setMusicOnHoldManager(MusicOnHoldManager musicOnHoldManager) {
         m_musicOnHoldManager = musicOnHoldManager;
     }

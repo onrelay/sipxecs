@@ -42,11 +42,11 @@ import org.sipfoundry.commons.userdb.ValidUsers;
 import org.sipfoundry.commons.util.UnfortunateLackOfSpringSupportFactory;
 import org.xmpp.packet.JID;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
+import org.bson.Document;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import org.bson.conversions.Bson;
 
 public class MongoUserProviderAlt implements UserProvider {
     public static final String SIP_UID = "sipUid";
@@ -65,19 +65,19 @@ public class MongoUserProviderAlt implements UserProvider {
             actualUsername = username.substring(0, username.lastIndexOf("@"));
         }
 
-        DBCollection userCollection = getCollection();
-        DBObject query = new BasicDBObject();
+        MongoCollection<Document> userCollection = getCollection();
+        Document query = new Document();
 
         query.put("ent", "user");
         query.put("imenbld", true);
         query.put("imid", actualUsername);
 
-        DBObject userObj = userCollection.findOne(query);
+        Document userObj = userCollection.find(query).first();
 
         if (userObj == null) {
             // maybe it was looking for imbot
             query.put("ent", "imbotsettings");
-            userObj = userCollection.findOne(query);
+            userObj = userCollection.find(query).first();
             log.debug("ImBot query: " + query);
 
             if (userObj == null) {
@@ -94,7 +94,7 @@ public class MongoUserProviderAlt implements UserProvider {
                 GroupManager.getInstance().getProvider().getGroupNames(new JID(appendDomain(username))));
         }
         
-        return fromDBObject(userObj);
+        return fromDocument(userObj);
     }
 
     @Override
@@ -118,13 +118,13 @@ public class MongoUserProviderAlt implements UserProvider {
 
     @Override
     public int getUserCount() {
-        DBCollection userCollection = getCollection();
-        DBObject query = new BasicDBObject();
+        MongoCollection<Document> userCollection = getCollection();
+        Document query = new Document();
 
         query.put("ent", "user");
         query.put("imenbld", true);
 
-        return (int) userCollection.count(query);
+        return (int) userCollection.countDocuments(query);
     }
 
     @Override
@@ -146,14 +146,14 @@ public class MongoUserProviderAlt implements UserProvider {
     @Override
     public Collection<User> getUsers(int startIndex, int numResults) {
         List<User> users = new ArrayList<User>();
-        DBCollection userCollection = getCollection();
-        DBObject query = new BasicDBObject();
+        MongoCollection<Document> userCollection = getCollection();
+        Document query = new Document();
 
         query.put("ent", "user");
         query.put("imenbld", true);
 
-        for (DBObject userObj : userCollection.find(query).skip(startIndex).limit(numResults)) {
-            users.add(fromDBObject(userObj));
+        for (Document userObj : userCollection.find(query).skip(startIndex).limit(numResults)) {
+            users.add(fromDocument(userObj));
         }
 
         return users;
@@ -192,40 +192,42 @@ public class MongoUserProviderAlt implements UserProvider {
 
     @Override
     public Collection<User> findUsers(Set<String> fields, String query, int startIndex, int numResults) {
-        if (fields.isEmpty()) {
+        if (fields == null || fields.isEmpty()) {
+            return Collections.emptyList();
+        }
+        if (query == null || query.trim().isEmpty()) {
             return Collections.emptyList();
         }
         if (!getSearchFields().containsAll(fields)) {
             throw new IllegalArgumentException("Search fields " + fields + " are not valid.");
         }
-        if (query == null || "".equals(query)) {
+
+        String trimmedQuery = query.trim();
+
+        List<Bson> orConditions = new ArrayList<>();
+
+        if (fields.contains("Username")) {
+            orConditions.add(Filters.eq(IM_ID, trimmedQuery));
+            orConditions.add(Filters.eq(ALT_IM_ID, trimmedQuery));
+        }
+        if (fields.contains("Name")) {
+            orConditions.add(Filters.eq(IM_DISPLAY_NAME, trimmedQuery));
+        }
+        if (fields.contains("Email")) {
+            orConditions.add(Filters.eq(EMAIL, trimmedQuery));
+        }
+
+        if (orConditions.isEmpty()) {
             return Collections.emptyList();
         }
 
-        QueryBuilder mongoQuery = QueryBuilder.start();
-        if (fields.contains("Username")) {
-            DBObject q = new BasicDBObject();
-            q.put(IM_ID, query);
-            DBObject altQ = new BasicDBObject();
-            altQ.put(ALT_IM_ID, query);
-            mongoQuery.or(q, altQ);
-        }
-        if (fields.contains("Name")) {
-            DBObject q = new BasicDBObject();
-            q.put(IM_DISPLAY_NAME, query);
-            mongoQuery.or(q);
-        }
-        if (fields.contains("Email")) {
-            DBObject q = new BasicDBObject();
-            q.put(EMAIL, query);
-            mongoQuery.or(q);
-        }
+        Bson mongoQuery = Filters.or(orConditions);
 
-        List<User> users = new ArrayList<User>();
-        DBCollection userCollection = getCollection();
+        List<User> users = new ArrayList<>();
+        MongoCollection<Document> userCollection = getCollection();
 
-        for (DBObject userObj : userCollection.find(mongoQuery.get()).skip(startIndex).limit(numResults)) {
-            users.add(fromDBObject(userObj));
+        for (Document userObj : userCollection.find(mongoQuery).skip(startIndex).limit(numResults)) {
+            users.add(fromDocument(userObj));
         }
 
         return users;
@@ -246,7 +248,7 @@ public class MongoUserProviderAlt implements UserProvider {
         return false;
     }
 
-    private static User fromDBObject(DBObject userObj) {
+    private static User fromDocument(Document userObj) {
         User u = null;
 
         if (userObj != null) {
@@ -255,7 +257,7 @@ public class MongoUserProviderAlt implements UserProvider {
             String name = (String) userObj.get("imdn");
             String email = (String) userObj.get("email");
             Date creationDate = new Date();
-            if (userObj.containsField("creationDate")) {
+            if (userObj.containsKey("creationDate")) {
                 creationDate = new Date((Long) userObj.get("creationDate"));
             }
             Date modificationDate = new Date((Long) userObj.get("lastUpdated"));
@@ -269,8 +271,8 @@ public class MongoUserProviderAlt implements UserProvider {
         return u;
     }
 
-    private static DBCollection getCollection() {
-        DB db = UnfortunateLackOfSpringSupportFactory.getImdb();
+    private static MongoCollection<Document> getCollection() {
+        MongoDatabase db = UnfortunateLackOfSpringSupportFactory.getImdb();
 
         return db.getCollection(COLLECTION_NAME);
     }

@@ -11,7 +11,7 @@ Url: http://www.sipfoundry.org/sipXtools
 
 BuildRequires: automake
 BuildRequires: nsis
-BuildRequires: java-1.8.0-openjdk-devel
+BuildRequires: java-17-openjdk-devel
 BuildRequires: sipxcommons >= %version
 
 Source: %name-%version.tar.gz

@@ -11,12 +11,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.Map;
-
-import org.sipfoundry.sipxrelay.BridgeState;
-import org.sipfoundry.sipxrelay.SymInterface;
-import org.sipfoundry.sipxrelay.Symmitron;
 
 import junit.framework.TestCase;
 
@@ -256,7 +251,7 @@ public class SymmitronTest extends AbstractSymmitronTestCase {
         int count = 1;
         Object[] args = new Object[3];
         args[0] = clientHandle;
-        args[1] = new Integer(count);
+        args[1] = Integer.valueOf(count);
         args[2] = Symmitron.EVEN;
 
         Map retval = (Map) super.client.execute("sipXrelay.createSyms", args);
@@ -337,8 +332,8 @@ public class SymmitronTest extends AbstractSymmitronTestCase {
         params[0] = clientHandle;
         params[1] = sym1;
         params[2] = serverAddress;
-        params[3] = new Integer(destinationPort1);
-        params[4] = new Integer(500);
+        params[3] = Integer.valueOf(destinationPort1);
+        params[4] = Integer.valueOf(500);
         params[5] = "USE-EMPTY-PACKET";
 
         retval = (Map) client.execute("sipXrelay.setDestination", params);
@@ -348,8 +343,8 @@ public class SymmitronTest extends AbstractSymmitronTestCase {
         params[0] = clientHandle;
         params[1] = sym2;
         params[2] = serverAddress;
-        params[3] = new Integer(destinationPort2);
-        params[4] = new Integer(500);
+        params[3] = Integer.valueOf(destinationPort2);
+        params[4] = Integer.valueOf(500);
         params[5] = "USE-EMPTY-PACKET";
 
         retval = (Map) client.execute("sipXrelay.setDestination", params);

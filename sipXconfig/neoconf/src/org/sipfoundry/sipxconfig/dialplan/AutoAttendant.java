@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.commons.mongo.MongoConstants;
@@ -42,7 +42,6 @@ import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.type.FileSetting;
 import org.sipfoundry.sipxconfig.setting.type.SettingType;
 import org.sipfoundry.sipxconfig.systemaudit.SystemAuditable;
-import org.springframework.beans.factory.annotation.Required;
 
 public class AutoAttendant extends BeanWithGroups implements NamedObject, DeployConfigOnEdit, SystemAuditable,
     Replicable {
@@ -199,12 +198,12 @@ public class AutoAttendant extends BeanWithGroups implements NamedObject, Deploy
         m_menu.reset(isPermanent());
     }
 
-    @Required
+    
     public void setPromptsDirectory(String promptsDirectory) {
         m_promptsDirectory = promptsDirectory;
     }
 
-    @Required
+    
     public void setSysDirectory(String sysDirectory) {
         m_sysDirectory = sysDirectory;
     }

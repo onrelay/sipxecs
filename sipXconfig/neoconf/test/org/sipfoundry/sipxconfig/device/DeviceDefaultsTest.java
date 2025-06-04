@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.device;
 
 import junit.framework.TestCase;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.sipfoundry.sipxconfig.dialplan.DialPlanContext;
 import org.sipfoundry.sipxconfig.dialplan.EmergencyInfo;
 import org.sipfoundry.sipxconfig.moh.MohAddressFactory;

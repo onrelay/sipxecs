@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.bulk.csv;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class SimpleCsvWriter {
     private Writer m_writer;

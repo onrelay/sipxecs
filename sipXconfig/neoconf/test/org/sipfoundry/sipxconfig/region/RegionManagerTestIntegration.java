@@ -17,7 +17,7 @@ package org.sipfoundry.sipxconfig.region;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
 
 public class RegionManagerTestIntegration extends IntegrationTestCase {
@@ -37,7 +37,7 @@ public class RegionManagerTestIntegration extends IntegrationTestCase {
         r1.setName("Bird Bath in Central Park");
         m_regionManager.saveRegion(r1);
         String count = "select count(*) from region where region_id = ?";
-        assertEquals(1, db().queryForInt(count, r1.getId()));
+        assertEquals(1, (int)db().queryForObject(count, Integer.class, r1.getId()));
         
         // Read
         List<Region> regions = m_regionManager.getRegions();
@@ -62,7 +62,7 @@ public class RegionManagerTestIntegration extends IntegrationTestCase {
         
         // Delete
         m_regionManager.deleteRegion(r1);
-        assertEquals(0, db().queryForInt(count, r1.getId()));        
+        assertEquals(0, (int)db().queryForObject(count, Integer.class, r1.getId()));        
     }
     
     String dump(Collection<?> o) {

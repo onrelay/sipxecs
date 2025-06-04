@@ -4,7 +4,6 @@ sipxconfig_test_integration_core_PKGS = \
 	$(sipxconfig_web_test_PKGS) \
 	dbunit \
 	easymock \
-	easymockclassextension \
 	jsonassert \
 	junit \
 	junitperf \
@@ -23,15 +22,13 @@ sipxconfig_web_test_PKGS = \
 	c3p0 \
 	cglib-nodep \
 	commons-fileupload \
-	commons-pool \
 	ez-vcard \
 	hivemind \
 	hivemind-lib \
 	jasper-compiler \
 	javassist \
-	jdom \	
-	javax.servlet-api \
-	javax.servlet.jsp-api \
+	jakarta.servlet-api \
+	jakarta.servlet.jsp-api \
 	jta \
 	not-yet-commons-ssl \
 	ognl \

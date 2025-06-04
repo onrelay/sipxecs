@@ -21,7 +21,6 @@ import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchFeature;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchSettings;
 import org.sipfoundry.sipxconfig.freeswitch.config.AbstractFreeswitchConfiguration;
-import org.springframework.beans.factory.annotation.Required;
 
 public class CallCenterConfiguration extends AbstractFreeswitchConfiguration {
     private CallQueueContext m_callQueueContext;
@@ -29,7 +28,7 @@ public class CallCenterConfiguration extends AbstractFreeswitchConfiguration {
     private Collection<CallQueueAgent> m_callQueueAgents;
     private Collection<CallQueueTier> m_callQueueTiers = new ArrayList<CallQueueTier>();
 
-    @Required
+    
     public void setCallQueueContext(CallQueueContext callQueueContext) {
         m_callQueueContext = callQueueContext;
     }

@@ -23,7 +23,7 @@ import static org.sipfoundry.commons.mongo.MongoConstants.FROM_URI;
 import static org.sipfoundry.commons.mongo.MongoConstants.IDENTITY;
 import static org.sipfoundry.commons.mongo.MongoConstants.TO_URI;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.common.SipUri;
 
 public class UserStaticMapping extends DataSetRecord {

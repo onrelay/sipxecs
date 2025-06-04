@@ -22,11 +22,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.common.ApplicationInitializedEvent;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 
@@ -43,12 +42,12 @@ public class DefaultSystemFirmwareInstall implements ApplicationListener {
     private UploadUtil m_uploadUtil;
     private String m_firmwareDirectory;
 
-    @Required
+    
     public void setUploadUtil(UploadUtil uploadUtil) {
         m_uploadUtil = uploadUtil;
     }
 
-    @Required
+    
     public void setFirmwareDirectory(String firmwareDirectory) {
         m_firmwareDirectory = firmwareDirectory;
     }

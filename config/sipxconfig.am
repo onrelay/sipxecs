@@ -1,20 +1,17 @@
 sipxconfig_neoconf_PKGS = \
-	ant-contrib \
 	antlr \
 	aopalliance \
-	axis \
 	bcpkix-jdk15on \
 	bcprov-jdk15on \
 	cglib \
-	com.noelios.restlet \
-	com.noelios.restlet.ext.servlet \
-	commons-beanutils \
+	commons-beanutils-core \
 	commons-codec \
 	commons-collections \
+	commons-collections4 \
 	commons-digester \
-	commons-httpclient \
 	commons-io \
 	commons-lang \
+	commons-lang3 \
 	commons-logging \
 	commons-net \
 	dom4j \
@@ -25,14 +22,20 @@ sipxconfig_neoconf_PKGS = \
 	hibernate \
 	hibernate-commons-annotations \
 	hibernate-jpa \
+	junit \
 	jackson-core-asl \
 	jackson-mapper-asl \
+	jackson-annotations \
 	jain-sip-sdp \
 	jakarta-oro \
 	jasper-runtime \
 	jasperreports \
-	javamail \
-	javax.servlet-api \
+	jasperreports-pdf \
+	jakarta.mail \
+	jakarta.activation-api \
+	jakarta.servlet-api \
+	jakarta.servlet.jsp-api \
+	jakarta.ws.rs-api \
 	jaxen \
 	jaxrpc \
 	jettison \
@@ -44,23 +47,36 @@ sipxconfig_neoconf_PKGS = \
 	lucene-queryparser \
 	lucene-suggest \
 	mime-dir-j-vcard4j \
-	mongo \
 	mysql-connector-java \
 	org.restlet \
 	org.restlet.ext.json \
 	org.restlet.ext.spring \
 	org.restlet.ext.fileupload \
+	org.restlet.ext.servlet \
 	spring-aop \
 	spring-beans \
 	spring-context \
 	spring-context-support \
 	spring-core \
 	spring-expression \
-	org.springframework.jdbc \
-	org.springframework.orm \
-	org.springframework.transaction \
+	spring-security-crypto \
+	spring-tx \
+	spring-jdbc \
+	spring-orm \
 	spring-web \
 	spring-webmvc \
+	spring-ws \
+	spring-xml \
+	spring-security-jwt \
+	spring-data-redis \
+	spring-security-config \
+	spring-security-core \
+	spring-security-ldap \
+	spring-security-web \
+	spring-messaging \
+	spring-data-commons \
+	spring-data-mongodb \
+	spring-ldap-core \
 	postgresql \
 	saxpath \
 	serializer \
@@ -68,55 +84,61 @@ sipxconfig_neoconf_PKGS = \
 	slf4j-api \
 	slf4j-log4j12 \
 	snmp4j \
-	spring-data-commons \
-	spring-data-mongodb \
-	spring-ldap \
-	spring-ws \
-	spring-security-jwt \
 	thumbnailator \
 	velocity \
 	velocity-tools-generic \
 	xercesImpl \
 	xmlrpc \
 	xstream \
-        jedis \
-        spring-data-redis \
-        spring-security-config \
-        spring-security-core \
-        spring-security-ldap \
-        spring-security-web \
+	jedis \
 	jradius-core \
 	jradius-dictionary \
 	gnu-crypto \
 	smack \
-	FastInfoset \
 	cxf-core \
     cxf-rt-rs-client \
 	cxf-rt-rs-service-description \
 	cxf-rt-transports-http \
 	cxf-rt-frontend-jaxrs \
 	cxf-rt-rs-extension-providers \
-	cxf-tools-wadlto-jaxrs \
-	javax.ws.rs-api \
 	neethi \
 	xmlschema-core \
-	wsdl4j \
 	jackson-jaxrs \
+	jackson-core \
+	jackson-databind \
+	jackson-annotations \
 	woodstox-core-asl \
 	jaxb-api \
 	jaxb-core \
 	jaxb-impl \
 	stax2-api \
 	jcl-over-slf4j \
-	spring-messaging \
 	jaudiotagger \
 	spring-websocket \
 	hazelcast-all \
 	reflections \
 	guava \
 	elasticsearch \
-	gson \ 
-	commons-cli
+	gson \
+	commons-cli \
+	mongodb-driver-core \
+	mongodb-driver-sync   \
+	bson  \
+	jsinterop-annotations \
+	asm \
+	asm-commons \
+	asm-util \
+	colt \
+	gwt-user \
+	gwt-dev \
+	smartgwt \
+	smartgwt-skins \
+	hivemind \
+	hivemind-lib \
+	tapestry-annotations \
+	tapestry-contrib \
+	tapestry-framework \
+	validation-api
 
 sipxconfig_web_PKGS = \
 	$(sipxconfig_neoconf_PKGS) \
@@ -126,30 +148,26 @@ sipxconfig_web_PKGS = \
 	c3p0 \
 	cglib-nodep \
 	commons-fileupload \
-	commons-pool \
 	ez-vcard \
 	hivemind \
 	hivemind-lib \
 	jasper-compiler \
 	javassist \
-	jdom \
 	jetty-server \
 	jetty-util \
 	jetty-http \
 	jetty-xml \
-	jetty-servlet \
-	jetty-servlets \
+	jetty-ee10-servlet \
+	jetty-ee10-servlets \
 	jetty-security \
 	jetty-deploy \
 	jetty-io \
-	jetty-webapp \
+	jetty-ee10-webapp \
 	websocket-api \
 	websocket-client \
 	websocket-common \
 	websocket-server \
 	websocket-servlet \
-	javax.servlet-api \
-	javax.servlet.jsp-api \
 	jta \
 	not-yet-commons-ssl \
 	ognl \
@@ -157,7 +175,6 @@ sipxconfig_web_PKGS = \
 	tapestry-annotations \
 	tapestry-contrib \
 	tapestry-framework \
-	xpp3 \
-	jackson-core \
-	jackson-databind \
-	jackson-annotations
+	xpp3 
+
+

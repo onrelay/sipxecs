@@ -24,7 +24,7 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.alias.AliasManager;
@@ -49,7 +49,6 @@ import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingDao;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationListener;
 import org.springframework.dao.support.DataAccessUtils;
 
@@ -117,7 +116,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
 
     private AutoAttendant getAttendant(String systemId) {
         String query = "from AutoAttendant a where a.systemId = :systemId";
-        List<AutoAttendant> operatorList = getHibernateTemplate().findByNamedParam(query, "systemId", systemId);
+        List<AutoAttendant> operatorList = (List<AutoAttendant>)getHibernateTemplate().findByNamedParam(query, "systemId", systemId);
 
         return DaoUtils.requireOneOrZero(operatorList, query);
     }
@@ -235,8 +234,8 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         return aa;
     }
 
-    private Collection getAutoAttendantsWithName(String alias) {
-        return getHibernateTemplate().findByNamedQueryAndNamedParam("autoAttendantIdsWithName", "value", alias);
+    private Collection<AutoAttendant> getAutoAttendantsWithName(String alias) {
+        return (Collection<AutoAttendant>)getHibernateTemplate().findByNamedQueryAndNamedParam("autoAttendantIdsWithName", "value", alias);
     }
 
     @Override
@@ -376,7 +375,8 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
     @Override
     public boolean manageLiveAttendant(String code, boolean enable) {
         try {
-            Collection<AttendantRule> rules = getHibernateTemplate().findByNamedQueryAndNamedParam("aaRulesForCode",
+            Collection<AttendantRule> rules = 
+                (Collection<AttendantRule>)getHibernateTemplate().findByNamedQueryAndNamedParam("aaRulesForCode",
                     "code", code);
             AttendantRule rule = DaoUtils.requireOneOrZero(rules, "aaByCode");
             rule.setLiveAttendantEnabled(enable);
@@ -460,7 +460,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         LOG.trace("Check live attendant expiration");
         // hibernate query to load all Live AA rules enabled and night on disable
         // check if current time after expiration time, if so then re enable rule
-        Collection<AttendantRule> rules = getHibernateTemplate().findByNamedQuery("disabledLiveAaRules");
+        Collection<AttendantRule> rules = (Collection<AttendantRule>)getHibernateTemplate().findByNamedQuery("disabledLiveAaRules");
         for (AttendantRule rule : rules) {
             LOG.debug("found rule " + rule.getExtension() + " will expire at " + rule.getLiveAttendantExpire());
             if (rule.getLiveAttendantExpire() != null && new Date().after(rule.getLiveAttendantExpire())) {
@@ -473,17 +473,17 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         }
     }
 
-    @Required
+    
     public void setSettingDao(SettingDao settingDao) {
         m_settingDao = settingDao;
     }
 
-    @Required
+    
     public void setBeanWithSettingsDao(BeanWithSettingsDao<AutoAttendantSettings> settingDao) {
         m_beanWithSettingsDao = settingDao;
     }
 
-    @Required
+    
     public void setAliasManager(AliasManager aliasManager) {
         m_aliasManager = aliasManager;
     }
@@ -493,12 +493,12 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         m_beanFactory = beanFactory;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }
 
-    @Required
+    
     public void setMediaServer(MediaServer mediaServer) {
         m_mediaServer = mediaServer;
     }
@@ -512,7 +512,8 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
     @Override
     public AutoAttendant getAutoAttendantByName(String attendantName) {
         String query = "from AutoAttendant a where a.name = :name";
-        List<AutoAttendant> operatorList = getHibernateTemplate().findByNamedParam(query, "name", attendantName);
+        List<AutoAttendant> operatorList = 
+            (List<AutoAttendant>)getHibernateTemplate().findByNamedParam(query, "name", attendantName);
 
         return DaoUtils.requireOneOrZero(operatorList, query);
     }

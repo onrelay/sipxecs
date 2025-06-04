@@ -6,8 +6,11 @@ import org.jivesoftware.openfire.XMPPServer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import com.mongodb.DB;
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoClient;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ConnectionString;
+import com.mongodb.client.MongoClients;
 
 /**
  * Setup and teardown for all tests going to OpenfireDB is the same.
@@ -17,8 +20,8 @@ public abstract class BaseMongoTest {
     private static final String OF_DB_NAME = "openfiredb_TEST";
 
     private static MongoClient mongoClient;
-    private static DB openfiredb;
-    private static DB imdb;
+    private static MongoDatabase openfiredb;
+    private static MongoDatabase imdb;
     private static XMPPServer server;
 
     @BeforeClass
@@ -30,16 +33,18 @@ public abstract class BaseMongoTest {
         System.setProperty("provider.properties.className", "org.jivesoftware.util.FilePropertiesProvider");
         System.setProperty("configFile", "mongo-lib/src/test/resources/openfire.properties");
 
-        mongoClient = new MongoClient();
-        imdb = mongoClient.getDB(IM_DB_NAME);
-        openfiredb = mongoClient.getDB(OF_DB_NAME);
-        // if (server == null) {
-        // synchronized (new byte[0]) {
-        // if (server == null) {
-        // server = new XMPPServer();
-        // }
-        // }
-        // }
+        // MongoDB client setup
+        ConnectionString connectionString = new ConnectionString("mongodb://localhost:27017"); // Replace with your MongoDB connection string
+        MongoClientSettings settings = MongoClientSettings.builder()
+                                                          .applyConnectionString(connectionString)
+                                                          .build();
+        mongoClient = MongoClients.create(settings);
+
+        // Get databases
+        imdb = mongoClient.getDatabase(IM_DB_NAME);
+        openfiredb = mongoClient.getDatabase(OF_DB_NAME);
+
+        // Initialize XMPP server
         try {
             server = new XMPPServer();
         } catch (IllegalStateException ex) {
@@ -49,16 +54,18 @@ public abstract class BaseMongoTest {
 
     @AfterClass
     public static void classTeardown() {
+        // Stop the server and drop the test databases
         server.stop();
-        mongoClient.dropDatabase(IM_DB_NAME);
-        mongoClient.dropDatabase(OF_DB_NAME);
+        mongoClient.getDatabase(IM_DB_NAME).drop();
+        mongoClient.getDatabase(OF_DB_NAME).drop();
+        mongoClient.close();
     }
 
-    protected static DB getOpenfireDb() {
+    protected static MongoDatabase getOpenfireDb() {
         return openfiredb;
     }
 
-    protected static DB getImdb() {
+    protected static MongoDatabase getImdb() {
         return imdb;
     }
 }

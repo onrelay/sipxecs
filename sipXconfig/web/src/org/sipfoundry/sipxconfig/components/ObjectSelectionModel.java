@@ -16,7 +16,7 @@ import java.util.Comparator;
 import ognl.Ognl;
 import ognl.OgnlException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.form.IPropertySelectionModel;
 
 public class ObjectSelectionModel implements IPropertySelectionModel {

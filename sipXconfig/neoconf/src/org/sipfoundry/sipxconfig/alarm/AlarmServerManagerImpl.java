@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.common.UserException;
@@ -34,12 +34,11 @@ import org.sipfoundry.sipxconfig.snmp.SnmpManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.util.CollectionUtils;
 
 public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> implements AlarmServerManager,
@@ -74,12 +73,12 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
         return defs;
     }
 
-    @Required
+    
     public void setLocationsManager(LocationsManager locationsManager) {
         m_locationsManager = locationsManager;
     }
 
-    @Required
+    
     public void setSipxUser(String sipxUser) {
         m_sipxUser = sipxUser;
     }
@@ -124,7 +123,7 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
         return affectDefaultGroup;
     }
 
-    @Required
+    
     public void setLogDirectory(String logDirectory) {
         m_logDirectory = logDirectory;
     }
@@ -134,7 +133,7 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
         return m_logDirectory;
     }
 
-    @Required
+    
     public void setMibsDirectory(String mibsDirectory) {
         m_mibsDirectory = mibsDirectory;
     }
@@ -152,7 +151,7 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
 
     @Override
     public AlarmServer getAlarmServer() {
-        List servers = getHibernateTemplate().loadAll(AlarmServer.class);
+        List<AlarmServer> servers = getHibernateTemplate().loadAll(AlarmServer.class);
         AlarmServer server = (AlarmServer) DataAccessUtils.singleResult(servers);
         if (server == null) {
             server = newAlarmServer();
@@ -322,7 +321,7 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
     }
 
     private boolean isNameChanged(AlarmGroup group) {
-        List count = getHibernateTemplate().findByNamedQueryAndNamedParam("countAlarmGroupWithSameName",
+        List<Object> count = (List<Object>)getHibernateTemplate().findByNamedQueryAndNamedParam("countAlarmGroupWithSameName",
                 new String[] {
                     PARAM_ALARM_GROUP_ID, PARAM_ALARM_GROUP_NAME
                 }, new Object[] {
@@ -411,7 +410,9 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
 
     @Override
     public void saveAlarmTrapReceivers(List<AlarmTrapReceiver> receivers) {
-        getHibernateTemplate().saveOrUpdateAll(receivers);
+        for (AlarmTrapReceiver receiver : receivers) {
+            getHibernateTemplate().saveOrUpdate(receiver);
+        }
     }
 
     @Override

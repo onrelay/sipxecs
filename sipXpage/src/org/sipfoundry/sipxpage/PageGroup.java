@@ -20,11 +20,12 @@ import javax.sip.address.SipURI;
 import org.apache.log4j.Logger;
 import org.sipfoundry.commons.util.UnfortunateLackOfSpringSupportFactory;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.WriteResult;
+import org.bson.Document;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.InsertOneResult;
+import com.mongodb.client.MongoCollection;
 
 /**
  * A PageGroup is the object that, given an inbound call,
@@ -359,9 +360,9 @@ public class PageGroup implements LegListener
       return true ;
    }
    
-   private DBCollection getDbCollection()
+   private MongoCollection<Document> getDbCollection()
    {
-	   DB imDb = UnfortunateLackOfSpringSupportFactory.getImdb();
+	   MongoDatabase imDb = UnfortunateLackOfSpringSupportFactory.getImdb();
 	   LOG.debug("PageGroup::MongoDebug::getDbCollection::imDb " + imDb);
 	   if(imDb != null)
 	   {
@@ -372,59 +373,42 @@ public class PageGroup implements LegListener
 	   }
    }
    
-   private boolean isUserBusy(String user)
-   {
-	   DBCollection pagingCollection = getDbCollection();
-	   BasicDBObject query = new BasicDBObject();
-	   query.append(SipXpage.MONGO_PAGING_USER, user);
-	   DBCursor cursor = pagingCollection.find(query);
-	   
-	   LOG.debug("PageGroup::MongoDebug::isUserBusy::cursor " + cursor);
-	   if(cursor.hasNext())
-	   {
-		   BasicDBObject dbo = (BasicDBObject)cursor.next();
-		   boolean busyState = ((BasicDBObject)dbo).getBoolean(SipXpage.MONGO_BUSY, false);
-		   LOG.debug("PageGroup::MongoDebug::isUserBusy::busyState " + busyState);
-		   return busyState;
-	   } else 
-	   {
-		   LOG.debug("PageGroup::MongoDebug::isUserBusy: No cursor, busy is false");
-		   return false;
-	   }
-   }
+   private boolean isUserBusy(String user) {
+      MongoCollection<Document> pagingCollection = getDbCollection();
+  
+      // Use Filters.eq to construct the query
+      Document dbo = pagingCollection.find(Filters.eq(SipXpage.MONGO_PAGING_USER, user)).first();
+  
+      // Check if a document was found and extract the busy state
+      boolean busyState = (dbo != null) && dbo.getBoolean(SipXpage.MONGO_BUSY, false);
+  
+      LOG.debug("PageGroup::MongoDebug::isUserBusy::busyState " + busyState);
+      return busyState;
+  }
    
-   private void setUserBusy(String user, boolean busy, int timeout)
-   {
-	   if(haEnabled)
-	   {
-		   DBCollection pagingCollection = getDbCollection();
-		   BasicDBObject query = new BasicDBObject();
-		   LOG.debug("PageGroup::MongoDebug::setUserBusy::user " + user);
-		   LOG.debug("PageGroup::MongoDebug::setUserBusy::busy " + busy);
-		   WriteResult result = null;
-		   if(busy)
-	       {
-			   query.append(SipXpage.MONGO_IP, ipAddress);
-			   query.append(SipXpage.MONGO_PAGING_USER, user);
-			   query.append(SipXpage.MONGO_BUSY, busy);
-			   query.append(SipXpage.MONGO_EXPIRE_TIME, new Date(System.currentTimeMillis() + timeout));
-			   result = pagingCollection.insert(query);
-	       }
-	       else
-	       {
-			   query.append(SipXpage.MONGO_PAGING_USER, user);
-			   result = pagingCollection.remove(query);
-	       }
-		   if(result != null)
-		   {
-			   LOG.debug("PageGroup::MongoDebug::setUserBusy::result " + result.toString());
-		   } else
-		   {
-			   LOG.debug("PageGroup::MongoDebug::setUserBusy: No result found");
-		   }
-	   } else
-	   {
-		   this.busy = busy;
-	   }
-   }
+private void setUserBusy(String user, boolean busy, int timeout) {
+
+    if (haEnabled) {
+        MongoCollection<Document> pagingCollection = getDbCollection();
+        LOG.debug("PageGroup::MongoDebug::setUserBusy::user " + user);
+
+        if (busy) {
+            Document query = new Document()
+                    .append(SipXpage.MONGO_IP, ipAddress)
+                    .append(SipXpage.MONGO_PAGING_USER, user)
+                    .append(SipXpage.MONGO_BUSY, true)
+                    .append(SipXpage.MONGO_EXPIRE_TIME, new Date(System.currentTimeMillis() + timeout));
+
+            InsertOneResult result = pagingCollection.insertOne(query);
+            LOG.debug("PageGroup::MongoDebug::setUserBusy::insert result " + result);
+        } 
+        else {
+            Document query = new Document().append(SipXpage.MONGO_PAGING_USER, user);
+            DeleteResult result = pagingCollection.deleteOne(query);
+            LOG.debug("PageGroup::MongoDebug::setUserBusy::delete result " + result);
+        }
+    } else {
+        this.busy = busy;
+    }
+}
 }

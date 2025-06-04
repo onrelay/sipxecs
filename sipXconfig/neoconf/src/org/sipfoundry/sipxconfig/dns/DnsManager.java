@@ -18,6 +18,7 @@ package org.sipfoundry.sipxconfig.dns;
 
 
 import java.util.Collection;
+import java.util.List;
 
 import org.sipfoundry.sipxconfig.address.Address;
 import org.sipfoundry.sipxconfig.address.AddressManager;
@@ -76,6 +77,8 @@ public interface DnsManager {
     public void deleteCustomRecords(DnsCustomRecords custom);
 
     public Collection<DnsCustomRecords> getCustomRecordsByIds(Collection<Integer> customIds);
+
+    public List<String> getSystemDnsServers();
 
     Collection<ResourceRecords> getResourceRecords();
 

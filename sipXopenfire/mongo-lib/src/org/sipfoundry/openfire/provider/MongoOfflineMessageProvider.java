@@ -26,7 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
@@ -37,10 +36,9 @@ import org.jivesoftware.util.FastDateFormat;
 import org.jivesoftware.util.StringUtils;
 import org.jivesoftware.util.XMPPDateTimeFormat;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.WriteResult;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.result.DeleteResult;
 
 public class MongoOfflineMessageProvider extends BaseMongoProvider implements OfflineMessageProvider {
     private static final String COLLECTION_NAME = "ofOffline";
@@ -59,15 +57,14 @@ public class MongoOfflineMessageProvider extends BaseMongoProvider implements Of
 
     public MongoOfflineMessageProvider() {
         setDefaultCollectionName(COLLECTION_NAME);
-        DBCollection offlineCollection = getDefaultCollection();
+        MongoCollection<Document> offlineCollection = getDefaultCollection();
 
-        offlineCollection.ensureIndex("username");
+        offlineCollection.createIndex(new Document("username", 1));
 
-        DBObject index = new BasicDBObject();
-
+        Document index = new Document();
         index.put("username", 1);
         index.put("messageID", 1);
-        offlineCollection.ensureIndex(index);
+        offlineCollection.createIndex(index);
     }
 
     /**
@@ -75,9 +72,9 @@ public class MongoOfflineMessageProvider extends BaseMongoProvider implements Of
      */
     @Override
     public void addMessage(String username, long messageID, String msgXML) {
-        DBCollection offlineCollection = getDefaultCollection();
+        MongoCollection<Document> offlineCollection = getDefaultCollection();
 
-        DBObject toInsert = new BasicDBObject();
+        Document toInsert = new Document();
 
         toInsert.put("username", username);
         toInsert.put("messageID", messageID);
@@ -85,7 +82,7 @@ public class MongoOfflineMessageProvider extends BaseMongoProvider implements Of
         toInsert.put("messageSize", msgXML.length());
         toInsert.put("stanza", msgXML);
 
-        offlineCollection.insert(toInsert);
+        offlineCollection.insertOne(toInsert);
     }
 
     /**
@@ -93,14 +90,14 @@ public class MongoOfflineMessageProvider extends BaseMongoProvider implements Of
      */
     @Override
     public boolean deleteMessage(String username, Date creationDate) {
-        DBCollection offlineCollection = getDefaultCollection();
+        MongoCollection<Document> offlineCollection = getDefaultCollection();
 
-        DBObject toDelete = new BasicDBObject();
+        Document toDelete = new Document();
         toDelete.put("username", username);
         toDelete.put("creationDate", StringUtils.dateToMillis(creationDate));
-        WriteResult result = offlineCollection.remove(toDelete);
+        DeleteResult result = offlineCollection.deleteOne(toDelete);
 
-        return !org.apache.commons.lang.StringUtils.isEmpty(result.getError());
+        return result.getDeletedCount() > 0;
     }
 
     /**
@@ -108,13 +105,13 @@ public class MongoOfflineMessageProvider extends BaseMongoProvider implements Of
      */
     @Override
     public boolean deleteMessages(String username) {
-        DBCollection offlineCollection = getDefaultCollection();
+        MongoCollection<Document> offlineCollection = getDefaultCollection();
 
-        DBObject toDelete = new BasicDBObject();
+        Document toDelete = new Document();
         toDelete.put("username", username);
-        WriteResult result = offlineCollection.remove(toDelete);
+        DeleteResult result = offlineCollection.deleteMany(toDelete);
 
-        return !org.apache.commons.lang.StringUtils.isEmpty(result.getError());
+        return result.getDeletedCount() > 0;
     }
 
     /**
@@ -122,15 +119,23 @@ public class MongoOfflineMessageProvider extends BaseMongoProvider implements Of
      */
     @Override
     public OfflineMessage getMessage(String username, Date creationDate, SAXReader xmlReader) {
-        DBCollection offlineCollection = getDefaultCollection();
+        MongoCollection<Document> offlineCollection = getDefaultCollection();
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
         query.put("username", username);
         query.put("creationDate", StringUtils.dateToMillis(creationDate));
-        DBObject keys = new BasicDBObject();
-        keys.put("stanza", 1);
 
-        DBObject dbObj = offlineCollection.findOne(query);
+        Document projection = new Document();
+        projection.put("stanza", 1);
+
+        Document dbObj = offlineCollection.find(query)
+                                        .projection(projection)
+                                        .first();
+
+        if (dbObj == null) {
+            return null; // or handle not found case as appropriate
+        }
+
         String msgXml = (String) dbObj.get("stanza");
 
         return fromString(msgXml, creationDate, xmlReader);
@@ -141,26 +146,25 @@ public class MongoOfflineMessageProvider extends BaseMongoProvider implements Of
      */
     @Override
     public Collection<OfflineMessage> getMessages(String username, boolean delete, SAXReader xmlReader) {
-        List<OfflineMessage> messages = new ArrayList<OfflineMessage>();
-        DBCollection offlineCollection = getDefaultCollection();
+        List<OfflineMessage> messages = new ArrayList<>();
+        MongoCollection<Document> offlineCollection = getDefaultCollection();
 
-        DBObject query = new BasicDBObject();
-        query.put("username", username);
-        DBObject keys = new BasicDBObject();
-        keys.put("stanza", 1);
-        keys.put("creationDate", 1);
+        Document query = new Document("username", username);
+        Document projection = new Document("stanza", 1).append("creationDate", 1);
 
-        for (DBObject dbObj : offlineCollection.find(query, keys)) {
-            String msgXml = (String) dbObj.get("stanza");
-            Date creationDate = new Date(Long.parseLong((String) dbObj.get("creationDate")));
+        // Iterate over results with projection
+        for (Document dbObj : offlineCollection.find(query).projection(projection)) {
+            String msgXml = dbObj.getString("stanza");
+            // Note: "creationDate" stored as string in old code, convert properly:
+            String creationDateStr = dbObj.getString("creationDate");
+            Date creationDate = new Date(Long.parseLong(creationDateStr));
             messages.add(fromString(msgXml, creationDate, xmlReader));
         }
 
-        // Check if the offline messages loaded should be deleted, and that there are
-        // messages to delete
+        // Delete if requested
         if (delete && !messages.isEmpty()) {
             log.debug("deleting offline messages for user " + username);
-            offlineCollection.remove(query);
+            offlineCollection.deleteMany(query);
         }
 
         return messages;
@@ -171,7 +175,7 @@ public class MongoOfflineMessageProvider extends BaseMongoProvider implements Of
      */
     @Override
     public int getSize() {
-        return getSize(new BasicDBObject());
+        return getSize(new Document());
     }
 
     /**
@@ -179,22 +183,21 @@ public class MongoOfflineMessageProvider extends BaseMongoProvider implements Of
      */
     @Override
     public int getSize(String username) {
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
 
         query.put("username", username);
 
         return getSize(query);
     }
 
-    private int getSize(DBObject toFind) {
-        DBCollection offlineCollection = getDefaultCollection();
+    private int getSize(Document toFind) {
+        MongoCollection<Document> offlineCollection = getDefaultCollection();
 
         int totalSize = 0;
-        BasicDBObject keys = new BasicDBObject();
-        keys.put("messageSize", 1);
+        Document projection = new Document("messageSize", 1);
 
-        for (DBObject dbObj : offlineCollection.find(toFind, keys)) {
-            int messageSize = (Integer) dbObj.get("messageSize");
+        for (Document dbObj : offlineCollection.find(toFind).projection(projection)) {
+            Integer messageSize = dbObj.getInteger("messageSize", 0);
             totalSize += messageSize;
         }
 
@@ -211,7 +214,7 @@ public class MongoOfflineMessageProvider extends BaseMongoProvider implements Of
                 Matcher matcher = PATTERN.matcher(msgXml);
                 if (matcher.find()) {
                     String invalidRemoved = matcher.replaceAll("");
-                    Document doc = xmlReader.read(new StringReader(invalidRemoved));
+                    org.dom4j.Document doc = xmlReader.read(new StringReader(invalidRemoved));
                     message = new OfflineMessage(creationDate, doc.getRootElement());
                 }
             }

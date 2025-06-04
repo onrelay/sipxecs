@@ -23,10 +23,14 @@ import org.sipfoundry.commons.siprouter.ProxyRouter;
 import org.sipfoundry.commons.util.UnfortunateLackOfSpringSupportFactory;
 import org.sipfoundry.sipxpage.Configuration.PageGroupConfig;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
+import org.bson.Document;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import org.bson.conversions.Bson;
 
 public class SipXpage implements LegListener
 {
@@ -296,24 +300,23 @@ public class SipXpage implements LegListener
       return true ;
    }
    
-   private void clearBusyStatesFromServer()
-   {
-	   if(config != null)
-	   {
-	       LOG.info("Clear busy states in node DB from server with IP: " + config.ipAddress);
-		   DBCollection pagingCollection = getDbCollection();
-		   BasicDBObject query = new BasicDBObject();
-		   query.append(MONGO_IP, config.ipAddress);
-		   pagingCollection.remove(query);
-	   } else
-	   {
-		   LOG.fatal("Could not clear busy states from server. IP is unknown.");   
-	   }
+   private void clearBusyStatesFromServer() {
+      if (config != null) {
+         LOG.info("Clear busy states in node DB from server with IP: " + config.ipAddress);
+         MongoCollection<Document> pagingCollection = getDbCollection();
+         
+         Document query = new Document(MONGO_IP, config.ipAddress);
+         DeleteResult result = pagingCollection.deleteMany(query);
+
+         LOG.debug("PageGroup::MongoDebug::clearBusyStatesFromServer::delete result " + result);
+      } else {
+         LOG.fatal("Could not clear busy states from server. IP is unknown.");
+      }
    }
    
-   private DBCollection getDbCollection()
+   private MongoCollection<Document> getDbCollection()
    {
-	   DB imDb = UnfortunateLackOfSpringSupportFactory.getImdb();
+	   MongoDatabase imDb = UnfortunateLackOfSpringSupportFactory.getImdb();
 	   if(imDb != null)
 	   {
 		   return imDb.getCollection(MONGO_COLLECTION_PAGING);
@@ -323,30 +326,33 @@ public class SipXpage implements LegListener
 	   }
    }
    
-   private void createIndexForPaging()
-   {
-	   DBCollection pagingCollection = getDbCollection();
-	   if(pagingCollection != null)
-	   {
-	       DBCollection indexesCollection = UnfortunateLackOfSpringSupportFactory.getImdb().getCollection("system.indexes");
+   private void createIndexForPaging() {
+      MongoCollection<Document> pagingCollection = getDbCollection();
+      if (pagingCollection != null) {
+         // Define the index key and index options
+         Bson indexKey = Indexes.ascending(MONGO_EXPIRE_TIME);
+         IndexOptions indexOptions = new IndexOptions().expireAfter(1L, java.util.concurrent.TimeUnit.SECONDS);
 
-	       // Add index for state TTL
-	       BasicDBObject dateField = new BasicDBObject().append(MONGO_EXPIRE_TIME, 1);
-	       BasicDBObject deleteObj = new BasicDBObject().append("expireAfterSeconds", 1);
-	   
-	       BasicDBObject query = new BasicDBObject();
-	       query.append("key", dateField);
-	       query.append("ns", "imdb" + "." + MONGO_COLLECTION_PAGING);
-	       query.append("expireAfterSeconds", 1);
-	   
-	       // Check if index already exist. If not create it
-	       DBCursor cursor = indexesCollection.find(query).limit(1);
-	       if(!cursor.hasNext())
-	       {
-	    	   // TTL could exist with different expire time. Drop to ensure correct time
-	    	   pagingCollection.dropIndex(dateField);
-	    	   pagingCollection.createIndex(dateField, deleteObj);
-	       }
-	   }
+         boolean indexExists = false;
+         for (Document indexDoc : pagingCollection.listIndexes()) {
+               Document key = (Document) indexDoc.get("key");
+               Long expireAfterSeconds = indexDoc.getLong("expireAfterSeconds");
+
+               if (key != null && key.containsKey(MONGO_EXPIRE_TIME) && expireAfterSeconds != null && expireAfterSeconds == 1L) {
+                  indexExists = true;
+                  break;
+               }
+         }
+
+         if (!indexExists) {
+               // Drop any existing index on the same field just in case
+               try {
+                  pagingCollection.dropIndex(indexKey);
+               } catch (Exception e) {
+                  // It might not exist, safe to ignore
+               }
+               pagingCollection.createIndex(indexKey, indexOptions);
+         }
+      }
    }
 }

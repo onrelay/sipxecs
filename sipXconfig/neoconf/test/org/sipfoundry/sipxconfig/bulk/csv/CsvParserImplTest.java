@@ -18,7 +18,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.collections.Closure;
+import org.apache.commons.collections4.Closure;
 import org.sipfoundry.sipxconfig.bulk.BulkParser;
 
 public class CsvParserImplTest extends TestCase {

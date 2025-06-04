@@ -17,8 +17,8 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.time.DateUtils;
 
 public class MillisDurationFormat extends Format {
 

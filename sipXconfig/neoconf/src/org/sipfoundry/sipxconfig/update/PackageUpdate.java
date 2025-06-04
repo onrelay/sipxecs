@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.update;
 
 import java.io.Serializable;
 
-import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang3.StringUtils.split;
 
 /**
  * Represents an available package update.

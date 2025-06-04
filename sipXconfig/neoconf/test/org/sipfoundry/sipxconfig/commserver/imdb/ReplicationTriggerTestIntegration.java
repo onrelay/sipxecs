@@ -34,7 +34,7 @@ import org.sipfoundry.sipxconfig.test.ImdbTestCase;
 import org.sipfoundry.sipxconfig.tls.TlsPeer;
 import org.sipfoundry.sipxconfig.tls.TlsPeerManager;
 
-import com.mongodb.BasicDBObject;
+import org.bson.Document;
 
 public class ReplicationTriggerTestIntegration extends ImdbTestCase {
     private ReplicationTrigger m_trigger;
@@ -61,7 +61,7 @@ public class ReplicationTriggerTestIntegration extends ImdbTestCase {
     public void _testUpdateUserGroup() throws Exception {
         loadDataSet("commserver/imdb/UserGroupSeed2.db.xml");
 
-        Group g = m_dao.getGroup(new Integer(1000));
+        Group g = m_dao.getGroup(Integer.valueOf(1000));
         User user = getCoreContext().loadUser(1001);
         user.setPermissionManager(getPermissionManager());
         User user2 = getCoreContext().loadUser(1002);
@@ -85,7 +85,7 @@ public class ReplicationTriggerTestIntegration extends ImdbTestCase {
 
         m_tlsPeerManager.saveTlsPeer(peer);
         commit();
-        assertObjectPresent(getEntityCollection(), new BasicDBObject().append("ident", "~~tp~test@example.org"));
+        assertObjectPresent(getEntityCollection(), new Document().append("ident", "~~tp~test@example.org"));
     }
 
     /*

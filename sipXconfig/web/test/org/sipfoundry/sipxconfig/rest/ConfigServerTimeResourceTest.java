@@ -11,8 +11,8 @@ import java.util.Date;
 import java.util.Locale;
 
 import org.restlet.data.MediaType;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Representation;
+import org.restlet.representation.Variant;
 
 import junit.framework.TestCase;
 

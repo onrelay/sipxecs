@@ -11,14 +11,14 @@ import org.junit.After;
 import org.junit.Test;
 import org.xmpp.packet.Message;
 
-import com.mongodb.BasicDBObject;
+import org.bson.Document;
 
 @SuppressWarnings("static-method")
 public class OfflineMessageProviderTest extends BaseMongoTest {
 
     @After
     public void teardown() {
-        getOpenfireDb().getCollection("ofOffline").remove(new BasicDBObject());
+        getOpenfireDb().getCollection("ofOffline").remove(new Document());
     }
 
     @Test

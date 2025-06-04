@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.collections.iterators.TransformIterator;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.iterators.TransformIterator;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.branch.Branch;
 import org.sipfoundry.sipxconfig.common.NamedObject;
 

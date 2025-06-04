@@ -35,7 +35,6 @@ import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.domain.Domain;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingUtil;
-import org.springframework.beans.factory.annotation.Required;
 
 public class RestConfiguration implements ConfigProvider {
     private RestServer m_restServer;
@@ -98,7 +97,7 @@ public class RestConfiguration implements ConfigProvider {
         m_velocityEngine = velocityEngine;
     }
 
-    @Required
+    
     public void setPostgresPwd(String postgresPwd) {
         m_postgresPwd = postgresPwd;
     }

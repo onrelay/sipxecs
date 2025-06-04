@@ -605,35 +605,4 @@ public class FindSipServer {
     }
 
 
-
-
-	/*
-	 * public static void main(String[] args) { FindSipServer f = new
-	 * FindSipServer(); try { SipFactory sipFactory = SipFactory.getInstance();
-	 * AddressFactory addressFactory = sipFactory.createAddressFactory();
-	 * javax.sip.address.Address addr =addressFactory.createAddress(
-	 * "Hello<sip:woof@interop.pingtel.com:5000;transport=udp>"); Hop h =
-	 * f.findServer((SipURI)addr.getURI());
-	 * System.out.println("Hop is "+h.toString()); System.out.println();
-	 *
-	 * addr =
-	 * addressFactory.createAddress("sip:1@47.16.90.233:5160;Alert-info=sipXpage"
-	 * ); h = f.findServer((SipURI)addr.getURI());
-	 * System.out.println("Hop is "+h.toString()); System.out.println();
-	 *
-	 * addr = addressFactory.createAddress("sip:woof@interop.pingtel.com"); h =
-	 * f.findServer((SipURI)addr.getURI());
-	 * System.out.println("Hop is "+h.toString()); System.out.println();
-	 *
-	 * addr = addressFactory.createAddress("sip:woof@nortel.com"); h =
-	 * f.findServer((SipURI)addr.getURI());
-	 * System.out.println("Hop is "+h.toString()); System.out.println();
-	 *
-	 * } catch (ParseException e) { // TODO Auto-generated catch block
-	 * e.printStackTrace(); } catch (PeerUnavailableException e) { // TODO
-	 * Auto-generated catch block e.printStackTrace(); }
-	 *
-	 * }
-	 */
-
 }

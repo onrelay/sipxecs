@@ -12,6 +12,7 @@ package org.sipfoundry.sipxconfig.test;
 import static org.easymock.EasyMock.aryEq;
 import static org.easymock.EasyMock.reportMatcher;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -42,7 +43,7 @@ import javax.sql.DataSource;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
-import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -81,13 +82,10 @@ import org.sipfoundry.sipxconfig.setting.ModelFilesContext;
 import org.sipfoundry.sipxconfig.setting.ModelFilesContextImpl;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.XmlModelBuilder;
-import org.springframework.beans.factory.access.BeanFactoryLocator;
-import org.springframework.beans.factory.access.BeanFactoryReference;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import com.mongodb.util.JSON;
 
 /**
 * TestHelper: used for unit tests that need Spring instantiated
@@ -140,9 +138,12 @@ public final class TestHelper {
 
     public static ApplicationContext getApplicationContext() {
         if (s_appContext == null) {
-            BeanFactoryLocator bfl = ContextSingletonBeanFactoryLocator.getInstance();
-            BeanFactoryReference bfr = bfl.useBeanFactory("servicelayer-context");
-            s_appContext = (ApplicationContext) bfr.getFactory();
+            s_appContext = new ClassPathXmlApplicationContext(
+                "classpath:/org/sipfoundry/sipxconfig/system.beans.xml",
+                "classpath*:/org/sipfoundry/sipxconfig/*/**/*.beans.xml",
+                "classpath*:/sipxplugin2.beans.xml",
+                "classpath*:/sipxplugin.beans.xml",
+                "classpath*:/sipxplugin0.beans.xml");
         }
 
         return s_appContext;
@@ -152,21 +153,24 @@ public final class TestHelper {
         Domain exampleDomain = new Domain(domain);
         exampleDomain.setNetworkName(domain);
         exampleDomain.setName(domain);
-        IMocksControl domainManagerControl = EasyMock.createControl();
-        DomainManager domainManager = domainManagerControl.createMock(DomainManager.class);
-        domainManager.getDomain();
-        domainManagerControl.andReturn(exampleDomain).anyTimes();
-        domainManagerControl.replay();
-        return domainManager;
+
+        IMocksControl control = EasyMock.createControl();
+        DomainManager mock = control.createMock(DomainManager.class);
+
+        EasyMock.expect(mock.getDomain()).andReturn(exampleDomain).anyTimes();
+        control.replay();
+
+        return mock;
     }
 
     public static TimeZoneManager getTimeZoneManager(DeviceTimeZone tz) {
-        IMocksControl timeZoneManagerControl = EasyMock.createControl();
-        TimeZoneManager tzm = timeZoneManagerControl.createMock(TimeZoneManager.class);
-        tzm.getDeviceTimeZone();
-        timeZoneManagerControl.andReturn(tz).anyTimes();
-        timeZoneManagerControl.replay();
-        return tzm;
+        IMocksControl control = EasyMock.createControl();
+        TimeZoneManager mock = control.createMock(TimeZoneManager.class);
+
+        EasyMock.expect(mock.getDeviceTimeZone()).andReturn(tz).anyTimes();
+        control.replay();
+
+        return mock;
     }
 
     public static ModelFilesContext getModelFilesContext() {
@@ -360,8 +364,8 @@ public final class TestHelper {
             Object expected = getExpected();
 
             if (expected instanceof Object[] && (actual == null || actual instanceof Object[])) {
-                Set expectedSet = new HashSet(Arrays.asList((Object[]) expected));
-                Set actualSet = new HashSet(Arrays.asList((Object[]) actual));
+                Set<Object> expectedSet = new HashSet<Object>(Arrays.asList((Object[]) expected));
+                Set<Object> actualSet = new HashSet<Object>(Arrays.asList((Object[]) actual));
 
                 return expectedSet.equals(actualSet);
             }
@@ -380,8 +384,8 @@ public final class TestHelper {
             Object expected = getExpected();
 
             if (expected instanceof Collection && (actual == null || actual instanceof Collection)) {
-                Set expectedSet = new HashSet(((Collection) expected));
-                Set actualSet = new HashSet(((Collection) actual));
+                Set<Object> expectedSet = new HashSet<Object>(((Collection<Object>) expected));
+                Set<Object> actualSet = new HashSet<Object>(((Collection<Object>) actual));
 
                 return expectedSet.equals(actualSet);
             }
@@ -404,8 +408,8 @@ public final class TestHelper {
         IOUtils.closeQuietly(from);
     }
 
+    @SuppressWarnings("rawtypes")
     public static String getSourceDirectory(Class klass) {
-        String n = klass.getSimpleName();
         return getResourceAsFile(klass, klass.getSimpleName() + ".java").getParent();
     }
 
@@ -416,7 +420,8 @@ public final class TestHelper {
 * @param resource resource name relative to class
 * @return file that can be opened and used to read resource
 */
-    public static File getResourceAsFile(Class klass, String resource) {
+    @SuppressWarnings("rawtypes")
+    public static File getResourceAsFile( Class klass, String resource) {
         URL url = klass.getResource(resource);
         return new File(url.getFile());
     }
@@ -481,6 +486,7 @@ public final class TestHelper {
     /**
 * The directory that is part of the classpath that a class was loaded from
 */
+    @SuppressWarnings("rawtypes")
     public static String getClasspathDirectory(Class testClass) {
         // create file on classpath
         CodeSource code = testClass.getProtectionDomain().getCodeSource();
@@ -565,13 +571,14 @@ public final class TestHelper {
         domain.setName(EXAMPLE_ORG);
         domain.setSipRealm(EXAMPLE_ORG);
 
-        DomainManager domainManager = EasyMock.createMock(DomainManager.class);
-        domainManager.getDomain();
-        EasyMock.expectLastCall().andReturn(domain).anyTimes();
+        DomainManager mock = EasyMock.createMock(DomainManager.class);
+        EasyMock.expect(mock.getDomain()).andReturn(domain).anyTimes();
+        
         if (replay) {
-            EasyMock.replay(domainManager);
+            EasyMock.replay(mock);
         }
-        return domainManager;
+
+        return mock;
     }
 
     /**
@@ -624,11 +631,10 @@ public final class TestHelper {
 *
 */
     public static LocationsManager getMockLocationsManager() {
-        LocationsManager locationsManager = EasyMock.createMock(LocationsManager.class);
-        locationsManager.getPrimaryLocation();
-        EasyMock.expectLastCall().andReturn(createDefaultLocation()).anyTimes();
-        EasyMock.replay(locationsManager);
-        return locationsManager;
+        LocationsManager mock = EasyMock.createMock(LocationsManager.class);
+        EasyMock.expect(mock.getPrimaryLocation()).andReturn(createDefaultLocation()).anyTimes();
+        EasyMock.replay(mock);
+        return mock;
     }
 
     /**
@@ -685,14 +691,18 @@ public final class TestHelper {
     }
 
     public static void assertEqualJson(String expectedJson, String actualJson) {
-        Map<?, ?> e = (Map<?, ?>) JSON.parse(expectedJson);
-        ByteArrayOutputStream expected = new ByteArrayOutputStream();
-        MapUtils.debugPrint(new PrintStream(expected), EMPTY, e);
+        try {
+            Map<?, ?> e = new ObjectMapper().readValue(expectedJson, Map.class);
+            ByteArrayOutputStream expected = new ByteArrayOutputStream();
+            MapUtils.debugPrint(new PrintStream(expected), EMPTY, e);
 
-        Map< ? , ? > a = (Map< ? , ? >) JSON.parse(actualJson);
-        ByteArrayOutputStream actual = new ByteArrayOutputStream();
-        MapUtils.debugPrint(new PrintStream(actual), EMPTY, a);
+            Map< ? , ? > a = new ObjectMapper().readValue(actualJson, Map.class);
+            ByteArrayOutputStream actual = new ByteArrayOutputStream();
+            MapUtils.debugPrint(new PrintStream(actual), EMPTY, a);
 
-        assertEquals(expected.toString(), actual.toString());
+            assertEquals(expected.toString(), actual.toString());
+        } catch( Exception ex ) {
+            Assert.fail(ex.getMessage());
+        }
     }
 }

@@ -9,12 +9,12 @@
  */
 package org.sipfoundry.sipxconfig.search;
 
-import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.common.DataObjectSource;
 import org.sipfoundry.sipxconfig.search.BeanAdaptor.Identity;
-import org.springframework.orm.hibernate3.HibernateObjectRetrievalFailureException;
+import org.springframework.orm.hibernate5.HibernateObjectRetrievalFailureException;
 
 /**
  * Tries to load bean from DataObjectSource if the object cannot be loaded catches exception and returns null

@@ -38,7 +38,7 @@ public class Server {
         return buffer.toString();
     }
 
-    public int calculateTest(Vector names) {
+    public int calculateTest(Vector<String> names) {
         int len = 0;
         for (int i = 0; i < names.size(); i++) {
             len += ((String) names.get(i)).length();
@@ -46,7 +46,7 @@ public class Server {
         return len;
     }
 
-    public Hashtable create(Hashtable map) {
+    public Hashtable<String,Object> create(Hashtable<String,Object> map) {
         return map;
     }
 }

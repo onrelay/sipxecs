@@ -35,12 +35,9 @@ public class LocalizedOptionModelDecoratorTest extends TestCase {
     public void testLocalization() {
         IMocksControl messagesControl = EasyMock.createStrictControl();
         Messages messages = messagesControl.createMock(Messages.class);
-        messages.getMessage("xyz.a");
-        messagesControl.andReturn("localized a");
-        messages.getMessage("xyz.b");
-        messagesControl.andReturn("b");
-        messages.getMessage("c");
-        messagesControl.andReturn("localized c");
+        EasyMock.expect(messages.getMessage("xyz.a")).andReturn("localized a");
+        EasyMock.expect(messages.getMessage("xyz.b")).andReturn("b");
+        EasyMock.expect(messages.getMessage("c")).andReturn("localized c");
         messagesControl.replay();
 
         m_out.setMessages(messages);

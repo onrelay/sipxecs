@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
-import org.sipfoundry.commons.freeswitch.Localization;
 
 /*
  *  this class is responsible with conversing with the user until a command has

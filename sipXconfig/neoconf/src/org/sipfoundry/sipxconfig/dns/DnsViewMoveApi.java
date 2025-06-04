@@ -25,14 +25,15 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 
-public class DnsViewMoveApi extends Resource {
+public class DnsViewMoveApi extends ServerResource {
     private DnsManager m_dnsManager;
     private ObjectMapper m_jsonMapper = new ObjectMapper();
 
@@ -42,14 +43,11 @@ public class DnsViewMoveApi extends Resource {
         getVariants().add(new Variant(APPLICATION_JSON));
     }
 
-    @Override
-    public boolean allowPut() {
-        return true;
-    };
+
 
     // PUT
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {       
         try {
             JsonNode data = m_jsonMapper.reader().readTree(entity.getStream());
             int step = Integer.valueOf(data.get("step").asInt());
@@ -60,12 +58,11 @@ public class DnsViewMoveApi extends Resource {
             }
             m_dnsManager.moveViewById(ids.toArray(new Integer[0]), step);
         } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return null;
     }
 
     public void setDnsManager(DnsManager dnsManager) {

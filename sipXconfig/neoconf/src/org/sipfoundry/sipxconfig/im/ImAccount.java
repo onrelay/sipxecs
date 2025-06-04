@@ -10,8 +10,8 @@
 
 package org.sipfoundry.sipxconfig.im;
 
-import static org.apache.commons.lang.StringUtils.defaultString;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.sipfoundry.sipxconfig.common.AbstractUser.IM_ACCOUNT;
 
 import org.sipfoundry.sipxconfig.common.AbstractUser;

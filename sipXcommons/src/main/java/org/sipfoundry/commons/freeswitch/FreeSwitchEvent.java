@@ -11,8 +11,6 @@ package org.sipfoundry.commons.freeswitch;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Vector;
 

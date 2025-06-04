@@ -36,7 +36,6 @@ import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.tls.TlsPeer;
 import org.sipfoundry.sipxconfig.tls.TlsPeerManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -179,7 +178,7 @@ public class ProxyConfiguration implements ConfigProvider, ApplicationContextAwa
         return document;
     }
 
-    @Required
+    
     public void setTlsPeerManager(TlsPeerManager peerManager) {
         m_tlsPeerManager = peerManager;
     }
@@ -193,7 +192,7 @@ public class ProxyConfiguration implements ConfigProvider, ApplicationContextAwa
         m_context = context;
     }
 
-    @Required
+    
     public void setProxyLimitsConfig(AbstractResLimitsConfig proxyLimitsConfig) {
         m_proxyLimitsConfig = proxyLimitsConfig;
     }

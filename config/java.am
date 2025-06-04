@@ -9,7 +9,7 @@
 # It's useful to talk about 4 different types of targets: 
 # I.) Compiling
 # II.) Building a jar
-# III.) Running arbitrary java commands. example: generating java source from WSDL file
+# III.) Running arbitrary java commands. 
 # IV.) Unit testing
 #
 #

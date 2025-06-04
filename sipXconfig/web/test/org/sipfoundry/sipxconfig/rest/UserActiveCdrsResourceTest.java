@@ -16,9 +16,10 @@
  */
 package org.sipfoundry.sipxconfig.rest;
 
+import org.easymock.EasyMock;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -30,9 +31,9 @@ import junit.framework.TestCase;
 import org.apache.commons.io.IOUtils;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
+import org.restlet.Request;
+import org.restlet.representation.Representation;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.cdr.ActiveCallCdr;
 import org.sipfoundry.sipxconfig.cdr.Cdr;
 import org.sipfoundry.sipxconfig.cdr.CdrManager;
@@ -64,12 +65,12 @@ public class UserActiveCdrsResourceTest extends TestCase {
 
         m_cdr = new ActiveCallCdr();
         Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(new Long("1299785283000"));
+        c.setTimeInMillis(Long.valueOf("1299785283000"));
         m_cdr.setCallerAor("<sip:user3@decebal.buc.ro:5060>");
         m_cdr.setCalleeAor("<sip:user4@decebal.buc.ro:5060>");
         m_cdr.setCalleeContact("contact");
         m_cdr.setStartTime(c.getTime());
-        m_cdr.setDuration(new Long("71069032"));
+        m_cdr.setDuration(Long.valueOf("71069032"));
 
         List<Cdr> cdrs = new ArrayList<Cdr>();
         cdrs.add(m_cdr);

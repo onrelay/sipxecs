@@ -16,10 +16,10 @@
  */
 package org.sipfoundry.sipxconfig.commserver.imdb;
 
-import com.mongodb.BasicDBObject;
+import org.bson.Document;
 import org.sipfoundry.sipxconfig.common.Replicable;
 
-public abstract class DataSetRecord extends BasicDBObject {
+public abstract class DataSetRecord extends Document {
     private Replicable m_entity;
 
     public Replicable getEntity() {

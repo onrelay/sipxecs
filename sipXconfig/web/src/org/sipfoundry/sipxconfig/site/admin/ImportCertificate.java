@@ -19,7 +19,7 @@ package org.sipfoundry.sipxconfig.site.admin;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tapestry.BaseComponent;
@@ -46,9 +46,9 @@ import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.site.common.IntegerPropertySelectionModel;
 
 public abstract class ImportCertificate extends BaseComponent implements PageBeginRenderListener {
-    public static final Integer UPLOAD = new Integer(1);
+    public static final Integer UPLOAD = Integer.valueOf(1);
 
-    public static final Integer TEXT = new Integer(2);
+    public static final Integer TEXT = Integer.valueOf(2);
 
     private static final Log LOG = LogFactory.getLog(ImportCertificate.class);
 

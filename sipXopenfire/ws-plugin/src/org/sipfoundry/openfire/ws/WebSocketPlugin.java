@@ -17,38 +17,52 @@
 package org.sipfoundry.openfire.ws;
 
 import java.io.File;
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import org.apache.commons.httpclient.contrib.ssl.EasySSLProtocolSocketFactory;
-import org.apache.commons.httpclient.protocol.Protocol;
-import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import javax.net.ssl.*;
+
 import org.jivesoftware.openfire.container.Plugin;
 import org.jivesoftware.openfire.container.PluginManager;
 import org.jivesoftware.openfire.user.PresenceEventDispatcher;
 
 public class WebSocketPlugin implements Plugin {
 
-	@Override
-	public void initializePlugin(PluginManager pluginManager, File file) {
-	    trustAllCerts();
-	    PresenceEventDispatcher.addListener(new PresenceEventListenerImpl());
-	}
-
-	@Override
-	public void destroyPlugin() {
-	}
-
-    public void trustAllCerts(){
-        ProtocolSocketFactory sf;
+    @Override
+    public void initializePlugin(PluginManager pluginManager, File file) {
         try {
-            sf = new EasySSLProtocolSocketFactory();
-            Protocol p = new Protocol("https", sf, 443);
-            Protocol.registerProtocol("https", p);
+            trustAllCerts(); // Only use in dev/test environments
         } catch (GeneralSecurityException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        PresenceEventDispatcher.addListener(new PresenceEventListenerImpl());
+    }
+
+    @Override
+    public void destroyPlugin() {
+        // No-op
+    }
+
+    /**
+     * Trusts all HTTPS certificates, insecure!
+     */
+    private void trustAllCerts() throws GeneralSecurityException {
+        TrustManager[] trustAllCerts = new TrustManager[]{
+            new X509TrustManager() {
+                public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+                public void checkClientTrusted(X509Certificate[] certs, String authType) { }
+                public void checkServerTrusted(X509Certificate[] certs, String authType) { }
+            }
+        };
+
+        SSLContext sc = SSLContext.getInstance("TLS");
+        sc.init(null, trustAllCerts, new SecureRandom());
+
+        // Set the default SSL socket factory to trust all
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+        // Also trust all hostnames (optional, also insecure)
+        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
     }
 }

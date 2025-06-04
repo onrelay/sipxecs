@@ -91,7 +91,7 @@ public class PKCS12Import
             (fileOut.exists())
             ? new FileInputStream(fileOut) : null, outphrase);
 
-      Enumeration eAliases = kspkcs12.aliases();
+      Enumeration<String> eAliases = kspkcs12.aliases();
       int n = 0;
       while (eAliases.hasMoreElements()) {
          String strAlias = (String)eAliases.nextElement();

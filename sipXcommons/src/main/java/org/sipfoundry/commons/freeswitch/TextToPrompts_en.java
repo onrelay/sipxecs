@@ -144,7 +144,7 @@ public class TextToPrompts_en extends TextToPrompts {
         int v = origValue;
 
         if (v < 0) {
-            // TODO Currently no way of saying minus or negative with current prompt set
+            // Currently no way of saying minus or negative with current prompt set
             // result = "minus.wav:" ;
             v = -v; // Convert back to positive
         }

@@ -49,7 +49,7 @@ public class EmailFormatter implements ApplicationContextAware {
             fromUri = vmessage.getDescriptor().getFromUri();
             fromUser = ValidUsers.getUserPart(fromUri);
             fromDisplay = ValidUsers.getDisplayPart(fromUri);
-            args[ 0] = new Long(vmessage.getDescriptor().getDurationSecsLong()*1000);    //  0 audio Duration in mS
+            args[ 0] = Long.valueOf(vmessage.getDescriptor().getDurationSecsLong()*1000);    //  0 audio Duration in mS
             args[ 5] = vmessage.getMessageId();                  //  5 Message Id
             args[ 6] = new Date(vmessage.getDescriptor().getTimeStampDate().getTime());        //  6 message timestamp         
         }

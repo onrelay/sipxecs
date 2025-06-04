@@ -16,10 +16,10 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -87,7 +87,7 @@ public class ConfRecordStatus extends HttpServlet {
         String parmOwnerName = request.getParameter("on");
         String parmBridgeContact = request.getParameter("bc");
         String synch = request.getParameter("synchronous");
-        Boolean synchronous = (synch == null) ? false : new Boolean(synch);
+        Boolean synchronous = (synch == null) ? false : Boolean.valueOf(synch);
 
         boolean stringsOK = ((parmWavName!=null) && (parmOwnerName!=null) && (parmBridgeContact!=null) &&
                              (parmWavName.compareTo("") != 0) &&

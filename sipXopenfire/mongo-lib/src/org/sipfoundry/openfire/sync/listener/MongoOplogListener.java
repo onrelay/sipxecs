@@ -15,25 +15,24 @@
  * details.
  */
 package org.sipfoundry.openfire.sync.listener;
-
 import static org.sipfoundry.commons.mongo.MongoConstants.ID;
+import org.sipfoundry.commons.mongo.MongoFactory;
 
-import java.net.UnknownHostException;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.bson.Document;
 import org.bson.types.BSONTimestamp;
-import org.sipfoundry.commons.mongo.MongoFactory;
 import org.sipfoundry.openfire.sync.MongoOperation;
 import org.sipfoundry.openfire.sync.job.AbstractJobFactory;
 import org.sipfoundry.openfire.sync.job.Job;
 
-import com.mongodb.Bytes;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.Mongo;
+import com.mongodb.CursorType;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.conversions.Bson;
 
 public abstract class MongoOplogListener<T extends AbstractJobFactory> implements Runnable {
     private static Logger logger = Logger.getLogger(MongoOplogListener.class);
@@ -54,64 +53,56 @@ public abstract class MongoOplogListener<T extends AbstractJobFactory> implement
     @Override
     public void run() {
         logger.debug("Running " + this.getClass());
-        Mongo m = null;
+
         try {
-            m = MongoFactory.fromConnectionFile();
-        } catch (UnknownHostException ex) {
-            logger.error("Error running mongo opLog listener", ex);
-            return;
-        }
-        DB db = m.getDB("local");
-        DBCollection col = db.getCollection("oplog.rs");
-        long seconds = System.currentTimeMillis() / 1000;
-        DBObject query = buildOpLogQuery();
-        System.out.println("Query: " + query);
-        DBCursor cur = col.find(query).addOption(Bytes.QUERYOPTION_TAILABLE).addOption(Bytes.QUERYOPTION_AWAITDATA);
+            MongoClient client = MongoFactory.fromConnectionFile();
 
-        while (cur.hasNext()) {
-            DBObject object = cur.next();
-            try {
-                int time = ((BSONTimestamp) object.get(TIMESTAMP)).getTime();
+            MongoDatabase db = client.getDatabase("local");
+            MongoCollection<Document> col = db.getCollection("oplog.rs");
 
-                if (time > seconds) {
-                    logger.debug(String.format("Got operation: %s", object));
-                    MongoOperation op = MongoOperation.fromString((String) object.get(OPERATION));
+            long seconds = System.currentTimeMillis() / 1000;
 
-                    if (getWatchedOperations().contains(op)) {
-                        DBObject record = (DBObject) object.get(RECORD);
-                        Object id = record.get(ID);
+            Bson query = buildOpLogQuery();
+            FindIterable<Document> cur = col.find(query).cursorType(CursorType.TailableAwait);
 
-                        if (id == null) {
-                            // this is an update, the id is in a different place
-                            DBObject otherRecord = (DBObject) object.get(RECORD2);
-                            id = otherRecord.get(ID);
-                            // if it's a partial update, consider only the update part
-                            DBObject partialUpdate = (DBObject) record.get(SET_OP);
-                            if (partialUpdate != null) {
-                                record = partialUpdate;
+            for (Document object : cur) {
+                try {
+                    BSONTimestamp ts = object.get(TIMESTAMP, BSONTimestamp.class);
+                    if (ts != null && ts.getTime() > seconds) {
+                        logger.debug(String.format("Got operation: %s", object));
+                        MongoOperation op = MongoOperation.fromString(object.getString(OPERATION));
+
+                        if (getWatchedOperations().contains(op)) {
+                            Document record = object.get(RECORD, Document.class);
+                            Object id = record.get(ID);
+
+                            if (id == null) {
+                                // this is an update, the id is in a different place
+                                Document otherRecord = object.get(RECORD2, Document.class);
+                                id = otherRecord.get(ID);
+
+                                Document partialUpdate = record.get(SET_OP, Document.class);
+                                if (partialUpdate != null) {
+                                    record = partialUpdate;
+                                }
+                            }
+
+                            Job j = m_jobFactory.createJob(op, record, id);
+                            if (j != null) {
+                                j.process();
                             }
                         }
-                        Job j = m_jobFactory.createJob(op, record, id);
-
-                        // job can be null if the affected object is not in use (e.g. user
-                        // update for an offline user - updated data will be read when the
-                        // user comes online)
-                        if (j != null) {
-                            j.process();
-                        }
                     }
+                } catch (Exception ex) {
+                    logger.error("Error processing change: " + object, ex);
                 }
-            } catch (Exception ex) {
-                // this is a guard: no matter what fails, this worker loop must continue
-                // handling changes
-                logger.error("Error processing change: " + object, ex);
             }
+        } catch (Exception ex) {
+            logger.error("Error running mongo oplog listener", ex);
         }
-
-        cur.close();
     }
 
-    protected abstract DBObject buildOpLogQuery();
+    protected abstract Bson buildOpLogQuery();
 
     protected abstract Collection<MongoOperation> getWatchedOperations();
 }

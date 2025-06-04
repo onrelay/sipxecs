@@ -9,14 +9,8 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
-import org.springframework.beans.factory.access.BeanFactoryLocator;
-import org.springframework.beans.factory.access.BeanFactoryReference;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.access.ContextSingletonBeanFactoryLocator;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-/**
- * Triggers system to start up, then find a requested bean, then runs it.
- */
 public class SystemTaskRunner {
 
     public static void main(String[] args) {
@@ -25,8 +19,6 @@ public class SystemTaskRunner {
                 throw new IllegalArgumentException("bean to run is required as first argument");
             }
             new SystemTaskRunner().runMain(args);
-
-        // need to exit, otherwise call from cfengine fails to return
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
@@ -36,10 +28,21 @@ public class SystemTaskRunner {
     }
 
     void runMain(String[] args) {
-        BeanFactoryLocator bfl = ContextSingletonBeanFactoryLocator.getInstance();
-        BeanFactoryReference bfr = bfl.useBeanFactory("servicelayer-context");
-        ApplicationContext app = (ApplicationContext) bfr.getFactory();
-        SystemTaskEntryPoint task = (SystemTaskEntryPoint) app.getBean(args[0]);
-        task.runSystemTask(args);
+        ClassPathXmlApplicationContext context = null;
+        try {
+            context = new ClassPathXmlApplicationContext(
+                "classpath:/org/sipfoundry/sipxconfig/system.beans.xml",
+                "classpath*:/org/sipfoundry/sipxconfig/*/**/*.beans.xml",
+                "classpath*:/sipxplugin2.beans.xml",
+                "classpath*:/sipxplugin.beans.xml",
+                "classpath*:/sipxplugin0.beans.xml");
+
+            SystemTaskEntryPoint task = (SystemTaskEntryPoint) context.getBean(args[0]);
+            task.runSystemTask(args);
+        } finally {
+            if( context != null ) {
+                context.close();
+            }
+        }
     }
 }

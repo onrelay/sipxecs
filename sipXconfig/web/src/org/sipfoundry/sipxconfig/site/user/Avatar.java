@@ -9,8 +9,8 @@
  */
 package org.sipfoundry.sipxconfig.site.user;
 
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -11,11 +11,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.HashSet;
 
-import org.sipfoundry.sipxrelay.SymEndpointInterface;
-import org.sipfoundry.sipxrelay.SymInterface;
-import org.sipfoundry.sipxrelay.SymmitronConfig;
-import org.sipfoundry.sipxrelay.SymmitronConfigParser;
-
 import junit.framework.TestCase;
 import junit.textui.TestRunner;
 
@@ -149,7 +144,7 @@ public class SymmitronThruputTest extends AbstractSymmitronTestCase {
                     .getByName(testerAddress));
             Listener listener2 = new Listener(datagramSocket2);
             this.listeners.add(listener2);
-            super.setRemoteEndpointNoKeepAlive(sym, this.testerAddress, destinationPort2);
+            super.setRemoteEndpointNoKeepAlive(sym, testerAddress, destinationPort2);
             super.addSym(bridge, sym);
             super.startBridge(bridge);
             

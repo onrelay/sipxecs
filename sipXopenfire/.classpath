@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="lib" path="/sipxcommons/lib/xmlrpc-common-3.1.jar"/>
 	<classpathentry kind="src" path="config-plugin/src"/>
 	<classpathentry kind="src" path="mongo-lib/test/java"/>
 	<classpathentry excluding="test/java/" kind="src" path="mongo-lib/src"/>

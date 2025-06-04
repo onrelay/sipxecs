@@ -32,11 +32,9 @@ import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
 import org.sipfoundry.sipxconfig.forwarding.GeneralSchedule;
 import org.sipfoundry.sipxconfig.forwarding.Schedule;
 import org.sipfoundry.sipxconfig.test.MongoTestIntegration;
-import org.springframework.beans.factory.annotation.Required;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
 
 public class AttendantRuleTestIntegration extends MongoTestIntegration {
 
@@ -95,41 +93,41 @@ public class AttendantRuleTestIntegration extends MongoTestIntegration {
         }, new String[] {
             "attendantrule", "160@example.org", "sip:160@example.org"
         });
-        List<DBObject> aliasesList = new ArrayList<DBObject>();
-        DBObject als = new BasicDBObject();
+        List<Document> aliasesList = new ArrayList<Document>();
+        Document als = new Document();
         als.put("id", "160");
         als.put("cnt", "<sip:201@example.org;sipx-noroute=Voicemail;sipx-userforward=false?expires=10>;q=0.933");
         als.put("rln", "userforward");
         aliasesList.add(als);
-        DBObject als2 = new BasicDBObject();
+        Document als2 = new Document();
         als2.put("id", "160");
         als2.put("cnt", "<sip:aa_live_" + rule.getId() + "@example.org;sipx-noroute=Voicemail?expires=30>;q=0.867");
         als2.put("rln", "userforward");
         aliasesList.add(als2);
-        DBObject als3 = new BasicDBObject();
+        Document als3 = new Document();
         als3.put("id", "6");
         als3.put("cnt", "sip:160@example.org");
         als3.put("rln", "alias");
         aliasesList.add(als3);
-        DBObject als4 = new BasicDBObject();
+        Document als4 = new Document();
         als4.put("id", "live");
         als4.put("cnt", "sip:160@example.org");
         als4.put("rln", "alias");
         aliasesList.add(als4);
-        DBObject als5 = new BasicDBObject();
+        Document als5 = new Document();
         als5.put("id", "+123456789");
         als5.put("cnt", "sip:160@example.org");
         als5.put("rln", "alias");
         aliasesList.add(als5);
-        DBObject liveAttendantMongo = new BasicDBObject();
+        Document liveAttendantMongo = new Document();
         liveAttendantMongo.put(ALIASES, aliasesList);
         MongoTestCaseHelper.assertObjectPresent(getEntityCollection(), liveAttendantMongo);
 
         // enable 'follow user call forwarding' option
         rule.setFollowUserCallForward(true);
         m_dialPlanContext.storeRule(rule);
-        aliasesList = new ArrayList<DBObject>();
-        als = new BasicDBObject();
+        aliasesList = new ArrayList<Document>();
+        als = new Document();
         als.put("id", "160");
         als.put("cnt", "<sip:201@example.org;sipx-noroute=Voicemail?expires=10>;q=0.933");
         als.put("rln", "userforward");
@@ -138,7 +136,7 @@ public class AttendantRuleTestIntegration extends MongoTestIntegration {
         aliasesList.add(als3);
         aliasesList.add(als4);
         aliasesList.add(als5);
-        DBObject liveAttendantUserCallFwd = new BasicDBObject();
+        Document liveAttendantUserCallFwd = new Document();
         liveAttendantUserCallFwd.put(ALIASES, aliasesList);
         MongoTestCaseHelper.assertObjectPresent(getEntityCollection(), liveAttendantUserCallFwd);
 
@@ -172,8 +170,8 @@ public class AttendantRuleTestIntegration extends MongoTestIntegration {
         Integer stopWithTimezone = minutesFromSunday + stopHour * 60 + stopMinute - offset;
         String expected = Integer.toHexString(startWithTimezone) + ":" + Integer.toHexString(stopWithTimezone);
 
-        aliasesList = new ArrayList<DBObject>();
-        als = new BasicDBObject();
+        aliasesList = new ArrayList<Document>();
+        als = new Document();
         als.put("id", "160");
         als.put("cnt", "<sip:201@example.org;sipx-noroute=Voicemail?expires=10>;q=0.933;sipx-ValidTime=\""
             + expected + "\"");
@@ -183,7 +181,7 @@ public class AttendantRuleTestIntegration extends MongoTestIntegration {
         aliasesList.add(als3);
         aliasesList.add(als4);
         aliasesList.add(als5);
-        DBObject liveAttendantSchedule = new BasicDBObject();
+        Document liveAttendantSchedule = new Document();
         liveAttendantSchedule.put(ALIASES, aliasesList);
         MongoTestCaseHelper.assertObjectPresent(getEntityCollection(), liveAttendantSchedule);
 
@@ -197,21 +195,21 @@ public class AttendantRuleTestIntegration extends MongoTestIntegration {
         });
     }
 
-    private DBCollection getEntityCollection() {
+    private MongoCollection<Document> getEntityCollection() {
         return getImdb().getCollection("entity");
     }
 
-    @Required
+    
     public void setDialPlanContext(DialPlanContext dialPlanContext) {
         m_dialPlanContext = dialPlanContext;
     }
 
-    @Required
+    
     public void setDialPlanSetup(DialPlanSetup dialPlanSetup) {
         m_dialPlanSetup = dialPlanSetup;
     }
 
-    @Required
+    
     public void setForwardingContext(ForwardingContext forwardingContext) {
         m_forwardingContext = forwardingContext;
     }

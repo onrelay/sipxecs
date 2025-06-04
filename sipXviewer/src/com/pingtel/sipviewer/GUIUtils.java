@@ -10,7 +10,6 @@ package com.pingtel.sipviewer;
  */
 
 import java.awt.*;
-import java.util.*;
 
 public class GUIUtils
 {

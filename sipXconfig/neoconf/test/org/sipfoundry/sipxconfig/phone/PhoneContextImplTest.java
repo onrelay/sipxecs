@@ -10,7 +10,7 @@ import java.util.Collection;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.easymock.EasyMock;
 import org.sipfoundry.sipxconfig.alarm.AlarmDefinition;
 import org.sipfoundry.sipxconfig.alarm.AlarmServerManagerImpl;

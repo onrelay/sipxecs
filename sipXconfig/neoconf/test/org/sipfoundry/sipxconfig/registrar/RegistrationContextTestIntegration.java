@@ -9,6 +9,8 @@
  */
 package org.sipfoundry.sipxconfig.registrar;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -16,15 +18,13 @@ import java.util.List;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.commserver.imdb.RegistrationItem;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
-import org.sipfoundry.sipxconfig.registrar.RegistrationContextImpl;
 import org.sipfoundry.sipxconfig.test.ImdbTestCase;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.FindIterable;
 
 public class RegistrationContextTestIntegration extends ImdbTestCase {
     private RegistrationContextImpl m_builder;
@@ -46,14 +46,14 @@ public class RegistrationContextTestIntegration extends ImdbTestCase {
         }
     };
 
-    private DBCollection getRegistrarCollection() {
+    private MongoCollection<Document> getRegistrarCollection() {
         return m_nodeDb.getDb().getCollection("registrar");
     }
 
     @Override
     protected void onSetUpInTransaction() throws Exception {
         super.onSetUpInTransaction();
-        DBObject reg1 = new BasicDBObject();
+        Document reg1 = new Document();
         reg1.put("contact", DATA[0][3]);
         reg1.put("expirationTime", DATA[0][6]);
         reg1.put("uri", DATA[0][2]);
@@ -62,7 +62,7 @@ public class RegistrationContextTestIntegration extends ImdbTestCase {
         reg1.put("identity", DATA[0][5]);
         reg1.put("_id", DATA[0][9]);
         reg1.put("callId", DATA[0][10]);
-        DBObject reg2 = new BasicDBObject();
+        Document reg2 = new Document();
         reg2.put("contact", DATA[1][3]);
         reg2.put("expirationTime", DATA[1][6]);
         reg2.put("uri", DATA[1][2]);
@@ -72,8 +72,8 @@ public class RegistrationContextTestIntegration extends ImdbTestCase {
         reg2.put("_id", DATA[1][9]);
         reg2.put("callId", DATA[1][10]);
 
-        m_nodeDb.getDb().dropDatabase();
-        getRegistrarCollection().insert(reg1, reg2);
+        m_nodeDb.getDb().drop();
+        getRegistrarCollection().insertMany( Arrays.asList( reg1, reg2 ) );
 
         m_builder = new RegistrationContextImpl();
         m_builder.setNodedb(m_nodeDb);
@@ -81,7 +81,7 @@ public class RegistrationContextTestIntegration extends ImdbTestCase {
     }
 
     public void testGetRegistrations() throws Exception {
-        List registrations = m_builder.getRegistrations();
+        List<RegistrationItem> registrations = m_builder.getRegistrations();
         assertEquals(1, registrations.size());
         RegistrationItem ri = (RegistrationItem) registrations.get(0);
         assertEquals(calendar.getTime(), ri.getExpires());
@@ -102,61 +102,64 @@ public class RegistrationContextTestIntegration extends ImdbTestCase {
     }
 
     public void testGetRegistrationsByCallId() throws Exception {
-        List registrations = m_builder.getRegistrationsByCallId("3f404b64-fc8490c3-6b14ac9a@192.168.2.19");
+        List<RegistrationItem> registrations = m_builder.getRegistrationsByCallId("3f404b64-fc8490c3-6b14ac9a@192.168.2.19");
         assertEquals(1, registrations.size());
         RegistrationItem ri = (RegistrationItem) registrations.get(0);
         assertEquals("0004f2a9b633", ri.getInstrument());
     }
 
     public void testGetRegistrationsByIp() throws Exception {
-        List registrations = m_builder.getRegistrationsByIp("192.168.2.19");
+        List<RegistrationItem> registrations = m_builder.getRegistrationsByIp("192.168.2.19");
         assertEquals(1, registrations.size());
         RegistrationItem ri = (RegistrationItem) registrations.get(0);
         assertEquals("0004f2a9b633", ri.getInstrument());
     }
 
     public void testGetRegistrationsByMac() throws Exception {
-        List registrations = m_builder.getRegistrationsByMac("0004f2a9b633");
+        List<RegistrationItem> registrations = m_builder.getRegistrationsByMac("0004f2a9b633");
         assertEquals(1, registrations.size());
         RegistrationItem ri = (RegistrationItem) registrations.get(0);
         assertEquals("sip:3001@example.org", ri.getUri());
     }
 
     public void testGetCursorRegistrationsByMac() throws Exception {
-        DBCursor registrations = m_builder.getMongoDbCursorRegistrationsByMac("0004f22aa38a");
-        assertFalse(registrations.hasNext());
+        FindIterable<Document> registrations = m_builder.getMongoDbCursorRegistrationsByMac("0004f22aa38a");
+        assertFalse(registrations.iterator().hasNext());
+
         registrations = m_builder.getMongoDbCursorRegistrationsByMac("0004f2a9b633");
-        assertTrue(registrations.hasNext());
-        BasicDBList list = new BasicDBList();
-        while (registrations.hasNext()) {
-            BasicDBObject registration = (BasicDBObject) registrations.next();
-            list.add(registration);
+        List<Document> list = new ArrayList<>();
+        try (MongoCursor<Document> cursor = registrations.iterator()) {
+            while (cursor.hasNext()) {
+                list.add(cursor.next());
+            }
         }
         assertEquals(1, list.size());
     }
 
     public void testGetCursorRegistrationsByIp() throws Exception {
-        DBCursor registrations = m_builder.getMongoDbCursorRegistrationsByIp("192.168.2.21");
-        assertFalse(registrations.hasNext());
+        FindIterable<Document> registrations = m_builder.getMongoDbCursorRegistrationsByIp("192.168.2.21");
+        assertFalse(registrations.iterator().hasNext());
+
         registrations = m_builder.getMongoDbCursorRegistrationsByIp("192.168.2.19");
-        assertTrue(registrations.hasNext());
-        BasicDBList list = new BasicDBList();
-        while (registrations.hasNext()) {
-            BasicDBObject registration = (BasicDBObject) registrations.next();
-            list.add(registration);
+        List<Document> list = new ArrayList<>();
+        try (MongoCursor<Document> cursor = registrations.iterator()) {
+            while (cursor.hasNext()) {
+                list.add(cursor.next());
+            }
         }
         assertEquals(1, list.size());
     }
 
     public void testGetCursorRegistrationsByUid() throws Exception {
-        DBCursor registrations = m_builder.getMongoDbCursorRegistrationsByLineId("3000");
-        assertFalse(registrations.hasNext());
+        FindIterable<Document> registrations = m_builder.getMongoDbCursorRegistrationsByLineId("3000");
+        assertFalse(registrations.iterator().hasNext());
+
         registrations = m_builder.getMongoDbCursorRegistrationsByLineId("3001");
-        assertTrue(registrations.hasNext());
-        BasicDBList list = new BasicDBList();
-        while (registrations.hasNext()) {
-            BasicDBObject registration = (BasicDBObject) registrations.next();
-            list.add(registration);
+        List<Document> list = new ArrayList<>();
+        try (MongoCursor<Document> cursor = registrations.iterator()) {
+            while (cursor.hasNext()) {
+                list.add(cursor.next());
+            }
         }
         assertEquals(1, list.size());
     }

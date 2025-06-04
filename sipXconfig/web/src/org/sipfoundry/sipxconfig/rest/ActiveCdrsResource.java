@@ -17,8 +17,8 @@
 package org.sipfoundry.sipxconfig.rest;
 
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.sipfoundry.sipxconfig.common.User;
 
 public class ActiveCdrsResource extends UserActiveCdrsResource {

@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Test;
 import org.sipfoundry.sipxconfig.address.Address;
 import org.sipfoundry.sipxconfig.commserver.Location;

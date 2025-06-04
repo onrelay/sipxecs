@@ -17,7 +17,7 @@ import org.sipfoundry.sipxconfig.common.DataObjectSource;
 import org.sipfoundry.sipxconfig.common.PrimaryKeySource;
 
 public class ObjectSourceDataSqueezerTest extends TestCase {
-    static final Integer KEY = new Integer(5);
+    static final Integer KEY = Integer.valueOf(5);
     private PrimaryKeySource m_object;
 
     protected void setUp() throws Exception {
@@ -45,9 +45,7 @@ public class ObjectSourceDataSqueezerTest extends TestCase {
     public void testGetValue() {
         IMocksControl control = EasyMock.createStrictControl();
         DataObjectSource source = control.createMock(DataObjectSource.class);
-
-        source.load(PrimaryKeySource.class, KEY);
-        control.andReturn(m_object);
+        EasyMock.expect(source.load(PrimaryKeySource.class, KEY)).andReturn(m_object);
         control.replay();
 
         ObjectSourceDataSqueezer squeezer = new ObjectSourceDataSqueezer(source,

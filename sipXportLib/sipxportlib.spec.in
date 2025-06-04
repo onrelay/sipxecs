@@ -23,7 +23,7 @@ BuildRequires: poco-devel
 BuildRequires: dnf-plugins-core 
 BuildRequires: krb5-devel 
 BuildRequires: cyrus-sasl-devel 
-BuildRequires: java-1.8.0-openjdk-devel 
+BuildRequires: java-17-openjdk-devel 
 BuildRequires: v8-devel 
 BuildRequires: policycoreutils 
 BuildRequires: policycoreutils-python-utils

@@ -9,8 +9,8 @@ package org.sipfoundry.sipxrest.testb;
 
 import org.apache.log4j.Logger;
 import org.restlet.Restlet;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
 
 public class RestletB extends Restlet {

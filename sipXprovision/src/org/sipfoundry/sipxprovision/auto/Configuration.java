@@ -67,10 +67,10 @@ public class Configuration {
 
             m_LogLevel = prov_config.getProperty("log.level", DEFAULT_STRING);
             m_Logfile = prov_config.getProperty("log.file", DEFAULT_STRING);
-            m_Debug = (new Boolean(prov_config.getProperty("provision.debug", DEBUG_BY_DEFAULT))).booleanValue();
-            m_ServletPort = (new Integer(prov_config.getProperty("provision.servlet.port", "-1"))).intValue();
-            m_securePort = (new Integer(prov_config.getProperty("provision.servlet.securePort", "-1"))).intValue();
-            m_useSecure = (new Boolean(prov_config.getProperty("provision.servlet.useSecure", "false"))).booleanValue();
+            m_Debug = (Boolean.valueOf(prov_config.getProperty("provision.debug", DEBUG_BY_DEFAULT))).booleanValue();
+            m_ServletPort = (Integer.valueOf(prov_config.getProperty("provision.servlet.port", "-1"))).intValue();
+            m_securePort = (Integer.valueOf(prov_config.getProperty("provision.servlet.securePort", "-1"))).intValue();
+            m_useSecure = (Boolean.valueOf(prov_config.getProperty("provision.servlet.useSecure", "false"))).booleanValue();
             m_ProvisionSipUsername = prov_config.getProperty("provision.username", DEFAULT_STRING);
             m_ProvisionSipPassword = prov_config.getProperty("provision.password", DEFAULT_STRING);
             m_ConfigurationUri = prov_config.getProperty("provision.configUrl", DEFAULT_STRING);

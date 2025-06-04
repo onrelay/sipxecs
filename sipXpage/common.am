@@ -6,6 +6,8 @@ page_PKGS = \
 	dom4j \
 	dnsjava \
 	jain-sip-sdp \
-	mongo \
+	mongodb-driver-core \
+	mongodb-driver-sync \
+	bson \
 	sipxcommons \
-	slf4j-api 
+	slf4j-api

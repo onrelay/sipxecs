@@ -17,7 +17,7 @@ import java.io.OutputStream;
 import java.io.Writer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hivemind.Messages;
 import org.apache.tapestry.annotations.InitialValue;

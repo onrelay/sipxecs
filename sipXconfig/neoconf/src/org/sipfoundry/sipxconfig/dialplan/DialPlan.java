@@ -14,10 +14,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.functors.InstanceofPredicate;
 import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
 import org.sipfoundry.sipxconfig.cfgmgt.DeployConfigOnEdit;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
@@ -104,10 +102,10 @@ public class DialPlan extends BeanWithId implements DeployConfigOnEdit {
      * @return list of attendant rules, empty list if no attendant rules in this plan
      */
     public List<AttendantRule> getAttendantRules() {
-        List<AttendantRule> attendantRules = new ArrayList<AttendantRule>();
-        Predicate isAttendantRule = InstanceofPredicate.getInstance(AttendantRule.class);
-        CollectionUtils.select(m_rules, isAttendantRule, attendantRules);
-        return attendantRules;
+        return m_rules.stream()
+            .filter(AttendantRule.class::isInstance)
+            .map(AttendantRule.class::cast)
+            .collect(Collectors.toList());
     }
 
     /**

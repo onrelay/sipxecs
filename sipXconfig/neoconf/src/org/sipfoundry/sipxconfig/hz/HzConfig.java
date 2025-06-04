@@ -37,7 +37,6 @@ import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.imbot.ImBot;
 import org.sipfoundry.sipxconfig.ivr.Ivr;
 import org.sipfoundry.sipxconfig.recording.RecordingManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class HzConfig implements ConfigProvider {
     private static final Log LOG = LogFactory.getLog(HzConfig.class);
@@ -96,12 +95,12 @@ public class HzConfig implements ConfigProvider {
         config.write("hz.addresses", hzAddresses);
     }
 
-    @Required
+    
     public void setVelocityEngine(VelocityEngine velocityEngine) {
         m_velocityEngine = velocityEngine;
     }
 
-    @Required
+    
     public void setHzContext(HzContext hzContext) {
         m_hzContext = hzContext;
     }

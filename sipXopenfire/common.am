@@ -7,7 +7,7 @@ cfg_PKGS = \
 	dom4j \
 	spring-beans \
 	spring-core \
-	org.springframework.transaction \
+	spring-tx \
 	xercesImpl \
 	sipxconfig-neoconf \
 	sipxconfig-web \
@@ -17,9 +17,9 @@ cfg_PKGS = \
 	log4j
 
 plugin_JAR_PKGS = \
-	com.noelios.restlet \
-	commons-beanutils \
+	commons-beanutils-core \
 	commons-collections \
+	commons-collections4 \
 	commons-digester \
 	commons-io \
 	dnsjava \
@@ -37,7 +37,6 @@ plugin_JAR_PKGS = \
 	sipxsqaclient
 
 plugin_JAR_RT_PKGS = \
-	com.noelios.restlet \
 	org.restlet
 
 # NOTE: this list of dependencies affects compile and runtime becasue it 
@@ -48,17 +47,23 @@ plugin_PKGS = \
 	ant-launcher \
 	thumbnailator \
 	xmlrpc-common \
-	spring-data-mongodb \
 	commons-digester \
 	commons-logging \
 	commons-beanutils-core \
 	spring-context \
 	spring-data-commons \
-	org.springframework.transaction \
+	spring-data-mongodb \
+	spring-tx \
 	spring-core \
 	spring-beans \
 	spring-expression \
+	spring-jdbc \
+	jaxb-api \
+	bson \
+	mongodb-driver-core \
+	mongodb-driver-sync \
 	commons-lang \
+	commons-lang3 \
 	log4j \
 	xmlrpc-server \
 	xmlrpc-client \
@@ -98,7 +103,7 @@ provider_PKGS_RT = \
 	not-yet-commons-ssl \
 	spring-context \
 	spring-context-support \
-	org.springframework.transaction \
+	spring-tx \
 	spring-core \
 	spring-beans \
 	spring-expression \

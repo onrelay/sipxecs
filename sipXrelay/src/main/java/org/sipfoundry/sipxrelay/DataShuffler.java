@@ -19,15 +19,13 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.collections.list.SynchronizedList;
 import org.apache.log4j.Logger;
 
 class DataShuffler implements Runnable {
@@ -43,9 +41,9 @@ class DataShuffler implements Runnable {
     
     private static long packetCounter = Math.abs(random.nextLong());
     
-    private static List workQueue = SynchronizedList.decorate(new LinkedList<WorkItem>());
-        
- //   private static List workQueue = new LinkedList<WorkItem>();
+    private static List<WorkItem> workQueue = Collections.synchronizedList(new ArrayList<WorkItem>());
+     
+    //   private static List workQueue = new LinkedList<WorkItem>();
     public DataShuffler() {
 
     }
@@ -55,7 +53,7 @@ class DataShuffler implements Runnable {
 
 		it = workQueue.iterator();
 		if (!workQueue.isEmpty()) {
-			workQueue = SynchronizedList.decorate (new LinkedList<WorkItem>());
+			workQueue = Collections.synchronizedList(new ArrayList<WorkItem>());
 		}
 
 		while (it.hasNext()) {

@@ -10,11 +10,11 @@
 
 package org.sipfoundry.sipxconfig.rest;
 
-import static org.easymock.classextension.EasyMock.expectLastCall;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.reportMatcher;
-import static org.easymock.classextension.EasyMock.verify;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.reportMatcher;
+import static org.easymock.EasyMock.verify;
+import static org.easymock.EasyMock.createMock;
 
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -26,9 +26,9 @@ import junit.framework.TestCase;
 import org.apache.commons.io.IOUtils;
 import org.easymock.internal.matchers.InstanceOf;
 import org.restlet.data.MediaType;
-import org.restlet.resource.InputRepresentation;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.InputRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.callgroup.AbstractRing;
 import org.sipfoundry.sipxconfig.callgroup.AbstractRing.Type;
 import org.sipfoundry.sipxconfig.common.User;

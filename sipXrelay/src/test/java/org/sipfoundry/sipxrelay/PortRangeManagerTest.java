@@ -8,10 +8,6 @@ package org.sipfoundry.sipxrelay;
 import java.util.HashSet;
 import java.util.Random;
 
-import org.sipfoundry.sipxrelay.Parity;
-import org.sipfoundry.sipxrelay.PortRange;
-import org.sipfoundry.sipxrelay.PortRangeManager;
-
 import junit.framework.TestCase;
 
 public class PortRangeManagerTest extends TestCase {

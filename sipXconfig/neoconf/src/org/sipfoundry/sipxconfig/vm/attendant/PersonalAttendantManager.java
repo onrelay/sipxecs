@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.sipfoundry.sipxconfig.common.User;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 
 public abstract class PersonalAttendantManager extends HibernateDaoSupport {
 

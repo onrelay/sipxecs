@@ -32,7 +32,6 @@ import org.sipfoundry.sipxconfig.cfgmgt.ConfigUtils;
 import org.sipfoundry.sipxconfig.cfgmgt.LoggerKeyValueConfiguration;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class ElasticsearchConfig implements ConfigProvider {
 
@@ -66,7 +65,7 @@ public class ElasticsearchConfig implements ConfigProvider {
         config.write("tmpDir", backupSettings.getTmpDir());
     }
 
-    @Required
+    
     public void setBackupManager(BackupManager backupManager) {
         m_backupManager = backupManager;
     }

@@ -49,7 +49,7 @@ public class XmlRpcClientInterceptorTest extends TestCase {
         assertEquals(6, len);
 
         Map xx = new Hashtable();
-        xx.put("name", new Integer(5));
+        xx.put("name", Integer.valueOf(5));
         proxy.create(xx);
     }
 }

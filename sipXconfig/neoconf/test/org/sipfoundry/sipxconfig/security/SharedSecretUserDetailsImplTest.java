@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.security;
 
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,11 +21,12 @@ import junit.framework.TestCase;
 import org.easymock.EasyMock;
 import org.sipfoundry.commons.security.Md5Encoder;
 import org.sipfoundry.sipxconfig.common.User;
+import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.sipfoundry.sipxconfig.permission.PermissionManager;
 import org.sipfoundry.sipxconfig.test.TestHelper;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class SharedSecretUserDetailsImplTest extends TestCase {
@@ -56,7 +57,7 @@ public class SharedSecretUserDetailsImplTest extends TestCase {
         String hashedSecret = Md5Encoder.getEncodedPassword("secret");
 
         Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(1);
-        GrantedAuthority party = new GrantedAuthorityImpl("party");
+        GrantedAuthority party = new SimpleGrantedAuthority("party");
         authorities.add(party);
         UserDetails details = new SharedSecretUserDetailsImpl(m_domainManager, user, userName, authorities);
 

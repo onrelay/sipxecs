@@ -18,7 +18,7 @@ package org.sipfoundry.sipxconfig.cfgmgt;
 
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.commserver.Location;
 
 /**

@@ -64,7 +64,7 @@ public class AlarmServerManagerTestIntegration extends IntegrationTestCase {
         Alarm a = new Alarm(AdminContext.ALARM_LOGIN_FAILED);
         a.setMinThreshold(5);
         m_alarmServerManager.saveAlarms(Collections.singletonList(a));
-        int actual = db().queryForInt("select min_threshold from alarm_code where alarm_code_id = 'LOGIN_FAILED'");
+        int actual = db().queryForObject("select min_threshold from alarm_code where alarm_code_id = 'LOGIN_FAILED'", Integer.class);
         assertEquals(5, actual);
     }
 
@@ -96,7 +96,7 @@ public class AlarmServerManagerTestIntegration extends IntegrationTestCase {
     }
 
     public void testGetAlarmGroupById() throws Exception {
-        AlarmGroup group = m_alarmServerManager.getAlarmGroupById(new Integer(101));
+        AlarmGroup group = m_alarmServerManager.getAlarmGroupById(Integer.valueOf(101));
         assertEquals("eng", group.getName());
         assertEquals("Engineering", group.getDescription());
         assertEquals(false, group.isEnabled());
@@ -152,11 +152,11 @@ public class AlarmServerManagerTestIntegration extends IntegrationTestCase {
         r.setHostAddress("snmp.example.org");
         m_alarmServerManager.saveAlarmTrapReceiver(r);
         flush();
-        db().queryForInt("select 1 from alarm_receiver where address = ? ", r.getHostAddress());
+        db().queryForObject("select 1 from alarm_receiver where address = ? ", Integer.class, r.getHostAddress());
         List<AlarmTrapReceiver> receivers = m_alarmServerManager.getAlarmTrapReceivers();
         assertEquals(1, receivers.size());
         m_alarmServerManager.deleteAlarmTrapReceiver(receivers.get(0));
         flush();
-        assertEquals(0, db().queryForInt("select count(*) from alarm_receiver"));
+        assertEquals(0, (int)db().queryForObject("select count(*) from alarm_receiver", Integer.class));
     }
 }

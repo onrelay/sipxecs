@@ -14,38 +14,49 @@ commons_PKGS = \
 	not-yet-commons \
 	jain-sip-sdp \
 	dnsjava \
-	commons-beanutils \
+	commons-beanutils-core \
 	commons-io \
 	commons-codec \
 	commons-digester \
 	commons-lang \
+	commons-lang3 \
 	commons-collections \
+	commons-collections4 \
+	commons-cli \
+	commons-logging \
+	xstream \
 	xmlrpc-client \
 	spring-beans \
 	spring-context \
 	spring-core \
-	org.springframework.transaction \
+	spring-tx \
 	spring-data-mongodb \
 	spring-data-commons \
-	mongo \
 	org.restlet \
 	spring-data-redis \
 	jedis \
 	thumbnailator \
 	jaudiotagger \
-	jetty \
+	jakarta.mail \
+	jakarta.servlet-api \
+	jakarta.activation-api \
+	jakarta.xml.bind-api \
+	jaxb-core \
+	jaxb-api \
+	jaxb-impl \
 	jetty-http \
 	jetty-io \
 	jetty-security \
 	jetty-server \
-	jetty-servlet \
+	jetty-ee10-servlet \
+	jetty-ee10-servlets \
 	jetty-util \
-	jetty-webapp \
+	jetty-ee10-webapp \
 	jetty-xml \
-	servlet-api \
 	spring-security-cas \
 	spring-security-config \
 	spring-security-core \
+	spring-security-crypto \
 	spring-security-ldap \
 	spring-security-web \
 	spring-security-jwt \
@@ -57,4 +68,8 @@ commons_PKGS = \
 	guava \
 	jackson-core-asl \
 	jackson-mapper-asl \
-	jackson-annotations
+	jackson-annotations \
+	jackson-databind \
+	mongodb-driver-core \
+	mongodb-driver-sync   \
+	bson

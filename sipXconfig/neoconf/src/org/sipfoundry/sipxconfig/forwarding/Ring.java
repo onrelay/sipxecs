@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.forwarding;
 
 import java.util.Formatter;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.callgroup.AbstractRing;
 
 /**

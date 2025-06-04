@@ -17,32 +17,28 @@
 package org.sipfoundry.commons.security;
 
 
-import org.springframework.beans.factory.annotation.Required;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class PasswordEncoderImpl implements PasswordEncoder{
+	@SuppressWarnings("unused")
 	private String m_realm;
 
 	@Override
-	public String encodePassword(String rawPass, Object salt) {
-        if (salt instanceof String) {
-            return Md5Encoder.getEncodedPassword(rawPass);
-        }
-        return rawPass;
+	public String encode(CharSequence rawPassword) {
+		return Md5Encoder.getEncodedPassword( rawPassword.toString() );
 	}
 
 	@Override
-	public boolean isPasswordValid(String encPass, String rawPass, Object salt) {
-        if (rawPass == null) {
+	public boolean matches(CharSequence rawPassword, String encodedPassword) {
+        if (rawPassword == null) {
             return false;
-        }
-        String pass = encodePassword(rawPass, salt);
-        return pass.equals(encPass);
+        } 
+        String password = encode(rawPassword);
+        return password.equals(encodedPassword);
 	}
 
-	@Required
+	
 	public void setRealm(String realm) {
 		m_realm = realm;
 	}
-
 }

@@ -18,7 +18,6 @@ CHECK_POSTGRES
 CHECK_ODBC
 AC_CONFIG_FILES([
   Makefile
-  java-client/Makefile
   etc/Makefile
   bin/Makefile
 ])

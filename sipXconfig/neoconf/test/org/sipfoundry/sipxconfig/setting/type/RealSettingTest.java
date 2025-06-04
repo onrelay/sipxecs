@@ -15,13 +15,13 @@ public class RealSettingTest extends TestCase {
 
     public void testConvertToTypedValue() {
         SettingType type = new RealSetting();
-        assertEquals(new Double(51), type.convertToTypedValue("51"));
+        assertEquals(Double.valueOf(51), type.convertToTypedValue("51"));
         assertNull(type.convertToTypedValue("kuku"));
     }
 
     public void testConvertToStringValue() {
         SettingType type = new RealSetting();
-        assertEquals("52.51", type.convertToStringValue(new Float(52.51)));
+        assertEquals("52.51", type.convertToStringValue(Float.valueOf(52.51f)));
         assertNull(type.convertToStringValue(null));
     }
 }

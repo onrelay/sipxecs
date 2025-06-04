@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.security;
 
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 import static org.sipfoundry.sipxconfig.security.UserRole.Admin;
 import static org.sipfoundry.sipxconfig.security.UserRole.User;
 
@@ -24,7 +24,6 @@ import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.permission.PermissionManager;
 import org.sipfoundry.sipxconfig.test.TestHelper;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -90,7 +89,7 @@ public class TestAuthenticationProvider implements AuthenticationProvider {
                 || (TestAuthenticationToken.class.isAssignableFrom(authentication));
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }

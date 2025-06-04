@@ -18,7 +18,6 @@ package org.sipfoundry.sipxconfig.security;
 
 import org.sipfoundry.sipxconfig.bulk.ldap.LdapManager;
 import org.sipfoundry.sipxconfig.bulk.ldap.LdapSystemSettings;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.authentication.AuthenticationServiceException;
 
 public class SystemAuthPolicyVerifierImpl implements SystemAuthPolicyVerifier {
@@ -34,7 +33,7 @@ public class SystemAuthPolicyVerifierImpl implements SystemAuthPolicyVerifier {
         }
     }
 
-    @Required
+    
     public void setLdapManager(LdapManager ldapManager) {
         m_ldapManager = ldapManager;
     }

@@ -18,8 +18,9 @@ package org.sipfoundry.openfire.provider;
 
 import org.sipfoundry.commons.util.UnfortunateLackOfSpringSupportFactory;
 
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
+import org.bson.Document;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
 
 /**
  * Root class for mongo providers. Provides common methods for collections retrieval.
@@ -34,9 +35,9 @@ public abstract class BaseMongoProvider {
     /**
      * Returns the default collection for this class
      *
-     * @return {@link DBCollection}
+     * @return {@link MongoCollection<Document>}
      */
-    protected DBCollection getDefaultCollection() {
+    protected MongoCollection<Document> getDefaultCollection() {
         return getCollection(m_defaultCollectionName);
     }
 
@@ -44,10 +45,10 @@ public abstract class BaseMongoProvider {
      * Returns the collection having the specified name
      *
      * @param collectionName Name of the collection to retrieve.
-     * @return {@link DBCollection}
+     * @return {@link MongoCollection<Document>}
      */
-    protected static DBCollection getCollection(String collectionName) {
-        DB db = UnfortunateLackOfSpringSupportFactory.getOpenfiredb();
+    protected static MongoCollection<Document> getCollection(String collectionName) {
+        MongoDatabase db = UnfortunateLackOfSpringSupportFactory.getOpenfiredb();
 
         return db.getCollection(collectionName);
     }

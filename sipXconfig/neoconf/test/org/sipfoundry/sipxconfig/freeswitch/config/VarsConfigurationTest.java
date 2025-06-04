@@ -42,37 +42,46 @@ public class VarsConfigurationTest {
    }
    
    @Test
-   public void testConfigVMDisabled() throws IOException {
-       FreeswitchSettings settings = new FreeswitchSettings();
-       StringWriter actual = new StringWriter();
-       settings.setModelFilesContext(TestHelper.getModelFilesContext());
-       Location location = new Location();
-       IMocksControl mc = EasyMock.createControl();
-       FeatureManager mgr = mc.createMock(FeatureManager.class);
-       mgr.isFeatureEnabled(Ivr.FEATURE, location);
-       mc.andReturn(false);
-       mc.replay();
-       m_configuration.setFeatureManager(mgr);
-       m_configuration.write(actual, location, settings);
-       String expected = IOUtils.toString(getClass().getResourceAsStream("vars.test.xml"));
-       assertEquals(expected, actual.toString());
-   }
+    public void testConfigVMDisabled() throws IOException {
+        FreeswitchSettings settings = new FreeswitchSettings();
+        StringWriter actual = new StringWriter();
+        settings.setModelFilesContext(TestHelper.getModelFilesContext());
+        Location location = new Location();
+
+        IMocksControl mc = EasyMock.createControl();
+        FeatureManager mgr = mc.createMock(FeatureManager.class);
+
+        EasyMock.expect(mgr.isFeatureEnabled(Ivr.FEATURE, location)).andReturn(false);
+
+        mc.replay();
+
+        m_configuration.setFeatureManager(mgr);
+        m_configuration.write(actual, location, settings);
+
+        String expected = IOUtils.toString(getClass().getResourceAsStream("vars.test.xml"));
+        assertEquals(expected, actual.toString());
+    }
 
    @Test
-   public void testConfigVMEnabled() throws IOException {
-       FreeswitchSettings settings = new FreeswitchSettings();
-       StringWriter actual = new StringWriter();
-       settings.setModelFilesContext(TestHelper.getModelFilesContext());
-       Location location = new Location();
-       location.setFqdn("toor.mydomain.org");
-       IMocksControl mc = EasyMock.createControl();
-       FeatureManager mgr = mc.createMock(FeatureManager.class);
-       mgr.isFeatureEnabled(Ivr.FEATURE, location);
-       mc.andReturn(true);
-       mc.replay();
-       m_configuration.setFeatureManager(mgr);
-       m_configuration.write(actual, location, settings);
-       String expected = IOUtils.toString(getClass().getResourceAsStream("vars_vm_enabled.test.xml"));
-       assertEquals(expected, actual.toString());
-   }
+    public void testConfigVMEnabled() throws IOException {
+        FreeswitchSettings settings = new FreeswitchSettings();
+        StringWriter actual = new StringWriter();
+        settings.setModelFilesContext(TestHelper.getModelFilesContext());
+
+        Location location = new Location();
+        location.setFqdn("toor.mydomain.org");
+
+        IMocksControl mc = EasyMock.createControl();
+        FeatureManager mgr = mc.createMock(FeatureManager.class);
+
+        EasyMock.expect(mgr.isFeatureEnabled(Ivr.FEATURE, location)).andReturn(true);
+
+        mc.replay();
+
+        m_configuration.setFeatureManager(mgr);
+        m_configuration.write(actual, location, settings);
+
+        String expected = IOUtils.toString(getClass().getResourceAsStream("vars_vm_enabled.test.xml"));
+        assertEquals(expected, actual.toString());
+    }
 }

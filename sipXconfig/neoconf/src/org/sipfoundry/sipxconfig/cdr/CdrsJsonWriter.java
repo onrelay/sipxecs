@@ -67,6 +67,7 @@ class CdrsJsonWriter extends CdrsWriter {
         out.write("\t\t\t\"type\" : \"CDR\"");
         out.write("\n\t\t}");
         m_firstRecord = false;
+        formatter.close();
     }
 
     protected void writeFooter() throws IOException {

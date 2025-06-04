@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.phonebook;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 
 /**

@@ -9,8 +9,8 @@
  */
 package org.sipfoundry.sipxconfig.site.user_portal;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.valid.IValidationDelegate;
 import org.apache.tapestry.valid.ValidationConstraint;
 import org.sipfoundry.sipxconfig.common.CoreContext;

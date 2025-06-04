@@ -54,9 +54,6 @@
     <property name="userDetailsService" ref="standardUserDetailsService" />
     <property name="userCache" ref="userCache" />
     <property name="passwordEncoder" ref="passwordEncoder" />
-    <property name="saltSource">
-      <bean class="org.sipfoundry.sipxconfig.security.SaltSourceImpl" />
-    </property>
      <property name="systemAuthPolicyCollector" ref="systemAuthPolicyCollector"/>    
   </bean>
 
@@ -64,9 +61,6 @@
     <property name="userDetailsService" ref="sharedSecretUserDetailsService" />
     <property name="userCache" ref="userCache" />
     <property name="passwordEncoder" ref="passwordEncoder" />
-    <property name="saltSource">
-      <bean class="org.sipfoundry.sipxconfig.security.SaltSourceImpl" />
-    </property>
   </bean>
 
   <bean id="jwtAuthenticationProvider" class="org.sipfoundry.sipxconfig.security.JwtAuthenticationProvider">
@@ -96,8 +90,7 @@
     <property name="locationsManager" ref="locationsManager" />
   </bean>
 
-  <bean id="passwordEncoder" class="org.sipfoundry.sipxconfig.security.PasswordEncoderImpl">
-    <property name="loginContext" ref="loginContext" />
+  <bean id="passwordEncoder" class="org.sipfoundry.commons.security.PasswordEncoderImpl">
   </bean>
 
   <!-- User cache configuration -->

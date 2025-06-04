@@ -21,8 +21,8 @@ import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
 import org.restlet.data.MediaType;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Representation;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.dialplan.AutoAttendant;
 import org.sipfoundry.sipxconfig.dialplan.AutoAttendantManager;
 

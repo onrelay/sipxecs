@@ -14,10 +14,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.lang.StringUtils;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.address.Address;
@@ -39,7 +41,6 @@ import org.sipfoundry.sipxconfig.xmlrpc.ApiProvider;
 import org.sipfoundry.sipxconfig.xmlrpc.XmlRpcRemoteException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.annotation.Required;
 
 public class ActiveConferenceContextImpl implements ActiveConferenceContext, BeanFactoryAware {
 
@@ -57,28 +58,28 @@ public class ActiveConferenceContextImpl implements ActiveConferenceContext, Bea
     private CoreContext m_coreContext;
     private BeanFactory m_beanFactory;
 
-    @Required
+    
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }
 
-    @Required
+    
     public void setFreeswitchApiProvider(ApiProvider<FreeswitchApi> freeswitchApiProvider) {
         m_freeswitchApiProvider = freeswitchApiProvider;
     }
 
-    @Required
+    
     public void setConferenceBridgeContext(ConferenceBridgeContext conferenceBridgeContext) {
         m_conferenceBridgeContext = conferenceBridgeContext;
     }
 
-    @Required
+    
     public void setSipService(SipService sipService) {
         m_sipService = sipService;
     }
 
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
@@ -166,15 +167,17 @@ public class ActiveConferenceContextImpl implements ActiveConferenceContext, Bea
 
     @Override
     public String executeCommand(Conference conference, String[] arguments) {
-        HttpClient client = new HttpClient();
+        HttpClient client = HttpClient.newHttpClient();
         String uri = getConferenceManagerRestUrl(conference, arguments);
-        PutMethod putMethod = new PutMethod(uri);
-        int statusCode = HttpStatus.SC_OK;
         String response = null;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(uri))
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build();
         try {
-            statusCode = client.executeMethod(putMethod);
-            if (statusCode == HttpStatus.SC_OK) {
-                response = putMethod.getResponseBodyAsString();
+            HttpResponse<String> httpResponse = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (httpResponse.statusCode() == 200) {
+                response = httpResponse.body();
             }
         } catch (Exception ex) {
             response = "ERROR: " + ex.getMessage();
@@ -356,7 +359,7 @@ public class ActiveConferenceContextImpl implements ActiveConferenceContext, Bea
     }
 
     @Override
-    @Required
+    
     public void setBeanFactory(BeanFactory beanFactory) {
         m_beanFactory = beanFactory;
     }

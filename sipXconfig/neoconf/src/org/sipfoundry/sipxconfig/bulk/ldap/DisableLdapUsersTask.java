@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.commons.mongo.MongoConstants;
 import org.sipfoundry.commons.userdb.profile.UserProfileService;
 import org.sipfoundry.sipxconfig.common.CoreContext;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -66,7 +65,7 @@ public class DisableLdapUsersTask implements Runnable {
         m_userNames.add(userName);
     }
 
-    @Required
+    
     public void setUserProfileService(UserProfileService userProfileService) {
         m_userProfileService = userProfileService;
     }
@@ -75,7 +74,7 @@ public class DisableLdapUsersTask implements Runnable {
         return !m_userNames.isEmpty();
     }
 
-    @Required
+    
     public void setImdb(MongoTemplate imdb) {
         m_imdb = imdb;
     }

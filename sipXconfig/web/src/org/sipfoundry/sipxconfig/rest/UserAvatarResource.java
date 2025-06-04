@@ -22,18 +22,20 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.ext.fileupload.RestletFileUpload;
-import org.restlet.resource.OutputRepresentation;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.representation.OutputRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Get;
+import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.commons.userdb.profile.UserProfileService;
 
-public class UserAvatarResource extends Resource {
+public class UserAvatarResource extends ServerResource {
     private static final Log LOG = LogFactory.getLog(UserAvatarResource.class);
 
     private String m_userName;
@@ -47,14 +49,13 @@ public class UserAvatarResource extends Resource {
         m_userName = (String) getRequest().getAttributes().get("user");
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         return new AvatarRepresentation(MediaType.IMAGE_PNG, m_avatarService.getAvatar(m_userName));
     }
 
-    //POST
-    @Override
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {        
         if (entity != null) {
             if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
                 DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -83,11 +84,7 @@ public class UserAvatarResource extends Resource {
                 }
             }
         }
-    }
-
-    @Override
-    public boolean allowPost() {
-        return true;
+        return null;
     }
 
     static class AvatarRepresentation extends OutputRepresentation {

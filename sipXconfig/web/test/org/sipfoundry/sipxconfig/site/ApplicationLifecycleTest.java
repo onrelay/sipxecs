@@ -20,10 +20,10 @@ public class ApplicationLifecycleTest extends TestCase {
     public void testLogout() {
         IMocksControl stateManagerCtrl = EasyMock.createControl();
         ApplicationStateManager stateManager = stateManagerCtrl.createMock(ApplicationStateManager.class);
-        stateManager.exists(UserSession.SESSION_NAME);
-        stateManagerCtrl.andReturn(true);
-        stateManager.get(UserSession.SESSION_NAME);
-        stateManagerCtrl.andReturn(new UserSession());
+
+        EasyMock.expect(stateManager.exists(UserSession.SESSION_NAME)).andReturn(true);
+        EasyMock.expect(stateManager.get(UserSession.SESSION_NAME)).andReturn(new UserSession());
+
         stateManagerCtrl.replay();
 
         ApplicationLifecycleImpl life = new ApplicationLifecycleImpl();

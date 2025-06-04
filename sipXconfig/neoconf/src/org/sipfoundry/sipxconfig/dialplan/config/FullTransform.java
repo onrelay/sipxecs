@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.dialplan.config;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.dom4j.Element;
 
 /**

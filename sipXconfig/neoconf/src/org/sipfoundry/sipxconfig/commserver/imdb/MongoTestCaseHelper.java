@@ -16,115 +16,116 @@
  */
 package org.sipfoundry.sipxconfig.commserver.imdb;
 
-import java.util.List;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.FindIterable;
+import org.bson.Document;
 import junit.framework.TestCase;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public final class MongoTestCaseHelper {
     public static final String DOMAIN = "mydomain.org";
     public static final String ID = "_id";
-    public static final String EXCEPTION = "fields and values do not match (they have different legths)";
+    public static final String EXCEPTION = "fields and values do not match (they have different lengths)";
 
-    private MongoTestCaseHelper() {
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    private MongoTestCaseHelper() {}
+
+    public static void assertObjectPresent(MongoCollection<Document> collection, Document ref) {
+        TestCase.assertTrue(collection.find(ref).into(new ArrayList<>()).size() > 0);
     }
 
-    public static final void assertObjectPresent(DBCollection collection, DBObject ref) {
-        TestCase.assertTrue(collection.find(ref).size() > 0);
+    public static void assertObjectNotPresent(MongoCollection<Document> collection, Document ref) {
+        TestCase.assertTrue(collection.find(ref).into(new ArrayList<>()).isEmpty());
     }
 
-    public static final void assertObjectNotPresent(DBCollection collection, DBObject ref) {
-        TestCase.assertTrue(collection.find(ref).size() == 0);
+    public static void assertObjectWithIdPresent(MongoCollection<Document> collection, String id) {
+        Document ref = new Document(ID, id);
+        TestCase.assertEquals(1, collection.countDocuments(ref));
     }
 
-    public static final void assertObjectWithIdPresent(DBCollection collection, String id) {
-        DBObject ref = new BasicDBObject();
-        ref.put(ID, id);
-        TestCase.assertEquals(1, collection.find(ref).size());
+    public static void assertObjectWithIdNotPresent(MongoCollection<Document> collection, Object id) {
+        Document ref = new Document(ID, id);
+        TestCase.assertEquals(0, collection.countDocuments(ref));
     }
 
-    public static final void assertObjectWithIdNotPresent(DBCollection collection, Object id) {
-        DBObject ref = new BasicDBObject();
-        ref.put(ID, id);
-        TestCase.assertEquals(0, collection.find(ref).size());
+    public static void assertCollectionItemsCount(MongoCollection<Document> collection, Document ref, int count) {
+        TestCase.assertEquals(count, collection.find(ref).into(new ArrayList<>()).size());
     }
 
-    public static final void assertCollectionItemsCount(DBCollection collection, DBObject ref, int count) {
-        TestCase.assertTrue(collection.find(ref).size() == count);
+    public static void assertCollectionCount(MongoCollection<Document> collection, int count) {
+        TestCase.assertEquals(count, collection.countDocuments());
     }
 
-    public static final void assertCollectionCount(DBCollection collection, int count) {
-        TestCase.assertEquals(count, collection.find().count());
+    public static void assertObjectListFieldCount(MongoCollection<Document> collection, String id, String listField, int count) {
+        Document ref = new Document(ID, id);
+        Document obj = collection.find(ref).first();
+        TestCase.assertNotNull(obj);
+        TestCase.assertTrue(obj.containsKey(listField));
+        TestCase.assertEquals(count, ((List<?>) obj.get(listField)).size());
     }
 
-    public static final void assertObjectListFieldCount(DBCollection collection, String id, String listField,
-            int count) {
-        DBObject ref = new BasicDBObject();
-        ref.put(ID, id);
-        TestCase.assertEquals(1, collection.find(ref).size());
-        DBObject obj = collection.findOne(ref);
-        TestCase.assertTrue(obj.containsField(listField));
-        TestCase.assertEquals(count, ((List<DBObject>) obj.get(listField)).size());
-
-    }
-
-    public static final void assertObjectWithFieldsValuesPresent(DBCollection collection, String[] fields,
-            Object[] values) {
+    public static void assertObjectWithFieldsValuesPresent(MongoCollection<Document> collection, String[] fields, Object[] values) {
         if (fields.length != values.length) {
             throw new RuntimeException(EXCEPTION);
         }
-        DBObject ref = new BasicDBObject();
+        Document ref = new Document();
         for (int i = 0; i < fields.length; i++) {
             ref.put(fields[i], values[i]);
         }
-        TestCase.assertEquals(1, collection.find(ref).count());
+        TestCase.assertEquals(1, collection.countDocuments(ref));
     }
 
-    public static final void assertObjectWithFieldsValuesNotPresent(DBCollection collection, String[] fields,
-            Object[] values) {
+    public static void assertObjectWithFieldsValuesNotPresent(MongoCollection<Document> collection, String[] fields, Object[] values) {
         if (fields.length != values.length) {
             throw new RuntimeException(EXCEPTION);
         }
-        DBObject ref = new BasicDBObject();
+        Document ref = new Document();
         for (int i = 0; i < fields.length; i++) {
             ref.put(fields[i], values[i]);
         }
-        TestCase.assertEquals(0, collection.find(ref).count());
+        TestCase.assertEquals(0, collection.countDocuments(ref));
     }
 
-    public static final void assertObjectWithIdFieldValuePresent(DBCollection collection, Object id, String field,
-            Object value) {
-        DBObject ref = new BasicDBObject();
-        ref.put(ID, id);
-        ref.put(field, value);
-        TestCase.assertEquals(1, collection.find(ref).count());
+    public static void assertObjectWithIdFieldValuePresent(MongoCollection<Document> collection, Object id, String field, Object value) {
+        Document ref = new Document(ID, id).append(field, value);
+        TestCase.assertEquals(1, collection.countDocuments(ref));
     }
 
-    public static final void assertObjectWithIdFieldValueNotPresent(DBCollection collection, Object id,
-            String field, Object value) {
-        DBObject ref = new BasicDBObject();
-        ref.put(ID, id);
-        ref.put(field, value);
-        TestCase.assertEquals(0, collection.find(ref).count());
+    public static void assertObjectWithIdFieldValueNotPresent(MongoCollection<Document> collection, Object id, String field, Object value) {
+        Document ref = new Document(ID, id).append(field, value);
+        TestCase.assertEquals(0, collection.countDocuments(ref));
     }
 
-    public static final void insert(DBCollection collection, DBObject dbo) {
-        collection.insert(dbo);
+    public static void insert(MongoCollection<Document> collection, Document doc) {
+        collection.insertOne(doc);
     }
 
-    public static final void insertJson(DBCollection collection, String... jsons) {
+    public static void insertJson(MongoCollection<Document> collection, String... jsons) {
         for (String json : jsons) {
-            collection.save((DBObject) JSON.parse(json));
+            try {
+                Map<String, Object> map = MAPPER.readValue(json, new TypeReference<Map<String, Object>>() {});
+                collection.insertOne(new Document(map));
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to parse JSON: " + json, e);
+            }
         }
     }
 
-    public static final void assertJson(DBCursor actual, String expectedJson) {
-        String actualJson = JSON.serialize(actual.toArray());
-        TestCase.assertEquals(expectedJson, actualJson);
+    public static void assertJson(FindIterable<Document> actual, String expectedJson) {
+        List<Document> docs = actual.into(new ArrayList<>());
+        try {
+            String actualJson = MAPPER.writeValueAsString(docs);
+            TestCase.assertEquals(expectedJson, actualJson);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to serialize JSON", e);
+        }
     }
 }

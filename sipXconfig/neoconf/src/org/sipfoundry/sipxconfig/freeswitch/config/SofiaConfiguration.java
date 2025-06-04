@@ -19,7 +19,6 @@ import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.domain.Domain;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchSettings;
-import org.springframework.beans.factory.annotation.Required;
 
 public class SofiaConfiguration extends AbstractFreeswitchConfiguration {
     private DomainManager m_domainManager;
@@ -50,12 +49,12 @@ public class SofiaConfiguration extends AbstractFreeswitchConfiguration {
         write(writer, context);
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }

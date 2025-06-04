@@ -37,14 +37,12 @@
 		<description>sipviewer</description>
 		<file src="LICENSES" targetdir="$INSTALL_PATH" />
 		<file src="dist/sipviewer.jar" targetdir="$INSTALL_PATH" />
-		<file src="jdom.jar" targetdir="$INSTALL_PATH" />
 		<file src="startup/sipviewer" targetdir="$INSTALL_PATH" />
 	</pack>
 	<pack name="Base_WINDOWS" required="yes" os="windows" >
 		<description>sipviewer</description>
 		<file src="LICENSES" targetdir="$INSTALL_PATH" />
 		<file src="dist/sipviewer.jar" targetdir="$INSTALL_PATH" />
-		<file src="jdom.jar" targetdir="$INSTALL_PATH" />
 		<file src="startup" targetdir="$INSTALL_PATH" />
 	</pack>
 	<pack name="Doc_LINUX" required="yes" os="unix">

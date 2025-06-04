@@ -6,7 +6,7 @@ include config/project.am
 	doc
 
 SUBDIRS = \
-	 src \
+	src \
 	lib \
 	bin \
 	etc

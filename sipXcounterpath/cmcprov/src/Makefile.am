@@ -30,5 +30,5 @@ $(WAR_FILE) : javac-cmcprov $(war_RESOURCES)
 	mv $@.tmp $@
 
 style_SRC = $(cmcprov_SRC)
-style_DEPS = $(call JavaDep,@SIPX_JAVADIR@/sipXcommons,javax.servlet)
+style_DEPS = $(call JavaDep,@SIPX_JAVADIR@/sipXcommons,jakarta.servlet)
 precommit : style

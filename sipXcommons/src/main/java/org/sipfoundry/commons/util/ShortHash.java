@@ -7,7 +7,7 @@ package org.sipfoundry.commons.util;
 
 import java.util.Random;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 
 /**
  * Returns a simple unique-ish ID string (hash) generated from the specified seed.
@@ -59,7 +59,7 @@ public class ShortHash {
             seed_string = "";
         }
         seed_string = seed_string.toLowerCase();
-        Long seed_num = new Long(1);
+        Long seed_num = Long.valueOf(1);
         for (int i = 0; i < seed_string.length(); i++) {
             seed_num += (seed_num * seed_string.charAt(i)) % (Long.MAX_VALUE - 1 / seed_string.length());
         }

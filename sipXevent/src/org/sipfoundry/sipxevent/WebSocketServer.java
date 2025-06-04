@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.sipfoundry.commons.log4j.SipFoundryLayout;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class WebSocketServer {
@@ -86,37 +85,37 @@ public class WebSocketServer {
         server.start();
 	}
 
-    @Required
+    
     public void setKeystore(String keystore) {
         m_keystore = keystore;
     }
 
-    @Required
+    
     public void setPassword(String password) {
         m_password = password;
     }
 
-    @Required
+    
     public void setPort(int port) {
         m_port = port;
     }
 
-    @Required
+    
     public void setLogFile(String logFile) {
         m_logFile = logFile;
     }
 
-    @Required
+    
     public void setLogLevel(String logLevel) {
         m_logLevel = logLevel;
     }
 
-    @Required
+    
     public void setResourceBase(String resourceBase) {
         m_resourceBase = resourceBase;
     }
 
-    @Required
+    
     public void setConfDir(String confDir) {
         m_confDir = confDir;
     }

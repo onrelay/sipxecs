@@ -12,8 +12,8 @@ package org.sipfoundry.sipxconfig.device;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
 
 public class FilteredModelSource<T extends Model> implements ModelSource {
 

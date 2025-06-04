@@ -18,8 +18,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.collections.map.LazyMap;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.map.LazyMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.CallbackException;
@@ -45,7 +45,7 @@ public class SpringHibernateInstantiator extends EmptyInterceptor implements Bea
     private static final Log LOG = LogFactory.getLog(SpringHibernateInstantiator.class);
     private ListableBeanFactory m_beanFactory;
     private SessionFactory m_sessionFactory;
-    private Map m_beanNamesCache;
+    private Map<Class<?>,String> m_beanNamesCache;
     private Map<String, EntityDecorator> m_decorators;
     private Collection<HibernateEntityChangeProvider> m_hbEntityProviders;
 
@@ -58,11 +58,11 @@ public class SpringHibernateInstantiator extends EmptyInterceptor implements Bea
      */
     public Object instantiate(String entityName, EntityMode entityMode, Serializable id) {
         ClassMetadata classMetadata = m_sessionFactory.getClassMetadata(entityName);
-        Class clazz = classMetadata.getMappedClass(entityMode);
+        Class<?> clazz = classMetadata.getMappedClass(entityMode);
         return instantiate(clazz, id);
     }
 
-    Object instantiate(Class clazz, Serializable id) {
+    Object instantiate(Class<?> clazz, Serializable id) {
         String beanName = (String) m_beanNamesCache.get(clazz);
         if (beanName == null) {
             return null;
@@ -87,7 +87,7 @@ public class SpringHibernateInstantiator extends EmptyInterceptor implements Bea
         }
 
         public Object transform(Object input) {
-            Class clazz = (Class) input;
+            Class<?> clazz = (Class<?>) input;
             String[] beanDefinitionNames = m_beanFactory.getBeanNamesForType(clazz);
             LOG.debug(beanDefinitionNames.length + " beans registered for class: " + clazz.getName());
             for (int i = 0; i < beanDefinitionNames.length; i++) {
@@ -127,7 +127,7 @@ public class SpringHibernateInstantiator extends EmptyInterceptor implements Bea
         return getDecorator(entity.getClass());
     }
 
-    private EntityDecorator getDecorator(Class clazz) {
+    private EntityDecorator getDecorator(Class<?> clazz) {
         String decoratorName = clazz.getSimpleName().toLowerCase() + "Decorator";
         if (getEntityDecorators().containsKey(decoratorName)) {
             EntityDecorator decorator = getEntityDecorators().get(decoratorName);
@@ -149,7 +149,7 @@ public class SpringHibernateInstantiator extends EmptyInterceptor implements Bea
     public void setBeanFactory(BeanFactory beanFactory) {
         m_beanFactory = (ListableBeanFactory) beanFactory;
         Transformer transformer = new ClassToBeanName(m_beanFactory);
-        m_beanNamesCache = LazyMap.decorate(new HashMap(), transformer);
+        m_beanNamesCache = LazyMap.lazyMap(new HashMap<>(), transformer);
     }
 
     public BeanFactory getBeanFactory() {
@@ -175,6 +175,7 @@ public class SpringHibernateInstantiator extends EmptyInterceptor implements Bea
         super.onCollectionUpdate(collection, key);
     }
 
+    @Override
     public void postFlush(Iterator iterator) {
         HbEntity hbEntity = null;
         for (Iterator<HbEntity> it = m_inserts.iterator(); it.hasNext();) {

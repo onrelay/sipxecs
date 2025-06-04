@@ -28,20 +28,21 @@ import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.jivesoftware.util.JiveConstants;
 import org.xmpp.packet.JID;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Indexes;
 
 public class MongoRosterProvider extends BaseMongoProvider implements RosterItemProvider {
     private static final String COLLECTION_NAME = "ofRoster";
 
     public MongoRosterProvider() {
         setDefaultCollectionName(COLLECTION_NAME);
-        DBCollection rosterCollection = getDefaultCollection();
+        MongoCollection<Document> rosterCollection = getDefaultCollection();
 
-        rosterCollection.ensureIndex("rosterID");
-        rosterCollection.ensureIndex("jid");
-        rosterCollection.ensureIndex("username");
+        // Create indexes on the specified fields
+        rosterCollection.createIndex(Indexes.ascending("rosterID"));
+        rosterCollection.createIndex(Indexes.ascending("jid"));
+        rosterCollection.createIndex(Indexes.ascending("username"));
     }
 
     /**
@@ -49,8 +50,8 @@ public class MongoRosterProvider extends BaseMongoProvider implements RosterItem
      */
     @Override
     public RosterItem createItem(String username, RosterItem item) throws UserAlreadyExistsException {
-        DBCollection rosterCollection = getDefaultCollection();
-        DBObject toInsert = new BasicDBObject();
+        MongoCollection<Document> rosterCollection = getDefaultCollection();
+        Document toInsert = new Document();
 
         toInsert.put("rosterID", SequenceManager.nextID(JiveConstants.ROSTER));
         toInsert.put("username", username);
@@ -61,8 +62,8 @@ public class MongoRosterProvider extends BaseMongoProvider implements RosterItem
         toInsert.put("nick", item.getNickname());
         toInsert.put("groups", item.getGroups());
 
-        rosterCollection.insert(toInsert);
-        item.setID((Long) toInsert.get("rosterID"));
+        rosterCollection.insertOne(toInsert);
+        item.setID(toInsert.getLong("rosterID"));
 
         return item;
     }
@@ -72,17 +73,15 @@ public class MongoRosterProvider extends BaseMongoProvider implements RosterItem
      */
     @Override
     public void deleteItem(String username, long rosterItemID) {
-        DBCollection rosterGrpCollection = getCollection("ofRosterGroups");
-        DBObject grpToRemove = new BasicDBObject();
-        grpToRemove.put("rosterID", rosterItemID);
+        MongoCollection<Document> rosterGrpCollection = getCollection("ofRosterGroups");
+        Document grpToRemove = new Document("rosterID", rosterItemID);
 
-        rosterGrpCollection.remove(grpToRemove);
+        rosterGrpCollection.deleteOne(grpToRemove);
 
-        DBCollection rosterCollection = getDefaultCollection();
-        DBObject toRemove = new BasicDBObject();
-        toRemove.put("rosterID", rosterItemID);
+        MongoCollection<Document> rosterCollection = getDefaultCollection();
+        Document toRemove = new Document("rosterID", rosterItemID);
 
-        rosterCollection.remove(toRemove);
+        rosterCollection.deleteOne(toRemove);
     }
 
     /**
@@ -90,12 +89,11 @@ public class MongoRosterProvider extends BaseMongoProvider implements RosterItem
      */
     @Override
     public int getItemCount(String username) {
-        DBCollection rosterCollection = getDefaultCollection();
-        DBObject toQuery = new BasicDBObject();
-        toQuery.put("username", username);
+        MongoCollection<Document> rosterCollection = getDefaultCollection();
+        Document toQuery = new Document("username", username);
 
-        return (int) rosterCollection.count(toQuery);
-
+        long count = rosterCollection.countDocuments(toQuery);
+        return (int) count;
     }
 
     /**
@@ -105,11 +103,11 @@ public class MongoRosterProvider extends BaseMongoProvider implements RosterItem
     public Iterator<RosterItem> getItems(String username) {
         List<RosterItem> items = new ArrayList<RosterItem>();
 
-        DBCollection rosterCollection = getDefaultCollection();
-        DBObject toQuery = new BasicDBObject();
+        MongoCollection<Document> rosterCollection = getDefaultCollection();
+        Document toQuery = new Document();
         toQuery.put("username", username);
 
-        for (DBObject row : rosterCollection.find(toQuery)) {
+        for (Document row : rosterCollection.find(toQuery)) {
             long id = (Long) row.get("rosterID");
             JID jid = new JID((String) row.get("jid"));
             int subType = (Integer) row.get("sub");
@@ -134,11 +132,11 @@ public class MongoRosterProvider extends BaseMongoProvider implements RosterItem
     public Iterator<String> getUsernames(String jid) {
         List<String> names = new ArrayList<String>();
 
-        DBCollection rosterCollection = getDefaultCollection();
-        DBObject toQuery = new BasicDBObject();
+        MongoCollection<Document> rosterCollection = getDefaultCollection();
+        Document toQuery = new Document();
         toQuery.put("jid", jid);
 
-        for (DBObject row : rosterCollection.find(toQuery)) {
+        for (Document row : rosterCollection.find(toQuery)) {
             names.add((String) row.get("username"));
         }
 
@@ -150,20 +148,23 @@ public class MongoRosterProvider extends BaseMongoProvider implements RosterItem
      */
     @Override
     public void updateItem(String username, RosterItem item) throws UserNotFoundException {
-        DBCollection rosterCollection = getDefaultCollection();
+        MongoCollection<Document> rosterCollection = getDefaultCollection();
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document("rosterID", item.getID());
 
-        query.put("rosterID", item.getID());
+        Document update = new Document()
+            .append("sub", item.getSubStatus().getValue())
+            .append("ask", item.getAskStatus().getValue())
+            .append("recv", item.getRecvStatus().getValue())
+            .append("nick", item.getNickname())
+            .append("groups", item.getGroups());
 
-        DBObject update = new BasicDBObject();
+        Document updateOperation = new Document("$set", update);
 
-        update.put("sub", item.getSubStatus().getValue());
-        update.put("ask", item.getAskStatus().getValue());
-        update.put("recv", item.getRecvStatus().getValue());
-        update.put("nick", item.getNickname());
-        update.put("groups", item.getGroups());
+        Document updatedDoc = rosterCollection.findOneAndUpdate(query, updateOperation);
 
-        rosterCollection.findAndModify(query, new BasicDBObject("$set", update));
+        if (updatedDoc == null) {
+            throw new UserNotFoundException("Roster item not found with ID: " + item.getID());
+        }
     }
 }

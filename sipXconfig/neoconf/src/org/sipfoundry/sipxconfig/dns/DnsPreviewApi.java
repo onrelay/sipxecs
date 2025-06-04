@@ -17,15 +17,16 @@ package org.sipfoundry.sipxconfig.dns;
 import static org.restlet.data.MediaType.APPLICATION_JSON;
 
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+import org.restlet.resource.ServerResource;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
 
-public class DnsPreviewApi extends Resource {
+public class DnsPreviewApi extends ServerResource {
     private DnsPreview m_dnsPreview;
     private DnsViewApi m_dnsViewApi;
     private DnsPreview.Show m_showLevel;
@@ -37,16 +38,12 @@ public class DnsPreviewApi extends Resource {
         m_showLevel = DnsPreview.Show.valueOf(showLevel);
     }
 
-    @Override
-    public boolean allowPost() {
-        return true;
-    };
-
     // POST
-    @Override
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {        
         DnsView view = m_dnsViewApi.readViewHandleErrors(entity);
         getResponse().setEntity(new StringRepresentation(m_dnsPreview.getZone(view, m_showLevel)));
+        return null;
     }
 
     public void setDnsPreview(DnsPreview dnsPreview) {

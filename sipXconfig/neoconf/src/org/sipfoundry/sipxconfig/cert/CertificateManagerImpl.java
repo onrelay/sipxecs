@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -25,13 +24,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.alarm.AlarmDefinition;
@@ -368,7 +365,7 @@ public class CertificateManagerImpl implements CertificateManager, SetupListener
     }
 
     private boolean hasCertificate(String id, String authority) {
-        int check = m_jdbc.queryForInt("select count(*) from cert where name = ? and authority = ?", id, authority);
+        int check = m_jdbc.queryForObject("select count(*) from cert where name = ? and authority = ?", Integer.class, id, authority);
         return (check >= 1);
     }
 

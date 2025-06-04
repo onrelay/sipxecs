@@ -16,8 +16,7 @@
  */
 package org.sipfoundry.sipxconfig.rest;
 
-import static org.apache.commons.lang.StringUtils.join;
-import static org.restlet.data.MediaType.APPLICATION_RSS_XML;
+import static org.apache.commons.lang3.StringUtils.join;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,18 +25,19 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.OutputRepresentation;
-import org.restlet.resource.Representation;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.data.MediaType;
+import org.restlet.representation.OutputRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.login.PrivateUserKeyManager;
 import org.sipfoundry.sipxconfig.vm.MailboxManager;
 import org.sipfoundry.sipxconfig.vm.Voicemail;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
@@ -54,6 +54,8 @@ import edu.emory.mathcs.backport.java.util.Collections;
 public class VoicemailResource extends UserResource {
     private static final String WAV = "wav";
     private static final String UTF_8 = "UTF-8";
+    
+    public static final MediaType APPLICATION_RSS_XML = new MediaType("application/rss+xml");
 
     private String m_folder;
     private String m_url;
@@ -75,8 +77,8 @@ public class VoicemailResource extends UserResource {
         getVariants().add(new Variant(APPLICATION_RSS_XML));
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         SyndFeed feed = new SyndFeedImpl();
         feed.setFeedType("rss_2.0");
         feed.setEncoding(UTF_8);
@@ -130,12 +132,12 @@ public class VoicemailResource extends UserResource {
         }
     }
 
-    @Required
+    
     public void setMailboxManager(MailboxManager mailboxManager) {
         m_mailboxManager = mailboxManager;
     }
 
-    @Required
+    
     public void setPrivateUserKeyManager(PrivateUserKeyManager privateUserKeyManager) {
         m_privateUserKeyManager = privateUserKeyManager;
     }

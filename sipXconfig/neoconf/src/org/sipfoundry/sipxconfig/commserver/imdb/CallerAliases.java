@@ -17,7 +17,7 @@ import static org.sipfoundry.commons.mongo.MongoConstants.KEEP_DIGITS;
 import static org.sipfoundry.commons.mongo.MongoConstants.TRANSFORM_EXT;
 import static org.sipfoundry.commons.mongo.MongoConstants.UID;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.common.Replicable;
 import org.sipfoundry.sipxconfig.common.SipUri;
 import org.sipfoundry.sipxconfig.common.User;
@@ -25,7 +25,7 @@ import org.sipfoundry.sipxconfig.common.UserCallerAliasInfo;
 import org.sipfoundry.sipxconfig.gateway.Gateway;
 import org.sipfoundry.sipxconfig.gateway.GatewayCallerAliasInfo;
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 public class CallerAliases extends AbstractDataSetGenerator {
 
@@ -35,7 +35,7 @@ public class CallerAliases extends AbstractDataSetGenerator {
     }
 
     @Override
-    public void generate(Replicable entity, DBObject top) {
+    public void generate(Replicable entity, Document top) {
         if (entity instanceof User) {
             User user = (User) entity;
             if (StringUtils.isNotBlank(user.getSettingValue(UserCallerAliasInfo.EXTERNAL_NUMBER))) {

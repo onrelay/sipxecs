@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
@@ -50,10 +50,9 @@ import org.sipfoundry.sipxconfig.freeswitch.FreeswitchFeature;
 import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.support.DataAccessUtils;
 
-public class CallQueueContextImpl extends SipxHibernateDaoSupport implements CallQueueContext, BeanFactoryAware,
+public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implements CallQueueContext, BeanFactoryAware,
         FeatureProvider {
 
     private static final String QUERY_CALL_QUEUE_EXTENSIONS_WITH_NAMES = "callQueueExtensionWithName";
@@ -86,22 +85,22 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport implements Cal
     }
 
     /* Bean properties */
-    @Required
+    
     public void setAliasManager(AliasManager aliasManager) {
         m_aliasManager = aliasManager;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }
 
-    @Required
+    
     public void setReplicationManager(ReplicationManager replicationManager) {
         m_replicationManager = replicationManager;
     }
 
-    @Required
+    
     public void setCallQueueDeployer(CallQueueDeployer deployer) {
         m_fsDeployer = deployer;
     }
@@ -219,7 +218,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport implements Cal
 
     @Override
     public CallQueueExtension getExtensionByName(String extensionName) {
-        List<CallQueue> extensions = getHibernateTemplate().findByNamedQueryAndNamedParam(
+        List<CallQueue> extensions = (List<CallQueue>)getHibernateTemplate().findByNamedQueryAndNamedParam(
                 QUERY_CALL_QUEUE_EXTENSIONS_WITH_NAMES, QUERY_PARAM_VALUE, extensionName);
         return DataAccessUtils.singleResult(extensions);
     }
@@ -261,7 +260,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport implements Cal
     @Override
     public CallQueue getCallQueueByName(String name) {
         String query = "from CallQueue c where c.name = :name";
-        List<CallQueue> queueList = getHibernateTemplate().findByNamedParam(query, "name", name);
+        List<CallQueue> queueList = (List<CallQueue>)getHibernateTemplate().findByNamedParam(query, "name", name);
 
         return DaoUtils.requireOneOrZero(queueList, query);
     }
@@ -293,7 +292,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport implements Cal
         }
     }
     
-    @Required
+    
     public void deleteCallQueue(String name) {
         if (StringUtils.isEmpty(name)) {
             return;
@@ -365,7 +364,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport implements Cal
     
     @Override
     public CallQueueAgent getAgentByName(String agentName) {
-        List<CallQueueAgent> clients = getHibernateTemplate().findByNamedQueryAndNamedParam(
+        List<CallQueueAgent> clients = (List<CallQueueAgent>)getHibernateTemplate().findByNamedQueryAndNamedParam(
                 QUERY_CALL_QUEUE_AGENT_WITH_NAME_OR_EXT, QUERY_PARAM_VALUE, agentName);
         return DataAccessUtils.singleResult(clients);
     }

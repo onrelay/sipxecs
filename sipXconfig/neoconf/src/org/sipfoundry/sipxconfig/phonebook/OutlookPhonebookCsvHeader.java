@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.phonebook;
 
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class OutlookPhonebookCsvHeader extends PhonebookCsvHeader {
     private static final String FIRST_NAME = "First Name";

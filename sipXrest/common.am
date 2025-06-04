@@ -1,7 +1,5 @@
 rest_PKGS = \
-	com.noelios.restlet \
-	com.noelios.restlet.ext.servlet \
-	commons-beanutils \
+	commons-beanutils-core \
 	commons-codec \
 	commons-collections \
 	commons-digester \
@@ -10,8 +8,17 @@ rest_PKGS = \
 	commons-logging \
 	dnsjava \
 	jain-sip-sdp \
-	javax.servlet \
-	jetty \
+	jakarta.servlet \
+	jetty-server \
+	jetty-util \
+	jetty-http \
+	jetty-xml \
+	jetty-ee10-servlet \
+	jetty-ee10-servlets \
+	jetty-security \
+	jetty-deploy \
+	jetty-io \
+	jetty-ee10-webapp \
 	log4j \
 	mongo \
 	org.restlet \

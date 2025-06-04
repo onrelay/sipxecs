@@ -1013,7 +1013,7 @@ public class SipUtilities {
 					.getTraceEndpoint());
 			
 			newResponse.setHeader( SipTester.getHeaderFactory().createHeader("x-sipx-emulated-frame",
-					new Integer(traceResponse.getFrameId()).toString() ));
+					Integer.valueOf(traceResponse.getFrameId()).toString() ));
 
 			return newResponse;
 		} catch (Exception ex) {

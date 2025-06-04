@@ -16,13 +16,12 @@ import org.sipfoundry.sipxconfig.commserver.ContactInfoChangeApi;
 import org.sipfoundry.sipxconfig.im.ImAccount;
 import org.sipfoundry.sipxconfig.im.ImManager;
 import org.sipfoundry.sipxconfig.xmlrpc.ApiProvider;
-import org.springframework.beans.factory.annotation.Required;
 
 public class XmppContactInformationUpdate {
     private ApiProvider<ContactInfoChangeApi> m_contactInfoChangeApiProvider;
     private AddressManager m_addressManager;
 
-    @Required
+    
     public void setContactInfoChangeApiProvider(ApiProvider<ContactInfoChangeApi> contactInfoChangeApiProvider) {
         m_contactInfoChangeApiProvider = contactInfoChangeApiProvider;
     }

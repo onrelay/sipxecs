@@ -70,7 +70,7 @@ public class GroupTestIntegration extends IntegrationTestCase {
                 "snow pea");
         root.addSetting(new SettingSet("dairy")).addSetting(new SettingImpl("milk"));
 
-        Group ms = m_settingDao.loadGroup(new Integer(1));
+        Group ms = m_settingDao.loadGroup(Integer.valueOf(1));
 
         TestBeanWithSettings bean = new TestBeanWithSettings(root);
         Setting settings = ms.inherhitSettingsForEditing(bean);
@@ -95,7 +95,7 @@ public class GroupTestIntegration extends IntegrationTestCase {
     public void testDuplicateName() throws Exception {
         sql("setting/UpdateGroupSeed.sql");
 
-        Group ms = m_settingDao.loadGroup(new Integer(1));
+        Group ms = m_settingDao.loadGroup(Integer.valueOf(1));
         Group duplicate = new Group();
         duplicate.setName(ms.getName());
         duplicate.setResource(ms.getResource());

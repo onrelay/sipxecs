@@ -29,7 +29,7 @@ public class LenSelectionModel implements IPropertySelectionModel {
     }
 
     public Object getOption(int index) {
-        return new Integer(index + m_min);
+        return Integer.valueOf(index + m_min);
     }
 
     public String getLabel(int index) {
@@ -42,7 +42,7 @@ public class LenSelectionModel implements IPropertySelectionModel {
 
     public Object translateValue(String value) {
         int index = Integer.parseInt(value);
-        return new Integer(index);
+        return Integer.valueOf(index);
     }
 
     public int getMax() {

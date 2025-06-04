@@ -33,7 +33,6 @@ import org.sipfoundry.sipxconfig.localization.LocalizationContext;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 public class ConferenceConfiguration implements ConfigProvider, BeanFactoryAware {
     private ConferenceBridgeContext m_conferenceBridgeContext;
@@ -101,22 +100,22 @@ public class ConferenceConfiguration implements ConfigProvider, BeanFactoryAware
         }
     }
 
-    @Required
+    
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }
 
-    @Required
+    
     public void setConferenceBridgeContext(ConferenceBridgeContext conferenceBridgeContext) {
         m_conferenceBridgeContext = conferenceBridgeContext;
     }
 
-    @Required
+    
     public void setMohLocalStreamUrl(String mohLocalStreamUrl) {
         m_mohLocalStreamUrl = mohLocalStreamUrl;
     }
 
-    @Required
+    
     public void setPortAudioUrl(String portAudioUrl) {
         m_portAudioUrl = portAudioUrl;
     }

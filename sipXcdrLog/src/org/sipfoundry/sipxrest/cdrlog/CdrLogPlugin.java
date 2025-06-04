@@ -7,12 +7,11 @@ package org.sipfoundry.sipxrest.cdrlog;
 
 
 import org.restlet.Context;
-import org.restlet.Filter;
-import org.restlet.Route;
-import org.restlet.Router;
-import org.restlet.data.Request;
+import org.restlet.routing.Filter;
+import org.restlet.routing.Route;
+import org.restlet.routing.Router;
+import org.restlet.Request;
 import org.sipfoundry.sipxrest.Plugin;
-import org.sipfoundry.sipxrest.cdrlog.CdrLogRestlet;
 
 public class CdrLogPlugin extends Plugin {
 
@@ -20,9 +19,9 @@ public class CdrLogPlugin extends Plugin {
     public void attachContext(Filter filter, Context context, Router router) {
        filter.setNext(new CdrLogRestlet());
        Route cdrRoute = router.attach(this.getMetaInf().getUriPrefix() + "/{user}",filter);       
-       cdrRoute.extractQuery(CdrLogParams.LIMIT, CdrLogParams.LIMIT, true);
-       cdrRoute.extractQuery(CdrLogParams.FROMDATE, CdrLogParams.FROMDATE, true);
-       cdrRoute.extractQuery(CdrLogParams.OFFSET, CdrLogParams.OFFSET, true);
+       extractQuery(cdrRoute,CdrLogParams.LIMIT, CdrLogParams.LIMIT, true);
+       extractQuery(cdrRoute,CdrLogParams.FROMDATE, CdrLogParams.FROMDATE, true);
+       extractQuery(cdrRoute,CdrLogParams.OFFSET, CdrLogParams.OFFSET, true);
     }
 
     @Override

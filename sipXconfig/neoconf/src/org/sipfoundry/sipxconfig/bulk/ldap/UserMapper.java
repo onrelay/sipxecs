@@ -27,14 +27,13 @@ import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.bulk.UserPreview;
 import org.sipfoundry.sipxconfig.bulk.csv.Index;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.permission.PermissionManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.ldap.core.NameClassPairMapper;
 
 public class UserMapper implements NameClassPairMapper {
@@ -351,7 +350,7 @@ public class UserMapper implements NameClassPairMapper {
         m_ldapManager = ldapManager;
     }
 
-    @Required
+    
     public void setPermissionManager(PermissionManager permissionManager) {
         m_permissionManager = permissionManager;
     }

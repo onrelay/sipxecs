@@ -15,8 +15,8 @@ import net.sourceforge.jwebunit.html.Cell;
 import net.sourceforge.jwebunit.html.Row;
 import net.sourceforge.jwebunit.html.Table;
 import net.sourceforge.jwebunit.junit.WebTestCase;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Support for testing screens (or parts of the screen) that display table with add, delete, move

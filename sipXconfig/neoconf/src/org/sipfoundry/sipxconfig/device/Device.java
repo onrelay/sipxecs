@@ -17,7 +17,7 @@ import org.sipfoundry.sipxconfig.setting.BeanWithGroups;
 import org.sipfoundry.sipxconfig.setting.SettingExpressionEvaluator;
 import org.sipfoundry.sipxconfig.setting.SimpleDefinitionsEvaluator;
 
-import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 public abstract class Device extends BeanWithGroups {
 

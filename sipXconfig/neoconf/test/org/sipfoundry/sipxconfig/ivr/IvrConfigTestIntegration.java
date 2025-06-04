@@ -73,13 +73,13 @@ public class IvrConfigTestIntegration extends ImdbTestCase {
         m_featureManager.enableLocationFeature(Registrar.FEATURE, l, true);
         m_featureManager.enableLocationFeature(ProxyManager.FEATURE, l, true);
         m_featureManager.enableLocationFeature(Ivr.FEATURE, l, true);
-        DBObject als = new BasicDBObject();
+        Document als = new Document();
         als.put("id", "~~vm~user1");
         als.put("cnt", "<sip:IVR@vm.example.org;mailbox=user1;action=deposit;locale=en>");
         als.put("rln", "vmprm");
-        List<DBObject> list = new ArrayList<DBObject>();
+        List<Document> list = new ArrayList<Document>();
         list.add(als);
-        DBObject userMongo = new BasicDBObject();
+        Document userMongo = new Document();
         userMongo.put("als", list);
         Thread.sleep(10000);
         MongoTestCaseHelper.assertObjectPresent(getEntityCollection(), userMongo);*/

@@ -25,24 +25,21 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLSession;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.mortbay.http.HttpConnection;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.HttpListener;
-import org.mortbay.http.HttpServer;
-import org.mortbay.http.SocketListener;
-import org.mortbay.http.SslListener;
-import org.mortbay.jetty.servlet.ServletHandler;
-import org.mortbay.util.InetAddrPort;
-import org.mortbay.util.ThreadedServer;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+
 import org.sipfoundry.commons.log4j.SipFoundryLayout;
 import org.sipfoundry.commons.util.AddressDiscovery;
-
 
 /**
  * The SIPXbridge XML RPC handler.
@@ -50,7 +47,6 @@ import org.sipfoundry.commons.util.AddressDiscovery;
  * @author M. Ranganathan
  * 
  */
-@SuppressWarnings("unchecked")
 public class SymmitronServer implements Symmitron {
 
     static Logger logger = Logger.getLogger(SymmitronServer.class.getPackage()
@@ -110,7 +106,7 @@ public class SymmitronServer implements Symmitron {
     /*
      * Pointer to our web server.
      */
-    private static HttpServer webServer;
+    private static Server webServer;
 
     /*
      * Local address by name.
@@ -345,17 +341,17 @@ public class SymmitronServer implements Symmitron {
                 }
                 retval = createSuccessMap();
                 retval.put(Symmitron.BRIDGE_STATE, bridge.getState().toString());
-                retval.put(Symmitron.CREATION_TIME, new Long(bridge
+                retval.put(Symmitron.CREATION_TIME, Long.valueOf(bridge
                         .getCreationTime()).toString());
-                retval.put(Symmitron.LAST_PACKET_RECEIVED, new Long(bridge
+                retval.put(Symmitron.LAST_PACKET_RECEIVED, Long.valueOf(bridge
                         .getLastPacketTime()).toString());
-                retval.put(Symmitron.CURRENT_TIME_OF_DAY, new Long(System
+                retval.put(Symmitron.CURRENT_TIME_OF_DAY, Long.valueOf(System
                         .currentTimeMillis()).toString());
-                retval.put(Symmitron.PACKETS_RECEIVED, new Long(
+                retval.put(Symmitron.PACKETS_RECEIVED, Long.valueOf(
                         bridge.pakcetsReceived).toString());
-                retval.put(Symmitron.PACKETS_SENT, new Long(bridge.packetsSent)
+                retval.put(Symmitron.PACKETS_SENT, Long.valueOf(bridge.packetsSent)
                 .toString());
-                Map[] symStats = new Map[bridge.getSyms().size()];
+                Map<String,Object>[] symStats = new Map[bridge.getSyms().size()];
                 int i = 0;
                 for (Sym sym : bridge.getSyms()) {
                     symStats[i++] = sym.getStats();
@@ -386,184 +382,6 @@ public class SymmitronServer implements Symmitron {
      * @throws Exception
      */
 
-     /* 
-    static void discoverAddress() throws Exception {
-       
-        logger.debug("discoverAddress" );
-
-        try {
-            String stunServerAddress = symmitronConfig.getStunServerAddress();
-
-            logger.debug("stunServerAddress: " + stunServerAddress );
-
-            int stunServerPort = symmitronConfig.getStunServerPort();
-
-            logger.debug("stunServerPort: " + stunServerPort );
-
-            int localStunPort = stunServerPort + 1;
-
-            logger.debug("localStunPort: " + localStunPort );
-
-            if (stunServerAddress == null) {
-                logger.error("Stun server address not specified");
-            }
-            else if( stunServerPort <= 0 ) {
-                logger.error("Stun server port not valid: " + stunServerPort );
-            }
-            else {
-              
-                logger.debug("addressDetector: " + addressDetector );
-
-                if ( addressDetector == null ) { 
-                    TransportAddress localTransportAddress = new TransportAddress(
-                        symmitronConfig.getLocalAddress(), localStunPort, STUN_TRANSPORT );  
-
-                    logger.debug("localTransportAddress: " + localTransportAddress );
-
-                    TransportAddress serverTransportAddress = new TransportAddress(
-                        stunServerAddress, stunServerPort, STUN_TRANSPORT );
-
-                    logger.debug("serverTransportAddress: " + serverTransportAddress );
-
-                    StunStack stunStack = new StunStack();
-
-                    logger.debug("stunStack created" );
-
-                    addressDetector = new NetworkConfigurationDiscoveryProcess( stunStack, localTransportAddress, serverTransportAddress);
-
-                    logger.debug("addressDetector created" );
-
-                    addressDetector.start();
-
-                    logger.debug("Started address detector with server transport address: " + serverTransportAddress );
-                    
-                }
-
-                StunDiscoveryReport report = addressDetector.determineAddress();
-                if (report == null || report.getPublicAddress() == null) {
-                    logger.warn("STUN Error : Global address could not be found");
-                    try {
-                        if (addressDetector != null) {
-                            addressDetector.shutDown();
-                        }
-                    } catch (Exception e) {
-                        logger.error("Error shutting down address discovery ", e);
-                    } finally {
-                        addressDetector = null;
-                    }
-                    return;
-                }
-
-                logger.debug("Stun report = " + report);
-
-                if (report.getPublicAddress().getPort() != localStunPort ) {
-                    logger.warn("WARNING External port != internal port your NAT may not be symmetric.");
-                }
-
-                if (publicAddress == null || 
-                    !publicAddress.equals( report.getPublicAddress().getAddress()) ) {
-
-                    publicAddress = report.getPublicAddress().getAddress();
-
-                    symmitronConfig.setPublicAddress(publicAddress.getHostAddress());
-
-                    logger.debug("Updated symmitron config with new discovered address " + publicAddress.getHostAddress() );
-                }
-            }
-
-            logger.debug("STUN discovered address = " + publicAddress);
-
-        } catch (Exception ex) {
-
-            logger.error("Error discovering  address -- Check Stun Server", ex);
-
-            if (addressDetector != null) {
-                try {
-                    addressDetector.shutDown();
-                } catch (Exception e ) {
-                    logger.error("Problem shutting down address detector!",e);
-                } finally {
-                    addressDetector = null;
-                }
-            }
-        } 
-    }
-
-    */
-
-    /* 
-    static void discoverAddress() throws Exception {
-       
-        try {
-            String stunServerAddress = symmitronConfig.getStunServerAddress();
-
-            int stunServerPort = symmitronConfig.getStunServerPort();
-
-            TransportAddress serverTransportAddress = new TransportAddress(
-                stunServerAddress, stunServerPort, STUN_TRANSPORT );
-
-            int localStunPort = stunServerPort + 1;
-
-            TransportAddress localTransportAddress = new TransportAddress(
-                symmitronConfig.getLocalAddress(), localStunPort, STUN_TRANSPORT );
-
-            if (stunServerAddress == null) {
-                logger.error("Stun server address not specified");
-            }
-            else if( stunServerPort <= 0 ) {
-                logger.error("Stun server port not valid: " + stunServerPort );
-            }
-            else {
-              
-                if ( addressDetector == null ) { 
-
-                    addressDetector = new SimpleAddressDetector( serverTransportAddress );
-
-                    addressDetector.start();
-                }
-
-                IceUdpSocketWrapper localSocket = new IceUdpSocketWrapper(new DatagramSocket(localTransportAddress));
-
-                TransportAddress publicTransportAddress = addressDetector.getMappingFor(localSocket);
-
-                if( publicTransportAddress == null )
-                {
-                    logger.error("No stun address - could not do address discovery from STUN server: " + serverTransportAddress );
-                    return;
-                }
-
-                logger.info("Discovered public address " + publicAddress
-                    + " from STUN server " + stunServerAddress
-                    + " using local address " + localSocket);
-
-                if (publicAddress == null || 
-                    !publicAddress.equals( publicTransportAddress.getAddress() ) ) {
-
-                    publicAddress = publicTransportAddress.getAddress();
-
-                    symmitronConfig.setPublicAddress(publicAddress.getHostAddress());
-
-                    logger.debug("Updated symmitron config with new public address " + publicAddress.getHostAddress() );
-                } 
-            } 
-
-            logger.debug("Public address from STUN is " + publicAddress.getHostAddress());
-
-        } catch (Exception ex) {
-            if (addressDetector != null) {
-                try {
-                    addressDetector.shutDown();
-                } catch (Exception e ) {
-                    logger.error("Problem shutting down address detector!",e);
-                } finally {
-                    addressDetector = null;
-                }
-            }
-            logger.error("Error discovering  address -- Check Stun Server", ex);
-        } 
-    }
-
-    */
 
     static void discoverAddress() throws Exception {
        
@@ -617,7 +435,7 @@ public class SymmitronServer implements Symmitron {
     private Map<String, Object> createErrorMap(int errorCode, String reason) {
         Map<String, Object> retval = new HashMap<String, Object>();
         retval.put(STATUS_CODE, ERROR);
-        retval.put(ERROR_CODE, new Integer(errorCode).toString());
+        retval.put(ERROR_CODE, Integer.valueOf(errorCode).toString());
         retval.put(ERROR_INFO, reason);
 
         retval.put(INSTANCE_HANDLE, myHandle);
@@ -722,119 +540,50 @@ public class SymmitronServer implements Symmitron {
         filterStrayPackets = symmitronConfig.isRejectStrayPackets();
     }
 
-    public static void startWebServer() throws Exception {
 
+
+     public static void startWebServer() throws Exception {
         if (!isWebServerRunning) {
-            Logger log = Logger.getLogger("org.mortbay");
-            log.setLevel(Level.OFF);
             isWebServerRunning = true;
-            webServer = new HttpServer(); 
 
-            InetAddrPort inetAddrPort = new InetAddrPort(symmitronConfig
-                    .getLocalAddress(), symmitronConfig.getXmlRpcPort());
-            inetAddrPort.setInetAddress(InetAddress.getByName(symmitronConfig
-                    .getLocalAddress()));
-            
-            HttpContext httpContext = new HttpContext();
-            HttpConnection connection= httpContext.getHttpConnection();
-           
-            httpContext.setContextPath("/");
-            ServletHandler servletHandler = new ServletHandler();
-            servletHandler.addServlet("symmitron", "/*", SymmitronServlet.class
-                    .getName());
-            httpContext.addHandler(servletHandler);
+            int port = symmitronConfig.getXmlRpcPort();
+            String host = symmitronConfig.getLocalAddress();
+            webServer = new Server();
 
+            ServerConnector connector;
 
             if (symmitronConfig.getUseHttps()) {
-                logger.info("Starting  secure xml rpc server on inetAddr:port "
-                        + symmitronConfig.getLocalAddress() + ":"
-                        + symmitronConfig.getXmlRpcPort());
+                logger.info("Starting secure xml rpc server on " + host + ":" + port);
 
-                SslListener sslListener = new SslListener(inetAddrPort);
-                inetAddrPort.setInetAddress(InetAddress
-                        .getByName(symmitronConfig.getLocalAddress()));
+                HttpConfiguration httpsConfig = new HttpConfiguration();
+                httpsConfig.addCustomizer(new SecureRequestCustomizer());
 
-                String keystore = System.getProperties().getProperty(
-                        "javax.net.ssl.keyStore");
-                logger.info("keystore = " + keystore);
-                sslListener.setKeystore(keystore);
-                String keystoreType = System
-                        .getProperty("javax.net.ssl.trustStoreType");
-                logger.info("keyStoreType = " + keystoreType);
-                sslListener.setKeystoreType(keystoreType);
+                SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+                sslContextFactory.setKeyStorePath(System.getProperty("javax.net.ssl.keyStore"));
+                sslContextFactory.setKeyStorePassword(System.getProperty("jetty.ssl.password"));
+                sslContextFactory.setKeyManagerPassword(System.getProperty("jetty.ssl.keypassword"));
+                sslContextFactory.setKeyStoreType(System.getProperty("javax.net.ssl.trustStoreType"));
 
-                String algorithm = System.getProperties().getProperty(
-                        "jetty.x509.algorithm");
-                logger.info("algorithm = " + algorithm);
-                sslListener.setAlgorithm(algorithm);
-                String password = System.getProperties().getProperty(
-                        "jetty.ssl.password");
-                sslListener.setPassword(password);
-
-                String keypassword = System.getProperties().getProperty(
-                        "jetty.ssl.keypassword");
-
-                sslListener.setKeyPassword(keypassword);
-
-                sslListener.setMaxThreads(32);
-                sslListener.setMinThreads(4);
-                //sslListener.setLingerTimeSecs(30000);
-                sslListener.persistConnection(connection);
-
-                ((ThreadedServer) sslListener).open();
-
-                String[] cypherSuites = ((SSLServerSocket) sslListener
-                        .getServerSocket()).getSupportedCipherSuites();
-
-                for (String suite : cypherSuites) {
-                    logger.info("Cypher Suites enabled : " + suite);
-                }
-
-                ((SSLServerSocket) sslListener.getServerSocket())
-                        .setEnabledCipherSuites(cypherSuites);
-
-                String[] protocols = ((SSLServerSocket) sslListener
-                        .getServerSocket()).getSupportedProtocols();
-
-                for (String protocol : protocols) {
-                    logger.info("Supported protocol = " + protocol);
-                }
-
-                ((SSLServerSocket) sslListener.getServerSocket())
-                        .setEnabledProtocols(protocols);
-
-                webServer.setListeners(new HttpListener[] { sslListener });
-
-                for (HttpListener listener : webServer.getListeners()) {
-                    logger.debug("Listener = " + listener);
-
-                    listener.start();
-                }
-                
-            
-
+                connector = new ServerConnector(webServer,
+                    new SslConnectionFactory(sslContextFactory, "http/1.1"),
+                    new HttpConnectionFactory(httpsConfig));
             } else {
-                logger
-                        .info("Starting unsecure xml rpc server on inetAddr:port "
-                                + symmitronConfig.getLocalAddress()
-                                + ":"
-                                + symmitronConfig.getXmlRpcPort());
-
-                SocketListener socketListener = new SocketListener(inetAddrPort);
-                socketListener.setMaxThreads(32);
-                socketListener.setMinThreads(4);
-                //socketListener.setLingerTimeSecs(30000);
-                socketListener.persistConnection(connection);
-                webServer.addListener(socketListener);
+                logger.info("Starting unsecure xml rpc server on " + host + ":" + port);
+                connector = new ServerConnector(webServer);
             }
 
-           
-            webServer.addContext(httpContext);
+            connector.setHost(host);
+            connector.setPort(port);
+            connector.setIdleTimeout(30000);
+            webServer.addConnector(connector);
+
+            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+            context.setContextPath("/");
+            context.addServlet(SymmitronServlet.class, "/*");
+            webServer.setHandler(context);
 
             webServer.start();
-
             logger.debug("Web server started.");
-
         }
     }
 
@@ -872,7 +621,7 @@ public class SymmitronServer implements Symmitron {
     /**
      * For testing purposes only
      */
-    public Map tearDown() {
+    public Map<String,Object> tearDown() {
         stop();
         return createSuccessMap();
     }
@@ -883,7 +632,7 @@ public class SymmitronServer implements Symmitron {
      * @return the port range supported by the bridge.
      */
 
-    public Map getRtpPortRange() {
+    public Map<String,Object> getRtpPortRange() {
 
         PortRange portRange = new PortRange(symmitronConfig
                 .getPortRangeLowerBound(), symmitronConfig
@@ -945,7 +694,7 @@ public class SymmitronServer implements Symmitron {
             }
 
             try {
-                if (! this.semaphoreLockTable.get(controllerHandle).tryAcquire(10,TimeUnit.SECONDS) ) {
+                if (! SymmitronServer.semaphoreLockTable.get(controllerHandle).tryAcquire(10,TimeUnit.SECONDS) ) {
                     logger.error("Error occured during lock acquire for controller handle " + controllerHandle);
                     throw new RuntimeException("Could not successfully acquire handle lock for 10 seconds, giving up");
                 } else {
@@ -961,8 +710,8 @@ public class SymmitronServer implements Symmitron {
     
     private void release(String handle) {
         synchronized(semaphoreLockTable) {
-            if ( this.semaphoreLockTable.get(handle) != null ) {
-                this.semaphoreLockTable.get(handle).release();
+            if ( semaphoreLockTable.get(handle) != null ) {
+                semaphoreLockTable.get(handle).release();
             } else {
                 logger.error("NULL semaphore in table corresponding to handle " + handle);
             }
@@ -1033,7 +782,7 @@ public class SymmitronServer implements Symmitron {
             }
 
             Map<String, Object> retval = createSuccessMap();
-            HashMap[] hmapArray = new HashMap[count];
+            HashMap<String, Object>[] hmapArray = new HashMap[count];
             for (int i = 0; i < count; i++) {
                 Sym sym = new Sym();
                 SymReceiverEndpoint rtpEndpoint = new SymReceiverEndpoint(
@@ -1542,8 +1291,8 @@ public class SymmitronServer implements Symmitron {
                     retval.put(SYM_SESSION, symArray);
                 }
 
-                int nbridges = this.bridgeMap.size();
-                retval.put(NBRIDGES, new Integer(nbridges).toString());
+                int nbridges = bridgeMap.size();
+                retval.put(NBRIDGES, Integer.valueOf(nbridges).toString());
             }
             return retval;
         } catch (Exception ex) {
@@ -1572,8 +1321,8 @@ public class SymmitronServer implements Symmitron {
                     Thread.sleep(5);
                 }
             }
-            retval.put(PROXY_LIVENESS, new Boolean(
-                    this.crlfReceiver.packetRecieved).toString());
+            retval.put(PROXY_LIVENESS, Boolean.valueOf(
+                    SymmitronServer.crlfReceiver.packetRecieved).toString());
             return retval;
         } catch (Exception ex) {
             logger.error("Processing Error", ex);
@@ -1670,7 +1419,7 @@ public class SymmitronServer implements Symmitron {
             if (sessionMap.containsKey(symId)) {
                 Sym sym = sessionMap.get(symId);
                 String state = sym.getReceiver().getDatagramChannelState();
-                Map retval = this.createSuccessMap();
+                Map<String,Object> retval = this.createSuccessMap();
                 retval.put(Symmitron.RECEIVER_STATE, state);
                 return retval;
             } else {
@@ -1692,7 +1441,7 @@ public class SymmitronServer implements Symmitron {
         try {
             SymmitronServer.webServer.stop();
             isWebServerRunning = false;
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             logger.error("request processing interrupt", e);
         }
     }

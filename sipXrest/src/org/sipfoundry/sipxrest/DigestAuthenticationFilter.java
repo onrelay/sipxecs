@@ -5,17 +5,18 @@
  */
 package org.sipfoundry.sipxrest;
 
+import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.restlet.Filter;
+import org.restlet.routing.Filter;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.data.Parameter;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.util.Series;
 import org.sipfoundry.commons.security.Md5Encoder;
@@ -46,7 +47,7 @@ public class DigestAuthenticationFilter extends Filter {
 
     @Override
     protected int beforeHandle(Request request, Response response) {
-        String remoteAddr = request.getClientInfo().getAddress();
+        //String remoteAddr = request.getClientInfo().getAddress();
         int httpPort = request.getHostRef().getHostPort();
         //if internal port is used, do not perform authentication
         if (httpPort == RestServer.getRestServerConfig().getHttpPort()) {
@@ -82,7 +83,7 @@ public class DigestAuthenticationFilter extends Filter {
                     logger.debug("Requesting DIGEST credentials");
                     ChallengeRequest challengeRequest = new ChallengeRequest(
                             ChallengeScheme.HTTP_DIGEST, RestServer.getRealm());
-                    response.setChallengeRequest(challengeRequest);
+                    response.setChallengeRequests(List.of( challengeRequest ));
                     response.setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
 
                     return Filter.STOP;
@@ -93,15 +94,13 @@ public class DigestAuthenticationFilter extends Filter {
                     String nonce = Util.H(Long.toString(Math.abs(random.nextLong())));
                     ChallengeRequest challengeRequest = new ChallengeRequest(
                             ChallengeScheme.HTTP_DIGEST, RestServer.getRealm());
-                    response.setChallengeRequest(challengeRequest);
+                    response.setChallengeRequests(List.of(challengeRequest));
                     response.setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
 
                     parameters.add("qop", "auth");
                     parameters.add("nonce", nonce);
                     parameters.add("algorithm", "MD5");
-                    parameters
-                            .add("realm", RestServer.getRealm());
-                    challengeResponse.setCredentialComponents(parameters);
+                    parameters.add("realm", RestServer.getRealm());
                     logger.debug("sending DIGEST challenge");
                     return Filter.STOP;
                 }
@@ -110,12 +109,12 @@ public class DigestAuthenticationFilter extends Filter {
                     logger.debug("Requesting DIGEST credentials");
                     ChallengeRequest challengeRequest = new ChallengeRequest(
                             ChallengeScheme.HTTP_DIGEST, RestServer.getRealm());
-                    response.setChallengeRequest(challengeRequest);
+                    response.setChallengeRequests(List.of(challengeRequest));
                     response.setStatus(Status.CLIENT_ERROR_PROXY_AUTHENTIFICATION_REQUIRED);
                     return Filter.STOP;
                 }
 
-                logger.debug("credentials = " + challengeResponse.getCredentials());
+                logger.debug("credentials = " + challengeResponse.getParameters().toString());
 
                 String nonce = challengeResponse.getParameters().getFirstValue("nonce", true);
                 String cnonce = challengeResponse.getParameters().getFirstValue("cnonce", true);
@@ -134,7 +133,7 @@ public class DigestAuthenticationFilter extends Filter {
                         || qop.trim().equalsIgnoreCase("auth")) {
                     A2 = method + ":" + uri;
                 } else {
-                    String entity_digest = response.getEntity().getDigest().toString();
+                    //String entity_digest = response.getEntity().getDigest().toString();
 
                     A2 = method + ":" + uri + ":" + RestServer.getRealm();
                 }

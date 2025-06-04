@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.dialplan;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang.enums.Enum;
 import org.sipfoundry.sipxconfig.common.EnumUserType;
 import org.sipfoundry.sipxconfig.common.SipUri;

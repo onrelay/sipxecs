@@ -21,7 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.systemaudit.ConfigChangeAction;
 import org.sipfoundry.sipxconfig.systemaudit.SystemAuditManager;
@@ -55,7 +55,7 @@ public class RegionManagerImpl implements RegionManager {
         String addresses = encodeAddresses(region.getAddresses());
         try {
             if (region.getId() == -1) {
-                int nextId = m_db.queryForInt("select nextval('region_seq')");
+                int nextId = m_db.queryForObject("select nextval('region_seq')", Integer.class);
                 String sql = "insert into region (region_id, name, addresses) values (?, ?, ?)";
                 m_db.update(sql, new Object[] {
                     nextId, region.getName(), addresses

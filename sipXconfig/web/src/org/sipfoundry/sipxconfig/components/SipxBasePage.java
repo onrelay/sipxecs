@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.components;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.annotations.InjectObject;
 import org.apache.tapestry.html.BasePage;
 import org.apache.tapestry.web.WebRequest;

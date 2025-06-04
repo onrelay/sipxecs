@@ -15,16 +15,18 @@
 package org.sipfoundry.sipxconfig.rest;
 
 import static org.sipfoundry.sipxconfig.rest.JacksonConvert.fromRepresentation;
-import static org.sipfoundry.sipxconfig.rest.JacksonConvert.toRepresentation;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.common.AbstractUser;
 import org.sipfoundry.sipxconfig.common.DialPad;
 import org.sipfoundry.sipxconfig.common.User;
@@ -41,51 +43,47 @@ public class PersonalAttendantResource extends UserResource {
 
     private PersonalAttendantManager m_mgr;
 
-    @Override
-    public boolean allowPost() {
-        return false;
-    }
 
-    @Override
-    public boolean allowDelete() {
-        return false;
-    }
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {       
+     
+        try {
+            AttendantBean settings = new AttendantBean();
+            User user = getUser();
 
-    // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        AttendantBean settings = new AttendantBean();
-        User user = getUser();
+            settings.setPersonalAttendantPermission(user.hasPermission(PermissionName.PERSONAL_AUTO_ATTENDANT));
+            settings.setDepositVM(user.isDepositVoicemail());
+            boolean isForwardDeleteVM = (boolean) user.getSettingTypedValue(MailboxPreferences.FORWARD_DELETE_VOICEMAIL);
+            settings.setForwardDeleteVM(isForwardDeleteVM);
+            settings.setPlayVMDefaultOptions(user.getPlayVmDefaultOptions());
+            settings.setOperator((String) user.getSettingTypedValue(AbstractUser.OPERATOR_SETTING));
 
-        settings.setPersonalAttendantPermission(user.hasPermission(PermissionName.PERSONAL_AUTO_ATTENDANT));
-        settings.setDepositVM(user.isDepositVoicemail());
-        boolean isForwardDeleteVM = (boolean) user.getSettingTypedValue(MailboxPreferences.FORWARD_DELETE_VOICEMAIL);
-        settings.setForwardDeleteVM(isForwardDeleteVM);
-        settings.setPlayVMDefaultOptions(user.getPlayVmDefaultOptions());
-        settings.setOperator((String) user.getSettingTypedValue(AbstractUser.OPERATOR_SETTING));
+            PersonalAttendant att = m_mgr.loadPersonalAttendantForUser(user);
 
-        PersonalAttendant att = m_mgr.loadPersonalAttendantForUser(user);
+            settings.setLanguage(att.getLanguage());
+            settings.setOverrideLanguage(att.getOverrideLanguage());
+            Map<String, String> menuMap = new LinkedHashMap<String, String>();
+            AttendantMenu menu = att.getMenu();
 
-        settings.setLanguage(att.getLanguage());
-        settings.setOverrideLanguage(att.getOverrideLanguage());
-        Map<String, String> menuMap = new LinkedHashMap<String, String>();
-        AttendantMenu menu = att.getMenu();
-
-        if (menu != null) {
-            for (Map.Entry<DialPad, AttendantMenuItem> entry : menu.getMenuItems().entrySet()) {
-                menuMap.put(entry.getKey().getName(), entry.getValue().getParameter());
+            if (menu != null) {
+                for (Map.Entry<DialPad, AttendantMenuItem> entry : menu.getMenuItems().entrySet()) {
+                    menuMap.put(entry.getKey().getName(), entry.getValue().getParameter());
+                }
+                settings.setMenu(menuMap);
             }
-            settings.setMenu(menuMap);
+
+            LOG.debug("Returning attendant prefs:\t" + settings);
+
+            return toRepresentation(settings);
+
+        } catch( IOException ex ) {
+            throw new ResourceException( ex );
         }
-
-        LOG.debug("Returning attendant prefs:\t" + settings);
-
-        return toRepresentation(settings);
     }
 
-    // PUT
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
+        
         if (Boolean.TRUE == getUser().hasPermission(PermissionName.PERSONAL_AUTO_ATTENDANT)) {
             AttendantBean settings = fromRepresentation(entity, AttendantBean.class);
             LOG.debug("Got attendant prefs:\t" + settings);
@@ -137,6 +135,7 @@ public class PersonalAttendantResource extends UserResource {
                 getCoreContext().saveUser(user);
             }
         }
+        return null;
     }
 
     public void setMgr(PersonalAttendantManager mgr) {

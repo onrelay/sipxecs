@@ -13,7 +13,7 @@ Url: http://www.siplabs.ru
 %define debug_package %{nil}
 
 BuildRequires: automake
-BuildRequires: java-1.8.0-openjdk-devel >= 1.6
+BuildRequires: java-17-openjdk-devel >= 1.6
 BuildRequires: sipxcommons >= %version
 BuildRequires: sipxconfig >= %version
 

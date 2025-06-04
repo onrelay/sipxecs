@@ -15,7 +15,7 @@ import java.util.List;
 
 import static java.io.File.separator;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Special type of setting used for upload-able file.

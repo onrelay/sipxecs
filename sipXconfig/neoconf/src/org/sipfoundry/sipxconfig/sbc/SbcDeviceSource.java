@@ -10,13 +10,12 @@
 package org.sipfoundry.sipxconfig.sbc;
 
 import org.sipfoundry.sipxconfig.device.DeviceSource;
-import org.springframework.beans.factory.annotation.Required;
 
 public class SbcDeviceSource implements DeviceSource<SbcDevice> {
 
     private SbcDeviceManager m_sbcDeviceManager;
 
-    @Required
+    
     public void setSbcDeviceManager(SbcDeviceManager sbcDeviceManager) {
         m_sbcDeviceManager = sbcDeviceManager;
     }

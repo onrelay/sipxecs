@@ -22,7 +22,6 @@ import java.io.Writer;
 import org.apache.velocity.VelocityContext;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchSettings;
-import org.springframework.beans.factory.annotation.Required;
 
 public class IvrConfiguration extends AbstractFreeswitchConfiguration {
     private String m_mediaServer;
@@ -48,7 +47,7 @@ public class IvrConfiguration extends AbstractFreeswitchConfiguration {
         write(writer, context);
     }
 
-    @Required
+    
     public void setMediaServer(String mediaServer) {
         m_mediaServer = mediaServer;
     }

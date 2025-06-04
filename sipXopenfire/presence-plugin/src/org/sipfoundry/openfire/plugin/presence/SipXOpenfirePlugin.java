@@ -73,17 +73,22 @@ import org.sipfoundry.openfire.config.XmppS2sInfo;
 import org.sipfoundry.openfire.config.XmppUserAccount;
 import org.sipfoundry.openfire.muc.RoomManager;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.convert.CustomConversions;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+
 import org.xmpp.component.Component;
 import org.xmpp.component.ComponentManager;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Packet;
 import org.xmpp.packet.Presence;
 
-import com.mongodb.DBObject;
-import com.mongodb.Mongo;
+import org.bson.Document;
+import com.mongodb.client.MongoClient;
 
 public class SipXOpenfirePlugin implements Plugin, Component {
 
@@ -251,17 +256,36 @@ public class SipXOpenfirePlugin implements Plugin, Component {
                 System.getProperties().load(is);
                 configurationPath = System.getProperty("conf.dir", "/etc/sipxpbx");
             }
-            Mongo mongo = MongoFactory.fromConnectionFile();
-            List<Converter<DBObject, Conference>> converters = new ArrayList<Converter<DBObject, Conference>>();
-            ConfReadConverter confReadConverter = new ConfReadConverter();
-            converters.add(confReadConverter);
-            CustomConversions cc = new CustomConversions(converters);
-            MongoTemplate entityDb = new MongoTemplate(mongo, "imdb");
-            MappingMongoConverter mappingConverter = (MappingMongoConverter) entityDb.getConverter();
-            mappingConverter.setCustomConversions(cc);
-            mappingConverter.afterPropertiesSet();
+
+            // Modern MongoClient from MongoDB driver 4.x
+            com.mongodb.client.MongoClient mongoClient = MongoFactory.fromConnectionFile();
+
+            // Spring Data MongoDB factory (replaces legacy Mongo)
+            MongoDatabaseFactory factory = new SimpleMongoClientDatabaseFactory(mongoClient, "imdb");
+
+            // Register custom converters
+            List<Converter<?, ?>> converters = new ArrayList<>();
+            converters.add(new ConfReadConverter());
+            MongoCustomConversions customConversions = new MongoCustomConversions(converters);
+
+            // Set up mapping context and converter
+            MongoMappingContext mappingContext = new MongoMappingContext();
+            mappingContext.setSimpleTypeHolder(customConversions.getSimpleTypeHolder());
+
+            MappingMongoConverter converter = new MappingMongoConverter(
+                new DefaultDbRefResolver(factory),
+                mappingContext
+            );
+            converter.setCustomConversions(customConversions);
+            converter.afterPropertiesSet();
+
+            // Create MongoTemplate with updated converter
+            MongoTemplate entityDb = new MongoTemplate(factory, converter);
+
+            // Inject into your service
             m_conferenceService = new ConferenceServiceImpl();
             ((ConferenceServiceImpl) m_conferenceService).setTemplate(entityDb);
+
         } finally {
             IOUtils.closeQuietly(is);
         }

@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.site.setting;
 
-import static org.apache.commons.lang.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 import java.util.Collection;
 import java.util.List;

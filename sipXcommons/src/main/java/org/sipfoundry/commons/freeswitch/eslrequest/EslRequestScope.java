@@ -60,7 +60,6 @@ public class EslRequestScope implements Scope {
 
     @Override
     public Object resolveContextualObject(String arg0) {
-        // TODO Auto-generated method stub
         return null;
     }
 

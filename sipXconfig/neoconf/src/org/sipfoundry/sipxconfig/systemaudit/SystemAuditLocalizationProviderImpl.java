@@ -35,7 +35,6 @@ import org.sipfoundry.sipxconfig.phone.Phone;
 import org.sipfoundry.sipxconfig.phone.PhoneContext;
 import org.sipfoundry.sipxconfig.setting.BeanWithSettings;
 import org.sipfoundry.sipxconfig.setting.Setting;
-import org.springframework.beans.factory.annotation.Required;
 
 public class SystemAuditLocalizationProviderImpl implements SystemAuditLocalizationProvider {
 
@@ -120,27 +119,27 @@ public class SystemAuditLocalizationProviderImpl implements SystemAuditLocalizat
         return null;
     }
 
-    @Required
+    
     public void setPermissionManager(PermissionManager permissionManager) {
         m_permissionManager = permissionManager;
     }
 
-    @Required
+    
     public void setPhoneContext(PhoneContext phoneContext) {
         m_phoneContext = phoneContext;
     }
 
-    @Required
+    
     public void setConferenceBridgeContext(ConferenceBridgeContext conferenceBridgeContext) {
         m_conferenceBridgeContext = conferenceBridgeContext;
     }
 
-    @Required
+    
     public void setAutoAttendantManager(AutoAttendantManager autoAttendantManager) {
         m_autoAttendantManager = autoAttendantManager;
     }
 
-    @Required
+    
     public void setParkOrbitContext(ParkOrbitContext parkOrbitContext) {
         m_parkOrbitContext = parkOrbitContext;
     }
@@ -185,7 +184,7 @@ public class SystemAuditLocalizationProviderImpl implements SystemAuditLocalizat
         return configChangeTypes;
     }
 
-    @Required
+    
     public void setConfigChangeTypesPackageNames(List<String> configChangePackageNames) {
         m_configChangeTypesPackageNames = configChangePackageNames;
     }

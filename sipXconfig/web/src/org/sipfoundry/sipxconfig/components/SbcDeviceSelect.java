@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.components;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.tapestry.BaseComponent;
 import org.apache.tapestry.IActionListener;
 import org.apache.tapestry.IComponent;

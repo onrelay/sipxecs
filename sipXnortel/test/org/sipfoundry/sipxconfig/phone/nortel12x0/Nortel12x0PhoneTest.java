@@ -13,7 +13,7 @@ package org.sipfoundry.sipxconfig.phone.nortel12x0;
 
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 
 import java.io.InputStream;
 import java.util.ArrayList;

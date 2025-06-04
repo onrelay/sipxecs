@@ -10,9 +10,9 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.restlet.Application;
 import org.restlet.Context;
-import org.restlet.Filter;
+import org.restlet.routing.Filter;
 import org.restlet.Restlet;
-import org.restlet.Router;
+import org.restlet.routing.Router;
 
 public class RestServerApplication extends Application {
     private static Logger logger = Logger.getLogger(RestServerApplication.class);
@@ -25,8 +25,8 @@ public class RestServerApplication extends Application {
     }
 
     @Override
-    public Restlet createRoot() {
-        logger.debug("createRoot");
+    public Restlet getInboundRoot() {
+        logger.debug("getInboundRoot");
         Context context = getContext();
         Router router = new Router(context);
         try {

@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.alias.AliasManager;
 import org.sipfoundry.sipxconfig.common.BeanId;
 import org.sipfoundry.sipxconfig.common.DaoUtils;
@@ -33,13 +33,12 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.support.DataAccessUtils;
 
 /**
  * DialPlanContextImpl is an implementation of DialPlanContext with hibernate support.
  */
-public class DialPlanContextImpl extends SipxHibernateDaoSupport implements BeanFactoryAware, DialPlanContext {
+public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> implements BeanFactoryAware, DialPlanContext {
 
     private static final String AUDIT_LOG_CONFIG_TYPE = "Dialing Rule";
     private static final String DIALING_RULE_IDS_WITH_NAME_QUERY = "dialingRuleIdsWithName";
@@ -56,7 +55,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport implements Bean
      * @return the single instance of dial plan
      */
     DialPlan getDialPlan() {
-        List dialPlans = getHibernateTemplate().loadAll(DialPlan.class);
+        List<DialPlan> dialPlans = getHibernateTemplate().loadAll(DialPlan.class);
         if (dialPlans.isEmpty()) {
             DialPlan dp = new DialPlan();
             return dp;
@@ -65,7 +64,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport implements Bean
     }
 
     public boolean isInitialized() {
-        List dialPlans = getHibernateTemplate().loadAll(DialPlan.class);
+        List<DialPlan> dialPlans = getHibernateTemplate().loadAll(DialPlan.class);
         return !dialPlans.isEmpty();
     }
 
@@ -183,7 +182,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport implements Bean
      * @return A List of the DialingRules for that gateway.
      */
     public List<DialingRule> getRulesForGateway(Integer gatewayId) {
-        return getHibernateTemplate().findByNamedQueryAndNamedParam("dialingRulesByGatewayId", "gatewayId",
+        return (List<DialingRule>)getHibernateTemplate().findByNamedQueryAndNamedParam("dialingRulesByGatewayId", "gatewayId",
                 gatewayId);
     }
 
@@ -315,7 +314,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport implements Bean
         m_beanFactory = (ListableBeanFactory) beanFactory;
     }
 
-    @Required
+    
     public void setAliasManager(AliasManager aliasManager) {
         m_aliasManager = aliasManager;
     }
@@ -414,7 +413,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport implements Bean
         // we can't query the DB for individual aliases. However, there will be so few
         // of these aliases (one string per internal dialing rule) that we can simply load
         // all such alias strings and check them in Java.
-        List<String> aliasStrings = getHibernateTemplate().findByNamedQuery("aaAliases");
+        List<String> aliasStrings = (List<String>)getHibernateTemplate().findByNamedQuery("aaAliases");
         for (String aliasString : aliasStrings) {
             String[] aliases = AttendantRule.getAttendantAliasesAsArray(aliasString);
             if (ArrayUtils.contains(aliases, alias)) {
@@ -424,14 +423,18 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport implements Bean
         return false;
     }
 
-    public Collection getBeanIdsOfObjectsWithAlias(String alias) {
-        Collection bids = new ArrayList();
+    public Collection<BeanId> getBeanIdsOfObjectsWithAlias(String alias) {
+        Collection<BeanId> bids = new ArrayList<>();
 
-        Collection internalRules = getInternalRulesWithVoiceMailExtension(alias);
-        bids.addAll(BeanId.createBeanIdCollection(internalRules, InternalRule.class));
+        Collection<InternalRule> internalRules = getInternalRulesWithVoiceMailExtension(alias);
+        for( InternalRule internalRule : internalRules ) {
+            bids.add(new BeanId(internalRule.getId(), InternalRule.class));
+        }
 
-        Collection attendantRules = getAttendantRulesWithExtensionOrDid(alias);
-        bids.addAll(BeanId.createBeanIdCollection(attendantRules, AttendantRule.class));
+        Collection<AttendantRule> attendantRules = getAttendantRulesWithExtensionOrDid(alias);
+        for( AttendantRule attendantRule : attendantRules ) {
+            bids.add(new BeanId(attendantRule.getId(), AttendantRule.class));
+        }
 
         bids.addAll(getBeanIdsOfRulesWithAutoAttendantAlias(alias));
 
@@ -439,7 +442,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport implements Bean
     }
 
     private Collection<BeanId> getBeanIdsOfRulesWithAutoAttendantAlias(String alias) {
-        Collection<Object[]> objs = getHibernateTemplate().findByNamedQuery("attendantRuleIdsAndAttendantAliases");
+        Collection<Object[]> objs = (Collection<Object[]>)getHibernateTemplate().findByNamedQuery("attendantRuleIdsAndAttendantAliases");
         Collection<BeanId> bids = new ArrayList<BeanId>();
         for (Object[] idAndAliases : objs) {
             Integer id = (Integer) idAndAliases[0];
@@ -453,14 +456,14 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport implements Bean
     }
 
     @Override
-    public Collection getInternalRulesWithVoiceMailExtension(String extension) {
-        return getHibernateTemplate().findByNamedQueryAndNamedParam("internalRuleIdsWithVoiceMailExtension", VALUE,
+    public Collection<InternalRule> getInternalRulesWithVoiceMailExtension(String extension) {
+        return (Collection<InternalRule>)getHibernateTemplate().findByNamedQueryAndNamedParam("internalRuleIdsWithVoiceMailExtension", VALUE,
                 extension);
     }
 
     @Override
-    public Collection getAttendantRulesWithExtensionOrDid(String extension) {
-        return getHibernateTemplate().findByNamedQueryAndNamedParam("attendantRuleIdsWithExtensionOrDid", VALUE,
+    public Collection<AttendantRule> getAttendantRulesWithExtensionOrDid(String extension) {
+        return (Collection<AttendantRule>)getHibernateTemplate().findByNamedQueryAndNamedParam("attendantRuleIdsWithExtensionOrDid", VALUE,
                 extension);
     }
 
@@ -472,7 +475,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport implements Bean
         return replicables;
     }
 
-    @Required
+    
     public void setAuditLogContext(AuditLogContext auditLogContext) {
         m_auditLogContext = auditLogContext;
     }

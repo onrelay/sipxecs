@@ -16,16 +16,16 @@
  */
 package org.sipfoundry.sipxconfig.commserver.imdb;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.Replicable;
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 public abstract class AbstractDataSetGenerator {
     private CoreContext m_coreContext;
 
-    public abstract void generate(Replicable entity, DBObject top);
+    public abstract void generate(Replicable entity, Document top);
 
     protected abstract DataSet getType();
 
@@ -44,7 +44,7 @@ public abstract class AbstractDataSetGenerator {
         return m_coreContext.getDomainName();
     }
 
-    protected static void putOnlyIfNotNull(DBObject obj, String propName, Object prop) {
+    protected static void putOnlyIfNotNull(Document obj, String propName, Object prop) {
         if (prop instanceof String) {
             if (StringUtils.isNotBlank((String) prop)) {
                 obj.put(propName, prop);
@@ -52,13 +52,13 @@ public abstract class AbstractDataSetGenerator {
         } else if (prop != null) {
             obj.put(propName, prop);
         } else {
-            obj.removeField(propName);
+            obj.remove(propName); 
         }
     }
 
-    protected static void removeField(DBObject top, String field) {
-        if (top.containsField(field)) {
-            top.removeField(field);
+    protected static void removeField(Document top, String field) {
+        if (top.containsKey(field)) {  
+            top.remove(field);        
         }
     }
 

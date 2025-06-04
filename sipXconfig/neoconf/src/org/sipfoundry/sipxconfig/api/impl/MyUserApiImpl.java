@@ -14,15 +14,14 @@
  */
 package org.sipfoundry.sipxconfig.api.impl;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.sipfoundry.sipxconfig.api.MyUserApi;
 import org.sipfoundry.sipxconfig.api.model.SettingsList;
 import org.sipfoundry.sipxconfig.api.model.UserBean;
 import org.sipfoundry.sipxconfig.common.User;
-import org.springframework.beans.factory.annotation.Required;
 
 public class MyUserApiImpl extends CurrentUser implements MyUserApi {
     /**
@@ -68,7 +67,7 @@ public class MyUserApiImpl extends CurrentUser implements MyUserApi {
         return Response.status(Status.FORBIDDEN).build();
     }
 
-    @Required
+    
     public void setUserApiImpl(UserApiImpl userApiImpl) {
         m_userApiImpl = userApiImpl;
     }

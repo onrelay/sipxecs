@@ -102,8 +102,8 @@ import static org.sipfoundry.commons.mongo.MongoConstants.VOICEMAIL_PINTOKEN;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -111,19 +111,19 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.BooleanUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.commons.mongo.MongoConstants;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
-import com.mongodb.util.JSON;
+import org.bson.Document;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.Updates;
+import org.bson.conversions.Bson;
 
 /**
  * Holds the valid user data needed for the AutoAttendant, parsing from mongo db imdb
@@ -146,7 +146,7 @@ public class ValidUsers {
     private static final String ENTITY_NAME_GROUP = "group";
     private static final String ENTITY_NAME_IMBOTSETTINGS = "imbotsettings";
 
-    private DB m_imdb;
+    private MongoDatabase m_imdb;
 
     /**
      * Loading all users into memory is an extremely expensive call for large systems (10K-50K
@@ -154,18 +154,17 @@ public class ValidUsers {
      *
      * @return
      */
+    @SuppressWarnings("unchecked")
     public List<User> getValidUsers() {
         List<User> users = new ArrayList<User>();
         try {
-            DBCursor cursor = getEntityCollection().find(QueryBuilder.start(VALID_USER).is(Boolean.TRUE).get());
-            Iterator<DBObject> objects = cursor.iterator();
-            while (objects.hasNext()) {
-                DBObject validUser = objects.next();
+            FindIterable<Document> validUsers = getEntityCollection().find(Filters.eq(VALID_USER, true));
+            for (Document validUser : validUsers ) {
                 if (!validUser.get(ID).toString().startsWith("User")) {
-                    BasicDBList aliasesObj = (BasicDBList) validUser.get(ALIASES);
+                    List<Document> aliasesObj = (List<Document>) validUser.get(ALIASES);
                     if (aliasesObj != null) {
                         for (int i = 0; i < aliasesObj.size(); i++) {
-                            DBObject aliasObj = (DBObject) aliasesObj.get(i);
+                            Document aliasObj = (Document) aliasesObj.get(i);
                             users.add(extractValidUserFromAlias(aliasObj));
                         }
                     }
@@ -173,7 +172,6 @@ public class ValidUsers {
                     users.add(extractValidUser(validUser));
                 }
             }
-            cursor.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -186,31 +184,30 @@ public class ValidUsers {
      *
      * @return
      */
-    public DBCursor getUsers() {
-        BasicDBObject query = new BasicDBObject(ENTITY_NAME, ENTITY_NAME_USER);
-        DBCursor cursor = getEntityCollection().find(query);
+    public FindIterable<Document> getUsers() {
+        Document query = new Document(ENTITY_NAME, ENTITY_NAME_USER);
+        FindIterable<Document> cursor = getEntityCollection().find(query);
         return cursor;
     }
 
     /**
-     * Find a list of users DBObjects based on a search query. The DBObject will have only
+     * Find a list of users Documents based on a search query. The Document will have only
      * the fields specified by projection.
      * @param query
      * @param projection
      * @return
      */
-    public List<DBObject> getUsers(DBObject query, DBObject projection) {
-        DBCursor cursor = getEntityCollection().find(query, projection);
-        cursor.close();
-        return cursor.toArray();
+    public List<Document> getUsers(Document query, Document projection) {
+        return getEntityCollection().find(query).projection(projection).into(new ArrayList<>());
     }
 
-    public DBCursor getUsersWithSpeedDial() {
-        DBCursor cursor = getEntityCollection().find(
-                QueryBuilder.start(ENTITY_NAME).is(ENTITY_NAME_USER)
-                        .or(QueryBuilder.start(SPEEDDIAL).exists(true).get(), new BasicDBObject(IM_ENABLED, true))
-                        .get());
-        return cursor;
+    public FindIterable<Document> getUsersWithSpeedDial() {
+        return getEntityCollection().find(
+            Filters.and(
+                Filters.eq(ENTITY_NAME, ENTITY_NAME_USER),
+                Filters.or(Filters.exists(SPEEDDIAL, true), Filters.eq(IM_ENABLED, true))
+            )
+        );
     }
 
     /**
@@ -220,8 +217,10 @@ public class ValidUsers {
      * @param field
      */
     public void removeFieldFromUsers(String field) {
-        getEntityCollection().update(new BasicDBObject(),
-                new BasicDBObject("$unset", new BasicDBObject(SPEEDDIAL, 1)), false, true);
+        getEntityCollection().updateMany(
+            new Document(), 
+            Updates.unset(field)
+        );
     }
 
     /**
@@ -231,13 +230,15 @@ public class ValidUsers {
      * @return
      */
     public List<User> getUsersWithImEnabled() {
-        List<User> users = new ArrayList<User>();
-        DBCursor cursor = getEntityCollection().find(QueryBuilder.start(IM_ENABLED).is(Boolean.TRUE).get());
-        Iterator<DBObject> objects = cursor.iterator();
-        while (objects.hasNext()) {
-            DBObject user = objects.next();
-            users.add(extractUser(user));
+
+        List<User> users = new ArrayList<>();
+    
+        FindIterable<Document> userDocs = getEntityCollection().find(Filters.eq(IM_ENABLED, true));
+    
+        for (Document userDoc : userDocs ) {
+            users.add(extractUser(userDoc));
         }
+    
         return users;
     }
 
@@ -247,15 +248,19 @@ public class ValidUsers {
      * @return
      */
     public List<String> getAllImIdsInGroup(String group) {
-        List<String> imIds = new ArrayList<String>();
-        DBCursor cursor = getEntityCollection().find(
-                QueryBuilder.start(GROUPS).is(group).and(IM_ENABLED).is(Boolean.TRUE).get());
-        Iterator<DBObject> objects = cursor.iterator();
-        while (objects.hasNext()) {
-            DBObject user = objects.next();
-            imIds.add(user.get(IM_ID).toString());
+
+        List<String> imIds = new ArrayList<>();
+    
+        FindIterable<Document> userDocs = getEntityCollection().find(
+            Filters.and(Filters.eq(GROUPS, group), Filters.eq(IM_ENABLED, true))
+        );
+    
+        for (Document userDoc : userDocs) {
+            Object imId = userDoc.get(IM_ID);
+            if (imId != null) {
+                imIds.add(imId.toString());
+            }
         }
-        cursor.close();
         return imIds;
     }
 
@@ -270,33 +275,35 @@ public class ValidUsers {
         if (userName == null) {
             return null;
         }
-        DBObject queryUserName = QueryBuilder.start(VALID_USER).is(Boolean.TRUE).and(UID).is(userName).get();
-        DBObject result = getEntityCollection().findOne(queryUserName);
+        
+        // Primary query: Search by UID with VALID_USER = true
+        Document result = getEntityCollection().find(
+                Filters.and(Filters.eq(VALID_USER, true), Filters.eq(UID, userName))
+        ).first();
+    
         if (result != null) {
             return extractValidUser(result);
         }
-
-        // check aliases
-        BasicDBObject elemMatch = new BasicDBObject();
-        elemMatch.put(ALIAS_ID, userName);
-        BasicDBObject alias = new BasicDBObject();
-        alias.put("$elemMatch", elemMatch);
-        BasicDBObject queryAls = new BasicDBObject();
-        queryAls.put(ALIASES, alias);
-        queryAls.put(VALID_USER, Boolean.TRUE);
-        DBObject aliasResult = getEntityCollection().findOne(queryAls);
+    
+        // Secondary query: Search in aliases
+        Document aliasResult = getEntityCollection().find(
+                Filters.and(Filters.eq(VALID_USER, true), Filters.elemMatch(ALIASES, Filters.eq(ALIAS_ID, userName)))
+        ).first();
+    
         if (aliasResult == null) {
             return null;
         }
+    
+        // If ID does not start with "User", check aliases explicitly
         if (!aliasResult.get(ID).toString().startsWith("User")) {
-            BasicDBList aliases = (BasicDBList) aliasResult.get(ALIASES);
-            for (int i = 0; i < aliases.size(); i++) {
-                DBObject aliasObj = (DBObject) aliases.get(i);
-                if (getStringValue(aliasObj, ALIAS_ID).equals(userName)) {
+            List<Document> aliases = aliasResult.getList(ALIASES, Document.class);
+            for (Document aliasObj : aliases) {
+                if (userName.equals(getStringValue(aliasObj, ALIAS_ID))) {
                     return extractValidUserFromAlias(aliasObj);
                 }
             }
         }
+    
         return extractValidUser(aliasResult);
     }
 
@@ -305,23 +312,30 @@ public class ValidUsers {
      * which has the Auto Enter Pin from External Number permission set to true. <br>
      * If the method finds more than 1 user who share the same external number it will return null;
      */
+
     public User getUserWithAutoEnterPinByExternalNumber(String externalNumber, int matchLastDigits) {
         if (externalNumber == null) {
             return null;
         }
-        QueryBuilder query = QueryBuilder.start(VALID_USER).is(Boolean.TRUE);
+        
+        // Get the last N digits of the external number
         externalNumber = getExternalNumberLastDigits(externalNumber, matchLastDigits);
+    
+        // Create regex pattern for partial matching
         Pattern cellPattern = Pattern.compile(".*" + externalNumber);
-        BasicDBObject cell = new BasicDBObject(CELL_PHONE_NUMBER, cellPattern);
-        BasicDBObject home = new BasicDBObject(HOME_PHONE_NUMBER, cellPattern);
-        query.or(cell, home);
-        query.and(AUTO_ENTER_PIN_EXTERNAL).is("1");
-        DBObject queryUserName = query.get();
-        DBCursor result = getEntityCollection().find(queryUserName);
-        if (result != null && result.size() == 1) {
-            return extractValidUser(result.one());
-        }
-        return null;
+    
+        // Build query using Filters
+        Bson query = Filters.and(
+                Filters.eq(VALID_USER, true),
+                Filters.or(
+                        Filters.regex(CELL_PHONE_NUMBER, cellPattern),
+                        Filters.regex(HOME_PHONE_NUMBER, cellPattern)
+                ),
+                Filters.eq(AUTO_ENTER_PIN_EXTERNAL, "1")
+        );
+    
+        Document result = getEntityCollection().find(query).first();
+        return (result != null) ? extractValidUser(result) : null;
     }
 
     private String getExternalNumberLastDigits(String externalNumber, int matchLastDigits) {
@@ -335,12 +349,18 @@ public class ValidUsers {
     }
 
     public User getUserByConferenceName(String conferenceName) {
-        DBObject queryConference = QueryBuilder.start(CONF_NAME).is(conferenceName).get();
-        DBObject conferenceResult = getEntityCollection().findOne(queryConference);
-        if (conferenceResult != null && getStringValue(conferenceResult, CONF_OWNER) != null) {
-            User user = getUser(getStringValue(conferenceResult, CONF_OWNER));
-            addConference(user, conferenceResult);
-            return user;
+    
+        // Build query using Filters
+        Document conferenceResult = getEntityCollection().find(
+            Filters.eq(CONF_NAME, conferenceName)).first();
+    
+        if (conferenceResult != null) {
+            String owner = getStringValue(conferenceResult, CONF_OWNER);
+            if (owner != null) {
+                User user = getUser(owner);
+                addConference(user, conferenceResult);
+                return user;
+            }
         }
         return null;
     }
@@ -356,65 +376,73 @@ public class ValidUsers {
     // We might rarely need to search through alternate id. "or" query proved to be pretty heavy
     // especially on systems with many users, so we might want to limit those if possible
     private User getUserByJidObject(Object jid) {
-        BasicDBObject jidQuery = new BasicDBObject();
-        jidQuery.put(IM_ID, jid);
-        DBObject jidResult = getEntityCollection().findOne(jidQuery);
+    
+        // First attempt: Find by IM_ID
+        Document jidResult = getEntityCollection().find(Filters.eq(IM_ID, jid)).first();
         User user = extractValidUser(jidResult);
+    
+        // If not found, attempt ALT_IM_ID
         if (user == null) {
-            BasicDBObject altJidQuery = new BasicDBObject();
-            altJidQuery.put(ALT_IM_ID, jid);
-            jidResult = getEntityCollection().findOne(altJidQuery);
+            jidResult = getEntityCollection().find(Filters.eq(ALT_IM_ID, jid)).first();
             user = extractValidUser(jidResult);
         }
+    
+        // If user is found, check for associated conference
         if (user != null) {
-            DBObject queryConference = QueryBuilder.start(CONF_OWNER).is(user.getUserName()).get();
-            DBObject conferenceResult = getEntityCollection().findOne(queryConference);
+            Document conferenceResult = getEntityCollection().find(Filters.eq(CONF_OWNER, user.getUserName())).first();
             if (conferenceResult != null) {
                 addConference(user, conferenceResult);
             }
         }
+    
         return user;
     }
 
     public List<User> getUsersUpdatedAfter(Long ms) {
-        List<User> users = new ArrayList<User>();
-        DBObject query = QueryBuilder.start(ENTITY_NAME).is(ENTITY_NAME_USER).and(MongoConstants.TIMESTAMP)
-                .greaterThan(ms).get();
-        DBCursor cursor = getEntityCollection().find(query);
-        Iterator<DBObject> objects = cursor.iterator();
-        while (objects.hasNext()) {
-            DBObject user = objects.next();
-            users.add(extractUser(user));
+    
+        List<User> users = new ArrayList<>();
+
+        FindIterable<Document> userDocs = getEntityCollection().find(
+            Filters.and(
+                Filters.eq(ENTITY_NAME, ENTITY_NAME_USER),
+                Filters.gt(MongoConstants.TIMESTAMP, ms)
+            )
+        );
+    
+        for (Document userDoc : userDocs ) {
+            users.add(extractUser(userDoc));
         }
-        cursor.close();
+    
         return users;
     }
 
-    public DBCursor getEntitiesWithPermissions() {
-        DBObject query = QueryBuilder.start(PERMISSIONS).exists(true).get();
-        DBCursor cursor = getEntityCollection().find(query);
-        return cursor;
+    public FindIterable<Document> getEntitiesWithPermissions() {
+        return getEntityCollection().find(Filters.exists(PERMISSIONS, true));
+    }
+    
+    public FindIterable<Document> getEntitiesWithPermission(String name) {
+        return getEntityCollection().find(
+            Filters.and(
+                Filters.exists(PERMISSIONS, true),
+                Filters.eq(PERMISSIONS, name)
+            )
+        );
     }
 
-    public DBCursor getEntitiesWithPermission(String name) {
-        DBObject query = QueryBuilder.start(PERMISSIONS).exists(true).and(PERMISSIONS).is(name).get();
-        DBCursor cursor = getEntityCollection().find(query);
-        return cursor;
+    public FindIterable<Document> getUsersInBranch(String name) {
+        return getEntityCollection().find(Filters.eq(USER_LOCATION, name));
+    }
+    
+    public FindIterable<Document> getUsersInGroup(String name) {
+        return getEntityCollection().find(
+            Filters.and(
+                Filters.eq(ENTITY_NAME, ENTITY_NAME_USER),
+                Filters.eq(GROUPS, name)
+            )
+        );
     }
 
-    public DBCursor getUsersInBranch(String name) {
-        DBObject query = QueryBuilder.start(USER_LOCATION).is(name).get();
-        DBCursor cursor = getEntityCollection().find(query);
-        return cursor;
-    }
-
-    public DBCursor getUsersInGroup(String name) {
-        DBObject query = QueryBuilder.start(ENTITY_NAME).is(ENTITY_NAME_USER).and(GROUPS).is(name).get();
-        DBCursor cursor = getEntityCollection().find(query);
-        return cursor;
-    }
-
-    private static void addConference(User user, DBObject conference) {
+    private static void addConference(User user, Document conference) {
         user.setConfName(getStringValue(conference, CONF_NAME));
         user.setConfNum(getStringValue(conference, CONF_EXT));
         user.setConfPin(getStringValue(conference, CONF_PIN));
@@ -427,32 +455,35 @@ public class ValidUsers {
      * @param onlyVoicemailUsers limit match to users in directory who have voicemail
      * @return a Vector of users that match
      */
-    public List<User> lookupDTMF(String digits, boolean onlyVoicemailUsers, String groups) {
-        List<User> matches = new ArrayList<User>();
-        BasicDBList permList = new BasicDBList();
-        permList.add(IMDB_PERM_AA);
-        BasicDBObject inDirectory = new BasicDBObject();
-        inDirectory.put("$all", permList);
-        BasicDBObject hasDisplayName = new BasicDBObject();
-        hasDisplayName.put("$exists", Boolean.TRUE);
-        BasicDBObject queryAls = new BasicDBObject();
-        queryAls.put(PERMISSIONS, inDirectory);
-        queryAls.put(VALID_USER, Boolean.TRUE);
-        queryAls.put(DISPLAY_NAME, hasDisplayName);
 
-        // if user group specified then restrict query
+     public List<User> lookupDTMF(String digits, boolean onlyVoicemailUsers, String groups) {
+        List<User> matches = new ArrayList<>();
+    
+        // Permissions filter (corrected)
+        List<Object> permList = Collections.singletonList(IMDB_PERM_AA);
+        Bson inDirectory = Filters.all(PERMISSIONS, permList);
+        Bson hasDisplayName = Filters.exists(DISPLAY_NAME, true);
+        Bson validUserFilter = Filters.eq(VALID_USER, Boolean.TRUE);
+    
+        // Base query
+        List<Bson> filters = new ArrayList<>();
+        filters.add(inDirectory);
+        filters.add(validUserFilter);
+        filters.add(hasDisplayName);
+    
+        // Group filter (if applicable)
         if (!StringUtils.isBlank(groups)) {
             String[] searchGroups = StringUtils.split(groups, " ");
-            BasicDBList groupList = new BasicDBList();
-            for (String searchGroup : searchGroups) {
-                groupList.add(searchGroup);
-            }
-            queryAls.put(GROUPS, new BasicDBObject("$in", groupList));
+            Bson groupFilter = Filters.in(GROUPS, (Object[]) searchGroups);
+            filters.add(groupFilter);
         }
-        DBCursor aliasResult = getEntityCollection().find(queryAls);
-        Iterator<DBObject> objects = aliasResult.iterator();
-        while (objects.hasNext()) {
-            User user = extractValidUser(objects.next());
+    
+        // Query execution
+        FindIterable<Document> aliasResult = getEntityCollection().find(Filters.and(filters));
+    
+        // Processing results
+        for (Document doc : aliasResult) {
+            User user = extractValidUser(doc);
             if (user.getDialPatterns() != null) {
                 for (String dialPattern : user.getDialPatterns()) {
                     if (dialPattern.startsWith(digits)) {
@@ -464,68 +495,75 @@ public class ValidUsers {
                 }
             }
         }
-        aliasResult.close();
         return matches;
     }
 
+
     public long getImUsersCount() {
-        return getEntityCollection().count(QueryBuilder.start(IM_ENABLED).is(Boolean.TRUE).get());
+        return getEntityCollection().countDocuments(Filters.eq(IM_ENABLED, true));
     }
 
     public List<User> getImUsersByFilter(Set<String> fields, String query, int startIndex, int numResults) {
-        QueryBuilder mongoQuery = QueryBuilder.start();
+        List<Bson> orFilters = new ArrayList<>();
+    
         if (fields.contains(IM_USERNAME_FILTER)) {
-            BasicDBObject q = new BasicDBObject();
-            q.put(IM_ID, query);
-            BasicDBObject altQ = new BasicDBObject();
-            altQ.put(ALT_IM_ID, query);
-            mongoQuery.or(q, altQ);
+            orFilters.add(Filters.eq(IM_ID, query));
+            orFilters.add(Filters.eq(ALT_IM_ID, query));
         }
         if (fields.contains(IM_NAME_FILTER)) {
-            BasicDBObject q = new BasicDBObject();
-            q.put(IM_DISPLAY_NAME, query);
-            mongoQuery.or(q);
+            orFilters.add(Filters.eq(IM_DISPLAY_NAME, query));
         }
         if (fields.contains(IM_EMAIL_FILTER)) {
-            BasicDBObject q = new BasicDBObject();
-            q.put(EMAIL, query);
-            mongoQuery.or(q);
+            orFilters.add(Filters.eq(EMAIL, query));
         }
-        DBCursor cursor = getEntityCollection().find(mongoQuery.get()).skip(startIndex).limit(numResults);
-        List<User> users = new ArrayList<User>();
-        Iterator<DBObject> objects = cursor.iterator();
-        while (objects.hasNext()) {
-            DBObject user = objects.next();
-            User imUser = extractUser(user);
+    
+        Bson finalFilter = orFilters.isEmpty() ? new Document() : Filters.or(orFilters);
+    
+        FindIterable<Document> cursor = getEntityCollection()
+            .find(finalFilter)
+            .skip(startIndex)
+            .limit(numResults);
+    
+        List<User> users = new ArrayList<>();
+        for (Document userDoc : cursor) {
+            User imUser = extractUser(userDoc);
             if (imUser.isImEnabled()) {
                 users.add(imUser);
             }
         }
-        cursor.close();
+    
         return users;
     }
 
+
     public Collection<String> getImUsernames(int startIndex, int numResults) {
-        BasicDBObject query = new BasicDBObject();
-        query.put(IM_ENABLED, true);
-        DBObject dbObject = (DBObject) JSON.parse("{'" + IM_ID + "':1}");
-        List<String> userNames = new ArrayList<String>();
-        DBCursor cursor = getEntityCollection().find(query, dbObject).skip(startIndex).limit(numResults);
-        Iterator<DBObject> objects = cursor.iterator();
-        while (objects.hasNext()) {
-            DBObject user = objects.next();
+        Bson filter = Filters.eq(IM_ENABLED, true);
+        Bson projection = Projections.include(IM_ID);
+    
+        List<String> userNames = new ArrayList<>();
+        FindIterable<Document> cursor = getEntityCollection()
+            .find(filter)
+            .projection(projection)
+            .skip(startIndex)
+            .limit(numResults);
+    
+        for (Document user : cursor) {
             String imUsername = getStringValue(user, IM_ID);
             if (StringUtils.isNotBlank(imUsername)) {
                 userNames.add(imUsername);
             }
         }
-        cursor.close();
+    
         return userNames;
     }
 
     public UserGroup getImGroup(String name) {
-        DBObject queryGroup = QueryBuilder.start(IM_GROUP).is("1").and(UID).is(name).get();
-        DBObject groupResult = getEntityCollection().findOne(queryGroup);
+        Bson filter = Filters.and(
+            Filters.eq(IM_GROUP, "1"),
+            Filters.eq(UID, name)
+        );
+    
+        Document groupResult = getEntityCollection().find(filter).first();
         if (groupResult != null) {
             return convertUserGroup(groupResult);
         }
@@ -533,21 +571,20 @@ public class ValidUsers {
     }
 
     public Collection<UserGroup> getImGroups() {
-        Collection<UserGroup> groups = new ArrayList<UserGroup>();
-        DBObject queryGroup = QueryBuilder.start(IM_GROUP).is("1").get();
-        DBCursor cursor = getEntityCollection().find(queryGroup);
-        DBObject groupResult = null;
-        while (cursor.hasNext()) {
-            groupResult = cursor.next();
+        Collection<UserGroup> groups = new ArrayList<>();
+        Bson filter = Filters.eq(IM_GROUP, "1");
+    
+        FindIterable<Document> cursor = getEntityCollection().find(filter);
+        for (Document groupResult : cursor) {
             if (groupResult != null) {
                 groups.add(convertUserGroup(groupResult));
             }
         }
-        cursor.close();
+    
         return groups;
     }
 
-    private static UserGroup convertUserGroup(DBObject groupResult) {
+    private static UserGroup convertUserGroup(Document groupResult) {
         UserGroup group = new UserGroup();
         group.setGroupName(getStringValue(groupResult, UID));
         group.setDescription(getStringValue(groupResult, DESCR));
@@ -568,61 +605,79 @@ public class ValidUsers {
     }
 
     public User getImbotUser() {
-        DBObject queryImbot = QueryBuilder.start(ENTITY_NAME).is(ENTITY_NAME_IMBOTSETTINGS).and(IM_ENABLED).is(true)
-                .get();
-        DBObject imbotResult = getEntityCollection().findOne(queryImbot);
+        Bson filter = Filters.and(
+            Filters.eq(ENTITY_NAME, ENTITY_NAME_IMBOTSETTINGS),
+            Filters.eq(IM_ENABLED, true)
+        );
+    
+        Document imbotResult = getEntityCollection().find(filter).first();
         if (imbotResult != null) {
             User imbotUser = new User();
             imbotUser.setUserName(getStringValue(imbotResult, IM_ID));
             imbotUser.setPintoken(getStringValue(imbotResult, PINTOKEN));
             return imbotUser;
         }
-
+    
         return null;
     }
 
     public long getImGroupCount() {
-        return getEntityCollection().count(
-                QueryBuilder.start(ENTITY_NAME).is(ENTITY_NAME_GROUP).and(IM_GROUP).is("1").get());
+        Bson filter = Filters.and(
+            Filters.eq(ENTITY_NAME, ENTITY_NAME_GROUP),
+            Filters.eq(IM_GROUP, "1")
+        );
+
+        return getEntityCollection().countDocuments(filter);
     }
 
     public Collection<String> getImGroupNames(int startIndex, int numResults) {
-        BasicDBObject query = new BasicDBObject();
-        query.put(IM_GROUP, "1");
-        DBObject dbObject = (DBObject) JSON.parse("{'" + UID + "':1}");
-        List<String> groupNames = new ArrayList<String>();
-        DBCursor cursor = getEntityCollection().find(query, dbObject).skip(startIndex).limit(numResults);
-        Iterator<DBObject> objects = cursor.iterator();
-        while (objects.hasNext()) {
-            DBObject group = objects.next();
-            String groupName = getStringValue(group, UID);
+        Bson query = Filters.eq(IM_GROUP, "1");
+        Bson projection = new Document(UID, 1); // Projection to retrieve only UID
+    
+        List<String> groupNames = new ArrayList<>();
+        FindIterable<Document> cursor = getEntityCollection()
+            .find(query)
+            .projection(projection)
+            .skip(startIndex)
+            .limit(numResults);
+    
+        for (Document document : cursor) {
+            
+            String groupName = getStringValue(document, UID);
             if (StringUtils.isNotBlank(groupName)) {
                 groupNames.add(groupName);
             }
         }
-        cursor.close();
+    
         return groupNames;
     }
 
     public List<String> getImGroupNameByQuery(String query, int startIndex, int numResults) {
         Pattern insensitiveQuery = Pattern.compile(query, Pattern.CASE_INSENSITIVE);
-        QueryBuilder mongoQuery = QueryBuilder.start(ENTITY_NAME).is(ENTITY_NAME_GROUP).and(UID)
-                .is(insensitiveQuery);
-        DBCursor cursor = getEntityCollection().find(mongoQuery.get()).skip(startIndex).limit(numResults);
-        List<String> groups = new ArrayList<String>();
-        Iterator<DBObject> objects = cursor.iterator();
-        while (objects.hasNext()) {
-            DBObject group = objects.next();
-            groups.add(getStringValue(group, UID));
+        Bson mongoQuery = Filters.and(
+            Filters.eq(ENTITY_NAME, ENTITY_NAME_GROUP),
+            Filters.regex(UID, insensitiveQuery)
+        );
+    
+        List<String> groups = new ArrayList<>();
+        FindIterable<Document> cursor = getEntityCollection()
+            .find(mongoQuery)
+            .skip(startIndex)
+            .limit(numResults);
+    
+        for (Document document : cursor) {
+            groups.add(getStringValue(document, UID));
         }
-        cursor.close();
+    
         return groups;
     }
 
+    @SuppressWarnings("unchecked")
     public List<String> getImGroupnamesForUser(String jid) {
-        List<String> names = new ArrayList<String>();
-        Collection<UserGroup> imGroups = getImGroups();        
-        //for imbot user there is a different algoritm to return all groups where imbot is member
+        List<String> names = new ArrayList<>();
+        Collection<UserGroup> imGroups = getImGroups();
+    
+        // For imbot user, there is a different algorithm to return all groups where imbot is a member
         if (StringUtils.equals(jid, getImBotName())) {
             for (UserGroup group : imGroups) {
                 if (group.isImbotEnabled()) {
@@ -631,50 +686,52 @@ public class ValidUsers {
             }
             return names;
         }
-        BasicDBObject query = new BasicDBObject();
-        query.put(IM_ENABLED, true);
-        query.put(IM_ID, jid);
-        DBObject user = getEntityCollection().findOne(query);
+    
+        Bson query = Filters.and(
+            Filters.eq(IM_ENABLED, true),
+            Filters.eq(IM_ID, jid)
+        );
+    
+        Document user = getEntityCollection().find(query).first();
         if (user != null) {
-            BasicDBList groupList = (BasicDBList) user.get(GROUPS);
-            for (int i = 0; i < groupList.size(); i++) {
-                names.add((String) groupList.get(i));
-            }
+            List<String> groupList = (List<String>) user.get(GROUPS);
+            names.addAll(groupList);
         }
-        
-        List<String> imNames = new ArrayList<String>();
+    
+        List<String> imNames = new ArrayList<>();
         for (UserGroup group : imGroups) {
             imNames.add(group.getGroupName());
         }
-        return new ArrayList<String>(CollectionUtils.intersection(names, imNames));
+    
+        return new ArrayList<>(CollectionUtils.intersection(names, imNames));
     }
 
     public List<String> getImUsernamesInGroup(String groupName) {
-        BasicDBObject query = new BasicDBObject();
-        query.put(IM_ENABLED, true);
-        BasicDBList groupList = new BasicDBList();
-        groupList.add(groupName);
-        query.put(GROUPS, new BasicDBObject("$in", groupList));
-        DBObject dbObject = (DBObject) JSON.parse("{'" + IM_ID + "':1}");
-        List<String> userNames = new ArrayList<String>();
-        DBCursor cursor = getEntityCollection().find(query, dbObject);
-        Iterator<DBObject> objects = cursor.iterator();
-        while (objects.hasNext()) {
-            DBObject user = objects.next();
+        Bson query = Filters.and(
+            Filters.eq(IM_ENABLED, true),
+            Filters.in(GROUPS, groupName)
+        );
+    
+        Bson projection = Projections.include(IM_ID);
+    
+        List<String> userNames = new ArrayList<>();
+        FindIterable<Document> cursor = getEntityCollection().find(query).projection(projection);
+    
+        for (Document user : cursor) {
             String imUsername = getStringValue(user, IM_ID);
             if (StringUtils.isNotBlank(imUsername)) {
                 userNames.add(imUsername);
             }
         }
-        cursor.close();
+    
         return userNames;
     }
 
-    private DBCollection getEntityCollection() {
-        return getImdb().getCollection("entity");
+    private MongoCollection<Document> getEntityCollection() {
+        return getImdb().getCollection( MongoConstants.ENTITY_COLLECTION );
     }
 
-    private static User extractValidUserFromAlias(DBObject aliasObj) {
+    private static User extractValidUserFromAlias(Document aliasObj) {
         if (aliasObj == null) {
             return null;
         }
@@ -687,7 +744,7 @@ public class ValidUsers {
         return user;
     }
 
-    private static User extractValidUser(DBObject obj) {
+    private static User extractValidUser(Document obj) {
         if (obj == null) {
             return null;
         }
@@ -697,7 +754,8 @@ public class ValidUsers {
         return extractUser(obj);
     }
 
-    private static User extractUser(DBObject obj) {
+    @SuppressWarnings("unchecked")
+    private static User extractUser(Document obj) {
         if (obj == null) {
             return null;
         }
@@ -718,7 +776,7 @@ public class ValidUsers {
             user.setHotelingEnabled(BooleanUtils.toBoolean(getStringValue(obj, HOTELING), "1", "0"));
         }
 
-        BasicDBList permissions = (BasicDBList) obj.get(PERMISSIONS);
+        List<String> permissions = (List<String>) obj.get(PERMISSIONS);
         if (permissions != null) {
             user.setInDirectory(permissions.contains(IMDB_PERM_AA));
             user.setHasVoicemail(permissions.contains(IMDB_PERM_VOICEMAIL));
@@ -731,9 +789,10 @@ public class ValidUsers {
         user.setMoh(getStringValue(obj, MOH));
 
         // highest weight group is always the last in the list
-        BasicDBList groups = (BasicDBList) obj.get(GROUPS);
+        List<Document> groups = (List<Document>) obj.get(GROUPS);
         if (groups != null) {
-        	user.setHighestWeightGroup((String) groups.get(groups.size() - 1));
+            Document lastGroup = groups.get(groups.size() - 1);
+        	user.setHighestWeightGroup(getStringValue(lastGroup, UID));
         }
 
         user.setVoicemailTui(getStringValue(obj, VOICEMAILTUI));
@@ -774,11 +833,11 @@ public class ValidUsers {
             user.setDaysToKeepVM(daysToKeepVM);
         }
 
-        BasicDBList aliasesObj = (BasicDBList) obj.get(ALIASES);
+        List<Document> aliasesObj = (List<Document>) obj.get(ALIASES);
         if (aliasesObj != null) {
             Vector<String> aliases = new Vector<String>();
             for (int i = 0; i < aliasesObj.size(); i++) {
-                DBObject aliasObj = (DBObject) aliasesObj.get(i);
+                Document aliasObj = (Document) aliasesObj.get(i);
                 if (aliasObj.get(RELATION).toString().equals(ALIAS)) {
                     aliases.add(aliasObj.get(ALIAS_ID).toString());
                 }
@@ -834,15 +893,15 @@ public class ValidUsers {
 
         // personal attendant related data
         if (obj.keySet().contains(PERSONAL_ATT)) {
-            BasicDBObject pao = (BasicDBObject) obj.get(PERSONAL_ATT);
+            Document pao = (Document) obj.get(PERSONAL_ATT);
             String operator = getStringValue(pao, OPERATOR);
             String language = getStringValue(pao, LANGUAGE);
             Map<String, String> menu = new HashMap<String, String>();
             StringBuilder validDigits = new StringBuilder(10);
-            BasicDBList buttonsList = (BasicDBList) pao.get(BUTTONS);
+            List<Document> buttonsList = (List<Document>) pao.get(BUTTONS);
             if (buttonsList != null) {
                 for (int i = 0; i < buttonsList.size(); i++) {
-                    DBObject button = (DBObject) buttonsList.get(i);
+                    Document button = (Document) buttonsList.get(i);
                     if (button != null) {
                         menu.put(getStringValue(button, DIALPAD), getStringValue(button, ITEM));
                         validDigits.append(getStringValue(button, DIALPAD));
@@ -855,10 +914,10 @@ public class ValidUsers {
         // distribution lists
         if (obj.keySet().contains(DISTRIB_LISTS)) {
             Distributions distribs = new Distributions();
-            BasicDBList distribList = (BasicDBList) obj.get(DISTRIB_LISTS);
+            List<Document> distribList = (List<Document>) obj.get(DISTRIB_LISTS);
             if (distribList != null) {
                 for (int i = 0; i < distribList.size(); i++) {
-                    DBObject distrib = (DBObject) distribList.get(i);
+                    Document distrib = (Document) distribList.get(i);
                     if (distrib != null) {
                         distribs.addList(getStringValue(distrib, DIALPAD),
                                 StringUtils.split(getStringValue(distrib, ITEM), " "));
@@ -875,7 +934,7 @@ public class ValidUsers {
         return user;
     }
 
-    public static String getStringValue(DBObject obj, String key) {
+    public static String getStringValue(Document obj, String key) {
         if (obj.keySet().contains(key)) {
             if (obj.get(key) != null) {
                 return obj.get(key).toString();
@@ -884,7 +943,7 @@ public class ValidUsers {
         return null;
     }
 
-    public static Integer getIntegerValue(DBObject obj, String key) {
+    public static Integer getIntegerValue(Document obj, String key) {
         if (obj.keySet().contains(key)) {
             if (obj.get(key) != null) {
                 return Integer.parseInt(obj.get(key).toString());
@@ -1059,16 +1118,18 @@ public class ValidUsers {
         if (uri == null) {
             return false;
         }
-        DBObject queryIdent = QueryBuilder.start(IDENTITY).is(uri).get();
-        long result = getEntityCollection().count(queryIdent);
+    
+        Bson queryIdent = Filters.eq(IDENTITY, uri);
+    
+        long result = getEntityCollection().countDocuments(queryIdent);
         return result > 0;
     }
 
-    public DB getImdb() {
+    public MongoDatabase getImdb() {
         return m_imdb;
     }
 
-    public void setImdb(DB imdb) {
+    public void setImdb(MongoDatabase imdb) {
         m_imdb = imdb;
     }
 }

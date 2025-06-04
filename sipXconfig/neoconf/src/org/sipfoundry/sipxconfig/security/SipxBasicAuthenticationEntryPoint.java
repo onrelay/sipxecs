@@ -20,12 +20,11 @@ import static java.lang.String.format;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.sipfoundry.sipxconfig.domain.DomainManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
@@ -49,7 +48,7 @@ public class SipxBasicAuthenticationEntryPoint implements AuthenticationEntryPoi
         httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
     }
 
-    @Required
+    
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }

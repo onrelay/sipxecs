@@ -9,12 +9,6 @@
  */
 package org.sipfoundry.sipxconfig.branch;
 
-import static org.sipfoundry.commons.mongo.MongoConstants.LOCATION_NAME;
-import static org.sipfoundry.commons.mongo.MongoConstants.LOCATION_RESTRICTIONS_DOMAINS;
-import static org.sipfoundry.commons.mongo.MongoConstants.LOCATION_RESTRICTIONS_SUBNETS;
-import static org.sipfoundry.commons.mongo.MongoConstants.LOCATION_ASSOCIATIONS;
-import static org.sipfoundry.commons.mongo.MongoConstants.LOCATION_ASSOCIATIONS_INBOUND;
-import static org.sipfoundry.commons.mongo.MongoConstants.LOCATION_ASSOCIATIONS_FALLBACK;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,17 +19,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
-import org.sipfoundry.sipxconfig.common.NamedObject;
 import org.sipfoundry.sipxconfig.common.Replicable;
 import org.sipfoundry.sipxconfig.commserver.imdb.AliasMapping;
 import org.sipfoundry.sipxconfig.commserver.imdb.DataSet;
 import org.sipfoundry.sipxconfig.phonebook.Address;
 import org.sipfoundry.sipxconfig.systemaudit.SystemAuditable;
+import org.sipfoundry.commons.mongo.MongoConstants;
 
 
-public class Branch extends BeanWithId implements NamedObject, SystemAuditable, Replicable {
+public class Branch extends BeanWithId implements SystemAuditable, Replicable {
     private String m_name;
     private String m_description;
     private Address m_address = new Address();
@@ -200,15 +193,15 @@ public class Branch extends BeanWithId implements NamedObject, SystemAuditable, 
     @Override
     public Map<String, Object> getMongoProperties(String domain) {
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(LOCATION_NAME, getName());
-        props.put(LOCATION_RESTRICTIONS_DOMAINS, m_routes.getDomains());
-        props.put(LOCATION_RESTRICTIONS_SUBNETS, m_routes.getSubnets());
-        props.put(LOCATION_ASSOCIATIONS, getLocationsNamesList());
-        props.put(LOCATION_ASSOCIATIONS_INBOUND, getLocationsInboundNamesList());
+        props.put(MongoConstants.LOCATION_NAME, getName());
+        props.put(MongoConstants.LOCATION_RESTRICTIONS_DOMAINS, m_routes.getDomains());
+        props.put(MongoConstants.LOCATION_RESTRICTIONS_SUBNETS, m_routes.getSubnets());
+        props.put(MongoConstants.LOCATION_ASSOCIATIONS, getLocationsNamesList());
+        props.put(MongoConstants.LOCATION_ASSOCIATIONS_INBOUND, getLocationsInboundNamesList());
         if (m_fallbackBranch != null) {
-            props.put(LOCATION_ASSOCIATIONS_FALLBACK, m_fallbackBranch.getName());
+            props.put(MongoConstants.LOCATION_ASSOCIATIONS_FALLBACK, m_fallbackBranch.getName());
         } else {
-            props.put(LOCATION_ASSOCIATIONS_FALLBACK, StringUtils.EMPTY);
+            props.put(MongoConstants.LOCATION_ASSOCIATIONS_FALLBACK, "");
         }
         return props;
     }

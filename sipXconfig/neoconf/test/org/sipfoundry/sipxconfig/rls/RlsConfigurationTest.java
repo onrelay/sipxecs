@@ -42,6 +42,4 @@ public class RlsConfigurationTest {
         String expected = IOUtils.toString(getClass().getResourceAsStream("expected-rls-config"));
         assertEquals(expected, actual.toString());
     }
-    
-    // resource lists xml is covered by ResourceListsTest
 }

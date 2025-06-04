@@ -10,7 +10,7 @@
 
 package org.sipfoundry.sipxconfig.gateway;
 
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.Predicate;
 import org.sipfoundry.sipxconfig.device.FilteredModelSource;
 
 public class GatewayModelSource extends FilteredModelSource<GatewayModel> {

@@ -15,19 +15,20 @@ import java.net.URLDecoder;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
 import org.sipfoundry.sipxconfig.common.SipUri;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.sipfoundry.sipxconfig.sip.SipService;
-import org.springframework.beans.factory.annotation.Required;
 
 public class CallResource extends UserResource {
     private static final String VALID_PHONE_OR_SIP_URI = "([-_.!~*'\\(\\)&=+$,;?/a-zA-Z0-9]|"
             + "(%[0-9a-fA-F]{2}))+|([-_.!~*'\\(\\)&=+$,;?/a-zA-Z0-9]|"
             + "(%[0-9a-fA-F]{2}))+@\\w[-._\\w]*\\w\\.\\w{2,6}";
+
+    public static final MediaType APPLICATION_ATOM_XML = new MediaType("application/atom+xml");
 
     private SipService m_sipService;
     private DomainManager m_domainManager;
@@ -57,35 +58,27 @@ public class CallResource extends UserResource {
         // NOTE: Due to the bug in Restlet, it requires PUT and POST request must have
         // entity. The following hack is to workaround the bug.
         if (request.getMethod().equals(Method.PUT) && !request.isEntityAvailable()) {
-            request.setEntity(" ", MediaType.APPLICATION_ATOM_XML);
+            request.setEntity(" ", APPLICATION_ATOM_XML);
         }
     }
 
-    @Override
-    public boolean allowGet() {
-        return false;
-    }
 
     @Override
-    public boolean allowPut() {
-        return true;
-    }
-
-    @Override
-    public void put(Representation entity) {
+    public Representation put(Representation entity) {
         if (m_errorStatus == null) {
             m_sipService.sendRefer(getUser(), m_from, m_to);
         } else {
             getResponse().setStatus(m_errorStatus);
         }
+        return null;
     }
 
-    @Required
+    
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }
 
-    @Required
+    
     public void setSipService(SipService sipService) {
         m_sipService = sipService;
     }

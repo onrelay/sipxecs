@@ -69,11 +69,11 @@ public abstract class TimeZonePage extends SipxBasePage implements PageBeginRend
 
     public IPropertySelectionModel getSelectWeekModel() {
         Map<Integer, String> map = new HashMap<Integer, String>();
-        map.put(new Integer(1), getMessages().getMessage("label.firstWeek"));
-        map.put(new Integer(2), getMessages().getMessage("label.secondWeek"));
-        map.put(new Integer(3), getMessages().getMessage("label.thirdWeek"));
-        map.put(new Integer(4), getMessages().getMessage("label.fourthWeek"));
-        map.put(new Integer(-1), getMessages().getMessage("label.lastWeek"));
+        map.put(Integer.valueOf(1), getMessages().getMessage("label.firstWeek"));
+        map.put(Integer.valueOf(2), getMessages().getMessage("label.secondWeek"));
+        map.put(Integer.valueOf(3), getMessages().getMessage("label.thirdWeek"));
+        map.put(Integer.valueOf(4), getMessages().getMessage("label.fourthWeek"));
+        map.put(Integer.valueOf(-1), getMessages().getMessage("label.lastWeek"));
         return new MapSelectionModel(map);
     }
 

@@ -9,15 +9,15 @@
  */
 package org.sipfoundry.sipxconfig.components;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.form.IPropertySelectionModel;
 
 /**
  * Decorates property selection model but inserting a new value as the first value in the model.
  */
 public class ExtraOptionModelDecorator implements IPropertySelectionModel {
-    private static final Integer RESERVED = new Integer(-1);
+    private static final Integer RESERVED = Integer.valueOf(-1);
 
     /** decorated model */
     private IPropertySelectionModel m_model;

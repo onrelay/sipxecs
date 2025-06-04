@@ -18,13 +18,11 @@ package org.sipfoundry.sipxconfig.security;
 
 import java.io.Serializable;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.springframework.security.core.session.SessionIdentifierAware;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 // Adapted from Acegi's WebAuthenticationDetails
-public class SipxAuthenticationDetails implements SessionIdentifierAware, Serializable {
+public class SipxAuthenticationDetails implements Serializable {
     private String m_remoteAddress;
     private String m_sessionId;
 
@@ -39,7 +37,6 @@ public class SipxAuthenticationDetails implements SessionIdentifierAware, Serial
         m_sessionId = (session != null) ? session.getId() : null;
     }
 
-    @Override
     public String getSessionId() {
         return m_sessionId;
     }

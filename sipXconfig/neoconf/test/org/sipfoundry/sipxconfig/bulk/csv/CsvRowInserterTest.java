@@ -148,13 +148,13 @@ public class CsvRowInserterTest extends TestCase {
         assertEquals("outofoffice", user1.getActiveGreeting());
         assertEquals("1", user1.getPrimaryEmailNotification());
         assertEquals("MEDIUM", user1.getPrimaryEmailFormat());
-        assertEquals(new Boolean(true), user1.isPrimaryEmailAttachAudio());
+        assertEquals(Boolean.valueOf(true), user1.isPrimaryEmailAttachAudio());
         assertEquals("1", user1.getAlternateEmailNotification());
         assertEquals("BRIEF", user1.getAlternateEmailFormat());
-        assertEquals(new Boolean(false), user1.isAlternateEmailAttachAudio());
-        assertEquals(new Boolean(true), user1.isVoicemailServer());
+        assertEquals(Boolean.valueOf(false), user1.isAlternateEmailAttachAudio());
+        assertEquals(Boolean.valueOf(true), user1.isVoicemailServer());
         assertEquals("CallerID", user1.getExternalNumber());
-        assertEquals(new Boolean(true), user1.isAnonymousCallerAlias());
+        assertEquals(Boolean.valueOf(true), user1.isAnonymousCallerAlias());
 
         verify(coreContext);
     }
@@ -277,7 +277,7 @@ public class CsvRowInserterTest extends TestCase {
             "", "", "", "", "", "", "", "", "", "001122334466", "polycom300", "yellow phone", ""
         };
 
-        Integer phoneId = new Integer(5);
+        Integer phoneId = Integer.valueOf(5);
         Phone phone = new TestPhone();
         PhoneModel model = new TestPhoneModel();
 

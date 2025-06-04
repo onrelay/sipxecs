@@ -86,19 +86,19 @@ public class ConferenceBridgeContextImplTestIntegration extends IntegrationTestC
     }
 
     public void testRemoveConferences() throws Exception {
-        m_context.removeConferences(Collections.singleton(new Integer(3002)));
+        m_context.removeConferences(Collections.singleton(Integer.valueOf(3002)));
         flush();
         assertEquals(2, countRowsInTable("meetme_bridge"));
         assertEquals(4, countRowsInTable("meetme_conference"));
     }
 
     public void testLoadBridge() throws Exception {
-        Bridge bridge = m_context.loadBridge(new Integer(2006));
+        Bridge bridge = m_context.loadBridge(Integer.valueOf(2006));
         assertEquals(3, bridge.getConferences().size());
     }
 
     public void testLoadConference() throws Exception {
-        Conference conference = m_context.loadConference(new Integer(3001));
+        Conference conference = m_context.loadConference(Integer.valueOf(3001));
         assertEquals("conf_name_3001", conference.getName());
     }
 

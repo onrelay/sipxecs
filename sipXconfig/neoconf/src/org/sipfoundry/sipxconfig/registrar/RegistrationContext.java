@@ -12,11 +12,12 @@ package org.sipfoundry.sipxconfig.registrar;
 import java.util.Collection;
 import java.util.List;
 
+import org.bson.Document;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.commserver.imdb.RegistrationItem;
 import org.sipfoundry.sipxconfig.commserver.imdb.TimeRegistrationStatistics;
 
-import com.mongodb.DBCursor;
+import com.mongodb.client.FindIterable;
 
 public interface RegistrationContext {
 
@@ -63,12 +64,12 @@ public interface RegistrationContext {
     public List<TimeRegistrationStatistics> getTimeRegStats();
 
     @Deprecated
-    DBCursor getMongoDbCursorRegistrationsByLineId(String uid);
+    FindIterable<Document> getMongoDbCursorRegistrationsByLineId(String uid);
 
     @Deprecated
-    DBCursor getMongoDbCursorRegistrationsByMac(String mac);
+    FindIterable<Document> getMongoDbCursorRegistrationsByMac(String mac);
 
     @Deprecated
-    DBCursor getMongoDbCursorRegistrationsByIp(String ip);
+    FindIterable<Document> getMongoDbCursorRegistrationsByIp(String ip);
 
 }

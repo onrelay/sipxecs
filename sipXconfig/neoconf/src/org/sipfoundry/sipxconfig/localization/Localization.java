@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.localization;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.cfgmgt.DeployConfigOnEdit;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.dialplan.DialPlanContext;

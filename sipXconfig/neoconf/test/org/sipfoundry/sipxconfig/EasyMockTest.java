@@ -14,8 +14,8 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 
 public class EasyMockTest extends TestCase {
 

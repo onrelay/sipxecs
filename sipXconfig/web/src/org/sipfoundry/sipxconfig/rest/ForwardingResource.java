@@ -20,11 +20,14 @@ import java.util.List;
 
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.callgroup.AbstractRing;
 import org.sipfoundry.sipxconfig.callgroup.AbstractRing.Type;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
@@ -32,7 +35,6 @@ import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.forwarding.CallSequence;
 import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
 import org.sipfoundry.sipxconfig.forwarding.Ring;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.SingleValueConverter;
@@ -51,15 +53,15 @@ public class ForwardingResource extends UserResource {
         getVariants().add(new Variant(APPLICATION_JSON));
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         CallSequence callSequence = m_forwardingContext.getCallSequenceForUser(getUser());
         Representable reprCallSequence = new Representable(callSequence);
         return new CallSequenceRepresentation(variant.getMediaType(), reprCallSequence);
     }
 
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         CallSequenceRepresentation representation = new CallSequenceRepresentation(entity);
         Representable reprCallSequence = representation.getObject();
         CallSequence callSequence = m_forwardingContext.getCallSequenceForUser(getUser());
@@ -67,9 +69,10 @@ public class ForwardingResource extends UserResource {
         callSequence.replaceRings(rings);
         callSequence.setCfwdTime(reprCallSequence.getExpiration());
         m_forwardingContext.saveCallSequence(callSequence);
+        return null;
     }
 
-    @Required
+    
     public void setForwardingContext(ForwardingContext forwardingContext) {
         m_forwardingContext = forwardingContext;
     }

@@ -18,16 +18,14 @@ package org.sipfoundry.sipxconfig.security;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.www.DigestAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.NonceExpiredException;
@@ -50,7 +48,7 @@ public class SipxDigestAuthenticationEntryPoint extends DigestAuthenticationEntr
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse httpResponse,
-            AuthenticationException authException) throws IOException, ServletException {
+            AuthenticationException authException) throws IOException {
         // compute a nonce (do not use remote IP address due to proxy farms)
         // format of nonce is:
         // base64(expirationTime + ":" + md5Hex(expirationTime + ":" + key))
@@ -82,7 +80,7 @@ public class SipxDigestAuthenticationEntryPoint extends DigestAuthenticationEntr
         return m_domainManager.getAuthorizationRealm();
     }
 
-    @Required
+    
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }

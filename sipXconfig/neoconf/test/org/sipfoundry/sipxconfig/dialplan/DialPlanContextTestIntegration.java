@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.lang3.ArrayUtils;
 import org.sipfoundry.commons.util.HolidayPeriod;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
@@ -210,7 +210,7 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
     public void testLoadAttendantRule() throws Exception {
         TestHelper.cleanInsertFlat("dialplan/attendant_rule.db.xml");
 
-        DialingRule rule = m_dialPlanContext.getRule(new Integer(2002));
+        DialingRule rule = m_dialPlanContext.getRule(Integer.valueOf(2002));
         assertTrue(rule instanceof AttendantRule);
         AttendantRule ar = (AttendantRule) rule;
         assertTrue(ar.getAfterHoursAttendant().isEnabled());
@@ -230,7 +230,7 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
 
     public void testStoreAttendantRule() throws Exception {
         TestHelper.cleanInsert("dialplan/seedDialPlanWithAttendant.xml");
-        AutoAttendant autoAttendant = m_autoAttendantManager.getAutoAttendant(new Integer(2000));
+        AutoAttendant autoAttendant = m_autoAttendantManager.getAutoAttendant(Integer.valueOf(2000));
 
         m_dialPlanSetup.setupDefaultRegion();
 

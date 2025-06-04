@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.collections.Closure;
+import org.apache.commons.collections4.Closure;
 import org.sipfoundry.sipxconfig.bulk.csv.CsvParserImpl;
 import org.sipfoundry.sipxconfig.bulk.csv.SimpleCsvWriter;
 

@@ -18,8 +18,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServlet;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;

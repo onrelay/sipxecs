@@ -47,14 +47,14 @@ public class MailboxManagerTestIntegration extends IntegrationTestCase {
         assertSame(newUser, pa.getUser());
 
         m_mailboxManager.storePersonalAttendant(pa);
-        assertEquals(1, db().queryForLong("select count(*) from personal_attendant"));
+        assertEquals(Long.valueOf(1), db().queryForObject("select count(*) from personal_attendant", Long.class));
 
         Set<Integer> ids = Collections.singleton(newUser.getId());
         getDaoEventPublisher().resetListeners();
         m_coreContext.deleteUsers(ids);
 
         commit();
-        assertEquals(0, db().queryForLong("select count(*) from personal_attendant"));
+        assertEquals(Long.valueOf(0), db().queryForObject("select count(*) from personal_attendant", Long.class));
     }
 
     public void testUserGroupOperator() throws Exception {

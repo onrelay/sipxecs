@@ -18,14 +18,16 @@ package org.sipfoundry.conference;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.sipfoundry.commons.confdb.Conference;
 import org.sipfoundry.commons.confdb.ConferenceService;
@@ -70,37 +72,41 @@ public class ConferenceContextImpl {
      * "http://s1.example.com:8086/recording/conference?test1_6737347.wav or
      * http://s1.example.com:8086/recording/conference?test1_6737347.mp3"
      */
-    private void notifyIvr(String ivrUri, String fileName, Conference conf, boolean synchronous)
-            throws IOException {
-        String username = conf.getConfOwner();
-        HttpClient httpClient = new HttpClient();
-        String urlString = ivrUri + "/recording/conference"
-            + "?wn=" + fileName
-            + "&on=" + conf.getConfOwner()
-            + "&bc=" + conf.getUri()
+private void notifyIvr(String ivrUri, String fileName, Conference conf, boolean synchronous)
+        throws IOException, InterruptedException {
+    String username = conf.getConfOwner();
+
+    String urlString = ivrUri + "/recording/conference"
+            + "?wn=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8)
+            + "&on=" + URLEncoder.encode(username, StandardCharsets.UTF_8)
+            + "&bc=" + URLEncoder.encode(conf.getUri(), StandardCharsets.UTF_8)
             + "&synchronous=" + synchronous;
-        LOG.debug("Notify IVR to pick the recorded file and copy it into user mailbox: " + urlString);
-        GetMethod triggerRecording = new GetMethod(urlString);
-        try {
-            int statusCode = httpClient.executeMethod(triggerRecording);
-            if (statusCode != HttpStatus.SC_OK) {
-                LOG.error("Save recording::failure "+triggerRecording.getStatusLine());
-            }
-            InputStream stream = triggerRecording.getResponseBodyAsStream();
-            LOG.debug(IOUtils.toString(stream));
-            stream.close();
-            lastGoodIvr = ivrUri;
-        } finally {
-            triggerRecording.releaseConnection();
-        }
+
+    LOG.debug("Notify IVR to pick the recorded file and copy it into user mailbox: " + urlString);
+
+    HttpClient httpClient = HttpClient.newHttpClient();
+
+    HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(urlString))
+            .GET()
+            .build();
+
+    HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+    if (response.statusCode() != 200) {
+        LOG.error("Save recording::failure " + response.statusCode() + " " + response.body());
+    } else {
+        LOG.debug(response.body());
+        lastGoodIvr = ivrUri;
     }
+}
 
     public void notifyIvr(String[] ivrUris, String fileName, Conference conf, boolean synchronous) {
         if (lastGoodIvr != null) {
             try {
                 notifyIvr(lastGoodIvr, fileName, conf, synchronous);
                 return;
-            } catch (IOException ex) {
+            } catch (IOException | InterruptedException ex) {
                 //do not throw exception as we have to iterate through all nodes
                 LOG.error("ConfRecordThread::Trigger error on last good ivr node:" + lastGoodIvr);
             }
@@ -113,7 +119,7 @@ public class ConferenceContextImpl {
             try {
                 notifyIvr(ivrUri, fileName, conf, synchronous);
                 return;
-            } catch (IOException ex) {
+            } catch (IOException | InterruptedException ex) {
                 LOG.error("ConfRecordThread::Trigger error on node:" + ivrUri);
             }
         }

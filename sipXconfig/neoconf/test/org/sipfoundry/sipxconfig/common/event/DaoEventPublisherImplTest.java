@@ -36,8 +36,9 @@ public class DaoEventPublisherImplTest extends TestCase {
 
         IMocksControl appContextCtrl = EasyMock.createControl();
         ApplicationContext appContext = appContextCtrl.createMock(ApplicationContext.class);
-        appContext.getBeansOfType(DaoEventListener.class, true, true);
-        appContextCtrl.andReturn(beans);
+
+        EasyMock.expect(appContext.getBeansOfType(DaoEventListener.class, true, true)).andReturn(beans);
+
         appContextCtrl.replay();
 
         DaoEventPublisherImpl impl = new DaoEventPublisherImpl();
@@ -63,8 +64,10 @@ public class DaoEventPublisherImplTest extends TestCase {
 
         IMocksControl appContextCtrl = EasyMock.createControl();
         ApplicationContext appContext = appContextCtrl.createMock(ApplicationContext.class);
-        appContext.getBeansOfType(DaoEventListener.class, true, true);
-        appContextCtrl.andReturn(beans);
+
+        EasyMock.expect(appContext.getBeansOfType(DaoEventListener.class, true, true))
+                .andReturn(beans);
+
         appContextCtrl.replay();
 
         DaoEventPublisherImpl impl = new DaoEventPublisherImpl();

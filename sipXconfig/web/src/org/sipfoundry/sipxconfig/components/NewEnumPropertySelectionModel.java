@@ -39,7 +39,7 @@ public class NewEnumPropertySelectionModel<E extends Enum<E>> implements IProper
     }
 
     public String getValue(int index) {
-        return new Integer(index).toString();
+        return Integer.valueOf(index).toString();
     }
 
     public Object translateValue(String value) {

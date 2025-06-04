@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.site.search;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hivemind.Messages;
 import org.apache.tapestry.IExternalPage;
 import org.apache.tapestry.IPage;
@@ -77,7 +77,7 @@ public abstract class SearchPage extends SipxBasePage implements IExternalPage,
 
     public String getFoundMsg() {
         Collection results = getResults();
-        return getMessages().format("msg.found", new Integer(getFoundCount()));
+        return getMessages().format("msg.found", Integer.valueOf(getFoundCount()));
     }
 
     public IPage activateEditPage(IRequestCycle cycle, String klass, Object id) {

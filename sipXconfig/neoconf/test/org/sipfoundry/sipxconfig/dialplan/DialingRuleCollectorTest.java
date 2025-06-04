@@ -36,11 +36,14 @@ public class DialingRuleCollectorTest extends TestCase {
         for (int i = 0; i < len; i++) {
             drpCtrl[i] = EasyMock.createControl();
             drp[i] = drpCtrl[i].createMock(DialingRuleProvider.class);
-            drp[i].getDialingRules(new Location());
-            drpCtrl[i].andReturn(rules).anyTimes();
+
+            EasyMock.expect(drp[i].getDialingRules(new Location()))
+                    .andReturn((List)rules)
+                    .anyTimes();
+
             drpCtrl[i].replay();
         }
-
+                
         DialingRuleCollector collector = new DialingRuleCollector() {
             protected Collection getDialingRuleProviders() {
                 return Arrays.asList(drp);
@@ -71,8 +74,9 @@ public class DialingRuleCollectorTest extends TestCase {
         for (int i = 0; i < len; i++) {
             drpCtrl[i] = EasyMock.createControl();
             drp[i] = drpCtrl[i].createMock(DialingRuleProvider.class);
-            drp[i].getDialingRules(new Location());
-            drpCtrl[i].andReturn(rules).anyTimes();
+
+            EasyMock.expect(drp[i].getDialingRules(new Location())).andReturn((List)rules).anyTimes();
+
             drpCtrl[i].replay();
         }
 

@@ -17,7 +17,6 @@ import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.device.ModelSource;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.type.FileSetting;
-import org.springframework.beans.factory.annotation.Required;
 
 public class UploadUtil {
     private UploadManager m_uploadManager;
@@ -90,12 +89,12 @@ public class UploadUtil {
         }
     }
 
-    @Required
+    
     public void setUploadManager(UploadManager uploadManager) {
         m_uploadManager = uploadManager;
     }
 
-    @Required
+    
     public void setUploadSpecificationSource(ModelSource<UploadSpecification> uploadSpecSource) {
         m_uploadSpecSource = uploadSpecSource;
     }

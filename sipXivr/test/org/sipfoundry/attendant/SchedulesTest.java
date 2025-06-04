@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.sipfoundry.attendant.Schedule;
 import org.sipfoundry.attendant.Schedule.Day;
 import org.sipfoundry.commons.util.HolidayPeriod;
 
@@ -23,7 +22,7 @@ import junit.framework.TestCase;
 public class SchedulesTest extends TestCase {
 
     public void testGetAttendant1() {
-        DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+        //DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
         DateFormat dateTimeFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
         Schedule s = new Schedule();
         try {
@@ -73,7 +72,7 @@ public class SchedulesTest extends TestCase {
 
     public void testGetAttendant2() {
         DateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+        //DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
         DateFormat dateTimeFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
         Schedule s = new Schedule();
         try {

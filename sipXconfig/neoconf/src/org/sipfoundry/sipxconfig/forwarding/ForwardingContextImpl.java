@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
@@ -32,17 +32,16 @@ import org.sipfoundry.sipxconfig.dialplan.AttendantRule;
 import org.sipfoundry.sipxconfig.dialplan.DialPlanContext;
 import org.sipfoundry.sipxconfig.dialplan.DialingRule;
 import org.sipfoundry.sipxconfig.setting.Group;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 
 /**
  * ForwardingContextImpl
  */
-public class ForwardingContextImpl extends SipxHibernateDaoSupport implements ForwardingContext,
+public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> implements ForwardingContext,
         ApplicationListener, DaoEventListener {
     private static final Log LOG = LogFactory.getLog(ForwardingContextImpl.class);
     private static final String PARAM_SCHEDULE_ID = "scheduleId";
@@ -134,7 +133,7 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport implements Fo
         m_coreContext = coreContext;
     }
 
-    private Collection<CallSequence> getCallSequencesForGroup(Group group) {
+    public Collection<CallSequence> getCallSequencesForGroup(Group group) {
         Collection<CallSequence> ids = new HashSet<CallSequence>();
         for (Integer id : m_coreContext.getGroupMembersIds(group)) {
             ids.add(getCallSequenceForUserId(id));
@@ -146,19 +145,19 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport implements Fo
     public List<Schedule> getPersonalSchedulesForUserId(Integer userId) {
         HibernateTemplate hibernate = getHibernateTemplate();
 
-        return hibernate.findByNamedQueryAndNamedParam("userSchedulesForUserId", PARAM_USER_ID, userId);
+        return (List<Schedule>)hibernate.findByNamedQueryAndNamedParam("userSchedulesForUserId", PARAM_USER_ID, userId);
     }
 
     public List<Ring> getRingsForScheduleId(Integer scheduleId) {
         HibernateTemplate hibernate = getHibernateTemplate();
 
-        return hibernate.findByNamedQueryAndNamedParam("ringsForScheduleId", PARAM_SCHEDULE_ID, scheduleId);
+        return (List<Ring>)hibernate.findByNamedQueryAndNamedParam("ringsForScheduleId", PARAM_SCHEDULE_ID, scheduleId);
     }
 
     private List<DialingRule> getDialingRulesForScheduleId(Integer scheduleId) {
         HibernateTemplate hibernate = getHibernateTemplate();
 
-        return hibernate.findByNamedQueryAndNamedParam("dialingRulesForScheduleId", PARAM_SCHEDULE_ID, scheduleId);
+        return (List<DialingRule>)hibernate.findByNamedQueryAndNamedParam("dialingRulesForScheduleId", PARAM_SCHEDULE_ID, scheduleId);
     }
 
     @Override
@@ -225,7 +224,7 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport implements Fo
     }
 
     private boolean isNameChanged(Schedule schedule) {
-        List count = getHibernateTemplate().findByNamedQueryAndNamedParam("countScheduleWithSameName", new String[] {
+        List<Object> count = (List<Object>)getHibernateTemplate().findByNamedQueryAndNamedParam("countScheduleWithSameName", new String[] {
             PARAM_SCHEDULE_ID, PARAM_NAME
         }, new Object[] {
             schedule.getId(), schedule.getName()
@@ -265,7 +264,7 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport implements Fo
     public List<UserGroupSchedule> getSchedulesForUserGroupId(Integer userGroupId) {
         HibernateTemplate hibernate = getHibernateTemplate();
 
-        return hibernate.findByNamedQueryAndNamedParam("userSchedulesForUserGroupId", PARAM_USER_GROUP_ID,
+        return (List<UserGroupSchedule>)hibernate.findByNamedQueryAndNamedParam("userSchedulesForUserGroupId", PARAM_USER_GROUP_ID,
                 userGroupId);
     }
 
@@ -281,7 +280,7 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport implements Fo
 
     @Override
     public List<FeatureSchedule> getSchedulesForFeatureId(String featureId) {
-        return getHibernateTemplate().findByNamedQueryAndNamedParam("schedulesForFeatureId", PARAM_FEATURE_ID,
+        return (List<FeatureSchedule>)getHibernateTemplate().findByNamedQueryAndNamedParam("schedulesForFeatureId", PARAM_FEATURE_ID,
             featureId);
     }
 
@@ -314,7 +313,7 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport implements Fo
 
     @Override
     public boolean isCallSequenceReplicable(User user) {
-        int any = m_jdbcTemplate.queryForInt("select count(*) from ring where user_id = ?", user.getId());
+        int any = m_jdbcTemplate.queryForObject("select count(*) from ring where user_id = ?", Integer.class, user.getId());
         return any > 0;
     }
 
@@ -326,7 +325,7 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport implements Fo
         m_sipxReplicationContext = sipxReplicationContext;
     }
 
-    @Required
+    
     public void setConfigManager(ConfigManager configManager) {
         m_configManager = configManager;
     }
@@ -342,7 +341,9 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport implements Fo
                     for (DialingRule rule : rules) {
                         rule.setSchedule(null);
                     }
-                    getHibernateTemplate().saveOrUpdateAll(rules);
+                    for (DialingRule rule : rules) {
+                        getHibernateTemplate().saveOrUpdate(rule);
+                    }
                     for (DialingRule rule : rules) {
                         if (rule instanceof AttendantRule) {
                             AttendantRule aaRule = (AttendantRule) rule;
@@ -361,7 +362,9 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport implements Fo
                         ring.setSchedule(null);
                         css.add(ring.getCallSequence());
                     }
-                    getHibernateTemplate().saveOrUpdateAll(rings);
+                    for (Ring ring : rings) {
+                        getHibernateTemplate().saveOrUpdate(ring);
+                    }
                 }
                 notifyCommserver(css);
             }

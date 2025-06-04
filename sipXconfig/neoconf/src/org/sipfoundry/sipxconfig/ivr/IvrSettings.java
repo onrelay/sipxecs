@@ -30,7 +30,6 @@ import org.sipfoundry.sipxconfig.setting.PersistableSettings;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.type.EnumSetting;
 import org.sipfoundry.sipxconfig.setting.type.SettingType;
-import org.springframework.beans.factory.annotation.Required;
 
 public class IvrSettings extends PersistableSettings implements DeployConfigOnEdit {
     public static final String IVR_BACKUP_HOST = "ivr/ivr.backup_host";
@@ -100,7 +99,7 @@ public class IvrSettings extends PersistableSettings implements DeployConfigOnEd
         return "ivrSettings";
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }

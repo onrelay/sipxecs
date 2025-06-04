@@ -36,7 +36,6 @@ import org.sipfoundry.sipxconfig.common.AbstractUser;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.localization.LocalizationContext;
-import org.springframework.beans.factory.annotation.Required;
 
 public class OpenfireConfigurationFile {
     private static final String SEPARATOR = ", ";
@@ -181,7 +180,7 @@ public class OpenfireConfigurationFile {
         // subclasses could override properties here at their will
     }
 
-    @Required
+    
     public void setLdapManager(LdapManager ldapManager) {
         m_ldapManager = ldapManager;
     }
@@ -190,12 +189,12 @@ public class OpenfireConfigurationFile {
         return m_ldapManager;
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setLocalizationContext(LocalizationContext localizationContext) {
         m_localizationContext = localizationContext;
     }

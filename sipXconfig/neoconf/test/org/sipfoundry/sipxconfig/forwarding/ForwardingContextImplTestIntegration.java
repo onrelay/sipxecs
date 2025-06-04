@@ -36,7 +36,7 @@ import org.springframework.dao.DataAccessException;
 public class ForwardingContextImplTestIntegration extends ImdbTestCase {
     private ForwardingContext m_forwardingContext;
     private CoreContext m_coreContext;
-    private final Integer m_testUserId = new Integer(1000);
+    private final Integer m_testUserId = Integer.valueOf(1000);
 
     @Override
     protected void onSetUpBeforeTransaction() throws Exception {
@@ -75,7 +75,7 @@ public class ForwardingContextImplTestIntegration extends ImdbTestCase {
             assertSame(Ring.Type.DELAYED, ring.getType());
             assertEquals("23" + ring.getId(), ring.getNumber());
             assertEquals(400 + ring.getId().intValue() - 1000, ring.getExpiration());
-            assertEquals(new Integer(id--), ring.getId());
+            assertEquals(Integer.valueOf(id--), ring.getId());
         }
     }
 
@@ -180,7 +180,7 @@ public class ForwardingContextImplTestIntegration extends ImdbTestCase {
         commit();
         Map<String, Object> actual = db().queryForMap("select * from ring where ring_id = ?", ring.getId());
         assertEquals("999999", actual.get("Number"));
-        assertEquals(new Integer(3), actual.get("Position"));
+        assertEquals(Integer.valueOf(3), actual.get("Position"));
     }
 
     public void testClearCallSequence() throws Exception {
@@ -204,7 +204,7 @@ public class ForwardingContextImplTestIntegration extends ImdbTestCase {
     }
 
     public void testGetSchedulesByID() throws Exception {
-        Schedule schedule = m_forwardingContext.getScheduleById(new Integer(100));
+        Schedule schedule = m_forwardingContext.getScheduleById(Integer.valueOf(100));
         Map<String, Object> actual = db().queryForMap("select * from schedule where schedule_id = ?", 100);
         assertEquals(schedule.getName(), actual.get("name"));
         assertEquals(schedule.getDescription(), actual.get("description"));
@@ -259,7 +259,7 @@ public class ForwardingContextImplTestIntegration extends ImdbTestCase {
     }
 
     public void testSaveDuplicateNameUserGroupSchedule() throws Exception {
-        User user = m_coreContext.loadUser(new Integer(1001));
+        User user = m_coreContext.loadUser(Integer.valueOf(1001));
         Schedule userGroupScheduleWithDuplicateName = new UserGroupSchedule();
         userGroupScheduleWithDuplicateName.setUser(user);
         userGroupScheduleWithDuplicateName.setUserGroup(user.getGroupsAsList().get(0));
@@ -284,8 +284,8 @@ public class ForwardingContextImplTestIntegration extends ImdbTestCase {
     public void testDeleteSchedulesById() throws Exception {
         assertEquals(6, getConnection().getRowCount("schedule"));
         List<Integer> scheduleIds = new ArrayList<Integer>();
-        scheduleIds.add(new Integer(100));
-        scheduleIds.add(new Integer(101));
+        scheduleIds.add(Integer.valueOf(100));
+        scheduleIds.add(Integer.valueOf(101));
 
         m_forwardingContext.deleteSchedulesById(scheduleIds);
         commit();
@@ -307,7 +307,7 @@ public class ForwardingContextImplTestIntegration extends ImdbTestCase {
         List<UserGroupSchedule> allGroupSchedules = m_forwardingContext.getAllUserGroupSchedules();
         assertEquals(1, allGroupSchedules.size());
         UserGroupSchedule groupSchedule = allGroupSchedules.get(0);
-        assertEquals(new Integer(103), groupSchedule.getId());
+        assertEquals(Integer.valueOf(103), groupSchedule.getId());
         assertEquals("MondaySchedule", groupSchedule.getName());
         assertEquals("Monday Schedule", groupSchedule.getDescription());
     }
@@ -316,7 +316,7 @@ public class ForwardingContextImplTestIntegration extends ImdbTestCase {
         List<GeneralSchedule> allGeneralSchedules = m_forwardingContext.getAllGeneralSchedules();
         assertEquals(1, allGeneralSchedules.size());
         GeneralSchedule generalSchedule = allGeneralSchedules.get(0);
-        assertEquals(new Integer(104), generalSchedule.getId());
+        assertEquals(Integer.valueOf(104), generalSchedule.getId());
         assertEquals("GeneralSchedule", generalSchedule.getName());
         assertEquals("Schedule for dialing rule", generalSchedule.getDescription());
     }
@@ -327,7 +327,7 @@ public class ForwardingContextImplTestIntegration extends ImdbTestCase {
         assertEquals(1, m_forwardingContext.getSchedulesForFeatureId("proxy").size());
 
         FeatureSchedule featureSchedule = allFeatureSchedules.get(0);
-        assertEquals(new Integer(105), featureSchedule.getId());
+        assertEquals(Integer.valueOf(105), featureSchedule.getId());
         assertEquals("proxy", featureSchedule.getFeatureId());
         assertEquals("FeatureSchedule", featureSchedule.getName());
         assertEquals("Schedule for proxy feature", featureSchedule.getDescription());

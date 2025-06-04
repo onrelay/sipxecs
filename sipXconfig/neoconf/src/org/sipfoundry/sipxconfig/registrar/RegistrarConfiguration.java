@@ -45,7 +45,6 @@ import org.sipfoundry.sipxconfig.setting.PatternSettingFilter;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingFilter;
 import org.sipfoundry.sipxconfig.setting.SettingUtil;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -185,7 +184,7 @@ public class RegistrarConfiguration implements ConfigProvider, ApplicationContex
         }
     }
 
-    @Required
+    
     public void setRegistrar(Registrar registrar) {
         m_registrar = registrar;
     }
@@ -195,7 +194,7 @@ public class RegistrarConfiguration implements ConfigProvider, ApplicationContex
         m_context = context;
     }
 
-    @Required
+    
     public void setRegistrarLimitsConfig(AbstractResLimitsConfig registrarLimitsConfig) {
         m_registrarLimitsConfig = registrarLimitsConfig;
     }

@@ -15,7 +15,7 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import org.apache.tapestry.IAsset;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 
 public class SkinControlTest extends TestCase {
 

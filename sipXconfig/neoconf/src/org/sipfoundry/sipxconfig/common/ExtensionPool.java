@@ -62,7 +62,7 @@ public class ExtensionPool extends BeanWithId implements NamedObject, SystemAudi
 
     /** Set the first extension in the range for this pool */
     public void setFirstExtension(int firstExtension) {
-        setFirstExtension(new Integer(firstExtension));
+        setFirstExtension(Integer.valueOf(firstExtension));
     }
 
     /** Return the last extension in the range for this pool */
@@ -77,7 +77,7 @@ public class ExtensionPool extends BeanWithId implements NamedObject, SystemAudi
 
     /** Set the last extension in the range for this pool */
     public void setLastExtension(int lastExtension) {
-        setLastExtension(new Integer(lastExtension));
+        setLastExtension(Integer.valueOf(lastExtension));
     }
 
     /** Return the next extension that we will assign automatically, if it is free */
@@ -92,7 +92,7 @@ public class ExtensionPool extends BeanWithId implements NamedObject, SystemAudi
 
     /** Set the next extension in the range for this pool */
     public void setNextExtension(int nextExtension) {
-        setNextExtension(new Integer(nextExtension));
+        setNextExtension(Integer.valueOf(nextExtension));
     }
 
     @Override

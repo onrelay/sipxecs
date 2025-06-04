@@ -14,7 +14,7 @@ import java.util.TimeZone;
 
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 
 public class TimeZoneManagerImpl extends SipxHibernateDaoSupport implements TimeZoneManager {
 

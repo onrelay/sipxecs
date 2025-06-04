@@ -46,7 +46,7 @@ import org.sipfoundry.openfire.vcard.ContactInfoHandlerImpl;
 import org.sipfoundry.openfire.vcard.synchserver.VCardRpcServer;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.Mongo;
+import com.mongodb.client.MongoClient;
 
 public class MongoVCardProvider implements VCardProvider {
     private static Logger logger = Logger.getLogger(MongoVCardProvider.class);
@@ -59,7 +59,7 @@ public class MongoVCardProvider implements VCardProvider {
     }
 
     private void initUserProfileService() throws Exception {
-        Mongo mongo = MongoFactory.fromConnectionFile();
+        MongoClient mongo = MongoFactory.fromConnectionFile();
         MongoTemplate profilesDb = new MongoTemplate(mongo, "profiles");
         m_userProfileService = new UserProfileServiceImpl();
         ((UserProfileServiceImpl) m_userProfileService).setProfilesDb(profilesDb);

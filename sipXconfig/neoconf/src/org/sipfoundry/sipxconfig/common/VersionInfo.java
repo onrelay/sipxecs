@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Version information is kept in jar manifest file which is created during build process. See
@@ -41,7 +41,7 @@ public class VersionInfo {
         String[] sids = version.split("\\.");
         Integer[] ids = new Integer[sids.length];
         for (int i = 0; i < ids.length; i++) {
-            ids[i] = new Integer(sids[i]);
+            ids[i] = Integer.valueOf(sids[i]);
         }
         return ids;
     }

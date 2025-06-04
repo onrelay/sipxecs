@@ -15,8 +15,8 @@ import java.util.Map;
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.Converter;
 import org.apache.commons.beanutils.converters.IntegerConverter;
-import org.apache.commons.collections.map.LinkedMap;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections4.map.LinkedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.setting.Setting;
 
 public class EnumSetting extends AbstractSettingType {

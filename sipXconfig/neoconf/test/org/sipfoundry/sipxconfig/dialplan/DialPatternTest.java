@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.dialplan;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * DialPatternTest

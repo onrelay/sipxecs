@@ -14,7 +14,7 @@
  */
 package org.sipfoundry.sipxconfig.firewall;
 
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.Predicate;
 
 public class CustomFirewallRule {
     private FirewallTable m_table;

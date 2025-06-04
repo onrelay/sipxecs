@@ -15,47 +15,52 @@
 package org.sipfoundry.sipxconfig.rest;
 
 import static org.sipfoundry.sipxconfig.rest.JacksonConvert.fromRepresentation;
-import static org.sipfoundry.sipxconfig.rest.JacksonConvert.toRepresentation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.restlet.resource.Representation;
+import org.restlet.data.Status;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.callgroup.AbstractRing;
 import org.sipfoundry.sipxconfig.callgroup.AbstractRing.Type;
 import org.sipfoundry.sipxconfig.forwarding.CallSequence;
 import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
 import org.sipfoundry.sipxconfig.forwarding.Ring;
 import org.sipfoundry.sipxconfig.forwarding.Schedule;
-import org.springframework.beans.factory.annotation.Required;
 
 public class CallFwdResource extends UserResource {
     private static final Log LOG = LogFactory.getLog(CallFwdResource.class);
 
     private ForwardingContext m_forwardingContext;
 
-    // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        CallSequence callSequence = m_forwardingContext.getCallSequenceForUser(getUser());
-        CallFwdBean bean = new CallFwdBean();
+    @Get
+    public Representation represent(Variant variant) throws ResourceException { 
+        try {
+            CallSequence callSequence = m_forwardingContext.getCallSequenceForUser(getUser());
+            CallFwdBean bean = new CallFwdBean();
 
-        bean.setRings(toRingBeanList(callSequence.getRings()));
-        bean.setWithVM(getUser().hasVoicemailPermission());
-        bean.setExpiration(callSequence.getCfwdTime());
+            bean.setRings(toRingBeanList(callSequence.getRings()));
+            bean.setWithVM(getUser().hasVoicemailPermission());
+            bean.setExpiration(callSequence.getCfwdTime());
 
-        LOG.warn("Returning call fwd:\t" + bean);
+            LOG.warn("Returning call fwd:\t" + bean);
 
-        return toRepresentation(bean);
+            return toRepresentation(bean);
+            
+        } catch (IOException e) {
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage());
+        }
     }
 
-    // PUT
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         CallFwdBean bean = fromRepresentation(entity, CallFwdBean.class);
         LOG.warn("Saving call fwd bean:\t" + bean);
         CallSequence callSequence = m_forwardingContext.getCallSequenceForUser(getUser());
@@ -68,6 +73,7 @@ public class CallFwdResource extends UserResource {
         LOG.warn("Saving call fwd:\t" + callSequence);
 
         m_forwardingContext.saveCallSequence(callSequence);
+        return null;
     }
 
     private static List<RingBean> toRingBeanList(List<AbstractRing> rings) {
@@ -117,7 +123,7 @@ public class CallFwdResource extends UserResource {
         return rings;
     }
 
-    @Required
+    
     public void setForwardingContext(ForwardingContext forwardingContext) {
         m_forwardingContext = forwardingContext;
     }

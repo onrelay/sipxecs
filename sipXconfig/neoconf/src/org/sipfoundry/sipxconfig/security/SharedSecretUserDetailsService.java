@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -30,7 +29,7 @@ public class SharedSecretUserDetailsService extends AbstractUserDetailsService {
         return new SharedSecretUserDetailsImpl(m_domainManager, user, userNameOrAlias, gas);
     }
 
-    @Required
+    
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }

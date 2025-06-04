@@ -112,7 +112,7 @@ public class DialPlanApiTestIntegration extends RestApiIntegrationTestCase {
         int code = postJsonString(createRule, "rules");
         assertEquals(200, code);
 
-        int savedRuleId = db().queryForInt("select dialing_rule_id from dialing_rule where name='Attedant-2'");
+        int savedRuleId = db().queryForObject("select dialing_rule_id from dialing_rule where name='Attedant-2'", Integer.class);
         //create long distance dialing rule
         createRule = "{\"type\":\"Long_Distance\",\"name\":\"LD\",\"enabled\":false,\"description\":\"didi\",\"scheduleId\":2,"
             + "\"permissions\":{\"names\":[]},\"gatewayAware\":true,\"authorizationChecked\":true,\"internal\":false,\"mediaServerHostname\":null,"
@@ -163,7 +163,7 @@ public class DialPlanApiTestIntegration extends RestApiIntegrationTestCase {
         assertEquals(200, putCode);
 
         //retrieve modified rule
-        int count = db().queryForInt("select count(*) from dialing_rule where name='Attedant-2-modified'");
+        int count = db().queryForObject("select count(*) from dialing_rule where name='Attedant-2-modified'", Integer.class);
         assertEquals(1, count);
         ruleJson = getAsJson(String.format("rules/%s", savedRuleId));
         assertEquals(
@@ -187,7 +187,7 @@ public class DialPlanApiTestIntegration extends RestApiIntegrationTestCase {
         //delete rule
         int deleteRule = delete(String.format("rules/%s", savedRuleId));
         assertEquals(200, deleteRule);
-        count = db().queryForInt("select count(*) from dialing_rule where name='Attedant-2-modified'");
+        count = db().queryForObject("select count(*) from dialing_rule where name='Attedant-2-modified'", Integer.class);
         assertEquals(0, count);
     }
 
@@ -304,7 +304,7 @@ public class DialPlanApiTestIntegration extends RestApiIntegrationTestCase {
         int code = postXmlString(createRule, "rules");
         assertEquals(200, code);
 
-        int savedRuleId = db().queryForInt("select dialing_rule_id from dialing_rule where name='Attendant-2'");
+        int savedRuleId = db().queryForObject("select dialing_rule_id from dialing_rule where name='Attendant-2'", Integer.class);
 
         //retrieve saved rule
         String ruleXml = getAsXml(String.format("rules/%s", savedRuleId));
@@ -366,7 +366,7 @@ public class DialPlanApiTestIntegration extends RestApiIntegrationTestCase {
         assertEquals(200, putCode);
 
         //retrieve modified rule
-        int count = db().queryForInt("select count(*) from dialing_rule where name='Attendant-2-modified'");
+        int count = db().queryForObject("select count(*) from dialing_rule where name='Attendant-2-modified'", Integer.class);
         assertEquals(1, count);
         ruleXml = getAsXml(String.format("rules/%s", savedRuleId));
         assertEquals(
@@ -401,7 +401,7 @@ public class DialPlanApiTestIntegration extends RestApiIntegrationTestCase {
         //delete rule
         int deleteRule = delete(String.format("rules/%s", savedRuleId));
         assertEquals(200, deleteRule);
-        count = db().queryForInt("select count(*) from dialing_rule where name='Attedant-2-modified'");
+        count = db().queryForObject("select count(*) from dialing_rule where name='Attedant-2-modified'", Integer.class);
         assertEquals(0, count);
     }
 

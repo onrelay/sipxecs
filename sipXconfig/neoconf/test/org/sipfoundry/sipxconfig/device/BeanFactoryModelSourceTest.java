@@ -21,11 +21,9 @@ public class BeanFactoryModelSourceTest extends TestCase {
         };
         IMocksControl beanFactoryControl = EasyMock.createControl();
         ListableBeanFactory beanFactory = beanFactoryControl.createMock(ListableBeanFactory.class);
-        beanFactory.getBeanNamesForType(BirdType.class);
-        beanFactoryControl.andReturn(birdNames);
+        EasyMock.expect(beanFactory.getBeanNamesForType(BirdType.class)).andReturn(birdNames);
         for (String name : birdNames) {
-            beanFactory.getBean(name);
-            beanFactoryControl.andReturn(new BirdType(name));
+            EasyMock.expect(beanFactory.getBean(name)).andReturn(new BirdType(name));
         }
         beanFactoryControl.replay();
         BeanFactoryModelSource<BirdType> modelSource = new BeanFactoryModelSource(BirdType.class.getName());

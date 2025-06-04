@@ -14,30 +14,28 @@
  */
 package org.sipfoundry.sipxconfig.rest;
 
-import static org.sipfoundry.sipxconfig.rest.JacksonConvert.toRepresentation;
 
-import org.restlet.resource.Representation;
+import java.io.IOException;
+
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.localization.LocalizationContext;
 
 public class PersonalAttendantLangResource extends UserResource {
     private LocalizationContext m_context;
 
-    @Override
-    public boolean allowPost() {
-        return false;
-    }
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
+        
+        try {
+            String[] langs = m_context.getInstalledLanguages();
+            return toRepresentation(langs);
 
-    @Override
-    public boolean allowDelete() {
-        return false;
-    }
-
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        String[] langs = m_context.getInstalledLanguages();
-        return toRepresentation(langs);
+        } catch( IOException ex ) {
+            throw new ResourceException( ex );
+        }
     }
 
     public void setLocalizationContext(LocalizationContext context) {

@@ -27,9 +27,9 @@ import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Variant;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.device.ProfileManager;
 import org.sipfoundry.sipxconfig.phone.PhoneContext;
 
@@ -96,7 +96,7 @@ public class PhoneUpdateResourceTest extends TestCase {
         m_resource.setRequest(request);
         m_resource.init(null, request, new Response(request));
         
-        m_resource.represent(new Variant(MediaType.ALL));
+        m_resource.updatePhone();
         verify(m_phoneContext);
     }
     
@@ -123,7 +123,7 @@ public class PhoneUpdateResourceTest extends TestCase {
         m_resource.setRequest(request);
         m_resource.init(null, request, new Response(request));
         
-        m_resource.represent(new Variant(MediaType.ALL));
+        m_resource.updatePhone();
         verify(m_phoneContext);
         m_polycom301.getModelId().equals("polycom301");
         m_polycom301.getDeviceVersion().equals(PolycomModel.VER_3_1_X);
@@ -150,7 +150,7 @@ public class PhoneUpdateResourceTest extends TestCase {
         m_resource.setRequest(request);
         m_resource.init(null, request, new Response(request));
         
-        m_resource.represent(new Variant(MediaType.ALL));
+        m_resource.updatePhone();
         verify(m_phoneContext);
         m_polycom335.getModelId().equals("polycom335");
         m_polycom335.getDeviceVersion().equals(PolycomModel.VER_4_0_X);

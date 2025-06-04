@@ -43,7 +43,7 @@ public class AuthCodesTestIntegration extends ImdbTestCase {
         for (String[] internalUser : INTERNAL_USER_DATA) {
             user = new InternalUser();
             user.setPermissionManager(getPermissionManager());
-            user.setUniqueId(new Integer(internalUser[0]));
+            user.setUniqueId(Integer.valueOf(internalUser[0]));
             user.setName(internalUser[1]);
             user.setSipPassword(internalUser[2]);
             user.setDomainManager(getDomainManager());
@@ -53,7 +53,7 @@ public class AuthCodesTestIntegration extends ImdbTestCase {
         AuthCode authCode = null;
         for (String[] code : AUTHCODES_DATA) {
             authCode = new AuthCode();
-            authCode.setUniqueId(new Integer(code[0]));
+            authCode.setUniqueId(Integer.valueOf(code[0]));
             authCode.setCode(code[1]);
             authCode.setName(code[2]);
             authCode.setDescription(code[3]);

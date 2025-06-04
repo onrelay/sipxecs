@@ -8,18 +8,10 @@
  */
 package org.sipfoundry.authcode;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Vector;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.sipfoundry.commons.freeswitch.Collect;
 import org.sipfoundry.commons.freeswitch.FreeSwitchEventSocketInterface;
 import org.sipfoundry.commons.freeswitch.Localization;
 import org.sipfoundry.commons.freeswitch.PromptList;
-import org.sipfoundry.commons.freeswitch.TextToPrompts;
 import org.sipfoundry.sipxacccode.DigitCollect;
 
 public class DestinationEnter {

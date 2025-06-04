@@ -35,9 +35,9 @@ public class AutoAttendantTestIntegration extends IntegrationTestCase {
 
     public void testUpdate() throws Exception {
         loadDataSet("dialplan/seedAttendant.xml");
-        AutoAttendant aa = m_autoAttendantManager.getAutoAttendant(new Integer(1000));
+        AutoAttendant aa = m_autoAttendantManager.getAutoAttendant(Integer.valueOf(1000));
         m_autoAttendantManager.storeAutoAttendant(aa);
-        assertEquals(new Integer(1000), aa.getId());
+        assertEquals(Integer.valueOf(1000), aa.getId());
     }
 
     public void testDupe() throws Exception {
@@ -137,7 +137,7 @@ public class AutoAttendantTestIntegration extends IntegrationTestCase {
 
     public void testDelete() throws Exception {
         loadDataSet("dialplan/seedAttendant.xml");
-        AutoAttendant aa = m_autoAttendantManager.getAutoAttendant(new Integer(1000));
+        AutoAttendant aa = m_autoAttendantManager.getAutoAttendant(Integer.valueOf(1000));
         m_autoAttendantManager.deleteAutoAttendant(aa);
         assertEquals(0, countRowsInTable("attendant_menu_item"));
     }
@@ -155,14 +155,14 @@ public class AutoAttendantTestIntegration extends IntegrationTestCase {
 
     public void testDeleteOperatorInUse() throws Exception {
         loadDataSet("dialplan/seedOperator.xml");
-        AutoAttendant aa = m_autoAttendantManager.getAutoAttendant(new Integer(1000));
+        AutoAttendant aa = m_autoAttendantManager.getAutoAttendant(Integer.valueOf(1000));
         try {
             m_autoAttendantManager.deleteAutoAttendant(aa);
             fail();
         } catch (AttendantInUseException e) {
             assertTrue(true);
         }
-        aa = m_autoAttendantManager.getAutoAttendant(new Integer(1001));
+        aa = m_autoAttendantManager.getAutoAttendant(Integer.valueOf(1001));
         try {
             m_autoAttendantManager.deleteAutoAttendant(aa);
             fail();
@@ -186,7 +186,7 @@ public class AutoAttendantTestIntegration extends IntegrationTestCase {
 
     public void testGetAutoAttendantSettings() throws Exception {
         TestHelper.cleanInsert("dialplan/seedDialPlanWithAttendant.xml");
-        AutoAttendant autoAttendant = m_autoAttendantManager.getAutoAttendant(new Integer(2000));
+        AutoAttendant autoAttendant = m_autoAttendantManager.getAutoAttendant(Integer.valueOf(2000));
         assertNotNull(autoAttendant.getSettings());
     }
 

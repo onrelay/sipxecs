@@ -13,8 +13,8 @@ import java.util.Collections;
 import java.util.Formatter;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.dialplan.config.Transform;
 import org.sipfoundry.sipxconfig.dialplan.config.UrlTransform;
 import org.sipfoundry.sipxconfig.permission.PermissionName;

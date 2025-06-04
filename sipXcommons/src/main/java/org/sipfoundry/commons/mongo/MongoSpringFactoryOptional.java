@@ -3,9 +3,12 @@ package org.sipfoundry.commons.mongo;
 import java.io.File;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.dao.support.PersistenceExceptionTranslator;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 
-import com.mongodb.DB;
+import com.mongodb.ClientSessionOptions;
+import com.mongodb.client.ClientSession;
+import com.mongodb.client.MongoDatabase;
 
 /**
  * Like MongoSpringFactory but config file might not exist.  If it doesn't then
@@ -16,17 +19,15 @@ import com.mongodb.DB;
  * Ultimately sipxconfig uses this class to determine if system has a local
  * database defined and if it does, use it.
  */
-public class MongoSpringFactoryOptional implements MongoDbFactory {
+public class MongoSpringFactoryOptional implements MongoDatabaseFactory {
     private MongoSpringFactory m_delegate;
 
-    @Override
-    public DB getDb() throws DataAccessException {
-        return m_delegate != null ? m_delegate.getDb() : null;
+    public MongoDatabase getMongoDatabase() throws DataAccessException {
+        return m_delegate != null ? m_delegate.getMongoDatabase() : null;
     }
 
-    @Override
-    public DB getDb(String dbname) throws DataAccessException {
-        return m_delegate != null ? m_delegate.getDb(dbname) : null;
+    public MongoDatabase getMongoDatabase(String dbname) throws DataAccessException {
+        return m_delegate != null ? m_delegate.getMongoDatabase(dbname) : null;
     }
     
     public void setConfigFile(String configFile) {
@@ -34,5 +35,17 @@ public class MongoSpringFactoryOptional implements MongoDbFactory {
             m_delegate = new MongoSpringFactory();
             m_delegate.setConfigFile(configFile);
         }
+    }
+
+    public PersistenceExceptionTranslator getExceptionTranslator() {
+        throw new UnsupportedOperationException("Unimplemented method 'getExceptionTranslator'");
+    }
+
+    public ClientSession getSession(ClientSessionOptions options) {
+        throw new UnsupportedOperationException("Unimplemented method 'getSession'");
+    }
+
+    public MongoDatabaseFactory withSession(ClientSession session) {
+        throw new UnsupportedOperationException("Unimplemented method 'withSession'");
     }    
 }

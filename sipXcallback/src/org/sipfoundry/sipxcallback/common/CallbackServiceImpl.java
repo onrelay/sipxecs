@@ -31,7 +31,6 @@ import java.util.TimeZone;
 import org.apache.log4j.Logger;
 import org.sipfoundry.commons.mongo.MongoConstants;
 import org.sipfoundry.commons.userdb.ValidUsers;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import com.hazelcast.core.Cluster;
@@ -39,12 +38,12 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IAtomicReference;
 import com.hazelcast.core.IQueue;
 import com.hazelcast.core.Member;
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
+
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.ReplaceOptions;
 
 public class CallbackServiceImpl implements CallbackService {
 
@@ -63,21 +62,21 @@ public class CallbackServiceImpl implements CallbackService {
         if (callerChannelName.contains(".")) {
             callerChannelName = callerChannelName.replace(".", ";");
         }
-        DBCollection entityCollection = m_imdbTemplate.getCollection("entity");
-        DBObject user = findUserByName(callbackLegs.getCalleeName(), entityCollection);
+        MongoCollection<Document> entityCollection = m_imdbTemplate.getCollection("entity");
+        Document user = findUserByName(callbackLegs.getCalleeName(), entityCollection);
         if (user == null) {
             // callback user was not found
             throw new CallbackException("Callback user: " + callbackLegs.getCalleeName() + " not found !");
         }
-        BasicDBList callbackList = null;
+        List<Document> callbackList = null;
         if (user.keySet().contains(MongoConstants.CALLBACK_LIST)) {
-            callbackList = (BasicDBList) user.get(MongoConstants.CALLBACK_LIST);
+            callbackList = (List<Document>) user.get(MongoConstants.CALLBACK_LIST);
         } else {
-            callbackList = new BasicDBList();
+            callbackList = new ArrayList<Document>();
         }
-        for (Object callerObject : callbackList.toArray()) {
-            DBObject callerDbObject = (DBObject) callerObject;
-            if (((DBObject) callerDbObject).containsField(callerChannelName)) {
+        for (Document callerDbObject: callbackList ) {
+
+            if( callerDbObject.containsKey(callerChannelName) ) {
                 callbackList.remove(callerDbObject);
             }
         }
@@ -87,8 +86,8 @@ public class CallbackServiceImpl implements CallbackService {
         updateCallbackList(entityCollection, callbackList, user, null);
     }
 
-    private void insertNewObject(CallbackLegs callbackLegs, BasicDBList callbackList) {
-        DBObject callback = new BasicDBObject(callbackLegs.getCallerUID(), getCurrentTimestamp());
+    private void insertNewObject(CallbackLegs callbackLegs, List<Document> callbackList) {
+        Document callback = new Document(callbackLegs.getCallerUID(), getCurrentTimestamp());
         callbackList.add(callback);
         if (callbackLegs != null) {
             // add the request also in the hazelcast call queue
@@ -108,20 +107,20 @@ public class CallbackServiceImpl implements CallbackService {
     }
 
     private Set<CallbackLegs> setupCallbackRequest() {
-        DBCollection entityCollection = m_imdbTemplate.getCollection("entity");
+        MongoCollection<Document> entityCollection = m_imdbTemplate.getCollection("entity");
         // get all users which have callback on busy set
-        DBCursor users = getCallbackUsers(entityCollection);
+        FindIterable<Document> users = getCallbackUsers(entityCollection);
 
         // iterate over users
         Set<CallbackLegs> callsMap = new HashSet<CallbackLegs>();
-        for (DBObject user : users) {
-            BasicDBList callbackList = (BasicDBList) user.get(CALLBACK_LIST);
+        for (Document user : users) {
+            List<Document> callbackList = (List<Document>) user.get(CALLBACK_LIST);
             String calleeName = ValidUsers.getStringValue(user, UID);
             // iterate over callback requests for each user
             // keep tabs if any callback flag has expired and then update the callback list
-            List<DBObject> objectsToBeRemoved = new ArrayList<DBObject>();
+            List<Document> objectsToBeRemoved = new ArrayList<Document>();
             for (Object callerDbObject : callbackList) {
-                Set<CallbackLegs> callbackRequests = handleCallbackAction(calleeName, (DBObject) callerDbObject,
+                Set<CallbackLegs> callbackRequests = handleCallbackAction(calleeName, (Document) callerDbObject,
                         callbackList, objectsToBeRemoved);
                 callsMap.addAll(callbackRequests);
             }
@@ -130,11 +129,15 @@ public class CallbackServiceImpl implements CallbackService {
         return callsMap;
     }
 
-    private DBObject findUserByName(String userName, DBCollection entityCollection) {
-        DBObject query = QueryBuilder.start(ENTITY_NAME).is("user").and(UID).is(userName).get();
-        return entityCollection.findOne(query);
+    public Document findUserByName(String userName, MongoCollection<Document> entityCollection) {
+        return entityCollection.find(
+                Filters.and(
+                        Filters.eq(ENTITY_NAME, "user"),
+                        Filters.eq(UID, userName)
+                )
+        ).first();
     }
-
+    
     /**
      * Retrieves the current date in UTC timezone
      */
@@ -143,24 +146,26 @@ public class CallbackServiceImpl implements CallbackService {
         return date.getTime();
     }
 
-    private void updateCallbackList(DBCollection entityCollection,
-            BasicDBList callbackList, DBObject user, List<DBObject> objectsToBeRemoved) {
+    private void updateCallbackList(MongoCollection<Document> entityCollection,
+        List<Document> callbackList, Document user, List<Document> objectsToBeRemoved) {
+
         if (objectsToBeRemoved != null && !objectsToBeRemoved.isEmpty()) {
             callbackList.removeAll(objectsToBeRemoved);
         }
         if (callbackList.isEmpty()) {
-            user.removeField(MongoConstants.CALLBACK_LIST);
+            user.remove(MongoConstants.CALLBACK_LIST);
         } else {
             user.put(MongoConstants.CALLBACK_LIST, callbackList);
         }
-        entityCollection.save(user);
+
+        entityCollection.replaceOne(Filters.eq("_id", user.getObjectId("_id")), user, new ReplaceOptions().upsert(true));
     }
 
     /**
      * Returns a list with objects to be removed because their callback duration has expired
      */
-    private Set<CallbackLegs> handleCallbackAction(String calleeName,DBObject callbackObject, BasicDBList callbackList,
-            List<DBObject> objectsToBeRemoved) {
+    private Set<CallbackLegs> handleCallbackAction(String calleeName,Document callbackObject, List<Document> callbackList,
+            List<Document> objectsToBeRemoved) {
         Set<CallbackLegs> callSet = new HashSet<CallbackLegs>();
         for (String callerName : callbackObject.keySet()) {
             long callerDate = (long) callbackObject.get(callerName);
@@ -177,22 +182,26 @@ public class CallbackServiceImpl implements CallbackService {
         return callSet;
     }
 
-    private DBCursor getCallbackUsers(DBCollection entityCollection) {
-        DBObject query = QueryBuilder.start(ENTITY_NAME).is("user").and(CALLBACK_LIST).exists(true).get();
-        return entityCollection.find(query);
+    private FindIterable<Document> getCallbackUsers(MongoCollection<Document> entityCollection) {
+        return entityCollection.find(
+                Filters.and(
+                        Filters.eq(ENTITY_NAME, "user"),  // ENTITY_NAME == "user"
+                        Filters.exists(CALLBACK_LIST)  // CALLBACK_LIST field exists
+                )
+        );
     }
 
-    @Required
+    
     public void setImdbTemplate(MongoTemplate imdbTemplate) {
         m_imdbTemplate = imdbTemplate;
     }
 
-    @Required
+    
     public void setExpires(int expires) {
         m_expires = expires;
     }
 
-    @Required
+    
     public void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         m_hazelcastInstance = hazelcastInstance;
     }
@@ -214,7 +223,7 @@ public class CallbackServiceImpl implements CallbackService {
             // initiate the queue if needed
             if (initiated.get() == null) {
                 LOG.debug("Setting up Hazelcast callback queue.");
-                initiated.set(new Boolean(true));
+                initiated.set(Boolean.valueOf(true));
                 Set<CallbackLegs> calls = setupCallbackRequest();
                 getCallbackQueue().clear();
                 getCallbackQueue().addAll(calls);

@@ -14,7 +14,7 @@ import java.util.TreeMap;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class SipUriTest extends TestCase {
     public void testFormatFullUri() {

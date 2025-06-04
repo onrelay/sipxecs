@@ -23,50 +23,50 @@ import org.jivesoftware.openfire.component.ExternalComponentConfiguration;
 import org.jivesoftware.openfire.component.ExternalComponentConfiguration.Permission;
 import org.jivesoftware.openfire.provider.ExternalComponentProvider;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+
 
 public class MongoExternalComponentProvider extends BaseMongoProvider implements ExternalComponentProvider {
     private static final String COLLECTION_NAME = "ofExtComponentConf";
 
     public MongoExternalComponentProvider() {
         setDefaultCollectionName(COLLECTION_NAME);
-        DBCollection extCompCollection = getDefaultCollection();
+        MongoCollection<Document> extCompCollection = getDefaultCollection();
 
-        DBObject index = new BasicDBObject();
-        index.put("subdomain", 1);
+        Document index = new Document("subdomain", 1);
 
-        extCompCollection.ensureIndex(index);
+        extCompCollection.createIndex(index);
     }
 
     @Override
     public ExternalComponentConfiguration getConfiguration(String subdomain, boolean useWildcard) {
         ExternalComponentConfiguration conf = null;
-        DBCollection extCompCollection = getDefaultCollection();
+        MongoCollection<Document> extCompCollection = getDefaultCollection();
 
-        DBObject query = new BasicDBObject();
-
+        Document query = new Document();
         query.put("subdomain", subdomain);
         query.put("wildcard", false);
 
-        DBObject confObj = extCompCollection.findOne(query);
+        Document confObj = extCompCollection.find(query).first();
 
         if (confObj != null) {
             String secret = (String) confObj.get("secret");
             String permission = (String) confObj.get("permission");
             conf = new ExternalComponentConfiguration(subdomain, false, Permission.valueOf(permission), secret);
         } else if (useWildcard) {
-            query = new BasicDBObject();
+            // Use Filters.regex to build regex query
+            confObj = extCompCollection.find(
+                Filters.and(
+                    Filters.regex("subdomain", subdomain),
+                    Filters.eq("wildcard", false)
+                )
+            ).first();
 
-            query.put("subdomain", "/" + subdomain + "/"); // mongodb regex
-            query.put("wildcard", false);
-
-            confObj = extCompCollection.findOne(query);
             if (confObj != null) {
                 String secret = (String) confObj.get("secret");
                 String permission = (String) confObj.get("permission");
-
                 conf = new ExternalComponentConfiguration(subdomain, false, Permission.valueOf(permission), secret);
             }
         }
@@ -76,28 +76,28 @@ public class MongoExternalComponentProvider extends BaseMongoProvider implements
 
     @Override
     public void addConfiguration(ExternalComponentConfiguration configuration) {
-        DBCollection extCompCollection = getDefaultCollection();
+        MongoCollection<Document> extCompCollection = getDefaultCollection();
 
-        DBObject toInsert = new BasicDBObject();
+        Document toInsert = new Document();
 
         toInsert.put("subdomain", configuration.getSubdomain());
         toInsert.put("wildcard", configuration.isWildcard());
         toInsert.put("permission", configuration.getPermission().toString());
         toInsert.put("secret", configuration.getSecret());
 
-        extCompCollection.insert(toInsert);
+        extCompCollection.insertOne(toInsert);
     }
 
     @Override
     public Collection<ExternalComponentConfiguration> getConfigurations(Permission permission) {
         Collection<ExternalComponentConfiguration> confs = new ArrayList<ExternalComponentConfiguration>();
-        DBCollection extCompCollection = getDefaultCollection();
+        MongoCollection<Document> extCompCollection = getDefaultCollection();
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
 
         query.put("permission", permission != null ? permission.toString() : null);
 
-        for (DBObject confObj : extCompCollection.find(query)) {
+        for (Document confObj : extCompCollection.find(query)) {
             String subdomain = (String) confObj.get("subdomain");
             String secret = (String) confObj.get("secret");
             Boolean wildcard = (Boolean) confObj.get("wildcard");
@@ -110,13 +110,13 @@ public class MongoExternalComponentProvider extends BaseMongoProvider implements
 
     @Override
     public void deleteConfigurationFromDB(ExternalComponentConfiguration configuration) {
-        DBCollection extCompCollection = getDefaultCollection();
+        MongoCollection<Document> extCompCollection = getDefaultCollection();
 
-        DBObject toDelete = new BasicDBObject();
+        Document toDelete = new Document();
 
         toDelete.put("subdomain", configuration.getSubdomain());
         toDelete.put("wildcard", configuration.isWildcard());
 
-        extCompCollection.remove(toDelete);
+        extCompCollection.deleteOne(toDelete);
     }
 }

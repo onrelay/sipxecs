@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.cfgmgt.ConfigManager;
 import org.sipfoundry.sipxconfig.cfgmgt.ConfigProvider;
 import org.sipfoundry.sipxconfig.cfgmgt.ConfigRequest;
@@ -33,7 +33,6 @@ import org.sipfoundry.sipxconfig.cfgmgt.ConfigUtils;
 import org.sipfoundry.sipxconfig.cfgmgt.YamlConfiguration;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.setting.Setting;
-import org.springframework.beans.factory.annotation.Required;
 
 public class Fail2banConfig implements ConfigProvider {
     private static final String PREFIX = ":";
@@ -101,7 +100,7 @@ public class Fail2banConfig implements ConfigProvider {
         }
     }
 
-    @Required
+    
     public void setFail2banManager(Fail2banManager manager) {
         m_fail2banManager = manager;
     }

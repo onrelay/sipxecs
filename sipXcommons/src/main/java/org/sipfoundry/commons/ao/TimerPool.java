@@ -83,7 +83,6 @@ public class TimerPool {
 							}
 							timerQueue.put(timer);
 						}
-						// TODO: Need to put some logging here.
 						timer.expire(currentTime);
 					} finally {
 						lock.unlock();

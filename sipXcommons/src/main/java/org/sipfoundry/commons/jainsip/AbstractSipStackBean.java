@@ -18,7 +18,6 @@ import gov.nist.javax.sip.header.ViaList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -52,7 +51,7 @@ import org.sipfoundry.commons.log4j.SipFoundryLayout;
 
 public abstract class AbstractSipStackBean {
 
-    private static final Logger logger = Logger.getLogger(AbstractSipStackBean.class);
+    //private static final Logger logger = Logger.getLogger(AbstractSipStackBean.class);
 
     private Properties m_properties;
 
@@ -122,7 +121,7 @@ public abstract class AbstractSipStackBean {
         Properties extraProperties = this.getExtraStackProperties();
         
         if ( extraProperties != null ) {
-            for (Enumeration keys = extraProperties.keys(); keys.hasMoreElements(); ) {
+            for (Enumeration<Object> keys = extraProperties.keys(); keys.hasMoreElements(); ) {
                 String key = (String) keys.nextElement();
                 m_properties.setProperty(key, extraProperties.getProperty(key));
             }
@@ -166,11 +165,11 @@ public abstract class AbstractSipStackBean {
     public void destroy(){
         if( m_sipStack != null ){
             try{
-                Iterator lpIter = m_sipStack.getListeningPoints();
+                Iterator<?> lpIter = m_sipStack.getListeningPoints();
                 while( lpIter.hasNext() ){
                     m_sipStack.deleteListeningPoint((ListeningPoint)(lpIter.next()));
                 }
-                Iterator spIter = m_sipStack.getSipProviders();
+                Iterator<?> spIter = m_sipStack.getSipProviders();
                 while( spIter.hasNext() ){
                     SipProvider sp = (SipProvider)(spIter.next());
                     sp.removeSipListener(getSipListener(this));

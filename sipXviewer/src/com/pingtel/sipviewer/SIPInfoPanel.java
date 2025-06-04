@@ -6,16 +6,10 @@
 package com.pingtel.sipviewer;
 
 import javax.swing.* ;
-import javax.swing.table.* ;
 import javax.swing.BorderFactory ;
-import javax.swing.border.* ;
 import java.awt.* ;
-import java.awt.event.* ;
-import java.lang.* ;
 import java.util.* ;
-import java.io.* ;
-import java.net.* ;
-import java.awt.datatransfer.*;
+
 
 /**
  *
@@ -80,7 +74,7 @@ public class SIPInfoPanel extends Container
         m_lblFrameID.setText(strFrameID) ;
     }
 
-    public void setBranchIDs(Vector vBranchIDs)
+    public void setBranchIDs(Vector<String> vBranchIDs)
     {
         String strBranches = new String() ;
 

@@ -19,9 +19,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.sipfoundry.sipxconfig.api.UserGroupApi;
 import org.sipfoundry.sipxconfig.api.model.GroupBean;
@@ -31,7 +31,6 @@ import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setting.SettingDao;
-import org.springframework.beans.factory.annotation.Required;
 
 public class UserGroupApiImpl extends GroupApiImpl implements UserGroupApi {
     private CoreContext m_coreContext;
@@ -116,12 +115,12 @@ public class UserGroupApiImpl extends GroupApiImpl implements UserGroupApi {
         return Response.status(Status.NOT_FOUND).build();
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setSettingDao(SettingDao settingDao) {
         m_settingDao = settingDao;
     }

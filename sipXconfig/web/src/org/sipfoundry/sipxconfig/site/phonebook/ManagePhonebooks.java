@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.site.phonebook;
 
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.IAsset;
 import org.apache.tapestry.IPage;
 import org.apache.tapestry.IRequestCycle;

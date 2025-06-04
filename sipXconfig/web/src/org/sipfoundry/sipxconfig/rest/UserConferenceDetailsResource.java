@@ -22,23 +22,24 @@ import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.conference.ActiveConference;
 import org.sipfoundry.sipxconfig.conference.ActiveConferenceContext;
 import org.sipfoundry.sipxconfig.conference.ActiveConferenceMember;
 import org.sipfoundry.sipxconfig.conference.Conference;
 import org.sipfoundry.sipxconfig.conference.ConferenceBridgeContext;
-import org.springframework.beans.factory.annotation.Required;
 
 import static org.restlet.data.MediaType.APPLICATION_JSON;
 import static org.restlet.data.MediaType.TEXT_XML;
@@ -56,8 +57,8 @@ public class UserConferenceDetailsResource extends UserResource {
         getVariants().add(new Variant(APPLICATION_JSON));
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         Conference conference = m_conferenceBridgeContext.findConferenceByName(m_confName);
         ActiveConference activeConference = null;
         if (conference == null) {
@@ -101,7 +102,7 @@ public class UserConferenceDetailsResource extends UserResource {
         return representable;
     }
 
-    @Required
+    
     public void setActiveConferenceContext(ActiveConferenceContext activeConferenceContext) {
         m_activeConferenceContext = activeConferenceContext;
     }
@@ -110,7 +111,6 @@ public class UserConferenceDetailsResource extends UserResource {
         m_conferenceBridgeContext = conferenceBridgeContext;
     }
 
-    @SuppressWarnings("serial")
     static class Representable implements Serializable {
         @SuppressWarnings("unused")
         private String m_extension;

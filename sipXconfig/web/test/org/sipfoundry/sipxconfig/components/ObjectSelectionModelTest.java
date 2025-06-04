@@ -20,9 +20,9 @@ public class ObjectSelectionModelTest extends TestCase {
 
     protected void setUp() {
         m_objects = new ArrayList();
-        m_objects.add(new ExampleBusinessObject("voltar", new Integer(100)));
-        m_objects.add(new ExampleBusinessObject("kuku", new Integer(101)));
-        m_objects.add(new ExampleBusinessObject("bongo", new Integer(102)));
+        m_objects.add(new ExampleBusinessObject("voltar", Integer.valueOf(100)));
+        m_objects.add(new ExampleBusinessObject("kuku", Integer.valueOf(101)));
+        m_objects.add(new ExampleBusinessObject("bongo", Integer.valueOf(102)));
     }
 
     public void testSetArray() {
@@ -46,9 +46,9 @@ public class ObjectSelectionModelTest extends TestCase {
         model.setCollection(m_objects);
         model.setValueExpression("somethingElse");
 
-        assertEquals(new Integer(100), model.getOption(0));
-        assertEquals(new Integer(101), model.getOption(1));
-        assertEquals(new Integer(102), model.getOption(2));
+        assertEquals(Integer.valueOf(100), model.getOption(0));
+        assertEquals(Integer.valueOf(101), model.getOption(1));
+        assertEquals(Integer.valueOf(102), model.getOption(2));
     }
 
     public void testNullLabel() {

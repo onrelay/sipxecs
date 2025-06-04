@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import junit.framework.TestCase;
 

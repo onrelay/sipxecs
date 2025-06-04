@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.security;
 
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +22,7 @@ import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.permission.PermissionManager;
 import org.sipfoundry.sipxconfig.test.TestHelper;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class UserDetailsImplTest extends TestCase {
@@ -38,7 +38,7 @@ public class UserDetailsImplTest extends TestCase {
         replay(pManager);
         user.setPermissionManager(pManager);
         Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(1);
-        GrantedAuthority party = new GrantedAuthorityImpl("party");
+        GrantedAuthority party = new SimpleGrantedAuthority("party");
         authorities.add(party);
         UserDetails details = new UserDetailsImpl(user, userName, authorities);
 

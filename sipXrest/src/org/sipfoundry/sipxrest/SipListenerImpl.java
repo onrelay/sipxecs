@@ -14,9 +14,7 @@ import javax.sip.ResponseEvent;
 import javax.sip.SipListener;
 import javax.sip.TimeoutEvent;
 import javax.sip.TransactionTerminatedEvent;
-import javax.sip.address.SipURI;
-import javax.sip.header.ToHeader;
-import javax.sip.message.Request;
+
 
 import org.apache.log4j.Logger;
 

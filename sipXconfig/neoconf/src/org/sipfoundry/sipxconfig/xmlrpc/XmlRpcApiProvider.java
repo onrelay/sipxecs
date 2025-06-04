@@ -15,7 +15,7 @@ public class XmlRpcApiProvider<T> implements ApiProvider<T>, InitializingBean {
 
     private String m_methodNamePrefix;
     private boolean m_secure;
-    private Class m_serviceInterface;
+    private Class<?> m_serviceInterface;
     private XmlRpcMarshaller m_marshaller;
     private long m_timeout;
 
@@ -47,7 +47,7 @@ public class XmlRpcApiProvider<T> implements ApiProvider<T>, InitializingBean {
         m_marshaller = marshaller;
     }
 
-    public void setServiceInterface(Class serviceInterface) {
+    public void setServiceInterface(Class<?> serviceInterface) {
         m_serviceInterface = serviceInterface;
     }
 

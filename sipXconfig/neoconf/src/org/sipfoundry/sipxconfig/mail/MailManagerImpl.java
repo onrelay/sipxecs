@@ -42,7 +42,6 @@ import org.sipfoundry.sipxconfig.setup.SetupManager;
 import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class MailManagerImpl implements MailManager, SetupListener, FeatureProvider, ProcessProvider,
         AddressProvider, FirewallProvider {
@@ -114,7 +113,7 @@ public class MailManagerImpl implements MailManager, SetupListener, FeatureProvi
         return Collections.singleton(new DefaultFirewallRule(SMTP));
     }
 
-    @Required
+    
     public void setLocationsManager(LocationsManager locationsManager) {
         m_locationsManager = locationsManager;
     }

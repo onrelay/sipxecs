@@ -12,17 +12,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Hashtable;
-import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.sipfoundry.authcode.AuthCode;
 import org.sipfoundry.commons.freeswitch.Answer;
 import org.sipfoundry.commons.freeswitch.DisconnectException;
 import org.sipfoundry.commons.freeswitch.FreeSwitchEventSocket;
 import org.sipfoundry.commons.freeswitch.FreeSwitchEventSocketInterface;
 import org.sipfoundry.commons.freeswitch.Hangup;
-import org.sipfoundry.commons.log4j.SipFoundryLayout;
 
 public class SipXacccode implements Runnable {
     private static final Logger LOG = Logger.getLogger("org.sipfoundry.sipxacccode");
@@ -164,12 +161,18 @@ public class SipXacccode implements Runnable {
 
         eventSocketPort = s_config.getEventSocketPort();
         LOG.info("Starting SipXacccode listening on port " + eventSocketPort);
+        
         ServerSocket serverSocket = new ServerSocket(eventSocketPort);
-        for (;;) {
-            Socket client = serverSocket.accept();
-            SipXacccode acccode = new SipXacccode(client);
-            Thread thread = new Thread(acccode);
-            thread.start();
+
+        try {
+            for (;;) {
+                Socket client = serverSocket.accept();
+                SipXacccode acccode = new SipXacccode(client);
+                Thread thread = new Thread(acccode);
+                thread.start();
+            }
+        } finally {
+            serverSocket.close();
         }
     }
 

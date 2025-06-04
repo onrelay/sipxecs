@@ -1,8 +1,9 @@
 package org.sipfoundry.sipxconfig.bulk.ldap;
 
+import org.easymock.EasyMock;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 
 import java.util.Collections;
 
@@ -43,7 +44,7 @@ public class LdapRowInserterTest2 extends LdapRowInserterTest {
         newGroupNamePrefix.setValue("grPrefix_");
         AbstractSetting stripUsername = (AbstractSetting) ldapManagement.addSetting(new SettingImpl("stripUserName"));
         stripUsername.setType(new IntegerSetting());
-        stripUsername.setTypedValue(new Integer(2));
+        stripUsername.setTypedValue(Integer.valueOf(2));
         AbstractSetting regex = (AbstractSetting) ldapManagement.addSetting(new SettingImpl("regex"));
         regex.setTypedValue("[^a-zA-Z]");
         AbstractSetting prefix = (AbstractSetting) ldapManagement.addSetting(new SettingImpl("prefix"));
@@ -73,23 +74,22 @@ public class LdapRowInserterTest2 extends LdapRowInserterTest {
      */
     @Override
     public void testCheckRowDataNotValid() throws Exception {
-        IMocksControl control = org.easymock.classextension.EasyMock.createNiceControl();
+        IMocksControl control = EasyMock.createNiceControl();
         UserMapper userMapper = control.createMock(UserMapper.class);
         SearchResult searchResult = control.createMock(SearchResult.class);
         Attributes attributes = control.createMock(Attributes.class);
         Attribute attribute = control.createMock(Attribute.class);
-        
-        searchResult.getAttributes();
-        control.andReturn(attributes);
-        attributes.get("identity");
-        control.andReturn(attribute);
-        userMapper.getUserName(attributes);
-        control.andReturn("@McQueen");
-        userMapper.getGroupNames(searchResult);
-        control.andReturn(Collections.singleton(SALES));
+
+        EasyMock.expect(searchResult.getAttributes()).andReturn(attributes);
+        EasyMock.expect(attributes.get("identity")).andReturn(attribute);
+        EasyMock.expect(userMapper.getUserName(attributes)).andReturn("@McQueen");
+        EasyMock.expect(userMapper.getGroupNames(searchResult)).andReturn(Collections.singleton(SALES));
+
         control.replay();
+
         m_rowInserter.setUserMapper(userMapper);
-        m_rowInserter.beforeInserting(null);
+        m_rowInserter.beforeInserting((Object[]) null);
+
         assertEquals(RowStatus.SUCCESS, m_rowInserter.checkRowData(searchResult).getRowStatus());
-    }    
+    }   
 }

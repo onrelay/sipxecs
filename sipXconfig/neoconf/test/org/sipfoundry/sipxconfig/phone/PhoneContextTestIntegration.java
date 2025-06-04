@@ -127,8 +127,8 @@ public class PhoneContextTestIntegration extends IntegrationTestCase {
 
     public void testGetPhoneIdBySerialNumber() throws Exception {
         loadDataSet("phone/SamplePhoneSeed.xml");
-        assertEquals(new Integer(1002), m_context.getPhoneIdBySerialNumber("00003"));
-        assertEquals(new Integer(1003), m_context.getPhoneIdBySerialNumber("aa00004"));
+        assertEquals(Integer.valueOf(1002), m_context.getPhoneIdBySerialNumber("00003"));
+        assertEquals(Integer.valueOf(1003), m_context.getPhoneIdBySerialNumber("aa00004"));
         assertEquals(null, m_context.getPhoneIdBySerialNumber("won't find this guy"));
     }
 
@@ -157,18 +157,18 @@ public class PhoneContextTestIntegration extends IntegrationTestCase {
 
     public void testCountPhonesInGroup() throws Exception {
         loadDataSet("phone/SamplePhoneSeed.xml");
-        assertEquals(1, m_context.getPhonesInGroupCount(new Integer(1001)));
-        assertEquals(2, m_context.getPhonesInGroupCount(new Integer(1002)));
+        assertEquals(1, m_context.getPhonesInGroupCount(Integer.valueOf(1001)));
+        assertEquals(2, m_context.getPhonesInGroupCount(Integer.valueOf(1002)));
     }
 
     public void testAddToGroup() throws Exception {
         sql("phone/GroupMemberCountSeed.sql");
 
-        assertEquals(0, db().queryForInt("select count(*) from phone_group where phone_id = 1001 AND group_id = 1002"));
+        assertEquals(0, (int)db().queryForObject("select count(*) from phone_group where phone_id = 1001 AND group_id = 1002", Integer.class) );
 
         m_context.addToGroup(1002, Collections.singleton(1001));
         flush();
-        db().queryForInt("select 1 from phone_group where phone_id = 1001 AND group_id = 1002");
+        db().queryForObject("select 1 from phone_group where phone_id = 1001 AND group_id = 1002", Integer.class);
     }
 
     public void testRemoveFromGroup() throws Exception {

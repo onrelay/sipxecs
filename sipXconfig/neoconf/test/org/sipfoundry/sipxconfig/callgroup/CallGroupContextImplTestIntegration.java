@@ -39,7 +39,7 @@ public class CallGroupContextImplTestIntegration extends IntegrationTestCase {
     }
 
     public void testLoadCallGroup() throws Exception {
-        CallGroup callGroup = m_callGroupContext.loadCallGroup(new Integer(1001));
+        CallGroup callGroup = m_callGroupContext.loadCallGroup(Integer.valueOf(1001));
         assertEquals("sales", callGroup.getName());
         assertTrue(callGroup.isEnabled());
         assertEquals("sales", callGroup.getName());
@@ -50,12 +50,12 @@ public class CallGroupContextImplTestIntegration extends IntegrationTestCase {
     }
 
     public void testGenerateSipPassword() throws Exception {
-        CallGroup callGroup = m_callGroupContext.loadCallGroup(new Integer(1001));
+        CallGroup callGroup = m_callGroupContext.loadCallGroup(Integer.valueOf(1001));
         assertNull(callGroup.getSipPassword());
         m_callGroupContext.generateSipPasswords();
-        callGroup = m_callGroupContext.loadCallGroup(new Integer(1001));
+        callGroup = m_callGroupContext.loadCallGroup(Integer.valueOf(1001));
         assertTrue(callGroup.getSipPasswordHash("realm").length() > 0);
-        callGroup = m_callGroupContext.loadCallGroup(new Integer(1001));
+        callGroup = m_callGroupContext.loadCallGroup(Integer.valueOf(1001));
         assertTrue(callGroup.getSipPassword().length() > 0);
         assertTrue(callGroup.getSipPasswordHash("realm").length() > 0);
     }
@@ -71,7 +71,7 @@ public class CallGroupContextImplTestIntegration extends IntegrationTestCase {
     }
 
     public void testLoadUserRing() throws Exception {
-        CallGroup callGroup = m_callGroupContext.loadCallGroup(new Integer(1002));
+        CallGroup callGroup = m_callGroupContext.loadCallGroup(Integer.valueOf(1002));
         List userRings = callGroup.getRings();
         assertEquals(1, userRings.size());
         UserRing ring = (UserRing) userRings.get(0);
@@ -127,7 +127,7 @@ public class CallGroupContextImplTestIntegration extends IntegrationTestCase {
 
     public void testRemoveCallGroups() throws Exception {
         List ids = Arrays.asList(new Integer[] {
-            new Integer(1001), new Integer(1002)
+            Integer.valueOf(1001), Integer.valueOf(1002)
         });
         m_callGroupContext.removeCallGroups(ids);
         // table should be empty now
@@ -145,7 +145,7 @@ public class CallGroupContextImplTestIntegration extends IntegrationTestCase {
 
     public void testDuplicateCallGroups() throws Exception {
         List ids = Arrays.asList(new Integer[] {
-            new Integer(1001), new Integer(1002)
+            Integer.valueOf(1001), Integer.valueOf(1002)
         });
         m_callGroupContext.duplicateCallGroups(ids);
         commit();
@@ -163,9 +163,9 @@ public class CallGroupContextImplTestIntegration extends IntegrationTestCase {
     }
 
     public void testEditUserRing() throws Exception {
-        final Integer testExpiration = new Integer(12);
+        final Integer testExpiration = Integer.valueOf(12);
 
-        CallGroup callGroup = m_callGroupContext.loadCallGroup(new Integer(1002));
+        CallGroup callGroup = m_callGroupContext.loadCallGroup(Integer.valueOf(1002));
         List userRings = callGroup.getRings();
         assertEquals(1, userRings.size());
         UserRing ring = (UserRing) userRings.get(0);
@@ -180,7 +180,7 @@ public class CallGroupContextImplTestIntegration extends IntegrationTestCase {
     }
 
     public void testRemoveUser() throws Exception {
-        CallGroup callGroup = m_callGroupContext.loadCallGroup(new Integer(1002));
+        CallGroup callGroup = m_callGroupContext.loadCallGroup(Integer.valueOf(1002));
         List userRings = callGroup.getRings();
         assertEquals(1, userRings.size());
 
@@ -188,20 +188,20 @@ public class CallGroupContextImplTestIntegration extends IntegrationTestCase {
 
         m_callGroupContext.removeUser(ring.getUser().getId());
 
-        callGroup = m_callGroupContext.loadCallGroup(new Integer(1002));
+        callGroup = m_callGroupContext.loadCallGroup(Integer.valueOf(1002));
         userRings = callGroup.getRings();
         assertTrue(userRings.isEmpty());
     }
 
     public void testDeleteUser() throws Exception {
-        User user = m_coreContext.loadUser(new Integer(1000));
+        User user = m_coreContext.loadUser(Integer.valueOf(1000));
         assertEquals(1, countRowsInTable("user_ring"));
         m_coreContext.deleteUser(user);
         assertEquals(0, TestHelper.getConnection().createDataSet().getTable("user_ring").getRowCount());
     }
 
     public void testDeleteUserById() throws Exception {
-        User user = m_coreContext.loadUser(new Integer(1000));
+        User user = m_coreContext.loadUser(Integer.valueOf(1000));
         assertEquals(1, countRowsInTable("user_ring"));
         m_coreContext.deleteUsers(Collections.singletonList(user.getId()));
         assertEquals(0, TestHelper.getConnection().createDataSet().getTable("user_ring").getRowCount());

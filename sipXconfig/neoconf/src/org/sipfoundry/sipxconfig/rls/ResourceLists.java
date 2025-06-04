@@ -21,33 +21,29 @@ import static org.sipfoundry.sipxconfig.common.SpecialUser.SpecialUserType.XMPP_
 import static org.sipfoundry.sipxconfig.speeddial.SpeedDial.getResourceListId;
 
 import java.util.Iterator;
+import java.util.List;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.dom4j.Document;
-import org.dom4j.Element;
+import org.apache.commons.lang3.BooleanUtils;
 import org.sipfoundry.commons.userdb.ValidUsers;
 import org.sipfoundry.sipxconfig.dialplan.config.XmlFile;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.SipUri;
-import org.springframework.beans.factory.annotation.Required;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import com.mongodb.client.FindIterable;
+import org.bson.Document;
 
 public class ResourceLists {
     private static final String NAMESPACE = "http://www.sipfoundry.org/sipX/schema/xml/resource-lists-00-01";
     private CoreContext m_coreContext;
     private ValidUsers m_validUsers;
 
-    public Document getDocument(boolean xmppPresenceEnabled) {
-        Document document = XmlFile.FACTORY.createDocument();
-        Element lists = document.addElement("lists", NAMESPACE);
-        Element imList = null;
+    public org.dom4j.Document getDocument(boolean xmppPresenceEnabled) {
+        org.dom4j.Document document = XmlFile.FACTORY.createDocument();
+        org.dom4j.Element lists = document.addElement("lists", NAMESPACE);
+        org.dom4j.Element imList = null;
 
-        DBCursor cursor = m_validUsers.getUsersWithSpeedDial();
-        while (cursor.hasNext()) {
-            DBObject user = cursor.next();
+        FindIterable<Document> cursor = m_validUsers.getUsersWithSpeedDial();
+        for ( Document user : cursor ) {
             String userName = user.get(UID).toString();
             if (userName.equals("superadmin")) {
                 continue;
@@ -59,21 +55,21 @@ public class ResourceLists {
                 String userAddrSpec = SipUri.format(userName, m_coreContext.getDomainName(), false);
                 createResource(imList, userAddrSpec, userName);
             }
-            DBObject speedDial = (DBObject) user.get(SPEEDDIAL);
+            Document speedDial = (Document) user.get(SPEEDDIAL);
 
             // ignore disabled orbits
             if (speedDial == null) {
                 continue;
             }
 
-            BasicDBList buttons = (BasicDBList) speedDial.get(BUTTONS);
-            Element list = null;
+            List<Document> buttons = (List<Document>) speedDial.get(BUTTONS);
+            org.dom4j.Element list = null;
             if (buttons != null) {
                 list = createResourceList(lists, user.get(UID).toString(), speedDial.get(USER).toString(),
                         speedDial.get(USER_CONS).toString());
-                Iterator iter = buttons.iterator();
+                Iterator<Document> iter = buttons.iterator();
                 while (iter.hasNext()) {
-                    DBObject button = (DBObject) iter.next();
+                    Document button = (Document) iter.next();
                     // Append "sipx-noroute=Voicemail" and "sipx-userforward=false"
                     // URI parameters to the target URI to control how the proxy forwards
                     // SUBSCRIBEs to the resource URI.
@@ -84,8 +80,8 @@ public class ResourceLists {
         return document;
     }
 
-    private Element createResource(Element list, String uri, String name) {
-        Element resource = list.addElement("resource");
+    private org.dom4j.Element createResource(org.dom4j.Element list, String uri, String name) {
+        org.dom4j.Element resource = list.addElement("resource");
         // Append "sipx-noroute=Voicemail" and "sipx-userforward=false"
         // URI parameters to the target URI to control how the proxy forwards
         // SUBSCRIBEs to the resource URI.
@@ -94,23 +90,23 @@ public class ResourceLists {
         return resource;
     }
 
-    private void addNameElement(Element parent, String name) {
+    private void addNameElement(org.dom4j.Element parent, String name) {
         parent.addElement("name").setText(name);
     }
 
-    private Element createResourceList(Element lists, String name, String full, String consolidated) {
-        Element list = lists.addElement("list");
+    private org.dom4j.Element createResourceList(org.dom4j.Element lists, String name, String full, String consolidated) {
+        org.dom4j.Element list = lists.addElement("list");
         list.addAttribute("user", full);
         list.addAttribute("user-cons", consolidated);
         addNameElement(list, name);
         return list;
     }
 
-    private Element createResourceList(Element lists, String name) {
+    private org.dom4j.Element createResourceList(org.dom4j.Element lists, String name) {
         return createResourceList(lists, name, getResourceListId(name, false), getResourceListId(name, true));
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }

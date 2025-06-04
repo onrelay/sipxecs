@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.dialplan.DialingRule;
@@ -121,7 +121,7 @@ public class DomainManagerImpl extends SipxHibernateDaoSupport<Domain> implement
     }
 
     private Domain loadDomainFromDb() {
-        Collection<Domain> domains = getHibernateTemplate().findByNamedQuery("domain");
+        Collection<Domain> domains = (Collection<Domain>)getHibernateTemplate().findByNamedQuery("domain");
         return (Domain) DataAccessUtils.singleResult(domains);
     }
 
@@ -150,7 +150,7 @@ public class DomainManagerImpl extends SipxHibernateDaoSupport<Domain> implement
     }
 
     public Localization getExistingLocalization() {
-        List l = getHibernateTemplate().loadAll(Localization.class);
+        List<Localization> l = getHibernateTemplate().loadAll(Localization.class);
         return (Localization) DataAccessUtils.singleResult(l);
     }
 

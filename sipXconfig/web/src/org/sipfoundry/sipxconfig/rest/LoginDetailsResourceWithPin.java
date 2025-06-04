@@ -20,14 +20,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.restlet.data.MediaType;
-import org.restlet.data.Status;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.routing.Redirector;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.address.AddressManager;
 import org.sipfoundry.sipxconfig.admin.AdminContext;
 import org.sipfoundry.sipxconfig.apache.ApacheManager;
@@ -37,11 +38,8 @@ import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.gateway.GatewayContext;
 import org.sipfoundry.sipxconfig.gateway.WebRtcGateway;
 import org.sipfoundry.sipxconfig.im.ImManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.noelios.restlet.http.HttpResponse;
-import com.noelios.restlet.http.HttpServerCall;
 import com.thoughtworks.xstream.XStream;
 
 import edu.emory.mathcs.backport.java.util.Collections;
@@ -55,8 +53,8 @@ public class LoginDetailsResourceWithPin extends LoginDetailsResource {
     private GatewayContext m_gatewayContext;
     private AdminContext m_adminContext;
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         String url = getRequest().getResourceRef().getIdentifier();
         LOG.debug("Requested url: " + url);
         if (url.contains(LOGOUT)) {
@@ -94,36 +92,16 @@ public class LoginDetailsResourceWithPin extends LoginDetailsResource {
         LOG.debug("Logging out... " + getUser().getUserName());
         SecurityContextHolder.clearContext();
 
-        // ensure login page redirection
-        getResponse().setStatus(Status.REDIRECTION_FOUND);
-        HttpServerCall serverCall = ((HttpResponse) getResponse()).getHttpCall();
-        serverCall.getResponseHeaders().add("Connection", "close");
+        // Redirect to logout URL
         String serverAddress = m_adminContext.getSettings().getSettingValue("configserver-config/logoutUrl");
         if (StringUtils.isEmpty(serverAddress)) {
             serverAddress = m_addressManager.getSingleAddress(ApacheManager.HTTPS_ADDRESS).toString();
         }
-        serverCall.getResponseHeaders().add("Location", serverAddress);
+
+        Redirector redirector = new Redirector(getContext(), serverAddress, Redirector.MODE_CLIENT_FOUND);
+        redirector.handle(getRequest(), getResponse());
     }
 
-    @Override
-    public boolean allowGet() {
-        return true;
-    }
-
-    @Override
-    public boolean allowPut() {
-        return false;
-    }
-
-    @Override
-    public boolean allowDelete() {
-        return false;
-    }
-
-    @Override
-    public boolean allowPost() {
-        return false;
-    }
 
     private static class RepresentableWithPin extends Representable {
         private static final long serialVersionUID = 1L;
@@ -190,22 +168,22 @@ public class LoginDetailsResourceWithPin extends LoginDetailsResource {
         }
     }
 
-    @Required
+    
     public void setConfigManager(ConfigManager configManager) {
         m_configManager = configManager;
     }
 
-    @Required
+    
     public void setAddressManager(AddressManager addressManager) {
         m_addressManager = addressManager;
     }
 
-    @Required
+    
     public void setGatewayContext(GatewayContext gatewayContext) {
         m_gatewayContext = gatewayContext;
     }
     
-    @Required
+    
     public void setAdminContext(AdminContext adminContext) {
         m_adminContext = adminContext;
     }

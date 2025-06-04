@@ -19,7 +19,7 @@ package org.sipfoundry.sipxconfig.commserver.imdb;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 import org.sipfoundry.commons.userdb.profile.Address;
 import org.sipfoundry.commons.userdb.profile.UserProfile;
@@ -60,7 +60,7 @@ public class UserLocation extends AbstractDataSetGenerator {
     }
 
     @Override
-    public void generate(Replicable entity, DBObject top) {
+    public void generate(Replicable entity, Document top) {
         if (entity instanceof User) {
             User user = (User) entity;
             List<String> locations = new ArrayList<String>();
@@ -69,7 +69,7 @@ public class UserLocation extends AbstractDataSetGenerator {
                 top.put(USER_LOCATION, site.getName());
                 locations.add(site.getName());
             } else {
-                top.removeField(USER_LOCATION);
+                top.remove(USER_LOCATION);
             }
             top.put(LOCATIONS, locations);
 

@@ -18,7 +18,6 @@ package org.sipfoundry.commons.security;
 
 import org.sipfoundry.commons.userdb.User;
 import org.sipfoundry.commons.userdb.ValidUsers;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,7 +30,7 @@ public class MongoUserDetailsService implements UserDetailsService {
 		return user == null ? null : new MongoUserDetails(userName, user.getPintoken());
 	}
 
-	@Required
+	
 	public void setValidUsers(ValidUsers validUsers) {
 		m_validUsers = validUsers;
 	}

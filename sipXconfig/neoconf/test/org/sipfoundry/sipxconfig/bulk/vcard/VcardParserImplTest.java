@@ -17,7 +17,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.collections.Closure;
+import org.apache.commons.collections4.Closure;
 
 public class VcardParserImplTest extends TestCase {
 

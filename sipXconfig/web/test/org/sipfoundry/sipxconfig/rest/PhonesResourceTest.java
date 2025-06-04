@@ -14,8 +14,8 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 import org.restlet.data.MediaType;
-import org.restlet.resource.InputRepresentation;
-import org.restlet.resource.Representation;
+import org.restlet.representation.InputRepresentation;
+import org.restlet.representation.Representation;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.device.ModelSource;
 import org.sipfoundry.sipxconfig.phone.Line;

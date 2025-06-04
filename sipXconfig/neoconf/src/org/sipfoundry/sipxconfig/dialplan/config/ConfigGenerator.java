@@ -33,7 +33,6 @@ import org.sipfoundry.sipxconfig.rls.Rls;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * ConfigGenerator
@@ -120,12 +119,12 @@ public class ConfigGenerator implements ConfigProvider, BeanFactoryAware {
         }
     }
 
-    @Required
+    
     public void setDialingRuleProvider(DialingRuleProvider dialingRuleProvider) {
         m_dialingRuleProvider = dialingRuleProvider;
     }
 
-    @Required
+    
     public void setPlanContext(DialPlanContext planContext) {
         m_planContext = planContext;
     }

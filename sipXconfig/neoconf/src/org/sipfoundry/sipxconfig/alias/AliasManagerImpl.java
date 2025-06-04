@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.common.BeanId;
@@ -35,7 +35,7 @@ import org.springframework.beans.factory.ListableBeanFactory;
 /**
  * AliasManagerImpl: manages all SIP aliases
  */
-public class AliasManagerImpl extends SipxHibernateDaoSupport implements AliasManager, BeanFactoryAware {
+public class AliasManagerImpl extends SipxHibernateDaoSupport<Object> implements AliasManager, BeanFactoryAware {
     public static final String CONTEXT_BEAN_NAME = "aliasManagerImpl";
     private static final Log LOG = LogFactory.getLog(AliasManagerImpl.class);
     private Collection<AliasOwner> m_aliasOwners;

@@ -18,7 +18,7 @@ import org.apache.tapestry.annotations.ComponentClass;
 import org.apache.tapestry.annotations.Parameter;
 import org.sipfoundry.sipxconfig.device.DeviceDescriptor;
 
-import static org.apache.commons.lang.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.join;
 
 @ComponentClass(allowBody = false, allowInformalParameters = false)
 public abstract class PhoneModelLabels extends BaseComponent {

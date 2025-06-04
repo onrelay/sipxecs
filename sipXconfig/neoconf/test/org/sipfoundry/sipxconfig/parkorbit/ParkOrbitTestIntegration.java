@@ -35,7 +35,7 @@ public class ParkOrbitTestIntegration extends IntegrationTestCase {
     }
 
     public void testLoadParkOrbit() throws Exception {
-        ParkOrbit orbit = m_parkOrbitContext.loadParkOrbit(new Integer(1001));
+        ParkOrbit orbit = m_parkOrbitContext.loadParkOrbit(Integer.valueOf(1001));
         assertEquals("sales", orbit.getName());
         assertTrue(orbit.isEnabled());
         assertEquals("sales", orbit.getName());
@@ -79,7 +79,7 @@ public class ParkOrbitTestIntegration extends IntegrationTestCase {
 
     public void testRemoveParkOrbit() throws Exception {
         List ids = Arrays.asList(new Integer[] {
-            new Integer(1001), new Integer(1002)
+            Integer.valueOf(1001), Integer.valueOf(1002)
         });
         m_parkOrbitContext.removeParkOrbits(ids);
         // table should be empty now - except for 1 music on hold orbit
@@ -99,7 +99,7 @@ public class ParkOrbitTestIntegration extends IntegrationTestCase {
         m_parkOrbitContext.setDefaultMusicOnHold(newMusic);
         commit();
         assertEquals(newMusic, m_parkOrbitContext.getDefaultMusicOnHold());
-        db().queryForInt("select 1 from park_orbit where music = ?", newMusic);
+        db().queryForObject("select 1 from park_orbit where music = ?", Integer.class, newMusic);
     }
 
     public void testIsAliasInUse() {

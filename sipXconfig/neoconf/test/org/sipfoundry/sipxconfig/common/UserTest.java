@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.common;
 
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,7 +21,7 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;
 import org.sipfoundry.commons.security.Md5Encoder;
 import org.sipfoundry.sipxconfig.address.Address;
@@ -514,10 +514,10 @@ public class UserTest extends TestCase {
     }
 
     public void testGetMusicOnHoldUri() {
-        MohAddressFactory moh = org.easymock.classextension.EasyMock.createMock(MohAddressFactory.class);
+        MohAddressFactory moh = org.easymock.EasyMock.createMock(MohAddressFactory.class);
         moh.getPersonalMohFilesUri("1234");
         expectLastCall().andReturn("sip:~~mh~u1234@example.org").anyTimes();
-        org.easymock.classextension.EasyMock.replay(moh);
+        org.easymock.EasyMock.replay(moh);
 
         PermissionManagerImpl pm = new PermissionManagerImpl();
         pm.setModelFilesContext(TestHelper.getModelFilesContext());

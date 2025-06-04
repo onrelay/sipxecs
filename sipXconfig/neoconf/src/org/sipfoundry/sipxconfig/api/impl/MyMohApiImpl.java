@@ -17,8 +17,8 @@ package org.sipfoundry.sipxconfig.api.impl;
 import java.io.File;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.sipfoundry.sipxconfig.api.MyMohApi;

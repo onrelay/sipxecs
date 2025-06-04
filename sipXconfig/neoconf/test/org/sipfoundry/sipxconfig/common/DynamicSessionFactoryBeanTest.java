@@ -32,14 +32,14 @@ public class DynamicSessionFactoryBeanTest extends TestCase {
     }
 
     public void testBindSubclasses() throws Exception {
+        
         IMocksControl controlFactory = EasyMock.createControl();
         ListableBeanFactory factory = controlFactory.createMock(ListableBeanFactory.class);
-        factory.getBeanNamesForType(Gateway.class);
-        controlFactory.andReturn(new String[] {"gwGeneric", "gwAcme"});
-        factory.getType("gwGeneric");
-        controlFactory.andReturn(Gateway.class);
-        factory.getType("gwAcme");
-        controlFactory.andReturn(AcmeGateway.class);
+
+        EasyMock.expect(factory.getBeanNamesForType(Gateway.class)).andReturn(new String[] {"gwGeneric", "gwAcme"});
+        EasyMock.expect(factory.getType("gwGeneric")).andReturn((Class)Gateway.class);
+        EasyMock.expect(factory.getType("gwAcme")).andReturn((Class)AcmeGateway.class);
+
         controlFactory.replay();
 
         ConfigurationMock config = new ConfigurationMock();
@@ -54,16 +54,15 @@ public class DynamicSessionFactoryBeanTest extends TestCase {
 
 
     public void testBindSubclassesOfBean() throws Exception {
+
         IMocksControl controlFactory = EasyMock.createControl();
         ListableBeanFactory factory = controlFactory.createMock(ListableBeanFactory.class);
-        factory.getBeanNamesForType(Gateway.class);
-        controlFactory.andReturn(new String[] {"gwGeneric", "gwAcme"});
-        factory.getType("gwGeneric");
-        controlFactory.andReturn(Gateway.class);
-        factory.getType("gwAcme");
-        controlFactory.andReturn(AcmeGateway.class);
-        controlFactory.replay();
 
+        EasyMock.expect(factory.getBeanNamesForType(Gateway.class)).andReturn(new String[] {"gwGeneric", "gwAcme"});
+        EasyMock.expect(factory.getType("gwGeneric")).andReturn((Class)Gateway.class);
+        EasyMock.expect(factory.getType("gwAcme")).andReturn((Class)AcmeGateway.class);
+
+        controlFactory.replay();
         ConfigurationMock config = new ConfigurationMock();
 
         DynamicSessionFactoryBean bean = new DynamicSessionFactoryBean();

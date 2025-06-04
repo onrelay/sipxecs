@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.common;
 
 import org.sipfoundry.sipxconfig.callgroup.CallGroup;
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 
 public class SipxHibernateDaoSupportTestIntegration extends IntegrationTestCase {
     private static final String GROUP_NAME = "testCallGroup";
@@ -61,7 +61,7 @@ public class SipxHibernateDaoSupportTestIntegration extends IntegrationTestCase 
 
     public void testGetOriginalValue() throws Exception {
         sql("common/TestUserSeed.sql");
-        Integer id = new Integer(1000);
+        Integer id = Integer.valueOf(1000);
         User user = (User) m_user.load(User.class, id);
         user.setUserName("goofy");
         assertEquals("testuser", m_user.getOriginalValue(user, "userName"));
@@ -69,7 +69,7 @@ public class SipxHibernateDaoSupportTestIntegration extends IntegrationTestCase 
 
     public void testGetOriginalValueIllegalProperty() throws Exception {
         sql("common/TestUserSeed.sql");
-        Integer id = new Integer(1000);
+        Integer id = Integer.valueOf(1000);
         User user = (User) m_user.load(User.class, id);
         user.setUserName("goofy");
         try {

@@ -5,8 +5,7 @@
  */
 package org.sipfoundry.sipxrelay;
 
-import java.io.File;
-import java.io.FileInputStream;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -14,17 +13,12 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
-import org.sipfoundry.sipxrelay.SymEndpointImpl;
-import org.sipfoundry.sipxrelay.SymEndpointInterface;
-import org.sipfoundry.sipxrelay.SymImpl;
-import org.sipfoundry.sipxrelay.SymInterface;
-import org.sipfoundry.sipxrelay.Symmitron;
+
 
 /*
  * The transmitter receiver pair for the thruput test.
@@ -121,7 +115,7 @@ public class TransReceiver {
         int count = 1;
         Object[] args = new Object[3];
         args[0] = clientHandle;
-        args[1] = new Integer(count);
+        args[1] = Integer.valueOf(count);
         args[2] = Symmitron.EVEN;
         
         Map retval = (Map) client.execute("sipXbridge.createSyms", args);
@@ -160,7 +154,7 @@ public class TransReceiver {
         int count = 1;
         Object[] args = new Object[3];
         args[0] = clientHandle;
-        args[1] = new Integer(count);
+        args[1] = Integer.valueOf(count);
         args[2] = Symmitron.ODD;
         
         Map retval = (Map) client.execute("sipXbridge.createSyms", args);
@@ -177,8 +171,8 @@ public class TransReceiver {
         params[0] = clientHandle;
         params[1] = sym;
         params[2] = clientAddress;
-        params[3] = new Integer(destinationPort);
-        params[4] = new Integer(500);
+        params[3] = Integer.valueOf(destinationPort);
+        params[4] = Integer.valueOf(500);
         params[5] = "USE-EMPTY-PACKET";
         params[6] = "";
         Map retval = (Map)client.execute("sipXbridge.setDestination", params);
@@ -195,8 +189,8 @@ public class TransReceiver {
         params[0] = clientHandle;
         params[1] = sym;
         params[2] = clientAddress;
-        params[3] = new Integer(destinationPort);
-        params[4] = new Integer(500);
+        params[3] = Integer.valueOf(destinationPort);
+        params[4] = Integer.valueOf(500);
         params[5] = "NONE";
         params[6] = "";
         Map retval = (Map)client.execute("sipXbridge.setDestination", params);
@@ -213,7 +207,7 @@ public class TransReceiver {
         params[1] = sym;
         params[2] = "";
         params[3] = 0;
-        params[4] = new Integer(500);
+        params[4] = Integer.valueOf(500);
         params[5] = "USE-EMPTY-PACKET";
         params[6] = "";
       

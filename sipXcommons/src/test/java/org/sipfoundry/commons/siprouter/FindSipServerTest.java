@@ -23,7 +23,6 @@ import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.Test;
-import org.sipfoundry.commons.siprouter.FindSipServer;
 import org.xbill.DNS.NAPTRRecord;
 import org.xbill.DNS.Name;
 import org.xbill.DNS.Record;
@@ -152,7 +151,6 @@ public class FindSipServerTest extends TestCase {
 			f.fakeA = new HashMap<String, InetAddress>(); 
 			f.fakeA.put("puppy", InetAddress.getByName("1.2.3.4"));
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -231,7 +229,6 @@ public class FindSipServerTest extends TestCase {
 			f.fakeA = new HashMap<String, InetAddress>(); 
 			f.fakeA.put("puppy", InetAddress.getByName("1.2.3.4"));
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -282,7 +279,6 @@ public class FindSipServerTest extends TestCase {
 			f.fakeA.put("puppy", InetAddress.getByName("1.2.3.4"));
 			f.fakeA.put("dog", InetAddress.getByName("1.2.3.5"));
 		} catch (Throwable e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -347,7 +343,6 @@ public class FindSipServerTest extends TestCase {
 			f.fakeSrv.put("_sip._tcp.dog", recsDog);
 			f.fakeSrv.put("_sips._tcp.dog", recsDog);
 		} catch (Throwable e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -427,7 +422,6 @@ public class FindSipServerTest extends TestCase {
 			f.fakeSrv.put("_sip._tcp.naptr.", recsNap);
 			f.fakeSrv.put("_sips._tcp.naptr.", recsNap);
 		} catch (Throwable e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

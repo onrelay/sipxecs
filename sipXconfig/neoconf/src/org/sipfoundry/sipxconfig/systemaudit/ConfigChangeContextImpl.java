@@ -32,7 +32,6 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.search.SearchableService;
 import org.sipfoundry.sipxconfig.setting.Group;
-import org.springframework.beans.factory.annotation.Required;
 
 public class ConfigChangeContextImpl implements ConfigChangeContext {
 
@@ -155,17 +154,17 @@ public class ConfigChangeContextImpl implements ConfigChangeContext {
         }
     }
 
-    @Required
+    
     public void setSearchableService(SearchableService searchableService) {
         m_searchableService = searchableService;
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setConfigChangeLoader(ConfigChangeLoader configChangeLoader) {
         m_configChangeLoader = configChangeLoader;
     }

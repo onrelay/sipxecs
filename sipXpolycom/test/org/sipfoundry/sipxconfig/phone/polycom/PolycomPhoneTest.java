@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.phone.polycom;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.EasyMock.replay;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

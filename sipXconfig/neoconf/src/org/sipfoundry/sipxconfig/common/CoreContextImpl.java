@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.Query;
@@ -50,13 +50,12 @@ import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setting.SettingDao;
 import org.sipfoundry.sipxconfig.setup.SetupListener;
 import org.sipfoundry.sipxconfig.setup.SetupManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate5.HibernateCallback;
 
 public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> implements CoreContext,
        ApplicationContextAware, SetupListener {
@@ -305,7 +304,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             // no users to delete => nothing to do
             return;
         }
-        List users = new ArrayList(userNames.size());
+        List<User> users = new ArrayList<>(userNames.size());
         for (String userName : userNames) {
             User user = loadUserByUserName(userName);
             users.add(user);
@@ -332,14 +331,14 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     private User loadUserByUniqueProperty(String propName, String propValue) {
         final Criterion expression = Restrictions.eq(propName, propValue);
 
-        HibernateCallback callback = new HibernateCallback() {
+        HibernateCallback<Object> callback = new HibernateCallback<>() {
             @Override
             public Object doInHibernate(Session session) {
                 Criteria criteria = session.createCriteria(User.class).add(expression);
                 return criteria.list();
             }
         };
-        List users = getHibernateTemplate().executeFind(callback);
+        List<User> users = (List<User>)getHibernateTemplate().execute(callback);
         User user = (User) DaoUtils.requireOneOrZero(users, expression.toString());
 
         return user;
@@ -396,7 +395,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public List<User> loadUserByAdmin() {
-        return getHibernateTemplate().findByNamedQuery(USER_ADMIN);
+        return (List<User>)getHibernateTemplate().findByNamedQuery(USER_ADMIN);
     }
 
     /**
@@ -415,7 +414,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public Collection<User> getUsersForBranch(Branch branch) {
-        Collection<User> users = getHibernateTemplate().findByNamedQueryAndNamedParam("usersForBranch", "branch",
+        Collection<User> users = (Collection<User>)getHibernateTemplate().findByNamedQueryAndNamedParam("usersForBranch", "branch",
                 branch);
         return users;
     }
@@ -519,8 +518,8 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     private User loadUserByNamedQueryAndNamedParam(String queryName, String paramName, Object value) {
-        Collection usersColl = getHibernateTemplate().findByNamedQueryAndNamedParam(queryName, paramName, value);
-        Set users = new HashSet(usersColl); // eliminate duplicates
+        List<User> usersColl = (List<User>)getHibernateTemplate().findByNamedQueryAndNamedParam(queryName, paramName, value);
+        Set<User> users = new HashSet<>(usersColl); // eliminate duplicates
         if (users.size() > 1) {
             throw new IllegalStateException("The database has more than one user matching the query " + queryName
                     + ", paramName = " + paramName + ", value = " + value);
@@ -539,14 +538,14 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
      */
     @Override
     public List<User> loadUserByTemplateUser(final User userTemplate) {
-        HibernateCallback callback = new HibernateCallback() {
+        HibernateCallback<Object> callback = new HibernateCallback<>() {
             @Override
             public Object doInHibernate(Session session) {
                 UserLoader loader = new UserLoader(session);
                 return loader.loadUsers(userTemplate);
             }
         };
-        List<User> users = getHibernateTemplate().executeFind(callback);
+        List<User> users = (List<User>)getHibernateTemplate().execute(callback);
         return users;
     }
 
@@ -575,7 +574,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     public int getUsersInGroupWithSearchCount(final Integer groupId, final String searchString) {
         int numUsers = 0;
         if (!StringUtils.isEmpty(searchString)) {
-            HibernateCallback callback = new HibernateCallback() {
+            HibernateCallback<Object> callback = new HibernateCallback<>() {
                 @Override
                 public Object doInHibernate(Session session) {
                     UserLoader loader = new UserLoader(session);
@@ -592,9 +591,9 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public List<User> getSharedUsers() {
-        Collection sharedUsers = getHibernateTemplate().findByNamedQueryAndNamedParam("sharedUsers", "isShared",
+        List<User> sharedUsers = (List<User>)getHibernateTemplate().findByNamedQueryAndNamedParam("sharedUsers", "isShared",
                 true);
-        return new ArrayList<User>(sharedUsers);
+        return sharedUsers;
     }
 
     @Override
@@ -604,7 +603,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
                 || StringUtils.equals(search, LDAP)) {
             return loadUsersByUserProfileAndPage(search, firstRow, pageSize);
         }
-        HibernateCallback callback = new HibernateCallback() {
+        HibernateCallback<Object> callback = new HibernateCallback<>() {
             @Override
             public Object doInHibernate(Session session) {
                 if (StringUtils.equals(search, PHANTOM)) {
@@ -619,7 +618,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
                         .loadUsersByPage(search, groupId, branchId, firstRow, pageSize, orderBy, orderAscending);
             }
         };
-        List<User> users = getHibernateTemplate().executeFind(callback);
+        List<User> users = (List<User>)getHibernateTemplate().execute(callback);
         return users;
     }
 
@@ -664,10 +663,9 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public void clear() {
-        Collection c = getHibernateTemplate().find(QUERY_USER);
+        List<Object> c = (List<Object>)getHibernateTemplate().find(QUERY_USER);
         getHibernateTemplate().deleteAll(c);
     }
-
     /**
      * Create a superadmin user with an empty pin. This is used to recover from the loss of all
      * users from the database.
@@ -792,8 +790,8 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
-    public Collection<User> getGroupMembers(Group group) {
-        Collection<User> users = getHibernateTemplate().findByNamedQueryAndNamedParam("userGroupMembers",
+    public List<User> getGroupMembers(Group group) {
+        List<User> users = (List<User>)getHibernateTemplate().findByNamedQueryAndNamedParam("userGroupMembers",
                 QUERY_PARAM_GROUP_ID, group.getId());
         return users;
     }
@@ -824,26 +822,28 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
-    public Collection<String> getGroupMembersNames(Group group) {
-        Collection<String> userNames = getHibernateTemplate().findByNamedQueryAndNamedParam("userNamesGroupMembers",
+    public List<String> getGroupMembersNames(Group group) {
+        List<String> userNames = (List<String>)getHibernateTemplate().findByNamedQueryAndNamedParam("userNamesGroupMembers",
                 QUERY_PARAM_GROUP_ID, group.getId());
         return userNames;
     }
 
     @Override
     public int getGroupMembersCount(int groupId) {
-        return m_jdbcTemplate.queryForInt(
+        return m_jdbcTemplate.queryForObject(
                 "select count(users.user_id) from users join user_group on user_group.user_id=users.user_id "
-                + "where user_group.group_id=" + groupId);
+                + "where user_group.group_id=" + groupId,
+                Integer.class);
     }
 
     @Override
     public int getBranchMembersCount(int branchId) {
-        return m_jdbcTemplate.queryForInt(
+        return m_jdbcTemplate.queryForObject(
                 "select count (users.user_id) from users left outer join "
                 + "user_group on users.user_id=user_group.user_id "
                 + " left outer join group_storage on user_group.group_id=group_storage.group_id "
-                + " where group_storage.branch_id=" + branchId + " or users.branch_id=" + branchId);
+                + " where group_storage.branch_id=" + branchId + " or users.branch_id=" + branchId,
+                Integer.class );
     }
 
     @Override
@@ -905,7 +905,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
-    public Collection getBeanIdsOfObjectsWithAlias(String alias) {
+    public Collection<BeanId> getBeanIdsOfObjectsWithAlias(String alias) {
         Query q = getHibernateTemplate().getSessionFactory().getCurrentSession()
         .createSQLQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS).addScalar(USER_ID, Hibernate.INTEGER);
         q.setString(ALIAS, alias);
@@ -918,7 +918,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
                 ids.add(userId);
             }
         }
-        Collection bids = BeanId.createBeanIdCollection(ids, User.class);
+        Collection<BeanId> bids = BeanId.createBeanIdCollection(ids, User.class);
         return bids;
     }
 
@@ -942,14 +942,14 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public List<User> getGroupSupervisors(Group group) {
-        List<User> objs = getHibernateTemplate().findByNamedQueryAndNamedParam("groupSupervisors",
+        List<User> objs = (List<User>)getHibernateTemplate().findByNamedQueryAndNamedParam("groupSupervisors",
                 QUERY_PARAM_GROUP_ID, group.getId());
         return objs;
     }
 
     @Override
     public List<User> getUsersThatISupervise(User supervisor) {
-        List<User> objs = getHibernateTemplate().findByNamedQueryAndNamedParam("usersThatISupervise",
+        List<User> objs = (List<User>)getHibernateTemplate().findByNamedQueryAndNamedParam("usersThatISupervise",
                 "supervisorId", supervisor.getId());
         return objs;
     }
@@ -993,7 +993,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public User getSpecialUser(SpecialUserType specialUserType) {
-        List<SpecialUser> specialUsersOfType = getHibernateTemplate().findByNamedQueryAndNamedParam(
+        List<SpecialUser> specialUsersOfType = (List<SpecialUser>)getHibernateTemplate().findByNamedQueryAndNamedParam(
                 SPECIAL_USER_BY_TYPE, SPECIAL_USER_TYPE, specialUserType.name());
         SpecialUser specialUser = DataAccessUtils.singleResult(specialUsersOfType);
         if (specialUser == null) {
@@ -1051,7 +1051,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public SpecialUser getSpecialUserAsSpecialUser(SpecialUserType specialUserType) {
-        List<SpecialUser> specialUsersOfType = getHibernateTemplate().findByNamedQueryAndNamedParam(
+        List<SpecialUser> specialUsersOfType = (List<SpecialUser>)getHibernateTemplate().findByNamedQueryAndNamedParam(
                 SPECIAL_USER_BY_TYPE, SPECIAL_USER_TYPE, specialUserType.name());
         SpecialUser specialUser = DataAccessUtils.singleResult(specialUsersOfType);
         if (specialUser == null) {
@@ -1117,7 +1117,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
         m_jdbcTemplate = jdbcTemplate;
     }
 
-    @Required    
+        
     public void setDidService(DidService didService) {
         m_didService = didService;
     }

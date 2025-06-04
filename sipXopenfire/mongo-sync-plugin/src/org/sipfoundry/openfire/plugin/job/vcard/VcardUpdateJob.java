@@ -35,8 +35,6 @@ import org.jivesoftware.openfire.vcard.VCardManager;
 import org.sipfoundry.openfire.sync.job.Job;
 import org.xmpp.packet.Presence;
 
-import com.mongodb.DBObject;
-
 public class VcardUpdateJob implements Job {
     private static Logger logger = Logger.getLogger(VcardUpdateJob.class);
     /**
@@ -45,7 +43,7 @@ public class VcardUpdateJob implements Job {
     private static final long serialVersionUID = 1L;
     protected final String userImName;
 
-    public VcardUpdateJob(String userImName, DBObject dbObj) {
+    public VcardUpdateJob(String userImName, org.bson.Document dbObj) {
         this.userImName = userImName;
     }
 

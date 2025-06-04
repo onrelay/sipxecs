@@ -23,9 +23,10 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.easymock.classextension.EasyMock;
-import org.restlet.data.Request;
-import org.restlet.resource.Representation;
+import org.easymock.EasyMock;
+import org.restlet.Request;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.permission.PermissionManager;
@@ -76,44 +77,19 @@ public class ActiveGreetingResourceTest extends TestCase {
 
     public void testStoreRepresentation() throws Exception {
         Request request = new Request();
-        Map<String, Object> attributes = new HashMap<String, Object>();
+        Map<String, Object> attributes = new HashMap<>();
         attributes.put("user", "200");
         attributes.put("greeting", "extendedabsence");
         request.setAttributes(attributes);
         m_resource.setRequest(request);
         m_resource.init(null, request, null);
 
-        Representation representation = new Representation() {
-            @Override
-            public void write(Writer arg0) throws IOException {
-            }
-
-            @Override
-            public void write(WritableByteChannel arg0) throws IOException {
-            }
-
-            @Override
-            public void write(OutputStream arg0) throws IOException {
-            }
-
-            @Override
-            public InputStream getStream() throws IOException {
-                return null;
-            }
-
-            @Override
-            public Reader getReader() throws IOException {
-                return null;
-            }
-
-            @Override
-            public ReadableByteChannel getChannel() throws IOException {
-                return null;
-            }
-        };
+        Representation representation = new StringRepresentation("extendedabsence");
         m_resource.storeRepresentation(representation);
-        assertEquals("extendedabsence", m_coreContext.loadUserByUserName("200").getSettingValue(
-                "voicemail/mailbox/active-greeting"));
+
+        assertEquals("extendedabsence",
+            m_coreContext.loadUserByUserName("200")
+                        .getSettingValue("voicemail/mailbox/active-greeting"));
     }
 
     public void testStoreRepresentationBadValue() throws Exception {
@@ -125,35 +101,8 @@ public class ActiveGreetingResourceTest extends TestCase {
         m_resource.setRequest(request);
         m_resource.init(null, request, null);
 
-        Representation representation = new Representation() {
+        Representation representation = new StringRepresentation(""); // empty body as original implementation returned null streams
 
-            @Override
-            public void write(Writer arg0) throws IOException {
-            }
-
-            @Override
-            public void write(WritableByteChannel arg0) throws IOException {
-            }
-
-            @Override
-            public void write(OutputStream arg0) throws IOException {
-            }
-
-            @Override
-            public InputStream getStream() throws IOException {
-                return null;
-            }
-
-            @Override
-            public Reader getReader() throws IOException {
-                return null;
-            }
-
-            @Override
-            public ReadableByteChannel getChannel() throws IOException {
-                return null;
-            }
-        };
         m_resource.storeRepresentation(representation);
         assertEquals("none", m_coreContext.loadUserByUserName("200").getSettingValue(
                 "voicemail/mailbox/active-greeting"));

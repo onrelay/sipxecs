@@ -39,16 +39,19 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.tapestry.contrib.table.model.common.ReverseComparator;
+import org.apache.commons.collections4.comparators.ReverseComparator;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
+import org.restlet.resource.ServerResource;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.permission.Permission;
@@ -61,11 +64,10 @@ import org.sipfoundry.sipxconfig.rest.RestUtilities.SettingPermissionRestInfo;
 import org.sipfoundry.sipxconfig.rest.RestUtilities.SortInfo;
 import org.sipfoundry.sipxconfig.rest.RestUtilities.UserPermissionRestInfoFull;
 import org.sipfoundry.sipxconfig.rest.RestUtilities.ValidationInfo;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.thoughtworks.xstream.XStream;
 
-public class UsersPermissionsResource extends Resource {
+public class UsersPermissionsResource extends ServerResource {
 
     private static final String ELEMENT_NAME_USERPERMISSIONBUNDLE = "user-permission";
     private static final String ELEMENT_NAME_USERPERMISSION = "user";
@@ -102,17 +104,12 @@ public class UsersPermissionsResource extends Resource {
         m_form = getRequest().getResourceRef().getQueryAsForm();
     }
 
-    @Override
-    public boolean allowDelete() {
-        return false;
-    }
 
     // GET - Retrieve all and single User with Permissions
     // ---------------------------------------------------
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        IntParameterInfo parameterInfo;
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        IntParameterInfo parameterInfo;
         User user;
         UserPermissionRestInfoFull userPermissionRestInfo;
 
@@ -200,8 +197,8 @@ public class UsersPermissionsResource extends Resource {
     // PUT - Update Permissions
     // ------------------------
 
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         IntParameterInfo parameterInfo;
 
         // get from request body
@@ -215,7 +212,7 @@ public class UsersPermissionsResource extends Resource {
         if (!validationInfo.getValid()) {
             RestUtilities.setResponseError(getResponse(), validationInfo.getResponseCode(), validationInfo
                     .getMessage());
-            return;
+            return null;
         }
 
         // if have id then update single item
@@ -223,7 +220,7 @@ public class UsersPermissionsResource extends Resource {
         if (parameterInfo.getExists()) {
             if (!parameterInfo.getValid()) {
                 RestUtilities.setResponseError(getResponse(), ERROR_ID_INVALID, parameterInfo.getValueString());
-                return;
+                return null;
             }
 
             // copy values over to existing item
@@ -231,7 +228,7 @@ public class UsersPermissionsResource extends Resource {
                 user = m_coreContext.getUser(parameterInfo.getValue());
                 if (user == null) {
                     RestUtilities.setResponseError(getResponse(), ERROR_OBJECT_NOT_FOUND, parameterInfo.getValue());
-                    return;
+                    return null;
                 }
 
                 updateUserPermission(user, userPermissionRestInfo);
@@ -239,15 +236,16 @@ public class UsersPermissionsResource extends Resource {
             } catch (Exception exception) {
                 RestUtilities.setResponseError(getResponse(), ERROR_UPDATE_FAILED, parameterInfo.getValue(),
                         exception.getLocalizedMessage());
-                return;
+                return null;
             }
 
             RestUtilities.setResponse(getResponse(), SUCCESS_UPDATED, user.getId());
-            return;
+            return null;
         }
 
         // otherwise error, since no creation of new permissions
         RestUtilities.setResponseError(getResponse(), ERROR_MISSING_ID);
+        return null;
     }
 
     // Helper functions
@@ -326,7 +324,6 @@ public class UsersPermissionsResource extends Resource {
         return metadata;
     }
 
-    @SuppressWarnings("unchecked")
     private void sortUsers(List<User> users) {
         // sort if requested
         SortInfo sortInfo = RestUtilities.calculateSorting(m_form);
@@ -343,7 +340,7 @@ public class UsersPermissionsResource extends Resource {
             if (sortForward) {
                 Collections.sort(users, new LastNameComparator());
             } else {
-                Collections.sort(users, new ReverseComparator(new LastNameComparator()));
+                Collections.sort(users, new ReverseComparator<User>(new LastNameComparator()));
             }
             break;
 
@@ -351,7 +348,7 @@ public class UsersPermissionsResource extends Resource {
             if (sortForward) {
                 Collections.sort(users, new FirstNameComparator());
             } else {
-                Collections.sort(users, new ReverseComparator(new FirstNameComparator()));
+                Collections.sort(users, new ReverseComparator<User>(new FirstNameComparator()));
             }
             break;
 
@@ -461,12 +458,12 @@ public class UsersPermissionsResource extends Resource {
     // Injected objects
     // ----------------
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setPermissionManager(PermissionManager permissionManager) {
         m_permissionManager = permissionManager;
     }

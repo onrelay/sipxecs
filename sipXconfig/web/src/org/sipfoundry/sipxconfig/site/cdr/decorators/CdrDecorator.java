@@ -13,7 +13,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Locale;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hivemind.Messages;
 import org.sipfoundry.sipxconfig.cdr.Cdr;
 import org.sipfoundry.sipxconfig.components.MillisDurationFormat;
@@ -86,7 +86,7 @@ public class CdrDecorator implements Serializable {
         format.setMaxField(1);
         format.setShowZero(true);
         format.setSeparator(":");
-        return format.format(new Long(m_cdr.getDuration()));
+        return format.format(Long.valueOf(m_cdr.getDuration()));
     }
 
     public String getCallDirection() {

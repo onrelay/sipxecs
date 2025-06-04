@@ -75,11 +75,10 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class MongoManagerImpl implements AddressProvider, FeatureProvider, MongoManager, ProcessProvider,
-        SetupListener, FirewallProvider, AlarmProvider, BeanFactoryAware, FeatureListener, DaoEventListenerAdvanced {
+        SetupListener, FirewallProvider, AlarmProvider, BeanFactoryAware, DaoEventListenerAdvanced {
     private static final Log LOG = LogFactory.getLog(MongoManagerImpl.class);
     private BeanWithSettingsDao<MongoSettings> m_settingsDao;
     private ConfigManager m_configManager;
@@ -424,7 +423,7 @@ public class MongoManagerImpl implements AddressProvider, FeatureProvider, Mongo
     void checkRegionForRegionalDatabase(Region r) {
         String sql = "select count(*) from feature_local f, location l where "
                 + "l.region_id = ? and l.location_id = f.location_id and f.feature_id in (?,?)";
-        int nLocalDbs = m_configJdbcTemplate.queryForInt(sql, r.getId(), LOCAL_FEATURE.getId(),
+        int nLocalDbs = m_configJdbcTemplate.queryForObject(sql, Integer.class, r.getId(), LOCAL_FEATURE.getId(),
                 LOCAL_ARBITER_FEATURE.getId());
         if (nLocalDbs > 0) {
             throw new UserException("&error.localDbsWithRegion");
@@ -433,7 +432,7 @@ public class MongoManagerImpl implements AddressProvider, FeatureProvider, Mongo
 
     void checkLocationForRegionalDatabase(Location l) {
         String sql = "select count(*) from feature_local f where " + "f.location_id = ? and f.feature_id in (?,?)";
-        int nLocalDbs = m_configJdbcTemplate.queryForInt(sql, l.getId(), LOCAL_FEATURE.getId(),
+        int nLocalDbs = m_configJdbcTemplate.queryForObject(sql, Integer.class, l.getId(), LOCAL_FEATURE.getId(),
                 LOCAL_ARBITER_FEATURE.getId());
         if (nLocalDbs > 0) {
             throw new UserException("&error.localDbsWithLocation");
@@ -575,17 +574,17 @@ public class MongoManagerImpl implements AddressProvider, FeatureProvider, Mongo
         return m_globalManager;
     }
 
-    @Required
+    
     public void setDidService(DidService didService) {
         m_didService = didService;
     }    
     
-    @Required
+    
     public void setDidPoolService(DidPoolService didPoolService) {
         m_didPoolService = didPoolService;
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }

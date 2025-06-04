@@ -46,7 +46,7 @@ public class BridgeSbcStatisticsTest {
         m_sbc.setModelFilesContext(modelFilesContext);
         m_sbc.setSettingValue("bridge-configuration/xml-rpc-port", "8888");
 
-        Integer callCountResult = new Integer(10);
+        Integer callCountResult = Integer.valueOf(10);
 
         Map<String, String> registrationMap = new HashMap<String, String>();
         registrationMap.put("47.123.2.34", "INIT");

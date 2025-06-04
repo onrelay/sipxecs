@@ -24,7 +24,6 @@ import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchSettings;
 import org.sipfoundry.sipxconfig.ivr.Ivr;
-import org.springframework.beans.factory.annotation.Required;
 
 public class VarsConfiguration extends AbstractFreeswitchConfiguration {
     private FeatureManager m_featureManager;
@@ -54,12 +53,12 @@ public class VarsConfiguration extends AbstractFreeswitchConfiguration {
         return "vars.xml";
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }
 
-    @Required
+    
     public FeatureManager getFeatureManager() {
         return m_featureManager;
     }

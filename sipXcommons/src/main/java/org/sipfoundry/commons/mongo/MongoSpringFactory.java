@@ -16,53 +16,62 @@
  */
 package org.sipfoundry.commons.mongo;
 
-import java.io.File;
-import java.net.UnknownHostException;
 
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.dao.support.PersistenceExceptionTranslator;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
-import com.mongodb.DB;
-import com.mongodb.Mongo;
-import com.mongodb.MongoException;
-import com.mongodb.MongoURI;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.ClientSession;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.ClientSessionOptions;
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
 
 /**
  * Creates a Mongo instance from a properties file for spring based projects
  * 
  */
-public class MongoSpringFactory implements MongoDbFactory {
-    private SimpleMongoDbFactory m_delegate;
+public class MongoSpringFactory implements MongoDatabaseFactory {
+    private SimpleMongoClientDatabaseFactory m_delegate;
     private String m_configFile;
     private String m_connectionUrl;
 
     @Override
-    public DB getDb() throws DataAccessException {
-        return getDelegate().getDb();
+    public MongoDatabase getMongoDatabase() throws DataAccessException {
+        return getDelegate().getMongoDatabase();
     }
 
     @Override
-    public DB getDb(String name) throws DataAccessException {        
-        return getDelegate().getDb(name);
+    public MongoDatabase getMongoDatabase(String name) throws DataAccessException {        
+        return getDelegate().getMongoDatabase(name);
     }
     
-    private MongoDbFactory getDelegate() {
-        if (m_delegate == null) {
-            if (m_connectionUrl == null) {
-                m_connectionUrl = MongoFactory.readConfig(m_configFile);
-            }
-            MongoURI uri = new MongoURI(m_connectionUrl);        
-            try {
-                m_delegate = new SimpleMongoDbFactory(new Mongo(uri), "notused");
-            } catch (MongoException e) {
-                throw new MongoConfigException(e);
-            } catch (UnknownHostException e) {
-                throw new MongoConfigException(e);
-            }            
+private MongoDatabaseFactory getDelegate() {
+
+    if (m_delegate == null) {
+
+        if (m_connectionUrl == null) {
+            m_connectionUrl = MongoFactory.readConfig(m_configFile);
         }
-        return m_delegate;
+        
+        try {
+            ConnectionString connectionString = new ConnectionString(m_connectionUrl);
+            MongoClientSettings settings = MongoClientSettings.builder()
+                    .applyConnectionString(connectionString)
+                    .build();
+            MongoClient mongoClient = MongoClients.create(settings);
+
+            m_delegate = new SimpleMongoClientDatabaseFactory(mongoClient, "notused");
+        } catch (Exception e) {
+            throw new MongoConfigException(e);
+        }
     }
+
+    return m_delegate;
+}
     
     static class MongoConfigException extends DataAccessException {
         public MongoConfigException(Throwable cause) {
@@ -76,5 +85,20 @@ public class MongoSpringFactory implements MongoDbFactory {
 
     public void setConfigFile(String configFile) {
         m_configFile = configFile;
+    }
+
+    @Override
+    public PersistenceExceptionTranslator getExceptionTranslator() {
+        throw new UnsupportedOperationException("Unimplemented method 'getExceptionTranslator'");
+    }
+
+    @Override
+    public ClientSession getSession(ClientSessionOptions options) {
+        throw new UnsupportedOperationException("Unimplemented method 'getSession'");
+    }
+
+    @Override
+    public MongoDatabaseFactory withSession(ClientSession session) {
+        throw new UnsupportedOperationException("Unimplemented method 'withSession'");
     }
 }

@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.phone.ciscoplus;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.sipfoundry.sipxconfig.registrar.RegistrationContext;
 import org.sipfoundry.sipxconfig.commserver.imdb.RegistrationItem;
 import org.sipfoundry.sipxconfig.device.RestartException;

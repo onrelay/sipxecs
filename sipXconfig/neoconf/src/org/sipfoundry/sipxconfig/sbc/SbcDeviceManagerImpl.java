@@ -23,9 +23,8 @@ import org.sipfoundry.sipxconfig.logging.AuditLogContext;
 import org.sipfoundry.sipxconfig.logging.AuditLogContext.CONFIG_CHANGE_TYPE;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate5.HibernateCallback;
 
 public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> implements SbcDeviceManager,
         BeanFactoryAware {
@@ -36,12 +35,12 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     private SbcDescriptor m_sipXbridgeSbcModel;
     private AuditLogContext m_auditLogContext;
 
-    @Required
+    
     public void setAuditLogContext(AuditLogContext auditLogContext) {
         m_auditLogContext = auditLogContext;
     }
 
-    @Required
+    
     public void setSipXbridgeSbcModel(SbcDescriptor sipXbridgeSbcModel) {
         m_sipXbridgeSbcModel = sipXbridgeSbcModel;
     }
@@ -75,7 +74,7 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     }
 
     public Collection<Integer> getAllSbcDeviceIds() {
-        return getHibernateTemplate().findByNamedQuery("sbcIds");
+        return (Collection<Integer>)getHibernateTemplate().findByNamedQuery("sbcIds");
     }
 
     public SbcDevice getSbcDevice(Integer id) {
@@ -98,13 +97,13 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     }
 
     private <T> List<T> getSbcDeviceByType(final Class<T> type) {
-        HibernateCallback callback = new HibernateCallback() {
+        HibernateCallback<Object> callback = new HibernateCallback<>() {
             public Object doInHibernate(Session session) {
                 Criteria criteria = session.createCriteria(type);
                 return criteria.list();
             }
         };
-        return getHibernateTemplate().executeFind(callback);
+        return (List<T>)getHibernateTemplate().execute(callback);
     }
 
     private List<SbcDevice> getSbcDevicesByDescriptor(SbcDescriptor descriptor) {
@@ -137,7 +136,7 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     public boolean maxAllowedLimitReached(SbcDescriptor model) {
         String type = model.getBeanId();
         int limit = model.getMaxAllowed();
-        List count = getHibernateTemplate().findByNamedQueryAndNamedParam("countSbcsByType", "sbcBeanId", type);
+        List<Object> count = (List<Object>)getHibernateTemplate().findByNamedQueryAndNamedParam("countSbcsByType", "sbcBeanId", type);
         int sbcNumber = DataAccessUtils.intResult(count);
         return limit != -1 && sbcNumber >= limit;
     }
@@ -200,7 +199,7 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     }
 
     private boolean isNameInUse(SbcDevice sbc) {
-        List count = getHibernateTemplate().findByNamedQueryAndNamedParam("anotherSbcWithSameName", new String[] {
+        List<Object> count = (List<Object>)getHibernateTemplate().findByNamedQueryAndNamedParam("anotherSbcWithSameName", new String[] {
             SBC_NAME
         }, new Object[] {
             sbc.getName()
@@ -210,7 +209,7 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     }
 
     private boolean isNameChanged(SbcDevice sbc) {
-        List count = getHibernateTemplate().findByNamedQueryAndNamedParam("countSbcWithSameName", new String[] {
+        List<Object> count = (List<Object>)getHibernateTemplate().findByNamedQueryAndNamedParam("countSbcWithSameName", new String[] {
             SBC_ID, SBC_NAME
         }, new Object[] {
             sbc.getId(), sbc.getName()
@@ -224,6 +223,6 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     }
 
     public List<Sbc> getSbcsForSbcDeviceId(Integer sbcDeviceId) {
-        return getHibernateTemplate().findByNamedQueryAndNamedParam("sbcsForSbcDeviceId", SBC_ID, sbcDeviceId);
+        return (List<Sbc>)getHibernateTemplate().findByNamedQueryAndNamedParam("sbcsForSbcDeviceId", SBC_ID, sbcDeviceId);
     }
 }

@@ -55,12 +55,14 @@ import org.sipfoundry.sipxconfig.snmp.SnmpManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 
 public class RegistrarImpl implements FeatureProvider, AddressProvider, BeanFactoryAware, Registrar,
         DnsProvider, ProcessProvider, FirewallProvider, SetupListener {
@@ -216,20 +218,22 @@ public class RegistrarImpl implements FeatureProvider, AddressProvider, BeanFact
             // XX-10812 - After 4.6 update 8, all registrations and subscriptions
             // require shardId attribute.  Migrate here.
             String shardId = "shardId";
-            DBObject noShardId = new BasicDBObject();
-            noShardId.put(shardId, new BasicDBObject("$exists", false));
-            DBObject defaultShard = new BasicDBObject("$set", new BasicDBObject(shardId, 0));
-            DBCollection regs = m_nodeDb.getCollection("registrar");
-            regs.update(noShardId, defaultShard);
-            DBCollection subs = m_nodeDb.getCollection("subscription");
-            subs.update(noShardId, defaultShard);
+            Bson noShardId = Filters.exists(shardId, false);
+            Bson defaultShard = Updates.set(shardId, 0);
+
+            MongoCollection<Document> regs = m_nodeDb.getCollection("registrar");
+            regs.updateMany(noShardId, defaultShard);
+
+            MongoCollection<Document> subs = m_nodeDb.getCollection("subscription");
+            subs.updateMany(noShardId, defaultShard);
+
             manager.setTrue(id);
         }
 
         return true;
     }
 
-    @Required
+    
     public void setNodeDb(MongoTemplate nodeDb) {
         m_nodeDb = nodeDb;
     }

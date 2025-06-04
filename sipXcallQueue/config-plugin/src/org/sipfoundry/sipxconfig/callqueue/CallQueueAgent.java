@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.callqueue;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.cfgmgt.DeployConfigOnEdit;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.sipfoundry.sipxconfig.feature.Feature;
@@ -22,7 +22,6 @@ import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingEntry;
 import org.sipfoundry.sipxconfig.setting.ValueStorage;
 import org.sipfoundry.sipxconfig.systemaudit.SystemAuditable;
-import org.springframework.beans.factory.annotation.Required;
 
 public class CallQueueAgent extends BeanWithSettings implements DeployConfigOnEdit, SystemAuditable {
 
@@ -68,12 +67,12 @@ public class CallQueueAgent extends BeanWithSettings implements DeployConfigOnEd
         m_description = description;
     }
 
-    @Required
+    
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }
 
-    @Required
+    
     public void setCallQueueContext(CallQueueContext callqueuecontext) {
         m_callQueueContext = callqueuecontext;
     }

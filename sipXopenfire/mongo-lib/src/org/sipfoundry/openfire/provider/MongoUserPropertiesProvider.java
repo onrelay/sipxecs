@@ -21,32 +21,30 @@ import java.util.Map;
 
 import org.jivesoftware.openfire.provider.UserPropertiesProvider;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Filters;
 
 public class MongoUserPropertiesProvider extends BaseMongoProvider implements UserPropertiesProvider {
     private static final String COLLECTION_NAME = "ofUserProp";
 
     public MongoUserPropertiesProvider() {
         setDefaultCollectionName(COLLECTION_NAME);
-        DBCollection usrPropsCollection = getDefaultCollection();
-        DBObject index = new BasicDBObject();
+        MongoCollection<Document> usrPropsCollection = getDefaultCollection();
 
-        index.put("username", 1);
-        index.put("name", 1);
-        usrPropsCollection.ensureIndex(index);
+        usrPropsCollection.createIndex(Indexes.ascending("username", "name"));
     }
 
     @Override
     public Map<String, String> loadProperties(String username) {
         Map<String, String> props = new HashMap<String, String>();
-        DBCollection usrPropsCollection = getDefaultCollection();
-        DBObject query = new BasicDBObject();
+        MongoCollection<Document> usrPropsCollection = getDefaultCollection();
+        Document query = new Document();
 
         query.put("username", username);
 
-        for (DBObject usrPropObj : usrPropsCollection.find(query)) {
+        for (Document usrPropObj : usrPropsCollection.find(query)) {
             String propName = (String) usrPropObj.get("name");
             String propValue = (String) usrPropObj.get("propValue");
 
@@ -63,8 +61,8 @@ public class MongoUserPropertiesProvider extends BaseMongoProvider implements Us
 
     @Override
     public String getPropertyValue(String username, String propName) {
-        DBCollection usrPropsCollection = getDefaultCollection();
-        DBObject usrPropObj = getPropObject(usrPropsCollection, username, propName);
+        MongoCollection<Document> usrPropsCollection = getDefaultCollection();
+        Document usrPropObj = getPropObject(usrPropsCollection, username, propName);
         String propValue = null;
 
         if (usrPropObj != null) {
@@ -91,13 +89,12 @@ public class MongoUserPropertiesProvider extends BaseMongoProvider implements Us
         // nothing to do
     }
 
-    private static DBObject getPropObject(DBCollection usrPropsCollection, String username, String propName) {
-        DBObject query = new BasicDBObject();
-
-        query.put("username", username);
-        query.put("name", propName);
-
-        DBObject usrPropObj = usrPropsCollection.findOne(query);
-        return usrPropObj;
+    private static Document getPropObject(MongoCollection<Document> usrPropsCollection, String username, String propName) {
+        return usrPropsCollection.find(
+            Filters.and(
+                Filters.eq("username", username),
+                Filters.eq("name", propName)
+            )
+        ).first();
     }
 }

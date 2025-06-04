@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.site.vm;
 
-import static org.apache.commons.lang.StringUtils.contains;
+import static org.apache.commons.lang3.StringUtils.contains;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tapestry.IAsset;

@@ -14,7 +14,7 @@
  */
 package org.sipfoundry.sipxconfig.api.impl;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import org.sipfoundry.sipxconfig.api.DnsApi;
 import org.sipfoundry.sipxconfig.dns.DnsManager;

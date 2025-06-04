@@ -2,7 +2,7 @@ package org.sipfoundry.commons.userdb;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.DB;
+import com.mongodb.client.MongoDatabase;
 
 public class ValidUsersSpring extends ValidUsers {    
     private MongoTemplate m_imdbTemplate;
@@ -15,7 +15,7 @@ public class ValidUsersSpring extends ValidUsers {
         m_imdbTemplate = imdbTemplate;
     }
     
-    public DB getImdb() {
+    public MongoDatabase getImdb() {
         return m_imdbTemplate.getDb();
     }
 }

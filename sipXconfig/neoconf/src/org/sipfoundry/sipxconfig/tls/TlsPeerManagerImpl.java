@@ -16,17 +16,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.InternalUser;
 import org.sipfoundry.sipxconfig.common.Replicable;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.permission.PermissionName;
-import org.springframework.beans.factory.annotation.Required;
 
-public class TlsPeerManagerImpl extends SipxHibernateDaoSupport implements TlsPeerManager {
+public class TlsPeerManagerImpl extends SipxHibernateDaoSupport<TlsPeer> implements TlsPeerManager {
 
     private static final String TLS_PEER_NAME = "name";
     private static final String INTERNAL_NAME = "~~tp~%s";
@@ -87,7 +86,7 @@ public class TlsPeerManagerImpl extends SipxHibernateDaoSupport implements TlsPe
     @Override
     public TlsPeer getTlsPeerByName(String name) {
         String query = "tlsPeerByName";
-        Collection<TlsPeer> peers = getHibernateTemplate().findByNamedQueryAndNamedParam(query, TLS_PEER_NAME, name);
+        Collection<TlsPeer> peers = (Collection<TlsPeer>)getHibernateTemplate().findByNamedQueryAndNamedParam(query, TLS_PEER_NAME, name);
         return requireOneOrZero(peers, query);
     }
 
@@ -123,7 +122,7 @@ public class TlsPeerManagerImpl extends SipxHibernateDaoSupport implements TlsPe
         return !getTlsPeer(peer.getId()).getName().equals(peer.getName());
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }

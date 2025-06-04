@@ -16,7 +16,7 @@
  */
 package org.sipfoundry.sipxconfig.site.common;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hivemind.Location;
 import org.apache.hivemind.Resource;
 import org.apache.hivemind.impl.LocationImpl;

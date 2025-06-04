@@ -9,12 +9,11 @@ package org.sipfoundry.sipxconfig.device;
 
 import org.sipfoundry.sipxconfig.setup.SetupListener;
 import org.sipfoundry.sipxconfig.setup.SetupManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class TimeZoneInit implements SetupListener {
     private TimeZoneManager m_timeZoneManager;
 
-    @Required
+    
     public void setTimeZoneManager(TimeZoneManager timeZoneManager) {
         m_timeZoneManager = timeZoneManager;
     }

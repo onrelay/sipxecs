@@ -6,7 +6,6 @@ audiocodes_PKGS = \
 	commons-lang \
 	commons-io \
 	easymock \
-	easymockclassextension \
 	velocity
 
 

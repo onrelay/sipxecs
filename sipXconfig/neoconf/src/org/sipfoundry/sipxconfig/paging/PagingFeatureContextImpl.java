@@ -102,7 +102,7 @@ public class PagingFeatureContextImpl extends SipxHibernateDaoSupport<PagingGrou
         if (entity instanceof User) {
             User user = (User) entity;
             // check if users in any paging group
-            int check = m_jdbc.queryForInt("SELECT count(*) FROM user_paging_group where user_id = ?", user.getId());
+            int check = m_jdbc.queryForObject("SELECT count(*) FROM user_paging_group where user_id = ?", Integer.class, user.getId());
             if (check >= 1) {
                 // cleanup paging group
                 m_jdbc.update("delete from user_paging_group where user_id = ?", user.getId());

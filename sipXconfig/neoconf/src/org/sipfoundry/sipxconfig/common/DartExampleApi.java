@@ -25,21 +25,25 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
-import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
 
-import com.mongodb.util.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.restlet.resource.Get;
+import org.restlet.resource.ResourceException;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
+
 
 /**
  * Example backend API to DartExample.html page. Emits fake data regarding bird report
  */
-class DartExampleApi extends Resource {
+class DartExampleApi extends ServerResource {
     private static final String DAY = "day";
     private static final String SPOTTINGS = "spottings";
     private static Map<String, Object> s_report;
@@ -57,21 +61,18 @@ class DartExampleApi extends Resource {
         getVariants().add(new Variant(APPLICATION_JSON));
     }
 
-    @Override
-    public boolean allowGet() {
-        return true;
-    }
 
-    @Override
-    public boolean allowPost() {
-        return true;
-    }
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {   
+        
+        try {
+            getResponse().setStatus(Status.SUCCESS_OK);
+            String json = new ObjectMapper().writeValueAsString(s_report);        
+            return new StringRepresentation(json);
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        getResponse().setStatus(Status.SUCCESS_OK);
-        String json = JSON.serialize(s_report);
-        return new StringRepresentation(json);
+        } catch( JsonProcessingException ex ) {
+            throw new ResourceException( ex );
+        }
     }
 
     public void acceptRepresentation(Representation entity) throws ResourceException {
@@ -84,34 +85,38 @@ class DartExampleApi extends Resource {
         }
     }
 
-    @SuppressWarnings("unchecked")
     void parseForm(String json) {
-        Map<String, Object> form = (Map<String, Object>) JSON.parse(json);
-        Map<String, String[]> spottings = (Map<String, String[]>) s_report.get(SPOTTINGS);
-        String action = (String) form.get("action");
-        switch (Actions.valueOf(action)) {
-        case DELETE:
-            spottings.remove(form.get(DAY));
-            break;
-        case RESET:
-            reset();
-            break;
-        case ADD:
-            String bird = (String) form.get("bird");
-            String day = (String) form.get(DAY);
-            String[] existing = spottings.get(day);
-            if (existing == null) {
-                spottings.put(day, new String[] {
-                    bird
-                });
-            } else {
-                List<String> add = new ArrayList<String>(Arrays.asList(existing));
-                add.add(bird);
-                spottings.put(day, add.toArray(new String[0]));
+        try {
+            Map<String, Object> form = new ObjectMapper().readValue(json, Map.class);
+            Map<String, String[]> spottings = (Map<String, String[]>) s_report.get(SPOTTINGS);
+            String action = (String) form.get("action");
+            switch (Actions.valueOf(action)) {
+            case DELETE:
+                spottings.remove(form.get(DAY));
+                break;
+            case RESET:
+                reset();
+                break;
+            case ADD:
+                String bird = (String) form.get("bird");
+                String day = (String) form.get(DAY);
+                String[] existing = spottings.get(day);
+                if (existing == null) {
+                    spottings.put(day, new String[] {
+                        bird
+                    });
+                } else {
+                    List<String> add = new ArrayList<String>(Arrays.asList(existing));
+                    add.add(bird);
+                    spottings.put(day, add.toArray(new String[0]));
+                }
+                break;
+        
+            default:
+                throw new RuntimeException("Unhandled action " + action);
             }
-            break;
-        default:
-            throw new RuntimeException("Unhandled action " + action);
+        } catch( IOException ex ) {
+            throw new ResourceException( ex );
         }
     }
 

@@ -31,19 +31,23 @@ import org.codehaus.jackson.map.module.SimpleModule;
 import org.codehaus.jackson.map.ser.std.SerializerBase;
 import org.codehaus.jackson.type.TypeReference;
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Delete;
+import org.restlet.resource.Get;
+import org.restlet.resource.Post;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.commserver.LocationsManager;
 
-public class RegionApi extends Resource {
+public class RegionApi extends ServerResource {
     private static final String ID = "id";
     private RegionManager m_regionManager;
     private LocationsManager m_locationsManager;
@@ -67,25 +71,6 @@ public class RegionApi extends Resource {
         m_jsonMapper.registerModule(module);
     }
 
-    @Override
-    public boolean allowGet() {
-        return true;
-    }
-
-    @Override
-    public boolean allowPost() {
-        return true;
-    }
-
-    @Override
-    public boolean allowPut() {
-        return true;
-    }
-
-    @Override
-    public boolean allowDelete() {
-        return true;
-    }
 
     public void setRegionManager(RegionManager regionManager) {
         m_regionManager = regionManager;
@@ -95,9 +80,8 @@ public class RegionApi extends Resource {
         m_locationsManager = locationsManager;
     }
 
-    // GET : list or specific region
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         getResponse().setStatus(Status.SUCCESS_OK);
         StringWriter json = new StringWriter();
         registerJsonSerilizer();
@@ -150,9 +134,8 @@ public class RegionApi extends Resource {
         }
     }
 
-    // POST
-    @Override
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {        
         String json;
         try {
             json = IOUtils.toString(entity.getStream());
@@ -160,27 +143,27 @@ public class RegionApi extends Resource {
             });
             r.setUniqueId(BeanWithId.UNSAVED_ID);
             m_regionManager.saveRegion(r);
+            return null;
         } catch (IOException e) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage());
         }
     };
 
-    // PUT
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         String json;
         try {
             json = IOUtils.toString(entity.getStream());
             Region r = m_jsonMapper.readValue(json, new TypeReference<Region>() {
             });
             m_regionManager.saveRegion(r);
+            return null;
         } catch (IOException e) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage());
         }
     }
 
-    // DELETE
-    @Override
+    @Delete
     public void removeRepresentations() throws ResourceException {
         Region r = m_regionManager.getRegion(m_regionId);
         m_regionManager.deleteRegion(r);

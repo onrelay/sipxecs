@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.gateway.Gateway;
 import org.sipfoundry.sipxconfig.gateway.acme.AcmeGateway;
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
@@ -34,7 +34,7 @@ public class SpringHibernateInstantiatorTestIntegration
 
     public void testInstantiate() throws Exception {
         init();
-        Integer id = new Integer(5);
+        Integer id = Integer.valueOf(5);
         BeanWithId bean = (BeanWithId) m_instantiator.instantiate(Gateway.class, id);
         assertSame(Gateway.class, bean.getClass());
         assertSame(id, bean.getId());
@@ -44,7 +44,7 @@ public class SpringHibernateInstantiatorTestIntegration
 
     public void testInstantiateSubclass() throws Exception {
         init();
-        Integer id = new Integer(5);
+        Integer id = Integer.valueOf(5);
         BeanWithId bean = (BeanWithId) m_instantiator.instantiate(AcmeGateway.class, id);
         assertSame(AcmeGateway.class, bean.getClass());
         assertSame(id, bean.getId());
@@ -52,7 +52,7 @@ public class SpringHibernateInstantiatorTestIntegration
 
     public void testInstantiateUnknown() throws Exception {
         init();
-        Integer id = new Integer(5);
+        Integer id = Integer.valueOf(5);
         // there is a good chance we will not have StringUtils in beanFactory
         Object bean = m_instantiator.instantiate(StringUtils.class, id);
         assertNull(bean);

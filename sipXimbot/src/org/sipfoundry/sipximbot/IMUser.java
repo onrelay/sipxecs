@@ -17,13 +17,16 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthPolicy;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.ClassicHttpResponse;
+import org.apache.hc.core5.http.HttpEntity;
+
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
@@ -631,44 +634,51 @@ public class IMUser {
             return localize("error");
         }
 
-        private String getUUID(User user) {
+        public String getUUID(User user) {
             String uuid = null;
-            HttpClient httpClient = new HttpClient();
-            List<String> authPrefs = new ArrayList<String>(1);
-            // call ivr API with digest auth policy
-            authPrefs.add(AuthPolicy.DIGEST);
-            httpClient.getParams().setParameter(AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs);
-            Credentials credentials = new UsernamePasswordCredentials(m_user.getUserName(), ImbotConfiguration.getSharedSecret());
-            httpClient.getState().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM),
-                    credentials);
-            GetMethod getUUID = new GetMethod(ImbotConfiguration.get().getVoicemailRootUrl() + "/mailbox/" + m_user.getUserName() + "/uuid");
-            try {
-                   int statusCode = httpClient.executeMethod(getUUID);
-                   if (statusCode != 200) {
-                       throw new Exception("failed to retrieve UUID");
-                   }
-                   InputStream in = getUUID.getResponseBodyAsStream();
-                   DocumentBuilderFactory factory = DocumentBuilderFactory
-                            .newInstance();
-                   DocumentBuilder builder = factory.newDocumentBuilder();
-                   Document doc = builder.parse(in);
-
-                   NodeList matches = doc.getElementsByTagName("uuid");
-
-                   if(matches.getLength() != 0) {
-                       Node match = matches.item(0);
-                       uuid = match.getTextContent().trim();
-                       if(uuid.length() == 0) {
-                           uuid = null;
-                       }
-                   }
-
-
+        
+            try (CloseableHttpClient client = HttpClients.custom()
+                    .setDefaultCredentialsProvider(credsProvider(user))
+                    .build()) {
+        
+                String uri = ImbotConfiguration.get().getVoicemailRootUrl() +
+                             "/mailbox/" + user.getUserName() + "/uuid";
+        
+                HttpGet get = new HttpGet(uri);
+                try (ClassicHttpResponse response = client.executeOpen(null, get, null)) {
+                    int statusCode = response.getCode();
+                    if (statusCode != 200) {
+                        throw new Exception("Failed to retrieve UUID, status: " + statusCode);
+                    }
+        
+                    HttpEntity entity = response.getEntity();
+                    try (InputStream in = entity.getContent()) {
+                        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                        DocumentBuilder builder = factory.newDocumentBuilder();
+                        Document doc = builder.parse(in);
+        
+                        NodeList matches = doc.getElementsByTagName("uuid");
+                        if (matches.getLength() > 0) {
+                            String content = matches.item(0).getTextContent().trim();
+                            uuid = content.isEmpty() ? null : content;
+                        }
+                    }
+                    EntityUtils.consumeQuietly(entity); // ensure connection release
+                }
             } catch (Exception e) {
-                LOG.error("exception in getVoicemailRootUrl " + e.getMessage());
+                LOG.error("Exception in getUUID: " + e.getMessage());
             }
-
+        
             return uuid;
+        }
+        
+        private BasicCredentialsProvider credsProvider(User user) {
+            BasicCredentialsProvider provider = new BasicCredentialsProvider();
+            provider.setCredentials(
+                new AuthScope(null, -1), // any host/port/realm
+                new UsernamePasswordCredentials(user.getUserName(), ImbotConfiguration.getSharedSecret().toCharArray())
+            );
+            return provider;
         }
 
         private String doListen() {

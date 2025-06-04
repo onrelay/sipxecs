@@ -10,21 +10,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
-import java.util.List;
 import java.util.Enumeration;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.jdom.Element;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.jdom.JDOMException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
-public class SipBranchData
-{
+import org.w3c.dom.*;
+
+public class SipBranchData {
     String method;
     String responseCode;
     String responseText;
@@ -33,41 +29,33 @@ public class SipBranchData
     String sourceAddress;
     String destinationAddress;
     String timeStamp;
-    long   timeStampInMicroseconds;
-    int    timeStampThreeDigitAccuracy;
+    long timeStampInMicroseconds;
+    int timeStampThreeDigitAccuracy;
     String timeIndexDisplay;
     String transactionId;
     String frameId;
     String message;
-    Vector branchIds;
+    Vector<String> branchIds;
     String transport;
 
-    // contains JDOM items from the XML file parse operation
+    // contains DOM items from the XML file parse operation
     static Element nodeContainer = null;
-    static Document traceDoc = null;
 
     public SipBranchData(Element xmlBranchNode) {
-        method = xmlBranchNode.getChildText("method");
+        // Extracting values from the XML node
+        method = getChildText(xmlBranchNode, "method");
+        responseCode = getChildText(xmlBranchNode, "responseCode");
+        responseText = getChildText(xmlBranchNode, "responseText");
+        sourceEntity = getChildText(xmlBranchNode, "source");
+        destinationEntity = getChildText(xmlBranchNode, "destination");
+        sourceAddress = getChildText(xmlBranchNode, "sourceAddress");
+        destinationAddress = getChildText(xmlBranchNode, "destinationAddress");
+        timeStamp = getChildText(xmlBranchNode, "time");
 
-        responseCode = xmlBranchNode.getChildText("responseCode");
-
-        responseText = xmlBranchNode.getChildText("responseText");
-
-        sourceEntity = xmlBranchNode.getChildText("source");
-
-        destinationEntity = xmlBranchNode.getChildText("destination");
-
-        sourceAddress = xmlBranchNode.getChildText("sourceAddress");
-
-        destinationAddress = xmlBranchNode.getChildText("destinationAddress");
-
-        timeStamp = xmlBranchNode.getChildText("time");
-
-        // setting DateFormater so that it can correctly parse the source
+        // setting DateFormatter so that it can correctly parse the source
         DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
-        try
-        {
+        try {
             // grabbing the actual time
             Date messageDate = dateFormatter.parse(timeStamp.substring(0, 23));
 
@@ -79,14 +67,13 @@ public class SipBranchData
 
             // this stores the complete 3 digits of microsecond value used
             // later in calculations
-            timeStampThreeDigitAccuracy = Integer.valueOf(timeStamp.substring(23, 26));
-            
+            timeStampThreeDigitAccuracy = Integer.parseInt(timeStamp.substring(23, 26));
+
             // adding the microsecond values to the overall microsecond values
             timeStampInMicroseconds += timeStampThreeDigitAccuracy;
 
-        } catch (ParseException e)
-        {
-            // we'll endup here if the logs are corrupted
+        } catch (ParseException e) {
+            // we'll end up here if the logs are corrupted
             e.printStackTrace();
         }
 
@@ -97,153 +84,113 @@ public class SipBranchData
         // Z letter
         timeIndexDisplay = timeStamp.substring(timeStamp.indexOf('T') + 1, timeStamp.length() - 1);
 
-        transactionId = xmlBranchNode.getChildText("transactionId");
-        int c = transactionId.charAt(0);
-        if (c == 'C' || c == 'A')
-        {
-            transactionId = transactionId.substring(1);
+        transactionId = getChildText(xmlBranchNode, "transactionId");
+        if (!transactionId.isEmpty()) {
+            int c = transactionId.charAt(0);
+            if (c == 'C' || c == 'A') {
+                transactionId = transactionId.substring(1);
+            }
         }
 
-        frameId = xmlBranchNode.getChildText("frameId");
-
-        message = xmlBranchNode.getChildText("message");
+        frameId = getChildText(xmlBranchNode, "frameId");
+        message = getChildText(xmlBranchNode, "message");
 
         // we convert the entire message string to lower case and
         // then look for the "via" tag
         int viaIndex = message.toLowerCase().indexOf("via");
 
         // if we found it then lets see what transport we can find
-        if (viaIndex != -1)
-        {
+        if (viaIndex != -1) {
             // lets get the first 22 characters of the string and convert to
             // lowercase, then we will search for udp, tcp and tls
-            String sub = message.substring(viaIndex + 3, viaIndex + 22).toLowerCase();
-            if (sub.contains("udp"))
-            {
+            String sub = message.substring(viaIndex + 3, Math.min(message.length(), viaIndex + 22)).toLowerCase();
+            if (sub.contains("udp")) {
                 // set transport to udp
                 transport = "udp";
-            }
-            else if (sub.contains("tcp"))
-            {
+            } else if (sub.contains("tcp")) {
                 // set transport to tcp
                 transport = "tcp";
-            }
-            else if (sub.contains("tls"))
-            {
+            } else if (sub.contains("tls")) {
                 // set transport to tls
                 transport = "tls";
-            }
-            else
-            {
+            } else {
                 // we were unable to determine
                 // the transport type
                 transport = "other";
             }
-        }
-        else
-        {
+        } else {
             // no via tag found so lets mark
-            // trasport as other
+            // transport as other
             transport = "other";
         }
 
-        Element branchSet = xmlBranchNode.getChild("branchIdSet");
-        branchIds = new Vector();
-        List elementList = branchSet.getChildren("branchId");
-        Element branchIdNode;
-        int count = elementList.size();
-        for (int i = 0; i < count; i++)
-        {
-            branchIdNode = (Element) elementList.get(i);
-            branchIds.add(branchIdNode.getText());
+        branchIds = new Vector<>();
+        Element branchSet = getChild(xmlBranchNode, "branchIdSet");
+        if (branchSet != null) {
+            NodeList elements = branchSet.getElementsByTagName("branchId");
+            for (int i = 0; i < elements.getLength(); i++) {
+                Node node = elements.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    branchIds.add(node.getTextContent().trim());
+                }
+            }
         }
-
     }
 
     // input is the root container of the input file, it contains individual
     // XML elements that are SIP messages
-    public static Vector getSipBranchDataElements(Element branchContainer)
-    {
-        Vector nodes = new Vector();
+    public static Vector<SipBranchData> getSipBranchDataElements(Element branchContainer) {
+        Vector<SipBranchData> nodes = new Vector<>();
 
         // puts all the <branchNode></branchNode> sections into their own
         // individual element on the list
-        List elementList = branchContainer.getChildren("branchNode");
-        Element xmlNode;
-
-        // list containing all the "branchNode" elements
-        int count = elementList.size();
+        NodeList elementList = branchContainer.getElementsByTagName("branchNode");
 
         // loop through all the elements
-        for (int i = 0; i < count; i++)
-        {
-            // get the JDOM Element object from the data
-            xmlNode = (Element) elementList.get(i);
-
-            // convert the JDOM object to a SipBranchData object
-            // and add it to the vector that will be used as a source
-            // to store ChartDescriptor elements
-            nodes.add(new SipBranchData(xmlNode));
+        for (int i = 0; i < elementList.getLength(); i++) {
+            Node node = elementList.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                // convert the DOM object to a SipBranchData object
+                // and add it to the vector that will be used as a source
+                // to store ChartDescriptor elements
+                nodes.add(new SipBranchData((Element) node));
+            }
         }
 
-        return (nodes);
+        return nodes;
     }
 
     // parses the input file and stores SIP data elements in a Vector
-    // which is later processes to reorder the SIP messages (in case
+    // which is later processed to reorder the SIP messages (in case
     // they are not in the proper chronological sequence), then each
-    // vector element in added to SIP Model
-    // Note: This is an overloaded method so don't get confused when
-    // its called again with the container object as the input
-    public static Vector getSipBranchDataElements(URL traceFilename)
-    {
-        // JDOM structure
-        SAXBuilder builder = new SAXBuilder();
-        System.out.println("reading: " + traceFilename);
-        Vector nodes = null;
-
-        try
-        {
+    // vector element is added to SIP Model
+    public static Vector<SipBranchData> getSipBranchDataElements(URL traceFilename) {
+        try {
             // open the file and create an input stream
             URLConnection uc = traceFilename.openConnection();
-            InputStreamReader input = new InputStreamReader(uc.getInputStream());
+            InputStream input = uc.getInputStream();
 
-            // feed the stream through the JDOM builder and store it in the JDOM
-            // document
-            traceDoc = builder.build(input);
+            // parse the XML file using DOM
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(input);
 
-            // get the root container from the JDOM document
-            nodeContainer = traceDoc.getRootElement();
+            // normalize the document
+            doc.getDocumentElement().normalize();
+
+            // get the root container from the DOM document
+            nodeContainer = doc.getDocumentElement();
 
             // get the individual sip elements and store them in a vector which
             // will be returned as part of this method
-            nodes = SipBranchData.getSipBranchDataElements(nodeContainer);
-            input.close();
-        } catch (JDOMException je)
-        {
-            je.printStackTrace();
-        } catch (IOException ioe)
-        {
-            ioe.printStackTrace();
-        }
-
-        return (nodes);
-    }
-
-    public static void main(String argv[]) throws Exception
-    {
-        String filename = argv[0];
-        URL url = new URL("file:" + filename);
-        Vector nodes = SipBranchData.getSipBranchDataElements(url);
-        int count = nodes.size();
-        for (int i = 0; i < count; i++)
-        {
-            System.out.println((nodes.elementAt(i)));
+            return getSipBranchDataElements(nodeContainer);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Vector<>();
         }
     }
 
-    public String getLabel()
-    {
+    public String getLabel() {
         String label;
         if (isRequest())
             label = method;
@@ -253,105 +200,63 @@ public class SipBranchData
         return (label);
     }
 
-    public boolean isRequest()
-    {
+    public boolean isRequest() {
         return (method != null);
     }
 
-    public String getMethod()
-    {
+    public String getMethod() {
         return (method);
     }
 
-    public String getResponseCode()
-    {
+    public String getResponseCode() {
         return (responseCode);
     }
 
-    public String getResponseText()
-    {
+    public String getResponseText() {
         return (responseText);
     }
 
-    public String getSourceEntity()
-    {
+    public String getSourceEntity() {
         return (sourceEntity);
     }
 
-    public String getDestinationEntity()
-    {
+    public String getDestinationEntity() {
         return (destinationEntity);
     }
 
-    public String getSourceAddress()
-    {
+    public String getSourceAddress() {
         return (sourceAddress);
     }
 
-    public String getDestinationAddress()
-    {
+    public String getDestinationAddress() {
         return (destinationAddress);
     }
 
-    public String getTimeStamp()
-    {
+    public String getTimeStamp() {
         return (timeStamp);
     }
 
-    public String getTransactionId()
-    {
+    public String getTransactionId() {
         return (transactionId);
     }
 
-    // Returns the CSeq number, the Call-Id, and the from-tag, which
-    // identifies the (end-to-end) transaction (assuming the to-tag is
-    // different from the from-tag).
-    public String getCSeqCallId()
-    {
-        int i = transactionId.lastIndexOf(",");
-        String s = (i == -1) ? transactionId : transactionId.substring(0, i);
-        return (s);
-    }
-
-    // Returns the dialog identifier, the Call-Id, the to-tag, and the
-    // from-tag, which identifies the dialog.
-    public String getDialogId()
-    {
-        int i = transactionId.indexOf(",");
-        String s = (i == -1) ? transactionId : transactionId.substring(i + 1);
-        return (s);
-    }
-
-    public String getCallId()
-    {
-        int i = transactionId.indexOf(",");
-        int j = (i == -1) ? -1 : transactionId.indexOf(",", i + 1);
-        String s = (j == -1) ? transactionId : transactionId.substring(i + 1, j);
-        return (s);
-    }
-
-    public String getFrameId()
-    {
+    public String getFrameId() {
         return (frameId);
     }
 
-    public String getMessage()
-    {
+    public String getMessage() {
         return (message);
     }
 
-    public String getThisBranchId()
-    {
-        return (branchIds.size() > 0 ? (String) branchIds.elementAt(0) : null);
+    public String getThisBranchId() {
+        return (branchIds.size() > 0 ? branchIds.elementAt(0) : null);
     }
 
-    public Vector getBranchIds()
-    {
+    public Vector<String> getBranchIds() {
         return (branchIds);
     }
 
-    public String toString()
-    {
+    public String toString() {
         StringBuffer buffer = new StringBuffer();
 
         if (method != null)
@@ -377,14 +282,28 @@ public class SipBranchData
         if (message != null)
             buffer.append("message: " + message + "\n");
 
-        if (branchIds != null)
-        {
-            for (Enumeration enumerator = branchIds.elements(); enumerator.hasMoreElements();)
-            {
-                buffer.append("   branchId: " + (String) enumerator.nextElement() + "\n");
+        if (branchIds != null) {
+            for (Enumeration<String> enumerator = branchIds.elements(); enumerator.hasMoreElements();) {
+                buffer.append("   branchId: " + enumerator.nextElement() + "\n");
             }
         }
 
         return (buffer.toString());
+    }
+
+    private static String getChildText(Element parent, String tagName) {
+        Element child = getChild(parent, tagName);
+        return child != null ? child.getTextContent().trim() : "";
+    }
+
+    private static Element getChild(Element parent, String tagName) {
+        NodeList list = parent.getElementsByTagName(tagName);
+        for (int i = 0; i < list.getLength(); i++) {
+            Node node = list.item(i);
+            if (node.getParentNode().equals(parent) && node.getNodeType() == Node.ELEMENT_NODE) {
+                return (Element) node;
+            }
+        }
+        return null;
     }
 }

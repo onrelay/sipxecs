@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.setting;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +26,7 @@ import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate5.HibernateCallback;
 
 /**
  * Use hibernate to perform database operations
@@ -233,7 +233,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
 
     @Override
     public List<Group> getGroups(String resource) {
-        List<Group> groups = getHibernateTemplate().findByNamedQueryAndNamedParam("groupsByResource",
+        List<Group> groups = (List<Group>)getHibernateTemplate().findByNamedQueryAndNamedParam("groupsByResource",
                 RESOURCE_PARAM, resource);
         return groups;
     }
@@ -241,7 +241,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
     @Override
     public Map<Integer, Long> getGroupMemberCountIndexedByGroupId(Class groupOwner) {
         String query = "select g.id, count(*) from " + groupOwner.getName() + " o join o.groups g group by g.id";
-        List<Object[]> l = getHibernateTemplate().find(query);
+        List<Object[]> l = (List<Object[]>)getHibernateTemplate().find(query);
         Map<Integer, Long> members = asMap(l);
 
         return members;
@@ -250,7 +250,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
     @Override
     public Map<Integer, Long> getBranchMemberCountIndexedByBranchId(Class branchOwner) {
         String query = "select b.id, count(*) from " + branchOwner.getName() + " o join o.branch b group by b.id";
-        List<Object[]> l = getHibernateTemplate().find(query);
+        List<Object[]> l = (List<Object[]>)getHibernateTemplate().find(query);
         Map<Integer, Long> members = asMap(l);
 
         return members;
@@ -260,7 +260,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
     public Map<Integer, Long> getGroupBranchMemberCountIndexedByBranchId(Class branchOwner) {
         String query = "select g.branch.id, count(*) from " + branchOwner.getName() + " o join "
                 + "o.groups g where o.branch = null group by g.branch.id";
-        List<Object[]> l = getHibernateTemplate().find(query);
+        List<Object[]> l = (List<Object[]>)getHibernateTemplate().find(query);
         Map<Integer, Long> members = asMap(l);
 
         return members;
@@ -294,7 +294,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
      */
     static class GroupWeight {
 
-        private Integer m_weight = new Integer(-1);
+        private Integer m_weight = Integer.valueOf(-1);
 
         public Integer getWeight() {
             return m_weight;

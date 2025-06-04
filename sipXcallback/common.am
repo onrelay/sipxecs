@@ -12,13 +12,12 @@ sipxcall_PKGS = \
 	slf4j-api \
 	slf4j-log4j12 \
 	spring-beans \
-	org.springframework.web \
-	org.springframework.web.servlet \
+	spring-web \
 	spring-context \
 	spring-context-support \
 	spring-core \
-	org.springframework.jdbc \
-	org.springframework.transaction \
+	spring-jdbc \
+	spring-tx \
 	spring-expression \
 	spring-aop \
 	spring-data-commons \

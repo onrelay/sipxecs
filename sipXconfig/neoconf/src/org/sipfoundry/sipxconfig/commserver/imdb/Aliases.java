@@ -13,7 +13,7 @@ import static org.sipfoundry.commons.mongo.MongoConstants.ALIASES;
 
 import org.sipfoundry.sipxconfig.common.Replicable;
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 public class Aliases extends AbstractDataSetGenerator {
     public static final String FAX_EXTENSION_PREFIX = "~~ff~";
@@ -27,7 +27,7 @@ public class Aliases extends AbstractDataSetGenerator {
     }
 
     @Override
-    public void generate(Replicable entity, DBObject top) {
+    public void generate(Replicable entity, Document top) {
         top.put(ALIASES, entity.getAliasMappings(getCoreContext().getDomainName()));
     }
 

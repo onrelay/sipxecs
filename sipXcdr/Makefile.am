@@ -5,11 +5,9 @@ include common.am
 
 @PACKAGE@_EXTRA_DIST = \
 	$(sipxcallresolver_SRC) \
-	sipxcallresolver.gemspec.in \
-	sipxcallresolver.wsdl
+	sipxcallresolver.gemspec.in
 
 SUBDIRS = \
-	java-client \
 	bin \
 	etc \
 	.

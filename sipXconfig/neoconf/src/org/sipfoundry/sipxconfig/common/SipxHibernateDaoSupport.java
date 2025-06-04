@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
@@ -28,9 +28,9 @@ import org.sipfoundry.sipxconfig.setting.BeanWithSettings;
 import org.sipfoundry.sipxconfig.setting.Storage;
 import org.sipfoundry.sipxconfig.setting.ValueStorage;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.HibernateCallback;
+import org.springframework.orm.hibernate5.HibernateTemplate;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 
 public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements DataObjectSource<T> {
     private DaoEventPublisher m_daoEventPublisher;
@@ -91,11 +91,13 @@ public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements D
         return copy;
     }
 
+    @SuppressWarnings("rawtypes")
     public List<T> loadBeansByPage(Class beanClass, Integer groupId, int firstRow, int pageSize,
             String[] orderBy, boolean orderAscending) {
         return loadBeansByPage(beanClass, groupId, null, firstRow, pageSize, orderBy, orderAscending);
     }
 
+    @SuppressWarnings("rawtypes")
     public List<T> loadBeansByPage(Class beanClass, Integer groupId, Integer branchId, int firstRow, int pageSize,
             String[] orderBy, boolean orderAscending) {
         DetachedCriteria c = DetachedCriteria.forClass(beanClass);
@@ -107,9 +109,10 @@ public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements D
                 c.addOrder(order);
             }
         }
-        return getHibernateTemplate().findByCriteria(c, firstRow, pageSize);
+        return (List<T>)getHibernateTemplate().findByCriteria(c, firstRow, pageSize);
     }
 
+    @SuppressWarnings("rawtypes")
     public List<T> loadBeansByPage(Class beanClass, int firstRow, int pageSize) {
         String[] orderBy = new String[] {
             "id"
@@ -121,6 +124,7 @@ public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements D
      * Return the count of beans of type beanClass in the specified group. If groupId is null,
      * then don't filter by group, just count all the beans.
      */
+    @SuppressWarnings("rawtypes")
     public int getBeansInGroupCount(Class beanClass, Integer groupId) {
         DetachedCriteria crit = DetachedCriteria.forClass(beanClass);
         addByGroupCriteria(crit, groupId);
@@ -129,10 +133,10 @@ public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements D
         return ((Long) DataAccessUtils.requiredSingleResult(results)).intValue();
     }
 
-    protected void removeAll(Class<T> klass, Collection ids) {
+    protected void removeAll(Class<?> klass, Collection<Integer> ids) {
         HibernateTemplate template = getHibernateTemplate();
-        Collection entities = new ArrayList(ids.size());
-        for (Iterator i = ids.iterator(); i.hasNext();) {
+        Collection<Object> entities = new ArrayList<>(ids.size());
+        for (Iterator<Integer> i = ids.iterator(); i.hasNext();) {
             Integer id = (Integer) i.next();
             Object entity = template.load(klass, id);
             entities.add(entity);
@@ -144,9 +148,9 @@ public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements D
         template.flush();
     }
 
-    protected void removeAll(Class<T> klass) {
+    protected void removeAll(Class<?> klass) {
         HibernateTemplate template = getHibernateTemplate();
-        List entities = template.loadAll(klass);
+        List<?> entities = template.loadAll(klass);
         for (Object entity : entities) {
             m_daoEventPublisher.publishDelete(entity);
         }
@@ -166,7 +170,7 @@ public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements D
      * the original value from the database.
      */
     protected Object getOriginalValue(PrimaryKeySource obj, String propertyName) {
-        HibernateCallback callback = new GetOriginalValueCallback(obj, propertyName);
+        GetOriginalValueCallback callback = new GetOriginalValueCallback(obj, propertyName);
         Object originalValue = getHibernateTemplate().executeWithNativeSession(callback);
         return originalValue;
     }
@@ -191,7 +195,7 @@ public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements D
         }
     }
 
-    static class GetOriginalValueCallback implements HibernateCallback {
+    static class GetOriginalValueCallback implements HibernateCallback<Object> {
         private final PrimaryKeySource m_object;
         private final String m_propertyName;
 

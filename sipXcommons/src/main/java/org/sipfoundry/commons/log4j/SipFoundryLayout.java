@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
@@ -27,7 +28,7 @@ public class SipFoundryLayout extends Layout {
     
     public static final Long LOG4J_MONITOR_FILE_DELAY = 30000L;
     
-    static Long lineNumber = 0L;
+    static AtomicLong lineNumber = new AtomicLong( 0L );
     SimpleDateFormat dateFormat;
     String hostName;
     String facility;
@@ -105,7 +106,7 @@ public class SipFoundryLayout extends Layout {
      * Returns to logLevel set for log4j.logger.org.sipfoundry.
      * If it is null, then it will return the log level of the root logger.
      */
-    public static Level getSipFoundryLogLevel(Class clazz)
+    public static Level getSipFoundryLogLevel(Class<?> clazz)
     {
         Level logLevel = Logger.getLogger(clazz.getPackage().getName()).getLevel();
         if (logLevel == null){
@@ -191,22 +192,21 @@ public class SipFoundryLayout extends Layout {
 
         // lineNumber is static across all loggers, so must be mutex protected.
         // time should also increase monotonically, so hold the lock
-        synchronized (lineNumber) {
-            lineNumber++;
-            String out1 = String.format("\"%s\":%d:%s:%s:%s:%s:%s:%s:\"%s\"%n",
-                    formatTimestamp((System.currentTimeMillis())), lineNumber, // line
-                    // number
-                    localFacility, // Facility
-                    mapLevel2SipFoundry(arg0.getLevel()), // msg priority
-                    // (DEBUG, WARN,
-                    // etc.)
-                    hostName, // Name of this machine
-                    arg0.getThreadName(), // Thread that called log
-                    "00000000", // Thread Id (not useful in Java)
-                    loggerName, // Name of the logger
-                    newMessage); // The message itself (w CRLF escaped)
-            return out1;
-        }
+        Long currentLineNumber = lineNumber.incrementAndGet();
+        String out1 = String.format("\"%s\":%d:%s:%s:%s:%s:%s:%s:\"%s\"%n",
+                formatTimestamp((System.currentTimeMillis())), currentLineNumber, // line
+                // number
+                localFacility, // Facility
+                mapLevel2SipFoundry(arg0.getLevel()), // msg priority
+                // (DEBUG, WARN,
+                // etc.)
+                hostName, // Name of this machine
+                arg0.getThreadName(), // Thread that called log
+                "00000000", // Thread Id (not useful in Java)
+                loggerName, // Name of the logger
+                newMessage); // The message itself (w CRLF escaped)
+        return out1;
+        
     }
     
     

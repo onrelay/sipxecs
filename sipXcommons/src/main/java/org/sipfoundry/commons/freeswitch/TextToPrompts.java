@@ -80,7 +80,6 @@ public abstract class TextToPrompts {
             foundClass = (TextToPrompts) c.newInstance();
         } catch (Throwable t) {
             if (foundClass == null) {
-            	// TODO: Add logging support.
                 // LOG.error("Cannot find TextToPrompt subclass for locale " + l.toString() + ".  Using locale en as backup.");
                 foundClass = new TextToPrompts_en();
             }
@@ -338,7 +337,6 @@ public abstract class TextToPrompts {
                 }
             }
         } catch (ParseException e) {
-        	// TODO: Add logging support
             // LOG.error("Value of for date() is not in yyyy-MM-dd HH:mm:ss format!.  Value="+getValue());
         }
         return appendPrefix(result);

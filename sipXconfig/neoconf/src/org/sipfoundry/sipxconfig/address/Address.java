@@ -16,8 +16,8 @@
  */
 package org.sipfoundry.sipxconfig.address;
 
-import org.apache.commons.collections.Transformer;
-import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 public class Address {
     public static final Transformer GET_IP = new Transformer() {

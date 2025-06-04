@@ -37,16 +37,19 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.tapestry.contrib.table.model.common.ReverseComparator;
+import org.apache.commons.collections4.comparators.ReverseComparator;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.permission.Permission;
 import org.sipfoundry.sipxconfig.permission.PermissionManager;
@@ -59,11 +62,10 @@ import org.sipfoundry.sipxconfig.rest.RestUtilities.UserGroupPermissionRestInfoF
 import org.sipfoundry.sipxconfig.rest.RestUtilities.ValidationInfo;
 import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setting.SettingDao;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.thoughtworks.xstream.XStream;
 
-public class UserGroupsPermissionsResource extends Resource {
+public class UserGroupsPermissionsResource extends ServerResource {
 
     private static final String ELEMENT_NAME_USERGROUPPERMISSIONBUNDLE = "user-group-permission";
     private static final String ELEMENT_NAME_USERGROUPPERMISSION = "group";
@@ -101,16 +103,11 @@ public class UserGroupsPermissionsResource extends Resource {
         m_form = getRequest().getResourceRef().getQueryAsForm();
     }
 
-    @Override
-    public boolean allowDelete() {
-        return false;
-    }
-
     // GET - Retrieve all and single User Group with Permissions
     // ---------------------------------------------------------
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         IntParameterInfo parameterInfo;
         Group userGroup;
         UserGroupPermissionRestInfoFull userGroupPermissionRestInfo;
@@ -162,8 +159,8 @@ public class UserGroupsPermissionsResource extends Resource {
     // PUT - Update Permissions
     // ------------------------
 
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         IntParameterInfo parameterInfo;
 
         // get from request body
@@ -177,7 +174,7 @@ public class UserGroupsPermissionsResource extends Resource {
         if (!validationInfo.getValid()) {
             RestUtilities.setResponseError(getResponse(), validationInfo.getResponseCode(), validationInfo
                     .getMessage());
-            return;
+            return null;
         }
 
         // if have id then update single item
@@ -185,14 +182,14 @@ public class UserGroupsPermissionsResource extends Resource {
         if (parameterInfo.getExists()) {
             if (!parameterInfo.getValid()) {
                 RestUtilities.setResponseError(getResponse(), ERROR_ID_INVALID, parameterInfo.getValueString());
-                return;
+                return null;
             }
 
             try {
                 userGroup = m_settingContext.getGroup(parameterInfo.getValue());
             } catch (Exception exception) {
                 RestUtilities.setResponseError(getResponse(), ERROR_OBJECT_NOT_FOUND, parameterInfo.getValue());
-                return;
+                return null;
             }
 
             // copy values over to existing item
@@ -202,15 +199,16 @@ public class UserGroupsPermissionsResource extends Resource {
             } catch (Exception exception) {
                 RestUtilities.setResponseError(getResponse(), ERROR_UPDATE_FAILED, parameterInfo.getValue(),
                         exception.getLocalizedMessage());
-                return;
+                return null;
             }
 
             RestUtilities.setResponse(getResponse(), SUCCESS_UPDATED, userGroup.getId());
-            return;
+            return null;
         }
 
         // otherwise error, since no creation of new permissions
         RestUtilities.setResponseError(getResponse(), ERROR_MISSING_ID);
+        return null;
     }
 
     // Helper functions
@@ -313,7 +311,7 @@ public class UserGroupsPermissionsResource extends Resource {
             if (sortForward) {
                 Collections.sort(userGroups, new NameComparator());
             } else {
-                Collections.sort(userGroups, new ReverseComparator(new NameComparator()));
+                Collections.sort(userGroups, new ReverseComparator<Group>(new NameComparator()));
             }
             break;
 
@@ -321,7 +319,7 @@ public class UserGroupsPermissionsResource extends Resource {
             if (sortForward) {
                 Collections.sort(userGroups, new DescriptionComparator());
             } else {
-                Collections.sort(userGroups, new ReverseComparator(new DescriptionComparator()));
+                Collections.sort(userGroups, new ReverseComparator<Group>(new DescriptionComparator()));
             }
             break;
 
@@ -443,17 +441,17 @@ public class UserGroupsPermissionsResource extends Resource {
     // Injected objects
     // ----------------
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setSettingDao(SettingDao settingContext) {
         m_settingContext = settingContext;
     }
 
-    @Required
+    
     public void setPermissionManager(PermissionManager permissionManager) {
         m_permissionManager = permissionManager;
     }

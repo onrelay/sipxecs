@@ -15,12 +15,16 @@ jardir = @SIPX_JAVADIR@/sipXopenfire/plugins
 jar_PKGS = \
 	log4j \
 	commons-collections \
+	commons-collections4 \
 	spring-data-mongodb \
-	mongo \
 	sipxcommons \
 	openfire \
-	commons-lang 
-
+	commons-lang \
+	commons-lang3 \
+	bson \
+	mongodb-driver-core \
+	mongodb-driver-sync
+	
 	
 sync_SRC = $(shell cd $(srcdir); find src -name '*.java')
 sync_DEPS = \

@@ -1,6 +1,5 @@
 package org.sipfoundry.commons.freeswitch;
 
-import org.apache.commons.lang.StringUtils;
 
 public class ConfCommand extends CallCommand {
    String  m_command; // eg. list, lock, mute, deaf, undeaf etc.

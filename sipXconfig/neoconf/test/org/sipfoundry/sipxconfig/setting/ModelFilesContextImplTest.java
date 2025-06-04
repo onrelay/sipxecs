@@ -37,8 +37,7 @@ public class ModelFilesContextImplTest extends TestCase {
 
         IMocksControl control = EasyMock.createControl();
         ModelBuilder builder = control.createMock(ModelBuilder.class);
-        builder.buildModel(getFile("aa", "bb"));
-        control.andReturn(setting);
+        EasyMock.expect(builder.buildModel(getFile("aa", "bb"))).andReturn(setting);
         control.replay();
 
         m_impl.setModelBuilder(builder);
@@ -48,7 +47,7 @@ public class ModelFilesContextImplTest extends TestCase {
 
         control.verify();
     }
-
+    
     private static File getFile(String manu, String base) {
         return new File(DIR + File.separator + manu + File.separator + base);
     }

@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.hivemind.util.PropertyUtils;
 import org.apache.tapestry.IPage;
 import org.apache.tapestry.IRequestCycle;

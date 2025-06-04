@@ -17,10 +17,11 @@ package org.sipfoundry.sipxconfig.rest;
 import java.net.URLDecoder;
 
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
 import org.sipfoundry.sipxconfig.common.AbstractUser;
 import org.sipfoundry.sipxconfig.common.User;
@@ -32,27 +33,16 @@ public class PasswordResource extends UserResource {
     public void init(Context context, Request request, Response response) {
         super.init(context, request, response);
 
-        setReadable(false);
-
         m_newPin = URLDecoder.decode((String) getRequest().getAttributes().get("password"));
     }
 
-    @Override
-    public boolean allowGet() {
-        return false;
-    }
-
-    @Override
-    public boolean allowPut() {
-        return true;
-    }
-
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         if (!(m_newPin == null) && m_newPin.length() >= AbstractUser.PASSWORD_LEN) {
             User user = getUser();
             user.setPin(m_newPin);
             getCoreContext().saveUser(user);
+            return null;
         } else {
             throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST, String.format(
                     "Password must be at least %d characters long", AbstractUser.PASSWORD_LEN));

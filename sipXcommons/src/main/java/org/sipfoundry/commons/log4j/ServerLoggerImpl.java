@@ -10,9 +10,6 @@ import java.util.Properties;
 import javax.sip.SipStack;
 import javax.sip.header.TimeStampHeader;
 
-import org.apache.log4j.Logger;
-import org.sipfoundry.commons.log4j.SipFoundryLogRecordFactory;
-
 import gov.nist.core.ServerLogger;
 import gov.nist.javax.sip.LogRecord;
 import gov.nist.javax.sip.LogRecordFactory;
@@ -66,7 +63,6 @@ public class ServerLoggerImpl implements ServerLogger {
     @Override
     public void logMessage(SIPMessage message, String source, String destination, String status, boolean isSender,
             long timeStamp) {
-        // TODO Auto-generated method stub
         CallID cid = (CallID) message.getCallId();
         String callId = null;
         if (cid != null)

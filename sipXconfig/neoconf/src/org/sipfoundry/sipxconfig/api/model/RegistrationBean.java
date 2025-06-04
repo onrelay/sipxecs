@@ -59,7 +59,7 @@ public class RegistrationBean extends RegistrationItem {
         return bean;
     }
 
-    public static List<RegistrationBean> buildRegistrationList(Collection<RegistrationBean> items, long now) {
+    public static List<RegistrationBean> buildRegistrationList(Collection<RegistrationItem> items, long now) {
         try {
             List<RegistrationBean> registrations = new LinkedList<RegistrationBean>();
             for (RegistrationItem item : items) {
@@ -91,7 +91,7 @@ public class RegistrationBean extends RegistrationItem {
             return m_registrations;
         }
 
-        public static RegistrationList convertRegistrationList(Collection<RegistrationBean> regs, long now) {
+        public static RegistrationList convertRegistrationList(Collection<RegistrationItem> regs, long now) {
             RegistrationList list = new RegistrationList();
             list.setRegistrations(RegistrationBean.buildRegistrationList(regs, now));
             return list;

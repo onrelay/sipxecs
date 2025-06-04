@@ -11,9 +11,9 @@ package org.sipfoundry.sipxconfig.dialplan;
 
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.verify;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,7 +24,7 @@ import org.easymock.EasyMock;
 import org.sipfoundry.sipxconfig.common.event.DaoEventListener;
 import org.sipfoundry.sipxconfig.common.event.DaoEventPublisherImpl;
 import org.sipfoundry.sipxconfig.gateway.Gateway;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 
 /**
  * DialPlanContextImplTest
@@ -35,11 +35,11 @@ public class DialPlanContextImplTest extends TestCase {
         DialPlan plan = createMock(DialPlan.class);
         plan.isNew();
         expectLastCall().andReturn(true);
-        plan.moveRules(Collections.singletonList(new Integer(5)), 3);
+        plan.moveRules(Collections.singletonList(Integer.valueOf(5)), 3);
         replay(plan);
 
         MockDialPlanContextImpl manager = new MockDialPlanContextImpl(plan);
-        manager.moveRules(Collections.singletonList(new Integer(5)), 3);
+        manager.moveRules(Collections.singletonList(Integer.valueOf(5)), 3);
         verify(plan);
     }
 

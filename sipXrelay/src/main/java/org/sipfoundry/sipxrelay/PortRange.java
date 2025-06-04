@@ -51,10 +51,9 @@ public class PortRange {
         return higherBound;
     }
 
-    @SuppressWarnings("unchecked")
-	public Map toMap() {
+	public Map<String,Object> toMap() {
         try {
-            Map retval = PropertyUtils.describe(this);
+            Map<String,Object> retval = PropertyUtils.describe(this);
             retval.remove("class");
             return retval;
         } catch (Exception ex) {

@@ -20,9 +20,10 @@ import static org.sipfoundry.commons.security.Util.retrieveUsername;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sipfoundry.commons.security.PasswordEncoderImpl;
 import org.sipfoundry.sipxconfig.common.User;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -30,9 +31,7 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
-import org.springframework.security.authentication.dao.SaltSource;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
-import org.springframework.security.authentication.encoding.PlaintextPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -55,9 +54,7 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 
     private static final Log LOG = LogFactory.getLog(DaoAuthenticationProvider.class);
 
-    private PasswordEncoder passwordEncoder = new PlaintextPasswordEncoder();
-
-    private SaltSource saltSource;
+    private PasswordEncoder passwordEncoder = new PasswordEncoderImpl();
 
     private UserDetailsService userDetailsService;
 
@@ -71,25 +68,18 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails,
             UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        Object salt = null;
-
-        if (this.saltSource != null) {
-            salt = this.saltSource.getSalt(userDetails);
-        }
 
         if (authentication.getCredentials() == null) {
             throw new BadCredentialsException(messages.getMessage(
-                    "AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"),
-                    includeDetailsObject ? userDetails : null);
+                    "AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials") );
         }
 
         String presentedPassword = authentication.getCredentials() == null ? "" : authentication.getCredentials()
                 .toString();
 
-        if (!passwordEncoder.isPasswordValid(userDetails.getPassword(), presentedPassword, salt)) {
+        if (!passwordEncoder.matches(presentedPassword, userDetails.getPassword() )) {
             throw new BadCredentialsException(messages.getMessage(
-                    "AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"),
-                    includeDetailsObject ? userDetails : null);
+                    "AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials" ) );
         }
     }
 
@@ -100,10 +90,6 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 
     public PasswordEncoder getPasswordEncoder() {
         return passwordEncoder;
-    }
-
-    public SaltSource getSaltSource() {
-        return saltSource;
     }
 
     public UserDetailsService getUserDetailsService() {
@@ -192,12 +178,7 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
      * will present <code>null</code> to the relevant
      * <code>PasswordEncoder</code>.
      *
-     * @param saltSource to use when attempting to decode passwords via the
-     * <code>PasswordEncoder</code>
      */
-    public void setSaltSource(SaltSource saltSource) {
-        this.saltSource = saltSource;
-    }
 
     public void setUserDetailsService(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;

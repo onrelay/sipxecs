@@ -14,8 +14,10 @@ import java.util.ResourceBundle;
 public class PromptList {
 
     class PromptGroup {
+        @SuppressWarnings("unused")
         private String m_prefix = "";
         private ArrayList<String> m_prompts = new ArrayList<String>();
+        @SuppressWarnings("unused")
         private String[] m_variables = {};
     }
 

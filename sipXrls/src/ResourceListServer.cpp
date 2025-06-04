@@ -123,14 +123,13 @@ ResourceListServer::ResourceListServer(const UtlString& domainName,
    mResourceListTask(this),
    mResourceListSet(this),
    // Do not set the resource list file name yet, so the ResourceListFileReader
-   // doesn't add elements to the ResourceListSet before we have the
+   // does not add elements to the ResourceListSet before we have the
    // SIP tasks set up.
    mResourceListFileReader(UtlString(""), &mResourceListSet),
    mChangeDelay(sRunningChangeDelay)
 {
    Os::Logger::instance().log(FAC_RLS, PRI_DEBUG,
-                 "ResourceListServer::_ this = %p, mDomainName = '%s', mEventType = '%s', mContentType = '%s', "
-                 "mResubscribeInterval = %d",
+                 "ResourceListServer::_ this = %p, mDomainName = %s, mEventType = %s, mContentType = %s, mResubscribeInterval = %d",
                  this, mDomainName.data(), mEventType.data(), mContentType.data(),
                  mResubscribeInterval);
    Os::Logger::instance().log(FAC_RLS, PRI_DEBUG,
@@ -152,19 +151,19 @@ ResourceListServer::ResourceListServer(const UtlString& domainName,
 
       char buffer[100];
 
-      // Construct the server's host-part.
+      // Construct the server host-part.
       sprintf(buffer, "%s:%d", localAddress.data(), portIsValid(udpPort) ? udpPort : tcpPort);
       mServerLocalHostPart = buffer;
 
-      // Construct the client's From URI.
+      // Construct the client From URI.
       sprintf(buffer, "sip:sipXrls@%s:%d", localAddress.data(), localPort);
       mClientFromURI = buffer;
 
-      // Obtain the client's Contact URI.
+      // Obtain the client Contact URI.
       mClientUserAgent.getContactURI(mClientContactURI);
    }
 
-   // Initialize the SipUserAgent's.
+   // Initialize the SipUserAgent.
    // Set the user-agent strings.
    mServerUserAgent.setUserAgentHeaderProperty("sipXecs/rls");
    mClientUserAgent.setUserAgentHeaderProperty("sipXecs/rls");
@@ -190,7 +189,7 @@ ResourceListServer::~ResourceListServer()
 {
    // Final stage of closing down the call processing objects.
 
-   // Stop the SipUserAgent's.
+   // Stop the SipUserAgent.
    if (!mServerUserAgent.isShutdownDone())
       mServerUserAgent.shutdown(TRUE);
    if (!mClientUserAgent.isShutdownDone())
@@ -214,7 +213,7 @@ void ResourceListServer::start()
    mResourceListTask.start();
 
    // Start the ResourceListFileReader by giving it the file name.
-   // Do this after starting all the subscription client server tasks,
+   // Do this after starting all the subscription client server tasks
    // as otherwise it will fill their queues.
    mResourceListFileReader.setFileName(&mResourceListFile);
 
@@ -262,9 +261,9 @@ void ResourceListServer::shutdown()
    // Use the shorter shutdown change delay so the shutdown happens fast enough.
    mChangeDelay = sShutdownChangeDelay;
 
-   // Finalize ResourceListSet, so timers stop queueing messages to
+   // Finalize ResourceListSet so timers stop queueing messages to
    // ResourceList Task and there are no references to the
-   // ResourceCached's.
+   // ResourceCached.
    mResourceListSet.finalize();
 
    // Stop the SIP subscribe client.
@@ -274,7 +273,7 @@ void ResourceListServer::shutdown()
    // Stop the subscribe server.
    mSubscribeServer.requestShutdown();
 
-   // Shut down SipUserAgent's.
+   // Shut down SipUserAgents.
    // Shut down the ResourceListTask.
    mServerUserAgent.shutdown(FALSE);
    mClientUserAgent.shutdown(FALSE);
@@ -304,7 +303,7 @@ void ResourceListServer::shutdown()
 
 /* ============================ INQUIRY =================================== */
 
-// Dump the object's internal state.
+// Dump the object internal state.
 void ResourceListServer::dumpState()
 {
    // indented 0

@@ -18,8 +18,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,7 +46,6 @@ import org.sipfoundry.sipxconfig.dialplan.SiteToSiteDialingRule;
 import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
 import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
 import org.sipfoundry.sipxconfig.forwarding.Schedule;
-import org.springframework.beans.factory.annotation.Required;
 
 public class DialPlanApiImpl implements DialPlanApi {
     private static final Log LOG = LogFactory.getLog(DialPlanApi.class);
@@ -216,27 +215,27 @@ public class DialPlanApiImpl implements DialPlanApi {
         return autoAttendant;
     }
 
-    @Required
+    
     public void setDialPlanContext(DialPlanContext dialPlanContext) {
         m_dialPlanContext = dialPlanContext;
     }
 
-    @Required
+    
     public DialingRuleFactory getDialingRuleFactory() {
         return m_dialingRuleFactory;
     }
 
-    @Required
+    
     public void setDialingRuleFactory(DialingRuleFactory dialingRuleFactory) {
         m_dialingRuleFactory = dialingRuleFactory;
     }
 
-    @Required
+    
     public void setAutoAttendantManager(AutoAttendantManager autoAttendantManager) {
         m_autoAttendantManager = autoAttendantManager;
     }
 
-    @Required
+    
     public void setForwardingContext(ForwardingContext forwardingContext) {
         m_forwardingContext = forwardingContext;
     }

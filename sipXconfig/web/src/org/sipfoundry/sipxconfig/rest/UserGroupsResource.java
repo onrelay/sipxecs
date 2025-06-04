@@ -40,16 +40,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.tapestry.contrib.table.model.common.ReverseComparator;
+import org.apache.commons.collections4.comparators.ReverseComparator;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Delete;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.branch.Branch;
 import org.sipfoundry.sipxconfig.branch.BranchManager;
 import org.sipfoundry.sipxconfig.common.CoreContext;
@@ -63,11 +67,10 @@ import org.sipfoundry.sipxconfig.rest.RestUtilities.ValidationInfo;
 import org.sipfoundry.sipxconfig.rest.RestUtilities.ValidationInfo.StringConstraint;
 import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setting.SettingDao;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.thoughtworks.xstream.XStream;
 
-public class UserGroupsResource extends Resource {
+public class UserGroupsResource extends ServerResource {
 
     private static final String ELEMENT_NAME_USERGROUPBUNDLE = "user-group";
     private static final String ELEMENT_NAME_USERGROUP = "group";
@@ -104,17 +107,12 @@ public class UserGroupsResource extends Resource {
         m_form = getRequest().getResourceRef().getQueryAsForm();
     }
 
-    @Override
-    public boolean allowDelete() {
-        return true;
-    }
 
     // GET - Retrieve all and single Skill
     // -----------------------------------
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        IntParameterInfo parameterInfo;
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        IntParameterInfo parameterInfo;
         Group userGroup;
         UserGroupRestInfoFull userGroupRestInfo;
 
@@ -164,8 +162,8 @@ public class UserGroupsResource extends Resource {
     // PUT - Update or Add single Skill
     // --------------------------------
 
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         IntParameterInfo parameterInfo;
 
         // get from request body
@@ -179,7 +177,7 @@ public class UserGroupsResource extends Resource {
         if (!validationInfo.getValid()) {
             RestUtilities.setResponseError(getResponse(), validationInfo.getResponseCode(), validationInfo
                     .getMessage());
-            return;
+            return null;
         }
 
         // if have id then update single item
@@ -187,14 +185,14 @@ public class UserGroupsResource extends Resource {
         if (parameterInfo.getExists()) {
             if (!parameterInfo.getValid()) {
                 RestUtilities.setResponseError(getResponse(), ERROR_ID_INVALID, parameterInfo.getValueString());
-                return;
+                return null;
             }
 
             try {
                 userGroup = m_settingContext.getGroup(parameterInfo.getValue());
             } catch (Exception exception) {
                 RestUtilities.setResponseError(getResponse(), ERROR_OBJECT_NOT_FOUND, parameterInfo.getValue());
-                return;
+                return null;
             }
 
             // copy values over to existing item
@@ -204,11 +202,11 @@ public class UserGroupsResource extends Resource {
             } catch (Exception exception) {
                 RestUtilities.setResponseError(getResponse(), ERROR_UPDATE_FAILED, parameterInfo.getValue(),
                         exception.getLocalizedMessage());
-                return;
+                return null;
             }
 
             RestUtilities.setResponse(getResponse(), SUCCESS_UPDATED, userGroup.getId());
-            return;
+            return null;
         }
 
         // if not single, add new item
@@ -217,16 +215,17 @@ public class UserGroupsResource extends Resource {
             m_coreContext.storeGroup(userGroup);
         } catch (Exception exception) {
             RestUtilities.setResponseError(getResponse(), ERROR_CREATE_FAILED, exception.getLocalizedMessage());
-            return;
+            return null;
         }
 
         RestUtilities.setResponse(getResponse(), SUCCESS_CREATED, userGroup.getId());
+        return null;
     }
 
     // DELETE - Delete single Skill
     // ----------------------------
 
-    @Override
+    @Delete
     public void removeRepresentations() throws ResourceException {
         IntParameterInfo parameterInfo;
         @SuppressWarnings("unused")
@@ -328,7 +327,6 @@ public class UserGroupsResource extends Resource {
         return metadata;
     }
 
-    @SuppressWarnings("unchecked")
     private void sortUserGroups(List<Group> userGroups) {
         // sort if requested
         SortInfo sortInfo = RestUtilities.calculateSorting(m_form);
@@ -345,7 +343,7 @@ public class UserGroupsResource extends Resource {
             if (sortForward) {
                 Collections.sort(userGroups, new NameComparator());
             } else {
-                Collections.sort(userGroups, new ReverseComparator(new NameComparator()));
+                Collections.sort(userGroups, new ReverseComparator<Group>(new NameComparator()));
             }
             break;
 
@@ -353,7 +351,7 @@ public class UserGroupsResource extends Resource {
             if (sortForward) {
                 Collections.sort(userGroups, new DescriptionComparator());
             } else {
-                Collections.sort(userGroups, new ReverseComparator(new DescriptionComparator()));
+                Collections.sort(userGroups, new ReverseComparator<Group>(new DescriptionComparator()));
             }
             break;
 
@@ -471,17 +469,17 @@ public class UserGroupsResource extends Resource {
     // Injected objects
     // ----------------
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setSettingDao(SettingDao settingContext) {
         m_settingContext = settingContext;
     }
 
-    @Required
+    
     public void setBranchManager(BranchManager branchManager) {
         m_branchManager = branchManager;
     }

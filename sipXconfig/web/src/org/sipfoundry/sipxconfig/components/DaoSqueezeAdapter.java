@@ -69,7 +69,7 @@ public class DaoSqueezeAdapter implements IDaoSqueezeAdapter {
     }
 
     protected Serializable unsqueezeKey(String skey) {
-        return new Integer(skey);
+        return Integer.valueOf(skey);
     }
 
     public Object unsqueeze(DataSqueezer squeezer, String string) {

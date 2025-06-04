@@ -23,44 +23,40 @@ import org.jivesoftware.openfire.provider.RemoteServerProvider;
 import org.jivesoftware.openfire.server.RemoteServerConfiguration;
 import org.jivesoftware.openfire.server.RemoteServerConfiguration.Permission;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
 
 public class MongoRemoteServerProvider extends BaseMongoProvider implements RemoteServerProvider {
     private static final String COLLECTION_NAME = "ofRemoteServerConf";
 
     public MongoRemoteServerProvider() {
         setDefaultCollectionName(COLLECTION_NAME);
-        DBCollection rSrvCollection = getDefaultCollection();
+        MongoCollection<Document> rSrvCollection = getDefaultCollection();
 
-        DBObject index = new BasicDBObject();
-        index.put("xmppDomain", 1);
-
-        rSrvCollection.ensureIndex(index);
+        Document index = new Document("xmppDomain", 1);
+        rSrvCollection.createIndex(index);
     }
 
     @Override
     public void addConfiguration(RemoteServerConfiguration configuration) {
-        DBCollection rSrvCollection = getDefaultCollection();
+        MongoCollection<Document> rSrvCollection = getDefaultCollection();
 
-        DBObject toInsert = new BasicDBObject();
-        toInsert.put("xmppDomain", configuration.getDomain());
-        toInsert.put("remotePort", configuration.getRemotePort());
-        toInsert.put("permission", configuration.getPermission().toString());
+        Document toInsert = new Document()
+            .append("xmppDomain", configuration.getDomain())
+            .append("remotePort", configuration.getRemotePort())
+            .append("permission", configuration.getPermission().toString());
 
-        rSrvCollection.insert(toInsert);
+        rSrvCollection.insertOne(toInsert);
     }
 
     @Override
     public RemoteServerConfiguration getConfiguration(String domain) {
-        DBCollection rSrvCollection = getDefaultCollection();
+        MongoCollection<Document> rSrvCollection = getDefaultCollection();
 
-        DBObject query = new BasicDBObject();
-        query.put("xmppDomain", domain);
+        Document query = new Document("xmppDomain", domain);
 
+        Document confObj = rSrvCollection.find(query).first();
         RemoteServerConfiguration conf;
-        DBObject confObj = rSrvCollection.findOne(query);
 
         if (confObj != null) {
             Integer remote = (Integer) confObj.get("remotePort");
@@ -79,12 +75,12 @@ public class MongoRemoteServerProvider extends BaseMongoProvider implements Remo
     @Override
     public Collection<RemoteServerConfiguration> getConfigurations(Permission permission) {
         Collection<RemoteServerConfiguration> confs = new ArrayList<RemoteServerConfiguration>();
-        DBCollection rSrvCollection = getDefaultCollection();
+        MongoCollection<Document> rSrvCollection = getDefaultCollection();
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
         query.put("permission", permission.toString());
 
-        for (DBObject confObj : rSrvCollection.find(query)) {
+        for (Document confObj : rSrvCollection.find(query)) {
             String domain = (String) confObj.get("domain");
             Integer remote = (Integer) confObj.get("remotePort");
 
@@ -99,11 +95,10 @@ public class MongoRemoteServerProvider extends BaseMongoProvider implements Remo
 
     @Override
     public void deleteConfiguration(String domain) {
-        DBCollection rSrvCollection = getDefaultCollection();
+        MongoCollection<Document> rSrvCollection = getDefaultCollection();
 
-        DBObject toDelete = new BasicDBObject();
-        toDelete.put("xmppDomain", domain);
+        Document toDelete = new Document("xmppDomain", domain);
 
-        rSrvCollection.remove(toDelete);
+        rSrvCollection.deleteOne(toDelete);
     }
 }

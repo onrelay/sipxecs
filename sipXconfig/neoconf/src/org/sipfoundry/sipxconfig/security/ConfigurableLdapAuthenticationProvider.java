@@ -206,7 +206,7 @@ public class ConfigurableLdapAuthenticationProvider extends AbstractUserDetailsA
     }
 
     @Override
-    public boolean supports(Class authentication) {
+    public boolean supports(Class<?> authentication) {
         if (!m_ldapManager.getSystemSettings().isConfigured()) {
             return false;
         }
@@ -272,7 +272,7 @@ public class ConfigurableLdapAuthenticationProvider extends AbstractUserDetailsA
         } else {
             dirContextFactory.setAnonymousReadOnly(true);
         }
-        Map<String, String> envProps = new HashMap<String, String>();
+        Map<String, Object> envProps = new HashMap<String, Object>();
         envProps.put(LdapConnectionParams.LDAP_TIMEOUT, String.valueOf(params.getTimeout()));
         dirContextFactory.setBaseEnvironmentProperties(envProps);
         try {

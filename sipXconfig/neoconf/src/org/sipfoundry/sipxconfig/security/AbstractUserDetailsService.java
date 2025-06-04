@@ -23,7 +23,6 @@ import org.sipfoundry.sipxconfig.admin.AdminContext;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.im.ImAccount;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -120,12 +119,12 @@ public abstract class AbstractUserDetailsService implements UserDetailsService {
 
     protected abstract UserDetails createUserDetails(String userNameOrAlias, User user, List<GrantedAuthority> gas);
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setAdminContext(AdminContext adminContext) {
         m_adminContext = adminContext;
     }

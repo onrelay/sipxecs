@@ -27,7 +27,7 @@ import static org.sipfoundry.commons.mongo.MongoConstants.UID;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.jivesoftware.openfire.XMPPServer;
@@ -45,18 +45,19 @@ import org.sipfoundry.openfire.sync.job.AbstractJobFactory;
 import org.sipfoundry.openfire.sync.job.Job;
 import org.xmpp.packet.JID;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
+import org.bson.conversions.Bson;
 
 public class JobFactory extends AbstractJobFactory {
     private static Logger logger = Logger.getLogger(JobFactory.class);
     private static final String COLLECTION_NAME = "entity";
 
     @Override
-    public Job createJob(MongoOperation op, DBObject dbObj, Object id) {
+    public Job createJob(MongoOperation op, Document dbObj, Object id) {
         Job job = null;
 
         if (id != null) {
@@ -78,7 +79,7 @@ public class JobFactory extends AbstractJobFactory {
         return job;
     }
 
-    private static Job createJob(MongoOperation op, DBObject dbObj, String id) {
+    private static Job createJob(MongoOperation op, Document dbObj, String id) {
         Job job = null;
 
         if (id.startsWith("User")) {
@@ -90,14 +91,14 @@ public class JobFactory extends AbstractJobFactory {
         return job;
     }
 
-    private static Job createJob(MongoOperation op, DBObject dbObj, ObjectId id) {
+    private static Job createJob(MongoOperation op, Document dbObj, ObjectId id) {
         logger.debug("id: " + id.toString());
         logger.debug("op: " + op);
         Job vcardUpdateJob = null;
 
         switch (op) {
         case INSERT:
-            if (dbObj.containsField("filename")) {
+            if (dbObj.containsKey("filename")) {
                 String filename = dbObj.get("filename").toString();
                 if (filename.startsWith("avatar_")) {
                     String userName = StringUtils.substringBetween(filename, "avatar_", ".");
@@ -115,7 +116,7 @@ public class JobFactory extends AbstractJobFactory {
         return vcardUpdateJob;
     }
 
-    private static Job buildUserJob(MongoOperation op, DBObject dbObj, String id) {
+    private static Job buildUserJob(MongoOperation op, Document dbObj, String id) {
         logger.debug("User job obj: " + dbObj);
 
         Job userJob = null;
@@ -168,7 +169,7 @@ public class JobFactory extends AbstractJobFactory {
         return userJob;
     }
 
-    private static Job buildGroupJob(MongoOperation op, DBObject dbObj, String id) {
+    private static Job buildGroupJob(MongoOperation op, Document dbObj, String id) {
         logger.debug("Group job obj: " + dbObj);
         logger.debug("Group job id: " + id);
 
@@ -233,27 +234,29 @@ public class JobFactory extends AbstractJobFactory {
     }
 
     private static String lookupImId(String uid) {
-        DBObject query = new BasicDBObject("_id", uid);
-        DBObject fields = new BasicDBObject("imid", 1);
-        DBObject user = getCollection().findOne(query, fields);
+        Bson query = Filters.eq("_id", uid);
+        Bson projection = Projections.include("imid");
+
+        Document user = getCollection().find(query).projection(projection).first();
         if (user == null) {
             return null;
         }
-        return (String) user.get("imid");
+        return user.getString("imid");
     }
 
     private static String lookupGroupName(String groupId) {
-        DBObject query = new BasicDBObject("_id", groupId);
-        DBObject fields = new BasicDBObject("uid", 1);
-        DBObject user = getCollection().findOne(query, fields);
+        Bson query = Filters.eq("_id", groupId);
+        Bson projection = Projections.include("uid");
+
+        Document user = getCollection().find(query).projection(projection).first();
         if (user == null) {
             return null;
         }
-        return (String) user.get("uid");
+        return user.getString("uid");
     }
 
-    private static DBCollection getCollection() {
-        DB db = UnfortunateLackOfSpringSupportFactory.getImdb();
+    private static MongoCollection<Document> getCollection() {
+        MongoDatabase db = UnfortunateLackOfSpringSupportFactory.getImdb();
 
         return db.getCollection(COLLECTION_NAME);
     }

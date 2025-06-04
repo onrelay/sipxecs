@@ -33,12 +33,10 @@ public class SettingsFieldsetTest extends TestCase {
     public void testRender() throws Exception {
         IMocksControl control = EasyMock.createNiceControl();
         Setting setting = control.createMock(Setting.class);
-        setting.getParent();
-        control.andReturn(null).atLeastOnce();
-        setting.isAdvanced();
-        control.andReturn(true);
-        setting.isAdvanced();
-        control.andReturn(false);
+
+        EasyMock.expect(setting.getParent()).andReturn(null).atLeastOnce();
+        EasyMock.expect(setting.isAdvanced()).andReturn(true);
+        EasyMock.expect(setting.isAdvanced()).andReturn(false);
         control.replay();
 
         m_fieldset.getSettings().addSetting(setting);

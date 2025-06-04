@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,7 +60,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
@@ -327,7 +326,7 @@ public class ConfigManagerImpl implements AddressProvider, ConfigManager, BeanFa
         return m_domainManager;
     }
 
-    @Required
+    
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }
@@ -337,7 +336,7 @@ public class ConfigManagerImpl implements AddressProvider, ConfigManager, BeanFa
         return m_featureManager;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }
@@ -567,7 +566,7 @@ public class ConfigManagerImpl implements AddressProvider, ConfigManager, BeanFa
         return getRegisteredLocations();
     }
 
-    @Required
+    
     public void setSystemAuditManager(SystemAuditManager systemAuditManager) {
         m_systemAuditManager = systemAuditManager;
     }

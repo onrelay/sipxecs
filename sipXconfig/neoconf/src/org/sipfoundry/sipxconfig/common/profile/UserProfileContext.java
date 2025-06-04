@@ -16,7 +16,7 @@
  */
 package org.sipfoundry.sipxconfig.common.profile;
 
-import static org.apache.commons.lang.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -25,7 +25,6 @@ import java.util.TimeZone;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.sipfoundry.commons.diddb.DidService;
 import org.sipfoundry.commons.userdb.profile.Address;
 import org.sipfoundry.commons.userdb.profile.UserProfile;
 import org.sipfoundry.commons.userdb.profile.UserProfileService;
@@ -38,7 +37,6 @@ import org.sipfoundry.sipxconfig.im.ImAccount;
 import org.sipfoundry.sipxconfig.setup.SetupListener;
 import org.sipfoundry.sipxconfig.setup.SetupManager;
 import org.sipfoundry.sipxconfig.systemaudit.SystemAuditManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -201,7 +199,7 @@ public class UserProfileContext implements DaoEventListener, SetupListener {
         m_userProfileService = profileService;
     }
 
-    @Required
+    
     public void setLocationManager(LocationsManager locationManager) {
         m_locationManager = locationManager;
     }
@@ -210,7 +208,7 @@ public class UserProfileContext implements DaoEventListener, SetupListener {
         m_jdbc = jdbc;
     }
 
-    @Required
+    
     public void setSystemAuditManager(SystemAuditManager systemAuditManager) {
         m_systemAuditManager = systemAuditManager;
     }

@@ -16,8 +16,6 @@
  */
 package org.sipfoundry.sipxconfig.ivr;
 
-import static java.lang.String.format;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.address.Address;
@@ -59,7 +57,6 @@ import org.sipfoundry.sipxconfig.mwi.Mwi;
 import org.sipfoundry.sipxconfig.restserver.RestServer;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingUtil;
-import org.springframework.beans.factory.annotation.Required;
 
 public class IvrConfig implements ConfigProvider, AlarmProvider {
 
@@ -241,22 +238,22 @@ public class IvrConfig implements ConfigProvider, AlarmProvider {
         return AlarmDefinition.asArray(ids);
     }
 
-    @Required
+    
     public void setIvr(Ivr ivr) {
         m_ivr = ivr;
     }
 
-    @Required
+    
     public void setMwi(Mwi mwi) {
         m_mwi = mwi;
     }
 
-    @Required
+    
     public void setAutoAttendantManager(AutoAttendantManager aaManager) {
         m_aaManager = aaManager;
     }
 
-    @Required
+    
     public void setFsRecordingContext(FreeswitchRecordingContext recordingContext) {
         m_fsRecording = recordingContext;
     }
@@ -265,7 +262,7 @@ public class IvrConfig implements ConfigProvider, AlarmProvider {
         m_adminContext = adminContext;
     }
 
-    @Required
+    
     public void setMailstoreDirectory(String mailstoreDirectory) {
         m_mailstoreDirectory = mailstoreDirectory;
     }        

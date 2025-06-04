@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.common.DaoUtils;
@@ -277,12 +277,12 @@ public class FirewallManagerImpl extends SipxHibernateDaoSupport<FirewallRule> i
         if (!serverGroup.isNew()) {
             params.add(serverGroup.getId());
         }
-        Integer newId = m_jdbc.queryForInt(sql, params.toArray());
+        Integer newId = m_jdbc.queryForObject(sql, Integer.class, params.toArray() );
         serverGroup.setUniqueId(newId);
     }
 
     private boolean isGroupDefined(String groupName) {
-        int check = m_jdbc.queryForInt("select count(*) from firewall_server_group where name = ?", groupName);
+        int check = m_jdbc.queryForObject("select count(*) from firewall_server_group where name = ?", Integer.class, groupName);
         return (check >= 1);
     }
 

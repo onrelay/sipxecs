@@ -40,16 +40,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.tapestry.contrib.table.model.common.ReverseComparator;
+import org.apache.commons.collections4.comparators.ReverseComparator;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Delete;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
+import org.restlet.resource.ServerResource;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.permission.Permission;
 import org.sipfoundry.sipxconfig.permission.PermissionManager;
 import org.sipfoundry.sipxconfig.rest.RestUtilities.MetadataRestInfo;
@@ -59,11 +63,10 @@ import org.sipfoundry.sipxconfig.rest.RestUtilities.SortInfo;
 import org.sipfoundry.sipxconfig.rest.RestUtilities.StringParameterInfo;
 import org.sipfoundry.sipxconfig.rest.RestUtilities.ValidationInfo;
 import org.sipfoundry.sipxconfig.rest.RestUtilities.ValidationInfo.StringConstraint;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.thoughtworks.xstream.XStream;
 
-public class PermissionsResource extends Resource {
+public class PermissionsResource extends ServerResource {
 
     private static final String ELEMENT_NAME_PERMISSIONBUNDLE = "permissions";
     private static final String ELEMENT_NAME_PERMISSION = "permission";
@@ -101,8 +104,9 @@ public class PermissionsResource extends Resource {
     // GET - Retrieve all and single Skill
     // -----------------------------------
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
+        
         Permission permission;
         StringParameterInfo parameterInfo;
 
@@ -153,8 +157,9 @@ public class PermissionsResource extends Resource {
     // PUT - Update or Add single Skill
     // --------------------------------
 
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
+        
         StringParameterInfo parameterInfo;
 
         // get from request body
@@ -168,7 +173,7 @@ public class PermissionsResource extends Resource {
         if (!validationInfo.getValid()) {
             RestUtilities.setResponseError(getResponse(), validationInfo.getResponseCode(), validationInfo
                     .getMessage());
-            return;
+            return null;
         }
 
         // if have name then get a single item
@@ -176,7 +181,7 @@ public class PermissionsResource extends Resource {
         if (parameterInfo.getExists()) {
             if (!parameterInfo.getValid()) {
                 RestUtilities.setResponseError(getResponse(), ERROR_ID_INVALID, parameterInfo.getValue());
-                return;
+                return null;
             }
 
             // copy values over to existing item
@@ -184,7 +189,7 @@ public class PermissionsResource extends Resource {
                 permission = m_permissionManager.getPermissionByName(parameterInfo.getValue());
                 if (permission == null) {
                     RestUtilities.setResponseError(getResponse(), ERROR_OBJECT_NOT_FOUND, parameterInfo.getValue());
-                    return;
+                    return null;
                 }
 
                 updatePermission(permission, permissionRestInfo);
@@ -192,11 +197,11 @@ public class PermissionsResource extends Resource {
             } catch (Exception exception) {
                 RestUtilities.setResponseError(getResponse(), ERROR_UPDATE_FAILED, parameterInfo.getValue(),
                         exception.getLocalizedMessage());
-                return;
+                return null;
             }
 
             RestUtilities.setResponse(getResponse(), SUCCESS_UPDATED, permission.getName());
-            return;
+            return null;
         }
 
         // if not single, add new item
@@ -205,16 +210,17 @@ public class PermissionsResource extends Resource {
             m_permissionManager.saveCallPermission(permission);
         } catch (Exception exception) {
             RestUtilities.setResponseError(getResponse(), ERROR_CREATE_FAILED, exception.getLocalizedMessage());
-            return;
+            return null;
         }
 
         RestUtilities.setResponse(getResponse(), SUCCESS_CREATED, permission.getName());
+        return null;
     }
 
     // DELETE - Delete single Skill
     // ----------------------------
 
-    @Override
+    @Delete
     public void removeRepresentations() throws ResourceException {
         StringParameterInfo parameterInfo;
         Permission permission;
@@ -294,7 +300,6 @@ public class PermissionsResource extends Resource {
         return metadata;
     }
 
-    @SuppressWarnings("unchecked")
     private void sortPermissions(List<Permission> permissions) {
         // sort if requested
         SortInfo sortInfo = RestUtilities.calculateSorting(m_form);
@@ -311,7 +316,7 @@ public class PermissionsResource extends Resource {
             if (sortForward) {
                 Collections.sort(permissions, new LabelComparator());
             } else {
-                Collections.sort(permissions, new ReverseComparator(new LabelComparator()));
+                Collections.sort(permissions, new ReverseComparator<Permission>(new LabelComparator()));
             }
             break;
 
@@ -319,7 +324,7 @@ public class PermissionsResource extends Resource {
             if (sortForward) {
                 Collections.sort(permissions, new DefaultValueComparator());
             } else {
-                Collections.sort(permissions, new ReverseComparator(new DefaultValueComparator()));
+                Collections.sort(permissions, new ReverseComparator<Permission>(new DefaultValueComparator()));
             }
             break;
 
@@ -327,7 +332,7 @@ public class PermissionsResource extends Resource {
             if (sortForward) {
                 Collections.sort(permissions, new NameComparator());
             } else {
-                Collections.sort(permissions, new ReverseComparator(new NameComparator()));
+                Collections.sort(permissions, new ReverseComparator<Permission>(new NameComparator()));
             }
             break;
 
@@ -335,7 +340,7 @@ public class PermissionsResource extends Resource {
             if (sortForward) {
                 Collections.sort(permissions, new DescriptionComparator());
             } else {
-                Collections.sort(permissions, new ReverseComparator(new DescriptionComparator()));
+                Collections.sort(permissions, new ReverseComparator<Permission>(new DescriptionComparator()));
             }
             break;
 
@@ -453,7 +458,7 @@ public class PermissionsResource extends Resource {
     // Injected objects
     // ----------------
 
-    @Required
+    
     public void setPermissionManager(PermissionManager permissionManager) {
         m_permissionManager = permissionManager;
     }

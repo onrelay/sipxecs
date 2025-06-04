@@ -11,9 +11,6 @@ package org.sipfoundry.commons.freeswitch;
 import java.io.BufferedReader;
 import java.io.StringReader;
 
-import org.sipfoundry.commons.freeswitch.FreeSwitchEvent;
-import org.sipfoundry.commons.freeswitch.FreeSwitchEventSocket;
-
 import junit.framework.TestCase;
 
 public class FreeSwitchEventSocketTest extends TestCase {

@@ -34,10 +34,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.JsonNode;
@@ -45,14 +45,17 @@ import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Get;
+import org.restlet.resource.Post;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
 import org.sipfoundry.sipxconfig.common.TimeOfDay;
 import org.sipfoundry.sipxconfig.commserver.Location;
@@ -63,10 +66,9 @@ import org.sipfoundry.sipxconfig.security.UserDetailsImpl;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingJsonReader;
 import org.sipfoundry.sipxconfig.setting.SettingJsonWriter;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.MessageSource;
 
-public class BackupApi extends Resource {
+public class BackupApi extends ServerResource {
     private static final Log LOG = LogFactory.getLog(BackupApi.class);
 
     private static final String BACKUP = "backup";
@@ -102,8 +104,8 @@ public class BackupApi extends Resource {
     }
 
     // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         if (m_backupType == null) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Must specify type of backup /backup/{type}");
         }
@@ -198,11 +200,12 @@ public class BackupApi extends Resource {
      *  Save plan: yes
      *  Backup Now: no
      */
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         putOrPost(entity);
         m_backupManager.saveBackupPlan(m_plan);
         m_backupManager.saveSettings(m_settings);
+        return null;
     }
 
     /**
@@ -210,8 +213,8 @@ public class BackupApi extends Resource {
      *  Save plan: no
      *  Backup Now: yes
      */
-    @Override
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {        
         putOrPost(entity);
         File planFile = null;
         Writer planWtr = null;
@@ -243,6 +246,7 @@ public class BackupApi extends Resource {
         } finally {
             IOUtils.closeQuietly(planWtr);
         }
+        return null;
     }
 
     void putOrPost(Representation entity) throws ResourceException {
@@ -289,31 +293,12 @@ public class BackupApi extends Resource {
         }
     }
 
-    @Override
-    public boolean allowGet() {
-        return true;
-    }
-
-    @Override
-    public boolean allowDelete() {
-        return true;
-    };
-
-    @Override
-    public boolean allowPut() {
-        return true;
-    };
-
-    @Override
-    public boolean allowPost() {
-        return true;
-    };
 
     ObjectMapper getJsonMapper() {
         return m_jsonMapper;
     }
 
-    @Required
+    
     public void setBackupManager(BackupManager backupManager) {
         m_backupManager = backupManager;
     }
@@ -322,17 +307,17 @@ public class BackupApi extends Resource {
         return m_backupManager;
     }
 
-    @Required
+    
     public void setMessages(MessageSource messages) {
         m_messages = messages;
     }
 
-    @Required
+    
     public void setBackupConfig(BackupConfig backupConfig) {
         m_backupConfig = backupConfig;
     }
 
-    @Required
+    
     public void setBackupRunner(BackupRunner backupRunner) {
         m_backupRunner = backupRunner;
     }

@@ -19,13 +19,12 @@ package org.sipfoundry.sipxevent;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.web.HttpRequestHandler;
 
 public class MessageReceiverServlet implements HttpRequestHandler {
@@ -48,7 +47,7 @@ public class MessageReceiverServlet implements HttpRequestHandler {
         }
     }
 
-    @Required
+    
     public void setRegisteredClients(RegisteredClients registeredClients) {
         m_registeredClients = registeredClients;
     }

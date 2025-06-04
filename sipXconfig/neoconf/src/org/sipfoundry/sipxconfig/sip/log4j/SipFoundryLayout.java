@@ -11,6 +11,7 @@ package org.sipfoundry.sipxconfig.sip.log4j;
 
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
@@ -27,7 +28,7 @@ import org.sipfoundry.sipxconfig.commserver.LocationsManager;
  */
 public class SipFoundryLayout extends Layout {
 
-    private static Long s_lineNumber = 0L;
+    private static AtomicLong s_lineNumber = new AtomicLong(0L);
 
     private SimpleDateFormat m_dateFormat;
 
@@ -154,20 +155,19 @@ public class SipFoundryLayout extends Layout {
 
         // lineNumber is static across all loggers, so must be mutex protected.
         // time should also increase monotonically, so hold the lock
-        synchronized (s_lineNumber) {
-            s_lineNumber++;
-            String out1 = String.format("\"%s\":%d:%s:%s:%s:%s:%s:%s:\"%s\"%n",
-                    m_dateFormat.format(System.currentTimeMillis()),
-                    s_lineNumber, // line number
-                    localFacility, // Facility
-                    mapLevel2SipFoundry(arg0.getLevel()), // msg priority (DEBUG, WARN, etc.)
-                    getHostname(), // Name of this machine
-                    arg0.getThreadName(), // Thread that called log
-                    "00000000", // Thread Id (not useful in Java)
-                    loggerName, // Name of the logger
-                    newMessage); // The message itself (w CRLF escaped)
-            return out1;
-        }
+        s_lineNumber.getAndIncrement();
+        String out1 = String.format("\"%s\":%d:%s:%s:%s:%s:%s:%s:\"%s\"%n",
+                m_dateFormat.format(System.currentTimeMillis()),
+                s_lineNumber.longValue(), // line number
+                localFacility, // Facility
+                mapLevel2SipFoundry(arg0.getLevel()), // msg priority (DEBUG, WARN, etc.)
+                getHostname(), // Name of this machine
+                arg0.getThreadName(), // Thread that called log
+                "00000000", // Thread Id (not useful in Java)
+                loggerName, // Name of the logger
+                newMessage); // The message itself (w CRLF escaped)
+        return out1;
+        
     }
 
     @Override

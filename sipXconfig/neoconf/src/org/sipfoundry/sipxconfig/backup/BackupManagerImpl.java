@@ -38,8 +38,7 @@ import org.sipfoundry.sipxconfig.setup.SetupManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Required;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 
 public class BackupManagerImpl extends HibernateDaoSupport implements BackupManager,
         BeanFactoryAware, SetupListener {
@@ -175,12 +174,12 @@ public class BackupManagerImpl extends HibernateDaoSupport implements BackupMana
         m_configManager = configManager;
     }
 
-    @Required
+    
     public void setTmpDirectoryPath(String tmpDirectoryPath) {
         m_tmpDirectoryPath = tmpDirectoryPath;
     }
 
-    @Required
+    
     public void setRestoreStagingDirectoryPath(String dir) {
         m_restoreStagingDir = new File(dir);
     }

@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.sipfoundry.sipximbot.ImbotConfiguration;
 
 // Ideally we should import those SIP stats code definitions from
 // import org.apache.http.contrib.sip;

@@ -17,7 +17,7 @@ package org.sipfoundry.sipxconfig.admin;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.cfgmgt.DeployConfigOnEdit;
@@ -25,7 +25,6 @@ import org.sipfoundry.sipxconfig.feature.Feature;
 import org.sipfoundry.sipxconfig.setting.PersistableSettings;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingEntry;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Does not implement DeployOnEdit because we don't need to replicate to other servers
@@ -194,12 +193,12 @@ public class AdminSettings extends PersistableSettings implements DeployConfigOn
         return noSpaces;
     }
 
-    @Required
+    
     public void setPasswordPolicy(PasswordPolicy passwordPolicy) {
         m_passwordPolicy = passwordPolicy;
     }
 
-    @Required
+    
     public void setLogLevelKeys(String[] logLevelKeys) {
         m_logLevelKeys = logLevelKeys;
     }

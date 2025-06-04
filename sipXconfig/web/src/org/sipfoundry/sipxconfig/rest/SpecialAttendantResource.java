@@ -16,12 +16,16 @@ import static org.sipfoundry.sipxconfig.permission.PermissionName.RECORD_SYSTEM_
 
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Delete;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.dialplan.AutoAttendantManager;
 
 import com.thoughtworks.xstream.XStream;
@@ -35,38 +39,24 @@ public class SpecialAttendantResource extends UserResource {
         super.init(context, request, response);
         getVariants().add(new Variant(TEXT_XML));
         getVariants().add(new Variant(APPLICATION_JSON));
-        setModifiable(getUser().hasPermission(RECORD_SYSTEM_PROMPTS));
     }
 
-    @Override
-    public boolean allowGet() {
-        return true;
-    }
 
-    @Override
-    public boolean allowPut() {
-        return true;
-    }
-
-    @Override
-    public boolean allowDelete() {
-        return true;
-    }
-
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         AutoAttendantSpecialModeRestInfo specialModeRest = new AutoAttendantSpecialModeRestInfo();
         specialModeRest.setSpecialMode(m_autoAttendantManager.getSpecialMode());
         return new SpecialAttendantRepresentation(variant.getMediaType(), specialModeRest);
     }
 
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         m_autoAttendantManager.setAttendantSpecialMode(true, null);
         getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
+        return null;
     }
 
-    @Override
+    @Delete
     public void removeRepresentations() throws ResourceException {
         m_autoAttendantManager.setAttendantSpecialMode(false, null);
         getResponse().setStatus(Status.SUCCESS_NO_CONTENT);

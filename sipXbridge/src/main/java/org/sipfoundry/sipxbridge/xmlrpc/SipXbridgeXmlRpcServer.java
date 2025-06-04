@@ -12,7 +12,7 @@ package org.sipfoundry.sipxbridge.xmlrpc;
 
 import java.util.Map;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 /**
  * 

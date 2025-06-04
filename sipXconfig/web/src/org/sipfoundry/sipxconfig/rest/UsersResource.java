@@ -47,16 +47,20 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.tapestry.contrib.table.model.common.ReverseComparator;
+import org.apache.commons.collections4.comparators.ReverseComparator;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Delete;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.branch.Branch;
 import org.sipfoundry.sipxconfig.branch.BranchManager;
 import org.sipfoundry.sipxconfig.common.CoreContext;
@@ -74,11 +78,10 @@ import org.sipfoundry.sipxconfig.rest.RestUtilities.UserRestInfoFull;
 import org.sipfoundry.sipxconfig.rest.RestUtilities.ValidationInfo;
 import org.sipfoundry.sipxconfig.rest.RestUtilities.ValidationInfo.StringConstraint;
 import org.sipfoundry.sipxconfig.setting.Group;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.thoughtworks.xstream.XStream;
 
-public class UsersResource extends Resource {
+public class UsersResource extends ServerResource {
     private static final String USER = "user";
 
     private static final String ELEMENT_NAME_USERBUNDLE = USER;
@@ -121,8 +124,8 @@ public class UsersResource extends Resource {
     // GET - Retrieve all and single User
     // ----------------------------------
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         IntParameterInfo parameterInfo;
         User user;
         UserRestInfoFull userRestInfo;
@@ -210,8 +213,8 @@ public class UsersResource extends Resource {
     // PUT - Update or Add single User
     // -------------------------------
 
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         IntParameterInfo parameterInfo;
 
         // get from request body
@@ -225,7 +228,7 @@ public class UsersResource extends Resource {
         if (!validationInfo.getValid()) {
             RestUtilities.setResponseError(getResponse(), validationInfo.getResponseCode(), validationInfo
                     .getMessage());
-            return;
+            return null;
         }
 
         // if have id then update single item
@@ -233,7 +236,7 @@ public class UsersResource extends Resource {
         if (parameterInfo.getExists()) {
             if (!parameterInfo.getValid()) {
                 RestUtilities.setResponseError(getResponse(), ERROR_ID_INVALID, parameterInfo.getValueString());
-                return;
+                return null;
             }
 
             // copy values over to existing item
@@ -241,7 +244,7 @@ public class UsersResource extends Resource {
                 user = m_coreContext.getUser(parameterInfo.getValue());
                 if (user == null) {
                     RestUtilities.setResponseError(getResponse(), ERROR_OBJECT_NOT_FOUND, parameterInfo.getValue());
-                    return;
+                    return null;
                 }
 
                 updateUser(user, userRestInfo);
@@ -249,11 +252,11 @@ public class UsersResource extends Resource {
             } catch (Exception exception) {
                 RestUtilities.setResponseError(getResponse(), ERROR_UPDATE_FAILED, parameterInfo.getValue(),
                         exception.getLocalizedMessage());
-                return;
+                return null;
             }
 
             RestUtilities.setResponse(getResponse(), SUCCESS_UPDATED, user.getId());
-            return;
+            return null;
         }
 
         // otherwise add new item
@@ -262,16 +265,17 @@ public class UsersResource extends Resource {
             m_coreContext.saveUser(user);
         } catch (Exception exception) {
             RestUtilities.setResponseError(getResponse(), ERROR_CREATE_FAILED, exception.getLocalizedMessage());
-            return;
+            return null;
         }
 
         RestUtilities.setResponse(getResponse(), SUCCESS_CREATED, user.getId());
+        return null;
     }
 
     // DELETE - Delete single User
     // ---------------------------
 
-    @Override
+    @Delete
     public void removeRepresentations() throws ResourceException {
         IntParameterInfo parameterInfo;
         User user;
@@ -398,7 +402,6 @@ public class UsersResource extends Resource {
         return metadata;
     }
 
-    @SuppressWarnings("unchecked")
     private void sortUsers(List<User> users) {
         // sort groups if requested
         SortInfo sortInfo = RestUtilities.calculateSorting(m_form);
@@ -415,7 +418,7 @@ public class UsersResource extends Resource {
             if (sortForward) {
                 Collections.sort(users, new UserNameComparator());
             } else {
-                Collections.sort(users, new ReverseComparator(new UserNameComparator()));
+                Collections.sort(users, new ReverseComparator<User>(new UserNameComparator()));
             }
             break;
 
@@ -423,7 +426,7 @@ public class UsersResource extends Resource {
             if (sortForward) {
                 Collections.sort(users, new LastNameComparator());
             } else {
-                Collections.sort(users, new ReverseComparator(new LastNameComparator()));
+                Collections.sort(users, new ReverseComparator<User>(new LastNameComparator()));
             }
             break;
 
@@ -431,7 +434,7 @@ public class UsersResource extends Resource {
             if (sortForward) {
                 Collections.sort(users, new FirstNameComparator());
             } else {
-                Collections.sort(users, new ReverseComparator(new FirstNameComparator()));
+                Collections.sort(users, new ReverseComparator<User>(new FirstNameComparator()));
             }
             break;
 
@@ -618,12 +621,12 @@ public class UsersResource extends Resource {
     // Injected objects
     // ----------------
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setBranchManager(BranchManager branchManager) {
         m_branchManager = branchManager;
     }

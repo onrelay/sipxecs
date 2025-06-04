@@ -6,9 +6,14 @@
 package org.sipfoundry.sipxrest;
 
 import org.restlet.Context;
-import org.restlet.Filter;
-import org.restlet.Router;
-import org.restlet.data.Request;
+import org.restlet.routing.Filter;
+import org.restlet.routing.Route;
+import org.restlet.routing.Router;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.data.MediaType;
+import org.restlet.data.Status;
+
 
 public abstract class Plugin {
     private MetaInf metaInf;
@@ -58,5 +63,32 @@ public abstract class Plugin {
      */
     public abstract void attachContext(Filter filter, Context context, Router router);
     
+    /**
+     * Automatically extracts a parameter from the incoming HTTP request and stores it
+     * as an attribute in the Request object 
+     * before the target Restlet or ServerResource handles it.
+     * @param route
+     * @param parameterName
+     * @param attributeName
+     * @param required
+     */
+    protected void extractQuery(Route route, String parameterName, String attributeName, boolean required) {
+        Filter originalFilter = (Filter) route.getNext();
+        Filter wrapper = new Filter(originalFilter.getContext()) {
+            @Override
+            protected int beforeHandle(Request request, Response response) {
+                String value = request.getResourceRef().getQueryAsForm().getFirstValue(parameterName);
+                if (required && (value == null || value.isEmpty())) {
+                    response.setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                    response.setEntity("Missing required query parameter: " + parameterName, MediaType.TEXT_PLAIN);
+                    return STOP;
+                }
+                request.getAttributes().put(attributeName, value);
+                return CONTINUE;
+            }
+        };
+        wrapper.setNext(originalFilter);
+        route.setNext(wrapper);
+    }
     
 }

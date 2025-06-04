@@ -65,7 +65,7 @@ public class SettingsWithLocationTestIntegration extends IntegrationTestCase {
         settings.setLocation(location);
         m_dao.upsert(settings);
         flush();
-        db().queryForLong("select 1 from settings_with_location where bean_id = 'birdWithLocation'");
+        db().queryForObject("select 1 from settings_with_location where bean_id = 'birdWithLocation'", Long.class);
     }
 
     public void testSaveWithSettings() throws IOException {
@@ -76,7 +76,7 @@ public class SettingsWithLocationTestIntegration extends IntegrationTestCase {
         settings.setSettingValue(PASSENGER_PIGEON, "1");
         m_dao.upsert(settings);
         flush();
-        db().queryForLong("select 1 from setting_value where value = '1' and path = ?", PASSENGER_PIGEON);
+        db().queryForObject("select 1 from setting_value where value = '1' and path = ?", Long.class, PASSENGER_PIGEON);
     }    
 
     public void setBirdWithLocationDao(SettingsWithLocationDao<BirdWithLocation> dao) {

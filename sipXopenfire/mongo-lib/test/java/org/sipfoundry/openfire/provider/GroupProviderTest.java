@@ -10,14 +10,13 @@ import org.jivesoftware.openfire.provider.GroupProvider;
 import org.junit.After;
 import org.junit.Test;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 @SuppressWarnings("static-method")
 public class GroupProviderTest extends BaseMongoTest {
     @After
     public void teardown() {
-        getImdb().getCollection("entity").remove(new BasicDBObject());
+        getImdb().getCollection("entity").remove(new Document());
     }
 
     @Test
@@ -102,7 +101,7 @@ public class GroupProviderTest extends BaseMongoTest {
     }
 
     private static void insertGroup(String groupName) {
-        DBObject grpObj = new BasicDBObject();
+        Document grpObj = new Document();
 
         grpObj.put("ent", "group");
         grpObj.put("uid", groupName);

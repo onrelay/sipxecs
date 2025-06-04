@@ -30,7 +30,6 @@ import org.sipfoundry.sipxconfig.freeswitch.FreeswitchFeature;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchSettings;
 import org.sipfoundry.sipxconfig.ivr.Ivr;
 import org.sipfoundry.sipxconfig.parkorbit.ParkOrbitContext;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Generates default_context.xml.in
@@ -98,12 +97,12 @@ public class DefaultContextConfiguration extends AbstractFreeswitchConfiguration
         write(writer, context);
     }
 
-    @Required
+    
     public void setConferenceContext(ConferenceBridgeContext conferenceContext) {
         m_conferenceContext = conferenceContext;
     }
 
-    @Required
+    
     public void setFreeswitchExtensionCollector(FreeswitchExtensionCollector collector) {
         m_freeswitchExtensionCollector = collector;
     }
@@ -137,17 +136,17 @@ public class DefaultContextConfiguration extends AbstractFreeswitchConfiguration
         }
     }
 
-    @Required
+    
     public FeatureManager getFeatureManager() {
         return m_featureManager;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }
 
-    @Required
+    
     public void setParkOrbitContext(ParkOrbitContext context) {
         m_parkOrbitContext = context;
     }
@@ -156,7 +155,7 @@ public class DefaultContextConfiguration extends AbstractFreeswitchConfiguration
         m_fsEtcDir = directory;
     }
 
-    @Required
+    
     public void setAdvancedCallHandling(AdvancedCallHandling advancedCallHandling) {
         m_advancedCallHandling = advancedCallHandling;
     }

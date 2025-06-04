@@ -2161,7 +2161,7 @@ public class BackToBackUserAgent implements Comparable {
             }
             ((ViaHeader) newRequest.getHeader(ViaHeader.NAME)).removeParameter("branch");
             ((FromHeader) newRequest.getHeader(FromHeader.NAME)).removeParameter("tag");
-            String newTag = new Integer(Math.abs(new Random().nextInt())).toString();
+            String newTag = Integer.valueOf(Math.abs(new Random().nextInt())).toString();
             ((FromHeader) newRequest.getHeader(FromHeader.NAME)).setTag(newTag);
 
             DialogContext dialogContext = DialogContext.get(clientTransaction.getDialog());

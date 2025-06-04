@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.sbc;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * List of domains and subnets that need special routing: either through session border controller

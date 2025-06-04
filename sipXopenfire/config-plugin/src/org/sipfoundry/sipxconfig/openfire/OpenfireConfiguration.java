@@ -36,7 +36,6 @@ import org.sipfoundry.sipxconfig.imbot.ImBot;
 import org.sipfoundry.sipxconfig.localization.LocalizationContext;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingUtil;
-import org.springframework.beans.factory.annotation.Required;
 
 public class OpenfireConfiguration implements ConfigProvider {
     protected static final String DAT_FILE = "sipxopenfire.cfdat";
@@ -139,12 +138,12 @@ public class OpenfireConfiguration implements ConfigProvider {
         m_sipxConfig = sipxConfig;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }
 
-    @Required
+    
     public void setOpenfire(Openfire openfire) {
         m_openfire = openfire;
     }

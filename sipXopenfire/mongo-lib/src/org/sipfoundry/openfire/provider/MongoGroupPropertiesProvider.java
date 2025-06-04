@@ -27,9 +27,8 @@ import org.jivesoftware.openfire.group.GroupAlreadyExistsException;
 import org.jivesoftware.openfire.provider.GroupPropertiesProvider;
 import org.jivesoftware.util.PersistableMap;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
 
 public class MongoGroupPropertiesProvider extends BaseMongoProvider implements GroupPropertiesProvider {
     private static final String COLLECTION_NAME = "ofGroupProp";
@@ -40,12 +39,14 @@ public class MongoGroupPropertiesProvider extends BaseMongoProvider implements G
 
     public MongoGroupPropertiesProvider() {
         setDefaultCollectionName(COLLECTION_NAME);
-        DBCollection grpPropsCollection = getDefaultCollection();
-        DBObject index = new BasicDBObject();
+        MongoCollection<Document> grpPropsCollection = getDefaultCollection();
 
-        index.put("groupname", 1);
-        index.put("name", 1);
-        grpPropsCollection.ensureIndex(index);
+        Document index = new Document()
+            .append("groupname", 1)
+            .append("name", 1);
+
+        // createIndex replaces ensureIndex
+        grpPropsCollection.createIndex(index);
     }
 
     /**
@@ -55,13 +56,13 @@ public class MongoGroupPropertiesProvider extends BaseMongoProvider implements G
     public PersistableMap<String, String> loadProperties(Group group) {
         PersistableMap<String, String> grpProps = new DefaultGroupPropertyMap<String, String>(group);
 
-        DBCollection grpPropsCollection = getDefaultCollection();
+        MongoCollection<Document> grpPropsCollection = getDefaultCollection();
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
 
         query.put("groupname", group.getName());
 
-        for (DBObject grpPropsObj : grpPropsCollection.find(query)) {
+        for (Document grpPropsObj : grpPropsCollection.find(query)) {
             String propName = (String) grpPropsObj.get("name");
             String propValue = (String) grpPropsObj.get("propValue");
             grpProps.put(propName, propValue, false);
@@ -86,15 +87,14 @@ public class MongoGroupPropertiesProvider extends BaseMongoProvider implements G
      */
     @Override
     public void insertProperty(String groupName, String propName, String propValue) {
-        DBCollection grpPropsCollection = getDefaultCollection();
+        MongoCollection<Document> grpPropsCollection = getDefaultCollection();
 
-        DBObject toInsert = new BasicDBObject();
+        Document toInsert = new Document()
+            .append("groupname", groupName)
+            .append("name", propName)
+            .append("propValue", propValue);
 
-        toInsert.put("groupname", groupName);
-        toInsert.put("name", propName);
-        toInsert.put("propValue", propValue);
-
-        grpPropsCollection.insert(toInsert);
+        grpPropsCollection.insertOne(toInsert);
     }
 
     /**
@@ -144,16 +144,16 @@ public class MongoGroupPropertiesProvider extends BaseMongoProvider implements G
      */
     @Override
     public Collection<String> getVisibleGroupNames(String userGroup) {
-        DBCollection grpPropsCollection = getDefaultCollection();
+        MongoCollection<Document> grpPropsCollection = getDefaultCollection();
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
 
         query.put("name", "sharedRoster.groupList");
         query.put("propValue", Pattern.compile("\\.*" + userGroup + "\\.*"));
 
         Set<String> names = new HashSet<String>();
 
-        for (DBObject propObj : grpPropsCollection.find(query)) {
+        for (Document propObj : grpPropsCollection.find(query)) {
             names.add((String) propObj.get("groupName"));
         }
 
@@ -175,16 +175,16 @@ public class MongoGroupPropertiesProvider extends BaseMongoProvider implements G
      */
     @Override
     public Collection<String> search(String key, String value) {
-        DBCollection grpPropsCollection = getDefaultCollection();
+        MongoCollection<Document> grpPropsCollection = getDefaultCollection();
 
-        DBObject query = new BasicDBObject();
+        Document query = new Document();
 
         query.put("name", key);
         query.put("propValue", value);
 
         Set<String> names = new HashSet<String>();
 
-        for (DBObject propObj : grpPropsCollection.find(query)) {
+        for (Document propObj : grpPropsCollection.find(query)) {
             names.add((String) propObj.get("groupName"));
         }
 

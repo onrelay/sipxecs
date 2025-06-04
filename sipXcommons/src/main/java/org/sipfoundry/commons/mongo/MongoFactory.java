@@ -1,20 +1,20 @@
 package org.sipfoundry.commons.mongo;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.UnknownHostException;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
-import com.mongodb.Mongo;
-import com.mongodb.MongoURI;
-import com.mongodb.WriteConcern;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.MongoException;
+import com.mongodb.ConnectionString;
 
 public class MongoFactory {
     private static final Logger log = Logger.getLogger(MongoFactory.class);
@@ -23,7 +23,7 @@ public class MongoFactory {
 
     private static String connectionURL;
 
-    public static final Mongo fromConnectionFile() throws UnknownHostException {
+    public static final MongoClient fromConnectionFile() throws MongoException {
         if (connectionURL == null) {
             synchronized (FILE_LOCK) {
                 String configurationPathDef = "/etc/sipxpbx";
@@ -31,7 +31,6 @@ public class MongoFactory {
                     configurationPathDef = "/usr/local/sipx/" + configurationPathDef;
                 }
                 String configurationPath = System.getProperty("conf.dir", configurationPathDef);
-                @SuppressWarnings("resource")
                 InputStream is = null;
                 String config = null;
 
@@ -57,19 +56,12 @@ public class MongoFactory {
         return fromConnectionString(connectionURL);
     }
 
-
-
-    public static final Mongo fromConnectionString(String connectionUrl) throws UnknownHostException {
-        MongoURI uri = new MongoURI(connectionUrl);
-        Mongo m = uri.connect();
-
-        // set explicitly, in case the driver changes the default value
-        m.setWriteConcern(WriteConcern.ACKNOWLEDGED);
-
-        return m;
+    public static final MongoClient fromConnectionString(String connectionUrl) throws MongoException {
+        // Use the MongoDB Java 4.x driver to connect
+        ConnectionString connString = new ConnectionString(connectionUrl);
+        return MongoClients.create(connString);
     }
 
-    @SuppressWarnings("resource")
     public static String readConfig(String configFile) {
         Properties p = new Properties();
         InputStream in = null;

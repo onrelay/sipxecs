@@ -3,10 +3,9 @@ package org.sipfoundry.sipxconfig.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.elasticsearch.common.lang3.StringUtils;
 import org.sipfoundry.commons.diddb.DidPool;
 import org.sipfoundry.commons.diddb.DidPoolService;
 import org.sipfoundry.sipxconfig.commserver.Location;
@@ -14,7 +13,6 @@ import org.sipfoundry.sipxconfig.dialplan.DialingRule;
 import org.sipfoundry.sipxconfig.dialplan.UnassignedDidRule;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchFeature;
-import org.springframework.beans.factory.annotation.Required;
 
 public class DidPoolContextImpl implements DidPoolContext {
     
@@ -60,12 +58,12 @@ public class DidPoolContextImpl implements DidPoolContext {
         return dialingRules;        
     }    
 
-    @Required
+    
     public void setFeatureManager(FeatureManager manager) {
         m_featureManager = manager;
     }
 
-    @Required
+    
     public void setDidPoolService(DidPoolService didPoolService) {
         m_didPoolService = didPoolService;
     }

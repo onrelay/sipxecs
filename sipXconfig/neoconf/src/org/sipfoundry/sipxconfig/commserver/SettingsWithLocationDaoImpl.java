@@ -57,7 +57,7 @@ public class SettingsWithLocationDaoImpl<T extends SettingsWithLocation> extends
 
     @Override
     public List<T> findAll(Location location) {
-        List<T> results = getHibernateTemplate().findByNamedQuery(FIND_QUERY, location.getId());
+        List<T> results = (List<T>)getHibernateTemplate().findByNamedQuery(FIND_QUERY, location.getId());
         return results;
     }
 

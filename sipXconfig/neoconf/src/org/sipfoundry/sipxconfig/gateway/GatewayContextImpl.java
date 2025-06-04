@@ -31,10 +31,10 @@ import org.sipfoundry.sipxconfig.logging.AuditLogContext.CONFIG_CHANGE_TYPE;
 import org.sipfoundry.sipxconfig.sbc.SbcDevice;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateCallback;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 
-public class GatewayContextImpl extends SipxHibernateDaoSupport implements GatewayContext, BeanFactoryAware {
+public class GatewayContextImpl extends SipxHibernateDaoSupport<Object> implements GatewayContext, BeanFactoryAware {
     private static final String QUERY_GATEWAY_ID_BY_SERIAL_NUMBER = "gatewayIdsWithSerialNumber";
     private static final String AUDIT_LOG_CONFIG_TYPE = "Gateway";
 
@@ -65,7 +65,7 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport implements Gatew
     }
 
     public Collection<Integer> getAllGatewayIds() {
-        return getHibernateTemplate().findByNamedQuery("gatewayIds");
+        return (Collection<Integer>)getHibernateTemplate().findByNamedQuery("gatewayIds");
     }
 
     public Gateway getGateway(Integer id) {
@@ -141,7 +141,7 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport implements Gatew
         }
 
         getHibernateTemplate().flush();
-        for (Iterator i = sbcSet.iterator(); i.hasNext();) {
+        for (Iterator<SbcDevice> i = sbcSet.iterator(); i.hasNext();) {
             SbcDevice sbc = (SbcDevice) i.next();
             sbc.generateProfiles(sbc.getProfileLocation());
             sbc.restart();
@@ -157,13 +157,13 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport implements Gatew
     }
 
     public <T> List<T> getGatewayByType(final Class<T> type) {
-        HibernateCallback callback = new HibernateCallback() {
+        HibernateCallback<Object> callback = new HibernateCallback<>() {
             public Object doInHibernate(Session session) {
                 Criteria criteria = session.createCriteria(type);
                 return criteria.list();
             }
         };
-        return getHibernateTemplate().executeFind(callback);
+        return (List<T>)getHibernateTemplate().execute(callback);
     }
 
     /**
@@ -177,7 +177,7 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport implements Gatew
         if (null == rule) {
             return Collections.EMPTY_LIST;
         }
-        List allGateways = getGateways();
+        List<Gateway> allGateways = getGateways();
         return rule.getAvailableGateways(allGateways);
     }
 
@@ -197,7 +197,7 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport implements Gatew
     }
 
     public void clear() {
-        List gateways = getHibernateTemplate().loadAll(Gateway.class);
+        List<Gateway> gateways = getHibernateTemplate().loadAll(Gateway.class);
         getHibernateTemplate().deleteAll(gateways);
     }
 
@@ -230,7 +230,7 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport implements Gatew
     }
 
     public Integer getGatewayIdBySerialNumber(String serialNumber) {
-        List objs = getHibernateTemplate().findByNamedQueryAndNamedParam(QUERY_GATEWAY_ID_BY_SERIAL_NUMBER, "value",
+        List<Integer> objs = (List<Integer>)getHibernateTemplate().findByNamedQueryAndNamedParam(QUERY_GATEWAY_ID_BY_SERIAL_NUMBER, "value",
                 serialNumber);
         return (Integer) DaoUtils.requireOneOrZero(objs, QUERY_GATEWAY_ID_BY_SERIAL_NUMBER);
     }

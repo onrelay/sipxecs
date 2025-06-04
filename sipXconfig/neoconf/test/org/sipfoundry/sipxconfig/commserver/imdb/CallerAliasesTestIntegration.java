@@ -21,8 +21,7 @@ import org.sipfoundry.sipxconfig.gateway.Gateway;
 import org.sipfoundry.sipxconfig.gateway.GatewayCallerAliasInfo;
 import org.sipfoundry.sipxconfig.test.ImdbTestCase;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 public class CallerAliasesTestIntegration extends ImdbTestCase {
     
@@ -51,7 +50,7 @@ public class CallerAliasesTestIntegration extends ImdbTestCase {
         getReplicationManager().replicateEntity(gw, DataSet.CALLER_ALIAS);
         
         assertObjectWithIdPresent(getEntityCollection(), "Gateway1");
-        DBObject ref = new BasicDBObject();
+        Document ref = new Document();
         ref.put(ID, "Gateway1");
         ref.put("ident", "gateway.example.org;sipxecs-lineid=1");
         ref.put("uid", "~~gw");

@@ -12,8 +12,8 @@ package org.sipfoundry.sipxconfig.dialplan;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Represents a regular expression corresponding to what users dialed. This concrete class allows

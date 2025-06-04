@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.commserver.imdb.MongoTestCaseHelper;
@@ -33,7 +33,7 @@ import org.sipfoundry.sipxconfig.test.MongoTestIntegration;
 import org.sipfoundry.sipxconfig.test.ResultDataGrid;
 import org.sipfoundry.sipxconfig.test.TestHelper;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.orm.hibernate3.HibernateObjectRetrievalFailureException;
+import org.springframework.orm.hibernate5.HibernateObjectRetrievalFailureException;
 
 public class PhoneTestIntegration extends MongoTestIntegration {
     private PhoneContext context;
@@ -77,7 +77,7 @@ public class PhoneTestIntegration extends MongoTestIntegration {
         sql("common/TestUserSeed.sql");
         sql("phone/EndpointLineSeed.sql");
 
-        Phone p = context.loadPhone(new Integer(1000));
+        Phone p = context.loadPhone(Integer.valueOf(1000));
         assertEquals("999123456789", p.getSerialNumber());
 
         context.storePhone(p);
@@ -97,8 +97,8 @@ public class PhoneTestIntegration extends MongoTestIntegration {
             assertTrue(true);
         }
         flush();
-        assertEquals(0, db().queryForInt("select count(*) from phone"));
-        assertEquals(0, db().queryForInt("select count(*) from line"));
+        assertEquals(0, (int)db().queryForObject("select count(*) from phone", Integer.class));
+        assertEquals(0, (int)db().queryForObject("select count(*) from line", Integer.class));
 
         MongoTestCaseHelper.assertObjectWithFieldsValuesNotPresent(getImdb().getCollection("entity"), new String[] {
             "ent", "mac"
@@ -111,11 +111,11 @@ public class PhoneTestIntegration extends MongoTestIntegration {
         sql("common/TestUserSeed.sql");
         sql("phone/EndpointLineSeed.sql");
 
-        Phone p = context.loadPhone(new Integer(1000));
+        Phone p = context.loadPhone(Integer.valueOf(1000));
         context.storePhone(p);
         context.flush();
 
-        Phone reloadPhone = context.loadPhone(new Integer(1000));
+        Phone reloadPhone = context.loadPhone(Integer.valueOf(1000));
         ValueStorage s = (ValueStorage) reloadPhone.getValueStorage();
         Map<String, Object> vs = db().queryForMap("select * from setting_value where value_storage_id = ?", s.getId());
         assertEquals("group.version/firmware.version", vs.get("path"));
@@ -126,25 +126,25 @@ public class PhoneTestIntegration extends MongoTestIntegration {
         sql("phone/EndpointLineSeed.sql");
         sql("phone/SeedPhoneGroup.sql");
 
-        Phone p = context.loadPhone(new Integer(1000));
-        List groups = context.getGroups();
+        Phone p = context.loadPhone(Integer.valueOf(1000));
+        List<Group> groups = context.getGroups();
         p.addGroup((Group) groups.get(0));
         context.storePhone(p);
         flush();
-        db().queryForInt("select 1 from phone_group where group_id = ? and phone_id = ?", 1000, 1000);
+        db().queryForObject("select 1 from phone_group where group_id = ? and phone_id = ?", Integer.class, 1000, 1000);
     }
 
     public void testRemoveGroupThenAddBackThenAddAnotherGroup() throws Exception {
         sql("common/TestUserSeed.sql");
         sql("phone/EndpointLineSeed.sql");
         sql("phone/SeedPhoneGroup.sql");
-        Phone p = context.loadPhone(new Integer(1000));
-        List groups = context.getGroups();
+        Phone p = context.loadPhone(Integer.valueOf(1000));
+        List<Group> groups = context.getGroups();
         p.addGroup((Group) groups.get(0));
         context.storePhone(p);
         p = null;
 
-        Phone reloaded = context.loadPhone(new Integer(1000));
+        Phone reloaded = context.loadPhone(Integer.valueOf(1000));
         reloaded.getGroups().clear();
         reloaded.addGroup((Group) groups.get(0));
         reloaded.addGroup((Group) groups.get(1));
@@ -167,17 +167,20 @@ public class PhoneTestIntegration extends MongoTestIntegration {
         subclass.setSerialNumber("000000000000");
         context.storePhone(subclass);
         flush();
-        db().queryForInt("select 1 from phone where serial_number = ? and bean_id = ? and model_id = ?",
-                subclass.getSerialNumber(), model.getBeanId(), model.getModelId());
+        db().queryForObject("select 1 from phone where serial_number = ? and bean_id = ? and model_id = ?",
+                Integer.class,
+                subclass.getSerialNumber(), 
+                model.getBeanId(), 
+                model.getModelId());
     }
 
     public void testPhoneSubclassDelete() throws Exception {
         sql("phone/PhoneSubclassSeed.sql");
-        Phone subclass = context.loadPhone(new Integer(1000));
+        Phone subclass = context.loadPhone(Integer.valueOf(1000));
         subclass.setSerialNumber("000000000000");
         context.deletePhone(subclass);
         flush();
-        assertEquals(0, db().queryForLong("select count(*) from phone"));
+        assertEquals(0, (long)db().queryForObject("select count(*) from phone", Long.class ));
     }
 
     public void testClear() throws Exception {
@@ -190,15 +193,15 @@ public class PhoneTestIntegration extends MongoTestIntegration {
 
     public void testDeletePhoneGroups() throws Exception {
         sql("phone/GroupMemberCountSeed.sql");
-        settingDao.deleteGroups(Collections.singletonList(new Integer(1001)));
+        settingDao.deleteGroups(Collections.singletonList(Integer.valueOf(1001)));
         flush();
-        assertEquals(1, db().queryForLong("select count(*) from phone_group"));
+        assertEquals(1, (long)db().queryForObject("select count(*) from phone_group", Long.class));
     }
 
     public void testPhonesByUserId() throws Exception {
         sql("common/TestUserSeed.sql");
         sql("phone/EndpointLineSeed.sql");
-        Collection phones = context.getPhonesByUserId(new Integer(1000));
+        Collection<Phone> phones = context.getPhonesByUserId(Integer.valueOf(1000));
         assertEquals(1, phones.size());
         Phone p = (Phone) phones.iterator().next();
         assertEquals("unittest-sample phone1", p.getDescription());
@@ -207,18 +210,18 @@ public class PhoneTestIntegration extends MongoTestIntegration {
     public void testPhonesByUserIdAndPhoneModel() throws Exception {
         sql("common/TestUserSeed.sql");
         sql("phone/EndpointLineSeed.sql");
-        Collection phones = context.getPhonesByUserIdAndPhoneModel(new Integer(1000), "testPhoneModel");
+        Collection<Phone> phones = context.getPhonesByUserIdAndPhoneModel(Integer.valueOf(1000), "testPhoneModel");
         assertEquals(1, phones.size());
         Phone p = (Phone) phones.iterator().next();
         assertEquals("unittest-sample phone1", p.getDescription());
-        phones = context.getPhonesByUserIdAndPhoneModel(new Integer(1000), "unknownModel");
+        phones = context.getPhonesByUserIdAndPhoneModel(Integer.valueOf(1000), "unknownModel");
         assertEquals(0, phones.size());
     }
 
     public void testDeleteUserRemoveLines() throws Exception {
         sql("common/TestUserSeed.sql");
         sql("phone/EndpointLineSeed.sql");
-        User testUser = core.loadUser(new Integer(1000));
+        User testUser = core.loadUser(Integer.valueOf(1000));
         core.deleteUser(testUser);
         assertEquals(0, TestHelper.getConnection().createDataSet().getTable("line").getRowCount());
     }
@@ -226,10 +229,10 @@ public class PhoneTestIntegration extends MongoTestIntegration {
     public void testDeleteUserOnPhoneWithExternalLines() throws Exception {
         sql("common/TestUserSeed.sql");
         sql("phone/ExternalLineSeed.sql");
-        User testUser = core.loadUser(new Integer(1000));
+        User testUser = core.loadUser(Integer.valueOf(1000));
         core.deleteUser(testUser);
         flush();
-        assertEquals(1, db().queryForLong("select count(*) from line"));
+        assertEquals(1, (long)db().queryForObject("select count(*) from line", Long.class));
 
         // no primary user after user is deleted
         Phone phone = context.loadPhone(1000);

@@ -12,7 +12,7 @@
 	<constructor-arg type="java.lang.String" value="application/json"/>
   </bean>
 
-  <bean id="jsonFormat" class="org.restlet.resource.Variant">
+  <bean id="jsonFormat" class="org.restlet.representation.Variant">
   	<property name="mediaType" ref="jsonMediaType" />
   </bean>
 

@@ -30,8 +30,8 @@ import java.util.Scanner;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -99,7 +99,7 @@ public class LoginServlet extends ProvisioningServlet {
     // we don't close servet's writer, we let the servlet container handle that
     @SuppressWarnings("resource")
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws javax.servlet.ServletException,
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws jakarta.servlet.ServletException,
         java.io.IOException {
         PrintWriter out = resp.getWriter();
         String reqType = EMPTY_STRING;

@@ -35,16 +35,13 @@ public class UserTableModelTest extends TestCase {
         List page1 = Arrays.asList(page1Array);
         List page2 = Arrays.asList(page2Array);
 
-        Integer groupId = new Integer(5);
+        Integer groupId = Integer.valueOf(5);
 
         IMocksControl coreContextCtrl = EasyMock.createControl();
         CoreContext coreContext = coreContextCtrl.createMock(CoreContext.class);
 
-        coreContext.loadUsersByPage(null, null, null, 0, 1, "userName", true);
-        coreContextCtrl.andReturn(page1);
-
-        coreContext.loadUsersByPage(null, groupId, null, 1, 1, "userName", true);
-        coreContextCtrl.andReturn(page2);
+        EasyMock.expect(coreContext.loadUsersByPage(null, null, null, 0, 1, "userName", true)).andReturn(page1);
+        EasyMock.expect(coreContext.loadUsersByPage(null, groupId, null, 1, 1, "userName", true)).andReturn(page2);
 
         coreContextCtrl.replay();
 

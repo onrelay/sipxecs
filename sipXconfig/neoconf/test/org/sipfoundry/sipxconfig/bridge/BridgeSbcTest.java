@@ -21,7 +21,7 @@ import java.util.Arrays;
 import junit.framework.JUnit4TestAdapter;
 
 import org.apache.commons.io.IOUtils;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.sipfoundry.sipxconfig.commserver.Location;

@@ -23,9 +23,9 @@ public class ExtensionPoolContextImpl extends SipxHibernateDaoSupport implements
     // Default pool values.  When we add multiple pools later, we'll need to have
     // different defaults for each named pool.
     private static final boolean DEFAULT_ENABLED = true;
-    private static final Integer DEFAULT_FIRST_EXTENSION = new Integer(200);
-    private static final Integer DEFAULT_LAST_EXTENSION = new Integer(299);
-    private static final Integer DEFAULT_NEXT_EXTENSION = new Integer(200);
+    private static final Integer DEFAULT_FIRST_EXTENSION = Integer.valueOf(200);
+    private static final Integer DEFAULT_LAST_EXTENSION = Integer.valueOf(299);
+    private static final Integer DEFAULT_NEXT_EXTENSION = Integer.valueOf(200);
 
     private CoreContext m_coreContext;
 
@@ -111,7 +111,7 @@ public class ExtensionPoolContextImpl extends SipxHibernateDaoSupport implements
         for (int i = start; i <= end; i++) {
             if (m_coreContext.loadUserByUserNameOrAlias(Integer.toString(i)) == null) {
                 // No user has that extension, so use it
-                ext = new Integer(i);
+                ext = Integer.valueOf(i);
                 break;
             }
         }

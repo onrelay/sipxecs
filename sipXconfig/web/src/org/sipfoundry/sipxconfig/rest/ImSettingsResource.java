@@ -15,48 +15,46 @@
 package org.sipfoundry.sipxconfig.rest;
 
 import static org.sipfoundry.sipxconfig.rest.JacksonConvert.fromRepresentation;
-import static org.sipfoundry.sipxconfig.rest.JacksonConvert.toRepresentation;
+
+import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.common.AbstractUser;
 import org.sipfoundry.sipxconfig.common.User;
 
 public class ImSettingsResource extends UserResource {
     private static final Log LOG = LogFactory.getLog(ImSettingsResource.class);
 
-    @Override
-    public boolean allowPost() {
-        return false;
+
+    @Get
+    public Representation represent(Variant variant) throws ResourceException { 
+        
+        try {
+            ImSettingsBean settings = new ImSettingsBean();
+            User user = getUser();
+
+            settings.setStatusPhonePresence((Boolean) user.getSettingTypedValue(AbstractUser.ADVERTISE_SIP_PRESENCE));
+            settings.setStatusCallInfo((Boolean) user.getSettingTypedValue(AbstractUser.INCLUDE_CALL_INFO));
+            settings.setOtpMessage((String) user.getSettingTypedValue(AbstractUser.ON_THE_PHONE_MESSAGE));
+            settings.setVoicemailOnDnd((Boolean) user.getSettingTypedValue(AbstractUser.FWD_TO_VM_ON_DND));
+
+            LOG.debug("Returning IM prefs:\t" + settings);
+
+            return toRepresentation(settings);
+        } catch( IOException ex ) {
+            throw new ResourceException( ex );
+        }
     }
 
-    @Override
-    public boolean allowDelete() {
-        return false;
-    }
-
-    // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        ImSettingsBean settings = new ImSettingsBean();
-        User user = getUser();
-
-        settings.setStatusPhonePresence((Boolean) user.getSettingTypedValue(AbstractUser.ADVERTISE_SIP_PRESENCE));
-        settings.setStatusCallInfo((Boolean) user.getSettingTypedValue(AbstractUser.INCLUDE_CALL_INFO));
-        settings.setOtpMessage((String) user.getSettingTypedValue(AbstractUser.ON_THE_PHONE_MESSAGE));
-        settings.setVoicemailOnDnd((Boolean) user.getSettingTypedValue(AbstractUser.FWD_TO_VM_ON_DND));
-
-        LOG.debug("Returning IM prefs:\t" + settings);
-
-        return toRepresentation(settings);
-    }
-
-    // PUT
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
+        
         ImSettingsBean settings = fromRepresentation(entity, ImSettingsBean.class);
 
         Boolean statusPhonePresence = settings.getStatusPhonePresence();
@@ -82,6 +80,7 @@ public class ImSettingsResource extends UserResource {
             }
             getCoreContext().saveUser(user);
         }
+        return null;
     }
 
     // the JSON representation of this is sent to/from the client

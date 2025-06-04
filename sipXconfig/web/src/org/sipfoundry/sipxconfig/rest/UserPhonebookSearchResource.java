@@ -19,11 +19,13 @@ import java.util.List;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.phonebook.AddressBookEntry;
 import org.sipfoundry.sipxconfig.phonebook.Phonebook;
@@ -43,12 +45,12 @@ public class UserPhonebookSearchResource extends UserResource {
         getVariants().add(new Variant(APPLICATION_JSON));
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
+        
         Form form = getRequest().getResourceRef().getQueryAsForm();
         m_searchTerm = form.getFirstValue("query");
         Collection<Phonebook> phonebooks = m_phonebookManager.getAllPhonebooksByUser(getUser());
-        // TODO
         Collection<PhonebookEntry> entries = m_phonebookManager.search(phonebooks, m_searchTerm, getUser());
 
         return new PhonebookEntryRepresentation(variant.getMediaType(), convertPhonebookEntries(entries));

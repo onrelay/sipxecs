@@ -40,13 +40,6 @@ You can use SOAP with WDSL, which is a formal API definition, and generate bindi
 
   perl -MCPAN -e 'install SOAP::lite'
 
-**Command line:** Use the following command::
-
-  java -jar $WsdlDocDir/wsdldoc.jar {color}
-  -title "sipXconfig SOAP API v3.2" {color}
-  -dir `pwd`"/ws-api-3.2" {color}
-  http://sipXcom.sipfoundry.org/rep/sipXcom/main/sipXconfig/web/src/org/sipfoundry/sipxconfig/api/sipxconfig.wsdl
-
 Administration Services
 -----------------------
 The following resources for the Configuration API are only available for users with administration rights.

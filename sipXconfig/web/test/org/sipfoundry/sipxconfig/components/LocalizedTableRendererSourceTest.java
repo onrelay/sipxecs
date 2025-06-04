@@ -41,13 +41,9 @@ public class LocalizedTableRendererSourceTest extends TestCase {
     public void testGetRenderer() {
         IMocksControl messagesCtrl = EasyMock.createControl();
         Messages messages = messagesCtrl.createMock(Messages.class);
-
-        // PORT
-        //messages.getMessage("prefix.bongo", "bongo");
-        messages.getMessage("prefix.bongo");
-
-        messagesCtrl.andReturn("kuku");
+        EasyMock.expect(messages.getMessage("prefix.bongo")).andReturn("kuku");
         messagesCtrl.replay();
+        messagesCtrl.verify();
 
         // class mock does not work here...
         ITableColumn column = new TestColumn(null);
@@ -66,8 +62,9 @@ public class LocalizedTableRendererSourceTest extends TestCase {
     public void testGetRendererNoPrefix() {
         IMocksControl messagesCtrl = EasyMock.createControl();
         Messages messages = messagesCtrl.createMock(Messages.class);
-        messages.getMessage("bongo");
-        messagesCtrl.andReturn("kuku");
+
+        EasyMock.expect(messages.getMessage("bongo")).andReturn("kuku");
+
         messagesCtrl.replay();
 
         // class mock does not work here...

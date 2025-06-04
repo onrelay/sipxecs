@@ -14,6 +14,7 @@
  */
 package org.sipfoundry.sipxconfig.mongo;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +22,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import com.mongodb.util.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 public class MongoMeta {
     private Map<String, MongoNode> m_nodes;
@@ -29,17 +31,20 @@ public class MongoMeta {
     private List<String> m_clusterStatus;
     private Map<String, Map<String, List<String>>> m_analysis;
 
-    @SuppressWarnings("unchecked")
     public void setStatusToken(String statusToken) {
-        Map<String, Object> statusData = (Map<String, Object>) JSON.parse(statusToken);
-        m_clusterStatus = (List<String>) statusData.get("cluster");
-        Map<String, List<String>> states = (Map<String, List<String>>) statusData.get("states");
-        m_nodes = new TreeMap<String, MongoNode>();
-        for (Entry<String, List<String>> entry : states.entrySet()) {
-            MongoNode node = new MongoNode(entry.getKey(), entry.getValue());
-            m_nodes.put(entry.getKey(), node);
+        try {
+            Map<String, Object> statusData = new ObjectMapper().readValue(statusToken, Map.class);
+            m_clusterStatus = (List<String>) statusData.get("cluster");
+            Map<String, List<String>> states = (Map<String, List<String>>) statusData.get("states");
+            m_nodes = new TreeMap<String, MongoNode>();
+            for (Entry<String, List<String>> entry : states.entrySet()) {
+                MongoNode node = new MongoNode(entry.getKey(), entry.getValue());
+                m_nodes.put(entry.getKey(), node);
+            }
+            m_meta = (Map<String, Map<String, Object>>) statusData.get("meta");
+        } catch( IOException ex ) {
+            throw new RuntimeException( ex );
         }
-        m_meta = (Map<String, Map<String, Object>>) statusData.get("meta");
     }
 
     /**
@@ -49,9 +54,12 @@ public class MongoMeta {
         m_nodes = new TreeMap<String, MongoNode>();
     }
 
-    @SuppressWarnings("unchecked")
     public void setAnalysisToken(String analysisToken) {
-        m_analysis = (Map<String, Map<String, List<String>>>) JSON.parse(analysisToken);
+        try {
+            m_analysis = (Map<String, Map<String, List<String>>>)new ObjectMapper().readValue(analysisToken, Map.class);
+        } catch( IOException ex ) {
+            throw new RuntimeException( ex );
+        }
     }
 
     public MongoNode getNode(String id) {

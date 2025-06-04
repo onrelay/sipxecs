@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.phone;
 
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.Predicate;
 import org.sipfoundry.sipxconfig.device.FilteredModelSource;
 
 public class EmergencyPhoneModelSource extends FilteredModelSource<PhoneModel> {

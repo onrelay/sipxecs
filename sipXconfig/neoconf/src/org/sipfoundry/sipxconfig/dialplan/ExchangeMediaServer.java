@@ -14,7 +14,7 @@ import java.util.Formatter;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.dialplan.MediaServer.Operation;
 import org.sipfoundry.sipxconfig.permission.PermissionName;
 

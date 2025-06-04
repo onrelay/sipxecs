@@ -5,29 +5,23 @@
  */
 package org.sipfoundry.sipxrest;
 
-import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Resource;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.resource.ServerResource;
 
-public class RestServerDefault extends Resource {
-    
-    public RestServerDefault(Context context, Request request, Response response) {
-       super(context,request,response); 
-    }
+public class RestServerDefault extends ServerResource {
     
     @Override
-    public void handleGet() {
-        /*
-         * Need to put something here to redirect to the wiki page.
-         */
-        Response response = getResponse();
+    protected Representation get() {
+        // Generate the response content
         String descriptionPage = RestServer.getServiceFinder().getDescriptions();
-        response.setEntity(descriptionPage, MediaType.TEXT_HTML);  
-        response.setStatus(Status.SUCCESS_OK);
-    }
-    
 
+        // Set the response status
+        setStatus(Status.SUCCESS_OK);
+
+        // Return the response as a Representation
+        return new StringRepresentation(descriptionPage, MediaType.TEXT_HTML);
+    }
 }

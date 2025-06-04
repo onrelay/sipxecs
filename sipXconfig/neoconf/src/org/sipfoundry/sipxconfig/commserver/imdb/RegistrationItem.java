@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.commserver.imdb;
 
 import java.util.Date;
 
-import org.apache.commons.lang.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 
 public class RegistrationItem implements Comparable {
     private String m_uri;

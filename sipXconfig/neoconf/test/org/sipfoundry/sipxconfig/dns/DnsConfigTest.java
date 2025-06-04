@@ -62,7 +62,7 @@ public class DnsConfigTest {
 
     @Test
     public void externalDns() {
-        List<?> nameservers = sun.net.dns.ResolverConfiguration.open().nameservers();
+        List<?> nameservers = new DnsManagerImpl().getSystemDnsServers();
         for( Object dns : nameservers ) {
             System.out.print( dns + " " );
         }

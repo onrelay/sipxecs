@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.site.line;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.event.PageBeginRenderListener;
 import org.apache.tapestry.event.PageEvent;
 import org.sipfoundry.sipxconfig.components.LocalizationUtils;

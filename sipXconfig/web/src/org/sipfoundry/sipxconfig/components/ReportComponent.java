@@ -24,16 +24,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.fill.JRSwapFileVirtualizer;
 import net.sf.jasperreports.engine.util.JRSwapFile;
-import net.sf.jasperreports.j2ee.servlets.BaseHttpServlet;
 
-import org.apache.commons.collections.Bag;
-import org.apache.commons.collections.bag.HashBag;
+import org.apache.commons.collections4.Bag;
+import org.apache.commons.collections4.bag.HashBag;
 import org.apache.tapestry.BaseComponent;
 import org.apache.tapestry.IAsset;
 import org.apache.tapestry.annotations.ComponentClass;
@@ -334,11 +333,11 @@ public abstract class ReportComponent extends BaseComponent {
     // Get graph data for CDR call direction pie.
     private List<CdrGraphBean> getCallDirectionGraphData(List<CdrCallDirectionDecorator> cdrdecorated) {
         List<CdrGraphBean> directionCalls = new ArrayList<CdrGraphBean>();
-        Bag directionCallsBag = new HashBag();
+        Bag<String> directionCallsBag = new HashBag<>();
         for (CdrCallDirectionDecorator cdr : cdrdecorated) {
             directionCallsBag.add(cdr.getCallDirection());
         }
-        Set uniqueSetDirection = directionCallsBag.uniqueSet();
+        Set<String> uniqueSetDirection = directionCallsBag.uniqueSet();
         for (Object key : uniqueSetDirection) {
             CdrGraphBean bean = new CdrGraphBean((String) key, directionCallsBag.getCount(key));
             directionCalls.add(bean);
@@ -360,7 +359,7 @@ public abstract class ReportComponent extends BaseComponent {
 
     // Get data for CDR most active callers graphs
     private List<CdrGraphBean> getActiveCallersData(List<Cdr> cdrs) {
-        Bag bagCallers = new HashBag();
+        Bag<String> bagCallers = new HashBag<>();
         for (Cdr cdr : cdrs) {
             bagCallers.add(cdr.getCaller());
         }
@@ -370,7 +369,7 @@ public abstract class ReportComponent extends BaseComponent {
 
     // Get data for CDR most active receivers graphs
     private List<CdrGraphBean> getActiveReceiversData(List<Cdr> cdrs) {
-        Bag bagReceivers = new HashBag();
+        Bag<String> bagReceivers = new HashBag<>();
         for (Cdr cdr : cdrs) {
             bagReceivers.add(cdr.getCallee());
         }
@@ -405,10 +404,10 @@ public abstract class ReportComponent extends BaseComponent {
         return minutesOutgoingCalls;
     }
     
-    private List<CdrGraphBean> mostActiveExtensions(Bag bagExtensions) {
+    private List<CdrGraphBean> mostActiveExtensions(Bag<String> bagExtensions) {
         List<CdrGraphBean> activeExtensions = new ArrayList<CdrGraphBean>();
-        Set uniqueSetCallers = bagExtensions.uniqueSet();
-        for (Object key : uniqueSetCallers) {
+        Set<String> uniqueSetCallers = bagExtensions.uniqueSet();
+        for (String key : uniqueSetCallers) {
             CdrGraphBean bean = new CdrGraphBean((String) key, bagExtensions.getCount(key));
             activeExtensions.add(bean);
         }
@@ -513,12 +512,12 @@ public abstract class ReportComponent extends BaseComponent {
     // Get data for CDR termination calls pie
     private List<CdrGraphBean> getTerminationCallsData(List<Cdr> cdrs, Locale locale) {
         List<CdrGraphBean> terminationCalls = new ArrayList<CdrGraphBean>();
-        Bag terminationCallsBag = new HashBag();
+        Bag<String> terminationCallsBag = new HashBag<>();
         for (Cdr cdr : cdrs) {
             CdrDecorator cdrDecorator = new CdrDecorator(cdr, locale, getMessages());
             terminationCallsBag.add(cdrDecorator.getTermination());
         }
-        Set uniqueSetTermination = terminationCallsBag.uniqueSet();
+        Set<String> uniqueSetTermination = terminationCallsBag.uniqueSet();
         for (Object key : uniqueSetTermination) {
             CdrGraphBean bean = new CdrGraphBean((String) key, terminationCallsBag.getCount(key));
             terminationCalls.add(bean);
@@ -533,7 +532,7 @@ public abstract class ReportComponent extends BaseComponent {
         IAsset backgroundAsset = getTapestry().getSkinControl().getAsset("banner-background.png");
         computeReportData(getReportName());
         try {
-            Map parameters = getReportParameters();
+            Map<String,Object> parameters = getReportParameters();
             parameters.put(JRParameter.REPORT_VIRTUALIZER, virtualizer);
             parameters.put("logopath", logoAsset.getResourceLocation().getResourceURL().toString());
             parameters.put("bannerpath", backgroundAsset.getResourceLocation().getResourceURL().toString());
@@ -552,10 +551,7 @@ public abstract class ReportComponent extends BaseComponent {
     }
 
     private void generateHtmlReport(JasperPrint jasperPrint) {
-        HttpSession session = getRequestGlobals().getRequest().getSession(true);
-        // Put JasperPrint object in the session for displaying html report images
-        session.setAttribute(BaseHttpServlet.DEFAULT_JASPER_PRINT_SESSION_ATTRIBUTE, jasperPrint);
-        getJasperReportContext().generateHtmlReport(jasperPrint, getHtmlReportPath());
+         getJasperReportContext().generateHtmlReport(jasperPrint, getHtmlReportPath());
     }
 
     private void generatePdfReport(JasperPrint jasperPrint) {

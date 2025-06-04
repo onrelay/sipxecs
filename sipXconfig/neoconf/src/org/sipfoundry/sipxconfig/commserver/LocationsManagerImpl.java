@@ -34,12 +34,11 @@ import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.sipfoundry.sipxconfig.logging.AuditLogContext;
 import org.sipfoundry.sipxconfig.setup.SetupListener;
 import org.sipfoundry.sipxconfig.setup.SetupManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate5.HibernateCallback;
 
 public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> implements LocationsManager,
         ApplicationListener<ApplicationEvent>, SetupListener {
@@ -93,14 +92,14 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
     private Location loadLocationByUniqueProperty(String propName, Object propValue) {
         final Criterion expression = Restrictions.eq(propName, propValue);
 
-        HibernateCallback callback = new HibernateCallback() {
+        HibernateCallback<Object> callback = new HibernateCallback<Object>() {
             @Override
             public Object doInHibernate(Session session) {
                 Criteria criteria = session.createCriteria(Location.class).add(expression);
                 return criteria.list();
             }
         };
-        List<Location> locations = getHibernateTemplate().executeFind(callback);
+        List<Location> locations = (List<Location>)getHibernateTemplate().execute(callback);
         Location location = singleResult(locations);
 
         return location;
@@ -243,7 +242,7 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
         m_domainManager.setNullDomain();
     }
 
-    @Required
+    
     public void setAuditLogContext(AuditLogContext auditLogContext) {
         m_auditLogContext = auditLogContext;
     }

@@ -25,17 +25,21 @@ import java.util.Collections;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Delete;
+import org.restlet.resource.Get;
+import org.restlet.resource.Post;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
-import org.restlet.resource.Variant;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 
-public class DnsCustomApi extends Resource {
+public class DnsCustomApi extends ServerResource {
     private Integer m_customId;
     private ObjectMapper m_jsonMapper = new ObjectMapper();
     private DnsManager m_dnsManager;
@@ -50,9 +54,8 @@ public class DnsCustomApi extends Resource {
         }
     }
 
-    // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         StringWriter json = new StringWriter();
         try {
             if (m_customId != null) {
@@ -68,9 +71,8 @@ public class DnsCustomApi extends Resource {
         return new StringRepresentation(json.toString());
     }
 
-    // POST
-    @Override
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {        
         try {
             DnsCustomRecords custom = readCustom(entity.getReader());
             custom.setUniqueId(BeanWithId.UNSAVED_ID);
@@ -78,24 +80,23 @@ public class DnsCustomApi extends Resource {
 
             // caller needs the object id so it can follow-up calls
             getResponse().setEntity(new StringRepresentation(custom.getId().toString()));
+            return null;
         } catch (IOException e) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage());
         }
     }
 
-    // PUT
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
-        try {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        try {
             DnsCustomRecords custom = readCustom(entity.getReader());
             m_dnsManager.saveCustomRecords(custom);
+            return null;
         } catch (IOException e) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage());
         }
     }
 
-    // DELETE
-    @Override
+    @Delete
     public void removeRepresentations() throws ResourceException {
         DnsCustomRecords custom = m_dnsManager.getCustomRecordsById(m_customId);
         m_dnsManager.deleteCustomRecords(custom);
@@ -108,26 +109,6 @@ public class DnsCustomApi extends Resource {
     void writeCustom(Writer json, Collection<DnsCustomRecords> custom) throws IOException {
         m_jsonMapper.writeValue(json, custom);
     }
-
-    @Override
-    public boolean allowGet() {
-        return true;
-    }
-
-    @Override
-    public boolean allowPost() {
-        return true;
-    };
-
-    @Override
-    public boolean allowDelete() {
-        return true;
-    };
-
-    @Override
-    public boolean allowPut() {
-        return true;
-    };
 
     ObjectMapper getJsonMapper() {
         return m_jsonMapper;

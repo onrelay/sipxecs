@@ -13,7 +13,7 @@ import java.util.Collection;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class DistributionListsTest extends TestCase {
 

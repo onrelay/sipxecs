@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.sipfoundry.sipxconfig.common.SpringHibernateInstantiator;
 import org.sipfoundry.sipxconfig.phone.Phone;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 
 public class BeanIndexHelper extends HibernateDaoSupport {
     private static final String BEAN_ID = "beanId";
@@ -51,6 +51,7 @@ public class BeanIndexHelper extends HibernateDaoSupport {
         // without this, phone beans are not created from spring because phone beans are
         // loaded special in another session
         m_springInstantiator = springInstantiator;
-        getHibernateTemplate().setEntityInterceptor(m_springInstantiator);
+        // Removed, now done in xml sessionFactory
+        //getHibernateTemplate().setEntityInterceptor(m_springInstantiator);
     }
 }

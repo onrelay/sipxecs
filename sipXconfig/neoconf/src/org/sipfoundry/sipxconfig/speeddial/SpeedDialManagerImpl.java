@@ -43,18 +43,18 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 
 public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> implements SpeedDialManager,
         DaoEventListenerAdvanced, BeanFactoryAware {
     private static final Log LOG = LogFactory.getLog(SpeedDialManagerImpl.class);
-    private static final int MAX_BUTTONS = 136;
     private CoreContext m_coreContext;
     private FeatureManager m_featureManager;
     private ConfigManager m_configManager;
@@ -108,7 +108,7 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
                     SpeedDial speedDial = speeddialGroups.get(i).getSpeedDial(user);
                     if (!isAllowSubscriptionToSelf()) {
                         List<Button> buttons = speedDial.getButtons();
-                        List<Button> selfButtons = new ArrayList();
+                        List<Button> selfButtons = new ArrayList<>();
                         for (Button button : buttons) {
                             if (user.getUserName().equals(button.getNumber())) {
                                 selfButtons.add(button);
@@ -153,13 +153,13 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
 
     @Override
     public List<SpeedDial> findSpeedDialForUserId(Integer userId) {
-        List<SpeedDial> speeddials = getHibernateTemplate().findByNamedQueryAndNamedParam("speedDialForUserId",
+        List<SpeedDial> speeddials = (List<SpeedDial>)getHibernateTemplate().findByNamedQueryAndNamedParam("speedDialForUserId",
                 "userId", userId);
         return speeddials;
     }
 
     private List<SpeedDialGroup> findSpeedDialForGroupId(Integer groupId) {
-        List<SpeedDialGroup> speeddialGroups = getHibernateTemplate().findByNamedQueryAndNamedParam(
+        List<SpeedDialGroup> speeddialGroups = (List<SpeedDialGroup>)getHibernateTemplate().findByNamedQueryAndNamedParam(
                 "speedDialForGroupId", "userGroupId", groupId);
         return speeddialGroups;
     }
@@ -268,12 +268,12 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
         return Arrays.asList(rules);
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }
@@ -288,7 +288,7 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
         m_configManager.configureEverywhere(Rls.FEATURE);
     }
 
-    @Required
+    
     public void setConfigManager(ConfigManager configManager) {
         m_configManager = configManager;
     }
@@ -297,22 +297,22 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
         return m_validUsers;
     }
 
-    @Required
+    
     public void setValidUsers(ValidUsers validUsers) {
         m_validUsers = validUsers;
     }
 
-    @Required
+    
     public void setAliasManager(AliasManager aliasMgr) {
         m_aliasManager = aliasMgr;
     }
 
-    @Required
+    
     public void setFeatureId(String feature) {
         m_featureId = feature;
     }
 
-    @Required
+    
     public void setAdminContext(AdminContext adminContext) {
         m_adminContext = adminContext;
     }
@@ -351,25 +351,36 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
             }
         }
     }
-
+    
     private void removeBlfFromUsers(String userName) {
         LOG.debug("removing user from ~~id~xmpprlsclient entity: " + userName);
-        DBCollection entity = m_imdbTemplate.getCollection("entity");
+        MongoCollection<Document> entity = m_imdbTemplate.getCollection("entity");
+
         String uri = SipUri.format(userName, m_coreContext.getDomainName(), false);
 
-        DBObject findCommand = new BasicDBObject();
-        BasicDBList list = new BasicDBList();
-        list.add(new BasicDBObject(MongoConstants.ENTITY_NAME, "specialuser"));
-        list.add(new BasicDBObject(MongoConstants.ENTITY_NAME, "user"));
-        findCommand.put("$or", list);
-        findCommand
-                .put(String.format("%s.%s.%s", MongoConstants.SPEEDDIAL, MongoConstants.BUTTONS, MongoConstants.URI),
-                        uri);
-        DBObject removeCommand = new BasicDBObject();
-        removeCommand.put("$pull",
-                new BasicDBObject(String.format("%s.%s", MongoConstants.SPEEDDIAL, MongoConstants.BUTTONS),
-                        new BasicDBObject(MongoConstants.URI, uri)));
-        entity.update(findCommand, removeCommand);
+        // Create the $or query
+        Bson orCondition = Filters.or(
+            Filters.eq(MongoConstants.ENTITY_NAME, "specialuser"),
+            Filters.eq(MongoConstants.ENTITY_NAME, "user")
+        );
+
+        // Match on nested URI field
+        Bson uriMatch = Filters.eq(
+            String.format("%s.%s.%s", MongoConstants.SPEEDDIAL, MongoConstants.BUTTONS, MongoConstants.URI),
+            uri
+        );
+
+        // Combine filters
+        Bson query = Filters.and(orCondition, uriMatch);
+
+        // Define the $pull update
+        Bson update = Updates.pull(
+            String.format("%s.%s", MongoConstants.SPEEDDIAL, MongoConstants.BUTTONS),
+            new Document(MongoConstants.URI, uri)
+        );
+
+        // Perform the update
+        entity.updateMany(query, update);
     }
 
     public void setSipxReplicationContext(SipxReplicationContext sipxReplicationContext) {

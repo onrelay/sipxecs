@@ -93,22 +93,18 @@ public class ExecutorPool {
 	}
 
 	public boolean isShutdown() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	public boolean isTerminated() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	public void shutdown() {
-		// TODO Auto-generated method stub
 
 	}
 
 	public List<Runnable> shutdownNow() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -267,6 +263,7 @@ public class ExecutorPool {
 		 * Thread this worker is running in. Acts as a final field, but cannot
 		 * be set until thread is created.
 		 */
+		@SuppressWarnings("unused")
 		Thread thread;
 
 		Executor(AOInvocationHandler firstTask) {

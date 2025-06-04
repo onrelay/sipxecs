@@ -6,8 +6,17 @@ tcpdumplog_PKGS = \
 	log4j \
 	sipxcommons \
 	postgresql \
-	javax.servlet \
-	jetty \
+	jakarta.servlet \
+	jetty-server \
+	jetty-util \
+	jetty-http \
+	jetty-xml \
+	jetty-ee10-servlet \
+	jetty-ee10-servlets \
+	jetty-security \
+	jetty-deploy \
+	jetty-io \
+	jetty-ee10-webapp \
 	ws-commons-util \
 	xmlrpc-client \
 	xmlrpc-server

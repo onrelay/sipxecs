@@ -10,7 +10,7 @@ Packager: SIPfoundry <sipxcom-dev@googlegroups.com>
 Url:      http://www.sipfoundry.org/
 
 
-BuildRequires: java-1.8.0-openjdk-devel
+BuildRequires: java-17-openjdk-devel
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: cppunit-devel

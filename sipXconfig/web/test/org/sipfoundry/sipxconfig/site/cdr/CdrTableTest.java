@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.site.cdr;
 
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.EasyMock.createMock;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +20,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.test.Creator;
 import org.easymock.EasyMock;
 import org.sipfoundry.sipxconfig.common.CoreContext;

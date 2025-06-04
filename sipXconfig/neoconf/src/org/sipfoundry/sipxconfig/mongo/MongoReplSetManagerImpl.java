@@ -31,9 +31,8 @@ import org.sipfoundry.sipxconfig.feature.LocationFeature;
 import org.sipfoundry.sipxconfig.region.Region;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
 
 public class MongoReplSetManagerImpl implements MongoReplSetManager {
     private static final String SHARD_ID = "shardId";
@@ -123,9 +122,9 @@ public class MongoReplSetManagerImpl implements MongoReplSetManager {
         m_featureManager.enableLocationFeature(f, l, false);
         // We might get registrations with the shard id that has just been deleted
         // so we need to make sure they are not in the primary mongo registrar
-        DBCollection registrar = m_nodeDb.getCollection("registrar");
-        DBObject condition = new BasicDBObject(SHARD_ID, l.getRegionId());
-        registrar.update(condition, new BasicDBObject("$set", new BasicDBObject(SHARD_ID, 0)), false, true);
+        MongoCollection<Document> registrar = m_nodeDb.getCollection("registrar");
+        Document condition = new Document(SHARD_ID, l.getRegionId());
+        registrar.updateMany(condition, new Document("$set", new Document(SHARD_ID, 0)));
         return run("removing local db " + hostPort, new ConfigCommandRunner());
     }
 

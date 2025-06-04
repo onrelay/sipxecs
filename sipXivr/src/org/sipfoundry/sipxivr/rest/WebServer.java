@@ -7,35 +7,30 @@
  *
  */
 package org.sipfoundry.sipxivr.rest;
-
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.HttpServer;
-import org.mortbay.http.SecurityConstraint;
-import org.mortbay.http.SocketListener;
-import org.mortbay.jetty.servlet.ServletHandler;
-import org.sipfoundry.commons.jetty.SipXSecurityHandler;
-import org.sipfoundry.commons.jetty.SocketFactory;
+
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHandler;
+import org.eclipse.jetty.ee10.servlet.security.ConstraintMapping;
+import org.eclipse.jetty.ee10.servlet.security.ConstraintSecurityHandler;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Required;
+import org.eclipse.jetty.security.Constraint;
+import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 
-/**
- * Run a Jetty based web server to handle http/https requests for sipXivr
- *
- */
 public class WebServer implements BeanFactoryAware {
     static final Logger LOG = Logger.getLogger("org.sipfoundry.sipxivr");
     private ServletHandler m_servletHandler;
     private int m_httpPort;
     private int m_publicHttpPort;
     private BeanFactory m_beanFactory;
-    private SipxIvrUserRealm m_userRealm;
-    private SipxIvrDigestAuthenticator m_digestAuthenticator;
-    private SipXSecurityHandler m_securityHandler;
+    private SipxIvrUserLoginService m_userLoginService;
+    private DigestAuthenticator m_digestAuthenticator;
 
     public void init() {
         Map<String, RestApiBean> beans = ((ListableBeanFactory) m_beanFactory).getBeansOfType(RestApiBean.class);
@@ -45,47 +40,51 @@ public class WebServer implements BeanFactoryAware {
         start();
     }
 
-    /**
-     * add a servlet for the Web server to use
-     *
-     * @param name
-     * @param pathSpec
-     * @param servletClass must be of type javax.servlet.Servlet
-     */
     private void addServlet(String name, String pathSpec, String servletClass) {
-        m_servletHandler.addServlet(name, pathSpec, servletClass);
-        LOG.info(String.format("Adding Servlet %s on %s", name, pathSpec));
+        m_servletHandler.addServletWithMapping(servletClass, pathSpec);
+        LOG.info(String.format("Adding Servlet %s on %s", pathSpec, servletClass));
     }
 
-    /**
-     * Start the Web Server that handles sipXivr Web requests
-     */
     private void start() {
         try {
-            // Start up jetty
-            HttpServer server = new HttpServer();
+            Server server = new Server();
 
-            SocketListener internalListener = SocketFactory.createSocketListener(m_httpPort);
-            SocketListener publicListener = SocketFactory.createSocketListener(m_publicHttpPort);
-            server.addListener(internalListener);
-            server.addListener(publicListener);
+            // Internal HTTP connector
+            ServerConnector internalConnector = new ServerConnector(server);
+            internalConnector.setPort(m_httpPort);
+            server.addConnector(internalConnector);
 
-            HttpContext httpContext = new HttpContext();
-            httpContext.setContextPath("/");
-            httpContext.setAuthenticator(m_digestAuthenticator);
+            // Public HTTP connector
+            ServerConnector publicConnector = new ServerConnector(server);
+            publicConnector.setPort(m_publicHttpPort);
+            server.addConnector(publicConnector);
 
-            SecurityConstraint digestConstraint = new SecurityConstraint();
-            digestConstraint.setName(SecurityConstraint.__DIGEST_AUTH);
-            digestConstraint.addRole("IvrRole");
-            digestConstraint.setAuthenticate(true);
-            httpContext.addSecurityConstraint("/*", digestConstraint);
-            httpContext.setRealm(m_userRealm);
-            httpContext.addHandler(0, m_securityHandler);
-            httpContext.addHandler(1, m_servletHandler);
+            // Servlet context
+            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+            context.setContextPath("/");
 
-            server.addContext(httpContext);
+            // Security constraint
+            Constraint digestConstraint = Constraint.from("IvrRole");
 
-            // Start it up.
+            ConstraintMapping mapping = new ConstraintMapping();
+            mapping.setPathSpec("/*");
+            mapping.setConstraint(digestConstraint);
+
+            // Security handler
+            ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+            securityHandler.setAuthenticator(m_digestAuthenticator);
+            securityHandler.setRealmName(m_userLoginService.getName());
+            securityHandler.setLoginService(m_userLoginService);
+            securityHandler.addConstraintMapping(mapping);
+
+            // Attach servlet handler
+            securityHandler.setHandler(m_servletHandler);
+
+            // Set security handler as the context handler
+            context.setSecurityHandler(securityHandler);
+
+            server.setHandler(context);
+
             LOG.info(String.format("Starting Jetty server on ports *:%d, *:%d", m_httpPort, m_publicHttpPort));
             server.start();
         } catch (Exception e) {
@@ -97,34 +96,24 @@ public class WebServer implements BeanFactoryAware {
         m_servletHandler = handler;
     }
 
-    public void setUserRealm(SipxIvrUserRealm realm) {
-        m_userRealm = realm;
+    public void setUserLoginService(SipxIvrUserLoginService userLoginService) {
+        m_userLoginService = userLoginService;
     }
 
-    @Required
     public void setHttpPort(int httpPort) {
         m_httpPort = httpPort;
     }
 
-    @Required
     public void setPublicHttpPort(int publicHttpPort) {
         m_publicHttpPort = publicHttpPort;
     }
 
-    @Override
     public void setBeanFactory(BeanFactory factory) {
         m_beanFactory = factory;
     }
 
-    @Required
-    public void setDigestAuthenticator(SipxIvrDigestAuthenticator digestAuthenticator) {
+    public void setDigestAuthenticator(DigestAuthenticator digestAuthenticator) {
         m_digestAuthenticator = digestAuthenticator;
     }
-
-    @Required
-    public void setSecurityHandler(SipXSecurityHandler securityHandler) {
-        m_securityHandler = securityHandler;
-    }
-
-
 }
+

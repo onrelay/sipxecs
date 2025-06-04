@@ -9,7 +9,7 @@ imbot_PKGS = \
 	commons-httpclient \
 	commons-lang \
 	commons-logging \
-	javax.servlet \
+	jakarta.servlet \
 	mongo \
 	xmlrpc-client \
 	ws-commons-util \

@@ -13,7 +13,7 @@ import java.util.Locale;
 import java.util.Vector;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class User {
     private String m_sysId;

@@ -26,7 +26,6 @@ import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchFeature;
 import org.sipfoundry.sipxconfig.ivr.Ivr;
-import org.springframework.beans.factory.annotation.Required;
 
 public class MohAddressFactory {
     private static final String LOCAL_FILES_SOURCE_SUFFIX = "l";
@@ -135,7 +134,7 @@ public class MohAddressFactory {
         return SipUri.format(mohParam, m_domainManager.getDomainName(), false);
     }
 
-    @Required
+    
     public void setAddressManager(AddressManager addressManager) {
         m_addressManager = addressManager;
     }

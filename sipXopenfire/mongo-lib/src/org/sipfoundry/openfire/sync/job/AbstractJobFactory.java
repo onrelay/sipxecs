@@ -18,8 +18,8 @@ package org.sipfoundry.openfire.sync.job;
 
 import org.sipfoundry.openfire.sync.MongoOperation;
 
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 public abstract class AbstractJobFactory {
-    public abstract Job createJob(MongoOperation op, DBObject dbObj, Object id);
+    public abstract Job createJob(MongoOperation op, Document dbObj, Object id);
 }

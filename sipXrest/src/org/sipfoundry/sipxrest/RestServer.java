@@ -1,8 +1,3 @@
-/*
- * Copyright (C) 2010 Avaya, certain elements licensed under a Contributor Agreement.
- * Contributors retain copyright to elements licensed under a Contributor Agreement.
- * Licensed to the User under the LGPL license.
- */
 package org.sipfoundry.sipxrest;
 
 import java.io.File;
@@ -12,15 +7,16 @@ import javax.sip.address.AddressFactory;
 import javax.sip.header.HeaderFactory;
 import javax.sip.message.MessageFactory;
 
+import org.restlet.ext.servlet.ServerServlet;
+
 import org.apache.log4j.Appender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.HttpServer;
-import org.mortbay.http.SocketListener;
-import org.mortbay.jetty.servlet.ServletHandler;
-import org.sipfoundry.commons.jetty.SocketFactory;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+
 import org.sipfoundry.commons.log4j.SipFoundryAppender;
 import org.sipfoundry.commons.log4j.SipFoundryLayout;
 import org.sipfoundry.commons.restconfig.RestServerConfig;
@@ -40,7 +36,7 @@ public class RestServer {
 
     private static RestServerConfig restServerConfig;
 
-    private static HttpServer webServer;
+    private static Server webServer;
 
     public static final Timer timer = new Timer();
 
@@ -50,76 +46,57 @@ public class RestServer {
 
     private static SipStackBean sipStackBean;
 
-
     public static RestServerConfig getRestServerConfig() {
         return restServerConfig;
     }
 
-
-    /**
-     * @param appender the appender to set
-     */
     public static void setAppender(Appender appender) {
         RestServer.appender = appender;
     }
 
-    /**
-     * @return the appender
-     */
     public static Appender getAppender() {
         return appender;
     }
 
-
     private static void initWebServer() throws Exception {
-        webServer = new HttpServer();
-        Logger.getLogger("org.mortbay").setLevel(Level.OFF);
+        webServer = new Server();
 
+        // Create connectors for public and internal ports
+        ServerConnector publicConnector = new ServerConnector(webServer);
+        publicConnector.setPort(restServerConfig.getPublicHttpPort());
+        webServer.addConnector(publicConnector);
 
-        // create a listener for the public port.
-        SocketListener publicSocketListener = SocketFactory.createSocketListener(restServerConfig.getPublicHttpPort());
-        SocketListener socketListener = SocketFactory.createSocketListener(restServerConfig.getHttpPort());
-        webServer.addListener(publicSocketListener);
-        webServer.addListener(socketListener);
+        ServerConnector internalConnector = new ServerConnector(webServer);
+        internalConnector.setPort(restServerConfig.getHttpPort());
+        webServer.addConnector(internalConnector);
 
-        HttpContext httpContext = new HttpContext();
-        httpContext.setContextPath("/");
-        httpContext.setInitParameter("org.restlet.application",
-                RestServerApplication.class.getName());
-        ServletHandler servletHandler = new ServletHandler();
-        Class<?> servletClass = com.noelios.restlet.ext.servlet.ServerServlet.class;
-        servletHandler.addServlet("rest", "/*", servletClass.getName());
+        // Set up the servlet context
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+        context.setInitParameter("org.restlet.application", RestServerApplication.class.getName());
 
-        httpContext.addHandler(servletHandler);
+        // Add the Restlet servlet
+        ServletHolder servletHolder = new ServletHolder(ServerServlet.class);
+        servletHolder.setInitParameter("org.restlet.application", RestServerApplication.class.getName());
+        context.addServlet(servletHolder, "/*");
 
-        webServer.addContext(httpContext);
+        webServer.setHandler(context);
+
+        // Start the server
         webServer.start();
     }
 
-    /**
-     * @return the messageFactory
-     */
     public static MessageFactory getMessageFactory() {
         return sipStackBean.getMessageFactory();
     }
 
-
-    /**
-     * @return the addressFactory
-     */
     public static AddressFactory getAddressFactory() {
         return sipStackBean.getAddressFactory();
     }
 
-
-    /**
-     * @return the headerFactory
-     */
     public static HeaderFactory getHeaderFactory() {
         return sipStackBean.getHeaderFactory();
     }
-
-
 
     public static RestServiceFinder getServiceFinder() {
         return restServiceFinder;
@@ -127,34 +104,28 @@ public class RestServer {
 
     public static AccountManagerImpl getAccountManager() {
         return accountManager;
-     }
-    /**
-     * @param args
-     */
-    public static void main(String[] args) throws Exception {
+    }
 
-        String configDir = System.getProperties().getProperty("conf.dir",  "/etc/sipxpbx");
+    public static void main(String[] args) throws Exception {
+        String configDir = System.getProperties().getProperty("conf.dir", "/etc/sipxpbx");
         configFileName = configDir + "/sipxrest-config.xml";
 
         if (!new File(configFileName).exists()) {
             System.err.println("Cannot find the config file");
             System.exit(-1);
         }
-        
-        PropertyConfigurator.configureAndWatch(configDir + "/sipxrest/log4j.properties", 
+
+        PropertyConfigurator.configureAndWatch(configDir + "/sipxrest/log4j.properties",
                 SipFoundryLayout.LOG4J_MONITOR_FILE_DELAY);
-        
-        restServerConfig = new RestServerConfigFileParser().parse("file://"
-                + configFileName);
+
+        restServerConfig = new RestServerConfigFileParser().parse("file://" + configFileName);
         setAppender(new SipFoundryAppender(new SipFoundryLayout(),
-                RestServer.getRestServerConfig().getLogDirectory()
-                +"/sipxrest.log"));
+                RestServer.getRestServerConfig().getLogDirectory() + "/sipxrest.log"));
 
         accountManager = new AccountManagerImpl();
         sipStackBean = new SipStackBean();
 
         restServiceFinder = new RestServiceFinder();
-
         restServiceFinder.search(System.getProperty("plugin.dir"));
 
         try {
@@ -168,10 +139,6 @@ public class RestServer {
         logger.debug("Web server started.");
     }
 
-
-    /**
-     * @return the sipStack
-     */
     public static SipStackBean getSipStack() {
         return sipStackBean;
     }

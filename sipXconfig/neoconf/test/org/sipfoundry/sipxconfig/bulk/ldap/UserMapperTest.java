@@ -16,6 +16,7 @@
  */
 package org.sipfoundry.sipxconfig.bulk.ldap;
 
+import org.easymock.EasyMock;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
@@ -136,28 +137,26 @@ public class UserMapperTest extends TestCase {
         }
     }
 
-    private Collection<String> getGroupNames(boolean existLdapGroup) throws Exception{
+    private Collection<String> getGroupNames(boolean existLdapGroup) throws Exception {
         Attributes attrs = new BasicAttributes();
         attrs.put(LDAP_GROUP, LDAP_1_GROUP);
 
         UserMapper userMapper = new UserMapper();
 
-        IMocksControl control = org.easymock.classextension.EasyMock.createNiceControl();
+        IMocksControl control = EasyMock.createNiceControl();
         AttrMap map = control.createMock(AttrMap.class);
         SearchResult sr = control.createMock(SearchResult.class);
 
-        map.getAttribute(Index.USER_GROUP.getName());
-        if (existLdapGroup) {
-            control.andReturn(LDAP_GROUP);
-        } else {
-            control.andReturn(null);
-            map.getDefaultGroupName();
-            control.andReturn(LDAP_IMPORTS);
+        EasyMock.expect(map.getAttribute(Index.USER_GROUP.getName()))
+                .andReturn(existLdapGroup ? LDAP_GROUP : null);
+
+        if (!existLdapGroup) {
+            EasyMock.expect(map.getDefaultGroupName()).andReturn(LDAP_IMPORTS);
         }
-        sr.getAttributes();
-        control.andReturn(attrs);
-        sr.isRelative();
-        control.andReturn(false);
+
+        EasyMock.expect(sr.getAttributes()).andReturn(attrs);
+        EasyMock.expect(sr.isRelative()).andReturn(false);
+
         control.replay();
 
         userMapper.setAttrMap(map);

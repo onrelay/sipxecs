@@ -12,8 +12,8 @@ package org.sipfoundry.sipxconfig.site.common;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.isA;
-import static org.easymock.classextension.EasyMock.createStrictMock;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.replay;
 import junit.framework.TestCase;
 
 import org.apache.hivemind.Messages;

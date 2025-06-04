@@ -30,8 +30,8 @@ public class BeanIdTest extends TestCase {
     }
 
     private Collection m_ids = new ArrayList(2);
-    private Integer m_id1 = new Integer(1);
-    private Integer m_id2 = new Integer(2);
+    private Integer m_id1 = Integer.valueOf(1);
+    private Integer m_id2 = Integer.valueOf(2);
     BeanId m_bid1Dummy = new BeanId(m_id1, Dummy.class);
     BeanId m_bid1OtherClass = new BeanId(m_id1, Integer.class);
     BeanId m_bid2Dummy = new BeanId(m_id2, Dummy.class);
@@ -68,7 +68,7 @@ public class BeanIdTest extends TestCase {
         // test negative ID
         try {
             m_ids.clear();
-            m_ids.add(new Integer(-1));
+            m_ids.add(Integer.valueOf(-1));
             BeanId.createBeanIdCollection(m_ids, Dummy.class);
             fail("Should throw exception because of negative ID value");
         }

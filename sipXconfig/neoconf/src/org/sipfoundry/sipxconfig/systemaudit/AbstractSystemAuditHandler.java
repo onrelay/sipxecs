@@ -27,7 +27,6 @@ import org.sipfoundry.sipxconfig.common.NamedObject;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.security.SipxAuthenticationDetails;
 import org.sipfoundry.sipxconfig.security.UserDetailsImpl;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -43,12 +42,12 @@ public abstract class AbstractSystemAuditHandler {
     private CoreContext m_coreContext;
     private AdminContext m_adminContext;
 
-    @Required
+    
     public void setConfigChangeContext(ConfigChangeContext configChangeContext) {
         m_configChangeContext = configChangeContext;
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
@@ -139,7 +138,7 @@ public abstract class AbstractSystemAuditHandler {
         return m_coreContext;
     }
 
-    @Required
+    
     public void setAdminContext(AdminContext adminContext) {
         m_adminContext = adminContext;
     }

@@ -29,10 +29,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.commons.security.Util;
@@ -48,7 +48,6 @@ import org.sipfoundry.sipxconfig.feature.FeatureListener;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.ivr.Ivr;
 import org.sipfoundry.sipxconfig.setting.Setting;
-import org.springframework.beans.factory.annotation.Required;
 
 public class BackupConfig implements ConfigProvider, FeatureListener {
     private static final Log LOG = LogFactory.getLog(BackupConfig.class);
@@ -261,7 +260,7 @@ public class BackupConfig implements ConfigProvider, FeatureListener {
         m_configManager = configManager;
     }
 
-    @Required
+    
     public void setIvr(Ivr ivr) {
         m_ivr = ivr;
     }

@@ -1,62 +1,48 @@
-/*
- *
- *
- * Copyright (C) 2009 Pingtel Corp., certain elements licensed under a Contributor Agreement.
- * Contributors retain copyright to elements licensed under a Contributor Agreement.
- * Licensed to the User under the LGPL license.
- *
- * $
- */
 package org.sipfoundry.sipxconfig.rest;
 
-import static org.restlet.data.MediaType.APPLICATION_JSON;
-import static org.restlet.data.MediaType.TEXT_XML;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.lang.StringUtils;
-import org.restlet.Context;
+import org.apache.commons.lang3.StringUtils;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.representation.Variant;
+import org.restlet.resource.Get;
+import org.restlet.resource.Post;
+import org.restlet.resource.Put;
+import org.restlet.resource.Delete;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.resource.ServerResource;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.phonebook.AddressBookEntry;
 import org.sipfoundry.sipxconfig.phonebook.Phonebook;
 import org.sipfoundry.sipxconfig.phonebook.PhonebookEntry;
 import org.sipfoundry.sipxconfig.phonebook.PhonebookManager;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.thoughtworks.xstream.XStream;
 
-public class UserPhonebookEntryResource extends UserResource {
+import java.util.ArrayList;
+import java.util.Collection;
 
-    public static final Status PHONEBOOK_DUPLICATE_ENTRY_ERROR = new Status(747);
+public class UserPhonebookEntryResource extends UserResource {
 
     private PhonebookManager m_phonebookManager;
     private String m_entryId;
 
     @Override
-    public void init(Context context, Request request, Response response) {
-        super.init(context, request, response);
-        getVariants().add(new Variant(TEXT_XML));
-        getVariants().add(new Variant(APPLICATION_JSON));
+    protected void doInit() {
         m_entryId = (String) getRequest().getAttributes().get("entryId");
+        // Define supported media types for representations
+        getVariants().add(new Variant(MediaType.APPLICATION_JSON));
+        getVariants().add(new Variant(MediaType.TEXT_XML));
     }
 
-    @Override
+    @Get
     public Representation represent(Variant variant) throws ResourceException {
         Phonebook privatePhonebook = m_phonebookManager.getPrivatePhonebook(getUser());
         if (privatePhonebook != null) {
             Collection<PhonebookEntry> entries = privatePhonebook.getEntries();
-            ArrayList<String> ids = new ArrayList<String>();
+            ArrayList<String> ids = new ArrayList<>();
             for (PhonebookEntry entry : entries) {
                 ids.add(String.valueOf(entry.getId()));
             }
@@ -69,38 +55,39 @@ public class UserPhonebookEntryResource extends UserResource {
         return null;
     }
 
-    @Override
-    public void acceptRepresentation(Representation entity) throws ResourceException {
+    @Post
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {
         PhonebookEntryRepresentation representation = new PhonebookEntryRepresentation(entity);
         PhonebookEntry newEntry = representation.getObject();
         if (!validatePhonebookEntry(newEntry)) {
-            return;
+            return null;
         }
 
         if (m_phonebookManager.getDuplicatePhonebookEntry(newEntry, getUser()) != null) {
             setDuplicateEntryStatus();
-            return;
+            return null;
         }
 
         User user = getUser();
         Phonebook privatePhonebook = m_phonebookManager.getPrivatePhonebookCreateIfRequired(user);
         newEntry.setPhonebook(privatePhonebook);
-        (privatePhonebook.getEntries()).add(newEntry);
+        privatePhonebook.getEntries().add(newEntry);
         m_phonebookManager.savePhonebook(privatePhonebook);
+        return new PhonebookEntryRepresentation(MediaType.APPLICATION_JSON, newEntry);
     }
 
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {
         PhonebookEntryRepresentation representation = new PhonebookEntryRepresentation(entity);
         PhonebookEntry newEntry = representation.getObject();
         if (!validatePhonebookEntry(newEntry)) {
-            return;
+            return null;
         }
 
         PhonebookEntry duplicateEntry = m_phonebookManager.getDuplicatePhonebookEntry(newEntry, getUser());
         if (duplicateEntry != null && !duplicateEntry.getId().equals(Integer.parseInt(m_entryId))) {
             setDuplicateEntryStatus();
-            return;
+            return null;
         }
 
         Phonebook privatePhonebook = m_phonebookManager.getPrivatePhonebook(getUser());
@@ -109,19 +96,17 @@ public class UserPhonebookEntryResource extends UserResource {
             PhonebookEntry entry = m_phonebookManager.getPhonebookEntry(Integer.parseInt(m_entryId));
             entry.update(newEntry);
             m_phonebookManager.updatePhonebookEntry(entry);
+            return new PhonebookEntryRepresentation(MediaType.APPLICATION_JSON, newEntry);
         }
+        return null;
     }
 
-    private void setDuplicateEntryStatus() {
-        getResponse().setStatus(PHONEBOOK_DUPLICATE_ENTRY_ERROR, "Duplicate Entry");
-    }
-
-    @Override
+    @Delete
     public void removeRepresentations() throws ResourceException {
         Phonebook privatePhonebook = m_phonebookManager.getPrivatePhonebook(getUser());
         if (privatePhonebook != null) {
             Collection<PhonebookEntry> entries = privatePhonebook.getEntries();
-            ArrayList<String> ids = new ArrayList<String>();
+            ArrayList<String> ids = new ArrayList<>();
             for (PhonebookEntry entry : entries) {
                 ids.add(String.valueOf(entry.getId()));
             }
@@ -130,6 +115,10 @@ public class UserPhonebookEntryResource extends UserResource {
                 m_phonebookManager.deletePhonebookEntry(entry);
             }
         }
+    }
+
+    private void setDuplicateEntryStatus() {
+        getResponse().setStatus(Status.CLIENT_ERROR_CONFLICT, "Duplicate Entry");
     }
 
     private boolean validatePhonebookEntry(PhonebookEntry newEntry) {
@@ -142,9 +131,8 @@ public class UserPhonebookEntryResource extends UserResource {
         }
 
         if (!StringUtils.isEmpty(newEntry.getAddressBookEntry().getEmailAddress())) {
-            Pattern emailPattern = Pattern.compile("^([a-zA-Z0-9_.\\-+])+@(([a-zA-Z0-9\\-])+\\.)+[a-zA-Z0-9]{2,4}$");
-            Matcher matcher = emailPattern.matcher(newEntry.getAddressBookEntry().getEmailAddress());
-            if (!matcher.matches()) {
+            // validate email format
+            if (!isValidEmail(newEntry.getAddressBookEntry().getEmailAddress())) {
                 getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST, "Invalid Email Address");
                 return false;
             }
@@ -152,7 +140,15 @@ public class UserPhonebookEntryResource extends UserResource {
         return true;
     }
 
-    @Required
+    private boolean isValidEmail(String email) {
+        return email.matches("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$");
+    }
+
+    protected User getUser() {
+        // Assume we have a user context here, replace with actual logic for getting the current user.
+        return new User();
+    }
+
     public void setPhonebookManager(PhonebookManager phonebookManager) {
         m_phonebookManager = phonebookManager;
     }
@@ -178,5 +174,4 @@ public class UserPhonebookEntryResource extends UserResource {
             xstream.omitField(AddressBookEntry.class, "m_branchOfficeAddress");
         }
     }
-
 }

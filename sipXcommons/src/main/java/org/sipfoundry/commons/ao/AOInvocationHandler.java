@@ -49,7 +49,6 @@ public class AOInvocationHandler implements InvocationHandler, Runnable {
 	private class Invocation {
 		protected Method method;
 		protected Object[] args;
-		protected boolean highPriority;
 		protected boolean blocking;
 		protected boolean terminate;
 		protected SynchronousQueue<Object> results = null;
@@ -337,6 +336,7 @@ public class AOInvocationHandler implements InvocationHandler, Runnable {
 		 * Atomically removes all of the elements from this queue. The queue will be
 		 * empty after this call returns.
 		 */
+		@SuppressWarnings("unused")
 		public void clear() {
 			int x = high_popIndex;
 			int count = high_count;

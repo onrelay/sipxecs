@@ -12,11 +12,11 @@ import javax.sip.address.Hop;
 import javax.sip.address.SipURI;
 
 import org.apache.log4j.Logger;
-import org.restlet.Filter;
+import org.restlet.routing.Filter;
 import org.restlet.data.MediaType;
 import org.restlet.data.Protocol;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
 import org.sipfoundry.commons.siprouter.FindSipServer;
 

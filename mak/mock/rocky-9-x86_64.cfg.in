@@ -10,10 +10,10 @@ config_opts['use_bootstrap'] = False
 #config_opts['bootstrap_image'] = 'rockylinux:9'
 
 # Fixes rocky linux annobin bug with find-plugindir() script, hardcoding instead
-# Ensures java 8 is default in case other jdks are pulled in
+# Ensures java 17 is default in case other jdks are pulled in
 config_opts['chroot_post_install'] = [
     '/usr/bin/sed -i "s/%:find-plugindir()/-iplugindir=\\/usr\\/lib\\/gcc\\/x86_64-redhat-linux\\/11\\/plugin\\//g" /usr/lib/rpm/redhat/redhat-annobin-cc1',
-    'alternatives --set java java-1.8.0-openjdk.x86_64'
+    'alternatives --set java java-17-openjdk.x86_64'
     ]
 
 config_opts['build_requirements'] = [
@@ -29,7 +29,6 @@ config_opts['build_requirements'] = [
     'pcre-devel',
     'openssl-devel',
     'krb5-devel',
-    'java-1.8.0-openjdk-devel',
     'java-17-openjdk-devel'
     ]
 

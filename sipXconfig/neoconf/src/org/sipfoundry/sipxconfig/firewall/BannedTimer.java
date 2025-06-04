@@ -4,7 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.elasticsearch.common.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.apiban.BannedApi;
-import org.springframework.beans.factory.annotation.Required;
 
 public class BannedTimer {
     private BannedApi m_bannedApi;
@@ -14,7 +13,7 @@ public class BannedTimer {
 
     private static final Log LOG = LogFactory.getLog(BannedTimer.class);
 
-    @Required
+    
     public void setBannedApi(BannedApi bannedApi) {
         m_bannedApi = bannedApi;
     }
@@ -49,12 +48,12 @@ public class BannedTimer {
         }
     }
 
-    @Required
+    
     public void setFirewallManager(FirewallManager firewallManager) {
         m_firewallManager = firewallManager;
     }
 
-    @Required
+    
     public void setKey(String key) {
         m_key = key;
     }        

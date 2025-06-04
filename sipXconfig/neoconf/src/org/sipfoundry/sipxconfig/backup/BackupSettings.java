@@ -14,7 +14,7 @@
  */
 package org.sipfoundry.sipxconfig.backup;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,7 +30,6 @@ import org.sipfoundry.sipxconfig.feature.Feature;
 import org.sipfoundry.sipxconfig.rest.RestUtilities;
 import org.sipfoundry.sipxconfig.setting.PersistableSettings;
 import org.sipfoundry.sipxconfig.setting.Setting;
-import org.springframework.beans.factory.annotation.Required;
 
 public class BackupSettings extends PersistableSettings implements DeployConfigOnEdit {
 
@@ -74,7 +73,7 @@ public class BackupSettings extends PersistableSettings implements DeployConfigO
         }
     }
 
-    @Required
+    
     public void setLocalBackupPath(String localBackupPath) {
         m_localBackupPath = localBackupPath;
     }
@@ -83,7 +82,7 @@ public class BackupSettings extends PersistableSettings implements DeployConfigO
         return m_localBackupPath;
     }
 
-    @Required
+    
     public void setBackupDbSettings(BackupDbSettings backupDbSettings) {
         m_backupDbSettings = backupDbSettings;
     }

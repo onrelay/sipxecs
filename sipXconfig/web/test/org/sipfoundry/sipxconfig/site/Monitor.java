@@ -26,10 +26,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
- * This is copied from examples in Jetty installation
- * (./jetty-5.1.4/src/org/mortbay/start/Monitor.java) and simplified to only support stop command.
- * The original code was licensed under the Apache License, Version 2.0 (the "License")
- *
+ *  
  * Monitor thread. This thread listens on the port specified by the STOP.PORT system parameter
  * (defaults to 9998) for request authenticated with the key given by the STOP.KEY system
  * parameter (defaults to "sipxconfig") for admin requests.

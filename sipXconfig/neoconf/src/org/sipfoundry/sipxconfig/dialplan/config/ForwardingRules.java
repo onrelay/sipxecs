@@ -36,7 +36,6 @@ import org.sipfoundry.sipxconfig.sbc.DefaultSbc;
 import org.sipfoundry.sipxconfig.sbc.SbcDevice;
 import org.sipfoundry.sipxconfig.sbc.SbcDeviceManager;
 import org.sipfoundry.sipxconfig.sbc.SbcManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -199,7 +198,7 @@ public class ForwardingRules extends RulesFile implements ApplicationContextAwar
         m_featureManager = featureManager;
     }
 
-    @Required
+    
     public void setAdvancedCallHandling(AdvancedCallHandling advancedCallHandling) {
         m_advancedCallHandling = advancedCallHandling;
     }

@@ -11,6 +11,7 @@ package org.sipfoundry.sipxconfig.site.cdr;
 
 import java.util.Collections;
 import java.util.List;
+import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -64,10 +65,16 @@ public abstract class ActiveCallsPanel extends BaseComponent {
         if (activeCalls == null) {
             try {
                 activeCalls = getCdrManager().getActiveCalls();
-            } catch (UserException e) {
-                LOG.error("Cannot connect to CDR agent", e.getCause());
-                // FIXME: validator errors are not visible - they are logged after @ErrorMessage
-                // is rendered
+            } catch (IOException ioe) {
+                LOG.error("Cannot connect to CDR agent", ioe.getCause());
+                getValidator().record(getError(), ValidationConstraint.CONSISTENCY);
+                activeCalls = Collections.emptyList();
+            } catch (InterruptedException ie) {
+                LOG.error("Interruptedd connecting to CDR agent", ie.getCause());
+                getValidator().record(getError(), ValidationConstraint.CONSISTENCY);
+                activeCalls = Collections.emptyList();
+            } catch (UserException ue) {
+                LOG.error("Cannot connect to CDR agent", ue.getCause());
                 getValidator().record(getError(), ValidationConstraint.CONSISTENCY);
                 activeCalls = Collections.emptyList();
             }

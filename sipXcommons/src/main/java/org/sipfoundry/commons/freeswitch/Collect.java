@@ -14,6 +14,7 @@ import java.net.URLDecoder;
 public class Collect extends CallCommand {
     private boolean m_done;
     private Break m_breaker;
+    @SuppressWarnings("unused")
     private boolean m_stopped;
     private String m_digitMask = "1234567890ABCD#*i";
     private String m_termChars = "#";

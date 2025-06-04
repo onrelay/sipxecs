@@ -15,6 +15,8 @@ import static org.sipfoundry.sipxconfig.commserver.imdb.MongoTestCaseHelper.asse
 import static org.sipfoundry.sipxconfig.commserver.imdb.MongoTestCaseHelper.assertObjectWithIdNotPresent;
 import static org.sipfoundry.sipxconfig.commserver.imdb.MongoTestCaseHelper.assertObjectWithIdPresent;
 
+import java.util.List;
+
 import org.sipfoundry.commons.mongo.MongoConstants;
 import org.sipfoundry.sipxconfig.acccode.AuthCode;
 import org.sipfoundry.sipxconfig.callgroup.CallGroup;
@@ -26,8 +28,12 @@ import org.sipfoundry.sipxconfig.permission.PermissionName;
 import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.test.ImdbTestCase;
 
-import com.mongodb.DBCursor;
-import com.mongodb.QueryBuilder;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Filters;
+
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
 public class PermissionsTestIntegration extends ImdbTestCase {
 
@@ -58,9 +64,9 @@ public class PermissionsTestIntegration extends ImdbTestCase {
             if (!su.equals(SpecialUserType.PHONE_PROVISION)) {
                 assertObjectWithIdPresent(getEntityCollection(), su.getUserName());
                 System.out.println("User: " + su.getUserName());
-                DBCursor c = getEntityCollection().find();
-                while (c.hasNext()) {
-                    System.out.println(c.next().toString());
+                FindIterable<Document> cursor = getEntityCollection().find();
+                for( Document doc : cursor ) {
+                    System.out.println(doc.toString());
                 }
                 assertObjectListFieldCount(getEntityCollection(), su.getUserName(), MongoConstants.PERMISSIONS, PERM_COUNT);
             }
@@ -104,44 +110,58 @@ public class PermissionsTestIntegration extends ImdbTestCase {
         m_testUser.setUniqueId(1);
         getReplicationManager().replicateEntity(m_testUser, DataSet.PERMISSION);
 
-        assertObjectWithIdPresent(getEntityCollection(), "User1");
-        assertObjectListFieldCount(getEntityCollection(), "User1", MongoConstants.PERMISSIONS, 8);
-        QueryBuilder qb = QueryBuilder.start(MongoConstants.ID);
-        qb.is("User1").and(MongoConstants.PERMISSIONS).size(4).and(MongoConstants.PERMISSIONS)
-                .is(PermissionName.LOCAL_DIALING.getName()).is(PermissionName.VOICEMAIL.getName())
-                .is(PermissionName.EXCHANGE_VOICEMAIL.getName()).is(PermissionName.MOBILE.getName());
-        assertObjectPresent(getEntityCollection(), qb.get());
+        MongoCollection<Document> collection = getEntityCollection();
+
+        assertObjectWithIdPresent(collection, "User1");
+
+        Document doc = collection.find(Filters.eq("_id", "User1")).first();
+        assertNotNull(doc);
+        List<String> permissions = doc.getList(MongoConstants.PERMISSIONS, String.class);
+        assertEquals(4, permissions.size());
+        assertTrue(permissions.contains(PermissionName.LOCAL_DIALING.getName()));
+        assertTrue(permissions.contains(PermissionName.EXCHANGE_VOICEMAIL.getName()));
+        assertTrue(permissions.contains(PermissionName.VOICEMAIL.getName()));
+        assertTrue(permissions.contains(PermissionName.MOBILE.getName()));
     }
 
-    public void testAuthCodePermissions() {
-        InternalUser user = new InternalUser();
-        user.setSipPassword("123");
-        user.setPintoken("11");
-        user.setPermissionManager(getPermissionManager());
-        user.setPermission(PermissionName.NINEHUNDERED_DIALING, true);
-        user.setPermission(PermissionName.INTERNATIONAL_DIALING, false);
-        user.setPermission(PermissionName.LOCAL_DIALING, false);
-        user.setPermission(PermissionName.LONG_DISTANCE_DIALING, false);
-        user.setPermission(PermissionName.MOBILE, false);
-        user.setPermission(PermissionName.TOLL_FREE_DIALING, false);
+public void testAuthCodePermissions() {
+    InternalUser user = new InternalUser();
+    user.setSipPassword("123");
+    user.setPintoken("11");
+    user.setPermissionManager(getPermissionManager());
+    user.setPermission(PermissionName.NINEHUNDERED_DIALING, true);
+    user.setPermission(PermissionName.INTERNATIONAL_DIALING, false);
+    user.setPermission(PermissionName.LOCAL_DIALING, false);
+    user.setPermission(PermissionName.LONG_DISTANCE_DIALING, false);
+    user.setPermission(PermissionName.MOBILE, false);
+    user.setPermission(PermissionName.TOLL_FREE_DIALING, false);
 
-        AuthCode code = new AuthCode();
-        code.setInternalUser(user);
-        getReplicationManager().replicateEntity(code, DataSet.PERMISSION);
-        assertObjectWithIdPresent(getEntityCollection(), "AuthCode-1");
-        QueryBuilder qb = QueryBuilder.start(MongoConstants.ID);
-        qb.is("AuthCode-1").and(MongoConstants.PERMISSIONS).size(1).and(MongoConstants.PERMISSIONS)
-                .is(PermissionName.NINEHUNDERED_DIALING.getName());
-        assertObjectPresent(getEntityCollection(), qb.get());
+    AuthCode code = new AuthCode();
+    code.setInternalUser(user);
+    getReplicationManager().replicateEntity(code, DataSet.PERMISSION);
 
-        user.setPermission(PermissionName.NINEHUNDERED_DIALING, false);
-        user.setPermission(PermissionName.INTERNATIONAL_DIALING, true);
-        code.setInternalUser(user);
+    MongoCollection<Document> collection = getEntityCollection();
 
-        getReplicationManager().replicateEntity(code, DataSet.PERMISSION);
-        qb.is("AuthCode-1").and(MongoConstants.PERMISSIONS).size(1).and(MongoConstants.PERMISSIONS)
-        .is(PermissionName.INTERNATIONAL_DIALING.getName());
-        assertObjectPresent(getEntityCollection(), qb.get());
-    }
+    assertObjectWithIdPresent(collection, "AuthCode-1");
+
+    Document doc = collection.find(Filters.eq("_id", "AuthCode-1")).first();
+    assertNotNull(doc);
+    List<String> permissions = doc.getList(MongoConstants.PERMISSIONS, String.class);
+    assertEquals(1, permissions.size());
+    assertEquals(PermissionName.NINEHUNDERED_DIALING.getName(), permissions.get(0));
+
+    // Switch permissions
+    user.setPermission(PermissionName.NINEHUNDERED_DIALING, false);
+    user.setPermission(PermissionName.INTERNATIONAL_DIALING, true);
+    code.setInternalUser(user);
+
+    getReplicationManager().replicateEntity(code, DataSet.PERMISSION);
+
+    doc = collection.find(Filters.eq("_id", "AuthCode-1")).first();
+    assertNotNull(doc);
+    permissions = doc.getList(MongoConstants.PERMISSIONS, String.class);
+    assertEquals(1, permissions.size());
+    assertEquals(PermissionName.INTERNATIONAL_DIALING.getName(), permissions.get(0));
+}
 
 }

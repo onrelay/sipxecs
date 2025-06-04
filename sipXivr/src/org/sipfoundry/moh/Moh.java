@@ -20,7 +20,6 @@ import org.sipfoundry.commons.userdb.User;
 import org.sipfoundry.commons.userdb.ValidUsers;
 import org.sipfoundry.commons.util.AudioUtil;
 import org.sipfoundry.sipxivr.SipxIvrApp;
-import org.springframework.beans.factory.annotation.Required;
 
 public class Moh extends SipxIvrApp {
     static final Logger LOG = Logger.getLogger("org.sipfoundry.sipxivr");
@@ -166,7 +165,7 @@ public class Moh extends SipxIvrApp {
         m_validUsers = validUsers;
     }
 
-    @Required
+    
     public void setTimeout(String timeout) {
         m_timeout = timeout;
     }       

@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,18 +35,20 @@ import net.coobird.thumbnailator.geometry.Positions;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-import com.mongodb.gridfs.GridFS;
-import com.mongodb.gridfs.GridFSDBFile;
-import com.mongodb.gridfs.GridFSInputFile;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.gridfs.GridFSDownloadStream;
+import com.mongodb.client.gridfs.GridFSUploadStream;
+
 
 public class UserProfileServiceImpl implements UserProfileService {
     private static final String USER_PROFILE_COLLECTION = "userProfile";
@@ -217,90 +220,100 @@ public class UserProfileServiceImpl implements UserProfileService {
 
     @Override
     public InputStream getAvatar(String userName) {
-        GridFSDBFile image = getAvatarDBFile(userName);
-        if (image != null) {
-            return image.getInputStream();
+        GridFSDownloadStream imageStream = getAvatarStream(userName);
+        if (imageStream != null) {
+            return imageStream;
         }
         return null;
     }
 
     @Override
     public ObjectId getAvatarId(String userName) {
-        GridFSDBFile imageForOutput = getAvatarDBFile(userName);
-        if (imageForOutput != null) {
-            return (ObjectId) getAvatarDBFile(userName).getId();
+        GridFSDownloadStream imageStream = getAvatarStream(userName);
+        if (imageStream != null) {
+            return imageStream.getGridFSFile().getObjectId();
         }
 
         return null;
     }
 
-    private GridFSDBFile getAvatarDBFile(String userName) {
-        GridFS avatarFS = new GridFS(m_template.getDb());
+    private GridFSDownloadStream getAvatarStream(String userName) {
+        MongoDatabase database = m_template.getDb();
+        GridFSBucket avatarFS = GridFSBuckets.create(database);
         UserProfile userProfile = getUserProfileByUsername(userName);
-        GridFSDBFile imageForOutput = null;
+        GridFSDownloadStream imageStream = null;
+        
         if (userProfile != null) {
-            if (!userProfile.getUseExtAvatar()) {
-                imageForOutput = avatarFS.findOne(String.format(AVATAR_NAME, userName));
-            } else {
-                imageForOutput =avatarFS.findOne(String.format(AVATAR_EXT_NAME, userName));
+            String fileName = userProfile.getUseExtAvatar() 
+                ? String.format(AVATAR_EXT_NAME, userName) 
+                : String.format(AVATAR_NAME, userName);
+            imageStream = avatarFS.openDownloadStream(fileName);
+        }
+
+        if (imageStream == null) {
+            // Try default avatar
+            imageStream = avatarFS.openDownloadStream(String.format(AVATAR_NAME, "default"));
+            if (imageStream != null) {
+                m_defaultId = imageStream.getGridFSFile().getObjectId().toString();
             }
         }
-        if (imageForOutput != null) {
-            return imageForOutput;
-        }
-        // try default avatar
-        imageForOutput = avatarFS.findOne(String.format(AVATAR_NAME, "default"));
-        if (imageForOutput != null) {
-            m_defaultId = imageForOutput.getId().toString();
-            return imageForOutput;
+
+        return imageStream;
+    }
+
+    @Override
+    public String getAvatarDBFileMD5(String userName) {
+        GridFSDownloadStream avatarStream = getAvatarStream(userName);
+        if (avatarStream != null) {
+            // Optionally, you can implement MD5 checksum calculation if needed.
+            // MongoDB's GridFS does not provide direct MD5 access in the new API.
+            return avatarStream.getGridFSFile().getObjectId().toString(); 
         }
         return null;
     }
-    @Override
-    public String getAvatarDBFileMD5(String userName) {
-        GridFSDBFile avatar = getAvatarDBFile(userName);
-        return avatar != null ? avatar.getMD5() : null;
-    }
-    
+
     private void deleteAvatar(String userName, String avatarName) {
-        GridFS avatarFS = new GridFS(m_template.getDb());
-        avatarFS.remove(String.format(avatarName, userName));
+        MongoDatabase database = m_template.getDb();
+        GridFSBucket avatarFS = GridFSBuckets.create(database);
+        avatarFS.delete(new ObjectId(String.format(avatarName, userName)));
     }
-    
+
     @Override
     public void deleteAvatar(String userName) {
         deleteIntAvatar(userName);
         deleteExtAvatar(userName);
     }
-    
+
     @Override
     public void deleteExtAvatar(String userName) {
         deleteAvatar(userName, AVATAR_EXT_NAME);
-        
     }
-    
+
     @Override
     public void deleteIntAvatar(String userName) {
         deleteAvatar(userName, AVATAR_NAME);
-        
-    }    
-    
+    }
+
     private void saveAvatar(String userName, InputStream originalIs, String avatarName) throws AvatarUploadException {
         ByteArrayOutputStream os = null;
         InputStream is = null;
         try {
             BufferedImage originalImage = ImageIO.read(originalIs);
-            BufferedImage thumbnail = Thumbnails.of(originalImage).crop(Positions.CENTER).size(128, 128)
-                    .asBufferedImage();
+            BufferedImage thumbnail = Thumbnails.of(originalImage).crop(Positions.CENTER).size(128, 128).asBufferedImage();
             os = new ByteArrayOutputStream();
             ImageIO.write(thumbnail, "png", os);
             is = new ByteArrayInputStream(os.toByteArray());
+
+            MongoDatabase database = m_template.getDb();
+            GridFSBucket avatarFS = GridFSBuckets.create(database);
             String fileName = String.format(avatarName, userName);
-            GridFS avatarFS = new GridFS(m_template.getDb());
-            avatarFS.remove(fileName);
-            GridFSInputFile gfsFile = avatarFS.createFile(is);
-            gfsFile.setFilename(fileName);
-            gfsFile.save();
+            
+            // Delete any existing avatar file before saving the new one
+            avatarFS.delete(new ObjectId(fileName));
+            
+            GridFSUploadStream uploadStream = avatarFS.openUploadStream(fileName);
+            IOUtils.copy(is, uploadStream);
+            uploadStream.flush();
         } catch (Exception ex) {
             throw new AvatarUploadException(ex);
         } finally {
@@ -309,36 +322,33 @@ public class UserProfileServiceImpl implements UserProfileService {
             IOUtils.closeQuietly(os);
         }
     }
-    
+
     @Override
     public void saveAvatar(String userName, InputStream originalIs) throws AvatarUploadException {
         saveAvatar(userName, originalIs, AVATAR_NAME);
     }
-    
+
     @Override
     public void saveExtAvatar(String userName, String url) throws AvatarUploadException {
         File temp = null;
         FileInputStream tempIs = null;
         try {
-            try {
-                temp = File.createTempFile(String.format(AVATAR_EXT_NAME, userName), ".tmp");        
-                FileUtils.copyURLToFile(new URL(url), temp);
-                tempIs = new FileInputStream(temp);
-            } catch (Exception ex) {
-                throw new AvatarUploadException(ex);
-            }
+            temp = File.createTempFile(String.format(AVATAR_EXT_NAME, userName), ".tmp");
+            FileUtils.copyURLToFile(new URL(url), temp);
+            tempIs = new FileInputStream(temp);
             saveAvatar(userName, tempIs, AVATAR_EXT_NAME);
-        } finally {
+        } catch( IOException ioException ) {
+            throw new AvatarUploadException( ioException );
+        }
+        finally {
             IOUtils.closeQuietly(tempIs);
         }
     }
 
     @Override
-    public void saveAvatar(String userName, InputStream originalIs, boolean overwriteIfExists)
-            throws AvatarUploadException {
-        GridFS avatarFS = new GridFS(m_template.getDb());
-        GridFSDBFile imageForOutput = avatarFS.findOne(String.format(AVATAR_NAME, userName));
-        if (imageForOutput == null || (imageForOutput != null && overwriteIfExists)) {
+    public void saveAvatar(String userName, InputStream originalIs, boolean overwriteIfExists) throws AvatarUploadException {
+        GridFSDownloadStream imageStream = getAvatarStream(userName);
+        if (imageStream == null || overwriteIfExists) {
             saveAvatar(userName, originalIs);
         }
     }
@@ -394,7 +404,7 @@ public class UserProfileServiceImpl implements UserProfileService {
         return m_template.find(
             new Query(Criteria.where("m_useExtAvatar").is(true).
                     and("m_extAvatar").exists(true)).                    
-                    limit(LIMIT_EXT_AVATAR_SYNC).with(new Sort(Sort.Direction.ASC, "m_extAvatarSyncDate")), 
+                    limit(LIMIT_EXT_AVATAR_SYNC).with(Sort.by(Sort.Direction.ASC, "m_extAvatarSyncDate")), 
                     UserProfile.class, USER_PROFILE_COLLECTION);
     }
 

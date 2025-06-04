@@ -20,7 +20,6 @@ import java.util.Hashtable;
 
 import org.sipfoundry.commons.freeswitch.Collect;
 import org.sipfoundry.commons.freeswitch.eslrequest.AbstractEslRequestController;
-import org.springframework.beans.factory.annotation.Required;
 
 public class AaLiveManagementController extends AbstractEslRequestController {
     private String m_dialedNumber;
@@ -52,22 +51,22 @@ public class AaLiveManagementController extends AbstractEslRequestController {
         return c.getDigits();
     }
 
-    @Required
+    
     public void setMaxDigits(int maxDigits) {
         this.m_maxDigits = maxDigits;
     }
 
-    @Required
+    
     public void setFirstDigitTimeout(int firstDigitsTimeout) {
         this.m_firstDigitTimeout = firstDigitsTimeout;
     }
 
-    @Required
+    
     public void setInterDigitTimeout(int interDigitsTimeout) {
         this.m_interDigitTimeout = interDigitsTimeout;
     }
 
-    @Required
+    
     public void setExtraDigitTimeout(int extraDigitsTimeout) {
         this.m_extraDigitTimeout = extraDigitsTimeout;
     }

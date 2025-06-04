@@ -8,15 +8,6 @@ package org.sipfoundry.commons.dhcp;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.sipfoundry.commons.dhcp.DHCPMessage;
-import org.sipfoundry.commons.dhcp.DomainNameOption;
-import org.sipfoundry.commons.dhcp.DomainNameServerOption;
-import org.sipfoundry.commons.dhcp.LeaseTimeOption;
-import org.sipfoundry.commons.dhcp.MessageTypeOption;
-import org.sipfoundry.commons.dhcp.RouterOption;
-import org.sipfoundry.commons.dhcp.ServerIdentifierOption;
-import org.sipfoundry.commons.dhcp.SubnetMaskOption;
-
 import junit.framework.TestCase;
 
 import static org.sipfoundry.commons.dhcp.HardwareAddressType.*;

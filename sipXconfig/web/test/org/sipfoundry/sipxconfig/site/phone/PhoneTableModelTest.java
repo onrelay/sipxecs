@@ -26,10 +26,10 @@ public class PhoneTableModelTest extends TestCase {
     public void testOrderByFromSortColum() {
         IMocksControl columnCtrl = EasyMock.createControl();
         ITableColumn column = columnCtrl.createMock(ITableColumn.class);
-        column.getColumnName();
-        columnCtrl.andReturn("bongo");
-        column.getColumnName();
-        columnCtrl.andReturn("modelId");
+
+        EasyMock.expect(column.getColumnName()).andReturn("bongo");
+        EasyMock.expect(column.getColumnName()).andReturn("modelId");
+
         columnCtrl.replay();
 
         String[] orderBy = TapestryUtils.orderByFromSortColum(column);

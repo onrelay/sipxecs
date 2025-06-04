@@ -10,9 +10,10 @@
 package org.sipfoundry.sipxconfig.rest;
 
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
 import org.sipfoundry.sipxconfig.common.User;
 
@@ -23,22 +24,15 @@ public class PersonalAttendantOperatorResource extends UserResource {
     public void init(Context context, Request request, Response response) {
         super.init(context, request, response);
 
-        setModifiable(true);
-        setReadable(false);
-
         m_operator = (String) getRequest().getAttributes().get("operator");
     }
 
-    @Override
-    public boolean allowPut() {
-        return true;
-    }
-
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
         User user = getUser();
         user.getSettings().getSetting("personal-attendant/operator").setValue(m_operator);
         getCoreContext().saveUser(user);
+        return null;
     }
 
 }

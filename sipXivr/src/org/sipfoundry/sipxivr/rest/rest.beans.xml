@@ -6,7 +6,7 @@
     <property name="httpPort" value="${ivr.httpPort}" />
     <property name="publicHttpPort" value="${ivr.publicHttpPort}" />
     <property name="servletHandler" ref="servletHandler" />
-    <property name="userRealm" ref="userRealm" />
+    <property name="userLoginService" ref="userLoginService" />
     <property name="digestAuthenticator" ref="digestAuthenticator" />
     <property name="securityHandler" ref="securityHandler" />
   </bean>
@@ -24,7 +24,7 @@
   	<constructor-arg><value>${ivr.publicHttpPort}</value></constructor-arg>
   </bean>
 
-  <bean id="userRealm" class="org.sipfoundry.sipxivr.rest.SipxIvrUserRealm">
+  <bean id="userLoginService" class="org.sipfoundry.sipxivr.rest.SipxIvrUserLoginService">
     <property name="validUsers" ref="validUsers" />
     <property name="sipRealm" value="${SIP_REALM}" />
     <property name="secret" value="${SHARED_SECRET}" />

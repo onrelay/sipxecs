@@ -40,7 +40,6 @@ import org.sipfoundry.sipxconfig.im.ImManager;
 import org.sipfoundry.sipxconfig.setting.PersistableSettings;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.annotation.Required;
 
 public class RlsConfig implements ConfigProvider, DaoEventListener, BeanFactoryAware, ResLimitPluginConfig {
     private Rls m_rls;
@@ -104,17 +103,17 @@ public class RlsConfig implements ConfigProvider, DaoEventListener, BeanFactoryA
         config.write("SIP_RLS_AUTHENTICATE_REALM", domain.getSipRealm());
     }
 
-    @Required
+    
     public void setRls(Rls rls) {
         m_rls = rls;
     }
 
-    @Required
+    
     public void setConfigManager(ConfigManager configManager) {
         m_configManager = configManager;
     }
 
-    @Required
+    
     public void setRlsLists(ResourceLists lists) {
         m_lists = lists;
     }
@@ -140,7 +139,7 @@ public class RlsConfig implements ConfigProvider, DaoEventListener, BeanFactoryA
         m_factory = factory;
     }
 
-    @Required
+    
     public void setRlsLimitsConfig(AbstractResLimitsConfig rlsLimitsConfig) {
         m_rlsLimitsConfig = rlsLimitsConfig;
     }

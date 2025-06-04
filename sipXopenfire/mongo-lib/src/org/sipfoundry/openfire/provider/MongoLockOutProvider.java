@@ -23,22 +23,23 @@ import org.jivesoftware.openfire.lockout.LockOutFlag;
 import org.jivesoftware.openfire.provider.LockOutProvider;
 import org.jivesoftware.util.StringUtils;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import org.bson.Document;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.model.Indexes;
 
 public class MongoLockOutProvider extends BaseMongoProvider implements LockOutProvider {
     private static final String COLLECTION_NAME = "ofUserFlag";
 
     public MongoLockOutProvider() {
         setDefaultCollectionName(COLLECTION_NAME);
-        DBCollection lockoutCollection = getDefaultCollection();
-        DBObject index = new BasicDBObject();
+        MongoCollection<Document> lockoutCollection = getDefaultCollection();
 
-        index.put("username", 1);
-        index.put("name", 1);
-        lockoutCollection.ensureIndex(index);
+        // Create a compound index on "username" and "name"
+        lockoutCollection.createIndex(Indexes.compoundIndex(
+            Indexes.ascending("username"),
+            Indexes.ascending("name")
+        ));
     }
 
     /**
@@ -47,26 +48,18 @@ public class MongoLockOutProvider extends BaseMongoProvider implements LockOutPr
     @Override
     public LockOutFlag getDisabledStatus(String username) {
         LockOutFlag flag = null;
-        DBCollection lockoutCollection = getDefaultCollection();
-        DBObject query = new BasicDBObject();
+        MongoCollection<Document> lockoutCollection = getDefaultCollection();
+        Document query = new Document()
+            .append("username", username)
+            .append("name", "lockout");
 
-        query.put("username", username);
-        // name of the lockout flag
-        query.put("name", "lockout");
+        Document line = lockoutCollection.find(query).first();
 
-        DBCursor cursor = lockoutCollection.find(query);
-
-        if (cursor.hasNext()) {
-            DBObject line = cursor.next();
-            BasicBSONObject obj = new BasicBSONObject();
-            obj.putAll(line);
-            long start = obj.getLong("startTime");
-            long end = obj.getLong("endTime");
-
+        if (line != null) {
+            long start = line.getLong("startTime");
+            long end = line.getLong("endTime");
             flag = new LockOutFlag(username, new Date(start), new Date(end));
         }
-
-        cursor.close();
 
         return flag;
     }
@@ -76,15 +69,15 @@ public class MongoLockOutProvider extends BaseMongoProvider implements LockOutPr
      */
     @Override
     public void setDisabledStatus(LockOutFlag flag) {
-        DBCollection lockoutCollection = getDefaultCollection();
-        DBObject toInsert = new BasicDBObject();
+        MongoCollection<Document> lockoutCollection = getDefaultCollection();
+        Document toInsert = new Document();
 
         toInsert.put("username", flag.getUsername());
         toInsert.put("name", "lockout");
         toInsert.put("startTime", StringUtils.dateToMillis(flag.getStartTime()));
         toInsert.put("endTime", StringUtils.dateToMillis(flag.getEndTime()));
 
-        lockoutCollection.insert(toInsert);
+        lockoutCollection.insertOne(toInsert);
     }
 
     /**
@@ -92,12 +85,12 @@ public class MongoLockOutProvider extends BaseMongoProvider implements LockOutPr
      */
     @Override
     public void unsetDisabledStatus(String username) {
-        DBCollection lockoutCollection = getDefaultCollection();
-        DBObject toDelete = new BasicDBObject();
+        MongoCollection<Document> lockoutCollection = getDefaultCollection();
+        Document toDelete = new Document();
 
         toDelete.put("username", username);
 
-        lockoutCollection.remove(toDelete);
+        lockoutCollection.deleteOne(toDelete);
     }
 
     /**

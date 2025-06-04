@@ -16,13 +16,11 @@
  */
 package org.sipfoundry.commons.mongo;
 
-import static java.lang.String.format;
-
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.BasicBSONObject;
+import org.bson.Document;
 
-import com.mongodb.CommandResult;
-import com.mongodb.DB;
+import com.mongodb.client.MongoDatabase;
 
 /**
  * Utility function when dealing with mongo
@@ -32,7 +30,6 @@ public final class MongoUtil {
     private MongoUtil() {        
     }
 
-    @SuppressWarnings("serial")
     public static class MongoCommandException extends RuntimeException {
         public MongoCommandException(String msg) {
             super(msg);
@@ -46,13 +43,16 @@ public final class MongoUtil {
      * Example:
      *  BasicBSONObject ret = MongoUtil.runCommand(m_db, "rs.config()");
      */
-    public static BasicBSONObject runCommand(DB db, String command) {
-        CommandResult status = db.doEval(command);        
-        if (!status.ok()) {
-            String msg = format("Cannot run command '%s'. Result '%s'.", command, status);
-            throw new MongoCommandException(msg);
+    public static Document runCommand(MongoDatabase db, String command) {
+        
+        try {
+            Document commandDoc = new Document(command, 1);  // Convert command string into BSON format
+            Document result = db.runCommand(commandDoc);
+            return result;
+        } catch (MongoCommandException e) {
+            String msg = String.format("Cannot run command '%s'. Result: '%s'.", command, e.getMessage());
+            throw new MongoCommandException( msg );
         }
-        return getObject(status, "retval");
     }
     
     public static void checkForError(BasicBSONObject o) {

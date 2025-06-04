@@ -11,8 +11,8 @@ package org.sipfoundry.sipxconfig.site.conference;
 
 import java.util.Iterator;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.contrib.table.model.IBasicTableModel;
 import org.apache.tapestry.contrib.table.model.ITableColumn;
 import org.sipfoundry.sipxconfig.conference.Bridge;

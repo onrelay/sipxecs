@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.site.user;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.contrib.table.model.IBasicTableModel;
 import org.apache.tapestry.contrib.table.model.ITableColumn;
 import org.sipfoundry.sipxconfig.common.CoreContext;

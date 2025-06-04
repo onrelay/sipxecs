@@ -17,7 +17,6 @@ test_DEPS = \
 	$(srcdir) \
 	$(call JavaDep, $(top_srcdir)/lib, \
 	  junit \
-	  jibx-run \
 	  $(commons_PKGS) \
 	)
 

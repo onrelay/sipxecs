@@ -11,8 +11,8 @@ package org.sipfoundry.sipxconfig.common;
 
 import java.text.MessageFormat;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Caught in application layer, this informs the user they've done something wrong. Despite being

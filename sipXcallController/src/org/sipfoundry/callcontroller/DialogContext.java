@@ -10,7 +10,7 @@
 
 package org.sipfoundry.callcontroller;
 
-import static org.apache.commons.lang.StringUtils.containsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 import gov.nist.javax.sip.DialogExt;
 import gov.nist.javax.sip.clientauthutils.UserCredentialHash;
 
@@ -39,7 +39,7 @@ import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.sipfoundry.sipxrest.RestServer;
 import org.sipfoundry.sipxrest.SipHelper;

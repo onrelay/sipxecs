@@ -12,13 +12,12 @@ package org.sipfoundry.sipxconfig.mail;
 import java.io.File;
 import java.util.Date;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -83,12 +82,12 @@ public class MailSenderContextImpl implements MailSenderContext {
         return String.format("%s@%s", address, m_domainManager.getDomain().getName());
     }
 
-    @Required
+    
     public void setMailSender(JavaMailSender mailSender) {
         m_mailSender = mailSender;
     }
 
-    @Required
+    
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }

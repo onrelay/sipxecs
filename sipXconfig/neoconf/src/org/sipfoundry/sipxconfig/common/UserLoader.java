@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
@@ -47,13 +47,13 @@ public class UserLoader {
         m_session = session;
     }
 
-    public List loadUsersByPage(String search, Integer groupId, Integer branchId, int firstRow, int pageSize,
+    public List<User> loadUsersByPage(String search, Integer groupId, Integer branchId, int firstRow, int pageSize,
             String orderBy, boolean orderAscending) {
         // create the query
         Query query = createUserQuery(search, groupId, branchId, orderBy, orderAscending, false);
 
         // execute the query and return results
-        List users = queryUsersByPage(query, firstRow, pageSize);
+        List<User> users = queryUsersByPage(query, firstRow, pageSize);
         return users;
     }
 
@@ -77,10 +77,10 @@ public class UserLoader {
         Query query = createUserQuery(search, groupId, null, null, true, false);
 
         // execute it & get a bunch of IDs
-        List ids = query.list();
+        List<Integer> ids = query.list();
 
         // count them, excluding duplicates
-        HashSet idSet = new HashSet(ids);
+        HashSet<Integer> idSet = new HashSet<>(ids);
         return idSet.size();
     }
 
@@ -175,8 +175,8 @@ public class UserLoader {
         }
     }
 
-    private List queryUsersByPage(Query query, int firstRow, int pageSize) {
-        List users = null;
+    private List<User> queryUsersByPage(Query query, int firstRow, int pageSize) {
+        List<User> users = null;
         if (m_outerJoin) {
             // Execute the query. Eliminate any duplicates in the users list. Because of
             // duplicates, we can't use standard pagination and have to paginate manually.
@@ -212,7 +212,7 @@ public class UserLoader {
         return addedWhere;
     }
 
-    public List loadUsers(final User userTemplate) {
+    public List<User> loadUsers(final User userTemplate) {
         init(false);
 
         // Add constraints
@@ -230,7 +230,7 @@ public class UserLoader {
         // Execute the query. Eliminate any duplicates in the users list.
         // See http://www.hibernate.org/117.html#A11 -- we can't count on the "distinct"
         // keyword in HQL to remove duplicates, because the query may use an outer join.
-        List users = query.list();
+        List<User> users = query.list();
         users = removeDuplicateUsers(users);
 
         return users;
@@ -319,11 +319,11 @@ public class UserLoader {
     /**
      * Remove duplicates from the users list and return the new list.
      */
-    private List removeDuplicateUsers(List<User> users) {
+    private List<User> removeDuplicateUsers(List<User> users) {
         // Store each user in a map, indexed by userName and look for collisions.
         // userName is guaranteed to be unique.
-        List uniqueUsers = new ArrayList(users.size());
-        Map usersMap = new HashMap();
+        List<User> uniqueUsers = new ArrayList<>(users.size());
+        Map<Integer,User> usersMap = new HashMap<>();
         for (User user : users) {
             if (!usersMap.containsKey(user.getId())) {
                 usersMap.put(user.getId(), null);

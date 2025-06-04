@@ -15,48 +15,46 @@
 package org.sipfoundry.sipxconfig.rest;
 
 import static org.sipfoundry.sipxconfig.rest.JacksonConvert.fromRepresentation;
-import static org.sipfoundry.sipxconfig.rest.JacksonConvert.toRepresentation;
+
+import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.common.AbstractUser;
 import org.sipfoundry.sipxconfig.common.User;
 
 public class ImBotSettingsResource extends UserResource {
     private static final Log LOG = LogFactory.getLog(ImBotSettingsResource.class);
 
-    @Override
-    public boolean allowPost() {
-        return false;
+
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {  
+        
+        try {
+            ImBotSettingsBean settings = new ImBotSettingsBean();
+            User user = getUser();
+
+            settings.setConfEnter((Boolean) user.getSettingTypedValue(AbstractUser.NOTIFICATION_CONF_ENTERED));
+            settings.setConfExit((Boolean) user.getSettingTypedValue(AbstractUser.NOTIFICATION_CONF_EXITED));
+            settings.setVmBegin((Boolean) user.getSettingTypedValue(AbstractUser.NOTIFICATION_VM_BEGIN));
+            settings.setVmEnd((Boolean) user.getSettingTypedValue(AbstractUser.NOTIFICATION_VM_END));
+
+            LOG.debug("Returning IM bot prefs:\t" + settings);
+
+            return toRepresentation(settings);
+        } catch( IOException ex ) {
+            throw new ResourceException( ex );
+        }
     }
 
-    @Override
-    public boolean allowDelete() {
-        return false;
-    }
-
-    // GET
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
-        ImBotSettingsBean settings = new ImBotSettingsBean();
-        User user = getUser();
-
-        settings.setConfEnter((Boolean) user.getSettingTypedValue(AbstractUser.NOTIFICATION_CONF_ENTERED));
-        settings.setConfExit((Boolean) user.getSettingTypedValue(AbstractUser.NOTIFICATION_CONF_EXITED));
-        settings.setVmBegin((Boolean) user.getSettingTypedValue(AbstractUser.NOTIFICATION_VM_BEGIN));
-        settings.setVmEnd((Boolean) user.getSettingTypedValue(AbstractUser.NOTIFICATION_VM_END));
-
-        LOG.debug("Returning IM bot prefs:\t" + settings);
-
-        return toRepresentation(settings);
-    }
-
-    // PUT
-    @Override
-    public void storeRepresentation(Representation entity) throws ResourceException {
+    @Put
+    public Representation storeRepresentation(Representation entity) throws ResourceException {        
+        
         ImBotSettingsBean settings = fromRepresentation(entity, ImBotSettingsBean.class);
 
         Boolean confEnter = settings.getConfEnter();
@@ -82,6 +80,7 @@ public class ImBotSettingsResource extends UserResource {
             }
             getCoreContext().saveUser(user);
         }
+        return null;
     }
 
     // the JSON representation of this is sent to/from the client

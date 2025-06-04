@@ -44,7 +44,7 @@ public class CiscoBitmapTest extends TestCase {
     }
 
     public void testIntegerFormat() {
-        m_wingbars.setTypedValue(new Integer(2));
+        m_wingbars.setTypedValue(Integer.valueOf(2));
         m_bitmap.setBitField(m_wingbars);
         assertEquals("0x4", m_bitmap.getProfileValue());
     }

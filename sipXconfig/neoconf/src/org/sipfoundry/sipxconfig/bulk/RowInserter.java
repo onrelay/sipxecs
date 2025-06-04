@@ -11,13 +11,13 @@ package org.sipfoundry.sipxconfig.bulk;
 
 import java.io.Serializable;
 
-import org.apache.commons.collections.Closure;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections4.Closure;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.job.JobContext;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;

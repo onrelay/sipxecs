@@ -72,7 +72,7 @@ public class CallQueueContextImplTestIntegration extends IntegrationTestCase {
     }
 
     public void testLoadCallQueue() throws Exception {
-        CallQueue callQueue = m_callQueueContext.loadCallQueue(new Integer(300001));
+        CallQueue callQueue = m_callQueueContext.loadCallQueue(Integer.valueOf(300001));
         assertEquals("Queue 1", callQueue.getName());
         assertEquals("8101", callQueue.getDid());
     }
@@ -83,7 +83,7 @@ public class CallQueueContextImplTestIntegration extends IntegrationTestCase {
     }
 
     public void testRemoveCallQueues() throws Exception {
-        Collection<Integer> callQueueIds = new HashSet<Integer>(Arrays.asList(new Integer(300004)));
+        Collection<Integer> callQueueIds = new HashSet<Integer>(Arrays.asList(Integer.valueOf(300004)));
         m_callQueueContext.deleteCallQueues(callQueueIds);
         commit();
         // table should have less rows now - 6
@@ -91,7 +91,7 @@ public class CallQueueContextImplTestIntegration extends IntegrationTestCase {
     }
 
     public void testDuplicateCallQueues() throws Exception {
-        Collection<Integer> callQueueIds = new HashSet<Integer>(Arrays.asList(new Integer(300001), new Integer(300002), new Integer(300003)));
+        Collection<Integer> callQueueIds = new HashSet<Integer>(Arrays.asList(Integer.valueOf(300001), Integer.valueOf(300002), Integer.valueOf(300003)));
         m_callQueueContext.duplicateCallQueues(callQueueIds);
         commit();
         // table should have additional row now - 10
@@ -116,7 +116,7 @@ public class CallQueueContextImplTestIntegration extends IntegrationTestCase {
     }
 
     public void testLoadCallQueueAgent() throws Exception {
-        CallQueueAgent callQueueAgent = m_callQueueContext.loadCallQueueAgent(new Integer(100001));
+        CallQueueAgent callQueueAgent = m_callQueueContext.loadCallQueueAgent(Integer.valueOf(100001));
         assertEquals("Agent 1", callQueueAgent.getName());
         assertEquals("4001", callQueueAgent.getExtension());
     }
@@ -127,7 +127,7 @@ public class CallQueueContextImplTestIntegration extends IntegrationTestCase {
     }
 
     public void testDeleteCallQueueAgents() throws Exception {
-        Collection<Integer> callQueueAgentIds = new HashSet<Integer>(Arrays.asList(new Integer(100001), new Integer(100002), new Integer(100003)));
+        Collection<Integer> callQueueAgentIds = new HashSet<Integer>(Arrays.asList(Integer.valueOf(100001), Integer.valueOf(100002), Integer.valueOf(100003)));
         m_callQueueContext.deleteCallQueueAgents(callQueueAgentIds);
         commit();
         // table should have no rows now - 0
@@ -135,7 +135,7 @@ public class CallQueueContextImplTestIntegration extends IntegrationTestCase {
     }
 
     public void _testDuplicateCallQueueAgents() throws Exception {
-        Collection<Integer> callQueueAgentIds = new HashSet<Integer>(Arrays.asList(new Integer(100001), new Integer(100002), new Integer(100003)));
+        Collection<Integer> callQueueAgentIds = new HashSet<Integer>(Arrays.asList(Integer.valueOf(100001), Integer.valueOf(100002), Integer.valueOf(100003)));
         m_callQueueContext.duplicateCallQueueAgents(callQueueAgentIds);
         commit();
         // table should have additional row now - 6
@@ -150,18 +150,18 @@ public class CallQueueContextImplTestIntegration extends IntegrationTestCase {
 
 // Test methods for CallQueueTier
     public void testGetCallQueueTiersForAgent() {
-        Collection<CallQueueTier> callQueueTiers100001 = m_callQueueContext.loadCallQueueAgent(new Integer(100001)).getTiers().getTiers();
-        Collection<CallQueueTier> callQueueTiers100002 = m_callQueueContext.loadCallQueueAgent(new Integer(100002)).getTiers().getTiers();
-        Collection<CallQueueTier> callQueueTiers100003 = m_callQueueContext.loadCallQueueAgent(new Integer(100003)).getTiers().getTiers();
+        Collection<CallQueueTier> callQueueTiers100001 = m_callQueueContext.loadCallQueueAgent(Integer.valueOf(100001)).getTiers().getTiers();
+        Collection<CallQueueTier> callQueueTiers100002 = m_callQueueContext.loadCallQueueAgent(Integer.valueOf(100002)).getTiers().getTiers();
+        Collection<CallQueueTier> callQueueTiers100003 = m_callQueueContext.loadCallQueueAgent(Integer.valueOf(100003)).getTiers().getTiers();
         assertEquals(2, callQueueTiers100001.size());
         assertEquals(1, callQueueTiers100002.size());
         assertEquals(0, callQueueTiers100003.size());
     }
 
     public void testGetAvaiableQueuesForAgent(){
-        List<CallQueue> callQueues100001 = m_callQueueContext.getAvaiableQueuesForAgent(new Integer(100001));
-        List<CallQueue> callQueues100002 = m_callQueueContext.getAvaiableQueuesForAgent(new Integer(100002));
-        List<CallQueue> callQueues100003 = m_callQueueContext.getAvaiableQueuesForAgent(new Integer(100003));
+        List<CallQueue> callQueues100001 = m_callQueueContext.getAvaiableQueuesForAgent(Integer.valueOf(100001));
+        List<CallQueue> callQueues100002 = m_callQueueContext.getAvaiableQueuesForAgent(Integer.valueOf(100002));
+        List<CallQueue> callQueues100003 = m_callQueueContext.getAvaiableQueuesForAgent(Integer.valueOf(100003));
         assertEquals(2, callQueues100001.size());
         assertEquals(3, callQueues100002.size());
         assertEquals(4, callQueues100003.size());

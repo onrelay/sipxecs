@@ -12,7 +12,7 @@ Url: http://www.sipfoundry.org/sipXopenfire
 # do not build a debuginfo package
 %define debug_package %{nil}
 
-BuildRequires: java-1.8.0-openjdk-devel
+BuildRequires: java-17-openjdk-devel
 BuildRequires: automake
 BuildRequires: zip
 BuildRequires: openfire
@@ -79,4 +79,4 @@ rm -rf $RPM_BUILD_ROOT
 %{_localstatedir}/sipxdata/cfdata/defaults/sipxopenfire.cfdat
 
 %post
-alternatives --set java java-1.8.0-openjdk.x86_64
+alternatives --set java java-17-openjdk.x86_64

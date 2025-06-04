@@ -18,14 +18,15 @@ import java.util.List;
 
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Representation;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.dialplan.AutoAttendant;
 import org.sipfoundry.sipxconfig.dialplan.AutoAttendantManager;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -40,13 +41,8 @@ public class AutoAttendantsResource extends UserResource {
         getVariants().add(new Variant(APPLICATION_JSON));
     }
 
-    @Override
-    public boolean allowGet() {
-        return true;
-    }
-
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         List<AutoAttendant> autoAttendants = m_autoAttendantManager.getAutoAttendants();
         AutoAttendant selectedAttendant = m_autoAttendantManager.getSelectedSpecialAttendant();
         boolean specialMode = m_autoAttendantManager.getSpecialMode();
@@ -61,7 +57,7 @@ public class AutoAttendantsResource extends UserResource {
         return new AutoAttendantsRepresentation(variant.getMediaType(), data);
     }
 
-    @Required
+    
     public void setAutoAttendantManager(AutoAttendantManager autoAttendantManager) {
         m_autoAttendantManager = autoAttendantManager;
     }

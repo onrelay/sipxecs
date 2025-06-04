@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.easymock.IMocksControl;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.sipfoundry.commons.util.ShortHash;
 import org.sipfoundry.sipxconfig.address.Address;
 import org.sipfoundry.sipxconfig.address.AddressManager;
@@ -77,10 +77,10 @@ public final class PhoneTestDriver {
             sd.setUser(users.get(0));
             Button b = new Button();
             b.setBlf(true);
-            List<Button> buttons = Arrays.asList(new Button[]{b});
+            List<Button> buttons = Arrays.asList(b);  // Simplified syntax
             sd.setButtons(buttons);
-            m_phoneContext.getSpeedDial(phone);
-            m_phoneContextControl.andReturn(sd).anyTimes();
+
+            EasyMock.expect(m_phoneContext.getSpeedDial(phone)).andReturn(sd).anyTimes();
         }
 
         supplyVitalTestData(m_phoneContextControl, phonebookManagementEnabled, m_phoneContext, phone);
@@ -289,15 +289,20 @@ public final class PhoneTestDriver {
 
     public static void supplyVitalEmergencyData(Phone phone, String emergencyValue) {
         DeviceDefaults defaults = phone.getPhoneContext().getPhoneDefaults();
-        IMocksControl dpControl = createNiceControl();
+
+        IMocksControl dpControl = EasyMock.createNiceControl();
         DialPlanContext dpContext = dpControl.createMock(DialPlanContext.class);
-        dpContext.getLikelyEmergencyInfo();
-        EmergencyInfo emergency = new EmergencyInfo("emergency.example.org", 8060, emergencyValue) {
-        };
-        dpControl.andReturn(emergency).anyTimes();
-        dpContext.getVoiceMail();
-        dpControl.andReturn("101").anyTimes();
+
+        EmergencyInfo emergency = new EmergencyInfo("emergency.example.org", 8060, emergencyValue) {};
+
+        EasyMock.expect(dpContext.getLikelyEmergencyInfo())
+                .andReturn(emergency).anyTimes();
+
+        EasyMock.expect(dpContext.getVoiceMail())
+                .andReturn("101").anyTimes();
+
         dpControl.replay();
+
         defaults.setDialPlanContext(dpContext);
     }
 
@@ -305,39 +310,47 @@ public final class PhoneTestDriver {
         supplyVitalTestData(control, true, phoneContext, phone);
     }
 
-    public static void supplyVitalTestData(IMocksControl control, boolean phonebookManagementEnabled,
-            PhoneContext phoneContext, Phone phone) {
+    public static void supplyVitalTestData(IMocksControl control,
+            boolean phonebookManagementEnabled, PhoneContext phoneContext, Phone phone) {
+
         DeviceDefaults defaults = getDeviceDefaults();
 
-        IMocksControl phonebookManagerControl = createNiceControl();
+        IMocksControl phonebookManagerControl = EasyMock.createNiceControl();
         PhonebookManager phonebookManager = phonebookManagerControl.createMock(PhonebookManager.class);
-        phonebookManager.getPhonebookManagementEnabled();
-        phonebookManagerControl.andReturn(phonebookManagementEnabled);
+
+        EasyMock.expect(phonebookManager.getPhonebookManagementEnabled())
+                .andReturn(phonebookManagementEnabled).anyTimes();
         phonebookManagerControl.replay();
         phone.setPhonebookManager(phonebookManager);
-        phoneContext.getSystemDirectory();
-        control.andReturn(TestHelper.getSystemEtcDir()).anyTimes();
 
-        phoneContext.createSpecialPhoneProvisionUser(SERIAL_NUMBER);
+        EasyMock.expect(phoneContext.getSystemDirectory())
+                .andReturn(TestHelper.getSystemEtcDir()).anyTimes();
+
         User userProv = new User();
         userProv.setUserName(SpecialUserType.PHONE_PROVISION.getUserName());
         userProv.setFirstName("ID:");
         userProv.setLastName(ShortHash.get(SERIAL_NUMBER));
         userProv.setSipPassword("abcd");
-        control.andReturn(userProv).anyTimes();
 
-        phoneContext.getPhoneDefaults();
-        control.andReturn(defaults).anyTimes();
+        EasyMock.expect(phoneContext.createSpecialPhoneProvisionUser(SERIAL_NUMBER))
+                .andReturn(userProv).anyTimes();
+
+        EasyMock.expect(phoneContext.getPhoneDefaults())
+                .andReturn(defaults).anyTimes();
 
         ModelFilesContextImpl mfContext = new ModelFilesContextImpl();
         mfContext.setConfigDirectory(TestHelper.getEtcDir());
         mfContext.setModelBuilder(new XmlModelBuilder(TestHelper.getSystemEtcDir()));
         phone.setModelFilesContext(mfContext);
 
-        IMocksControl pagingContextControl = createNiceControl();
+        IMocksControl pagingContextControl = EasyMock.createNiceControl();
         PagingContext pagingContext = pagingContextControl.createMock(PagingContext.class);
         pagingContextControl.replay();
+
         defaults.setPagingContext(pagingContext);
         phone.setPhoneContext(phoneContext);
+
+        // Important: replay the main PhoneContext mock
+        control.replay();
     }
 }

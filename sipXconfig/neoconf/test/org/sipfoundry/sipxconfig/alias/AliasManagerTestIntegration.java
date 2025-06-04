@@ -84,13 +84,13 @@ public class AliasManagerTestIntegration extends IntegrationTestCase {
         assertFalse(m_aliasManager.canObjectUseAlias(user, alias));
 
         // Test a saved bean trying to use an alias that has already been claimed
-        user = m_coreContext.loadUser(new Integer(1001));
+        user = m_coreContext.loadUser(Integer.valueOf(1001));
         alias = "morcheeba";
         user.addAlias(alias);
         assertFalse(m_aliasManager.canObjectUseAlias(user, alias));
 
         // Test a saved bean trying to use an alias that has already been claimed twice
-        user = m_coreContext.loadUser(new Integer(1001));
+        user = m_coreContext.loadUser(Integer.valueOf(1001));
         alias = "martha";
         user.setUserName(alias);
         assertFalse(m_aliasManager.canObjectUseAlias(user, alias));

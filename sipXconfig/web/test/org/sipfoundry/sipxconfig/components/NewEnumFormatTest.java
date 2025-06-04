@@ -26,10 +26,8 @@ public class NewEnumFormatTest extends TestCase {
     public void testLocalizedFormat() throws Exception {
         IMocksControl messagesCtrl = EasyMock.createControl();
         Messages messages = messagesCtrl.createMock(Messages.class);
-        messages.getMessage("fake.BONGO");
-        messagesCtrl.andReturn("localized bongo");
-        messages.getMessage("fake.KUKU");
-        messagesCtrl.andReturn("localized kuku");
+        EasyMock.expect(messages.getMessage("fake.BONGO")).andReturn("localized bongo");
+        EasyMock.expect(messages.getMessage("fake.KUKU")).andReturn("localized kuku");
         messagesCtrl.replay();
 
         NewEnumFormat format = new NewEnumFormat();

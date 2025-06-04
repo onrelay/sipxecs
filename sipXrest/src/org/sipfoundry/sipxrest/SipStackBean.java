@@ -5,25 +5,16 @@
  */
 package org.sipfoundry.sipxrest;
 
-import gov.nist.javax.sip.ClientTransactionExt;
 import gov.nist.javax.sip.ListeningPointExt;
-import gov.nist.javax.sip.ServerTransactionExt;
 import gov.nist.javax.sip.clientauthutils.AccountManager;
 import gov.nist.javax.sip.clientauthutils.SecureAccountManager;
-import gov.nist.javax.sip.message.MessageExt;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
 
-import javax.sip.ListeningPoint;
 import javax.sip.SipListener;
 import javax.sip.SipProvider;
-import javax.sip.TransactionAlreadyExistsException;
-import javax.sip.TransactionUnavailableException;
-import javax.sip.header.CallIdHeader;
-import javax.sip.header.ViaHeader;
-import javax.sip.message.Request;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;

@@ -28,7 +28,7 @@ import java.util.Set;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtilsBean;
-import org.apache.commons.collections.iterators.ArrayIterator;
+import org.apache.commons.collections4.iterators.ArrayIterator;
 import org.hibernate.collection.PersistentArrayHolder;
 import org.hibernate.collection.PersistentCollection;
 import org.hibernate.collection.PersistentList;
@@ -48,7 +48,6 @@ import org.sipfoundry.sipxconfig.setting.PersistableSettings;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingSet;
 import org.sipfoundry.sipxconfig.setting.ValueStorage;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * This class contains the business logic of a typical Add, Modify, Delete
@@ -463,12 +462,12 @@ public class GeneralAuditHandler extends AbstractSystemAuditHandler {
         getConfigChangeContext().storeConfigChange(configChange);
     }
 
-    @Required
+    
     public void setUserProfileService(UserProfileService profileService) {
         m_userProfileService = profileService;
     }
 
-    @Required
+    
     public void setModelFilesContext(ModelFilesContext modelFilesContext) {
         m_modelFilesContext = modelFilesContext;
     }

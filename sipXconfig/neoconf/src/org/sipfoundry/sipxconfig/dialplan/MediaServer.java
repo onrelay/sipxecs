@@ -19,7 +19,6 @@ import java.util.TreeMap;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.localization.LocalizationContext;
 import org.sipfoundry.sipxconfig.permission.PermissionName;
-import org.springframework.beans.factory.annotation.Required;
 
 public abstract class MediaServer {
 
@@ -139,7 +138,7 @@ public abstract class MediaServer {
         return m_type;
     }
 
-    @Required
+    
     public void setType(String type) {
         m_type = type;
     }

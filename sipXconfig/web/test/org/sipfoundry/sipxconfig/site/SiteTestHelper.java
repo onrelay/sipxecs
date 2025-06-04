@@ -30,7 +30,7 @@ import net.sourceforge.jwebunit.junit.WebTester;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.form.FormConstants;
 import org.junit.Assert;
 import org.sipfoundry.sipxconfig.test.TestHelper;

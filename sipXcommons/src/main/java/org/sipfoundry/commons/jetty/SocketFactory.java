@@ -1,15 +1,17 @@
 package org.sipfoundry.commons.jetty;
 
-import org.mortbay.http.SocketListener;
+import org.eclipse.jetty.server.ServerConnector;
+
+import org.eclipse.jetty.server.Server;
 
 public class SocketFactory {
-    public static SocketListener createSocketListener(int port) {
-        SocketListener socketListener = new SocketListener();
-        socketListener.setPort(port);
-        socketListener.setMaxThreads(32);
-        socketListener.setMinThreads(4);
-        socketListener.setLingerTimeSecs(30000);
-        socketListener.setMaxIdleTimeMs(60000);
-        return socketListener;
+    public static ServerConnector createSocketListener(int port) {
+        Server server = new Server(); // Create an internal server instance
+        ServerConnector connector = new ServerConnector(server);
+        connector.setPort(port);
+        connector.setIdleTimeout(60000);         
+        connector.setAcceptQueueSize(50); 
+        connector.setReuseAddress(true); 
+        return connector;
     }
 }

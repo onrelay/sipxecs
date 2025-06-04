@@ -1,13 +1,12 @@
 package org.sipfoundry.sipxconfig.api.impl;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.sipfoundry.sipxconfig.api.LocalizationApi;
 import org.sipfoundry.sipxconfig.api.model.LocalizationBean;
 import org.sipfoundry.sipxconfig.localization.Localization;
 import org.sipfoundry.sipxconfig.localization.LocalizationContext;
-import org.springframework.beans.factory.annotation.Required;
 
 public class LocalizationApiImpl implements LocalizationApi {
     
@@ -32,7 +31,7 @@ public class LocalizationApiImpl implements LocalizationApi {
         return Response.ok().entity(localization.getId()).build();
     }
     
-    @Required
+    
     public void setLocalizationContext(LocalizationContext localizationContext) {
         m_localizationContext = localizationContext;
     }    

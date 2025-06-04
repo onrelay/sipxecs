@@ -42,7 +42,8 @@ import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.region.Region;
 import org.sipfoundry.sipxconfig.region.RegionManager;
 
-import com.mongodb.util.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 public class MongoConfig implements ConfigProvider {
     private static final String GLOBAL_REPLSET = "sipxecs";
@@ -241,7 +242,9 @@ public class MongoConfig implements ConfigProvider {
         model.put("arbiters", serverIdMap(arbiters, false, arbPort));
         model.put("replSet", replSet);
         model.put("local", isLocal);
-        String json = JSON.serialize(model);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(model);
         sb.write(json);
     }
 

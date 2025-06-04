@@ -20,8 +20,8 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingException;
 import javax.naming.directory.SearchControls;
 
-import org.apache.commons.collections.Closure;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections4.Closure;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.admin.AdminContext;
@@ -32,13 +32,12 @@ import org.sipfoundry.sipxconfig.bulk.UserPreview;
 import org.sipfoundry.sipxconfig.bulk.csv.Index;
 import org.sipfoundry.sipxconfig.bulk.csv.SimpleCsvWriter;
 import org.sipfoundry.sipxconfig.common.UserException;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.ldap.SizeLimitExceededException;
 import org.springframework.ldap.control.PagedResultsDirContextProcessor;
 import org.springframework.ldap.core.CollectingNameClassPairCallbackHandler;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.NameClassPairMapper;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 
 public class LdapImportManagerImpl extends HibernateDaoSupport implements LdapImportManager, AlarmProvider {
     private static final Log LOG = LogFactory.getLog("ldap_logger");
@@ -62,8 +61,8 @@ public class LdapImportManagerImpl extends HibernateDaoSupport implements LdapIm
             LdapConnectionParams connParams = m_ldapManager.getConnectionParams(connectionId);
             m_rowInserter.setDomain(connParams.getDomain());
             m_rowInserter.setLdapConnectionParams(connParams);
-            m_rowInserter.beforeInserting(null);
-            CollectingNameClassPairCallbackHandler handler = new NameClassPairMapperClosureAdapter(m_rowInserter);
+            m_rowInserter.beforeInserting((Object[])null);
+            CollectingNameClassPairCallbackHandler<Object> handler = new NameClassPairMapperClosureAdapter(m_rowInserter);
             runSearch(0, handler, connectionId);
             int notImportedSize = m_rowInserter.getNotImportedUserNames().size();
             int importedSize = m_rowInserter.getImportedUserNames().size();
@@ -150,7 +149,7 @@ public class LdapImportManagerImpl extends HibernateDaoSupport implements LdapIm
         m_ldapManager = ldapManager;
     }
 
-    @Required
+    
     public void setPreviewSize(int previewSize) {
         m_previewSize = previewSize;
     }
@@ -159,7 +158,7 @@ public class LdapImportManagerImpl extends HibernateDaoSupport implements LdapIm
         try {
             LdapTemplate template = m_templateFactory.getLdapTemplate(m_ldapManager.getConnectionParams(connectionId));
             m_userMapper.setAttrMap(m_ldapManager.getAttrMap(connectionId));
-            CollectingNameClassPairCallbackHandler handler = new NameClassPairMapperCollector(m_userMapper);
+            CollectingNameClassPairCallbackHandler<UserPreview> handler = new NameClassPairMapperCollector<UserPreview>(m_userMapper);
             runSearch(limit, handler, connectionId);
             List<UserPreview> result = handler.getList();
             return result;
@@ -169,7 +168,7 @@ public class LdapImportManagerImpl extends HibernateDaoSupport implements LdapIm
         }
     }
 
-    private void runSearch(int limit, CollectingNameClassPairCallbackHandler handler, int connectionId) {
+    private void runSearch(int limit,  CollectingNameClassPairCallbackHandler<?> handler, int connectionId) {
         SearchControls sc = new SearchControls();
         sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
         LdapConnectionParams connParams = m_ldapManager.getConnectionParams(connectionId);
@@ -214,10 +213,10 @@ public class LdapImportManagerImpl extends HibernateDaoSupport implements LdapIm
         }
     }
 
-    static class NameClassPairMapperClosureAdapter extends CollectingNameClassPairCallbackHandler {
-        private Closure m_closure;
+    static class NameClassPairMapperClosureAdapter extends CollectingNameClassPairCallbackHandler<Object> {
+        private Closure<Object> m_closure;
 
-        NameClassPairMapperClosureAdapter(Closure closure) {
+        NameClassPairMapperClosureAdapter(Closure<Object> closure) {
             m_closure = closure;
         }
 
@@ -232,15 +231,15 @@ public class LdapImportManagerImpl extends HibernateDaoSupport implements LdapIm
         }
     }
 
-    static class NameClassPairMapperCollector  extends CollectingNameClassPairCallbackHandler {
-        private NameClassPairMapper m_mapper;
+    static class NameClassPairMapperCollector<T>  extends CollectingNameClassPairCallbackHandler<T> {
+        private NameClassPairMapper<T> m_mapper;
 
-        public NameClassPairMapperCollector(NameClassPairMapper mapper) {
+        public NameClassPairMapperCollector(NameClassPairMapper<T> mapper) {
             m_mapper = mapper;
         }
 
         @Override
-        public Object getObjectFromNameClassPair(NameClassPair nameClassPair) {
+        public T getObjectFromNameClassPair(NameClassPair nameClassPair) {
             try {
                 return m_mapper.mapFromNameClassPair(nameClassPair);
             } catch (NamingException e) {
@@ -253,7 +252,7 @@ public class LdapImportManagerImpl extends HibernateDaoSupport implements LdapIm
         m_templateFactory = templateFactory;
     }
 
-    @Required
+    
     public void setAdminContext(AdminContext adminContext) {
         m_adminContext = adminContext;
     }

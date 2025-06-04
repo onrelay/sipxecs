@@ -17,19 +17,18 @@
 package org.sipfoundry.sipxconfig.security;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
@@ -37,7 +36,6 @@ import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.admin.AdminContext;
 import org.sipfoundry.sipxconfig.common.AbstractUser;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.FilterChainProxy;
@@ -117,12 +115,12 @@ public class SipxFilterChainProxy extends FilterChainProxy {
         super.doFilter(requestToFilter, response, chain);
     }
 
-    @Required
+    
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }
 
-    @Required
+    
     public void setAdminContext(AdminContext adminContext) {
         m_adminCtx = adminContext;
         LOG.debug("AdminContext: " + m_adminCtx.getClass().getName());

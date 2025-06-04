@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.xmlrpc;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.factory.FactoryBean;
 
-public class XmlRpcProxyFactoryBean extends XmlRpcClientInterceptor implements FactoryBean {
+public class XmlRpcProxyFactoryBean extends XmlRpcClientInterceptor implements FactoryBean<Object> {
 
     private Object m_serviceProxy;
 
@@ -25,7 +25,7 @@ public class XmlRpcProxyFactoryBean extends XmlRpcClientInterceptor implements F
         return m_serviceProxy;
     }
 
-    public Class getObjectType() {
+    public Class<?> getObjectType() {
         return m_serviceProxy != null ? m_serviceProxy.getClass() : getServiceInterface();
     }
 

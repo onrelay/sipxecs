@@ -27,12 +27,12 @@ import com.google.gdata.data.extensions.Where;
 
 import static org.apache.commons.beanutils.BeanUtils.getSimpleProperty;
 import static org.apache.commons.beanutils.PropertyUtils.getProperty;
-import static org.apache.commons.lang.StringUtils.EMPTY;
-import static org.apache.commons.lang.StringUtils.contains;
-import static org.apache.commons.lang.StringUtils.defaultString;
-import static org.apache.commons.lang.StringUtils.isEmpty;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.apache.commons.lang.StringUtils.split;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.contains;
+import static org.apache.commons.lang3.StringUtils.defaultString;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.split;
 
 public class PhonebookGoogleEntryHelper {
     private static final String WORK = "work";

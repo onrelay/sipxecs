@@ -7,8 +7,8 @@ polycom_PKGS = \
 	commons-logging \
 	spring-beans \
 	spring-core \
-	org.springframework.transaction \
-	org.springframework.jdbc \
+	spring-tx \
+	spring-jdbc \
 	sipxcommons \
 	sipxconfig-neoconf \
 	velocity \

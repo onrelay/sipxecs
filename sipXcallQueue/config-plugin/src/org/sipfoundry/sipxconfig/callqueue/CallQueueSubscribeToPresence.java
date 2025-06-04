@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.sipfoundry.sipxconfig.speeddial.SpeedDialButtons;
 import org.sipfoundry.sipxconfig.speeddial.SubscribeToPresenceValidator;
-import org.springframework.beans.factory.annotation.Required;
 
 public class CallQueueSubscribeToPresence implements SubscribeToPresenceValidator{
 
@@ -27,7 +26,7 @@ public class CallQueueSubscribeToPresence implements SubscribeToPresenceValidato
         return true;
     }
 
-    @Required
+    
     public void setCallQueueContext(CallQueueContext callQueueContext) {
         m_callQueueContext = callQueueContext;
     }

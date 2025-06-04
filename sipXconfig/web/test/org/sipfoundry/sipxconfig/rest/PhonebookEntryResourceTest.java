@@ -8,10 +8,10 @@ import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.InputRepresentation;
-import org.restlet.resource.Representation;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.representation.InputRepresentation;
+import org.restlet.representation.Representation;
 import org.restlet.resource.ResourceException;
 import org.sipfoundry.sipxconfig.phonebook.AddressBookEntry;
 import org.sipfoundry.sipxconfig.phonebook.Phonebook;

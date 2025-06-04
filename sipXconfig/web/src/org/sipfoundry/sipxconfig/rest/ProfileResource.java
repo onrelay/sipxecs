@@ -15,20 +15,21 @@ import java.net.URLDecoder;
 
 import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.OutputRepresentation;
-import org.restlet.resource.Representation;
-import org.restlet.resource.Resource;
+import org.restlet.representation.OutputRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.ServerResource;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.device.Device;
 import org.sipfoundry.sipxconfig.device.OutputStreamProfileLocation;
 import org.sipfoundry.sipxconfig.device.Profile;
 import org.sipfoundry.sipxconfig.phone.PhoneContext;
 
-public class ProfileResource extends Resource {
+public class ProfileResource extends ServerResource {
     private PhoneContext m_phoneContext;
     private String m_serialNumber;
     private String m_name;
@@ -45,8 +46,9 @@ public class ProfileResource extends Resource {
         getVariants().add(new Variant(MediaType.ALL));
     }
 
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
+        
         Integer phoneId = m_phoneContext.getPhoneIdBySerialNumber(m_serialNumber);
         if (phoneId == null) {
             // no phone found

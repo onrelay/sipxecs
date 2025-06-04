@@ -14,7 +14,6 @@
  */
 package org.sipfoundry.sipxconfig.admin;
 
-import org.springframework.beans.factory.annotation.Required;
 
 public class ResLimitsConfigImpl extends AbstractResLimitsConfig {
     private String m_prefix;
@@ -24,7 +23,7 @@ public class ResLimitsConfigImpl extends AbstractResLimitsConfig {
         return m_prefix;
     }
 
-    @Required
+    
     public void setPrefix(String prefix) {
         m_prefix = prefix;
     }

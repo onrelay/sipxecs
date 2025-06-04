@@ -347,7 +347,7 @@ function setupCentOS7()
         libevent-devel poco-devel libconfig-devel hiredis-devel gtest-devel leveldb-devel cppunit-devel gperftools-devel \
         c-ares-devel libdb4-cxx-devel libdb-cxx-devel popt-devel xerces-c-devel zeromq-devel libev-devel v8-devel httpd unixODBC-devel \
         mock rsync gem systemd-sysv mongo-cxx-driver-devel libuuid-devel swig openfire resiprocate-libs \
-        dart-sdk createrepo unzip checkpolicy policycoreutils policycoreutils-python freeswitch-devel bcg729-devel java-1.8.0-openjdk-devel 
+        dart-sdk createrepo unzip checkpolicy policycoreutils policycoreutils-python freeswitch-devel bcg729-devel java-17-openjdk-devel 
 
     ERROR=$?
     if [ ${ERROR} -ne 0 ]; then 
@@ -394,7 +394,7 @@ function setupRocky9()
     echo "Begin setupRocky9()"
 
     echo "installing build tools"
-    sudo dnf install ${INSTALL_OPTIONS} make autoconf automake libtool epel-release cmake gem httpd
+    sudo dnf install ${INSTALL_OPTIONS} make autoconf automake libtool epel-release cmake gem httpd hostname
 
     ERROR=$?
     if [ ${ERROR} -ne 0 ]; then 
@@ -403,7 +403,7 @@ function setupRocky9()
     fi 
 
     echo "installing standard base OS repo tools"
-    sudo dnf install ${INSTALL_OPTIONS} libtool gcc-c++ openssl-devel boost-devel poco-devel cppunit-devel java-1.8.0-openjdk-devel 
+    sudo dnf install ${INSTALL_OPTIONS} libtool gcc-c++ openssl-devel boost-devel poco-devel cppunit-devel java-17-openjdk-devel 
 
     ERROR=$?
     if [ ${ERROR} -ne 0 ]; then 

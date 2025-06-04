@@ -6,7 +6,6 @@
  */
 package org.sipfoundry.sipxrelay;
 
-import static java.lang.String.format;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -15,7 +14,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.apache.xmlrpc.XmlRpcException;
 
 /**
  * Representation of a media session. A media sesison is a pair of media endpoints.
@@ -247,15 +245,15 @@ final class Sym implements SymInterface, Serializable {
         Map<String, Object> retval = new HashMap<String, Object>();
       
         retval.put(Symmitron.SESSION_STATE, this.getState().toString());
-        retval.put(Symmitron.CREATION_TIME, new Long(this.getCreationTime()).toString());
-        retval.put(Symmitron.LAST_PACKET_RECEIVED, new Long(this.getLastPacketTime()).toString());
+        retval.put(Symmitron.CREATION_TIME, Long.valueOf(this.getCreationTime()).toString());
+        retval.put(Symmitron.LAST_PACKET_RECEIVED, Long.valueOf(this.getLastPacketTime()).toString());
         
         if (this.getTransmitter() != null) {
-            retval.put(Symmitron.PACKETS_SENT, new Long(this.getTransmitter().getPacketsSent()).toString());
+            retval.put(Symmitron.PACKETS_SENT, Long.valueOf(this.getTransmitter().getPacketsSent()).toString());
         } else {
             retval.put(Symmitron.PACKETS_SENT, "0");
         }
-        retval.put(Symmitron.PACKETS_RECEIVED, new Long(this.getPacketsReceived()).toString());
+        retval.put(Symmitron.PACKETS_RECEIVED, Long.valueOf(this.getPacketsReceived()).toString());
         return retval;
         
     }

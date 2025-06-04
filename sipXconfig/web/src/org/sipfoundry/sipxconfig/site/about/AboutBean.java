@@ -19,10 +19,9 @@ package org.sipfoundry.sipxconfig.site.about;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.IPage;
 import org.sipfoundry.sipxconfig.common.VersionInfo;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.Resource;
 
 public class AboutBean {
@@ -84,7 +83,7 @@ public class AboutBean {
         return m_configurationFile;
     }
 
-    @Required
+    
     public void setTemplate(Resource template) {
         m_template = template;
     }

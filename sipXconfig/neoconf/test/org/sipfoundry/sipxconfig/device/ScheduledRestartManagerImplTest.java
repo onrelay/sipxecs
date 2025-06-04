@@ -6,10 +6,10 @@
 package org.sipfoundry.sipxconfig.device;
 
 import static org.easymock.EasyMock.expect;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.createStrictMock;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.verify;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import java.util.Date;
 import java.util.concurrent.ScheduledExecutorService;
@@ -24,7 +24,7 @@ public class ScheduledRestartManagerImplTest extends TestCase {
 
     public void testRestartSupported() {
         ScheduledRestartManagerImpl restartManager = new ScheduledRestartManagerImpl();
-        Integer deviceId = new Integer(1000);
+        Integer deviceId = Integer.valueOf(1000);
         MemoryProfileLocation location = new MemoryProfileLocation();
         DeviceDescriptor model = new DeviceDescriptor() {};
         model.setRestartSupported(true);
@@ -62,7 +62,7 @@ public class ScheduledRestartManagerImplTest extends TestCase {
 
     public void testRestartNotSupported() {
         ScheduledRestartManagerImpl restartManager = new ScheduledRestartManagerImpl();
-        Integer deviceId = new Integer(1000);
+        Integer deviceId = Integer.valueOf(1000);
         MemoryProfileLocation location = new MemoryProfileLocation();
         DeviceDescriptor model = new DeviceDescriptor() {};
         model.setDefaultProfileLocation(location);

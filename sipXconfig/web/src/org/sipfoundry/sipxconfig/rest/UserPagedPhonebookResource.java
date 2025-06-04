@@ -16,9 +16,11 @@ import java.util.Collection;
 
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
+import org.restlet.representation.Variant;
+import org.sipfoundry.commons.rest.XStreamRepresentation;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.phonebook.AddressBookEntry;
 import org.sipfoundry.sipxconfig.phonebook.PagedPhonebook;
@@ -27,8 +29,8 @@ import org.sipfoundry.sipxconfig.phonebook.Phonebook;
 import com.thoughtworks.xstream.XStream;
 
 public class UserPagedPhonebookResource extends UserPhonebookSearchResource {
-    @Override
-    public Representation represent(Variant variant) throws ResourceException {
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {        
         Form form = getRequest().getResourceRef().getQueryAsForm();
         String start = form.getFirstValue("start");
         String end = form.getFirstValue("end");

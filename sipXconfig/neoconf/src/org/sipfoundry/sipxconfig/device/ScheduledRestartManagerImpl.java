@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.job.JobContext;
-import org.springframework.beans.factory.annotation.Required;
 
 public class ScheduledRestartManagerImpl implements RestartManager {
     private static final Log LOG = LogFactory.getLog(ScheduledRestartManagerImpl.class);
@@ -73,17 +72,17 @@ public class ScheduledRestartManagerImpl implements RestartManager {
         }
     }
 
-    @Required
+    
     public void setJobContext(JobContext jobContext) {
         m_jobContext = jobContext;
     }
 
-    @Required
+    
     public void setDeviceSource(DeviceSource deviceSource) {
         m_deviceSource = deviceSource;
     }
 
-    @Required
+    
     public void setExecutorService(ScheduledExecutorService executorService) {
         m_executorService = executorService;
     }

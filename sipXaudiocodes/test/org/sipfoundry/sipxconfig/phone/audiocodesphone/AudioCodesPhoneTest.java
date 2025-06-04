@@ -2,7 +2,7 @@ package org.sipfoundry.sipxconfig.phone.audiocodesphone;
 
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.replay;
+import static org.easymock.EasyMock.replay;
 import static org.sipfoundry.sipxconfig.test.TestHelper.getMockDomainManager;
 
 import java.io.InputStream;

@@ -25,7 +25,6 @@ import org.sipfoundry.commons.userdb.ValidUsers;
 import org.sipfoundry.sipxivr.ApplicationConfiguraton;
 import org.sipfoundry.sipxivr.common.IvrChoice.IvrChoiceReason;
 import org.sipfoundry.voicemail.mailbox.MailboxManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class DialByName {
     static final Logger LOG = Logger.getLogger("org.sipfoundry.sipxivr");
@@ -313,12 +312,12 @@ public class DialByName {
         m_mailboxManager = mgr;
     }
 
-    @Required
+    
     public void setTts(boolean tts) {
         m_tts = tts;
     }
 
-    @Required
+    
     public void setTtsVoice(String ttsVoice) {
         m_ttsVoice = ttsVoice;
     }

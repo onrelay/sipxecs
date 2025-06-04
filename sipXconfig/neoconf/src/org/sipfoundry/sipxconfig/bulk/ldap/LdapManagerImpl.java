@@ -25,7 +25,7 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.SearchControls;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.alarm.AlarmDefinition;
@@ -35,7 +35,6 @@ import org.sipfoundry.sipxconfig.common.CronSchedule;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.setting.ValueStorage;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.dao.DataAccessException;
@@ -49,7 +48,7 @@ import org.springframework.ldap.core.AttributesMapper;
 /**
  * Maintains LDAP connection params, attribute maps and schedule LdapManagerImpl
  */
-public class LdapManagerImpl extends SipxHibernateDaoSupport implements LdapManager,
+public class LdapManagerImpl extends SipxHibernateDaoSupport<Object> implements LdapManager,
     ApplicationContextAware, AlarmProvider {
     private static final Log LOG = LogFactory.getLog(LdapManagerImpl.class);
     private static final String QUERY_OVERRIDE_PIN =
@@ -291,7 +290,7 @@ public class LdapManagerImpl extends SipxHibernateDaoSupport implements LdapMana
 
     @Override
     public AttrMap getAttrMap(int connectionId) {
-        List<AttrMap> connectionsAttrMap = getHibernateTemplate().findByNamedQueryAndNamedParam(
+        List<AttrMap> connectionsAttrMap = (List<AttrMap>)getHibernateTemplate().findByNamedQueryAndNamedParam(
                 "ldapConnectionAttrMap", "attrMapId", connectionId);
         if (!connectionsAttrMap.isEmpty()) {
             return connectionsAttrMap.get(0);
@@ -301,7 +300,7 @@ public class LdapManagerImpl extends SipxHibernateDaoSupport implements LdapMana
 
     @Override
     public LdapConnectionParams getConnectionParams(int connectionId) {
-        List<LdapConnectionParams> connections = getHibernateTemplate().findByNamedQueryAndNamedParam(
+        List<LdapConnectionParams> connections = (List<LdapConnectionParams>)getHibernateTemplate().findByNamedQueryAndNamedParam(
                 "ldapConnection", "connectionId", connectionId);
         if (!connections.isEmpty()) {
             return connections.get(0);
@@ -376,7 +375,7 @@ public class LdapManagerImpl extends SipxHibernateDaoSupport implements LdapMana
         m_templateFactory = templateFactory;
     }
 
-    @Required
+    
     public void setConfigJdbcTemplate(JdbcTemplate template) {
         m_jdbcTemplate = template;
     }

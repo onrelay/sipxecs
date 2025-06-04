@@ -16,7 +16,7 @@
  */
 package org.sipfoundry.sipxconfig.imbot;
 
-import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +39,6 @@ import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
 import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class ImBotImpl implements FeatureProvider, ImBot, ProcessProvider {
 
@@ -119,12 +118,12 @@ public class ImBotImpl implements FeatureProvider, ImBot, ProcessProvider {
         return Collections.emptyList();
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }
 
-    @Required
+    
     public void setReplicationManager(ReplicationManager replicationManager) {
         m_replicationManager = replicationManager;
     }

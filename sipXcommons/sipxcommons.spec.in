@@ -15,7 +15,7 @@ Packager: SIPfoundry <sipx-dev@sipfoundry.org>
 Url: http://www.sipfoundry.org/sipXcommons
 
 
-BuildRequires: java-1.8.0-openjdk-devel
+BuildRequires: java-17-openjdk-devel
 
 BuildRequires: automake
 BuildRequires: shadow-utils
@@ -29,7 +29,7 @@ Source: %name-%version.tar.gz
 
 Requires: shadow-utils
 
-Requires: java-1.8.0-openjdk
+Requires: java-17-openjdk
 
 Requires: which
 

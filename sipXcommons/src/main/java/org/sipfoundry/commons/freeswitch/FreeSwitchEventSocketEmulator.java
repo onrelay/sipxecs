@@ -12,9 +12,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Vector;
 
-import org.sipfoundry.commons.freeswitch.FreeSwitchEvent;
-import org.sipfoundry.commons.freeswitch.FreeSwitchEventSocketInterface;
-
 public class FreeSwitchEventSocketEmulator extends FreeSwitchEventSocketInterface {
 
     public FreeSwitchEventSocketEmulator(FreeSwitchConfigurationInterface config) {

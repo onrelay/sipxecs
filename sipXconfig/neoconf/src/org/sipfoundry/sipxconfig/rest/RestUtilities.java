@@ -26,7 +26,6 @@ import static org.sipfoundry.sipxconfig.rest.RestUtilities.ResponseCode.ERROR_VA
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -34,17 +33,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.lang.StringUtils;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.commons.lang3.StringUtils;
 import org.restlet.data.ClientInfo;
 import org.restlet.data.Form;
 import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.data.Preference;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.DomRepresentation;
-import org.restlet.resource.Representation;
+import org.restlet.representation.Representation;
+import org.sipfoundry.commons.rest.W3cDomRepresentation;
 import org.sipfoundry.sipxconfig.branch.Branch;
 import org.sipfoundry.sipxconfig.common.FileDigestSource;
 import org.sipfoundry.sipxconfig.common.User;
@@ -87,9 +89,6 @@ public final class RestUtilities {
         // hide default constructor
     }
 
-    /**
-     * TODO: Move this to common rest util package
-     */
     public static Locale getLocale(Request request) {
         ClientInfo ci = request.getClientInfo();
         if (ci != null) {
@@ -396,23 +395,25 @@ public final class RestUtilities {
         setResponse(response, code, ResponseElements.ID, elementValues);
     }
 
-    public static void setResponse(Response response, ResponseCode code, ResponseElements responseElements,
-            List<String> elementValues) {
-        try {
-            DomRepresentation representation = new DomRepresentation(MediaType.TEXT_XML);
-            Document document = representation.getDocument();
+public static void setResponse(Response response, ResponseCode code, ResponseElements responseElements,
+        List<String> elementValues) {
+    try {
+        // Create a new W3C DOM Document
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.newDocument();
 
-            // set response status
-            setResponseStatus(response, code);
-            setResponseElements(document, code, responseElements, elementValues);
+        // Set status and build XML content
+        setResponseStatus(response, code);
+        setResponseElements(document, code, responseElements, elementValues);
 
-            response.setEntity(new DomRepresentation(MediaType.TEXT_XML, document));
+        // Wrap with the custom W3cDomRepresentation
+        response.setEntity(new W3cDomRepresentation(MediaType.TEXT_XML, document));
 
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+}
 
     public static void setResponseError(Response response, ResponseCode code) {
         Representation representation = getResponseError(response, code);
@@ -482,24 +483,30 @@ public final class RestUtilities {
         return getResponseError(response, code, ResponseElements.STRING_ADDITIONAL_MESSAGE, elementValues);
     }
 
-    public static Representation getResponseError(Response response, ResponseCode code,
-            ResponseElements responseElements, List<String> elementValues) {
-        try {
-            DomRepresentation representation = new DomRepresentation(MediaType.TEXT_XML);
-            Document document = representation.getDocument();
+    public static Representation getResponseError(
+        Response response, 
+        ResponseCode code,
+        ResponseElements responseElements, List<String> elementValues) {
 
+        try {
+            // Create a new W3C DOM Document
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.newDocument();
+
+            // Set status and build XML content
             setResponseStatus(response, code);
             setResponseElements(document, code, responseElements, elementValues);
 
-            return representation;
+            // Wrap with the custom W3cDomRepresentation
+            return new W3cDomRepresentation(MediaType.TEXT_XML, document);
 
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return null;
-    }
+        }
 
     // number of elements specified by responseElements must equal number of values in
     // elementValues. elementNames and elementValues can be null for no data

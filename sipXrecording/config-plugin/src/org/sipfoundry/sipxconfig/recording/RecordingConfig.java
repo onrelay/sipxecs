@@ -35,7 +35,6 @@ import org.sipfoundry.sipxconfig.cfgmgt.ConfigUtils;
 import org.sipfoundry.sipxconfig.cfgmgt.KeyValueConfiguration;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.ivr.Ivr;
-import org.springframework.beans.factory.annotation.Required;
 
 public class RecordingConfig implements ConfigProvider {
     private Recording m_recording;
@@ -86,17 +85,17 @@ public class RecordingConfig implements ConfigProvider {
         config.write("recording.hzEnabled", hzEnabled);
     }
 
-    @Required
+    
     public void setRecording(Recording recording) {
         m_recording = recording;
     }
 
-    @Required
+    
     public void setIvr(Ivr ivr) {
         m_ivr = ivr;
     }
 
-    @Required
+    
     public void setAdminContext(AdminContext adminContext) {
         m_adminContext = adminContext;
     }

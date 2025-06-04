@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.device;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import org.apache.commons.lang.time.DateUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.systemaudit.SystemAuditable;
 

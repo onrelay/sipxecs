@@ -14,6 +14,7 @@
  */
 package org.sipfoundry.sipxconfig.test;
 
+import org.bson.Document;
 import org.sipfoundry.sipxconfig.address.AddressManager;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.commserver.imdb.ReplicationManagerImpl;
@@ -22,7 +23,7 @@ import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
 import org.sipfoundry.sipxconfig.permission.PermissionManager;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.mongodb.DBCollection;
+import com.mongodb.client.MongoCollection;
 
 public class ImdbTestCase extends IntegrationTestCase {
     public static final String DOMAIN = "example.org";
@@ -38,11 +39,11 @@ public class ImdbTestCase extends IntegrationTestCase {
     @Override
     protected void onSetUpInTransaction() throws Exception {
         super.onSetUpInTransaction();
-        m_imdb.getDb().dropDatabase();
+        m_imdb.getDb().drop();
     }
 
-    public DBCollection getEntityCollection() {
-        DBCollection entity = m_imdb.getDb().getCollection("entity");
+    public MongoCollection<Document> getEntityCollection() {
+        MongoCollection<Document> entity = m_imdb.getDb().getCollection("entity");
         return entity;
     }
 

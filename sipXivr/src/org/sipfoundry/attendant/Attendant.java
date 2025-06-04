@@ -25,7 +25,6 @@ import org.sipfoundry.sipxivr.common.DialByName;
 import org.sipfoundry.sipxivr.common.DialByNameChoice;
 import org.sipfoundry.sipxivr.common.IvrChoice.IvrChoiceReason;
 import org.sipfoundry.voicemail.mailbox.MailboxManager;
-import org.springframework.beans.factory.annotation.Required;
 
 public class Attendant extends SipxIvrApp {
     static final Logger LOG = Logger.getLogger("org.sipfoundry.sipxivr");
@@ -101,15 +100,16 @@ public class Attendant extends SipxIvrApp {
 
         // Find the configuration for the named attendant
         AttendantConfig config = controller.getAttendantConfig(id);
-        String lang = config.getLang();
-        if (StringUtils.isNotBlank(lang) && !StringUtils.equals(config.getLang(), "default")) {
-            controller.changeLocale(lang);
-        }
 
         if (config == null) {
             LOG.error(String.format("Attendant::attendant Unable to determine which configuration to use from (%s)",
                     id));
             return null;
+        }
+
+        String lang = config.getLang();
+        if (StringUtils.isNotBlank(lang) && !StringUtils.equals(config.getLang(), "default")) {
+            controller.changeLocale(lang);
         }
 
         LOG.info("Attendant::attendant Starting attendant id " + id + " (" + config.getName() + ") in locale "
@@ -406,12 +406,12 @@ public class Attendant extends SipxIvrApp {
         m_mailboxManager = mgr;
     }
 
-    @Required
+    
     public void setTts(boolean tts) {
         m_tts = tts;
     }
 
-    @Required
+    
     public void setTtsVoice(String ttsVoice) {
         m_ttsVoice = ttsVoice;
     }

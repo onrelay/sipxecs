@@ -13,7 +13,7 @@ Url: http://www.sipfoundry.org
 # do not build a debuginfo package
 %define debug_package %{nil}
 
-BuildRequires: java-1.8.0-openjdk-devel
+BuildRequires: java-17-openjdk-devel
 BuildRequires: automake
 BuildRequires: zip
 BuildRequires: sipxcommserverlib

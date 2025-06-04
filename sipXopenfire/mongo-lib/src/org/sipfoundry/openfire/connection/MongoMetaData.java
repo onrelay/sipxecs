@@ -24,7 +24,9 @@ import java.sql.SQLException;
 
 import org.sipfoundry.commons.mongo.MongoFactory;
 
-import com.mongodb.Mongo;
+import com.mongodb.client.MongoClient;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 
 public class MongoMetaData implements DatabaseMetaData {
 
@@ -114,12 +116,35 @@ public class MongoMetaData implements DatabaseMetaData {
 
     @Override
     public int getDriverMajorVersion() {
-        return Mongo.getMajorVersion();
+        String version = MongoClient.class.getPackage().getImplementationVersion();
+        // version is like "4.8.0" or null if unavailable
+
+        if (version == null) {
+            return -1; // unknown
+        }
+        String[] parts = version.split("\\.");
+        try {
+            return Integer.parseInt(parts[0]);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     @Override
     public int getDriverMinorVersion() {
-        return Mongo.getMinorVersion();
+        String version = MongoClient.class.getPackage().getImplementationVersion();
+        if (version == null) {
+            return -1;
+        }
+        String[] parts = version.split("\\.");
+        if (parts.length < 2) {
+            return -1;
+        }
+        try {
+            return Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     @Override
@@ -991,22 +1016,45 @@ public class MongoMetaData implements DatabaseMetaData {
 
     @Override
     public int getDatabaseMajorVersion() throws SQLException {
-        return Mongo.getMajorVersion();
+        return getDriverMajorVersion();
     }
 
     @Override
     public int getDatabaseMinorVersion() throws SQLException {
-        return Mongo.getMinorVersion();
+        return getDriverMinorVersion();
     }
 
     @Override
-    public int getJDBCMajorVersion() throws SQLException {
-        return Mongo.getMajorVersion();
+    public int getJDBCMajorVersion() {
+        String version = JdbcTemplate.class.getPackage().getImplementationVersion();
+        // version is like "4.8.0" or null if unavailable
+
+        if (version == null) {
+            return -1; // unknown
+        }
+        String[] parts = version.split("\\.");
+        try {
+            return Integer.parseInt(parts[0]);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     @Override
-    public int getJDBCMinorVersion() throws SQLException {
-        return Mongo.getMinorVersion();
+    public int getJDBCMinorVersion() {
+        String version = JdbcTemplate.class.getPackage().getImplementationVersion();
+        if (version == null) {
+            return -1;
+        }
+        String[] parts = version.split("\\.");
+        if (parts.length < 2) {
+            return -1;
+        }
+        try {
+            return Integer.parseInt(parts[1]);
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     @Override

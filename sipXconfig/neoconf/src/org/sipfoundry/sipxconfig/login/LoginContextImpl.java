@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.login;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.commons.security.Md5Encoder;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
@@ -28,9 +28,8 @@ public class LoginContextImpl implements LoginContext {
             return null;
         }
 
-        String userName = user.getUserName();
         String pintoken = user.getPintoken();
-        String encodedPassword = getEncodedPassword(userName, password);
+        String encodedPassword = getEncodedPassword(password);
 
         // Real match
         if (encodedPassword.equals(pintoken)) {
@@ -47,7 +46,7 @@ public class LoginContextImpl implements LoginContext {
         return null;
     }
 
-    public String getEncodedPassword(String userName, String password) {
+    public String getEncodedPassword(String password) {
         return Md5Encoder.getEncodedPassword(password);
     }
 

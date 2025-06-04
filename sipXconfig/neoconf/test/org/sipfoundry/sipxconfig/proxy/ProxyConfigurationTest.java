@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.sipfoundry.sipxconfig.common.InternalUser;

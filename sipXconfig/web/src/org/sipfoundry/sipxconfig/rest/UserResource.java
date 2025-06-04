@@ -10,19 +10,23 @@
 package org.sipfoundry.sipxconfig.rest;
 
 import org.restlet.Context;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
-import org.restlet.resource.Resource;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.resource.ServerResource;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Get;
+import org.restlet.representation.Variant;
+import org.restlet.resource.ResourceException;
+
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.security.StandardUserDetailsService;
 import org.sipfoundry.sipxconfig.security.UserDetailsImpl;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Special type of the resource accessible for an individual users
  */
-public class UserResource extends Resource {
+public class UserResource extends ServerResource {
 
     private CoreContext m_coreContext;
     private User m_user;
@@ -40,16 +44,22 @@ public class UserResource extends Resource {
         }
     }
 
-    @Required
+    
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
     }
 
-    protected final User getUser() {
+    protected User getUser() {
         return m_user;
     }
 
     protected final CoreContext getCoreContext() {
         return m_coreContext;
+    }
+
+    @Get
+    public Representation represent(Variant variant) throws ResourceException {
+        // Override
+        return null;
     }
 }

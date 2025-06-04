@@ -29,11 +29,10 @@ public class OptionalElementTest extends TestCase {
     }
 
     public void testRender() throws Exception {
-        IMocksControl mcCycle = EasyMock.createControl();
-        IRequestCycle cycle = mcCycle.createMock(IRequestCycle.class);
-        cycle.isRewinding();
-        mcCycle.andReturn(false).atLeastOnce();
-        mcCycle.replay();
+            IMocksControl mcCycle = EasyMock.createControl();
+            IRequestCycle cycle = mcCycle.createMock(IRequestCycle.class);
+            EasyMock.expect(cycle.isRewinding()).andReturn(false).atLeastOnce();
+            mcCycle.replay();
 
         IMocksControl mcWriter = EasyMock.createControl();
         IMarkupWriter writer = mcWriter.createMock(IMarkupWriter.class);
@@ -50,14 +49,12 @@ public class OptionalElementTest extends TestCase {
     public void testRenderWithElement() throws Exception {
         IMocksControl mcBinding = EasyMock.createControl();
         IBinding binding = mcBinding.createMock(IBinding.class);
-        binding.getObject();
-        mcBinding.andReturn("kuku").anyTimes();
+        EasyMock.expect(binding.getObject()).andReturn("kuku").anyTimes();
         mcBinding.replay();
 
         IMocksControl mcCycle = EasyMock.createControl();
         IRequestCycle cycle = mcCycle.createMock(IRequestCycle.class);
-        cycle.isRewinding();
-        mcCycle.andReturn(false).atLeastOnce();
+        EasyMock.expect(cycle.isRewinding()).andReturn(false).atLeastOnce();
         mcCycle.replay();
 
         IMocksControl mcWriter = EasyMock.createStrictControl();

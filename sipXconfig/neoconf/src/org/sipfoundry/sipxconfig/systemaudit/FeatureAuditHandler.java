@@ -28,7 +28,6 @@ import org.sipfoundry.sipxconfig.feature.FeatureChangeValidator;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.feature.GlobalFeature;
 import org.sipfoundry.sipxconfig.feature.LocationFeature;
-import org.springframework.beans.factory.annotation.Required;
 
 /**
  * This class contains the business logic for ENABLE or DISABLE actions done to
@@ -152,7 +151,7 @@ public class FeatureAuditHandler extends AbstractSystemAuditHandler {
         }
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }

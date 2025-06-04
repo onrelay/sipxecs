@@ -11,13 +11,12 @@ package org.sipfoundry.sipxconfig.externaltools;
 
 import java.io.File;
 
-import org.springframework.beans.factory.annotation.Required;
 
 public class ToolbarDownloadContextImpl implements ToolbarDownloadContext {
 
     private String m_toolbarInstallerLocation;
 
-    @Required
+    
     public void setToolbarInstallerLocation(String toolbarInstallerLocation) {
         m_toolbarInstallerLocation = toolbarInstallerLocation;
     }

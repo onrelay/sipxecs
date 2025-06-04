@@ -20,5 +20,4 @@ sipxcommons.dir=@SIPX_JAVADIR@/sipXcommons
 sipviewer.lib.dir=@SIPX_JAVADIR@/sipXviewer
 
 # U T I L
-jdom.jar=${sipxcommons.dir}/jdom-1.0.jar
 junit.jar=${sipxcommons.dir}/junit.jar

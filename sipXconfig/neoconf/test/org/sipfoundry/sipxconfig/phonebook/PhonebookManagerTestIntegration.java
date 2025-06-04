@@ -190,7 +190,7 @@ public class PhonebookManagerTestIntegration extends IntegrationTestCase {
     public void testFileUploadPhonebookEntries() throws Exception {
         sql("phonebook/PhonebookFileEntriesSeed.sql");
 
-        Phonebook p = m_phonebookManager.getPhonebook(new Integer(2001));
+        Phonebook p = m_phonebookManager.getPhonebook(Integer.valueOf(2001));
 
         // testing Gmail CSV file import
         m_phonebookManager.addEntriesFromFile(2001, getClass().getResourceAsStream("phonebook_gmail.csv"));
@@ -244,7 +244,7 @@ public class PhonebookManagerTestIntegration extends IntegrationTestCase {
         Collection<Phonebook> booksBeforeDelete = m_phonebookManager.getPhonebooks();
         assertEquals(2, booksBeforeDelete.size());
 
-        Phonebook book = m_phonebookManager.getPhonebook(new Integer(2001));
+        Phonebook book = m_phonebookManager.getPhonebook(Integer.valueOf(2001));
         m_phonebookManager.addEntriesFromFile(2001, getClass().getResourceAsStream("phonebook.csv"));
         Collection<PhonebookEntry> entries = m_phonebookManager.getEntries(book);
         assertEquals(1, entries.size());
@@ -432,16 +432,16 @@ public class PhonebookManagerTestIntegration extends IntegrationTestCase {
         Iterator<PhonebookEntry> entries = pagedPhonebook.getEntries().iterator();
 
         PhonebookEntry editableContact = entries.next();
-        assertEquals(new Integer(101), editableContact.getId());
+        assertEquals(Integer.valueOf(101), editableContact.getId());
         assertEquals("10020", editableContact.getNumber());
 
 
         PhonebookEntry contact1 = entries.next();
         assertEquals("canadian", contact1.getNumber());
-        assertEquals(new Integer(-1), contact1.getId());
+        assertEquals(Integer.valueOf(-1), contact1.getId());
         PhonebookEntry contact2 = entries.next();
         assertEquals("chirping", contact2.getNumber());
-        assertEquals(new Integer(-1), contact2.getId());
+        assertEquals(Integer.valueOf(-1), contact2.getId());
         assertEquals("mallard", entries.next().getNumber());
         assertEquals("pintail", entries.next().getNumber());
         assertEquals("song", entries.next().getNumber());
@@ -454,14 +454,14 @@ public class PhonebookManagerTestIntegration extends IntegrationTestCase {
         assertEquals(5, pagedPhonebook.getSize());
         entries = pagedPhonebook.getEntries().iterator();
         editableContact = entries.next();
-        assertEquals(new Integer(101), editableContact.getId());
+        assertEquals(Integer.valueOf(101), editableContact.getId());
         assertEquals("10020", editableContact.getNumber());
         contact1 = entries.next();
         assertEquals("canadian", contact1.getNumber());
-        assertEquals(new Integer(-1), contact1.getId());
+        assertEquals(Integer.valueOf(-1), contact1.getId());
         contact2 = entries.next();
         assertEquals("mallard", contact2.getNumber());
-        assertEquals(new Integer(-1), contact2.getId());
+        assertEquals(Integer.valueOf(-1), contact2.getId());
         assertEquals("pintail", entries.next().getNumber());
         assertEquals("yellowthroat", entries.next().getNumber());
     }
@@ -469,7 +469,7 @@ public class PhonebookManagerTestIntegration extends IntegrationTestCase {
     public void testMultipleFileUploadPhonebookEntries() throws Exception {
         sql("phonebook/PhonebookFileEntriesSeed.sql");
 
-        Phonebook p = m_phonebookManager.getPhonebook(new Integer(2001));
+        Phonebook p = m_phonebookManager.getPhonebook(Integer.valueOf(2001));
         m_phonebookManager.addEntriesFromFile(2001, getClass().getResourceAsStream("phonebook_gmail.csv"));
 
         assertEquals(1, m_phonebookManager.getEntries(p).size());
@@ -485,7 +485,7 @@ public class PhonebookManagerTestIntegration extends IntegrationTestCase {
     public void testUpdateFilePhonebookEntryInternalIds() throws Exception {
         sql("phonebook/PhonebookSeed.sql");
 
-        Phonebook p = m_phonebookManager.getPhonebook(new Integer(1002));
+        Phonebook p = m_phonebookManager.getPhonebook(Integer.valueOf(1002));
         Iterator<PhonebookEntry> entries = m_phonebookManager.getEntries(p).iterator();
         assertNull(entries.next().getInternalId());
 

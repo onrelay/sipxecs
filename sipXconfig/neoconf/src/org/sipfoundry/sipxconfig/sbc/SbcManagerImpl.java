@@ -21,11 +21,10 @@ import org.sipfoundry.sipxconfig.domain.Domain;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 
-public class SbcManagerImpl extends SipxHibernateDaoSupport implements SbcManager, BeanFactoryAware {
+public class SbcManagerImpl extends SipxHibernateDaoSupport<Sbc> implements SbcManager, BeanFactoryAware {
     private DomainManager m_domainManager;
     private BeanFactory m_beanFactory;
 
@@ -68,7 +67,7 @@ public class SbcManagerImpl extends SipxHibernateDaoSupport implements SbcManage
 
     public void removeSbcs(Collection<Integer> selectedRows) {
         HibernateTemplate hibernate = getHibernateTemplate();
-        Collection<AuxSbc> sbcs = DaoUtils.loadBeanByIds(hibernate, AuxSbc.class, selectedRows);
+        Collection<Object> sbcs = DaoUtils.loadBeanByIds(hibernate, AuxSbc.class, selectedRows);
         getDaoEventPublisher().publishDeleteCollection(sbcs);
         hibernate.deleteAll(sbcs);
     }
@@ -99,12 +98,12 @@ public class SbcManagerImpl extends SipxHibernateDaoSupport implements SbcManage
         removeAll(Sbc.class);
     }
 
-    @Required
+    
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }
 
-    @Required
+    
     public void setBeanFactory(BeanFactory beanFactory) {
         m_beanFactory = beanFactory;
     }

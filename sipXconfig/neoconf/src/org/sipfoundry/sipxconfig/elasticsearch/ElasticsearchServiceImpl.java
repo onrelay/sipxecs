@@ -66,7 +66,6 @@ import org.sipfoundry.sipxconfig.search.SearchableService;
 import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.google.gson.Gson;
 
@@ -95,17 +94,17 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
     private Gson m_gson;
     private LocationsManager m_locationsManager;
 
-    @Required
+    
     public void setHostName(String hostName) {
         m_hostName = hostName;
     }
 
-    @Required
+    
     public void setPort(int port) {
         m_port = port;
     }
 
-    @Required
+    
     public void setGson(Gson gson) {
         m_gson = gson;
     }

@@ -25,8 +25,7 @@ import org.sipfoundry.sipxconfig.speeddial.SpeedDialManager;
 import org.sipfoundry.sipxconfig.test.ImdbTestCase;
 import org.sipfoundry.sipxconfig.test.TestHelper;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 public class SpeedDialsTestIntegration extends ImdbTestCase {
     private SpeedDials m_speeddialDataSet;
@@ -59,33 +58,33 @@ public class SpeedDialsTestIntegration extends ImdbTestCase {
         getCoreContext().saveUser(userC);
         getCoreContext().saveUser(userD);
 
-        DBObject user1 = new BasicDBObject().append(ID, "User9991").append(UID, "user_a");
-        BasicDBObject speeddial1 = new BasicDBObject("usr", "~~rl~F~user_a")
+        Document user1 = new Document().append(ID, "User9991").append(UID, "user_a");
+        Document speeddial1 = new Document("usr", "~~rl~F~user_a")
             .append("usrcns", "~~rl~C~user_a");
-        List<DBObject> btns1 = new ArrayList<DBObject>();
-        btns1.add(new BasicDBObject("uri", "sip:102@example.org").append("name", "beta"));
-        btns1.add(new BasicDBObject("uri", "sip:104@sipfoundry.org").append("name", "gamma"));
+        List<Document> btns1 = new ArrayList<Document>();
+        btns1.add(new Document("uri", "sip:102@example.org").append("name", "beta"));
+        btns1.add(new Document("uri", "sip:104@sipfoundry.org").append("name", "gamma"));
         speeddial1.append("btn", btns1);
         user1.put("spdl", speeddial1);
 
-        DBObject user2 = new BasicDBObject().append(ID, "User9992").append(UID, "user_b");
-        BasicDBObject speeddial2 = new BasicDBObject("usr", "~~rl~F~user_b")
+        Document user2 = new Document().append(ID, "User9992").append(UID, "user_b");
+        Document speeddial2 = new Document("usr", "~~rl~F~user_b")
             .append("usrcns", "~~rl~C~user_b");
-        List<DBObject> btns2 = new ArrayList<DBObject>();
-        btns2.add(new BasicDBObject("uri", "sip:404@example.org").append("name", "beta1"));
+        List<Document> btns2 = new ArrayList<Document>();
+        btns2.add(new Document("uri", "sip:404@example.org").append("name", "beta1"));
         speeddial2.append("btn", btns2);
         user2.put("spdl", speeddial2);
 
 
-        DBObject user3 = new BasicDBObject().append(ID, "User9993").append(UID, "user_c");
-        BasicDBObject speeddial3 = new BasicDBObject();
+        Document user3 = new Document().append(ID, "User9993").append(UID, "user_c");
+        Document speeddial3 = new Document();
         user3.put("spdl", speeddial3);
 
-        DBObject user4 = new BasicDBObject().append(ID, "User9994").append(UID, "user_d");
-        BasicDBObject speeddial4 = new BasicDBObject("usr", "~~rl~F~user_d")
+        Document user4 = new Document().append(ID, "User9994").append(UID, "user_d");
+        Document speeddial4 = new Document("usr", "~~rl~F~user_d")
             .append("usrcns", "~~rl~C~user_d");
-        List<DBObject> btns4 = new ArrayList<DBObject>();
-        btns4.add(new BasicDBObject("uri", "sip:101@example.org").append("name", "alpha"));
+        List<Document> btns4 = new ArrayList<Document>();
+        btns4.add(new Document("uri", "sip:101@example.org").append("name", "alpha"));
         speeddial4.append("btn", btns4);
         user4.put("spdl", speeddial4);
 

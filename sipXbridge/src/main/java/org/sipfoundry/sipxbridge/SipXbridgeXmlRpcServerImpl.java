@@ -7,21 +7,21 @@ package org.sipfoundry.sipxbridge;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
+
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.HttpServer;
-import org.mortbay.http.SocketListener;
-import org.mortbay.jetty.servlet.ServletHandler;
-import org.mortbay.util.InetAddrPort;
+
 import org.sipfoundry.sipxbridge.xmlrpc.SipXbridgeXmlRpcServer;
 
 public class SipXbridgeXmlRpcServerImpl implements SipXbridgeXmlRpcServer {
@@ -31,63 +31,56 @@ public class SipXbridgeXmlRpcServerImpl implements SipXbridgeXmlRpcServer {
 	/*
 	 * THe Webserver for the xml rpc interface.
 	 */
-	private static HttpServer webServer;
+	private static Server webServer;
 
 	private static boolean isWebServerRunning;
 
 	public static void startXmlRpcServer() throws SipXbridgeException {
 		try {
 			if (!isWebServerRunning) {
-				Logger.getLogger("org.mortbay").setLevel(Level.OFF);
+				Logger.getLogger("org.eclipse.jetty").setLevel(Level.OFF);
 				Logger.getLogger("org.apache.xmlrpc").setLevel(Level.OFF);
 				isWebServerRunning = true;
-				webServer = new HttpServer();
 
-				if ( logger.isDebugEnabled() ) logger.debug("Starting xml rpc server on inetAddr:port "
-						+ Gateway.getBridgeConfiguration().getLocalAddress()
-						+ ":"
-						+ Gateway.getBridgeConfiguration().getXmlRpcPort());
-				InetAddrPort inetAddrPort = new InetAddrPort(Gateway
-						.getLocalAddress(), Gateway.getBridgeConfiguration()
-						.getXmlRpcPort());
-				inetAddrPort.setInetAddress(InetAddress.getByName(Gateway
-						.getLocalAddress()));
-				SocketListener socketListener = new SocketListener(
-						inetAddrPort);
-				socketListener.setMaxThreads(32);
-				socketListener.setMinThreads(4);
-				socketListener.setLingerTimeSecs(30000);
-				webServer.addListener(socketListener);
+				int port = Gateway.getBridgeConfiguration().getXmlRpcPort();
+				String host = Gateway.getBridgeConfiguration().getLocalAddress();
 
-				HttpContext httpContext = new HttpContext();
+				if (logger.isDebugEnabled()) {
+					logger.debug("Starting XML-RPC server on " + host + ":" + port);
+				}
 
-				httpContext.setContextPath("/");
-				ServletHandler servletHandler = new ServletHandler();
-				servletHandler.addServlet("sipxbridge", "/*",
-						SipxbridgeServlet.class.getName());
-				httpContext.addHandler(servletHandler);
+				webServer = new Server();
 
-				webServer.addContext(httpContext);
+				ServerConnector connector = new ServerConnector(webServer);
+				connector.setHost(host);
+				connector.setPort(port);
+				webServer.addConnector(connector);
 
+				ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+				context.setContextPath("/");
+				context.addServlet(new ServletHolder(new SipxbridgeServlet()), "/*");
+
+				webServer.setHandler(context);
 				webServer.start();
 
-				if ( logger.isDebugEnabled() ) logger.debug("Web server started.");
-
+				if (logger.isDebugEnabled()) {
+					logger.debug("Web server started.");
+				}
 			}
 		} catch (Exception ex) {
 			throw new SipXbridgeException("Exception starting web server", ex);
 		}
-
 	}
 
-	static void stopXmlRpcServer() {
+	public static void stopXmlRpcServer() {
 		try {
-			if (webServer != null) {
+			if (webServer != null && webServer.isRunning()) {
 				webServer.stop();
+				webServer = null;
 			}
 			isWebServerRunning = false;
 		} catch (Exception ex) {
-			logger.error("Error stopping xml rpc server.", ex);
+			logger.error("Error stopping XML-RPC server.", ex);
 		}
 	}
 
@@ -127,7 +120,7 @@ public class SipXbridgeXmlRpcServerImpl implements SipXbridgeXmlRpcServer {
 		} catch (Exception ex) {
 		    throw new ServletException(formatStackTrace(ex), ex);
 		}
-		return new Integer(retval);
+		return Integer.valueOf(retval);
 	}
 
 	public Boolean start() throws ServletException {

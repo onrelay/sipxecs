@@ -19,7 +19,7 @@ package org.sipfoundry.sipxconfig.callqueue;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.address.AddressManager;
@@ -29,7 +29,6 @@ import org.sipfoundry.sipxconfig.freeswitch.FreeswitchFeature;
 import org.sipfoundry.sipxconfig.freeswitch.api.FreeswitchApi;
 import org.sipfoundry.sipxconfig.xmlrpc.ApiProvider;
 import org.sipfoundry.sipxconfig.xmlrpc.XmlRpcRemoteException;
-import org.springframework.beans.factory.annotation.Required;
 
 public class CallQueueDeployer {
     private static final Log LOG = LogFactory.getLog(CallQueueDeployer.class);
@@ -123,17 +122,17 @@ public class CallQueueDeployer {
         return m_freeswitchApiProvider.getApi(url);
     }
 
-    @Required
+    
     public void setFreeswitchApiProvider(ApiProvider<FreeswitchApi> freeswitchApiProvider) {
         m_freeswitchApiProvider = freeswitchApiProvider;
     }
 
-    @Required
+    
     public void setFeatureManager(FeatureManager featureManager) {
         m_featureManager = featureManager;
     }
 
-    @Required
+    
     public void setAddressManager(AddressManager addressManager) {
         m_addressManager = addressManager;
     }

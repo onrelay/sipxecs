@@ -5,6 +5,8 @@
  */
 package org.sipfoundry.sipxrest.cdrlog;
 
+import org.sipfoundry.sipxconfig.rest.W3cDomRepresentation;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -19,14 +21,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 import org.restlet.Restlet;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Request;
-import org.restlet.data.Response;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.resource.DomRepresentation;
+import org.restlet.representation.Representation;
 import org.sipfoundry.commons.restconfig.RestServerConfig;
 import org.sipfoundry.sipxrest.RestServer;
 import org.w3c.dom.Document;
@@ -164,7 +165,7 @@ public class CdrLogRestlet extends Restlet {
                     row.appendChild(node);
                 }
             }
-            DomRepresentation rep = new DomRepresentation(MediaType.TEXT_XML,doc);
+            Representation rep = new W3cDomRepresentation(MediaType.TEXT_XML, doc);
             response.setEntity(rep);
             response.setStatus(Status.SUCCESS_OK);
 
@@ -197,7 +198,6 @@ public class CdrLogRestlet extends Restlet {
                 logger.error("An exception occured while closing the connection. : ", e);
             }
         }
-
     }
 
 }

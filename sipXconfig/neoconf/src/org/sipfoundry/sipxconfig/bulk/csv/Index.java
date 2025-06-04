@@ -13,7 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Values of the enums below determine the exact format of CSV file

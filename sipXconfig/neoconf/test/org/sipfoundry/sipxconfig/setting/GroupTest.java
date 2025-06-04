@@ -41,8 +41,8 @@ public class GroupTest extends TestCase {
         g2.setName("b");
         assertTrue(g1.compareTo(g2) < 0);
 
-        g1.setWeight(new Integer(5));
-        g2.setWeight(new Integer(3));
+        g1.setWeight(Integer.valueOf(5));
+        g2.setWeight(Integer.valueOf(3));
         assertTrue(g1.compareTo(g2) > 0);
     }
 

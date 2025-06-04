@@ -42,8 +42,7 @@ import org.sipfoundry.sipxconfig.vm.MailboxPreferences;
 import org.sipfoundry.sipxconfig.vm.MailboxPreferences.ActiveGreeting;
 import org.sipfoundry.sipxconfig.vm.attendant.PersonalAttendant;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+import org.bson.Document;
 
 public class MailstoreTestIntegration extends ImdbTestCase {
     private MailboxManager m_mailboxManager;
@@ -71,17 +70,17 @@ public class MailstoreTestIntegration extends ImdbTestCase {
         m_mailboxManager.storePersonalAttendant(pa);
         getCoreContext().saveUser(m_user);
 
-        DBObject search = new BasicDBObject();
+        Document search = new Document();
         search.put(OPERATOR, "sip:111@" + getDomainManager().getDomainName());
         search.put(LANGUAGE, "ro");
-        List<DBObject> buttonsList = new ArrayList<DBObject>();
-        DBObject menuItem = new BasicDBObject();
+        List<Document> buttonsList = new ArrayList<Document>();
+        Document menuItem = new Document();
         menuItem.put(DIALPAD, "0");
         menuItem.put(ITEM, "sip:222@" + getDomainManager().getDomainName());
         buttonsList.add(menuItem);
         search.put(BUTTONS, buttonsList);
 
-        MongoTestCaseHelper.assertObjectPresent(getEntityCollection(), new BasicDBObject(
+        MongoTestCaseHelper.assertObjectPresent(getEntityCollection(), new Document(
                 MongoConstants.PERSONAL_ATT, search));
 
         DistributionList dl1 = new DistributionList();
@@ -129,18 +128,18 @@ public class MailstoreTestIntegration extends ImdbTestCase {
         u202.setPermission(PermissionName.VOICEMAIL, true);
         getCoreContext().saveUser(u202);
         m_mailboxManager.saveDistributionLists(u202.getId(), dls);
-        List<DBObject> dLists = new ArrayList<DBObject>();
+        List<Document> dLists = new ArrayList<Document>();
 
-        DBObject dlist1 = new BasicDBObject();
+        Document dlist1 = new Document();
         dlist1.put(DIALPAD, 1);
         dlist1.put(ITEM, "202");
         dLists.add(dlist1);
 
-        DBObject dlist2 = new BasicDBObject();
+        Document dlist2 = new Document();
         dlist2.put(DIALPAD, 3);
         dlist2.put(ITEM, "203 204");
         dLists.add(dlist2);
-        MongoTestCaseHelper.assertObjectPresent(getEntityCollection(), new BasicDBObject(DISTRIB_LISTS, dLists).append("uid", "202"));
+        MongoTestCaseHelper.assertObjectPresent(getEntityCollection(), new Document(DISTRIB_LISTS, dLists).append("uid", "202"));
 
         //TODO: test for other stuff in Mailstore dataset, like email, etc
     }
@@ -160,8 +159,8 @@ public class MailstoreTestIntegration extends ImdbTestCase {
         user.addGroup(m_settingDao.getGroupByName(CoreContext.USER_GROUP_RESOURCE_ID, "group"));
         getCoreContext().saveUser(user);
 
-        DBObject user200 = new BasicDBObject().append(UID, "200");
-        DBObject search = new BasicDBObject()
+        Document user200 = new Document().append(UID, "200");
+        Document search = new Document()
             .append(OPERATOR, "sip:123@" + getDomainManager().getDomainName())
             .append("lng", "en");
         user200.put(MongoConstants.PERSONAL_ATT, search);

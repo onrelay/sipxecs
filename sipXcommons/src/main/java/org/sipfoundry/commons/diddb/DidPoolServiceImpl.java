@@ -3,8 +3,7 @@ package org.sipfoundry.commons.diddb;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Required;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -57,7 +56,7 @@ public class DidPoolServiceImpl implements DidPoolService {
             new Query(Criteria.where("_class").is("org.sipfoundry.commons.diddb.DidPool")), DidPool.class);
     }
     
-    @Required
+    
     public void setProfiles(MongoTemplate profiles) {
         m_profiles = profiles;
     }
@@ -81,7 +80,7 @@ public class DidPoolServiceImpl implements DidPoolService {
         return poolDids.size() > 0 ? poolDids.get(0) : null;
     }
 
-    @Required
+    
     public void setDidService(DidService didService) {
         m_didService = didService;
     }

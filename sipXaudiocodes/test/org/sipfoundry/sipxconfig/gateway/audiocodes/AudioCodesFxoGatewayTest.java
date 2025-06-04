@@ -15,8 +15,8 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import org.sipfoundry.sipxconfig.device.DeviceDefaults;
 import org.sipfoundry.sipxconfig.device.DeviceVersion;
 import org.sipfoundry.sipxconfig.gateway.FxoPort;

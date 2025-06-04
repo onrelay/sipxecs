@@ -27,10 +27,8 @@ import org.sipfoundry.sipxconfig.setting.SettingDao;
 import org.sipfoundry.sipxconfig.test.ImdbTestCase;
 import org.sipfoundry.sipxconfig.test.TestHelper;
 
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
+import org.bson.Document;
+import com.mongodb.client.model.Filters;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
@@ -90,26 +88,25 @@ public class SpeedDialManagerTestIntegration extends ImdbTestCase {
         }
 
         m_speedDialManager.saveSpeedDial(speedDial);
-        assertEquals(buttonCount, db().queryForLong(
-                "select count(*) from speeddial_button " + " WHERE label = 'testSave'"));
+        assertEquals(Long.valueOf( buttonCount ), db().queryForObject(
+                "select count(*) from speeddial_button " + " WHERE label = 'testSave'", Long.class));
 
-        DBObject user = new BasicDBObject().append(ID, "User1002");
-        BasicDBObject speeddial = new BasicDBObject("usr", "~~rl~F~user2").append("usrcns", "~~rl~C~user2");
-        List<DBObject> btns = new ArrayList<DBObject>();
-        btns.add(new BasicDBObject("uri", "sip:0@example.org").append("name", "testSave"));
-        btns.add(new BasicDBObject("uri", "sip:2@example.org").append("name", "testSave"));
-        btns.add(new BasicDBObject("uri", "sip:4@example.org").append("name", "testSave"));
+        Document user = new Document().append(ID, "User1002");
+        Document speeddial = new Document("usr", "~~rl~F~user2").append("usrcns", "~~rl~C~user2");
+        List<Document> btns = new ArrayList<Document>();
+        btns.add(new Document("uri", "sip:0@example.org").append("name", "testSave"));
+        btns.add(new Document("uri", "sip:2@example.org").append("name", "testSave"));
+        btns.add(new Document("uri", "sip:4@example.org").append("name", "testSave"));
         speeddial.append("btn", btns);
         user.put("spdl", speeddial);
 
         MongoTestCaseHelper.assertObjectPresent(getEntityCollection(), user);
 
         // Test clear speed dials directly from Mongo
-        int result = getEntityCollection().find(QueryBuilder.start(MongoConstants.SPEEDDIAL).exists(true).get())
-                .count();
+        int result = (int) getEntityCollection().countDocuments(Filters.exists(MongoConstants.SPEEDDIAL, true));
         assertEquals(1, result);
         m_speedDialManager.clear();
-        result = getEntityCollection().find(QueryBuilder.start(MongoConstants.SPEEDDIAL).exists(true).get()).count();
+        result = (int) getEntityCollection().countDocuments(Filters.exists(MongoConstants.SPEEDDIAL, true));
         assertEquals(0, result);
     }
 
@@ -153,16 +150,16 @@ public class SpeedDialManagerTestIntegration extends ImdbTestCase {
         }
 
         m_speedDialManager.saveSpeedDialGroup(speedDialgroup);
-        assertEquals(buttonCount,
-                db().queryForLong("select count(*) from speeddial_group_button WHERE label = 'testSave'"));
+        assertEquals(Long.valueOf(buttonCount),
+                db().queryForObject("select count(*) from speeddial_group_button WHERE label = 'testSave'", Long.class));
         /*
          * here, we should see all users in group updated, but we don't - due to operations
          * happening in different transactions group get members do not return what it should.
-         * DBObject user = new BasicDBObject().append(ID, "User4002"); BasicDBObject speeddial =
-         * new BasicDBObject("usr", "~~rl~F~user2") .append("usrcns", "~~rl~C~user2");
-         * List<DBObject> btns = new ArrayList<DBObject>(); btns.add(new BasicDBObject("uri",
-         * "sip:0@example.org").append("name", "testSave")); btns.add(new BasicDBObject("uri",
-         * "sip:2@example.org").append("name", "testSave")); btns.add(new BasicDBObject("uri",
+         * Document user = new Document().append(ID, "User4002"); Document speeddial =
+         * new Document("usr", "~~rl~F~user2") .append("usrcns", "~~rl~C~user2");
+         * List<Document> btns = new ArrayList<Document>(); btns.add(new Document("uri",
+         * "sip:0@example.org").append("name", "testSave")); btns.add(new Document("uri",
+         * "sip:2@example.org").append("name", "testSave")); btns.add(new Document("uri",
          * "sip:4@example.org").append("name", "testSave")); speeddial.append("btn", btns);
          * user.put("spdl", speeddial);
          *
@@ -194,10 +191,10 @@ public class SpeedDialManagerTestIntegration extends ImdbTestCase {
         m_speedDialManager.speedDialSynchToGroup(m_coreContext.getUser(1003));
         assertEquals(3, m_speedDialManager.getSpeedDialForUserId(1003, true).getButtons().size());
 
-        DBObject user = new BasicDBObject().append(ID, "User1003");
-        BasicDBObject speeddial = new BasicDBObject("usr", "~~rl~F~user3").append("usrcns", "~~rl~C~user3");
-        List<DBObject> btns = new ArrayList<DBObject>();
-        btns.add(new BasicDBObject("uri", "sip:111@example.org").append("name", "B"));// only one
+        Document user = new Document().append(ID, "User1003");
+        Document speeddial = new Document("usr", "~~rl~F~user3").append("usrcns", "~~rl~C~user3");
+        List<Document> btns = new ArrayList<Document>();
+        btns.add(new Document("uri", "sip:111@example.org").append("name", "B"));// only one
                                                                                       // subscribe
         speeddial.append("btn", btns);
         user.put("spdl", speeddial);
@@ -236,11 +233,11 @@ public class SpeedDialManagerTestIntegration extends ImdbTestCase {
         User u1020 = m_coreContext.loadUser(1020);
         m_coreContext.saveUser(u1020);
 
-        DBObject user = new BasicDBObject().append(ID, "User1020");
-        BasicDBObject speeddial = new BasicDBObject("usr", "~~rl~F~user20").append("usrcns", "~~rl~C~user20");
-        List<DBObject> btns = new ArrayList<DBObject>();
-        btns.add(new BasicDBObject("uri", "sip:user21@example.org").append("name", "X"));
-        btns.add(new BasicDBObject("uri", "sip:user22@example.org").append("name", "X"));
+        Document user = new Document().append(ID, "User1020");
+        Document speeddial = new Document("usr", "~~rl~F~user20").append("usrcns", "~~rl~C~user20");
+        List<Document> btns = new ArrayList<Document>();
+        btns.add(new Document("uri", "sip:user21@example.org").append("name", "X"));
+        btns.add(new Document("uri", "sip:user22@example.org").append("name", "X"));
         speeddial.append("btn", btns);
         user.put("spdl", speeddial);
 
@@ -260,11 +257,11 @@ public class SpeedDialManagerTestIntegration extends ImdbTestCase {
         u1001.setSettingTypedValue(IM_ACCOUNT, true);
         m_coreContext.saveUser(u1001);
 
-        DBObject user = new BasicDBObject().append(ID, "~~id~xmpprlsclient");
-        BasicDBObject speeddial = new BasicDBObject("usr", "~~rl~F~~~id~xmpprlsclient").append("usrcns",
+        Document user = new Document().append(ID, "~~id~xmpprlsclient");
+        Document speeddial = new Document("usr", "~~rl~F~~~id~xmpprlsclient").append("usrcns",
                 "~~rl~C~~~id~xmpprlsclient");
-        List<DBObject> btns = new ArrayList<DBObject>();
-        btns.add(new BasicDBObject("uri", "sip:user1@example.org").append("name", "user1"));
+        List<Document> btns = new ArrayList<Document>();
+        btns.add(new Document("uri", "sip:user1@example.org").append("name", "user1"));
         speeddial.append("btn", btns);
         user.put("spdl", speeddial);
 
@@ -285,16 +282,15 @@ public class SpeedDialManagerTestIntegration extends ImdbTestCase {
         MongoTestCaseHelper.assertObjectNotPresent(getEntityCollection(), user);
 
         User u1002 = m_coreContext.loadUser(1002);
-        User u1003 = m_coreContext.loadUser(1003);
         User u1004 = m_coreContext.loadUser(1004);
 
         Group group = m_settingDao.getGroup(1003);
         group.setSettingValue("im/im-account", "1");
         m_settingDao.saveGroup(group);
 
-        btns = new ArrayList<DBObject>();
-        btns.add(new BasicDBObject("uri", "sip:user2@example.org").append("name", "user2"));
-        btns.add(new BasicDBObject("uri", "sip:user3@example.org").append("name", "user3"));
+        btns = new ArrayList<Document>();
+        btns.add(new Document("uri", "sip:user2@example.org").append("name", "user2"));
+        btns.add(new Document("uri", "sip:user3@example.org").append("name", "user3"));
         speeddial.append("btn", btns);
         user.put("spdl", speeddial);
 
@@ -302,18 +298,18 @@ public class SpeedDialManagerTestIntegration extends ImdbTestCase {
 
         m_coreContext.deleteUser(u1002);
         MongoTestCaseHelper.assertObjectNotPresent(getEntityCollection(), user);
-        btns = new ArrayList<DBObject>();
-        btns.add(new BasicDBObject("uri", "sip:user3@example.org").append("name", "user3"));
+        btns = new ArrayList<Document>();
+        btns.add(new Document("uri", "sip:user3@example.org").append("name", "user3"));
         speeddial.append("btn", btns);
         user.put("spdl", speeddial);
 
-        DBObject o = new BasicDBObject();
+        Document o = new Document();
         o.put("_id", "~~id~xmpprlsclient");
-        BasicDBList XXX = new BasicDBList();
-        XXX.add(new BasicDBObject("uri","sip:user3@example.org").append("name", "user3"));
+        List<Document> XXX = new ArrayList<Document>();
+        XXX.add(new Document("uri","sip:user3@example.org").append("name", "user3"));
         o.put("spdl.btn", XXX);
 
-        assertTrue(getEntityCollection().find(o).count() > 0);
+    assertTrue(getEntityCollection().countDocuments(o) > 0);
         group.setSettingValue("im/im-account", "0");
         m_settingDao.saveGroup(group);
 
@@ -322,8 +318,8 @@ public class SpeedDialManagerTestIntegration extends ImdbTestCase {
         group.setSettingValue("im/im-account", "1");
         m_settingDao.saveGroup(group);
 
-        btns = new ArrayList<DBObject>();
-        btns.add(new BasicDBObject("uri", "sip:user3@example.org").append("name", "user3"));
+        btns = new ArrayList<Document>();
+        btns.add(new Document("uri", "sip:user3@example.org").append("name", "user3"));
         speeddial.append("btn", btns);
         user.put("spdl", speeddial);
 
@@ -334,9 +330,9 @@ public class SpeedDialManagerTestIntegration extends ImdbTestCase {
         u1004.setGroups(groups);
         m_coreContext.saveUser(u1004);
 
-        btns = new ArrayList<DBObject>();
-        btns.add(new BasicDBObject("uri", "sip:user3@example.org").append("name", "user3"));
-        btns.add(new BasicDBObject("uri", "sip:user4@example.org").append("name", "user4"));
+        btns = new ArrayList<Document>();
+        btns.add(new Document("uri", "sip:user3@example.org").append("name", "user3"));
+        btns.add(new Document("uri", "sip:user4@example.org").append("name", "user4"));
         speeddial.append("btn", btns);
         user.put("spdl", speeddial);
 

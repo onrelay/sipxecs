@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.bulk;
 
 import java.io.Reader;
 
-import org.apache.commons.collections.Closure;
+import org.apache.commons.collections4.Closure;
 
 public interface BulkParser {
     /**
