@@ -21,9 +21,6 @@
 
 package org.sipfoundry.sipxconfig.rest;
 
-
-import static org.sipfoundry.sipxconfig.rest.RestUtilities.ResponseCode.ERROR_VALIDATION_FAILED;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
@@ -46,7 +43,7 @@ import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
-import org.sipfoundry.commons.rest.W3cDomRepresentation;
+import org.sipfoundry.common.rest.W3cDomRepresentation;
 import org.sipfoundry.sipxconfig.branch.Branch;
 import org.sipfoundry.sipxconfig.common.FileDigestSource;
 import org.sipfoundry.sipxconfig.common.User;
@@ -918,7 +915,7 @@ public static void setResponse(Response response, ResponseCode code, ResponseEle
 
         private void setError(String message) {
             this.setValid(false);
-            this.setResponseCode(ERROR_VALIDATION_FAILED);
+            this.setResponseCode(ResponseCode.ERROR_VALIDATION_FAILED);
             this.setMessage(message);
         }
     }

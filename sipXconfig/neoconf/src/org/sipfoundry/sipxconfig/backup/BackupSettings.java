@@ -27,9 +27,9 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.sipfoundry.sipxconfig.cfgmgt.DeployConfigOnEdit;
 import org.sipfoundry.sipxconfig.elasticsearch.ElasticsearchServiceImpl;
 import org.sipfoundry.sipxconfig.feature.Feature;
-import org.sipfoundry.sipxconfig.rest.RestUtilities;
 import org.sipfoundry.sipxconfig.setting.PersistableSettings;
 import org.sipfoundry.sipxconfig.setting.Setting;
+import org.sipfoundry.sipxconfig.rest.RestUtilities;
 
 public class BackupSettings extends PersistableSettings implements DeployConfigOnEdit {
 

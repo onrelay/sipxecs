@@ -23,7 +23,9 @@ ivr_PKGS = \
 	jetty-io \
 	jetty-ee10-webapp \
 	log4j \
-	mongo \
+	mongodb-driver-core \
+	mongodb-driver-sync \
+	bson  \	
 	org.restlet \
 	sipxcommons \
 	slf4j-api \

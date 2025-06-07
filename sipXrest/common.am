@@ -20,8 +20,11 @@ rest_PKGS = \
 	jetty-io \
 	jetty-ee10-webapp \
 	log4j \
-	mongo \
+	mongodb-driver-core \
+	mongodb-driver-sync \
+	bson \
 	org.restlet \
+	org.restlet.ext.servlet \
 	sipxcommons \
 	ws-commons-util \
 	xmlrpc-client \

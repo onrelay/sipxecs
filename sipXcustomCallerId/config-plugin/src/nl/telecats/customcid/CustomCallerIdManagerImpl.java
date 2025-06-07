@@ -62,23 +62,23 @@ public class CustomCallerIdManagerImpl implements CustomCallerIdManager {
 
     private void setRewrites(String collection, Collection<CustomCallerAlias> rewrites) {
         MongoCollection<Document> col = m_db.getDb().getCollection(collection);
-        Document[] dbo = new Document[rewrites.size()];
+        ArrayList<Document> dbo = new ArrayList<Document>();
         Iterator<CustomCallerAlias> iRewrites = rewrites.iterator();
         for (int i = 0; i < rewrites.size(); i++) {
-            dbo[i] = new Document();
+            Document doc = new Document();
             CustomCallerAlias cca = iRewrites.next();
-            dbo[i].put(FROM_ATTR, cca.getFrom());
-            dbo[i].put(TO_ATTR, cca.getTo());
+            doc.put(FROM_ATTR, cca.getFrom());
+            doc.put(TO_ATTR, cca.getTo());
+            dbo.add( doc );
         }
         col.drop();
-        col.insert(dbo);
+        col.insertMany(dbo);
     }
 
     private Collection<CustomCallerAlias> getRewrites(String collection) {
         FindIterable<Document> csr = m_db.getDb().getCollection(collection).find();
         List<CustomCallerAlias> rw = new ArrayList<CustomCallerAlias>();
-        while (csr.hasNext()) {
-            Document o = csr.next();
+        for( Document o : csr ) {
             rw.add(new CustomCallerAlias(o.get(FROM_ATTR).toString(), o.get(TO_ATTR).toString()));
         }
 

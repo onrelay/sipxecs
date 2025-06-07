@@ -26,7 +26,9 @@ plugin_JAR_PKGS = \
 	dom4j \
 	jain-sip-sdp \
 	log4j \
-	mongo \
+	mongodb-driver-core \
+	mongodb-driver-sync \
+	bson \
 	org.restlet \
 	sipxcommons \
 	not-yet-commons-ssl \
@@ -97,7 +99,9 @@ provider_PKGS_RT = \
 	commons-collections \
 	commons-beanutils-core \
 	commons-io \
-	mongo \
+	mongodb-driver-core \
+	mongodb-driver-sync \
+	bson \
 	xmlrpc-common \
 	dnsjava \
 	not-yet-commons-ssl \

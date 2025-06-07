@@ -27,7 +27,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.sipfoundry.commons.confdb.Conference;
 import org.sipfoundry.commons.confdb.ConferenceService;

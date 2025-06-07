@@ -12,7 +12,9 @@ event_PKGS = \
 	spring-expression \
 	spring-web \
 	spring-webmvc \
-	mongo \
+	mongodb-driver-core \
+	mongodb-driver-sync   \
+	bson \	
 	jetty-http \
 	jetty-io \
 	jetty-security \

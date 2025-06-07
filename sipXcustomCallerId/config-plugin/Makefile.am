@@ -21,13 +21,16 @@ customcallerid_PKGS = \
 	commons-lang \
 	commons-io \
 	commons-collections \
+	commons-collections4 \
 	commons-logging \
 	tapestry-framework \
 	tapestry-annotations \
 	spring-data-mongodb \
 	spring-context \
 	spring-beans \
-	mongo \
+	mongodb-driver-core \
+	mongodb-driver-sync \
+	bson  \	
 	hivemind \
 	sipxcommons \
 	sipxconfig-neoconf \

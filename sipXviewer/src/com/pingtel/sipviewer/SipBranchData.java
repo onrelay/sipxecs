@@ -240,6 +240,33 @@ public class SipBranchData {
         return (transactionId);
     }
 
+    // Returns the CSeq number, the Call-Id, and the from-tag, which
+    // identifies the (end-to-end) transaction (assuming the to-tag is
+    // different from the from-tag).
+    public String getCSeqCallId()
+    {
+        int i = transactionId.lastIndexOf(",");
+        String s = (i == -1) ? transactionId : transactionId.substring(0, i);
+        return (s);
+    }
+
+    // Returns the dialog identifier, the Call-Id, the to-tag, and the
+    // from-tag, which identifies the dialog.
+    public String getDialogId()
+    {
+        int i = transactionId.indexOf(",");
+        String s = (i == -1) ? transactionId : transactionId.substring(i + 1);
+        return (s);
+    }
+
+    public String getCallId()
+    {
+        int i = transactionId.indexOf(",");
+        int j = (i == -1) ? -1 : transactionId.indexOf(",", i + 1);
+        String s = (j == -1) ? transactionId : transactionId.substring(i + 1, j);
+        return (s);
+    }
+
     public String getFrameId() {
         return (frameId);
     }

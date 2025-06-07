@@ -109,12 +109,14 @@ public class AudioCodesFxoGatewayTest extends TestCase {
         m_gateway.generateFiles(location);
         assertTrue(location.toString().length() > 0);
     }
-
+    
     public void testPrepareSettings() throws Exception {
         IMocksControl defaultsCtrl = EasyMock.createControl();
         DeviceDefaults defaults = defaultsCtrl.createMock(DeviceDefaults.class);
-        defaults.getDomainName();
-        defaultsCtrl.andReturn("mysipdomain.com").anyTimes();
+
+        EasyMock.expect(defaults.getDomainName())
+                .andReturn("mysipdomain.com")
+                .anyTimes();
 
         defaultsCtrl.replay();
 

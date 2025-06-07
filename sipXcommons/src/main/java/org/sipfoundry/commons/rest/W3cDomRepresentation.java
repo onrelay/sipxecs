@@ -8,7 +8,7 @@
  *
  */
 
-package org.sipfoundry.commons.rest;
+package org.sipfoundry.common.rest;
 
 import org.restlet.data.MediaType;
 import org.restlet.representation.WriterRepresentation;

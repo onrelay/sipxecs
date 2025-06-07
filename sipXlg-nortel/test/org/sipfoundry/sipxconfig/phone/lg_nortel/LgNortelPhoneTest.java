@@ -19,7 +19,7 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.sipfoundry.sipxconfig.common.CoreContext;
@@ -209,8 +209,9 @@ public class LgNortelPhoneTest extends TestCase {
         PhoneContext phoneContext = phoneContextControl.createMock(PhoneContext.class);
         PhoneTestDriver.supplyVitalTestData(phoneContextControl, phoneContext, phone);
 
-        phoneContext.getSpeedDial(phone);
-        phoneContextControl.andReturn(sp).anyTimes();
+        EasyMock.expect(phoneContext.getSpeedDial(phone))
+                .andReturn(sp)
+                .anyTimes();
 
         phoneContextControl.replay();
 
@@ -302,8 +303,9 @@ public class LgNortelPhoneTest extends TestCase {
         PhoneContext phoneContext = phoneContextControl.createMock(PhoneContext.class);
         PhoneTestDriver.supplyVitalTestData(phoneContextControl, phoneContext, phone);
 
-        phoneContext.getSpeedDial(phone);
-        phoneContextControl.andReturn(sp).anyTimes();
+        EasyMock.expect(phoneContext.getSpeedDial(phone))
+                .andReturn(sp)
+                .anyTimes();
         phoneContextControl.replay();
 
         phone.getProfileTypes()[0].generate(phone, location);

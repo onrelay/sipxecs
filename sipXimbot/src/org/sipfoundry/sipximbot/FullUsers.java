@@ -8,7 +8,7 @@
  */
 package org.sipfoundry.sipximbot;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.sipfoundry.commons.userdb.User;
 import org.sipfoundry.commons.util.UnfortunateLackOfSpringSupportFactory;

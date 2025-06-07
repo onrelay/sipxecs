@@ -5,8 +5,6 @@
  */
 package org.sipfoundry.sipxrest.cdrlog;
 
-import org.sipfoundry.sipxconfig.rest.W3cDomRepresentation;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -32,6 +30,9 @@ import org.sipfoundry.commons.restconfig.RestServerConfig;
 import org.sipfoundry.sipxrest.RestServer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.sipfoundry.common.rest.W3cDomRepresentation;
+
 public class CdrLogRestlet extends Restlet {
 
     private static Logger logger = Logger.getLogger(CdrLogRestlet.class);

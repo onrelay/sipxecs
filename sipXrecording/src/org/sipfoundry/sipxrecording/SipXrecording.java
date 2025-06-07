@@ -26,12 +26,12 @@ import org.sipfoundry.conference.ConferenceContextImpl;
 import org.sipfoundry.conference.WebServer;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.convert.CustomConversions;
+import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import com.mongodb.client.MongoClient;
+import org.bson.Document;
 
 import com.hazelcast.core.Hazelcast;
-import org.bson.Document;
-import com.mongodb.Mongo;
 
 public class SipXrecording implements Runnable {
     static final Logger LOG = Logger.getLogger("org.sipfoundry.sipxrecording");
@@ -100,11 +100,11 @@ public class SipXrecording implements Runnable {
     }
 
     private static void initConferenceService() throws Exception {
-        Mongo mongo = MongoFactory.fromConnectionFile();
+        MongoClient mongo = MongoFactory.fromConnectionFile();
         List<Converter<Document, Conference>> converters = new ArrayList<Converter<Document, Conference>>();
         ConfReadConverter confReadConverter = new ConfReadConverter();
         converters.add(confReadConverter);
-        CustomConversions cc = new CustomConversions(converters);
+        MongoCustomConversions cc = new MongoCustomConversions(converters);
         MongoTemplate entityDb = new MongoTemplate(mongo, "imdb");
         MappingMongoConverter mappingConverter = (MappingMongoConverter)entityDb.getConverter();
         mappingConverter.setCustomConversions(cc);

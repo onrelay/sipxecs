@@ -30,13 +30,21 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLServerSocket;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -47,11 +55,6 @@ import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.HttpServer;
-import org.mortbay.http.SslListener;
-import org.mortbay.jetty.servlet.ServletHandler;
-import org.mortbay.util.ThreadedServer;
 import org.sipfoundry.commons.util.ShortHash;
 
 /**
@@ -201,9 +204,6 @@ public class Servlet extends HttpServlet {
         return null;
     }
 
-    /**
-     * Starts the Jetty servlet that handles auto-provision requests
-     */
     public static void start() {
         try {
             // The configuration.
@@ -213,7 +213,7 @@ public class Servlet extends HttpServlet {
             LOG.info("START.");
             LOG.debug(String.format("Unique ID - length: %d  set size: %d  combinations: %d.", ShortHash.ID_LENGTH,
                     ShortHash.ID_CHARS.length,
-                    new Double(Math.pow(ShortHash.ID_CHARS.length, ShortHash.ID_LENGTH)).intValue()));
+                    Double.valueOf(Math.pow(ShortHash.ID_CHARS.length, ShortHash.ID_LENGTH)).intValue()));
 
             // Dump the configuration into the log.
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -223,59 +223,70 @@ public class Servlet extends HttpServlet {
                 LOG.info(line);
             }
 
-            // This is what causes non-provisioned Polycoms to the HTTP request to the servlet.
+            // This is what causes non-provisioned Polycoms to send the HTTP request to the servlet.
             initializeStaticConfig(m_config);
 
-            // Start up jetty.
-            HttpServer server = new HttpServer();
+            // Create Jetty Server
+            Server server = new Server();
 
-            SslListener sslListener = new SslListener();
-            sslListener.setPort(m_config.getSecurePort());
-            String keystore = System.getProperties().getProperty("javax.net.ssl.keyStore");
+            // HTTP Connector
+            ServerConnector httpConnector = new ServerConnector(server);
+            httpConnector.setPort(m_config.getServletPort());
+            server.addConnector(httpConnector);
+
+            // HTTPS Connector
+            String keystore = System.getProperty("javax.net.ssl.keyStore");
             LOG.debug("keystore = " + keystore);
-            sslListener.setKeystore(keystore);
-            String algorithm = System.getProperties().getProperty("jetty.x509.algorithm");
+            String algorithm = System.getProperty("jetty.x509.algorithm");
             LOG.debug("algorithm = " + algorithm);
-            sslListener.setAlgorithm(algorithm);
-            String password = System.getProperties().getProperty("jetty.ssl.password");
-            sslListener.setPassword(password);
-            String keypassword = System.getProperties().getProperty("jetty.ssl.keypassword");
-            sslListener.setKeyPassword(keypassword);
-            sslListener.setMaxThreads(32);
-            sslListener.setMinThreads(4);
-            sslListener.setLingerTimeSecs(30000);
+            String password = System.getProperty("jetty.ssl.password");
+            String keypassword = System.getProperty("jetty.ssl.keypassword");
 
-            ((ThreadedServer) sslListener).open();
+            SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+            sslContextFactory.setKeyStorePath(keystore);
+            sslContextFactory.setKeyStorePassword(password);
+            sslContextFactory.setKeyManagerPassword(keypassword);
+            if (algorithm != null) {
+                sslContextFactory.setCertAlias(algorithm);
+            }
 
-            String[] cypherSuites = ((SSLServerSocket) sslListener.getServerSocket()).getSupportedCipherSuites();
+            sslContextFactory.setIncludeProtocols("TLSv1", "TLSv1.1", "TLSv1.2");
 
-            ((SSLServerSocket) sslListener.getServerSocket()).setEnabledCipherSuites(cypherSuites);
+            HttpConfiguration httpsConfig = new HttpConfiguration();
+            httpsConfig.setSecureScheme("https");
+            httpsConfig.setSecurePort(m_config.getSecurePort());
+            httpsConfig.addCustomizer(new org.eclipse.jetty.server.SecureRequestCustomizer());
 
-            String[] protocols = new String[]{"TLSv1", "TLSv1.1", "TLSv1.2"};
+            ServerConnector httpsConnector = new ServerConnector(
+                    server,
+                    new SslConnectionFactory(sslContextFactory, "http/1.1"),
+                    new HttpConnectionFactory(httpsConfig)
+            );
+            httpsConnector.setPort(m_config.getSecurePort());
+            server.addConnector(httpsConnector);
 
-            ((SSLServerSocket) sslListener.getServerSocket()).setEnabledProtocols(protocols);
-            sslListener.setMaxIdleTimeMs(60000);
-
-            server.addListener(sslListener);
-            sslListener.start();
-
-            // Bind the port on all interfaces.
-            server.addListener(":" + m_config.getServletPort());
-
-            HttpContext httpContext = new HttpContext();
-            httpContext.setContextPath("/");
+            // Setup the servlet context
+            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+            context.setContextPath("/");
 
             // Setup the servlet to call the class when the URL is fetched.
-            ServletHandler servletHandler = new ServletHandler();
-            servletHandler.addServlet(Servlet.class.getCanonicalName(), m_config.getServletUriPath() + "/*",
-                    Servlet.class.getName());
-            httpContext.addHandler(servletHandler);
-            server.addContext(httpContext);
+            ServletHolder servletHolder = new ServletHolder(Servlet.class);
+            context.addServlet(servletHolder, m_config.getServletUriPath() + "/*");
+
+            LOG.info(String.format("Adding Servlet %s on %s", Servlet.class.getCanonicalName(), m_config.getServletUriPath()));
+
+            // Attach context to server
+            server.setHandler(context);
 
             // Start it up.
-            LOG.info(String.format("Starting %s servlet on *:%d%s", Servlet.class.getCanonicalName(),
-                    m_config.getServletPort(), m_config.getServletUriPath()));
+            LOG.info(String.format("Starting %s servlet on HTTP *:%d%s and HTTPS *:%d",
+                    Servlet.class.getCanonicalName(),
+                    m_config.getServletPort(),
+                    m_config.getServletUriPath(),
+                    m_config.getSecurePort()));
+
             server.start();
+
         } catch (Exception e) {
             LOG.error("Failed to start the servlet:", e);
         }

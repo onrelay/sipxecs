@@ -403,7 +403,7 @@ function setupRocky9()
     fi 
 
     echo "installing standard base OS repo tools"
-    sudo dnf install ${INSTALL_OPTIONS} libtool gcc-c++ openssl-devel boost-devel poco-devel cppunit-devel java-17-openjdk-devel 
+    sudo dnf install ${INSTALL_OPTIONS} libtool gcc-c++ openssl-devel boost-devel poco-devel java-17-openjdk-devel 
 
     ERROR=$?
     if [ ${ERROR} -ne 0 ]; then 

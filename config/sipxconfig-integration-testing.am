@@ -43,7 +43,6 @@ sipxconfig_web_test_PKGS = \
 
 sipxconfig_test_integration_PKGS = \
 	$(sipxconfig_test_integration_core_PKGS) \
-	cdr-bindings \
 	sipxconfig-neoconf \
 	sipxconfig-web
 

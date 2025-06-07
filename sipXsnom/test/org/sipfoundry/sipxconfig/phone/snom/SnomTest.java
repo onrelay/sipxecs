@@ -9,6 +9,8 @@
 
 package org.sipfoundry.sipxconfig.phone.snom;
 
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
 import static org.easymock.EasyMock.createNiceControl;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expectLastCall;
@@ -23,7 +25,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
-import org.easymock.IMocksControl;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.phone.Phone;
 import org.sipfoundry.sipxconfig.phone.PhoneContext;
@@ -151,13 +152,19 @@ public class SnomTest extends TestCase {
 
         phone.setModel(model);
 
-        IMocksControl phoneContextControl = createNiceControl();
+        IMocksControl phoneContextControl = EasyMock.createNiceControl();
         PhoneContext phoneContext = phoneContextControl.createMock(PhoneContext.class);
+
         PhoneTestDriver.supplyVitalTestData(phoneContextControl, phoneContext, phone);
-        phoneContext.getSpeedDial(phone);
-        phoneContextControl.andReturn(sp).anyTimes();
-        phoneContext.getPhonebookEntries(phone);
-        phoneContextControl.andReturn(m_emptyPhonebook).anyTimes();
+
+        EasyMock.expect(phoneContext.getSpeedDial(phone))
+                .andReturn(sp)
+                .anyTimes();
+
+        EasyMock.expect(phoneContext.getPhonebookEntries(phone))
+                .andReturn(m_emptyPhonebook)
+                .anyTimes();
+
         phoneContextControl.replay();
 
         MemoryProfileLocation location = TestHelper.setVelocityProfileGenerator(phone, TestHelper.getEtcDir());
@@ -184,18 +191,24 @@ public class SnomTest extends TestCase {
         PhonebookEntry entryWithSpecialChars = new PhonebookEntry();
         entryWithSpecialChars.setFirstName("&first");
         entryWithSpecialChars.setLastName("<last>");
-        List< ? extends PhonebookEntry> phonebook = Arrays.asList(new DummyEntry("1"), new DummyEntry("3"),
+        List<PhonebookEntry> phonebook = Arrays.asList(new DummyEntry("1"), new DummyEntry("3"),
                 new DummyEntry("5"), entryWithSpecialChars);
 
         phone.setModel(model);
 
-        IMocksControl phoneContextControl = createNiceControl();
+        IMocksControl phoneContextControl = EasyMock.createNiceControl();
         PhoneContext phoneContext = phoneContextControl.createMock(PhoneContext.class);
+
         PhoneTestDriver.supplyVitalTestData(phoneContextControl, phoneContext, phone);
-        phoneContext.getPhonebookEntries(phone);
-        phoneContextControl.andReturn(phonebook).anyTimes();
-        phoneContext.getSpeedDial(phone);
-        phoneContextControl.andReturn(null).anyTimes();
+
+        EasyMock.expect(phoneContext.getPhonebookEntries(phone))
+                .andReturn(phonebook)
+                .anyTimes();
+
+        EasyMock.expect(phoneContext.getSpeedDial(phone))
+                .andReturn(null)
+                .anyTimes();
+
         phoneContextControl.replay();
 
         MemoryProfileLocation location = TestHelper.setVelocityProfileGenerator(phone, TestHelper.getEtcDir());

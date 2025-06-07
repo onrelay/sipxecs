@@ -25,6 +25,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.phonebook.Phonebook;
 import org.sipfoundry.sipxconfig.phonebook.PhonebookManager;
+import org.sipfoundry.common.rest.Dom4jRepresentation;
 
 public class PhonebooksResource extends ServerResource {
     private PhonebookManager m_phonebookManager;

@@ -110,8 +110,9 @@ public class GtekAquiferPhoneTest extends TestCase {
         PhoneContext phoneContext = phoneContextControl.createMock(PhoneContext.class);
         PhoneTestDriver.supplyVitalTestData(phoneContextControl, phoneContext, phone);
 
-        phoneContext.getSpeedDial(phone);
-        phoneContextControl.andReturn(sp).anyTimes();
+        EasyMock.expect(phoneContext.getSpeedDial(phone))
+                .andReturn(sp)
+                .anyTimes();
         phoneContextControl.replay();
 
         phone.getProfileTypes()[0].generate(phone, location);

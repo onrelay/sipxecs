@@ -1,33 +1,45 @@
 package org.sipfoundry.conference;
 
 import org.apache.log4j.Logger;
-import org.mortbay.http.HttpContext;
-import org.mortbay.http.HttpServer;
-import org.mortbay.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.sipfoundry.sipxrecording.RecordingConfiguration;
 
 public class WebServer {
     private static int PORT = RecordingConfiguration.get().getJettyPort();
     static final Logger LOG = Logger.getLogger("org.sipfoundry.sipxrecording");
     private static WebServer instance;
-    private HttpServer server;
+    private Server server;
+
     private WebServer() {
         try {
-            server = new HttpServer();
-            HttpContext httpContext = new HttpContext();
-            httpContext.setContextPath("/");
-            ServletHandler handler = new ServletHandler();
-            addServlet(handler, "conference", "/conference/*", ConferenceServlet.class.getName());
-            addServlet(handler, "recordconference", "/recordconference/*", RecordConferenceServlet.class.getName());
-            httpContext.addHandler(0, handler);
-            server.addContext(httpContext);
-            server.addListener(":" + PORT);
+            server = new Server();
+
+            // Create connector
+            ServerConnector connector = new ServerConnector(server);
+            connector.setPort(PORT);
+            server.addConnector(connector);
+
+            // Create context handler (replaces HttpContext)
+            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+            context.setContextPath("/");
+
+            // Add servlets
+            addServlet(context, "conference", "/conference/*", ConferenceServlet.class);
+            addServlet(context, "recordconference", "/recordconference/*", RecordConferenceServlet.class);
+
+            // Attach context to server
+            server.setHandler(context);
+
             LOG.info(String.format("Starting Jetty server on port: %d", PORT));
         } catch (Exception e) {
             server = null;
-            LOG.error(String.format("Cannot instantiate jetty server on port *:%d", PORT), e);
+            LOG.error(String.format("Cannot instantiate Jetty server on port *:%d", PORT), e);
         }
     }
+
     public static synchronized WebServer getInstance() {
         if (instance == null) {
             instance = new WebServer();
@@ -36,13 +48,15 @@ public class WebServer {
     }
 
     /**
-     * add a servlet for the Web server to use
+     * Add a servlet for the Web server to use
      * @param name
      * @param pathSpec
      * @param servletClass must be of type jakarta.servlet.Servlet
      */
-    private void addServlet(ServletHandler handler, String name, String pathSpec, String servletClass) {
-        handler.addServlet(name, pathSpec, servletClass);
+    private void addServlet(ServletContextHandler context, String name, String pathSpec, Class<? extends jakarta.servlet.Servlet> servletClass) {
+        ServletHolder holder = new ServletHolder(servletClass);
+        holder.setName(name);
+        context.addServlet(holder, pathSpec);
         LOG.info(String.format("Adding Servlet %s on %s", name, pathSpec));
     }
 
@@ -55,7 +69,7 @@ public class WebServer {
                 LOG.error("Error starting server ", ex);
                 return false;
             }
-        } else if (server.isStarted()) {
+        } else if (server != null && server.isStarted()) {
             return true;
         } else {
             LOG.error("Error creating server");

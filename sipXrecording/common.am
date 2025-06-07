@@ -22,10 +22,12 @@ recording_PKGS = \
 	slf4j-log4j12 \
 	commons-io \
 	commons-codec \
-	commons-httpclient5 \
+	httpclient5 \
 	commons-logging \
 	jakarta.servlet \
-	mongo \
+	mongodb-driver-core \
+	mongodb-driver-sync \
+	bson \
 	spring-data-mongodb \
 	spring-data-commons \
 	spring-core \
@@ -35,4 +37,6 @@ recording_PKGS = \
 	spring-expression \
 	commons-lang \
 	jetty-server \
+	jetty-ee10-servlet \
+	jetty-util \
 	hazelcast-all

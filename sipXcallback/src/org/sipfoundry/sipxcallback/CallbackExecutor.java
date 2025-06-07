@@ -16,7 +16,7 @@
  */
 package org.sipfoundry.sipxcallback;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.sipfoundry.commons.freeswitch.BridgeCommand;
 import org.sipfoundry.commons.freeswitch.Broadcast;

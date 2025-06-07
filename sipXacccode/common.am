@@ -7,7 +7,9 @@ sipxacc_PKGS = \
 	dom4j \
 	jaxen \
 	log4j \
-	mongo \
+	mongodb-driver-core \
+	mongodb-driver-sync \
+	bson \
 	sipxcommons
 
 sipxacc_JAVAROOT = $(abspath $(top_builddir)/src/classes)

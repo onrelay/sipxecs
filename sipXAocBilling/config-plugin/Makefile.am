@@ -25,7 +25,9 @@ iantaocbilling_PKGS = \
 	commons-io \
 	commons-lang \
 	commons-logging \
-	mongo \
+	mongodb-driver-core \
+	mongodb-driver-sync   \
+	bson  \	
 	tapestry-annotations \
 	tapestry-framework \
 	spring-core \

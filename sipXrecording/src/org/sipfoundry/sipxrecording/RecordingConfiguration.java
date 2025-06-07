@@ -8,7 +8,7 @@
  */
 package org.sipfoundry.sipxrecording;
 
-import static org.apache.commons.lang3.StringUtils.split;
+import static org.apache.commons.lang.StringUtils.split;
 
 import java.io.File;
 import java.io.FileInputStream;

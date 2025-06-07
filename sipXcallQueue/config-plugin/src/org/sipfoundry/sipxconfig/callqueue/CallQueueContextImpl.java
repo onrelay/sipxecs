@@ -467,7 +467,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
         if (null == callqueueagentid) {
             return Collections.EMPTY_LIST;
         }
-        Query query = getSession()
+        Query query = getHibernateTemplate().getSessionFactory().getCurrentSession()
                 .createSQLQuery(
                         "(SELECT q.* FROM freeswitch_extension q WHERE freeswitch_ext_type = 'q')" + " EXCEPT"
                                 + " (SELECT DISTINCT q.* FROM freeswitch_extension q"
@@ -483,7 +483,8 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
         if (null == callqueueid) {
             return Collections.EMPTY_LIST;
         }
-        Query query = getSession().createSQLQuery(
+        Query query = getHibernateTemplate().getSessionFactory().getCurrentSession()
+            .createSQLQuery(
                 "SELECT DISTINCT t.call_queue_agent_id FROM call_queue_tier t WHERE t.freeswitch_ext_id = :"
                         + QUERY_PARAM_QUEUE_ID).setParameter(QUERY_PARAM_QUEUE_ID, callqueueid.intValue());
         List<Integer> result = query.list();
@@ -494,7 +495,8 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
         if (null == callqueueAgentId) {
             return Collections.EMPTY_LIST;
         }
-        Query query = getSession().createSQLQuery(
+        Query query = getHibernateTemplate().getSessionFactory().getCurrentSession()
+            .createSQLQuery(
                 "SELECT q.freeswitch_ext_id FROM freeswitch_extension q INNER JOIN call_queue_tier t"
                         + " ON q.freeswitch_ext_id=t.freeswitch_ext_id where t.call_queue_agent_id=:callqueueagentid")
                 .setParameter(QUERY_PARAM_AGENT_ID, callqueueAgentId);

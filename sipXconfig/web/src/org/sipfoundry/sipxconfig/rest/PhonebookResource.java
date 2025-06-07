@@ -35,6 +35,8 @@ import org.sipfoundry.sipxconfig.bulk.csv.SimpleCsvWriter;
 import org.sipfoundry.sipxconfig.phonebook.Phonebook;
 import org.sipfoundry.sipxconfig.phonebook.PhonebookEntry;
 import org.sipfoundry.sipxconfig.phonebook.PhonebookManager;
+import org.sipfoundry.common.rest.Dom4jRepresentation;
+
 
 public class PhonebookResource extends ServerResource {
     private static final MediaType CSV = new MediaType("text/comma-separated-values");

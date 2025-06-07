@@ -14,7 +14,6 @@ sipxconfig_neoconf_PKGS = \
 	commons-lang3 \
 	commons-logging \
 	commons-net \
-	dom4j \
 	gdata-client \
 	gdata-contacts \
 	gdata-contacts \
@@ -84,6 +83,7 @@ sipxconfig_neoconf_PKGS = \
 	slf4j-api \
 	slf4j-log4j12 \
 	snmp4j \
+	dom4j \
 	thumbnailator \
 	velocity \
 	velocity-tools-generic \

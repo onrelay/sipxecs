@@ -16,7 +16,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.sipfoundry.sipxconfig.common.User;
@@ -109,8 +109,9 @@ public class AastraPhoneTest extends TestCase {
         PhoneContext phoneContext = phoneContextControl.createMock(PhoneContext.class);
         PhoneTestDriver.supplyVitalTestData(phoneContextControl, phoneContext, phone);
 
-        phoneContext.getSpeedDial(phone);
-        phoneContextControl.andReturn(sp).anyTimes();
+        EasyMock.expect(phoneContext.getSpeedDial(phone))
+                .andReturn(sp)
+                .anyTimes();
 
         phoneContextControl.replay();
 
@@ -149,8 +150,9 @@ public class AastraPhoneTest extends TestCase {
         PhoneContext phoneContext = phoneContextControl.createMock(PhoneContext.class);
         PhoneTestDriver.supplyVitalTestData(phoneContextControl, phoneContext, phone);
 
-        phoneContext.getSpeedDial(phone);
-        phoneContextControl.andReturn(sp).anyTimes();
+        EasyMock.expect(phoneContext.getSpeedDial(phone))
+                .andReturn(sp)
+                .anyTimes();
 
         phoneContextControl.replay();
 

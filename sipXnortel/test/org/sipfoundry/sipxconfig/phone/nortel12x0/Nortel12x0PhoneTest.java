@@ -177,10 +177,13 @@ public class Nortel12x0PhoneTest extends TestCase {
 
         IMocksControl phoneContextControl = EasyMock.createNiceControl();
         PhoneContext phoneContext = phoneContextControl.createMock(PhoneContext.class);
+
         PhoneTestDriver.supplyVitalTestData(phoneContextControl, phoneContext, phone);
 
-        phoneContext.createSpecialPhoneProvisionUser(phone.getSerialNumber());
-        phoneContextControl.andReturn(special_user).once();
+        EasyMock.expect(phoneContext.createSpecialPhoneProvisionUser(phone.getSerialNumber()))
+                .andReturn(special_user)
+                .once();
+
         phoneContextControl.replay();
 
         phone.setPhoneContext(phoneContext);
@@ -294,8 +297,9 @@ public class Nortel12x0PhoneTest extends TestCase {
         PhoneContext phoneContext = phoneContextControl.createMock(PhoneContext.class);
         PhoneTestDriver.supplyVitalTestData(phoneContextControl, phoneContext, phone);
 
-        phoneContext.getSpeedDial(phone);
-        phoneContextControl.andReturn(sp).anyTimes();
+        EasyMock.expect(phoneContext.getSpeedDial(phone))
+                .andReturn(sp)
+                .anyTimes();
         phoneContextControl.replay();
 
         phone.setPhoneContext(phoneContext);
@@ -320,15 +324,18 @@ public class Nortel12x0PhoneTest extends TestCase {
         PhoneTestDriver.supplyTestData(phone);
         MemoryProfileLocation location = TestHelper.setVelocityProfileGenerator(phone, TestHelper.getEtcDir());
 
-        List< ? extends PhonebookEntry> phonebook = Arrays.asList(new DummyEntry("001"), new DummyEntry("003"),
+        List<PhonebookEntry> phonebook = Arrays.asList(new DummyEntry("001"), new DummyEntry("003"),
                 new DummyEntry("005"));
 
         IMocksControl phoneContextControl = EasyMock.createNiceControl();
         PhoneContext phoneContext = phoneContextControl.createMock(PhoneContext.class);
+
         PhoneTestDriver.supplyVitalTestData(phoneContextControl, phoneContext, phone);
 
-        phoneContext.getPhonebookEntries(phone);
-        phoneContextControl.andReturn(phonebook).anyTimes();
+        EasyMock.expect(phoneContext.getPhonebookEntries(phone))
+                .andReturn(phonebook)
+                .anyTimes();
+
         phoneContextControl.replay();
 
         phone.setPhoneContext(phoneContext);

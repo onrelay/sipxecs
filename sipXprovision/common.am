@@ -25,5 +25,7 @@ provision_PKGS = \
 	commons-io \
 	commons-logging \
 	jakarta.servlet \
-	velocity \
-	jetty
+	jetty-server \
+	jetty-util \
+	jetty-ee10-servlet \
+	velocity

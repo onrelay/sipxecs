@@ -7,7 +7,9 @@ sipxcall_PKGS = \
 	dom4j \
 	jaxen \
 	log4j \
-	mongo \
+	mongodb-driver-core \
+	mongodb-driver-sync \
+	bson  \	
 	sipxcommons \
 	slf4j-api \
 	slf4j-log4j12 \

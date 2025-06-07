@@ -11,7 +11,7 @@ package org.sipfoundry.sipxconfig.phone.Ciscospa;
 
 import org.sipfoundry.sipxconfig.phone.PhoneModel;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * Static differences in linksys models

@@ -1,16 +1,18 @@
 imbot_PKGS = \
 	sipxcommons \
-	mongo \
 	log4j \
 	smack \
 	smackx \
 	commons-io \
 	commons-codec \
-	commons-httpclient \
 	commons-lang \
 	commons-logging \
+	httpclient5 \
+	httpcore5 \
 	jakarta.servlet \
-	mongo \
+	mongodb-driver-core \
+	mongodb-driver-sync  \
+	bson \	
 	xmlrpc-client \
 	ws-commons-util \
 	jcl-over-slf4j \

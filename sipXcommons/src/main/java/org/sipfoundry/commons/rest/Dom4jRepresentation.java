@@ -8,7 +8,7 @@
  *
  */
 
-package org.sipfoundry.sipxconfig.rest;
+package org.sipfoundry.common.rest;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
