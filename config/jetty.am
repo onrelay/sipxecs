@@ -1,0 +1,19 @@
+# Include this file to use the Jetty libraries
+# Assumes BuildRequires: jetty which installs Jetty at /usr/share/jetty
+
+jetty_PKGS = \
+	start \
+  	jetty-deploy \
+	jetty-ee \
+	jetty-ee10-servlet \
+	jetty-ee10-webapp \
+  	jetty-http \
+	jetty-io \
+	jetty-security \
+	jetty-server \
+	jetty-session \
+	jetty-util \
+	jetty-xml
+
+jetty_DEPS = \
+	$(call JavaDep,@SIPX_JETTY_HOME@ @SIPX_JETTY_HOME@/lib,$(jetty_PKGS))

@@ -113,7 +113,7 @@ bundle edit_line sipx_log4j_properties_contents {
 	  "log4j.appender.file.layout=org.sipfoundry.commons.log4j.SipFoundryLayout";
 	  "log4j.additivity.org.apache.cxf.interceptor=true";
 	  "# legal values (highest to lowest): debug info warn error fatal";
-	  "log4j.rootLogger=warn, file";
+	  "log4j.rootLogger=debug, file";
 	  "# LDAP log";
 	  "log4j.logger.ldap_logger=debug,ldap";
 	  "log4j.additivity.ldap_logger=false";

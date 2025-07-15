@@ -462,6 +462,17 @@ function setupRocky9()
         fi 
     fi
 
+    if [ "${SUBPROJECT}" != "jetty" ] && [ "${SUBPROJECT}" != "lib" ]; then
+        echo "installing jetty from sipxcom repo"
+        sudo dnf install ${INSTALL_OPTIONS} jetty 
+
+        ERROR=$?
+        if [ ${ERROR} -ne 0 ]; then 
+            echo "dnf install error, exiting sipxecs-build"
+            exit ${ERROR}
+        fi 
+    fi
+
     if [ "${SUBPROJECT}" != "cfengine" ] && [ "${SUBPROJECT}" != "lib" ]; then
         echo "installing cfengine from sipxcom repo"
         sudo dnf install ${INSTALL_OPTIONS} cfengine-community

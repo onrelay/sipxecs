@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "https://jetty.org/configure_10_0.dtd">
+<Configure class="org.eclipse.jetty.ee10.webapp.WebAppContext">
+  <Set name="contextPath">/cmcprov</Set>
+  <Set name="war"><SystemProperty name="jetty.lib.dir"/>/cmcprov.war</Set>
+  <Set name="extractWAR">true</Set>
+  <Set name="tempDirectory"><SystemProperty name="jetty.tmp.dir"/>/cmcprov</Set>
+  <Set name="crossContextDispatchSupported">true</Set>
+</Configure>

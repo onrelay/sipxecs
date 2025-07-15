@@ -65,6 +65,10 @@ PluginDir=@SIPX_JAVADIR@/sipXconfig/plugins
 CommonsLibDir=@SIPX_JAVADIR@/sipXcommons
 LogDir=@SIPX_LOGDIR@
 TmpDir=@SIPX_TMPDIR@
+JettyHomeDir=@SIPX_JETTY_HOME@
+JettyBaseDir=@SIPX_CONFDIR@/jetty
+KeyStore=@SIPX_CONFDIR@/ssl/ssl-web.keystore
+TrustStore=@SIPX_CONFDIR@/ssl/authorities.jks
 prog=sipxconfig
 regex="Dprocname=sipxconfig"
 waitForListenPortTime=900
@@ -76,7 +80,7 @@ waitForListenPortTime=900
 Database=sipxconfig
 RequiredDatabaseVersion=13
 IndexDir=${TmpDir}/index
-Dependencies=`@SIPX_BINDIR@/java-dep -d ${CommonsLibDir} -d ${LibDir} sipxconfig sipxconfig-web @web_PKGS@ cdr-binding`
+Dependencies=`@SIPX_BINDIR@/java-dep -d ${CommonsLibDir} -d ${LibDir} sipxconfig sipxconfig-web @web_PKGS@`
 export CLASSPATH=`echo @SIPX_CONFDIR@ ${Dependencies} ${PluginDir}/*.jar | sed -e 's/ /:/g'`
 
 #source @SIPX_CONFDIR@/postgres-pwd.properties
@@ -169,18 +173,25 @@ buildCommand() {
   # -Dprocname needs to be early in the command so cfengine can detect it
   Command="$JavaCmd \
      -Dprocname=${procNameId} \
-     -XX:MaxPermSize=128M \
+     -XX:MaxMetaspaceSize=128M \
      -Xmx1024m \
      ${SIPXCONFIG_OPTS} \
      ${TrustStoreOpts} \
      -Djava.io.tmpdir=${TmpDir} \
+     -Dorg.apache.lucene.lockdir=${IndexDir} \
+     -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger \
      -Djetty.lib.dir=@SIPX_JAVADIR@/sipXconfig \
      -Djetty.conf.dir=@SIPX_CONFDIR@ \
      -Djetty.tmp.dir=@SIPX_TMPDIR@ \
      -Djetty.log.dir=${LogDir} \
-     -Dorg.apache.lucene.lockdir=${IndexDir} \
-     -Dorg.apache.commons.loging.Log=org.apache.commons.logging.impl.Log4JLogger \
-     -Dorg.eclipse.jetty.server.Request.maxFormKeys=2000 \
+     -Djetty.server.Request.maxFormKeys=2000 \
+     -Djetty.home=${JettyHomeDir} \
+     -Djetty.base=${JettyBaseDir} \
+     -Djetty.sslContext.keyStorePath=${KeyStore} \
+     -Djetty.sslContext.keyStorePassword=changeit \
+     -Djetty.sslContext.trustStorePath=${TrustStore} \
+     -Djetty.sslContext.trustStorePassword=changeit \
+     -Djetty.sslContext.excludeProtocols=SSLv3 \
      -Djava.awt.headless=true"
 }
 
@@ -203,7 +214,12 @@ start() {
   databaseVersionCheck
   clearIndexLocks
   buildCommand $prog
-  Command="$Command org.eclipse.jetty.xml.XmlConfiguration @SIPX_CONFDIR@/sipxconfig-jetty.xml"
+  if [[ -s "${KeyStore}" ]]; then
+    Command="$Command -jar ${JettyHomeDir}/start.jar --modules=ssl"
+  else 
+    Command="$Command -jar ${JettyHomeDir}/start.jar" 
+  fi
+  $Command >> ${LogDir}/sipxconfig.log 2>&1
   if [ -n "${NoFork}" ] ; then
     killAnyOrphans @SIPXPBXUSER@ $regex
     runuser -m -s @BASH@ @SIPXPBXUSER@ -c "${Command}"
