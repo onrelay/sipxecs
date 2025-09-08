@@ -120,6 +120,7 @@ lib_all = \
   jasperserver \
   libjsonrpccpp \
   libevent2 \
+  jetty \
   mongo-cxx-driver \
   dart-sdk \
   bcg729
