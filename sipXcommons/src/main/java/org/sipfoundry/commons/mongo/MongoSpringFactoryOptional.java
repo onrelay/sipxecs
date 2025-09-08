@@ -5,6 +5,7 @@ import java.io.File;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.MongoExceptionTranslator;
 
 import com.mongodb.ClientSessionOptions;
 import com.mongodb.client.ClientSession;
@@ -38,7 +39,7 @@ public class MongoSpringFactoryOptional implements MongoDatabaseFactory {
     }
 
     public PersistenceExceptionTranslator getExceptionTranslator() {
-        throw new UnsupportedOperationException("Unimplemented method 'getExceptionTranslator'");
+        return new MongoExceptionTranslator();
     }
 
     public ClientSession getSession(ClientSessionOptions options) {

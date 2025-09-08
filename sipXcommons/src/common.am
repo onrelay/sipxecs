@@ -42,18 +42,10 @@ commons_PKGS = \
 	jakarta.servlet-api \
 	jakarta.activation-api \
 	jakarta.xml.bind-api \
+	jakarta.xml.ws-api \
 	jaxb-core \
-	jaxb-api \
 	jaxb-impl \
-	jetty-http \
-	jetty-io \
-	jetty-security \
-	jetty-server \
-	jetty-ee10-servlet \
-	jetty-ee10-servlets \
-	jetty-util \
-	jetty-ee10-webapp \
-	jetty-xml \
+	jaxb-runtime \
 	spring-security-cas \
 	spring-security-config \
 	spring-security-core \
@@ -62,15 +54,19 @@ commons_PKGS = \
 	spring-security-web \
 	spring-security-jwt \
 	spring-web \
+	spring-beans \
+	spring-core \
 	spring-webmvc \	
 	joda-time \
 	hazelcast-all \
 	reflections \
 	guava \
-	jackson-core-asl \
-	jackson-mapper-asl \
 	jackson-annotations \
 	jackson-databind \
+	jackson-core \
+	jackson-jakarta-rs-json-provider \
+	jackson-jakarta-rs-base \
 	mongodb-driver-core \
 	mongodb-driver-sync   \
 	bson
+

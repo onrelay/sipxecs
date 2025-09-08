@@ -21,6 +21,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.PersistenceExceptionTranslator;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+import org.springframework.data.mongodb.core.MongoExceptionTranslator;
 
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.ClientSession;
@@ -89,7 +90,7 @@ private MongoDatabaseFactory getDelegate() {
 
     @Override
     public PersistenceExceptionTranslator getExceptionTranslator() {
-        throw new UnsupportedOperationException("Unimplemented method 'getExceptionTranslator'");
+        return new MongoExceptionTranslator();
     }
 
     @Override

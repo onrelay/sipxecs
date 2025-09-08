@@ -1,5 +1,6 @@
 include $(top_srcdir)/config/utility.am
 include $(top_srcdir)/config/java.am
+include $(top_srcdir)/config/jetty.am
 include $(top_srcdir)/src/common.am
 
 EXTRA_DIST = \
@@ -17,5 +18,6 @@ commons_RESOURCES = \
 
 commons_DEPS = \
 	$(JAVAROOT) \
+	$(jetty_DEPS) \
 	$(call JavaDep, $(top_srcdir)/lib, $(commons_PKGS)) \
 	$(commons_runtime_DEPS)
