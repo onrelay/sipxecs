@@ -5,5 +5,5 @@
 // Generated on: 2012.09.11 at 10:54:36 AM EEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "urn:ietf:params:xml:ns:dialog-info", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "urn:ietf:params:xml:ns:dialog-info", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package ietf.params.xml.ns.dialog_info;

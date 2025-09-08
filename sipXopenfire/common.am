@@ -1,11 +1,13 @@
 cfg_PKGS = \
 	sipxconfig-neoconf \
 	sipxcommons \
-	velocity \
+	velocity-engine-core \
 	commons-lang \
 	commons-io \
 	dom4j \
+	jakarta.persistence-api \
 	spring-beans \
+	spring-velocity-support \
 	spring-core \
 	spring-tx \
 	xercesImpl \
@@ -22,6 +24,7 @@ plugin_JAR_PKGS = \
 	commons-collections4 \
 	commons-digester \
 	commons-io \
+	jakarta.persistence-api \
 	dnsjava \
 	dom4j \
 	jain-sip-sdp \
@@ -60,7 +63,7 @@ plugin_PKGS = \
 	spring-beans \
 	spring-expression \
 	spring-jdbc \
-	jaxb-api \
+	jakarta.xml.bind-api \
 	bson \
 	mongodb-driver-core \
 	mongodb-driver-sync \

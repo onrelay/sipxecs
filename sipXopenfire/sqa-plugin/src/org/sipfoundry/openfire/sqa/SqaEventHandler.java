@@ -23,7 +23,7 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBContext;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;

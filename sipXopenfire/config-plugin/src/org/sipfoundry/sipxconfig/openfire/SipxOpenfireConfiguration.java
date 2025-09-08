@@ -55,7 +55,7 @@ public class SipxOpenfireConfiguration {
         context.put("restAddress", restAddress);
         context.put("restPublicAddress", restPublicAddress);
         try {
-            m_velocityEngine.mergeTemplate("openfire/sipxopenfire.vm", context, writer);
+            m_velocityEngine.mergeTemplate("openfire/sipxopenfire.vm", "UTF-8", context, writer);
         } catch (Exception e) {
             throw new IOException(e);
         }
