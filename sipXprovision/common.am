@@ -1,14 +1,16 @@
 cfg_PKGS = \
 	sipxconfig-neoconf \
 	sipxcommons \
-	velocity \
+	velocity-engine-core \
 	commons-lang \
 	commons-io \
 	commons-logging \
 	dom4j \
+	jakarta.persistence-api \
 	spring-beans \
 	spring-core \
 	spring-tx \
+	spring-velocity-support \
 	xercesImpl \
 	sipxconfig-neoconf \
 	sipxconfig-web \
@@ -24,8 +26,6 @@ provision_PKGS = \
 	commons-lang \
 	commons-io \
 	commons-logging \
+	jakarta.persistence-api \
 	jakarta.servlet \
-	jetty-server \
-	jetty-util \
-	jetty-ee10-servlet \
 	velocity

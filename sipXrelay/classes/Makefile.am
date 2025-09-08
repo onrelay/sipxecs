@@ -1,5 +1,6 @@
 include $(top_srcdir)/config/utility.am
 include $(top_srcdir)/config/java.am
+include $(top_srcdir)/config/jetty.am
 include $(top_srcdir)/common.am
 
 noinst_DATA = javac-relay
@@ -12,6 +13,7 @@ relay_SRC = \
 
 relay_DEPS = \
 	$(JAVAROOT) \
+	$(jetty_DEPS) \
 	$(call JavaDep, @SIPX_JAVADIR@/sipXcommons, $(relay_PKGS))
 
 jardir = @SIPX_JAVADIR@/sipXbridge

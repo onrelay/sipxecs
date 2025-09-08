@@ -10,18 +10,9 @@ ivr_PKGS = \
 	jaudiotagger \
 	jakarta.mail \
 	jakarta.servlet \
+	jakarta.servlet-api \
 	jakarta.activation-api \
 	jaxen \
-	jetty-server \
-	jetty-util \
-	jetty-http \
-	jetty-xml \
-	jetty-ee10-servlet \
-	jetty-ee10-servlets \
-	jetty-security \
-	jetty-deploy \
-	jetty-io \
-	jetty-ee10-webapp \
 	log4j \
 	mongodb-driver-core \
 	mongodb-driver-sync \

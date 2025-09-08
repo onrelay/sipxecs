@@ -9,6 +9,9 @@ Vendor: Telecats B.V.
 Packager: Niek Vlessert <niekvlessert@gmail.com>
 Url: http://www.telecats.nl/
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
 Requires: sipxproxy >= %version
 
 BuildRequires: automake

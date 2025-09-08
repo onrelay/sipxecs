@@ -3,7 +3,6 @@ sipxcall_PKGS = \
 	commons-codec \
 	commons-lang \
 	commons-io \
-	commons-logging \
 	dom4j \
 	jaxen \
 	log4j \

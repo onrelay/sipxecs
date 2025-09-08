@@ -1,5 +1,6 @@
 include $(top_srcdir)/config/utility.am
 include $(top_srcdir)/config/java.am
+include $(top_srcdir)/config/jetty.am
 include $(top_srcdir)/common.am
 
 # None of the unit tests work so renamed javac-test to javac-xtest so it at least compiles
@@ -13,6 +14,7 @@ xtest_SRC = $(shell cd $(srcdir); find . -name '*.java')
 
 xtest_DEPS = \
 	$(JAVAROOT) \
+	$(jetty_DEPS) \
 	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,junit $(relay_PKGS)) \
 	$(top_builddir)/src/main/java/classes
 

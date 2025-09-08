@@ -8,6 +8,10 @@ Group: Telcommunications
 Vendor: IANT GmbH
 Packager: IANT GmbH <info@iant.de>
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
+
 Requires: sipxproxy >= %version
 
 BuildRequires: automake

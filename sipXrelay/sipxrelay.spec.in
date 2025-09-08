@@ -15,18 +15,17 @@ Url: http://www.sipfoundry.org/sipXbridge
 BuildRequires: automake
 BuildRequires: java-17-openjdk-devel
 BuildRequires: zip
+BuildRequires: jetty
 BuildRequires: sipxcommons >= %version
 
 Source: %name-%version.tar.gz
+
+Requires: jetty
 
 Requires: sipxcommserverlib >= %version
 Requires: sipxcommons >= %version
 Requires: chkconfig
 
-%if %{?use_ibm_jvm}0
-Requires: java-ibm >= 1.6
-Requires: java-ibm-unrestricted
-%endif
 
 Prefix: %_prefix
 BuildRoot: %{_tmppath}/%name-%version-root

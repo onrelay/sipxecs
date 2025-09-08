@@ -1,5 +1,6 @@
 include $(top_srcdir)/config/utility.am
 include $(top_srcdir)/config/java.am
+include $(top_srcdir)/config/jetty.am
 include $(top_srcdir)/common.am
 
 EXTRA_DIST = \
@@ -12,5 +13,6 @@ bridge_SRC = \
 
 bridge_DEPS = \
 	$(JAVAROOT) \
+	$(jetty_DEPS) \
 	@SIPX_JAVADIR@/sipXbridge/sipXrelay.jar \
 	$(call JavaDep, @SIPX_JAVADIR@/sipXcommons, $(bridge_PKGS))

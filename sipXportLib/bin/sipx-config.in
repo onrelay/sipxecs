@@ -30,12 +30,11 @@ JavaHome=""
 JavaTool="java"
 
 # common java arguments:
-#    -Dcom.ibm.tools.attach.enable=no used to get around XX-7634
-CommonJavaArgs="-Dcom.ibm.tools.attach.enable=no"
+CommonJavaArgs=
 
-# All sipx programs require 1.8 or above, if this does not become
+# All sipx programs require 17.x or above, if this does not become
 # true, I suggest parameter-izing this
-JavaVersions="1\.[8]"
+JavaVersions="17\."
 
 ## Test the java executable command
 testJavaTool()

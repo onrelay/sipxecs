@@ -5,5 +5,7 @@ phoneplugin_PKGS = \
 	commons-collections \
 	commons-codec \
 	spring-beans \
+	spring-web \
+	spring-core \
 	sipxcommons \
 	sipxconfig-neoconf

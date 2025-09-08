@@ -1,32 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "classpath:org/sipfoundry/sipxconfig/site/spring-beans.dtd">
-<beans>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                           https://www.springframework.org/schema/beans/spring-beans.xsd">
+
 <!-- The default dial plan for pt Portugal -->
 <!-- properties: voiceMail, voiceMailPrefix -->
-<bean id="pt.voicemailRule" parent="defaultInternalRule" singleton="false">
+<bean id="pt.voicemailRule" parent="defaultInternalRule" scope="prototype">
 <property name="name" value="Correio de voz" />
 <property name="description" value="Plano de marcacao padrao para correio de voz" />
 <property name="voiceMail" value="101" />
 <property name="voiceMailPrefix" value="8" />
 </bean>
 <!-- properties: extension, attendantAliases -->
-<bean id="pt.attendantRule" parent="defaultAttendantRule" singleton="false">
+<bean id="pt.attendantRule" parent="defaultAttendantRule" scope="prototype">
 <property name="name" value="Atendimento automatico" />
 <property name="description" value="Plano de marcacao padrao para Atendimento automatico" />
 <property name="extension" value="100" />
 <property name="attendantAliases" value="operator 0" />
 </bean>
-<bean id="pt.EmergencyRule" parent="defaultEmergencyRule" singleton="false">
+<bean id="pt.EmergencyRule" parent="defaultEmergencyRule" scope="prototype">
 <property name="name" value="Emergencia medica" />
 <property name="description" value="Emergencia - medica" />
 <property name="emergencyNumber" value="112" />
 </bean>
-<bean id="pt.ForestRule" parent="defaultEmergencyRule" singleton="false">
+<bean id="pt.ForestRule" parent="defaultEmergencyRule" scope="prototype">
 <property name="name" value="Emergencia florestas" />
 <property name="description" value="Emergencia - Florestas" />
 <property name="emergencyNumber" value="117" />
 </bean>
-<bean id="pt.internationalRule" parent="defaultInternationalRule" singleton="false">
+<bean id="pt.internationalRule" parent="defaultInternationalRule" scope="prototype">
 <property name="name" value="Internacional" />
 <property name="description" value="marcacao internacional" />
 <property name="longDistancePrefix" value="00" />
@@ -34,7 +37,7 @@
 <property name="areaCodes" value="" />
 <property name="permissionName" value="InternationalDialing" />
 </bean>
-<bean id="pt.shortRule" parent="defaultLocalRule" singleton="false">
+<bean id="pt.shortRule" parent="defaultLocalRule" scope="prototype">
 <property name="name" value="Numeros curtos" />
 <property name="description" value="Plano de marcacao rede numeros curtos(atendimento)" />
 <!-- <property name="pstnPrefixOptional" value="true" /> -->
@@ -45,7 +48,7 @@
 <property name="areaCodes" value="14,16,18" />
 <property name="permissionName" value="900Dialing" />
 </bean>
-<bean id="pt.subshortRule" parent="defaultLocalRule" singleton="false">
+<bean id="pt.subshortRule" parent="defaultLocalRule" scope="prototype">
 <property name="name" value="Numeros curtos sub" />
 <property name="description" value="Plano de marcacao rede numeros curtos(atendimento)sub numeros" />
 <!-- <property name="pstnPrefixOptional" value="true" /> -->
@@ -54,7 +57,7 @@
 <property name="areaCodes" value="14,16,18" />
 <property name="permissionName" value="900Dialing" />
 </bean>
-<bean id="pt.localRule" parent="defaultLocalRule" singleton="false">
+<bean id="pt.localRule" parent="defaultLocalRule" scope="prototype">
 <property name="name" value="Local" />
 <property name="description" value="Plano de marcacao rede fixa" />
 <property name="longDistancePrefixOptional" value="true" />
@@ -64,7 +67,7 @@
 <property name="permissionName" value="LocalDialing" />
 </bean>
 
-<bean id="pt.nomadaRule" parent="defaultLocalRule" singleton="false">
+<bean id="pt.nomadaRule" parent="defaultLocalRule" scope="prototype">
 <property name="name" value="Nomada" />
 <property name="description" value="Plano de marcacao rede nomada" />
 <property name="longDistancePrefixOptional" value="true" />
@@ -73,7 +76,7 @@
 <property name="areaCodes" value="3" />
 <property name="permissionName" value="LocalDialing" />
 </bean>
-<bean id="pt.movelRule" parent="defaultLocalRule" singleton="false">
+<bean id="pt.movelRule" parent="defaultLocalRule" scope="prototype">
 <property name="name" value="Movel nacional" />
 <property name="description" value="Plano de marcacao rede movel nacional" />
 <property name="longDistancePrefixOptional" value="true" />
@@ -82,25 +85,25 @@
 <property name="areaCodes" value="91,92,93,96" />
 <property name="permissionName" value="Mobile" />
 </bean>
-<bean id="pt.greenRule" parent="defaultTollFreeRule" singleton="false">
+<bean id="pt.greenRule" parent="defaultTollFreeRule" scope="prototype">
 <property name="name" value="Ligue gratis verde" />
 <property name="description" value="marcacao gratuita verdes" />
 <property name="areaCodes" value="800" />
 <property name="permissionName" value="TollFree" />
 </bean>
-<bean id="pt.blueRule" parent="defaultTollFreeRule" singleton="false">
+<bean id="pt.blueRule" parent="defaultTollFreeRule" scope="prototype">
 <property name="name" value="Ligue gratis azul" />
 <property name="description" value="marcacao gratuita azul" />
 <property name="areaCodes" value="808" />
 <property name="permissionName" value="TollFree" />
 </bean>
-<bean id="pt.lowcostRule" parent="defaultLocalRule" singleton="false">
+<bean id="pt.lowcostRule" parent="defaultLocalRule" scope="prototype">
 <property name="name" value="Ligue gratis 809" />
 <property name="description" value="marcacao baixo custo" />
 <property name="areaCodes" value="809" />
 <property name="permissionName" value="LongDistanceDialing" />
 </bean>
-<bean id="pt.privateserviceRule" parent="defaultInternationalRule" singleton="false">
+<bean id="pt.privateserviceRule" parent="defaultInternationalRule" scope="prototype">
 <property name="name" value="Servicos especiais" />
 <property name="description" value="marcacao de servicos de empresas" />
 <property name="areaCodes" value="7,707,708,760,761,762" />
@@ -109,7 +112,7 @@
 
 <!-- defaultDialPlan defines the "factory default" structure of your valid plan -->
 <!-- this is the list of rules that admin will see after installation and after reverting to default -->
-<bean id="pt.dialPlan" parent="defaultDialPlan" singleton="false">
+<bean id="pt.dialPlan" parent="defaultDialPlan" scope="prototype">
 <property name="rules">
 <list>
 <ref bean="pt.voicemailRule" />

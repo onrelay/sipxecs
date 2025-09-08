@@ -1,5 +1,6 @@
 include $(top_srcdir)/config/utility.am
 include $(top_srcdir)/config/java.am
+include $(top_srcdir)/config/jetty.am
 include $(top_srcdir)/common.am
 
 EXTRA_DIST = \
@@ -14,6 +15,7 @@ jar_DATA = $(JAR_FILE)
 recording_SRC = $(shell cd $(srcdir); find org -type f -name '*.java')
 
 recording_DEPS = \
+	$(jetty_DEPS) \
 	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(recording_PKGS))
 
 $(JAR_FILE) : javac-recording

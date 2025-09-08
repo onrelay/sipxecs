@@ -7,10 +7,11 @@ polycom_PKGS = \
 	commons-logging \
 	spring-beans \
 	spring-core \
+	spring-velocity-support \
 	spring-tx \
 	spring-jdbc \
 	sipxcommons \
 	sipxconfig-neoconf \
-	velocity \
+	velocity-engine-core \
 	org.restlet \
 	org.restlet.ext.spring

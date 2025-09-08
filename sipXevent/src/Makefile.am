@@ -1,5 +1,6 @@
 include $(top_srcdir)/config/utility.am
 include $(top_srcdir)/config/java.am
+include $(top_srcdir)/config/jetty.am
 include $(top_srcdir)/common.am
 
 EXTRA_DIST = \
@@ -17,6 +18,7 @@ event_RESOURCES = \
     server.beans.xml
                       
 event_DEPS = \
+	$(jetty_DEPS) \
 	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(event_PKGS))
 
 event_SRC = \

@@ -10,6 +10,10 @@ Group: Development/Libraries
 Vendor: Pingtel Corp.
 Url: http://www.pingtel.com
 
+# do not build a debuginfo package
+%define debug_package %{nil}
+
+
 BuildRequires: automake
 BuildRequires: gcc-c++
 BuildRequires: cppunit-devel

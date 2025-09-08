@@ -23,6 +23,7 @@ customcallerid_PKGS = \
 	commons-collections \
 	commons-collections4 \
 	commons-logging \
+	jakarta.persistence-api \
 	tapestry-framework \
 	tapestry-annotations \
 	spring-data-mongodb \
@@ -51,5 +52,5 @@ precommit : validate style;
 
 validate : src/sipxplugin.beans.xml
 	xmllint --noout \
-	  --schema $(SIPX_DATADIR)/schema/spring-beans-2.0.xsd  \
+	  --schema $(SIPX_DATADIR)/schema/spring-beans.xsd  \
 	$^

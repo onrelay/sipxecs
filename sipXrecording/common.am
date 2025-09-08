@@ -1,13 +1,15 @@
 cfg_PKGS = \
 	sipxconfig-neoconf \
 	sipxcommons \
-	velocity \
+	velocity-engine-core \
 	commons-lang \
 	commons-io \
 	dom4j \
+	jakarta.persistence-api \
 	spring-beans \
 	spring-core \
 	spring-tx \
+	spring-velocity-support \
 	xercesImpl \
 	sipxconfig-neoconf \
 	sipxconfig-web \
@@ -25,6 +27,7 @@ recording_PKGS = \
 	httpclient5 \
 	commons-logging \
 	jakarta.servlet \
+	jakarta.persistence-api \
 	mongodb-driver-core \
 	mongodb-driver-sync \
 	bson \
@@ -36,7 +39,4 @@ recording_PKGS = \
 	spring-tx \
 	spring-expression \
 	commons-lang \
-	jetty-server \
-	jetty-ee10-servlet \
-	jetty-util \
 	hazelcast-all

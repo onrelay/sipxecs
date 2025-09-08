@@ -8,17 +8,22 @@ sipxjitsi_PKGS = \
 	commons-collections \
 	spring-security-config \
 	spring-security-core \
+	spring-velocity-support \
 	spring-beans \
 	spring-web \
+	spring-beans \
+	spring-core \
 	spring-webmvc \
 	spring-security-web \
 	spring-context \
 	spring-core \
 	sipxcommons \
 	sipxconfig-neoconf \
-	velocity \
+	velocity-engine-core \
 	spring-data-commons \
 	spring-data-mongodb \
+	mongodb-driver-core \
 	mongodb-driver-sync \
 	bson \
+	slf4j-api \
 	dom4j

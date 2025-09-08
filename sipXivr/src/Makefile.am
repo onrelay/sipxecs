@@ -1,5 +1,6 @@
 include $(top_srcdir)/config/utility.am
 include $(top_srcdir)/config/java.am
+include $(top_srcdir)/config/jetty.am
 include $(top_srcdir)/common.am
 
 audio_path=@SIPX_VARDIR@/mediaserver/data/moh
@@ -21,6 +22,7 @@ moh_AUDIO = \
 	audio/default.wav
 
 ivr_DEPS = \
+	$(jetty_DEPS) \
 	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(ivr_PKGS)) \
 	@SIPX_JAVADIR@/sipXopenfire/plugins/sipx-openfire-presence-plugin.jar
 

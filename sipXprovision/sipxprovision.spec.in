@@ -16,6 +16,7 @@ Url: http://www.sipfoundry.org
 BuildRequires: automake
 BuildRequires: java-17-openjdk-devel
 BuildRequires: zip
+BuildRequires: jetty
 BuildRequires: sipxcommons >= %version
 BuildRequires: sipxopenfire >= %version
 
@@ -25,12 +26,8 @@ Obsoletes: sipxvxml
 
 Requires: sipxcommons >= %version
 Requires: chkconfig
+Requires: jetty
 BuildRequires: sipxconfig >= %version
-
-%if %{?use_ibm_jvm}0
-Requires: java-ibm >= 1.6
-Requires: java-ibm-unrestricted
-%endif
 
 Prefix: %_prefix
 BuildRoot: %{_tmppath}/%name-%version-root

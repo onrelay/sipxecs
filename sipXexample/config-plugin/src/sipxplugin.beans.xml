@@ -4,7 +4,7 @@
   -   http://static.springsource.org/spring/docs/3.0.x/spring-framework-reference/html/beans.html
   -->
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   
   <!--
    - This "registers" your plugin to user interface.  You only need to register the hook, not any pages.

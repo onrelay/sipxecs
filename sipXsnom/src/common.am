@@ -4,7 +4,8 @@ snom_PKGS = \
 	commons-io \
 	commons-collections \
 	spring-beans \
+	spring-velocity-support \
 	sipxcommons \
 	sipxconfig-neoconf \
-	velocity \
+	velocity-engine-core \
 	velocity-tools-generic

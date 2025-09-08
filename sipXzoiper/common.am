@@ -16,9 +16,12 @@ sipxzopier_PKGS = \
 	spring-core \
 	sipxcommons \
 	sipxconfig-neoconf \
-	velocity \
+	velocity-engine-core \
 	spring-data-commons \
 	spring-data-mongodb \
+	spring-velocity-support \
+	mongodb-driver-core \
 	mongodb-driver-sync \
 	bson \
+	slf4j-api \
 	dom4j

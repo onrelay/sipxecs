@@ -15,15 +15,6 @@ event_PKGS = \
 	mongodb-driver-core \
 	mongodb-driver-sync   \
 	bson \	
-	jetty-http \
-	jetty-io \
-	jetty-security \
-	jetty-server \
-	jetty-ee10-servlet \
-	jetty-ee10-servlets \
-	jetty-util \
-	jetty-ee10-webapp \
-	jetty-xml \
 	jakarta.servlet-api \
 	sipxcommons \
 	spring-security-config \
