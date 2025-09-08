@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="authCodeManagerImpl" class="org.sipfoundry.sipxconfig.acccode.AuthCodeManagerImpl" parent="abstractDaoImpl">
     <property name="coreContext" ref="coreContext" />
@@ -20,9 +20,7 @@
         <value>org.sipfoundry.sipxconfig.dialplan.DialingRuleProvider</value>
       </list>
     </property>
-    <property name="target">
-      <ref local="authCodesImpl" />
-    </property>
+    <property name="target" ref="authCodesImpl" />
   </bean>
 
   <bean id="authCodesImpl" class="org.sipfoundry.sipxconfig.acccode.AuthCodesImpl">

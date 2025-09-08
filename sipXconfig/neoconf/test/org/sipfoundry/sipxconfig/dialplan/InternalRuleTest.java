@@ -27,8 +27,8 @@ import org.sipfoundry.sipxconfig.address.Address;
 import org.sipfoundry.sipxconfig.address.AddressManager;
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
 import org.sipfoundry.sipxconfig.dialplan.MappingRule.Operator;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.WorkingHours;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 import org.sipfoundry.sipxconfig.dialplan.config.UrlTransform;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.forwarding.GeneralSchedule;
@@ -55,7 +55,7 @@ public class InternalRuleTest extends TestCase {
         m_schedule = new GeneralSchedule();
         m_schedule.setName("Custom schedule");
         WorkingHours[] hours = new WorkingHours[1];
-        WorkingTime wt = new WorkingTime();
+        WorkingTimeAttendant wt = new WorkingTimeAttendant();
         hours[0] = new WorkingHours();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         cal.set(2006, Calendar.DECEMBER, 31, 10, 12);
@@ -66,7 +66,7 @@ public class InternalRuleTest extends TestCase {
         hours[0].setDay(ScheduledDay.WEDNESDAY);
         wt.setWorkingHours(hours);
         wt.setEnabled(true);
-        m_schedule.setWorkingTime(wt);
+        m_schedule.setWorkingTimeAttendant(wt);
 
         m_mediaServer = new FreeswitchMediaServer();
         AddressManager addressManager = createMock(AddressManager.class);

@@ -44,12 +44,12 @@ import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
 import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
-import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
+import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 
 /**
  * Backup provides Java interface to backup scripts
  */
-public class AdminContextImpl extends HibernateDaoSupport implements AdminContext, AddressProvider, ProcessProvider,
+public class AdminContextImpl extends SipxHibernateDaoSupport<Object> implements AdminContext, AddressProvider, ProcessProvider,
         AlarmProvider, FirewallProvider, ArchiveProvider, FeatureProvider {
     private static final Collection<AddressType> ADDRESSES = Arrays.asList(new AddressType[] {
         HTTP_ADDRESS, HTTP_ADDRESS_AUTH, HTTPS_ADDRESS_AUTH, SIPXCDR_DB_ADDRESS

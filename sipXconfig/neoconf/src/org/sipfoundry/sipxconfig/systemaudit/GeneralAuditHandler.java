@@ -29,16 +29,16 @@ import java.util.Set;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.commons.collections4.iterators.ArrayIterator;
-import org.hibernate.collection.PersistentArrayHolder;
-import org.hibernate.collection.PersistentCollection;
-import org.hibernate.collection.PersistentList;
-import org.hibernate.collection.PersistentMap;
-import org.hibernate.collection.PersistentSet;
+import org.hibernate.collection.spi.PersistentArrayHolder;
+import org.hibernate.collection.spi.PersistentCollection;
+import org.hibernate.collection.spi.PersistentList;
+import org.hibernate.collection.spi.PersistentMap;
+import org.hibernate.collection.spi.PersistentSet;
 import org.sipfoundry.commons.userdb.profile.Address;
 import org.sipfoundry.commons.userdb.profile.UserProfile;
 import org.sipfoundry.commons.userdb.profile.UserProfileService;
 import org.sipfoundry.sipxconfig.common.User;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 import org.sipfoundry.sipxconfig.permission.PermissionManager;
 import org.sipfoundry.sipxconfig.permission.PermissionManagerImpl;
 import org.sipfoundry.sipxconfig.setting.BeanWithSettings;
@@ -225,8 +225,8 @@ public class GeneralAuditHandler extends AbstractSystemAuditHandler {
             } else if (storedSnapshot instanceof Map) {
                 Map<Object, Object> oldMap = (Map<Object, Object>) storedSnapshot;
                 oldIterator = oldMap.values().iterator();
-            } else if (storedSnapshot instanceof WorkingTime.WorkingHours[]) {
-                WorkingTime.WorkingHours[] oldMap = (WorkingTime.WorkingHours[]) storedSnapshot;
+            } else if (storedSnapshot instanceof WorkingHours[]) {
+                WorkingHours[] oldMap = (WorkingHours[]) storedSnapshot;
                 oldIterator = new ArrayIterator(oldMap);
             } else {
                 return;

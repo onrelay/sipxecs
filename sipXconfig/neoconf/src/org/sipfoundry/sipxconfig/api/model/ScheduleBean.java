@@ -14,12 +14,12 @@
  */
 package org.sipfoundry.sipxconfig.api.model;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlEnumValue;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.sipfoundry.sipxconfig.forwarding.GeneralSchedule;
 import org.sipfoundry.sipxconfig.forwarding.Schedule;
 import org.sipfoundry.sipxconfig.forwarding.UserGroupSchedule;
@@ -27,10 +27,10 @@ import org.sipfoundry.sipxconfig.forwarding.UserSchedule;
 
 @XmlRootElement(name = "Schedule")
 @XmlType(propOrder = {
-        "id", "name", "description", "userId", "groupId", "type", "workingTime"
+        "id", "name", "description", "userId", "groupId", "type", "workingTimeAttendant"
         })
 @JsonPropertyOrder({
-        "id", "name", "description", "userId", "groupId", "type", "workingTime"
+        "id", "name", "description", "userId", "groupId", "type", "workingTimeAttendant"
     })
 public class ScheduleBean {
     private int m_id;
@@ -39,7 +39,7 @@ public class ScheduleBean {
     private Integer m_userId = -1;
     private Integer m_groupId = -1;
     private ScheduleType m_type;
-    private WorkingTimeBean m_workingTime;
+    private WorkingTimeAttendantBean m_workingTimeAttendant;
 
     @XmlType(name = "scheduleType")
     @XmlEnum
@@ -69,7 +69,9 @@ public class ScheduleBean {
             scheduleBean.setType(ScheduleType.U);
             scheduleBean.setGroupId(schedule.getUserGroup().getId());
         }
-        scheduleBean.setWorkingTime(WorkingTimeBean.convertWorkingTimeBean(schedule.getWorkingTime()));
+        scheduleBean.setWorkingTimeAttendant(
+            WorkingTimeAttendantBean.convertWorkingTimeAttendantBean(
+                schedule.getWorkingTimeAttendant()));
         return scheduleBean;
     }
 
@@ -121,11 +123,11 @@ public class ScheduleBean {
         m_type = type;
     }
 
-    public WorkingTimeBean getWorkingTime() {
-        return m_workingTime;
+    public WorkingTimeAttendantBean getWorkingTimeAttendant() {
+        return m_workingTimeAttendant;
     }
 
-    public void setWorkingTime(WorkingTimeBean workingTime) {
-        m_workingTime = workingTime;
+    public void setWorkingTimeAttendant(WorkingTimeAttendantBean workingTimeAttendant) {
+        m_workingTimeAttendant = workingTimeAttendant;
     }
 }

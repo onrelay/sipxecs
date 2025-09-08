@@ -17,8 +17,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.transaction.annotation.Transactional;
+
 import org.sipfoundry.sipxconfig.common.DaoUtils;
 import org.sipfoundry.sipxconfig.common.Replicable;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
@@ -29,10 +35,8 @@ import org.sipfoundry.sipxconfig.dialplan.DialingRule;
 import org.sipfoundry.sipxconfig.logging.AuditLogContext;
 import org.sipfoundry.sipxconfig.logging.AuditLogContext.CONFIG_CHANGE_TYPE;
 import org.sipfoundry.sipxconfig.sbc.SbcDevice;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.orm.hibernate5.HibernateCallback;
-import org.springframework.orm.hibernate5.HibernateTemplate;
+
+
 
 public class GatewayContextImpl extends SipxHibernateDaoSupport<Object> implements GatewayContext, BeanFactoryAware {
     private static final String QUERY_GATEWAY_ID_BY_SERIAL_NUMBER = "gatewayIdsWithSerialNumber";
@@ -61,61 +65,68 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport<Object> implemen
     }
 
     public List<Gateway> getGateways() {
-        return getHibernateTemplate().loadAll(Gateway.class);
+        return super.loadAllEntities(Gateway.class);
     }
 
     public Collection<Integer> getAllGatewayIds() {
-        return (Collection<Integer>)getHibernateTemplate().findByNamedQuery("gatewayIds");
+        return (Collection<Integer>)super.findByNamedQuery("gatewayIds", Integer.class);
     }
 
     public Gateway getGateway(Integer id) {
-        return (Gateway) getHibernateTemplate().load(Gateway.class, id);
+        return (Gateway) super.loadEntity(Gateway.class, id);
     }
 
     public FxoPort getPort(Integer id) {
-        return (FxoPort) getHibernateTemplate().load(FxoPort.class, id);
+        return (FxoPort) super.loadEntity(FxoPort.class, id);
     }
 
+    @Transactional
     public void saveGateway(Gateway gateway) {
         // Before storing the gateway, make sure that it has a unique name.
         // Throw an exception if it doesn't.
-        HibernateTemplate hibernate = getHibernateTemplate();
-        DaoUtils.checkDuplicates(hibernate, Gateway.class, gateway, "name",
-                new DuplicateNameException(gateway.getName()));
-        DaoUtils.checkDuplicates(hibernate, Gateway.class, gateway, "serialNumber",
-                new DuplicateSerialNumberException(gateway.getSerialNumber()));
-        // Find if we are about to save a new gateway
-        boolean isNew = gateway.isNew();
-        // Store the updated gateway
-        if (isNew) {
-            hibernate.save(gateway);
-        } else {
-            hibernate.merge(gateway);
-        }
-        hibernate.flush();
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
 
-        if (isNew) {
-            m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.ADDED, AUDIT_LOG_CONFIG_TYPE, gateway.getName());
-        } else {
-            m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.MODIFIED, AUDIT_LOG_CONFIG_TYPE, gateway.getName());
-        }
+            Session session = sessionTransaction.getSession();
 
-        SbcDevice sbc = gateway.getSbcDevice();
-        if (sbc != null) {
-            sbc.generateProfiles(sbc.getProfileLocation());
-            sbc.restart();
+            DaoUtils.checkDuplicates(session, Gateway.class, gateway, "name",
+                    new DuplicateNameException(gateway.getName()));
+
+            DaoUtils.checkDuplicates(session, Gateway.class, gateway, "serialNumber",
+                    new DuplicateSerialNumberException(gateway.getSerialNumber()));
+        
+            // Find if we are about to save a new gateway
+            boolean isNew = gateway.isNew();
+            // Store the updated gateway
+            if (isNew) {
+                super.persistEntity(gateway);
+            } else {
+                super.mergeEntity(gateway);
+            }
+            super.flush();
+
+            if (isNew) {
+                m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.ADDED, AUDIT_LOG_CONFIG_TYPE, gateway.getName());
+            } else {
+                m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.MODIFIED, AUDIT_LOG_CONFIG_TYPE, gateway.getName());
+            }
+
+            SbcDevice sbc = gateway.getSbcDevice();
+            if (sbc != null) {
+                sbc.generateProfiles(sbc.getProfileLocation());
+                sbc.restart();
+            }
         }
     }
 
     public void storePort(FxoPort port) {
-        getHibernateTemplate().saveOrUpdate(port);
+        super.mergeEntity(port);
     }
 
     public boolean deleteGateway(Integer id) {
         Gateway gateway = getGateway(id);
         ProfileLocation location = gateway.getModel().getDefaultProfileLocation();
         gateway.removeProfiles(location);
-        getHibernateTemplate().delete(gateway);
+        super.removeEntity(gateway);
         getDaoEventPublisher().publishDelete(gateway);
         m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.DELETED, AUDIT_LOG_CONFIG_TYPE, gateway.getName());
         return true;
@@ -140,7 +151,7 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport<Object> implemen
             deleteGateway(gw.getId());
         }
 
-        getHibernateTemplate().flush();
+        super.flush();
         for (Iterator<SbcDevice> i = sbcSet.iterator(); i.hasNext();) {
             SbcDevice sbc = (SbcDevice) i.next();
             sbc.generateProfiles(sbc.getProfileLocation());
@@ -156,14 +167,19 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport<Object> implemen
         return gateways;
     }
 
+    @Transactional
     public <T> List<T> getGatewayByType(final Class<T> type) {
-        HibernateCallback<Object> callback = new HibernateCallback<>() {
-            public Object doInHibernate(Session session) {
-                Criteria criteria = session.createCriteria(type);
-                return criteria.list();
-            }
-        };
-        return (List<T>)getHibernateTemplate().execute(callback);
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<T> cq = cb.createQuery(type);
+            Root<T> root = cq.from(type);
+            cq.select(root);
+            return session.createQuery(cq).getResultList();
+        }
     }
 
     /**
@@ -197,8 +213,8 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport<Object> implemen
     }
 
     public void clear() {
-        List<Gateway> gateways = getHibernateTemplate().loadAll(Gateway.class);
-        getHibernateTemplate().deleteAll(gateways);
+        List<Gateway> gateways = super.loadAllEntities(Gateway.class);
+        super.removeAllEntities(gateways);
     }
 
     public Gateway newGateway(GatewayModel model) {
@@ -226,12 +242,15 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport<Object> implemen
             FxoPort port = getPort(portId);
             gateway.removePort(port);
         }
-        getHibernateTemplate().saveOrUpdate(gateway);
+        super.mergeEntity(gateway);
     }
 
     public Integer getGatewayIdBySerialNumber(String serialNumber) {
-        List<Integer> objs = (List<Integer>)getHibernateTemplate().findByNamedQueryAndNamedParam(QUERY_GATEWAY_ID_BY_SERIAL_NUMBER, "value",
-                serialNumber);
+        List<Integer> objs = (List<Integer>)super.findByNamedQueryAndNamedParam(
+                QUERY_GATEWAY_ID_BY_SERIAL_NUMBER, 
+                "value",
+                serialNumber,
+                Integer.class);
         return (Integer) DaoUtils.requireOneOrZero(objs, QUERY_GATEWAY_ID_BY_SERIAL_NUMBER);
     }
 

@@ -22,7 +22,7 @@ import org.sipfoundry.sipxconfig.sbc.SbcDevice;
 import org.sipfoundry.sipxconfig.sbc.SbcDeviceManager;
 import org.sipfoundry.sipxconfig.setting.Storage;
 
-public class SipTrunkMigrationContextImpl extends SipxHibernateDaoSupport implements
+public class SipTrunkMigrationContextImpl extends SipxHibernateDaoSupport<Object> implements
         SipTrunkMigrationContext {
     public static final Log LOG = LogFactory.getLog(SipTrunkMigrationContextImpl.class);
 
@@ -33,7 +33,7 @@ public class SipTrunkMigrationContextImpl extends SipxHibernateDaoSupport implem
     private BeanFactoryModelSource<SbcDescriptor> m_sbcModelSource;
 
     public void migrateSipTrunk() {
-        List sipTrunks = getHibernateTemplate().findByNamedQuery("sipTrunks");
+        List<Object> sipTrunks = super.findByNamedQuery("sipTrunks", Object.class);
         for (Iterator i = sipTrunks.iterator(); i.hasNext();) {
             Object[] row = (Object[]) i.next();
             Integer sipTrunkId = (Integer) row[0];
@@ -47,14 +47,14 @@ public class SipTrunkMigrationContextImpl extends SipxHibernateDaoSupport implem
 
                 // clean value storage
                 Storage valueStorage = sipTrunk.getValueStorage();
-                getHibernateTemplate().delete(valueStorage);
+                super.removeEntity(valueStorage);
                 sipTrunk.setValueStorage(null);
 
                 sipTrunk.setSbcDevice(m_sbcDeviceManager.getSbcDevice(sbcDeviceId));
                 sipTrunk.setOutboundAddress(sipTrunk.getSbcDevice().getAddress());
                 sipTrunk.setOutboundPort(sipTrunk.getSbcDevice().getPort());
                 m_gatewayContext.saveGateway(sipTrunk);
-                getHibernateTemplate().flush();
+                super.flush();
             } catch (UserException e) {
                 LOG.warn("cannot migrate sip trunks", e);
             }
@@ -68,7 +68,7 @@ public class SipTrunkMigrationContextImpl extends SipxHibernateDaoSupport implem
         sbcDevice.setName(address + "_" + System.currentTimeMillis());
         sbcDevice.setAddress(address);
         m_sbcDeviceManager.saveSbcDevice(sbcDevice);
-        getHibernateTemplate().flush();
+        super.flush();
 
         return sbcDevice.getId();
     }

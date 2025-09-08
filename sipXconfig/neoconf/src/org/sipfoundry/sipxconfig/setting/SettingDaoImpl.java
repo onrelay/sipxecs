@@ -26,12 +26,12 @@ import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.hibernate5.HibernateCallback;
 
 /**
- * Use hibernate to perform database operations
+ * Use hibernate to perform
+  database operations
  */
-public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDao {
+public class SettingDaoImpl extends SipxHibernateDaoSupport<Object> implements SettingDao {
     private static final String RESOURCE_PARAM = "resource";
     private static final String NAME_PARAM = "name";
     private static final String GROUP_ID = "groupId";
@@ -44,7 +44,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
 
     @Override
     public Group getGroup(Integer groupId) {
-        return getHibernateTemplate().load(Group.class, groupId);
+        return super.loadEntity(Group.class, groupId);
     }
 
     /*
@@ -97,15 +97,15 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
     @Override
     public void storeValueStorage(ValueStorage storage) {
         if (storage.isNew()) {
-            getHibernateTemplate().save(storage);
+            super.persistEntity(storage);
         } else {
-            getHibernateTemplate().merge(storage);
+            super.mergeEntity(storage);
         }
     }
 
     @Override
     public ValueStorage loadValueStorage(Integer storageId) {
-        return getHibernateTemplate().load(ValueStorage.class, storageId);
+        return super.loadEntity(ValueStorage.class, storageId);
     }
 
     @Override
@@ -120,40 +120,41 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
             }
         }
         if (group.isNew()) {
-            getHibernateTemplate().save(group);
+            super.persistEntity(group);
         } else {
-            getHibernateTemplate().merge(group);
+            super.mergeEntity(group);
         }
     }
 
     @Override
-    public void moveGroups(final List<Group> groups, Collection<Integer> groupIds, int step) {
+    public void moveGroups(List<Group> groups, Collection<Integer> groupIds, int step) {
+        // Shift group order
         DataCollectionUtil.moveByPrimaryKey(groups, groupIds.toArray(), step);
+
+        // Update weight based on new order
         for (int i = 0; i < groups.size(); i++) {
-            // weight is position + 1 - for compatibility with old code
             groups.get(i).setWeight(i + 1);
         }
-        getHibernateTemplate().executeWithNativeSession(new HibernateCallback<Object>() {
-            public Object doInHibernate(Session session) throws HibernateException {
-                for (Group group : groups) {
-                    if (group.isNew()) {
-                        session.save(group);
-                    } else {
-                        session.merge(group);
-                    }
-                }
-                return null;
+
+        // Persist or merge each group
+        for (Group group : groups) {
+            if (group.isNew()) {
+                super.persistEntity(group);
+            } else {
+                super.mergeEntity(group);
             }
-        });
+        }
+
+        // Notify DAO listeners
         getDaoEventPublisher().publishSave(groups);
     }
 
     void assignWeightToNewGroups(Group group) {
         if (group.isNew() && group.getWeight() == null) {
             GroupWeight weight = new GroupWeight();
-            getHibernateTemplate().save(weight);
+            super.persistEntity(weight);
             group.setWeight(weight.getWeight());
-            getHibernateTemplate().delete(weight); // delete not strictly nec.
+            super.removeEntity(weight); // delete not strictly nec.
         }
     }
 
@@ -164,9 +165,16 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
         Object[] values = new Object[] {
             group.getResource(), group.getName()
         };
-        List objs = getHibernateTemplate().findByNamedQueryAndNamedParam("groupIdsWithNameAndResource", params,
-                values);
-        DaoUtils.checkDuplicates(group, objs, new DuplicateGroupException(group.getName()));
+        List<Integer> existingGroupIds = super.findByNamedQueryAndNamedParam(
+            "groupIdsWithNameAndResource", 
+            params,
+            values,
+            Integer.class);
+
+        DaoUtils.checkDuplicates(
+            group, 
+            existingGroupIds, 
+            new DuplicateGroupException(group.getName()));
     }
 
     private void checkBranchValidity(Group group) {
@@ -176,7 +184,11 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
         Object[] values = new Object[] {
             group.getId(), group.getBranch()
         };
-        List objs = getHibernateTemplate().findByNamedQueryAndNamedParam("selectedBranchValid", params, values);
+        List<User> objs = super.findByNamedQueryAndNamedParam(
+            "selectedBranchValid", 
+            params, 
+            values,
+            User.class);
         if (objs.size() > 0) {
             throw new UserException("&branch.validity.error", group.getBranch().getName());
         }
@@ -199,7 +211,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
             resource, name
         };
         String query = "groupsByResourceAndName";
-        List groups = getHibernateTemplate().findByNamedQueryAndNamedParam(query, params, values);
+        List<Group> groups = super.findByNamedQueryAndNamedParam(query, params, values, Group.class );
         return (Group) DaoUtils.requireOneOrZero(groups, query);
     }
 
@@ -228,20 +240,20 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
 
     @Override
     public Group loadGroup(Integer id) {
-        return getHibernateTemplate().load(Group.class, id);
+        return super.loadEntity(Group.class, id);
     }
 
     @Override
     public List<Group> getGroups(String resource) {
-        List<Group> groups = (List<Group>)getHibernateTemplate().findByNamedQueryAndNamedParam("groupsByResource",
-                RESOURCE_PARAM, resource);
+        List<Group> groups = (List<Group>)super.findByNamedQueryAndNamedParam("groupsByResource",
+                RESOURCE_PARAM, resource, Group.class);
         return groups;
     }
 
     @Override
     public Map<Integer, Long> getGroupMemberCountIndexedByGroupId(Class groupOwner) {
         String query = "select g.id, count(*) from " + groupOwner.getName() + " o join o.groups g group by g.id";
-        List<Object[]> l = (List<Object[]>)getHibernateTemplate().find(query);
+        List<Object[]> l = (List<Object[]>)super.find(query,Object[].class);
         Map<Integer, Long> members = asMap(l);
 
         return members;
@@ -250,7 +262,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
     @Override
     public Map<Integer, Long> getBranchMemberCountIndexedByBranchId(Class branchOwner) {
         String query = "select b.id, count(*) from " + branchOwner.getName() + " o join o.branch b group by b.id";
-        List<Object[]> l = (List<Object[]>)getHibernateTemplate().find(query);
+        List<Object[]> l = (List<Object[]>)super.find(query,Object[].class);
         Map<Integer, Long> members = asMap(l);
 
         return members;
@@ -260,7 +272,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport implements SettingDa
     public Map<Integer, Long> getGroupBranchMemberCountIndexedByBranchId(Class branchOwner) {
         String query = "select g.branch.id, count(*) from " + branchOwner.getName() + " o join "
                 + "o.groups g where o.branch = null group by g.branch.id";
-        List<Object[]> l = (List<Object[]>)getHibernateTemplate().find(query);
+        List<Object[]> l = (List<Object[]>)super.find(query,Object[].class);
         Map<Integer, Long> members = asMap(l);
 
         return members;

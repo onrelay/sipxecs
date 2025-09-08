@@ -33,6 +33,8 @@ public class SystemTaskRunner {
             context = new ClassPathXmlApplicationContext(
                 "classpath:/org/sipfoundry/sipxconfig/system.beans.xml",
                 "classpath*:/org/sipfoundry/sipxconfig/*/**/*.beans.xml",
+                "classpath*:/org/sipfoundry/sipxconfig/api/jaxrs-server.xml",
+                "classpath*:/org/sipfoundry/sipxconfig/api/jaxrs-client.xml",
                 "classpath*:/sipxplugin2.beans.xml",
                 "classpath*:/sipxplugin.beans.xml",
                 "classpath*:/sipxplugin0.beans.xml");

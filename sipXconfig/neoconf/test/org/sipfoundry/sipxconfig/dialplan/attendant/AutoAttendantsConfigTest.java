@@ -160,9 +160,9 @@ public class AutoAttendantsConfigTest extends XMLTestCase {
         holiday.setAttendant(operator);
         attendantRule.setHolidayAttendant(holiday);
 
-        WorkingTime workingTime = new WorkingTime();
-        workingTime.setAttendant(operator);
-        attendantRule.setWorkingTimeAttendant(workingTime);
+        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        workingTimeAttendant.setAttendant(operator);
+        attendantRule.setWorkingTimeAttendant(workingTimeAttendant);
 
         AutoAttendantManager aam = createMock(AutoAttendantManager.class);
         aam.getAutoAttendants();

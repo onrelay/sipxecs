@@ -94,7 +94,7 @@ public class ConferenceConfiguration implements ConfigProvider, BeanFactoryAware
             context.put("conferences", conferences);
         }
         try {
-            m_velocityEngine.mergeTemplate("sipxconference/conference.conf.xml.vm", context, wtr);
+            m_velocityEngine.mergeTemplate("sipxconference/conference.conf.xml.vm", "UTF-8", context, wtr);
         } catch (Exception e) {
             throw new IOException(e);
         }

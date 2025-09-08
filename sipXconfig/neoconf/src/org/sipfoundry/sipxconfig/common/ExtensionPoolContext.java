@@ -9,7 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
-public interface ExtensionPoolContext extends DataObjectSource {
+public interface ExtensionPoolContext extends DataObjectSource<ExtensionPool> {
     public static final String CONTEXT_BEAN_NAME = "extensionPoolContext";
 
     /** Return the user extension pool.  Create it if necessary. */

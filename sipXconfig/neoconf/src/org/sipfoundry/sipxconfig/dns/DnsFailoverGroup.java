@@ -16,7 +16,7 @@ package org.sipfoundry.sipxconfig.dns;
 
 import java.util.Collection;
 
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 
 @JsonPropertyOrder(alphabetic = true)

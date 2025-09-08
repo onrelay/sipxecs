@@ -15,10 +15,12 @@ import junit.framework.TestCase;
 
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
+import org.dom4j.io.SAXReader;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.util.DTDEntityResolver;
 import org.sipfoundry.sipxconfig.gateway.Gateway;
 import org.sipfoundry.sipxconfig.gateway.acme.AcmeGateway;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -76,9 +78,13 @@ public class DynamicSessionFactoryBeanTest extends TestCase {
 
     private static void validateXml(String xml) throws Exception {
         SAXReader xmlReader = new SAXReader();
-        xmlReader.setEntityResolver(new DTDEntityResolver());
-        xmlReader.setValidation(true);
 
+        // Prevents external DTD loading (safe default)
+        xmlReader.setEntityResolver((publicId, systemId) -> {
+            return new InputSource(new StringReader(""));  
+        });
+
+        xmlReader.setValidation(true);
         Document document = xmlReader.read(new StringReader(xml));
 
         assertEquals(Gateway.class.getName(), document.valueOf("/hibernate-mapping/subclass/@extends"));

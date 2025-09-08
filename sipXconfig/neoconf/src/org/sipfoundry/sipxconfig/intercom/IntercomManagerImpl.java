@@ -34,9 +34,8 @@ import org.sipfoundry.sipxconfig.phone.Phone;
 import org.sipfoundry.sipxconfig.proxy.ProxyManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 
-public class IntercomManagerImpl extends SipxHibernateDaoSupport implements IntercomManager, BeanFactoryAware,
+public class IntercomManagerImpl extends SipxHibernateDaoSupport<Intercom> implements IntercomManager, BeanFactoryAware,
         FeatureProvider {
 
     public static final String CONTEXT_BEAN_NAME = "intercomManagerImpl";
@@ -66,21 +65,20 @@ public class IntercomManagerImpl extends SipxHibernateDaoSupport implements Inte
     }
 
     public void saveIntercom(Intercom intercom) {
-        getHibernateTemplate().saveOrUpdate(intercom);
+        super.mergeEntity(intercom);
     }
 
     public List<Intercom> loadIntercoms() {
-        return getHibernateTemplate().loadAll(Intercom.class);
+        return super.loadAllEntities(Intercom.class);
     }
 
     /**
      * Remove all intercoms - mostly used for testing
      */
     public void clear() {
-        HibernateTemplate template = getHibernateTemplate();
-        Collection<Intercom> intercoms = template.loadAll(Intercom.class);
+        Collection<Intercom> intercoms = super.loadAllEntities(Intercom.class);
         getDaoEventPublisher().publishDeleteCollection(intercoms);
-        template.deleteAll(intercoms);
+        super.removeAllEntities(intercoms);
     }
 
     /**

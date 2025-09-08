@@ -13,18 +13,23 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.transaction.annotation.Transactional;
+
 import org.sipfoundry.sipxconfig.bridge.BridgeSbc;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.logging.AuditLogContext;
 import org.sipfoundry.sipxconfig.logging.AuditLogContext.CONFIG_CHANGE_TYPE;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.orm.hibernate5.HibernateCallback;
+
 
 public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> implements SbcDeviceManager,
         BeanFactoryAware {
@@ -56,12 +61,12 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     public void deleteSbcDevice(Integer id) {
         SbcDevice sbcDevice = getSbcDevice(id);
         getDaoEventPublisher().publishDelete(sbcDevice);
-        getHibernateTemplate().delete(sbcDevice);
+        super.removeEntity(sbcDevice);
         m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.DELETED, AUDIT_LOG_CONFIG_TYPE, sbcDevice.getName());
     }
 
     public void deleteSbcDevice(SbcDevice sbcDevice) {
-        getHibernateTemplate().delete(sbcDevice);
+        super.removeEntity(sbcDevice);
         m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.DELETED, AUDIT_LOG_CONFIG_TYPE, sbcDevice.getName());
     }
 
@@ -74,7 +79,7 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     }
 
     public Collection<Integer> getAllSbcDeviceIds() {
-        return (Collection<Integer>)getHibernateTemplate().findByNamedQuery("sbcIds");
+        return (Collection<Integer>)super.findByNamedQuery("sbcIds", Integer.class);
     }
 
     public SbcDevice getSbcDevice(Integer id) {
@@ -82,7 +87,7 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     }
 
     public BridgeSbc getBridgeSbc(Location location) {
-        List<BridgeSbc> sbcDevices = getSbcDeviceByType(BridgeSbc.class);
+        List<BridgeSbc> sbcDevices = getBridgeSbcs();
         for (Iterator<BridgeSbc> iterator = sbcDevices.iterator(); iterator.hasNext();) {
             BridgeSbc sbcDevice = iterator.next();
             if (null != location && (location.equals(sbcDevice.getLocation()))) {
@@ -93,18 +98,16 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     }
 
     public List<BridgeSbc> getBridgeSbcs() {
-        return getSbcDeviceByType(BridgeSbc.class);
+        List<SbcDevice> devices = getSbcDevices();
+        List<BridgeSbc> bridges = new ArrayList<>();
+        for (SbcDevice device : devices) {
+            if (device instanceof BridgeSbc) {
+                bridges.add((BridgeSbc) device);
+            }
+        }
+        return bridges;
     }
 
-    private <T> List<T> getSbcDeviceByType(final Class<T> type) {
-        HibernateCallback<Object> callback = new HibernateCallback<>() {
-            public Object doInHibernate(Session session) {
-                Criteria criteria = session.createCriteria(type);
-                return criteria.list();
-            }
-        };
-        return (List<T>)getHibernateTemplate().execute(callback);
-    }
 
     private List<SbcDevice> getSbcDevicesByDescriptor(SbcDescriptor descriptor) {
         List<SbcDevice> sbcs = getSbcDevices();
@@ -118,7 +121,7 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     }
 
     public List<SbcDevice> getSbcDevices() {
-        return getHibernateTemplate().loadAll(SbcDevice.class);
+        return super.loadAllEntities(SbcDevice.class);
     }
 
     public void checkForNewSbcDeviceCreation(SbcDescriptor descriptor) {
@@ -136,7 +139,8 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     public boolean maxAllowedLimitReached(SbcDescriptor model) {
         String type = model.getBeanId();
         int limit = model.getMaxAllowed();
-        List<Object> count = (List<Object>)getHibernateTemplate().findByNamedQueryAndNamedParam("countSbcsByType", "sbcBeanId", type);
+        List<Object> count = (List<Object>)super.findByNamedQueryAndNamedParam(
+            "countSbcsByType", "sbcBeanId", type, Object.class);
         int sbcNumber = DataAccessUtils.intResult(count);
         return limit != -1 && sbcNumber >= limit;
     }
@@ -152,7 +156,7 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
         bridgeSbc.setSettingTypedValue("bridge-configuration/location-id", location.getId());
         saveSbcDevice(bridgeSbc);
         getDaoEventPublisher().publishSave(bridgeSbc);
-        getHibernateTemplate().flush();
+        super.flush();
         return bridgeSbc;
     }
 
@@ -199,21 +203,23 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     }
 
     private boolean isNameInUse(SbcDevice sbc) {
-        List<Object> count = (List<Object>)getHibernateTemplate().findByNamedQueryAndNamedParam("anotherSbcWithSameName", new String[] {
+        List<Object> count = (List<Object>)super.findByNamedQueryAndNamedParam("anotherSbcWithSameName", new String[] {
             SBC_NAME
         }, new Object[] {
             sbc.getName()
-        });
+        },
+        Object.class);
 
         return DataAccessUtils.intResult(count) > 0;
     }
 
     private boolean isNameChanged(SbcDevice sbc) {
-        List<Object> count = (List<Object>)getHibernateTemplate().findByNamedQueryAndNamedParam("countSbcWithSameName", new String[] {
+        List<SbcDevice> count = (List<SbcDevice>)super.findByNamedQueryAndNamedParam("countSbcWithSameName", new String[] {
             SBC_ID, SBC_NAME
         }, new Object[] {
             sbc.getId(), sbc.getName()
-        });
+        },
+        SbcDevice.class);
 
         return DataAccessUtils.intResult(count) == 0;
     }
@@ -223,6 +229,10 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     }
 
     public List<Sbc> getSbcsForSbcDeviceId(Integer sbcDeviceId) {
-        return (List<Sbc>)getHibernateTemplate().findByNamedQueryAndNamedParam("sbcsForSbcDeviceId", SBC_ID, sbcDeviceId);
+        return (List<Sbc>)super.findByNamedQueryAndNamedParam(
+            "sbcsForSbcDeviceId", 
+            SBC_ID, 
+            sbcDeviceId,
+            Sbc.class);
     }
 }

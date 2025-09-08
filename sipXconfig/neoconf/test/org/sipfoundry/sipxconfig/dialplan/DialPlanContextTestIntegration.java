@@ -30,8 +30,8 @@ import org.sipfoundry.sipxconfig.common.ScheduledDay;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.dialplan.attendant.Holiday;
 import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.WorkingHours;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
 import org.sipfoundry.sipxconfig.forwarding.GeneralSchedule;
 import org.sipfoundry.sipxconfig.forwarding.Schedule;
@@ -69,7 +69,7 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
         Schedule schedule = new GeneralSchedule();
         schedule.setName("R1 Schedule");
         WorkingHours[] hours = new WorkingHours[1];
-        WorkingTime wt = new WorkingTime();
+        WorkingTimeAttendant wt = new WorkingTimeAttendant();
         hours[0] = new WorkingHours();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         cal.set(2006, Calendar.DECEMBER, 31, 10, 00);
@@ -80,7 +80,7 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
         hours[0].setDay(ScheduledDay.WEDNESDAY);
         wt.setWorkingHours(hours);
         wt.setEnabled(true);
-        schedule.setWorkingTime(wt);
+        schedule.setWorkingTimeAttendant(wt);
         m_forwardingContext.saveSchedule(schedule);
         r1.setSchedule(schedule);
 
@@ -245,7 +245,7 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
         holiday.addPeriod(getNewHolidayPeriod(format.parse("06-JUN-2005 00:00"), format.parse("06-JUN-2005 23:59")));
         holiday.addPeriod(getNewHolidayPeriod(format.parse("24-DEC-2005 00:00"), format.parse("24-DEC-2005 23:59")));
 
-        WorkingTime wt = new WorkingTime();
+        WorkingTimeAttendant wt = new WorkingTimeAttendant();
         wt.setAttendant(autoAttendant);
         WorkingHours[] workingHours = wt.getWorkingHours();
         Date stop = workingHours[4].getStop();

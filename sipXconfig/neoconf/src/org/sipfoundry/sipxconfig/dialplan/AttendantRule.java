@@ -34,7 +34,7 @@ import org.sipfoundry.sipxconfig.commserver.imdb.AliasMapping;
 import org.sipfoundry.sipxconfig.commserver.imdb.DataSet;
 import org.sipfoundry.sipxconfig.dialplan.attendant.Holiday;
 import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
 import org.sipfoundry.sipxconfig.dialplan.config.Transform;
 import org.sipfoundry.sipxconfig.feature.Feature;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
@@ -53,7 +53,7 @@ public class AttendantRule extends DialingRule implements Replicable {
     private MediaServer m_mediaServer;
     private ScheduledAttendant m_afterHoursAttendant = new ScheduledAttendant();
     private Holiday m_holidayAttendant = new Holiday();
-    private WorkingTime m_workingTimeAttendant = new WorkingTime();
+    private WorkingTimeAttendant m_workingTimeAttendant = new WorkingTimeAttendant();
     private String m_attendantAliases;
     private String m_extension;
     private String m_did;
@@ -92,7 +92,7 @@ public class AttendantRule extends DialingRule implements Replicable {
     protected Object clone() throws CloneNotSupportedException {
         AttendantRule ar = (AttendantRule) super.clone();
         ar.m_afterHoursAttendant = (ScheduledAttendant) m_afterHoursAttendant.clone();
-        ar.m_workingTimeAttendant = (WorkingTime) m_workingTimeAttendant.clone();
+        ar.m_workingTimeAttendant = (WorkingTimeAttendant) m_workingTimeAttendant.clone();
         ar.m_holidayAttendant = (Holiday) m_holidayAttendant.clone();
         ar.m_locations = new HashSet<Branch>(m_locations);
         return ar;
@@ -145,11 +145,11 @@ public class AttendantRule extends DialingRule implements Replicable {
         m_holidayAttendant = holidayAttendant;
     }
 
-    public WorkingTime getWorkingTimeAttendant() {
+    public WorkingTimeAttendant getWorkingTimeAttendant() {
         return m_workingTimeAttendant;
     }
 
-    public void setWorkingTimeAttendant(WorkingTime workingTimeAttendant) {
+    public void setWorkingTimeAttendant(WorkingTimeAttendant workingTimeAttendant) {
         m_workingTimeAttendant = workingTimeAttendant;
     }
 

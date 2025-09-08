@@ -19,130 +19,94 @@ import java.sql.Types;
 import org.apache.commons.lang.enums.Enum;
 import org.apache.commons.lang.enums.EnumUtils;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.EntityMode;
-import org.hibernate.Hibernate;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.usertype.UserType;
 
 /**
- * EnumUserType Maps a commons-lang <code>Enum</code> to a Hibernate type. From the example on
- * http://www.hibernate.org/172.html
+ * Hibernate 7 compatible EnumUserType for commons-lang Enum.
  */
 public class EnumUserType implements UserType {
-    private Class m_enumClass;
 
-    public EnumUserType(Class enumClass) {
-        m_enumClass = enumClass;
+    private final Class<? extends Enum> enumClass;
+
+    public EnumUserType(Class<? extends Enum> enumClass) {
+        this.enumClass = enumClass;
         initStaticFields();
     }
 
-    /**
-     * Initializes static fields for this enumeration
-     *
-     * Workaround for: http://issues.apache.org/jira/browse/LANG-76
-     *
-     */
-    public void initStaticFields() {
-        Field[] fields = m_enumClass.getFields();
+    private void initStaticFields() {
+        Field[] fields = enumClass.getFields();
         if (fields.length > 0) {
             try {
                 fields[0].get(null);
             } catch (Exception e) {
-                // we are going to get NullPointerException here
-                // ignore it - we are just loading class to trigger static field init
-                LogFactory.getLog(getClass()).debug("Initializing static fields for: " + m_enumClass);
+                LogFactory.getLog(getClass()).debug("Initializing static fields for: " + enumClass);
             }
         }
     }
 
-    /**
-     * @see org.hibernate.usertype.UserType#sqlTypes()
-     */
-    public int[] sqlTypes() {
-        return new int[] {
-            Types.VARCHAR
-        };
+    @Override
+    public int getSqlType() {
+        return Types.VARCHAR;
     }
 
-    /**
-     * @see org.hibernate.usertype.UserType#returnedClass()
-     */
-    public Class returnedClass() {
-        return m_enumClass;
+    @Override
+    public Class<?> returnedClass() {
+        return enumClass;
     }
 
-    /**
-     * @see org.hibernate.usertype.UserType#equals(java.lang.Object, java.lang.Object)
-     */
+    @Override
     public boolean equals(Object x, Object y) {
-        if (x == y) {
-            return true;
-        }
-
-        if (x == null || y == null) {
-            return false;
-        }
-
-        return Hibernate.STRING.isEqual(x, y, EntityMode.POJO);
+        return x == y || (x != null && x.equals(y));
     }
 
-    /**
-     * @see org.hibernate.usertype.UserType#nullSafeGet(java.sql.ResultSet, java.lang.String[],
-     *      java.lang.Object)
-     */
-    public Object nullSafeGet(ResultSet rs, String[] names, Object owner_) throws SQLException {
-        String enumCode = Hibernate.STRING.nullSafeGet(rs, names[0]);
-
-        return EnumUtils.getEnum(m_enumClass, enumCode);
+    @Override
+    public int hashCode(Object x) {
+        return x == null ? 0 : x.hashCode();
     }
 
-    /**
-     * @see org.hibernate.usertype.UserType#nullSafeSet(java.sql.PreparedStatement,
-     *      java.lang.Object, int)
-     */
-    public void nullSafeSet(PreparedStatement st, Object value, int index) throws SQLException {
-        // make sure the received value is of the right type
-        if ((value != null) && !returnedClass().isAssignableFrom(value.getClass())) {
-            throw new IllegalArgumentException("Received value is not a ["
-                    + returnedClass().getName() + "] but [" + value.getClass() + "]");
+    @Override
+    public Object nullSafeGet(ResultSet rs, int position,
+                              SharedSessionContractImplementor session, Object owner) throws SQLException {
+        String name = rs.getString(position);
+        if (rs.wasNull() || name == null) {
+            return null;
         }
+        return EnumUtils.getEnum(enumClass, name);
+    }
 
+    @Override
+    public void nullSafeSet(PreparedStatement st, Object value, int index,
+                            SharedSessionContractImplementor session) throws SQLException {
         if (value == null) {
             st.setNull(index, Types.VARCHAR);
-            return;
+        } else {
+            st.setString(index, ((Enum) value).getName());
         }
-
-        Enum enumeration = (Enum) value;
-        String enumCode = enumeration.getName();
-        st.setString(index, enumCode);
     }
 
-    /**
-     * @see org.hibernate.usertype.UserType#deepCopy(java.lang.Object)
-     */
+    @Override
     public Object deepCopy(Object value) {
         return value;
     }
 
-    /**
-     * @see org.hibernate.usertype.UserType#isMutable()
-     */
+    @Override
     public boolean isMutable() {
         return false;
     }
 
-    public int hashCode(Object x) {
-        return x.hashCode();
+    @Override
+    public Serializable disassemble(Object value) {
+        return value == null ? null : ((Enum) value).getName();
     }
 
-    public Serializable disassemble(Object value_) {
-        return null;
+    @Override
+    public Object assemble(Serializable cached, Object owner) {
+        return cached == null ? null : EnumUtils.getEnum(enumClass, cached.toString());
     }
 
-    public Object assemble(Serializable cached_, Object owner_) {
-        return null;
-    }
-
-    public Object replace(Object original, Object target_, Object owner_) {
+    @Override
+    public Object replace(Object original, Object target, Object owner) {
         return original;
     }
 }

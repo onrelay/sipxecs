@@ -88,7 +88,7 @@ public class NatConfiguration implements ConfigProvider {
         context.put("proxyTlsPort", proxyTlsPort);
         context.put("routes", routes);
         try {
-            m_velocityEngine.mergeTemplate("nattraversal/nattraversalrules.vm", context, writer);
+            m_velocityEngine.mergeTemplate("nattraversal/nattraversalrules.vm", "UTF-8", context, writer);
         } catch (Exception e) {
             throw new IOException(e);
         }

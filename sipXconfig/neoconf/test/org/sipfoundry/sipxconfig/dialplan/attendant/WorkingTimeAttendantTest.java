@@ -17,13 +17,12 @@ import java.util.TimeZone;
 import junit.framework.TestCase;
 
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.Interval;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.InvalidPeriodException;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.OverlappingPeriodsException;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.SameStartAndStopHoursException;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.WorkingHours;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant.InvalidPeriodException;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant.OverlappingPeriodsException;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant.SameStartAndStopHoursException;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 
-public class WorkingTimeTest extends TestCase {
+public class WorkingTimeAttendantTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -56,8 +55,8 @@ public class WorkingTimeTest extends TestCase {
         assertEquals("18:00", hours.getStopTime());
     }
 
-    public void testInitWorkingTime() {
-        WorkingTime wt = new WorkingTime();
+    public void testInitAttendantWorkingTime() {
+        WorkingTimeAttendant wt = new WorkingTimeAttendant();
         WorkingHours[] workingHours = wt.getWorkingHours();
         assertEquals(7, workingHours.length);
         assertTrue(workingHours[0].isEnabled());
@@ -83,7 +82,7 @@ public class WorkingTimeTest extends TestCase {
         c.set(Calendar.MINUTE, 5);
         hours.setStop(c.getTime());
 
-        List<Interval> minutes = new ArrayList<Interval>();
+        List<WorkingHours.Interval> minutes = new ArrayList<WorkingHours.Interval>();
         hours.addMinutesFromSunday(minutes, 0);
         assertEquals(1, minutes.size());
         assertEquals(63, minutes.get(0).getStart());
@@ -112,7 +111,7 @@ public class WorkingTimeTest extends TestCase {
         c.set(Calendar.MINUTE, 5);
         hours.setStop(c.getTime());
 
-        List<Interval> minutes = new ArrayList<Interval>();
+        List<WorkingHours.Interval> minutes = new ArrayList<WorkingHours.Interval>();
         hours.addMinutesFromSunday(minutes, 120);
         assertEquals(1, minutes.size());
         assertEquals(2 * 24 * 60 + 63 - 120, minutes.get(0).getStart());
@@ -140,7 +139,7 @@ public class WorkingTimeTest extends TestCase {
         c.set(Calendar.MINUTE, 5);
         hours.setStop(c.getTime());
 
-        List<Interval> minutes = new ArrayList<Interval>();
+        List<WorkingHours.Interval> minutes = new ArrayList<WorkingHours.Interval>();
         hours.addMinutesFromSunday(minutes, 180);
         assertEquals(1, minutes.size());
         assertEquals(63 + WorkingHours.MINUTES_PER_WEEK - 180, minutes.get(0).getStart());
@@ -179,7 +178,7 @@ public class WorkingTimeTest extends TestCase {
         c.set(Calendar.MINUTE, 5);
         hours.setStop(c.getTime());
 
-        List<Interval> minutes = new ArrayList<Interval>();
+        List<WorkingHours.Interval> minutes = new ArrayList<WorkingHours.Interval>();
         hours.addMinutesFromSunday(minutes, 80);
         assertEquals(2, minutes.size());
         assertEquals(63 + WorkingHours.MINUTES_PER_WEEK - 80, minutes.get(0).getStart());
@@ -221,7 +220,7 @@ public class WorkingTimeTest extends TestCase {
         c.set(Calendar.MINUTE, 5);
         hours.setStop(c.getTime());
 
-        List<Interval> minutes = new ArrayList<Interval>();
+        List<WorkingHours.Interval> minutes = new ArrayList<WorkingHours.Interval>();
         hours.addMinutesFromSunday(minutes, 0);
         assertEquals(7, minutes.size());
         for (int i = 0; i < 7; i++) {
@@ -245,7 +244,7 @@ public class WorkingTimeTest extends TestCase {
         c.set(Calendar.MINUTE, 5);
         hours.setStop(c.getTime());
 
-        List<Interval> minutes = new ArrayList<Interval>();
+        List<WorkingHours.Interval> minutes = new ArrayList<WorkingHours.Interval>();
         hours.addMinutesFromSunday(minutes, 0);
         assertEquals(5, minutes.size());
         for (int i = 0; i < 5; i++) {
@@ -269,7 +268,7 @@ public class WorkingTimeTest extends TestCase {
         c.set(Calendar.MINUTE, 5);
         hours.setStop(c.getTime());
 
-        List<Interval> minutes = new ArrayList<Interval>();
+        List<WorkingHours.Interval> minutes = new ArrayList<WorkingHours.Interval>();
         hours.addMinutesFromSunday(minutes, 0);
         assertEquals(2, minutes.size());
         assertEquals(6 * 24 * 60 + 63, minutes.get(0).getStart());
@@ -338,7 +337,7 @@ public class WorkingTimeTest extends TestCase {
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         c.set(1970, Calendar.JANUARY, 1);
 
-        WorkingTime wt = new WorkingTime();
+        WorkingTimeAttendant wt = new WorkingTimeAttendant();
         assertFalse(wt.overlappingPeriods());
 
         WorkingHours[] hours = new WorkingHours[2];
@@ -526,7 +525,7 @@ public class WorkingTimeTest extends TestCase {
     }
 
     public void testCheckValid() {
-        WorkingTime wt = new WorkingTime();
+        WorkingTimeAttendant wt = new WorkingTimeAttendant();
 
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         c.set(1970, Calendar.JANUARY, 1);

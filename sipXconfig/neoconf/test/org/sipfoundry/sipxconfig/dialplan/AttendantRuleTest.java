@@ -27,7 +27,7 @@ import org.sipfoundry.sipxconfig.address.Address;
 import org.sipfoundry.sipxconfig.address.AddressManager;
 import org.sipfoundry.sipxconfig.dialplan.attendant.Holiday;
 import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
 import org.sipfoundry.sipxconfig.dialplan.config.MappingRules;
 import org.sipfoundry.sipxconfig.dialplan.config.RulesXmlFile;
 import org.sipfoundry.sipxconfig.dialplan.config.Transform;
@@ -185,7 +185,7 @@ public class AttendantRuleTest extends TestCase {
         AutoAttendant attendant = new AutoAttendant();
         attendant.setUniqueId();
 
-        WorkingTime wt = new WorkingTime();
+        WorkingTimeAttendant wt = new WorkingTimeAttendant();
         wt.setAttendant(attendant);
 
         Holiday holiday = new Holiday();

@@ -128,10 +128,6 @@ bundle edit_line mongodb_arbiter_config_contents {
       "  path: /var/log/mongodb/mongod-arbiter.log";
       "storage:";
       "  dbPath: /var/lib/mongod-arbiter";
-      "  journal:";
-      "    enabled: true";
-      "  mmapv1:";
-      "    smallFiles: true";
       "processManagement:";
       "  fork: true";
       "  pidFilePath: /run/mongodb/mongod.pid";
@@ -228,10 +224,6 @@ bundle edit_line mongo_local_config_contents {
       "  replSetName: sipxlocal";                 
       "storage:";
       "  dbPath: /var/lib/mongo-local";
-      "  journal:";
-      "    enabled: true";
-      "  mmapv1:";
-      "    smallFiles: true";
 
     has_cache_value::
       "  wiredTiger:";
@@ -328,10 +320,6 @@ bundle edit_line mongo_local_arbiter_config_contents {
       "  path: /var/log/$(mongodb.id)/local/local-arbiter.log";
       "storage:";
       "  dbPath: /var/lib/mongo-local-arbiter";
-      "  journal:";
-      "    enabled: true";
-      "  mmapv1:";
-      "    smallFiles: true";
       "processManagement:";
       "  fork: true";
       "  pidFilePath: /run/mongodb/local-arbiter.pid";
@@ -393,10 +381,7 @@ bundle edit_line mongodb_config_contents {
       "  replSetName: sipxecs";                 
       "storage:";
       "  dbPath: /var/lib/mongo";
-      "  journal:";
-      "    enabled: true";
-      "  mmapv1:";
-      "    smallFiles: true";
+
 
     has_cache_value::
       "  wiredTiger:";
@@ -623,5 +608,5 @@ bundle agent mongodb_initialize {
     any::
       "$(sipx.SIPX_BINDIR)/mongodb-admin"
         comment => "Initialize mongodb if it's not already initialized",
-        args => "--host_port $(sipx.host).$(sipx.net_domain):27017 INITIALIZE";
+        args => "--host_port $(sipx.host).$(sipx.net_domain):27017 --primary $(sipx.host).$(sipx.net_domain):27017 INITIALIZE";
 }

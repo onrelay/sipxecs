@@ -33,7 +33,7 @@ import org.sipfoundry.sipxconfig.test.MongoTestIntegration;
 import org.sipfoundry.sipxconfig.test.ResultDataGrid;
 import org.sipfoundry.sipxconfig.test.TestHelper;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.orm.hibernate5.HibernateObjectRetrievalFailureException;
+import org.springframework.orm.ObjectRetrievalFailureException;
 
 public class PhoneTestIntegration extends MongoTestIntegration {
     private PhoneContext context;
@@ -93,7 +93,7 @@ public class PhoneTestIntegration extends MongoTestIntegration {
         try {
             context.loadPhone(id);
             fail();
-        } catch (HibernateObjectRetrievalFailureException x) {
+        } catch (ObjectRetrievalFailureException x) {
             assertTrue(true);
         }
         flush();

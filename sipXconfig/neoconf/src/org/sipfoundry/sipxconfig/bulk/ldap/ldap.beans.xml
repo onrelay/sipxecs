@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-  http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
   
   <!-- prototype, call ldapManager.getAttrMap for system's current attribute mapping  -->
   <bean id="attrMap" class="org.sipfoundry.sipxconfig.bulk.ldap.AttrMap" scope="prototype">
@@ -42,21 +42,21 @@
     <property name="objectClass" value="person" />
     <property name="selectedObjectClasses">
       <set>
-		<value>account</value>
-		<value>contact</value>
-		<value>inetOrgPerson</value>
-		<value>organizationalPerson</value>
-		<value>person</value>
-		<value>residentialPerson</value>
-		<value>securityPrincipal</value>
-		<value>top</value>
-		<value>user</value>
+        <value>account</value>
+        <value>contact</value>
+        <value>inetOrgPerson</value>
+        <value>organizationalPerson</value>
+        <value>person</value>
+        <value>residentialPerson</value>
+        <value>securityPrincipal</value>
+        <value>top</value>
+        <value>user</value>
       </set>
     </property>
   </bean>
 
   <bean id="ldapSystemSettings" class="org.sipfoundry.sipxconfig.bulk.ldap.LdapSystemSettings" scope="prototype">
-  	<property name="configured" value="false"/>
+      <property name="configured" value="false"/>
   </bean>
 
   <bean id="ldapConnectionParams" class="org.sipfoundry.sipxconfig.bulk.ldap.LdapConnectionParams" scope="prototype" parent="beanWithSettings">
@@ -70,17 +70,13 @@
     <property name="coreContext" ref="coreContext" />
     <property name="forwardingContext" ref="forwardingContext" />
     <property name="mailboxManager" ref="mailboxManager" />
-    <property name="userMapper">
-      <ref local="ldapUserMapper" />
-    </property>
+    <property name="userMapper" ref="ldapUserMapper" />
     <property name="settingDao" ref="settingDao" />
     <property name="permissionManager" ref="permissionManager" />
   </bean>
 
   <bean id="ldapUserMapper" class="org.sipfoundry.sipxconfig.bulk.ldap.UserMapper" scope="prototype">
-    <property name="ldapManager">
-      <ref local="ldapManager" />
-    </property>
+    <property name="ldapManager" ref="ldapManager" />
     <property name="permissionManager" ref="permissionManager" />
   </bean>
 
@@ -98,15 +94,9 @@
 
   <bean id="ldapImportManagerImpl" class="org.sipfoundry.sipxconfig.bulk.ldap.LdapImportManagerImpl">
     <property name="sessionFactory" ref="sessionFactory" />
-    <property name="userMapper">
-      <ref local="ldapUserMapper" />
-    </property>
-    <property name="rowInserter">
-      <ref local="ldapRowInserter" />
-    </property>
-    <property name="ldapManager">
-      <ref local="ldapManager" />
-    </property>
+    <property name="userMapper" ref="ldapUserMapper" />
+    <property name="rowInserter" ref="ldapRowInserter" />
+    <property name="ldapManager" ref="ldapManager" />
     <property name="previewSize" value="10" />
     <property name="templateFactory" ref="ldapTemplateFactory" />
     <property name="adminContext" ref="adminContext"/>
@@ -114,9 +104,7 @@
 
   <bean id="eagerLdapImportManager" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.bulk.ldap.LdapImportManager" />
-    <property name="target">
-      <ref local="ldapImportManagerImpl" />
-    </property>
+    <property name="target" ref="ldapImportManagerImpl" />
     <property name="interceptorNames">
       <list>
         <value>hibernateInterceptor</value>
@@ -126,9 +114,7 @@
 
   <bean id="ldapImportManager" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.bulk.ldap.LdapImportManager" />
-    <property name="target">
-      <ref local="ldapImportManagerImpl" />
-    </property>
+    <property name="target" ref="ldapImportManagerImpl" />
     <property name="interceptorNames">
       <list>
         <value>backgroundTaskInterceptor</value>
@@ -138,25 +124,19 @@
   </bean>
 
   <bean id="ldapImportTrigger" class="org.sipfoundry.sipxconfig.bulk.ldap.LdapImportTrigger">
-    <property name="ldapImportManager">
-      <ref local="eagerLdapImportManager" />
-    </property>
-    <property name="ldapManager">
-      <ref local="ldapManager" />
-    </property>
+    <property name="ldapImportManager" ref="eagerLdapImportManager" />
+    <property name="ldapManager" ref="ldapManager" />
   </bean>
 
   <bean id="ldapTimer" class="org.sipfoundry.sipxconfig.bulk.ldap.LdapTimer">
     <property name="adminContext" ref="adminContext"/>
     <property name="userProfileService" ref="userProfileService" />
-    <property name="ldapManager">
-      <ref local="ldapManager" />
-    </property>
+    <property name="ldapManager" ref="ldapManager" />
   </bean>
   
   <task:scheduled-tasks>
-	<task:scheduled ref="ldapTimer" method="disableDeleteUsers" fixed-delay="60000" />
-	<task:scheduled ref="ldapTimer" method="verifyLdapConnection" cron="0 0 */2 * * ?" /> 
+    <task:scheduled ref="ldapTimer" method="disableDeleteUsers" fixed-delay="60000" />
+    <task:scheduled ref="ldapTimer" method="verifyLdapConnection" cron="0 0 */2 * * ?" /> 
   </task:scheduled-tasks>
   
   <bean id="disableLdapUsersTask" class="org.sipfoundry.sipxconfig.bulk.ldap.DisableLdapUsersTask" scope="prototype">

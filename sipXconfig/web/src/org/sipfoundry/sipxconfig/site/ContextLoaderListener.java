@@ -24,14 +24,19 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class ContextLoaderListener extends org.springframework.web.context.ContextLoaderListener {
 
     public void contextInitialized(ServletContextEvent event) {
-        //configure log4j
-        String log4jfile = this.getClass().getResource("/log4j.properties").getFile();
-        PropertyConfigurator.configureAndWatch(log4jfile, SipFoundryLayout.LOG4J_MONITOR_FILE_DELAY);
+
+        String configDirectory = System.getProperty("conf.dir");
+
+        PropertyConfigurator.configureAndWatch( configDirectory+"/log4j.properties",
+                SipFoundryLayout.LOG4J_MONITOR_FILE_DELAY);
+
         super.contextInitialized(event);
+
         ServletContext servletContext = event.getServletContext();
+
         WebApplicationContext bf = WebApplicationContextUtils
                 .getWebApplicationContext(servletContext);
-        // tell entire application, we're ready to run
+
         bf.publishEvent(new ApplicationInitializedEvent(this));
     }
 }

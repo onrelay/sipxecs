@@ -12,11 +12,16 @@ package org.sipfoundry.sipxconfig.search;
 import java.io.Serializable;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.event.EventListeners;
-import org.hibernate.event.PostLoadEvent;
-import org.hibernate.event.PostLoadEventListener;
-import org.hibernate.impl.SessionFactoryImpl;
+import org.hibernate.event.spi.PostLoadEvent;
+import org.hibernate.event.spi.PostLoadEventListener;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.event.spi.EventType;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.type.Type;
+import org.hibernate.metamodel.spi.MappingMetamodelImplementor;
+
+import org.hibernate.persister.entity.EntityPersister;
 import org.sipfoundry.sipxconfig.common.SpringHibernateInstantiator;
 import org.sipfoundry.sipxconfig.common.event.KeepsOriginalCopy;
 
@@ -37,42 +42,50 @@ public class LoadIndexingInterceptor extends SpringHibernateInstantiator impleme
         m_beanIndexHelper = beanIndexHelper;
     }
 
-    public boolean onLoad(Object entity, Serializable id, Object[] state, String[] propertyNames,
-            Type[] types) {
-        BeanIndexProperties beanIndexProperties = new BeanIndexProperties(entity, id, state, propertyNames, types);
-        m_beanIndexHelper.setupIndexProperties(beanIndexProperties, true);
-        m_indexer.indexBean(entity, id, beanIndexProperties.getState(), beanIndexProperties.getPropertyNames(),
-                beanIndexProperties.getTypes(), true);
-        return false;
-    }
-
     @Override
     public void setSessionFactory(SessionFactory sessionFactory) {
         super.setSessionFactory(sessionFactory);
-        if (sessionFactory instanceof SessionFactoryImpl) {
-            SessionFactoryImpl impl = (SessionFactoryImpl) sessionFactory;
-            EventListeners elisteners = impl.getEventListeners();
-            addSelfAsPostLoadEventListener(elisteners);
+        if (sessionFactory instanceof SessionFactoryImplementor) {
+            SessionFactoryImplementor sfi = (SessionFactoryImplementor) sessionFactory;
+            ServiceRegistry serviceRegistry = sfi.getServiceRegistry();
+            EventListenerRegistry listenerRegistry = serviceRegistry.getService(EventListenerRegistry.class);
+            listenerRegistry.appendListeners(EventType.POST_LOAD, this);
         }
-    }
-
-    void addSelfAsPostLoadEventListener(EventListeners elisteners) {
-        PostLoadEventListener[] listeners = elisteners.getPostLoadEventListeners();
-        if (listeners == null || listeners.length == 0) {
-            listeners = new PostLoadEventListener[1];
-        } else {
-            PostLoadEventListener[] copy = new PostLoadEventListener[listeners.length + 1];
-            System.arraycopy(listeners, 0, copy, 0, listeners.length);
-        }
-        listeners[listeners.length - 1] = this;
-        elisteners.setPostLoadEventListeners(listeners);
     }
 
     @Override
-    public void onPostLoad(PostLoadEvent arg0) {
-        Object entity = arg0.getEntity();
-        if (entity instanceof KeepsOriginalCopy) {
-            ((KeepsOriginalCopy<?>) entity).makeBackupAsOriginalCopy();
+    public void onPostLoad(PostLoadEvent event) {
+
+        try {
+            Object entity = event.getEntity();
+            Serializable id = (Serializable)event.getId();
+
+            if (entity instanceof KeepsOriginalCopy) {
+                ((KeepsOriginalCopy<?>) entity).makeBackupAsOriginalCopy();
+            }
+
+            Class<?> entityClass = entity.getClass();
+            SessionFactory sessionFactory = event.getSession().getFactory();
+            SessionFactoryImplementor sfi = (SessionFactoryImplementor) sessionFactory;
+            MappingMetamodelImplementor metamodel = sfi.getMappingMetamodel();            
+            EntityPersister persister = metamodel.findEntityDescriptor(entityClass.getName()); 
+
+            String[] propertyNames = persister.getPropertyNames();
+            Object[] state = new Object[propertyNames.length];
+            Type[] types = new Type[propertyNames.length];
+
+            for (int i = 0; i < propertyNames.length; i++) {
+                state[i] = persister.getPropertyValue(entity, i);
+                types[i] = persister.getPropertyType(propertyNames[i]);  
+            }
+
+            BeanIndexProperties bip = new BeanIndexProperties(entity, id, state, propertyNames, types);
+            m_beanIndexHelper.setupIndexProperties(bip, true);
+            m_indexer.indexBean(entity, id, bip.getState(), bip.getPropertyNames(), bip.getTypes(), true);
+
+        } catch (Exception e) {
+            // Log or handle gracefully
+            throw new RuntimeException("onPostLoad() failed", e);
         }
     }
 }

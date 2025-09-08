@@ -22,14 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.Version;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.codehaus.jackson.map.module.SimpleModule;
-import org.codehaus.jackson.map.ser.std.SerializerBase;
-import org.codehaus.jackson.type.TypeReference;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -102,7 +102,7 @@ public class RegionApi extends ServerResource {
     /**
      * Add server list to region as help aid to caller to know what server are in what region.
      */
-    static final class RegionWithServers extends SerializerBase<Region> {
+    static final class RegionWithServers extends StdSerializer<Region> {
         private List<Location> m_locations;
 
         protected RegionWithServers(List<Location> locations) {

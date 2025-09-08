@@ -4,14 +4,14 @@
 <hibernate-mapping package="org.sipfoundry.sipxconfig.feature" default-lazy="false">
 
   <sql-query name="locationsForEnabledFeature">
-    <return class="org.sipfoundry.sipxconfig.commserver.Location"/>
+    <return alias="loc" class="org.sipfoundry.sipxconfig.commserver.Location"/>
     <![CDATA[
-      select location.* 
-        from location inner join feature_local on 
-          location.location_id = feature_local.location_id 
-       where 
-          feature_local.feature_id = :featureId
-      ]]>
+      select loc.* 
+        from location loc 
+        inner join feature_local fl on loc.location_id = fl.location_id 
+      where 
+        fl.feature_id = :featureId
+    ]]>
   </sql-query>
 
 </hibernate-mapping>

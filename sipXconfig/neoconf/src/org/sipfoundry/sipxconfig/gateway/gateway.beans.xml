@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   
   <bean id="abstractGatewayModel" class="org.sipfoundry.sipxconfig.gateway.GatewayModel" abstract="true">
     <property name="defaultProfileLocation" ref="tftpProfileLocation" />
@@ -78,12 +78,8 @@
   </bean>
 
   <bean id="eagerGatewayProfileManagerImpl" class="org.sipfoundry.sipxconfig.device.ProfileManagerImpl">
-    <property name="deviceSource">
-      <ref local="gatewaySource" />
-    </property>
-    <property name="restartManager">
-      <ref local="gatewayRestartManagerImpl" />
-    </property>
+    <property name="deviceSource" ref="gatewaySource" />
+    <property name="restartManager" ref="gatewayRestartManagerImpl" />
     <property name="jobContext" ref="jobContext" />
     <property name="systemAuditManager" ref="systemAuditManager" />
   </bean>
@@ -94,16 +90,12 @@
   </bean>
 
   <bean id="gatewayProfileManagerImpl" class="org.sipfoundry.sipxconfig.device.LazyProfileManagerImpl" init-method="init">
-    <property name="target">
-      <ref local="eagerGatewayProfileManagerImpl" />
-    </property>
+    <property name="target" ref="eagerGatewayProfileManagerImpl" />
     <property name="sleepInterval" value="5000" />
   </bean>
 
   <bean id="sipTrunkMigrationContextImpl" class="org.sipfoundry.sipxconfig.gateway.SipTrunkMigrationContextImpl">
-    <property name="gatewayContext">
-      <ref local="gatewayContext" />
-    </property>
+    <property name="gatewayContext" ref="gatewayContext" />
     <property name="sessionFactory" ref="sessionFactory" />
     <property name="sbcDeviceManager" ref="sbcDeviceManager" />
     <property name="sbcModelSource" ref="nakedSbcModelSource" />
@@ -113,14 +105,10 @@
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.gateway.SipTrunkMigrationContext</value>
     </property>
-    <property name="target">
-      <ref local="sipTrunkMigrationContextImpl" />
-    </property>
+    <property name="target" ref="sipTrunkMigrationContextImpl" />
   </bean>
 
   <bean id="sipTrunkSetup" class="org.sipfoundry.sipxconfig.gateway.SipTrunkSetup">
-    <property name="sipTrunkMigrationContext">
-      <ref local="sipTrunkMigrationContext" />
-    </property>
+    <property name="sipTrunkMigrationContext" ref="sipTrunkMigrationContext" />
   </bean>
 </beans>

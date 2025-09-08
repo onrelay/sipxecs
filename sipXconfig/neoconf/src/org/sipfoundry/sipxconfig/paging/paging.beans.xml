@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="pagingConfiguration" class="org.sipfoundry.sipxconfig.paging.PagingConfiguration">
     <property name="pagingContext" ref="pagingContext" />
@@ -20,7 +20,7 @@
   <bean id="pagingFeatureContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.paging.PagingFeatureContext" />
     <property name="target">
-      <ref local="pagingFeatureContextImpl" />
+      <ref bean="pagingFeatureContextImpl" />
     </property>
   </bean>
 
@@ -43,7 +43,7 @@
   <bean id="pagingContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.paging.PagingContext" />
     <property name="target">
-      <ref local="pagingContextImpl" />
+      <ref bean="pagingContextImpl" />
     </property>
   </bean>
 </beans>

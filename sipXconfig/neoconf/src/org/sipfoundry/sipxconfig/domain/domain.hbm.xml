@@ -5,9 +5,10 @@
 
   <class name="Domain" table="domain">
     <id name="id" column="domain_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">domain_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">domain_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="name"/>
     <set name="aliases" cascade="all" table="domain_alias">
@@ -21,5 +22,4 @@
   <query name="domain">
     <![CDATA[from Domain]]>
   </query>
-
 </hibernate-mapping>

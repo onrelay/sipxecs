@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.common;
 import java.util.List;
 
 
-public class ExtensionPoolContextImpl extends SipxHibernateDaoSupport implements ExtensionPoolContext {
+public class ExtensionPoolContextImpl extends SipxHibernateDaoSupport<ExtensionPool> implements ExtensionPoolContext {
 
     /** Name of the user extension pool */
     public static final String USER_POOL_NAME = "user";
@@ -35,9 +35,9 @@ public class ExtensionPoolContextImpl extends SipxHibernateDaoSupport implements
 
     public void saveExtensionPool(ExtensionPool pool) {
         if (pool.isNew()) {
-            getHibernateTemplate().save(pool);
+            super.persistEntity(pool);
         } else {
-            getHibernateTemplate().merge(pool);
+            super.mergeEntity(pool);
         }
     }
 
@@ -81,8 +81,8 @@ public class ExtensionPoolContextImpl extends SipxHibernateDaoSupport implements
 
     /** Return the named extension pool.  Create it if necessary. */
     private ExtensionPool getExtensionPool(String poolName) {
-        List pools = getHibernateTemplate().findByNamedQueryAndNamedParam(
-                "extensionPoolByName", PROP_NAME, poolName);
+        List<ExtensionPool> pools = super.findByNamedQueryAndNamedParam(
+                "extensionPoolByName", PROP_NAME, poolName, ExtensionPool.class);
         ExtensionPool pool = null;
 
         // Create the pool if it doesn't exist

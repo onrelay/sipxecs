@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   
   <bean id="nakedPhoneModelSource" class="org.sipfoundry.sipxconfig.device.BeanFactoryModelSource">
     <constructor-arg>
@@ -44,7 +44,7 @@
 
   <bean id="phoneRestartManagerImpl" class="org.sipfoundry.sipxconfig.device.ScheduledRestartManagerImpl">
     <property name="deviceSource">
-      <ref local="phoneSource" />
+      <ref bean="phoneSource" />
     </property>
     <property name="jobContext" ref="jobContext" />
     <property name="sleepInterval" value="5000" />
@@ -58,10 +58,10 @@
 
   <bean id="eagerPhoneProfileManagerImpl" class="org.sipfoundry.sipxconfig.device.ProfileManagerImpl">
     <property name="deviceSource">
-      <ref local="phoneSource" />
+      <ref bean="phoneSource" />
     </property>
     <property name="restartManager">
-      <ref local="phoneRestartManagerImpl" />
+      <ref bean="phoneRestartManagerImpl" />
     </property>
     <property name="jobContext" ref="jobContext" />
     <property name="systemAuditManager" ref="systemAuditManager" />
@@ -74,7 +74,7 @@
 
   <bean id="phoneProfileManagerImpl" class="org.sipfoundry.sipxconfig.device.LazyProfileManagerImpl" init-method="init">
     <property name="target">
-      <ref local="eagerPhoneProfileManagerImpl" />
+      <ref bean="eagerPhoneProfileManagerImpl" />
     </property>
     <property name="sleepInterval" value="5000" />
   </bean>

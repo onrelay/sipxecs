@@ -7,9 +7,10 @@
   -->
   <class name="UserRing" table="user_ring">
     <id name="id" column="user_ring_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">ring_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">ring_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="expiration" />
     <property name="type" column="ring_type" type="org.sipfoundry.sipxconfig.callgroup.AbstractRing$UserType" />
@@ -22,9 +23,10 @@
   -->
   <class name="CallGroup" table="call_group">
     <id name="id" column="call_group_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">call_group_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">call_group_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="enabled" />
     <property name="name" />
@@ -51,13 +53,10 @@
   <query name="userRingsForUserId">
     <![CDATA[from UserRing ring where ring.user.id = :userId]]>
   </query>
-
   <query name="callGroupIdsWithName">
-    <![CDATA[select cg.id from CallGroup cg where cg.name = :value]]>
+  <![CDATA[select cg.id from CallGroup cg where cg.name = :value]]>
   </query>
-
   <query name="callGroupIdsWithAlias">
     <![CDATA[select cg.id from CallGroup cg where cg.name = :value or cg.extension = :value or cg.did = :value]]>
   </query>
-
 </hibernate-mapping>

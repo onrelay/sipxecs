@@ -21,11 +21,12 @@ sipXconfig_dependency() {
        org.restlet \
        spring-context \
        spring-context-support \
+       spring-velocity-support \
        spring-core \
        spring-orm \
        spring-tx \
        sipxcommons \
-       velocity \
+       velocity-engine-core \
        velocity-tools-generic \
        xercesImpl \
        xmlunit

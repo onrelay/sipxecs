@@ -12,11 +12,7 @@ package org.sipfoundry.sipxconfig.rest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,7 +21,6 @@ import org.restlet.data.MediaType;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
-import org.restlet.ext.fileupload.RestletFileUpload;
 import org.restlet.representation.OutputRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ServerResource;
@@ -34,6 +29,9 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.representation.Variant;
 import org.sipfoundry.commons.userdb.profile.UserProfileService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
 
 public class UserAvatarResource extends ServerResource {
     private static final Log LOG = LogFactory.getLog(UserAvatarResource.class);
@@ -50,46 +48,46 @@ public class UserAvatarResource extends ServerResource {
     }
 
     @Get
-    public Representation represent(Variant variant) throws ResourceException {        
+    public Representation represent(Variant variant) throws ResourceException {
         return new AvatarRepresentation(MediaType.IMAGE_PNG, m_avatarService.getAvatar(m_userName));
     }
 
     @Post
-    public Representation acceptRepresentation(Representation entity) throws ResourceException {        
+    public Representation acceptRepresentation(Representation entity) throws ResourceException {
         if (entity != null) {
-            if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
-                DiskFileItemFactory factory = new DiskFileItemFactory();
-                factory.setSizeThreshold(1000240);
+            try {
+                // Extract the underlying HttpServletRequest
+                HttpServletRequest servletRequest =
+                        (HttpServletRequest) getRequest().getAttributes().get("jakarta.servlet.request");
 
-                RestletFileUpload upload = new RestletFileUpload(factory);
+                if (servletRequest != null) {
+                    Part filePart = servletRequest.getPart("file");
+                    if (filePart == null) {
+                        LOG.error("No file part in request");
+                        throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST,
+                                "Missing 'file' part in multipart request");
+                    }
 
-                List<FileItem> fileList = null;
-                try {
-                    fileList = upload.parseRepresentation(entity);
-                } catch (FileUploadException e) {
-                    LOG.error("Cannot parse representation", e);
-                    throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST);
+                    try (InputStream is = filePart.getInputStream()) {
+                        m_avatarService.saveAvatar(m_userName, is);
+                    }
+                } else {
+                    // Fallback: treat entity as raw body (non-multipart)
+                    try (InputStream is = entity.getStream()) {
+                        m_avatarService.saveAvatar(m_userName, is);
+                    }
                 }
-                if (fileList == null || fileList.size() != 1) {
-                    LOG.error("Wrong file list size. You have to send one file avatar to upload");
-                    throw new ResourceException(Status.CLIENT_ERROR_EXPECTATION_FAILED,
-                            "Zero or more than one avatar to upload");
-                }
-
-                try {
-                    m_avatarService.saveAvatar(m_userName, fileList.get(0).getInputStream());
-                } catch (Exception e) {
-                    LOG.error("Cannot upload avatar", e);
-                    throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST);
-                }
+            } catch (Exception e) {
+                LOG.error("Cannot upload avatar", e);
+                throw new ResourceException(Status.CLIENT_ERROR_BAD_REQUEST);
             }
         }
         return null;
     }
 
     static class AvatarRepresentation extends OutputRepresentation {
+        private final InputStream m_is;
 
-        private InputStream m_is;
         public AvatarRepresentation(MediaType mediaType, InputStream is) {
             super(mediaType);
             m_is = is;
@@ -107,5 +105,4 @@ public class UserAvatarResource extends ServerResource {
     public void setUserAvatarService(UserProfileService service) {
         m_avatarService = service;
     }
-
 }

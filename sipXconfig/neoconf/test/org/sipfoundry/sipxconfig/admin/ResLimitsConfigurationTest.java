@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -194,7 +195,7 @@ public class ResLimitsConfigurationTest {
         }
     }
 
-    private class PluginSettings extends PersistableSettings {
+        private class PluginSettings extends PersistableSettings {
 
         @Override
         protected Setting loadSettings() {

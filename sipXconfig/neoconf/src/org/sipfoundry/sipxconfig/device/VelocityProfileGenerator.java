@@ -28,7 +28,7 @@ public class VelocityProfileGenerator extends AbstractProfileGenerator {
      * Char encoding for the templates velocity templates directory: in most cases they are
      * limited to ASCII.
      */
-    private String m_templateEncoding = "US-ASCII";
+    private String m_templateEncoding = "UTF-8";
 
     private String m_profileEncoding = "UTF-8";
 

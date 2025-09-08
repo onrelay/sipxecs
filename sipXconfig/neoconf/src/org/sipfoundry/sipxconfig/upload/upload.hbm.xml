@@ -5,9 +5,10 @@
 
   <class name="Upload" table="upload" discriminator-value="upload">
     <id name="id" column="upload_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">upload_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">upload_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <discriminator column="bean_id"/>
     <property name="name"/>
@@ -22,16 +23,13 @@
   <query name="upload">
     <![CDATA[from Upload u order by u.name]]>
   </query>
-
   <query name="deployedUploadBySpecification">
-    <![CDATA[from Upload u where u.deployed = 't' and u.specificationId = :spec]]>
+    <![CDATA[from Upload u where u.deployed = true and u.specificationId = :spec]]>
   </query>
-
   <query name="uploadName">
     <![CDATA[from Upload u where u.name = :name]]>
   </query>
-
   <query name="uploadNameAndId">
     <![CDATA[from Upload u where u.name = :name and u.id != :id]]>
   </query>
-</hibernate-mapping>
+  </hibernate-mapping>

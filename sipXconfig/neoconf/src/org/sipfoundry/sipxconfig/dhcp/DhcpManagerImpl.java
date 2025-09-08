@@ -42,7 +42,7 @@ import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
 
-public class DhcpManagerImpl extends SipxHibernateDaoSupport implements DhcpManager, FeatureProvider,
+public class DhcpManagerImpl extends SipxHibernateDaoSupport<DhcpSettings> implements DhcpManager, FeatureProvider,
         ProcessProvider, AddressProvider, FirewallProvider {
     private static final Collection<AddressType> ADDRESSES = Arrays.asList(new AddressType[] {
         DHCPD_ADDRESS

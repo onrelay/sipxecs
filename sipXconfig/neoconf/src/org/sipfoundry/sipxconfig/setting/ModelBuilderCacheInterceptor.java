@@ -12,8 +12,7 @@ package org.sipfoundry.sipxconfig.setting;
 import java.io.File;
 import java.io.Serializable;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
+import javax.cache.Cache;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -23,36 +22,42 @@ import org.apache.commons.logging.LogFactory;
 public class ModelBuilderCacheInterceptor implements MethodInterceptor {
     private static final Log LOG = LogFactory.getLog(ModelBuilderCacheInterceptor.class);
 
-    private Cache m_cache;
+    private Cache<String, Serializable> cache;
 
-    public void setCache(Cache cache) {
-        m_cache = cache;
+    public void setCache(Cache<String, Serializable> cache) {
+        this.cache = cache;
     }
 
     /**
      * Main method caches method result if method is configured. For caching method results must
      * be serializable
      */
+    @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         Object[] arguments = invocation.getArguments();
 
-        LOG.trace("looking for method result in cache");
+        LOG.trace("Looking for method result in cache");
         String cacheKey = getCacheKey(arguments);
-        Element element = m_cache.get(cacheKey);
-        if (element == null) {
-            LOG.trace("calling intercepted method");
+        Serializable value = cache.get(cacheKey);
+
+        if (value == null) {
+            LOG.trace("Calling intercepted method");
             Object result = invocation.proceed();
 
-            LOG.debug("caching result");
-            element = new Element(cacheKey, (Serializable) result);
-            m_cache.put(element);
+            LOG.debug("Caching result");
+            if (!(result instanceof Serializable)) {
+                throw new IllegalArgumentException("Cached result must be Serializable");
+            }
+
+            value = (Serializable) result;
+            cache.put(cacheKey, value);
         }
-        return element.getValue();
+        return value;
     }
 
     /**
-     * Creates cache key - this implementation is fine tune to create key based on the name the
-     * file passed as the first (and only) argument to the method
+     * Creates cache key - this implementation creates a key based on the name of the file
+     * passed as the first (and only) argument to the method.
      */
     protected String getCacheKey(Object[] arguments) {
         File file = (File) arguments[0];

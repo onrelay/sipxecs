@@ -19,7 +19,11 @@ public class PrivateUserKeyManagerImpl extends SipxHibernateDaoSupport<PrivateUs
         PrivateUserKeyManager {
     @Override
     public User getUserFromPrivateKey(String privateKey) {
-        List users = getHibernateTemplate().findByNamedQueryAndNamedParam("userForPrivateKey", "key", privateKey);
+        List<User> users = super.findByNamedQueryAndNamedParam(
+            "userForPrivateKey", 
+            "key", 
+            privateKey,
+            User.class);
         return (User) DataAccessUtils.singleResult(users);
     }
 
@@ -34,12 +38,13 @@ public class PrivateUserKeyManagerImpl extends SipxHibernateDaoSupport<PrivateUs
 
     private String createUserPrivateKey(User user) {
         PrivateUserKey privateUserKey = new PrivateUserKey(user);
-        getHibernateTemplate().saveOrUpdate(privateUserKey);
+        super.mergeEntity(privateUserKey);
         return privateUserKey.getKey();
     }
 
     private String getKeyForUser(User user) {
-        List keys = getHibernateTemplate().findByNamedQueryAndNamedParam("privateKeyForUser", "user", user);
+        List<String> keys = super.findByNamedQueryAndNamedParam(
+            "privateKeyForUser", "user", user, String.class);
         return (String) DataAccessUtils.singleResult(keys);
     }
 }

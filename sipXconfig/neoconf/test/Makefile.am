@@ -13,11 +13,6 @@ test_PKGS = \
 	$(sipxconfig_test_integration_core_PKGS)
 
 test_jetty_PKGS = \
-	jetty-http \
-	jetty-io \
-	jetty-security \
-	jetty-server \
-	jetty-util \
 	lucene-highlighter \
 	lucene-join \
 	lucene-memory \
@@ -37,6 +32,7 @@ test_DEPS = \
 	$(neoconf_JAVAROOT) \
 	$(srcdir) \
 	$(top_srcdir)/etc/sipxpbx \
+	$(call JavaDep, $(srcdir)/lib/jetty, $(jetty_PKGS)) \
 	$(call JavaDep, @SIPX_JAVADIR@/sipXcommons $(srcdir)/lib, $(test_jetty_PKGS)) \
 	$(call JavaDep, @SIPX_JAVADIR@/sipXcommons $(top_srcdir)/lib, $(test_PKGS))
 test_SRC = $(shell cd $(srcdir); find org \( \

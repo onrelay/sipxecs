@@ -18,7 +18,7 @@ import org.sipfoundry.sipxconfig.common.DataObjectSource;
 /**
  * Database services for setting business objects
  */
-public interface SettingDao extends DataObjectSource {
+public interface SettingDao extends DataObjectSource<Object> {
 
     /** common name found in spring file */
     String CONTEXT_NAME = "settingDao";

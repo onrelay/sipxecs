@@ -8,15 +8,16 @@
     -->
   <class name="Intercom" table="intercom">
     <id name="id" column="intercom_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">intercom_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">intercom_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="enabled"/>
     <property name="prefix"/>
     <property name="timeout"/>
     <property name="code"/>
-  	<set name="groups" table="intercom_phone_group" sort="natural" cascade="save-update">
+  	<set name="groups" table="intercom_phone_group" sort="natural" cascade="persist,merge">
       <key column="intercom_id"/>
       <many-to-many column="group_id" class="org.sipfoundry.sipxconfig.setting.Group"/>
     </set>

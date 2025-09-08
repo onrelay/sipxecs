@@ -14,49 +14,46 @@ import java.util.Date;
 
 import org.hibernate.HibernateException;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.type.AbstractSingleColumnStandardBasicType;
-import org.hibernate.type.LiteralType;
-import org.hibernate.type.TimestampType;
-import org.hibernate.type.VersionType;
-import org.hibernate.type.descriptor.java.JdbcTimestampTypeDescriptor;
+import org.hibernate.type.SqlTypes;
+import org.hibernate.type.descriptor.java.DateJavaType;
 
-public class UtcTimestampType extends AbstractSingleColumnStandardBasicType<Date> implements VersionType<Date>,
-        LiteralType<Date> {
 
+public class UtcTimestampType extends AbstractSingleColumnStandardBasicType<Date> {
+    
     public static final UtcTimestampType INSTANCE = new UtcTimestampType();
 
     public UtcTimestampType() {
-        super(UtcTimestampTypeDescriptor.INSTANCE, JdbcTimestampTypeDescriptor.INSTANCE);
-    }
-
-    public String getName() {
-        return TimestampType.INSTANCE.getName();
+        super(UtcTimestampTypeDescriptor.INSTANCE, DateJavaType.INSTANCE);
     }
 
     @Override
-    public String[] getRegistrationKeys() {
-        return TimestampType.INSTANCE.getRegistrationKeys();
+    public String getName() {
+        return "utc-timestamp";
     }
 
-    public Date next(Date current, SessionImplementor session) {
-        return TimestampType.INSTANCE.next(current, session);
+    public int getJdbcTypeCode() {
+        return SqlTypes.TIMESTAMP;
     }
 
-    public Date seed(SessionImplementor session) {
-        return TimestampType.INSTANCE.seed(session);
+    public Date next(Date current, SharedSessionContractImplementor session) {
+        return new Date(System.currentTimeMillis());
+    }
+
+    public Date seed(SharedSessionContractImplementor session) {
+        return new Date(System.currentTimeMillis());
     }
 
     public Comparator<Date> getComparator() {
-        return TimestampType.INSTANCE.getComparator();
+        return Comparator.naturalOrder();
     }
 
     public String objectToSQLString(Date value, Dialect dialect) throws Exception {
-        return TimestampType.INSTANCE.objectToSQLString(value, dialect);
+        return "'" + new java.sql.Timestamp(value.getTime()).toString() + "'";
     }
 
     public Date fromStringValue(String xml) throws HibernateException {
-        return TimestampType.INSTANCE.fromStringValue(xml);
+        return java.sql.Timestamp.valueOf(xml);
     }
 }
-

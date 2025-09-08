@@ -34,10 +34,10 @@ import org.restlet.representation.Variant;
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
 import org.sipfoundry.sipxconfig.common.TimeOfDay;
 import org.sipfoundry.sipxconfig.common.UserException;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.InvalidPeriodException;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.OverlappingPeriodsException;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.WorkingHours;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant.InvalidPeriodException;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant.OverlappingPeriodsException;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
 import org.sipfoundry.sipxconfig.forwarding.Schedule;
 import org.sipfoundry.sipxconfig.forwarding.Schedule.ScheduleException;
@@ -156,16 +156,16 @@ public class CallFwdScheduleResource extends UserResource {
         bean.setScheduleId(schedule.getId());
         bean.setName(schedule.getName());
         bean.setDescription(schedule.getDescription());
-        bean.setPeriods(toPeriodBeanList(schedule.getWorkingTime()));
+        bean.setPeriods(toPeriodBeanList(schedule.getWorkingTimeAttendant()));
         return bean;
     }
 
     private static void fromScheduleBean(ScheduleBean bean, Schedule sch) throws ResourceException {
         sch.setName(bean.getName());
         sch.setDescription(bean.getDescription());
-        WorkingTime wTime = new WorkingTime();
+        WorkingTimeAttendant wTime = new WorkingTimeAttendant();
         wTime.setWorkingHours(fromPeriodBeanList(bean.getPeriods()));
-        sch.setWorkingTime(wTime);
+        sch.setWorkingTimeAttendant(wTime);
 
         try {
             sch.checkForValidSchedule();
@@ -198,7 +198,7 @@ public class CallFwdScheduleResource extends UserResource {
         m_forwardingContext = forwardingContext;
     }
 
-    private static List<PeriodBean> toPeriodBeanList(WorkingTime wTimes) {
+    private static List<PeriodBean> toPeriodBeanList(WorkingTimeAttendant wTimes) {
         List<PeriodBean> periodBeans = new ArrayList<PeriodBean>();
 
         for (WorkingHours wHours : wTimes.getWorkingHours()) {

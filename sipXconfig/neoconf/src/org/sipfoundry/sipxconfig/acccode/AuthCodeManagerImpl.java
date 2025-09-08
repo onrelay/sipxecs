@@ -53,17 +53,17 @@ public class AuthCodeManagerImpl extends SipxHibernateDaoSupport<AuthCode> imple
         for (AuthCode code : codes) {
             getDaoEventPublisher().publishDelete(code);
         }
-        getHibernateTemplate().deleteAll(codes);
+        super.removeAllEntities(codes);
     }
 
     @Override
     public AuthCode getAuthCode(Integer authCodeId) {
-        return (AuthCode) getHibernateTemplate().load(AuthCode.class, authCodeId);
+        return (AuthCode) super.loadEntity(AuthCode.class, authCodeId);
     }
 
     @Override
     public List<AuthCode> getAuthCodes() {
-        return getHibernateTemplate().loadAll(AuthCode.class);
+        return super.loadAllEntities(AuthCode.class);
     }
 
     @Override
@@ -116,9 +116,9 @@ public class AuthCodeManagerImpl extends SipxHibernateDaoSupport<AuthCode> imple
         }
         authCode.getInternalUser().setUserName(userName);
         if (!authCode.isNew()) {
-            getHibernateTemplate().merge(authCode);
+            super.mergeEntity(authCode);
         } else {
-            getHibernateTemplate().save(authCode);
+            super.persistEntity(authCode);
             // Need to update authname since we should have a real authcode id now
             userName = StringUtils.deleteWhitespace(String.format(INTERNAL_NAME, authCode.getId()));
             LOG.info("::authcode interanl user name after save: " + authCode.getInternalUser().getUserName());
@@ -129,8 +129,11 @@ public class AuthCodeManagerImpl extends SipxHibernateDaoSupport<AuthCode> imple
     @Override
     public AuthCode getAuthCodeByCode(String code) {
         String query = "authCodeByCode";
-        Collection<AuthCode> codes =(Collection<AuthCode>)getHibernateTemplate().findByNamedQueryAndNamedParam(query, AUTH_CODE_CODE,
-                code);
+        Collection<AuthCode> codes = (Collection<AuthCode>)super.findByNamedQueryAndNamedParam(
+            query, 
+            AUTH_CODE_CODE,
+            code,
+            AuthCode.class);
         return requireOneOrZero(codes, query);
     }
 
@@ -179,7 +182,7 @@ public class AuthCodeManagerImpl extends SipxHibernateDaoSupport<AuthCode> imple
                 }
             }
         }
-        getHibernateTemplate().evict(settings);
+        super.evictEntity(settings);
         return ids;
     }
 
@@ -201,7 +204,7 @@ public class AuthCodeManagerImpl extends SipxHibernateDaoSupport<AuthCode> imple
                     return true;
                 }
             }
-            getHibernateTemplate().evict(settings);
+            super.evictEntity(settings);
         }
 
         return false;

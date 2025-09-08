@@ -108,7 +108,7 @@ bundle edit_line sipx_log4j_properties_contents {
     any::
       "$(sipx.SIPX_CFDATA)/$(sipx.location_id)/log4j.properties.part"
         insert_type => "file";
-      "log4j.appender.file=org.sipfoundry.commons.log4j.SipFoundryAppender";
+    "log4j.appender.file=org.sipfoundry.commons.log4j.SipFoundryAppender";
 	  "log4j.appender.file.File=${jetty.log.dir}/sipxconfig.log";
 	  "log4j.appender.file.layout=org.sipfoundry.commons.log4j.SipFoundryLayout";
 	  "log4j.additivity.org.apache.cxf.interceptor=true";
@@ -125,8 +125,7 @@ bundle edit_line sipx_log4j_properties_contents {
 	  "log4j.appender.auditlog=org.sipfoundry.commons.log4j.SipFoundryAppender";
 	  "log4j.appender.auditlog.File=${jetty.log.dir}/sipxconfig-audit.log";
 	  "log4j.appender.auditlog.layout=org.sipfoundry.commons.log4j.SipFoundryLayout";
-	  "log4j.appender.auditlog.layout.ConversionPattern=\"%d\":%X{username}:%X{eventType}:\"%m\"%n";
-   	  "log4j.logger.org.sipfoundry.sipxconfig.auditlog=info, auditlog";
+   	"log4j.logger.org.sipfoundry.sipxconfig.auditlog=info, auditlog";
 	  "log4j.category.javax.sip=warn";
   delete_lines:
     any::

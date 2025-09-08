@@ -5,9 +5,10 @@
 
   <class name="GoogleDomain" table="google_domain">
     <id name="id" column="google_domain_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">google_domain_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">google_domain_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
 	<property name="domainName" column="domain_name"/>
   </class>

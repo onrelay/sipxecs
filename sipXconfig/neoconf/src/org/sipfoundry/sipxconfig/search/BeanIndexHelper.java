@@ -12,13 +12,12 @@ package org.sipfoundry.sipxconfig.search;
 import java.io.Serializable;
 import java.util.List;
 
-import org.sipfoundry.sipxconfig.common.SpringHibernateInstantiator;
 import org.sipfoundry.sipxconfig.phone.Phone;
-import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
+import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 
-public class BeanIndexHelper extends HibernateDaoSupport {
+
+public class BeanIndexHelper extends SipxHibernateDaoSupport<Object> {
     private static final String BEAN_ID = "beanId";
-    private SpringHibernateInstantiator m_springInstantiator;
 
     public void setupIndexProperties(BeanIndexProperties beanIndexProperties, boolean loadObjectFromSession) {
         Object entity = beanIndexProperties.getEntity();
@@ -36,7 +35,7 @@ public class BeanIndexHelper extends HibernateDaoSupport {
         if (null != entity && entity instanceof Phone) {
             Phone phone = null;
             if (loadFromSession) {
-                phone = (Phone) getHibernateTemplate().get(entity.getClass(), id);
+                phone = (Phone) super.findEntity(Phone.class, id);
             } else {
                 phone = (Phone) entity;
             }
@@ -47,11 +46,5 @@ public class BeanIndexHelper extends HibernateDaoSupport {
         }
     }
 
-    public void setSpringInstantiator(SpringHibernateInstantiator springInstantiator) {
-        // without this, phone beans are not created from spring because phone beans are
-        // loaded special in another session
-        m_springInstantiator = springInstantiator;
-        // Removed, now done in xml sessionFactory
-        //getHibernateTemplate().setEntityInterceptor(m_springInstantiator);
-    }
+
 }

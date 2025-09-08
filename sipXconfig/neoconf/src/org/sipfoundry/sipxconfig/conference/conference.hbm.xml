@@ -5,9 +5,10 @@
 
   <class name="Bridge" table="meetme_bridge">
     <id name="id" column="meetme_bridge_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">meetme_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">meetme_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <many-to-one name="location" class="org.sipfoundry.sipxconfig.commserver.Location" column="location_id" />
 
@@ -22,9 +23,10 @@
 
   <class name="Conference" table="meetme_conference">
     <id name="id" column="meetme_conference_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">meetme_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">meetme_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="enabled" />
     <property name="name" />
@@ -49,29 +51,23 @@
   <query name="conferenceIdsWithAlias">
     <![CDATA[select conf.id from Conference conf where conf.name = :value or conf.extension = :value or conf.did = :value]]>
   </query>
-
   <query name="conferenceByName">
     <![CDATA[from Conference conf where conf.name = :value]]>
   </query>
-
   <query name="conferenceByExtension">
     <![CDATA[from Conference conf where conf.extension = :value]]>
-  </query>
-  
+  </query>  
   <query name="conferencesByOwner">
     <![CDATA[from Conference conf where conf.owner = :owner]]>
   </query>
-
   <query name="bridgeForLocationId">
     <![CDATA[from Bridge bridge where bridge.location.id = :locationId]]>
   </query>
-
   <query name="bridgeByHost">
     <![CDATA[from Bridge bridge where bridge.location.fqdn = :value]]>
   </query>
-
   <query name="searchConferences">
-    <![CDATA[from Conference conf left join conf.owner owner
+    <![CDATA[select conf from Conference conf left join conf.owner owner
     where lower(conf.name) like lower(:name)
     or conf.extension = :ext
     or conf.did = :ext
@@ -83,5 +79,4 @@
     or lower(owner.lastName||' '||owner.firstName) like lower(:ownerName)
     ]]>
   </query>
-
 </hibernate-mapping>

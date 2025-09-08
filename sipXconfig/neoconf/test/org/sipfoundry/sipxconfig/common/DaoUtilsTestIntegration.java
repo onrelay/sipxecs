@@ -18,10 +18,10 @@ public class DaoUtilsTestIntegration extends IntegrationTestCase {
 
         User user = new User();
         user.setUserName("userseed1");
-        assertTrue(DaoUtils.checkDuplicates(getHibernateTemplate(), User.class, user, "userName", null));
+        assertTrue(DaoUtils.checkDuplicates(getCurrentSession(), User.class, user, "userName", null));
 
         user = new User();
         user.setUserName("wont find this guy");
-        assertFalse(DaoUtils.checkDuplicates(getHibernateTemplate(), User.class, user, "userName", null));
+        assertFalse(DaoUtils.checkDuplicates(getCurrentSession(), User.class, user, "userName", null));
     }
 }

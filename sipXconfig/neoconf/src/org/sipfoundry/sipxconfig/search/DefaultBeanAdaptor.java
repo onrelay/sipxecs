@@ -24,7 +24,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
-import org.hibernate.type.StringType;
 import org.hibernate.type.Type;
 import org.sipfoundry.sipxconfig.acccode.AuthCode;
 import org.sipfoundry.sipxconfig.branch.Branch;
@@ -154,11 +153,10 @@ public class DefaultBeanAdaptor implements BeanAdaptor, BeanFactoryAware {
             document.add(new Field(fieldName, (String) state, Field.Store.YES, Field.Index.ANALYZED));
             document.add(new Field(Indexer.DEFAULT_FIELD, (String) state, Field.Store.NO, Field.Index.ANALYZED));
             return true;
-        } else if (type instanceof StringType) {
+        } else if (String.class.equals(type.getReturnedClass())) {
             // index all strings with the exception of the fields explicitly listed as sensitive
             if (Arrays.binarySearch(SENSITIVE_FIELDS, fieldName) < 0) {
-                document
-                        .add(new Field(Indexer.DEFAULT_FIELD, (String) state, Field.Store.NO, Field.Index.ANALYZED));
+                document.add(new Field(Indexer.DEFAULT_FIELD, (String) state, Field.Store.NO, Field.Index.ANALYZED));
             }
             return true;
         } else if (fieldName.equals("aliases")) {

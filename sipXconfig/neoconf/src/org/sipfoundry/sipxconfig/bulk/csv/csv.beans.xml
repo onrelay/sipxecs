@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="csvParser" class="org.sipfoundry.sipxconfig.bulk.csv.CsvParserImpl" />
 
@@ -21,21 +21,15 @@
 
   <bean id="bulkManagerImpl" class="org.sipfoundry.sipxconfig.bulk.csv.BulkManagerImpl">
     <property name="sessionFactory" ref="sessionFactory" />
-    <property name="csvParser">
-      <ref local="csvParser" />
-    </property>
-    <property name="rowInserter">
-      <ref local="csvRowInserter" />
-    </property>
+    <property name="csvParser" ref="csvParser" />
+    <property name="rowInserter" ref="csvRowInserter" />
   </bean>
 
   <bean id="bulkManager" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.bulk.csv.BulkManager</value>
     </property>
-    <property name="target">
-      <ref local="bulkManagerImpl" />
-    </property>
+    <property name="target" ref="bulkManagerImpl" />
     <property name="interceptorNames">
       <list>
         <value>backgroundTaskInterceptor</value>
@@ -49,8 +43,6 @@
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.bulk.csv.BulkManager</value>
     </property>
-    <property name="target">
-      <ref local="bulkManagerImpl" />
-    </property>
+    <property name="target" ref="bulkManagerImpl" />
   </bean>
 </beans>

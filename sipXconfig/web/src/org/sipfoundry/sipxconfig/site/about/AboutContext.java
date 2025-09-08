@@ -46,7 +46,7 @@ public class AboutContext implements ApplicationContextAware {
                 context.put("about", aboutObject);
             }
             StringWriter output = new StringWriter();
-            m_velocityEngine.mergeTemplate(m_configurationFile, context, output);
+            m_velocityEngine.mergeTemplate(m_configurationFile, "UTF-8", context, output);
             output.flush();
             return output.toString();
         } catch (Exception e) {

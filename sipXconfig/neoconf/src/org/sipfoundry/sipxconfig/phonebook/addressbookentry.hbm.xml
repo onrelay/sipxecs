@@ -5,9 +5,10 @@
 
   <class name="AddressBookEntry" table="address_book_entry">
     <id name="id" column="address_book_entry_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">abe_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">abe_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="jobTitle" />
     <property name="jobDept" />

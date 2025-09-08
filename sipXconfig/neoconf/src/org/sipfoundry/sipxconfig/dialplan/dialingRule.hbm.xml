@@ -4,9 +4,10 @@
 <hibernate-mapping package="org.sipfoundry.sipxconfig.dialplan" default-lazy="false">
   <class name="DialPlan" table="dial_plan">
     <id name="id" column="dial_plan_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">dial_plan_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">dial_plan_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <list name="rules" cascade="all-delete-orphan">
       <key column="dial_plan_id" not-null="true" />
@@ -17,14 +18,15 @@
 
   <class name="DialingRule" table="dialing_rule">
     <id name="id" column="dialing_rule_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">dialing_rule_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">dialing_rule_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="name" not-null="true" />
     <property name="description" />
     <property name="enabled" />
-    <list name="gateways" table="dialing_rule_gateway" cascade="save-update">
+    <list name="gateways" table="dialing_rule_gateway" cascade="persist,merge">
       <key column="dialing_rule_id" />
       <list-index column="index" />
       <many-to-many class="org.sipfoundry.sipxconfig.gateway.Gateway" column="gateway_id" />
@@ -108,13 +110,13 @@
       <property name="liveAttendantExpire" />
       <component name="afterHoursAttendant"
         class="org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant">
-        <many-to-one name="attendant" column="after_hours_attendant_id" class="AutoAttendant"
+        <many-to-one name="attendant" column="after_hours_attendant_id" class="org.sipfoundry.sipxconfig.dialplan.AutoAttendant"
           cascade="none" foreign-key="fk_after_hours_attendant_auto_attendant" />
         <property name="enabled" column="after_hours_attendant_enabled" />
       </component>
       <component name="holidayAttendant"
         class="org.sipfoundry.sipxconfig.dialplan.attendant.Holiday">
-        <many-to-one name="attendant" column="holiday_attendant_id" class="AutoAttendant"
+        <many-to-one name="attendant" column="holiday_attendant_id" class="org.sipfoundry.sipxconfig.dialplan.AutoAttendant"
           cascade="none" foreign-key="fk_holiday_dates_attendant_dialing_rule" />
         <property name="enabled" column="holiday_attendant_enabled" />
         <list name="periods" table="holiday_dates">
@@ -127,19 +129,19 @@
 		  </composite-element>
         </list>
       </component>
-      <component name="workingTimeAttendant"
-        class="org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime">
-        <many-to-one name="attendant" column="working_time_attendant_id" class="AutoAttendant"
+      <component name="workingTimeAttendant" class="org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant">
+        <many-to-one name="attendant" column="working_time_attendant_id" class="org.sipfoundry.sipxconfig.dialplan.AutoAttendant"
           cascade="none" foreign-key="fk_attendant_working_hours_attendant_dialing_rule" />
         <property name="enabled" column="working_time_attendant_enabled" />
-        <array name="workingHours" table="attendant_working_hours" batch-size="7">
+        <array name="workingHours" 
+              table="attendant_working_hours" 
+              batch-size="7">
           <key column="attendant_dialing_rule_id"
-            foreign-key="fk_attendant_working_hours_attendant_dialing_rule" />
+              foreign-key="fk_attendant_working_hours_attendant_dialing_rule" />
           <index column="index" />
-          <composite-element
-            class="org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime$WorkingHours">
+          <composite-element class="org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours">
             <property name="start" type="org.sipfoundry.sipxconfig.common.UtcTimestampType" />
-            <property name="stop" type="org.sipfoundry.sipxconfig.common.UtcTimestampType" />
+            <property name="stop"  type="org.sipfoundry.sipxconfig.common.UtcTimestampType" />
             <property name="enabled" />
             <property name="day" type="org.sipfoundry.sipxconfig.common.ScheduledDay$UserType" />
           </composite-element>
@@ -173,28 +175,22 @@
   <query name="dialingRuleIdsWithName">
     <![CDATA[select dr.id from DialingRule dr where dr.name = :value]]>
   </query>
-
   <query name="dialingRulesByGatewayId">
     <![CDATA[select rule from DialingRule rule, Gateway gateway
         where gateway in elements(rule.gateways) and gateway.id = :gatewayId]]>
   </query>
-
   <query name="internalRuleIdsWithVoiceMailExtension">
     <![CDATA[select ir.id from InternalRule ir where ir.voiceMail = :value or ir.did = :value]]>
   </query>
-
   <query name="attendantRuleIdsWithExtensionOrDid">
     <![CDATA[select r.id from AttendantRule r where r.extension = :value or r.did = :value ]]>
   </query>
-
   <query name="aaAliases">
     <![CDATA[select r.attendantAliases from AttendantRule r]]>
   </query>
-
   <query name="attendantRuleIdsAndAttendantAliases">
     <![CDATA[select r.id, r.attendantAliases from AttendantRule r]]>
   </query>
-
   <!-- need to use SQL query since we no longer map some of the columns used here -->
   <sql-query name="attendantsReferencesByInternalRules">
     <return-scalar type="int" column="id" />
@@ -208,12 +204,11 @@
   <query name="dialingRulesForScheduleId">
     <![CDATA[from DialingRule dialingRule where dialingRule.schedule.id = :scheduleId]]>
   </query>
-
   <query name="aaRulesForCode">
     <![CDATA[from AttendantRule rule where concat(rule.extension, rule.liveAttendantCode) = :code]]>
   </query>
-
   <query name="disabledLiveAaRules">
     <![CDATA[from AttendantRule rule where rule.liveAttendant = true and rule.liveAttendantEnabled = false]]>
   </query>
-</hibernate-mapping>
+  
+  </hibernate-mapping>

@@ -23,7 +23,7 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;

@@ -9,6 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.phonebook;
 
+
 import org.sipfoundry.sipxconfig.setting.PersistableSettings;
 import org.sipfoundry.sipxconfig.setting.Setting;
 

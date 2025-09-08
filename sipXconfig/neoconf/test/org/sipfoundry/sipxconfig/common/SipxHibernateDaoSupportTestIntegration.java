@@ -11,7 +11,6 @@ package org.sipfoundry.sipxconfig.common;
 
 import org.sipfoundry.sipxconfig.callgroup.CallGroup;
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 
 public class SipxHibernateDaoSupportTestIntegration extends IntegrationTestCase {
     private static final String GROUP_NAME = "testCallGroup";
@@ -34,8 +33,7 @@ public class SipxHibernateDaoSupportTestIntegration extends IntegrationTestCase 
 
         CallGroup cg = new CallGroup();
         cg.setName(GROUP_NAME);
-        HibernateTemplate hibernate = getHibernateTemplate();
-        hibernate.save(cg);
+        getCurrentSession().persist(cg);
 
         // Make a copy and look for the copyOf prefix in the new bean's name
         CallGroup cg2 = (CallGroup) dao.duplicateBean(cg, "callGroupIdsWithName");
@@ -49,14 +47,14 @@ public class SipxHibernateDaoSupportTestIntegration extends IntegrationTestCase 
         // Make another copy after saving cg2.
         // This time the prefix should appear twice, so that
         // the name of the new bean will be unique.
-        hibernate.save(cg2);
+        getCurrentSession().persist(cg2);
         CallGroup cg4 = (CallGroup) dao.duplicateBean(cg, "callGroupIdsWithName");
         assertEquals(COPY_OF + COPY_OF + GROUP_NAME, cg4.getName());
 
         // Clean up just to be nice. This isn't strictly necessary.
-        hibernate.delete(cg);
-        hibernate.delete(cg2);
-        hibernate.flush();
+        getCurrentSession().remove(cg);
+        getCurrentSession().remove(cg2);
+        getCurrentSession().flush();
     }
 
     public void testGetOriginalValue() throws Exception {

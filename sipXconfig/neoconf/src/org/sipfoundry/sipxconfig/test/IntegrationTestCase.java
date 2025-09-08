@@ -21,6 +21,8 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.hibernate.Session;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,8 +40,6 @@ import org.sipfoundry.sipxconfig.common.event.DaoEventPublisherImpl;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.hibernate5.HibernateTemplate;
-import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.test.annotation.AbstractAnnotationAwareTransactionalTests;
 
 public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransactionalTests {
@@ -48,22 +48,14 @@ public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransac
     private static final String CANNOT_SET_PROP_MSG = "Unable to set property %s on target %s";
 
     private SessionFactory m_sessionFactory;
-    private HibernateTemplate m_hibernateTemplate;
     private JdbcTemplate m_db;
     private Map<Object, Map<String, Object>> m_modifiedContextObjectMap;
     private DaoEventPublisherImpl m_daoEventPublisher;
-    private SpringHibernateInstantiator m_entityInterceptor;
     private UserProfileService m_userProfileService;
     private MongoTemplate m_profilesDb;
 
     public IntegrationTestCase() {
         setAutowireMode(AUTOWIRE_BY_NAME);
-    }
-
-    @Override
-    protected void onSetUpBeforeTransaction() throws Exception {
-        // w/o this beans loaded from hibernate are not created from spring, therefore not dependency injected
-        ((HibernateTransactionManager) transactionManager).setEntityInterceptor(m_entityInterceptor);
     }
 
     protected void sql(String resource) throws IOException {
@@ -175,14 +167,17 @@ public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransac
     }
 
     protected IDatabaseConnection getConnection() {
-        // by getting the same connection, out dbunit operations happen in same transation
-        // subsequently get rolled back automaticaly
-        Connection jdbcConnection = m_sessionFactory.getCurrentSession().connection();
-        IDatabaseConnection dbunitConnection = new DatabaseConnection(jdbcConnection);
-        DatabaseConfig config = dbunitConnection.getConfig();
-        config.setFeature("http://www.dbunit.org/features/batchedStatements", true);
+        final IDatabaseConnection[] dbunitConnectionHolder = new IDatabaseConnection[1];
 
-        return dbunitConnection;
+        m_sessionFactory.getCurrentSession().doWork(connection -> {
+            IDatabaseConnection dbunitConnection = new DatabaseConnection(connection);
+            DatabaseConfig config = dbunitConnection.getConfig();
+            config.setFeature("http://www.dbunit.org/features/batchedStatements", true);
+
+            dbunitConnectionHolder[0] = dbunitConnection;
+        });
+
+        return dbunitConnectionHolder[0];
     }
 
     /**
@@ -192,11 +187,11 @@ public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransac
      * the database with jdbcTemplate or DBUnit assertions.
      */
     protected void flush() {
-        m_hibernateTemplate.flush();
+        m_sessionFactory.getCurrentSession().flush();
     }
 
     protected void evict(Object o) {
-        m_hibernateTemplate.evict(o);
+        m_sessionFactory.getCurrentSession().evict(o);
     }
 
     /**
@@ -214,16 +209,6 @@ public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransac
 
     public void setSessionFactory(SessionFactory sessionFactory) {
         m_sessionFactory = sessionFactory;
-        m_hibernateTemplate = new HibernateTemplate();
-        m_hibernateTemplate.setSessionFactory(m_sessionFactory);
-    }
-
-    public void setSpringInstantiator(SpringHibernateInstantiator entityInterceptor) {
-        m_entityInterceptor = entityInterceptor;
-    }
-
-    public SpringHibernateInstantiator getEntityInterceptor() {
-        return m_entityInterceptor;
     }
 
     /**
@@ -288,9 +273,10 @@ public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransac
         return m_sessionFactory;
     }
 
-    public HibernateTemplate getHibernateTemplate() {
-        return m_hibernateTemplate;
+    public Session getCurrentSession() {
+        return m_sessionFactory.getCurrentSession();
     }
+
 
     public UserProfileService getUserProfileService() {
         return m_userProfileService;

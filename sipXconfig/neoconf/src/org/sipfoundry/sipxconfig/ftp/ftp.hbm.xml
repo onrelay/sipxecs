@@ -7,9 +7,10 @@
   -->
   <class name="FtpExternalServerConfig" table="ftp_configuration">
     <id name="id" column="id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">ftp_configuration_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">ftp_configuration_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="host" />
     <property name="userId" />

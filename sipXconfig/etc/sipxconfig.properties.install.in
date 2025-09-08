@@ -1,5 +1,4 @@
 # Settings from install time
-sipxconfig.db.user=@POSTGRESQL_USER@
 coreContextImpl.debug=@IS_TEST_MODE@
 sysdir.java=@SIPX_JAVADIR@
 sysdir.bin=@SIPX_BINDIR@

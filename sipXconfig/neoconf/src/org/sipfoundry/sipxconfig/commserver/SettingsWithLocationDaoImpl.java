@@ -36,7 +36,7 @@ public class SettingsWithLocationDaoImpl<T extends SettingsWithLocation> extends
 
     @Override
     public List<T> findAll() {
-        return (List<T>) getHibernateTemplate().loadAll(m_class);
+        return (List<T>) super.loadAllEntities(m_class);
     }
 
     @Override
@@ -49,16 +49,16 @@ public class SettingsWithLocationDaoImpl<T extends SettingsWithLocation> extends
     @Override
     public void upsert(T bean) {
         if (bean.isNew()) {
-            getHibernateTemplate().save(bean);
+            super.persistEntity(bean);
         } else {
-            getHibernateTemplate().merge(bean);
+            super.mergeEntity(bean);
         }
     }
 
     @Override
     public List<T> findAll(Location location) {
-        List<T> results = (List<T>)getHibernateTemplate().findByNamedQuery(FIND_QUERY, location.getId());
-        return results;
+        List<SettingsWithLocation> results = super.findByNamedQuery(FIND_QUERY, location.getId(), SettingsWithLocation.class );
+        return (List<T>)results;
     }
 
     @Override

@@ -95,10 +95,10 @@ public class LdapManagerImpl extends SipxHibernateDaoSupport<Object> implements 
         if (existingOPB == null) {
             storage = new ValueStorage();
         } else {
-            storage = getHibernateTemplate().load(ValueStorage.class, existingOPB.getId());
+            storage = super.loadEntity(ValueStorage.class, existingOPB.getId());
         }
         storage.setSettingValue("ldap/overwrite_pin", String.valueOf(overwrite));
-        getHibernateTemplate().saveOrUpdate(storage);
+        super.mergeEntity(storage);
     }
 
     @Override
@@ -278,20 +278,20 @@ public class LdapManagerImpl extends SipxHibernateDaoSupport<Object> implements 
             // objects with same ID in session. This is only true because
             // schedule
             // is managed by LdapConnectionParams object.
-            getHibernateTemplate().update(schedule);
+            super.mergeEntity(schedule);
         }
 
         LdapConnectionParams connectionParams = getConnectionParams(connectionId);
         connectionParams.setSchedule(schedule);
-        getHibernateTemplate().update(connectionParams);
+        super.mergeEntity(connectionParams);
         getDaoEventPublisher().publishSave(connectionParams);
         m_applicationContext.publishEvent(new LdapImportTrigger.ScheduleChangedEvent(schedule, this, connectionId));
     }
 
     @Override
     public AttrMap getAttrMap(int connectionId) {
-        List<AttrMap> connectionsAttrMap = (List<AttrMap>)getHibernateTemplate().findByNamedQueryAndNamedParam(
-                "ldapConnectionAttrMap", "attrMapId", connectionId);
+        List<AttrMap> connectionsAttrMap = (List<AttrMap>)super.findByNamedQueryAndNamedParam(
+                "ldapConnectionAttrMap", "attrMapId", connectionId, AttrMap.class);
         if (!connectionsAttrMap.isEmpty()) {
             return connectionsAttrMap.get(0);
         }
@@ -300,8 +300,8 @@ public class LdapManagerImpl extends SipxHibernateDaoSupport<Object> implements 
 
     @Override
     public LdapConnectionParams getConnectionParams(int connectionId) {
-        List<LdapConnectionParams> connections = (List<LdapConnectionParams>)getHibernateTemplate().findByNamedQueryAndNamedParam(
-                "ldapConnection", "connectionId", connectionId);
+        List<LdapConnectionParams> connections = (List<LdapConnectionParams>)super.findByNamedQueryAndNamedParam(
+                "ldapConnection", "connectionId", connectionId, LdapConnectionParams.class);
         if (!connections.isEmpty()) {
             return connections.get(0);
         }
@@ -322,23 +322,23 @@ public class LdapManagerImpl extends SipxHibernateDaoSupport<Object> implements 
 
     @Override
     public List<LdapConnectionParams> getAllConnectionParams() {
-        return getHibernateTemplate().loadAll(LdapConnectionParams.class);
+        return super.loadAllEntities(LdapConnectionParams.class);
     }
 
     @Override
     public void setAttrMap(AttrMap attrMap) {
-        getHibernateTemplate().merge(attrMap);
+        super.mergeEntity(attrMap);
         getDaoEventPublisher().publishSave(attrMap);
     }
 
     @Override
     public void saveSystemSettings(LdapSystemSettings settings) {
-        getHibernateTemplate().saveOrUpdate(settings);
+        super.mergeEntity(settings);
     }
 
     @Override
     public LdapSystemSettings getSystemSettings() {
-        List settingses = getHibernateTemplate().loadAll(LdapSystemSettings.class);
+        List settingses = super.loadAllEntities(LdapSystemSettings.class);
         LdapSystemSettings settings = (LdapSystemSettings) singleResult(settingses);
         if (settings == null) {
             settings = m_applicationContext.getBean("ldapSystemSettings",
@@ -350,9 +350,9 @@ public class LdapManagerImpl extends SipxHibernateDaoSupport<Object> implements 
     @Override
     public void setConnectionParams(LdapConnectionParams params) {
         if (params.isNew()) {
-            getHibernateTemplate().save(params);
+            super.persistEntity(params);
         } else {
-            getHibernateTemplate().merge(params);
+            super.mergeEntity(params);
         }
         getDaoEventPublisher().publishSave(params);
     }
@@ -360,8 +360,8 @@ public class LdapManagerImpl extends SipxHibernateDaoSupport<Object> implements 
     @Override
     public void removeConnectionParams(int connectionId) {
         LdapConnectionParams params = getConnectionParams(connectionId);
-        getHibernateTemplate().delete(params);
-        getHibernateTemplate().delete(getAttrMap(connectionId));
+        super.removeEntity(params);
+        super.removeEntity(getAttrMap(connectionId));
         getDaoEventPublisher().publishDelete(params);
         m_applicationContext.publishEvent(new LdapImportTrigger.ScheduleDeletedEvent(this, connectionId));
     }

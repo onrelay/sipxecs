@@ -8,9 +8,10 @@
 
   <class name="AuthCode" table="auth_code">
     <id name="id" column="auth_code_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">auth_code_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">auth_code_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="description" />
     <property name="code" />
@@ -24,5 +25,4 @@
   <query name="authCodeByCode">
     <![CDATA[select code from AuthCode code where code.code= :code]]>
   </query>
-
 </hibernate-mapping>

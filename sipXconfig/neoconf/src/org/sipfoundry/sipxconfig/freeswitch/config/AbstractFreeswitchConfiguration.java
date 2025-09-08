@@ -43,7 +43,7 @@ public abstract class AbstractFreeswitchConfiguration implements FreeswitchProvi
 
     protected void write(Writer writer, VelocityContext context) throws IOException {
         try {
-            m_velocityEngine.mergeTemplate(getTemplate(), context, writer);
+            m_velocityEngine.mergeTemplate(getTemplate(), "UTF-8", context, writer);
         } catch (Exception e) {
             throw new IOException(e);
         }

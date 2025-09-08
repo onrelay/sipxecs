@@ -15,6 +15,9 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import org.hibernate.Session;
+
 import org.sipfoundry.sipxconfig.alias.AliasManager;
 import org.sipfoundry.sipxconfig.common.BeanId;
 import org.sipfoundry.sipxconfig.common.DaoUtils;
@@ -34,6 +37,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * DialPlanContextImpl is an implementation of DialPlanContext with hibernate support.
@@ -55,7 +59,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
      * @return the single instance of dial plan
      */
     DialPlan getDialPlan() {
-        List<DialPlan> dialPlans = getHibernateTemplate().loadAll(DialPlan.class);
+        List<DialPlan> dialPlans = super.loadAllEntities(DialPlan.class);
         if (dialPlans.isEmpty()) {
             DialPlan dp = new DialPlan();
             return dp;
@@ -64,12 +68,12 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
     }
 
     public boolean isInitialized() {
-        List<DialPlan> dialPlans = getHibernateTemplate().loadAll(DialPlan.class);
+        List<DialPlan> dialPlans = super.loadAllEntities(DialPlan.class);
         return !dialPlans.isEmpty();
     }
 
     public boolean isDialPlanEmpty() {
-        boolean empty = getHibernateTemplate().loadAll(DialPlan.class).isEmpty();
+        boolean empty = super.loadAllEntities(DialPlan.class).isEmpty();
         return empty;
     }
 
@@ -85,9 +89,9 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         DialPlan dialPlan = getDialPlan();
         dialPlan.addRule(position, rule);
         if (dialPlan.isNew()) {
-            getHibernateTemplate().save(dialPlan);
+            super.persistEntity(dialPlan);
         } else {
-            getHibernateTemplate().merge(dialPlan);
+            super.mergeEntity(dialPlan);
         }
         getDaoEventPublisher().publishSave(dialPlan);
         m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.ADDED, AUDIT_LOG_CONFIG_TYPE, rule.getName());
@@ -101,12 +105,12 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         if (rule.isNew()) {
             DialPlan dialPlan = getDialPlan();
             dialPlan.addRule(rule);
-            getHibernateTemplate().save(rule);
-            getHibernateTemplate().merge(dialPlan);
+            super.persistEntity(rule);
+            super.mergeEntity(dialPlan);
             getDaoEventPublisher().publishSave(dialPlan);
             m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.ADDED, AUDIT_LOG_CONFIG_TYPE, rule.getName());
         } else {
-            getHibernateTemplate().merge(rule);
+            super.mergeEntity(rule);
             m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.MODIFIED, AUDIT_LOG_CONFIG_TYPE, rule.getName());
         }
         getDaoEventPublisher().publishSave(rule);
@@ -117,18 +121,25 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
      *
      * @param rule to be verified
      */
+    @Transactional
     private void validateRule(DialingRule rule) {
-        String name = rule.getName();
-        DaoUtils.checkDuplicatesByNamedQuery(getHibernateTemplate(), rule, DIALING_RULE_IDS_WITH_NAME_QUERY, name,
-                new NameInUseException(DIALING_RULE, name));
 
-        // For internal rules, check for alias collisions. Note: this method throws
-        // an exception if it finds a duplicate.
-        if (rule instanceof InternalRule) {
-            checkAliasCollisionsForInternalRule((InternalRule) rule);
-        }
-        if (rule instanceof AttendantRule) {
-            checkAliasCollisionsForAttendantRule((AttendantRule) rule);
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            String name = rule.getName();
+            DaoUtils.checkDuplicatesByNamedQuery(session, rule, DIALING_RULE_IDS_WITH_NAME_QUERY, name,
+                    new NameInUseException(DIALING_RULE, name));
+
+            // For internal rules, check for alias collisions. Note: this method throws
+            // an exception if it finds a duplicate.
+            if (rule instanceof InternalRule) {
+                checkAliasCollisionsForInternalRule((InternalRule) rule);
+            }
+            if (rule instanceof AttendantRule) {
+                checkAliasCollisionsForAttendantRule((AttendantRule) rule);
+            }
         }
     }
 
@@ -182,8 +193,11 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
      * @return A List of the DialingRules for that gateway.
      */
     public List<DialingRule> getRulesForGateway(Integer gatewayId) {
-        return (List<DialingRule>)getHibernateTemplate().findByNamedQueryAndNamedParam("dialingRulesByGatewayId", "gatewayId",
-                gatewayId);
+        return (List<DialingRule>)super.findByNamedQueryAndNamedParam(
+            "dialingRulesByGatewayId", 
+            "gatewayId",
+            gatewayId,
+            DialingRule.class);
     }
 
     /**
@@ -207,7 +221,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
     }
 
     public DialingRule getRule(Integer id) {
-        return getHibernateTemplate().load(DialingRule.class, id);
+        return super.loadEntity(DialingRule.class, id);
     }
 
     public void deleteRules(Collection<Integer> selectedRows) {
@@ -221,9 +235,9 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         DialPlan dialPlan = getDialPlan();
         dialPlan.removeRules(selectedRows);
         if (dialPlan.isNew()) {
-            getHibernateTemplate().save(dialPlan);
+            super.persistEntity(dialPlan);
         } else {
-            getHibernateTemplate().merge(dialPlan);
+            super.mergeEntity(dialPlan);
         }
         getDaoEventPublisher().publishSave(dialPlan);
         for (DialingRule rule : rulesToDelete) {
@@ -242,9 +256,9 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         }
         getDaoEventPublisher().publishSave(dialPlan);
         if (dialPlan.isNew()) {
-            getHibernateTemplate().save(dialPlan);
+            super.persistEntity(dialPlan);
         } else {
-            getHibernateTemplate().merge(dialPlan);
+            super.mergeEntity(dialPlan);
         }
     }
 
@@ -262,9 +276,9 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         DialPlan dialPlan = getDialPlan();
         dialPlan.setOperator(attendant);
         if (dialPlan.isNew()) {
-            getHibernateTemplate().save(dialPlan);
+            super.persistEntity(dialPlan);
         } else {
-            getHibernateTemplate().merge(dialPlan);
+            super.mergeEntity(dialPlan);
         }
     }
 
@@ -276,7 +290,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
     public DialPlan resetToFactoryDefault(String dialPlanBeanName, AutoAttendant operator) {
         removeAll(DialingRule.class);
         removeAll(DialPlan.class);
-        getHibernateTemplate().flush();
+        super.flush();
 
         DialPlan newDialPlan = null;
         try {
@@ -286,13 +300,13 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         }
         newDialPlan.setOperator(operator);
 
-        getHibernateTemplate().save(newDialPlan);
+        super.persistEntity(newDialPlan);
         getDaoEventPublisher().publishSave(newDialPlan);
         // Flush the session to cause the delete to take immediate effect.
         // Otherwise we can get name collisions on dialing rules when we load the
         // default dial plan, causing a DB integrity exception, even though the
         // collisions would go away as soon as the session was flushed.
-        getHibernateTemplate().flush();
+        super.flush();
         return newDialPlan;
     }
 
@@ -323,9 +337,9 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         DialPlan dialPlan = getDialPlan();
         dialPlan.moveRules(selectedRows, step);
         if (dialPlan.isNew()) {
-            getHibernateTemplate().save(dialPlan);
+            super.persistEntity(dialPlan);
         } else {
-            getHibernateTemplate().merge(dialPlan);
+            super.mergeEntity(dialPlan);
         }
         getDaoEventPublisher().publishSave(dialPlan);
     }
@@ -337,9 +351,9 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         DialPlan dialPlan = getDialPlan();
         if (dialPlan.removeEmptyRules()) {
             if (dialPlan.isNew()) {
-                getHibernateTemplate().save(dialPlan);
+                super.persistEntity(dialPlan);
             } else {
-                getHibernateTemplate().merge(dialPlan);
+                super.mergeEntity(dialPlan);
             }
             getDaoEventPublisher().publishSave(dialPlan);
         }
@@ -413,7 +427,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         // we can't query the DB for individual aliases. However, there will be so few
         // of these aliases (one string per internal dialing rule) that we can simply load
         // all such alias strings and check them in Java.
-        List<String> aliasStrings = (List<String>)getHibernateTemplate().findByNamedQuery("aaAliases");
+        List<String> aliasStrings = (List<String>)super.findByNamedQuery("aaAliases", String.class);
         for (String aliasString : aliasStrings) {
             String[] aliases = AttendantRule.getAttendantAliasesAsArray(aliasString);
             if (ArrayUtils.contains(aliases, alias)) {
@@ -442,7 +456,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
     }
 
     private Collection<BeanId> getBeanIdsOfRulesWithAutoAttendantAlias(String alias) {
-        Collection<Object[]> objs = (Collection<Object[]>)getHibernateTemplate().findByNamedQuery("attendantRuleIdsAndAttendantAliases");
+        Collection<Object[]> objs = (Collection<Object[]>)super.findByNamedQuery("attendantRuleIdsAndAttendantAliases", Object[].class);
         Collection<BeanId> bids = new ArrayList<BeanId>();
         for (Object[] idAndAliases : objs) {
             Integer id = (Integer) idAndAliases[0];
@@ -457,14 +471,20 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
 
     @Override
     public Collection<InternalRule> getInternalRulesWithVoiceMailExtension(String extension) {
-        return (Collection<InternalRule>)getHibernateTemplate().findByNamedQueryAndNamedParam("internalRuleIdsWithVoiceMailExtension", VALUE,
-                extension);
+        return (Collection<InternalRule>)super.findByNamedQueryAndNamedParam(
+            "internalRuleIdsWithVoiceMailExtension", 
+            VALUE,
+            extension,
+            InternalRule.class);
     }
 
     @Override
     public Collection<AttendantRule> getAttendantRulesWithExtensionOrDid(String extension) {
-        return (Collection<AttendantRule>)getHibernateTemplate().findByNamedQueryAndNamedParam("attendantRuleIdsWithExtensionOrDid", VALUE,
-                extension);
+        return (Collection<AttendantRule>)super.findByNamedQueryAndNamedParam(
+            "attendantRuleIdsWithExtensionOrDid", 
+            VALUE,
+            extension,
+            AttendantRule.class);
     }
 
     @Override

@@ -2,9 +2,10 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:security="http://www.springframework.org/schema/security"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-  http://www.springframework.org/schema/security
-  http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+  xmlns:util="http://www.springframework.org/schema/util"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/security https://www.springframework.org/schema/security/spring-security.xsd
+    http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
 
   <!-- ======================== FILTER CHAIN ======================= -->
 
@@ -15,27 +16,29 @@
     filterInvocationInterceptor is not added to the chain for the remaining URLs.
   -->
   <bean id="sipxFilterChainProxy" class="org.sipfoundry.sipxconfig.security.SipxFilterChainProxy">
-    <security:filter-chain-map request-matcher="ciRegex">
-      <security:filter-chain pattern="/initial-config/.*"
-            filters="lazySecurityContextPersistenceFilter,basicAuthenticationFilter,basicExceptionTranslationFilter,filterInvocationInterceptor"/>
-      <security:filter-chain pattern="/rest/private/[^/]{32}/.*"
-            filters="lazySecurityContextPersistenceFilter,privateUserKeyProcessingFilter,digestExceptionTranslationFilter,filterInvocationInterceptor"/>
-      <security:filter-chain pattern="/rest/avatar/.*"
-            filters="lazySecurityContextPersistenceFilter,basicAuthenticationFilter,digestAuthenticationFilter,digestExceptionTranslationFilter,anonymousProcessingFilter,filterInvocationInterceptor"/>
-      <security:filter-chain pattern="/(services|rest|api)/.*"
-            filters="lazySecurityContextPersistenceFilter,optionsAuthFilter,basicAuthenticationFilter,digestAuthenticationFilter,digestExceptionTranslationFilter,filterInvocationInterceptor"/>
-      <security:filter-chain pattern="/(TestPage|FirstUser).html"
-            filters="securityContextPersistenceFilter"/>
-      <security:filter-chain pattern="/.*"
-            filters="securityContextPersistenceFilter,authenticationProcessingFilter,loginExceptionTranslationFilter,filterInvocationInterceptor"/>
-    </security:filter-chain-map>
+    <constructor-arg name="filterChains">
+      <util:list>
+        <security:filter-chain pattern="/initial-config/.*"
+            filters="lazySecurityContextPersistenceFilter,basicAuthenticationFilter,basicExceptionTranslationFilter,filterInvocationInterceptor" />
+        <security:filter-chain pattern="/rest/private/[^/]{32}/.*"
+            filters="lazySecurityContextPersistenceFilter,privateUserKeyProcessingFilter,digestExceptionTranslationFilter,filterInvocationInterceptor" />
+        <security:filter-chain pattern="/rest/avatar/.*"
+            filters="lazySecurityContextPersistenceFilter,basicAuthenticationFilter,digestAuthenticationFilter,digestExceptionTranslationFilter,anonymousProcessingFilter,filterInvocationInterceptor" />
+        <security:filter-chain pattern="/(services|rest|api)/.*"
+            filters="lazySecurityContextPersistenceFilter,optionsAuthFilter,basicAuthenticationFilter,digestAuthenticationFilter,digestExceptionTranslationFilter,filterInvocationInterceptor" />
+        <security:filter-chain pattern="/(TestPage|FirstUser).html"
+            filters="securityContextPersistenceFilter" />
+        <security:filter-chain pattern="/.*"
+            filters="securityContextPersistenceFilter,authenticationProcessingFilter,loginExceptionTranslationFilter,filterInvocationInterceptor" />
+      </util:list>
+    </constructor-arg>
     <property name="domainManager" ref="domainManager" />
     <property name="adminContext" ref="adminContextImpl" />
   </bean>
 
   <!-- ======================== AUTHENTICATION ======================= -->
   <bean id="authenticationManager" class="org.springframework.security.authentication.ProviderManager">
-    <property name="providers">
+    <constructor-arg name="providers">
       <list>
         <ref bean="testAuthenticationProvider" />
         <ref bean="ldapAuthProvider" />
@@ -44,7 +47,7 @@
         <ref bean="locationAuthenticationProvider" />
         <ref bean="anonymousAuthenticationProvider"/>
       </list>
-    </property>
+    </constructor-arg>
     <property name="authenticationEventPublisher" ref="defaultAuthenticationEventPublisher" />
   </bean>
 
@@ -103,13 +106,13 @@
   </bean>
 
   <!-- used for WEB services - it never creates sessions -->
-  <bean id="lazySecurityContextPersistenceFilter" class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
-    <property name="securityContextRepository">
-      <bean class="org.springframework.security.web.context.HttpSessionSecurityContextRepository">
-        <property name="allowSessionCreation" value="false" />
-      </bean>
-    </property>
-  </bean>
+<bean id="lazySecurityContextPersistenceFilter" class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
+  <constructor-arg>
+    <bean class="org.springframework.security.web.context.HttpSessionSecurityContextRepository">
+      <property name="allowSessionCreation" value="false"/>
+    </bean>
+  </constructor-arg>
+</bean>
 
   <bean id="loginUrlEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
     <constructor-arg value="/Home.html"/>
@@ -121,23 +124,23 @@
   <!-- ===================== HTTP REQUEST SECURITY ==================== -->
 
   <bean id="loginExceptionTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
-    <property name="authenticationEntryPoint" ref="loginUrlEntryPoint" />
+    <constructor-arg name="authenticationEntryPoint" ref="loginUrlEntryPoint" />
   </bean>
 
   <bean id="digestExceptionTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
-    <property name="authenticationEntryPoint" ref="digestAuthenticationEntryPoint" />
+    <constructor-arg name="authenticationEntryPoint" ref="digestAuthenticationEntryPoint" />
   </bean>
 
   <bean id="basicExceptionTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
-    <property name="authenticationEntryPoint" ref="authenticationEntryPoint" />
+    <constructor-arg name="authenticationEntryPoint" ref="authenticationEntryPoint" />
   </bean>
 
   <bean id="authenticationDetailsSource" class="org.sipfoundry.sipxconfig.security.SipxAuthenticationDetailsSource">
   </bean>
 
   <bean id="basicAuthenticationFilter" class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
-    <property name="authenticationManager" ref="authenticationManager" />
-    <property name="authenticationEntryPoint" ref="authenticationEntryPoint" />
+    <constructor-arg name="authenticationManager" ref="authenticationManager" />
+    <constructor-arg name="authenticationEntryPoint" ref="authenticationEntryPoint" />
     <property name="authenticationDetailsSource" ref="authenticationDetailsSource" />
   </bean>
 
@@ -187,13 +190,13 @@
   </bean>
 
   <bean id="httpRequestAccessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
-    <property name="allowIfAllAbstainDecisions">
-      <value>false</value>
-    </property>
-    <property name="decisionVoters">
+    <constructor-arg name="decisionVoters">
       <list>
         <ref bean="roleVoter" />
       </list>
+    </constructor-arg>
+    <property name="allowIfAllAbstainDecisions">
+      <value>false</value>
     </property>
   </bean>
 
@@ -208,13 +211,14 @@
     URL. Accordingly, you should place MOST SPECIFIC (ie a/b/c/d.*) expressions first, with LEAST SPECIFIC (ie a/.*)
     expressions last
   -->
-  <bean id="filterInvocationInterceptor" class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
-    <property name="authenticationManager" ref="authenticationManager" />
-    <property name="accessDecisionManager" ref="httpRequestAccessDecisionManager" />
-    <property name="securityMetadataSource" ref="webSecurityMetadataSource" />
+  <bean id="filterInvocationInterceptor"
+        class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+    <property name="authenticationManager" ref="authenticationManager"/>
+    <property name="accessDecisionManager" ref="httpRequestAccessDecisionManager"/>
+    <property name="securityMetadataSource" ref="webSecurityMetadataSource"/>
   </bean>
 
-  <security:filter-security-metadata-source request-matcher="ciRegex" id="webSecurityMetadataSource">
+  <security:filter-security-metadata-source request-matcher="ciRegex" id="webSecurityMetadataSource" use-expressions="false">
     <security:intercept-url pattern="/rest/auto-attendant/.*/special" access="ROLE_ADMIN,ROLE_ATTENDANT_ADMIN"/>
     <security:intercept-url pattern="/rest/auto-attendant/specialmode" access="ROLE_ADMIN,ROLE_ATTENDANT_ADMIN"/>
     <security:intercept-url pattern="/rest/auto-attendant" access="ROLE_ADMIN,ROLE_ATTENDANT_ADMIN"/>
@@ -232,12 +236,11 @@
   </bean>
 
   <bean id="anonymousAuthenticationProvider" class="org.springframework.security.authentication.AnonymousAuthenticationProvider">
-    <property name="key" value="foobar" />
+    <constructor-arg name="key" value="foobar" />
   </bean>
 
   <bean id="anonymousProcessingFilter" class="org.springframework.security.web.authentication.AnonymousAuthenticationFilter">
-    <property name="key" value="foobar"/>
-    <property name="userAttribute" value="anonymousUser,ROLE_ANONYMOUS" />
+    <constructor-arg name="key" value="foobar"/>
   </bean>
 
   <bean id="webInvocationPrivilegeEvaluator" class="org.springframework.security.web.access.DefaultWebInvocationPrivilegeEvaluator">

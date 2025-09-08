@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   <bean id="beanAdaptor" class="org.sipfoundry.sipxconfig.search.DefaultBeanAdaptor"/>
 
   <bean id="analyzer" class="org.apache.lucene.analysis.standard.StandardAnalyzer">
@@ -32,22 +32,15 @@
     <property name="beanAdaptor" ref="beanAdaptor"/>
   </bean>
 
-  <bean id="loadIndexingInterceptor"
-    class="org.sipfoundry.sipxconfig.search.LoadIndexingInterceptor">
+  <bean id="loadIndexingInterceptor" class="org.sipfoundry.sipxconfig.search.LoadIndexingInterceptor">
     <property name="sessionFactory" ref="sessionFactory"/>
     <property name="indexer" ref="bulkIndexer"/>
     <property name="beanIndexHelper" ref="beanIndexHelper"/>
   </bean>
 
-  <bean id="loadIndexingHibernateTemplate"
-    class="org.springframework.orm.hibernate5.HibernateTemplate">
-    <property name="sessionFactory" ref="sessionFactory"/>
-    <property name="entityInterceptor" ref="loadIndexingInterceptor"/>
-    <property name="alwaysUseNewSession" value="true"/>
-  </bean>
 
   <bean id="indexManagerImpl" class="org.sipfoundry.sipxconfig.search.IndexManagerImpl">
-    <property name="hibernateTemplate" ref="loadIndexingHibernateTemplate"/>
+    <property name="sessionFactory" ref="sessionFactory"/>
     <property name="indexer" ref="bulkIndexer"/>
     <property name="beanAdaptor" ref="bulkBeanAdaptor"/>
   </bean>
@@ -58,7 +51,7 @@
       <value>org.sipfoundry.sipxconfig.search.IndexManager</value>
     </property>
     <property name="target">
-      <ref local="indexManagerImpl"/>
+      <ref bean="indexManagerImpl"/>
     </property>
   </bean>
 
@@ -69,7 +62,7 @@
 
   <bean id="userSearchManager" class="org.sipfoundry.sipxconfig.search.UserSearchManagerImpl">
     <property name="searchManager">
-      <ref local="searchManager"/>
+      <ref bean="searchManager"/>
     </property>
   </bean>
 

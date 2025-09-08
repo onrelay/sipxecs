@@ -42,17 +42,17 @@ public class TlsPeerManagerImpl extends SipxHibernateDaoSupport<TlsPeer> impleme
         for (TlsPeer peer : peers) {
             getDaoEventPublisher().publishDelete(peer);
         }
-        getHibernateTemplate().deleteAll(peers);
+        super.removeAllEntities(peers);
     }
 
     @Override
     public TlsPeer getTlsPeer(Integer tlsPeerId) {
-        return (TlsPeer) getHibernateTemplate().load(TlsPeer.class, tlsPeerId);
+        return (TlsPeer) super.loadEntity(TlsPeer.class, tlsPeerId);
     }
 
     @Override
     public List<TlsPeer> getTlsPeers() {
-        return getHibernateTemplate().loadAll(TlsPeer.class);
+        return super.loadAllEntities(TlsPeer.class);
     }
 
     @Override
@@ -77,16 +77,21 @@ public class TlsPeerManagerImpl extends SipxHibernateDaoSupport<TlsPeer> impleme
         String userName = StringUtils.deleteWhitespace(String.format(INTERNAL_NAME, tlsPeer.getName()));
         tlsPeer.getInternalUser().setUserName(userName);
         if (!tlsPeer.isNew()) {
-            getHibernateTemplate().merge(tlsPeer);
+            super.mergeEntity(tlsPeer);
         } else {
-            getHibernateTemplate().save(tlsPeer);
+            super.persistEntity(tlsPeer);
         }
     }
 
     @Override
     public TlsPeer getTlsPeerByName(String name) {
         String query = "tlsPeerByName";
-        Collection<TlsPeer> peers = (Collection<TlsPeer>)getHibernateTemplate().findByNamedQueryAndNamedParam(query, TLS_PEER_NAME, name);
+        Collection<TlsPeer> peers = 
+            (Collection<TlsPeer>)super.findByNamedQueryAndNamedParam(
+                query, 
+                TLS_PEER_NAME, 
+                name,
+                TlsPeer.class );
         return requireOneOrZero(peers, query);
     }
 

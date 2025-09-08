@@ -15,8 +15,8 @@
     <param-value>
        classpath:/org/sipfoundry/sipxconfig/system.beans.xml
        classpath*:/org/sipfoundry/sipxconfig/*/**/*.beans.xml
-       classpath:/org/sipfoundry/sipxconfig/api/jaxrs-server.xml
-       classpath:/org/sipfoundry/sipxconfig/api/jaxrs-client.xml
+       classpath*:/org/sipfoundry/sipxconfig/api/jaxrs-server.xml
+       classpath*:/org/sipfoundry/sipxconfig/api/jaxrs-client.xml
        classpath*:/sipxplugin2.beans.xml
        classpath*:/sipxplugin.beans.xml
        classpath*:/sipxplugin0.beans.xml
@@ -93,10 +93,9 @@
     <servlet-class>org.sipfoundry.sipxconfig.rest.RestSpringAdapterServlet</servlet-class>
   </servlet>
 
-  <!-- image servlet provided under jasper libraries -->
   <servlet>
 	<servlet-name>ImageServlet</servlet-name>
-    <servlet-class>net.sf.jasperreports.j2ee.servlets.ImageServlet</servlet-class>
+    <servlet-class>net.sf.jasperreports.jakarta.servlets.ImageServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
@@ -158,17 +157,6 @@
 	<servlet-name>ImageServlet</servlet-name>
     <url-pattern>/image</url-pattern>
   </servlet-mapping>
-
-  <!-- START AXIS -->
-  <servlet-mapping>
-    <servlet-name>AdminServlet</servlet-name>
-    <url-pattern>/servlet/AdminServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>services</servlet-name>
-    <url-pattern>/services/*</url-pattern>
-  </servlet-mapping>
-  <!-- END AXIS -->
 
   <!-- Explicitly set session timeout to 15 minutes -->
   <!-- This value gets adjusted in LoginPage when user/admin logs in -->

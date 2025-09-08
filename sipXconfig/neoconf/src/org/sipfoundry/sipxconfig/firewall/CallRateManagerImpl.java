@@ -28,7 +28,7 @@ public class CallRateManagerImpl extends SipxHibernateDaoSupport<CallRateRule> i
 
     @Override
     public List<CallRateRule> getCallRateRules() {
-        return (List<CallRateRule>)getHibernateTemplate().findByNamedQuery("orderedCallRates");
+        return (List<CallRateRule>)super.findByNamedQuery("orderedCallRates", CallRateRule.class);
     }
 
     public Integer countCallRateRules() {
@@ -59,12 +59,12 @@ public class CallRateManagerImpl extends SipxHibernateDaoSupport<CallRateRule> i
         if (rate.isNew()) {
             rate.setPosition(countCallRateRules() + 1);
         }
-        getHibernateTemplate().saveOrUpdate(rate);
+        super.mergeEntity(rate);
     }
 
     @Override
     public CallRateRule getCallRateRule(Integer id) {
-        return getHibernateTemplate().load(CallRateRule.class, id);
+        return super.loadEntity(CallRateRule.class, id);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class CallRateManagerImpl extends SipxHibernateDaoSupport<CallRateRule> i
             return;
         }
         for (CallRateRule rule : rules) {
-            getHibernateTemplate().delete(rule);
+            super.removeEntity(rule);
         }
     }
 

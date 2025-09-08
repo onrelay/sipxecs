@@ -25,6 +25,8 @@ import org.sipfoundry.sipxconfig.cfgmgt.ConfigRequest;
 import org.sipfoundry.sipxconfig.cfgmgt.KeyValueConfiguration;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.commserver.LocationsManager;
+import org.sipfoundry.sipxconfig.localization.LocalizationContext;
+
 
 public class DomainConfiguration implements ConfigProvider {
     private LocationsManager m_locationsManager;
@@ -37,7 +39,9 @@ public class DomainConfiguration implements ConfigProvider {
         DomainManager domainManager = manager.getDomainManager();
         Domain domain = domainManager.getDomain();
         String fqdn = m_locationsManager.getPrimaryLocation().getFqdn();
-        String lang = manager.getDomainManager().getExistingLocalization().getLanguage();
+        String lang = domainManager.getExistingLocalization() != null ? 
+            domainManager.getExistingLocalization().getLanguage() : 
+            LocalizationContext.DEFAULT;
         File gdir = manager.getGlobalDataDirectory();
         Writer wtr1 = new FileWriter(new File(gdir, "domain-config.part"));
         try {

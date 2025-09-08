@@ -38,9 +38,6 @@ mappingRules.externalRulesFileName=
 # external additions to external call fallback rules
 fallbackRules.externalRulesFileName=
 
-# Postgres DB user
-sipxconfig.db.user=@POSTGRESQL_USER@
-
 # are we in a debug build?
 coreContextImpl.debug=@IS_TEST_MODE@
 

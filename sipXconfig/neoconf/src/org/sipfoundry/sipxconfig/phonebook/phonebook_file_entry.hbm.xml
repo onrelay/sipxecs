@@ -5,9 +5,10 @@
 
   <class name="PhonebookEntry" table="phonebook_file_entry" discriminator-value="U">
     <id name="id" column="phonebook_file_entry_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">phonebook_file_entry_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">phonebook_file_entry_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <discriminator column="phonebook_entry_type" type="character" />
 	<property name="firstName" column="first_name"/>
@@ -36,5 +37,4 @@
       select pbe from PhonebookEntry as pbe
       where pbe.internalId = :internalId]]>
   </query>
-
 </hibernate-mapping>

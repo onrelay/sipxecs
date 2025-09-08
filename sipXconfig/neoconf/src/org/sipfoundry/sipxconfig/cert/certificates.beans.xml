@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:task="http://www.springframework.org/schema/task"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-  http://www.springframework.org/schema/task
-  http://www.springframework.org/schema/task/spring-task-4.0.xsd">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans
+         https://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/task
+         https://www.springframework.org/schema/task/spring-task.xsd">
 
   <bean id="certificateManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.cert.CertificateManager</value>
     </property>
     <property name="target">
-      <ref local="certificateManagerImpl" />
+      <ref bean="certificateManagerImpl" />
     </property>
   </bean>
 
@@ -43,8 +45,7 @@
     <task:scheduled ref="certificateManagerImpl" method="checkAllCertificatesValidity" cron="0 0 0/23 * * ?" />
   </task:scheduled-tasks>
 
-  <bean id="certificateSettings" class="org.sipfoundry.sipxconfig.cert.CertificateSettings" parent="settingsBean">
-  </bean>
+  <bean id="certificateSettings" class="org.sipfoundry.sipxconfig.cert.CertificateSettings" parent="settingsBean" />
 
   <bean id="certificateConfig" class="org.sipfoundry.sipxconfig.cert.CertificateConfig">
     <property name="certificateManager" ref="certificateManager"/>

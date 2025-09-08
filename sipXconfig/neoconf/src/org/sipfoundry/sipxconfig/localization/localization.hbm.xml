@@ -4,9 +4,10 @@
 <hibernate-mapping package="org.sipfoundry.sipxconfig.localization" default-lazy="false">
   <class name="Localization" table="localization">
     <id name="id" column="localization_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">localization_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">localization_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="region" />
     <property name="language" />

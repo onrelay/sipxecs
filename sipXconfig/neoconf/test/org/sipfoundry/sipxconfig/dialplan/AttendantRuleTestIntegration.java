@@ -26,8 +26,8 @@ import java.util.TimeZone;
 
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
 import org.sipfoundry.sipxconfig.commserver.imdb.MongoTestCaseHelper;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.WorkingHours;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
 import org.sipfoundry.sipxconfig.forwarding.GeneralSchedule;
 import org.sipfoundry.sipxconfig.forwarding.Schedule;
@@ -143,7 +143,7 @@ public class AttendantRuleTestIntegration extends MongoTestIntegration {
         // add live attendant schedule
         Schedule schedule = new GeneralSchedule();
         WorkingHours[] hours = new WorkingHours[1];
-        WorkingTime wt = new WorkingTime();
+        WorkingTimeAttendant wt = new WorkingTimeAttendant();
         hours[0] = new WorkingHours();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         cal.set(2014, Calendar.MARCH, 7, 10, 00);
@@ -158,7 +158,7 @@ public class AttendantRuleTestIntegration extends MongoTestIntegration {
         hours[0].setDay(ScheduledDay.FRIDAY);
         wt.setWorkingHours(hours);
         wt.setEnabled(true);
-        schedule.setWorkingTime(wt);
+        schedule.setWorkingTimeAttendant(wt);
         schedule.setName("live attendant schedule");
         m_forwardingContext.saveSchedule(schedule);
         rule.setSchedule(schedule);

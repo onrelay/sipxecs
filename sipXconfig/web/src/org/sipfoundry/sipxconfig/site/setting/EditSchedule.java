@@ -16,8 +16,8 @@ import org.apache.tapestry.annotations.InjectObject;
 import org.apache.tapestry.annotations.Persist;
 import org.apache.tapestry.event.PageEvent;
 import org.sipfoundry.sipxconfig.components.TapestryUtils;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.WorkingHours;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 import org.sipfoundry.sipxconfig.forwarding.FeatureSchedule;
 import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
 import org.sipfoundry.sipxconfig.forwarding.GeneralSchedule;
@@ -85,7 +85,7 @@ public abstract class EditSchedule extends UserBasePage {
         Schedule schedule = null;
         if (getScheduleId() != null) {
             schedule = getForwardingContext().getScheduleById(getScheduleId());
-            workingHoursList = schedule.getWorkingTime().getWorkingHours();
+            workingHoursList = schedule.getWorkingTimeAttendant().getWorkingHours();
         } else {
             if (getResource().equals("usr_sch")) {
                 schedule = new UserSchedule();
@@ -99,10 +99,10 @@ public abstract class EditSchedule extends UserBasePage {
                 schedule = new FeatureSchedule();
                 ((FeatureSchedule) schedule).setFeatureId(getFeatureId());
             }
-            WorkingTime workingTime = new WorkingTime();
+            WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
             workingHoursList = new WorkingHours[0];
-            workingTime.setWorkingHours(workingHoursList);
-            schedule.setWorkingTime(workingTime);
+            workingTimeAttendant.setWorkingHours(workingHoursList);
+            schedule.setWorkingTimeAttendant(workingTimeAttendant);
         }
         setSchedule(schedule);
         setWorkingHours(workingHoursList);
@@ -146,8 +146,8 @@ public abstract class EditSchedule extends UserBasePage {
         }
 
         Schedule schedule = getSchedule();
-        WorkingTime workingTime = schedule.getWorkingTime();
-        workingTime.setWorkingHours(getWorkingHours());
+        WorkingTimeAttendant workingTimeAttendant = schedule.getWorkingTimeAttendant();
+        workingTimeAttendant.setWorkingHours(getWorkingHours());
         schedule.checkForValidSchedule();
         getForwardingContext().saveSchedule(schedule);
     }

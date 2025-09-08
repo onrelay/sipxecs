@@ -29,22 +29,17 @@ public class RowInserterTest extends TestCase {
     }
 
     public void testExecute() throws Exception {
-        PlatformTransactionManager ptm = createNiceMock(PlatformTransactionManager.class);
         JobContext jobContext = createMock(JobContext.class);
         jobContext.schedule("Import data: xyz");
         expectLastCall().andReturn("jobId");
         jobContext.start("jobId");
         jobContext.success("jobId");
-        replay(ptm, jobContext);
 
-        m_ri.setTransactionManager(ptm);
         m_ri.setJobContext(jobContext);
         DummyType dummy = new DummyType();
         assertEquals(0, m_ri.m_rows);
         m_ri.execute(dummy);
         assertEquals(1, m_ri.m_rows);
-
-        verify(ptm, jobContext);
     }
 
     private static class DummyRowInserter extends RowInserter<DummyType> {

@@ -83,7 +83,7 @@ public class RestConfiguration implements ConfigProvider {
         context.put("sipxcdrDbAddress", sipxcdrApi.toString());
         context.put("postgresPwd", m_postgresPwd);
         try {
-            m_velocityEngine.mergeTemplate("sipxrest/sipxrest-config.vm", context, wtr);
+            m_velocityEngine.mergeTemplate("sipxrest/sipxrest-config.vm", "UTF-8", context, wtr);
         } catch (Exception e) {
             throw new IOException(e);
         }

@@ -73,7 +73,7 @@ public class AdminConfig implements ConfigProvider {
             try {
                 KeyValueConfiguration cfg = KeyValueConfiguration.equalsSeparated(pwd);
                 CfengineModuleConfiguration cfgCfdat = new CfengineModuleConfiguration(pwdCfdat);
-                cfg.write("password", password);
+                cfg.write("postgres-pwd.password", password);
                 cfgCfdat.write("NEW_POSTGRESQL_PASSWORD", password);
             } finally {
                 IOUtils.closeQuietly(pwd);

@@ -4,9 +4,10 @@
 <hibernate-mapping package="org.sipfoundry.sipxconfig.branch" default-lazy="false">
   <class name="Branch" table="branch">
     <id name="id" column="branch_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">branch_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">branch_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="name" />
     <property name="description" />

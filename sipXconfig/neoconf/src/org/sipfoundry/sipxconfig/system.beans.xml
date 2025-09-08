@@ -1,66 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   <!--
     -  S Y S T E M  D I R E C T O R I E S
     -  evaluates system directory variables e.g. ${sysdir.*} in this file
   -->
-  <bean id="sipxconfig.properties" class="org.springframework.core.io.ClassPathResource">
+  <bean id="sipxconfig.properties" class="org.springframework.core.io.FileSystemResource">
     <constructor-arg index="0">
-      <value>sipxconfig.properties</value>
+      <value>/etc/sipxpbx/sipxconfig.properties</value>
     </constructor-arg>
   </bean>
   
-  <bean id="apiban.properties" class="org.springframework.core.io.ClassPathResource">
+  <bean id="apiban.properties" class="org.springframework.core.io.FileSystemResource">
     <constructor-arg index="0">
-      <value>apiban.properties</value>
+      <value>/etc/sipxpbx/apiban.properties</value>
     </constructor-arg>
   </bean>  
   
-  <bean id="postgres-pwd.properties" class="org.springframework.core.io.ClassPathResource">
+  <bean id="postgres-pwd.properties" class="org.springframework.core.io.FileSystemResource">
     <constructor-arg index="0">
-      <value>postgres-pwd.properties</value>
+      <value>/etc/sipxpbx/postgres-pwd.properties</value>
+    </constructor-arg>
+  </bean>
+
+  <bean id="admin.properties" class="org.springframework.core.io.FileSystemResource">
+    <constructor-arg index="0">
+      <value>/etc/sipxpbx/admin.properties</value>
     </constructor-arg>
   </bean>
 
   <bean id="sysdir" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="ignoreUnresolvablePlaceholders" value="true"/>
-    <property name="location">
-      <ref local="sipxconfig.properties" />
-    </property>
+    <property name="location" ref="sipxconfig.properties" />
   </bean>
   
   <bean id="apiban" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="ignoreUnresolvablePlaceholders" value="true"/>
-    <property name="location">
-      <ref local="apiban.properties" />
-    </property>
+    <property name="location" ref="apiban.properties" />
   </bean>
   
   <bean id="postgres-pwd" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="ignoreUnresolvablePlaceholders" value="true"/>
-    <property name="location">
-      <ref local="postgres-pwd.properties" />
-    </property>
+    <property name="location" ref="postgres-pwd.properties" />
   </bean>
 
   <!-- used to directly inject values from sipxconfig.properties file -->
   <!-- invalid keys are ignored to allow for easier upgrades and file changes -->
   <bean class="org.springframework.beans.factory.config.PropertyOverrideConfigurer">
-    <property name="location">
-      <ref local="sipxconfig.properties" />
-    </property>
+    <property name="location" ref="sipxconfig.properties"/>
     <property name="ignoreInvalidKeys" value="true" />
   </bean>
   
   <bean class="org.springframework.beans.factory.config.PropertyOverrideConfigurer">
-    <property name="location">
-      <ref local="postgres-pwd.properties" />
-    </property>
+    <property name="location" ref="postgres-pwd.properties"/>
     <property name="ignoreInvalidKeys" value="true" />
   </bean>
 
-  <bean class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor"/>
+  <bean class="org.springframework.beans.factory.config.PropertyOverrideConfigurer">
+    <property name="location" ref="admin.properties"/>
+    <property name="ignoreInvalidKeys" value="true" />
+  </bean>
+
 
   <!--
     - P O S T G R E S
@@ -81,7 +81,7 @@
       <value>${sipxconfig.db.user}</value>
     </property>
     <property name="password">
-      <value>${password}</value>
+      <value>${postgres-pwd.password}</value>
     </property>
     <!-- Determines how many connections at a time c3p0 will try to acquire when the pool
       is exhausted.  Default: 3.
@@ -127,14 +127,7 @@
     <property name="dataSource" ref="dataSource" />
   </bean>
 
-  <!--
-    - T R A N S A C T I O N  S U P P O R T
-  -->
-  <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
-    <property name="sessionFactory">
-      <ref local="sessionFactory" />
-    </property>
-  </bean>
+
   <!--
     - H I B E R N A T E   F A C T O R Y
   -->
@@ -146,20 +139,16 @@
         <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
         <prop key="hibernate.query.substitutions">true 't', false 'f'</prop>
         <prop key="hibernate.connection.release_mode">after_transaction</prop>
+        <prop key="hibernate.physical_naming_strategy">org.sipfoundry.sipxconfig.common.ImprovedNamingStrategy</prop>
+        <prop key="hibernate.current_session_context_class">thread</prop>
         <!-- prop key="hibernate.show_sql">true</prop -->
       </props>
-    </property>
-    <!-- unless otherwise specified property nameLikeThis will be mapped to column name_like_this -->
-    <property name="namingStrategy">
-      <bean class="org.sipfoundry.sipxconfig.common.ImprovedNamingStrategy" />
     </property>
   </bean>
 
   <bean id="sessionFactory" class="org.sipfoundry.sipxconfig.common.DynamicSessionFactoryBean"
     parent="commonSessionFactory">
-    <property name="dataSource">
-      <ref local="dataSource" />
-    </property>
+    <property name="dataSource" ref="dataSource" />
     <property name="mappingResources">
       <list>
         <value>org/sipfoundry/sipxconfig/acccode/authcode.hbm.xml</value>
@@ -210,10 +199,7 @@
         <value>settingsBean</value>
         <value>settingsWithLocation</value>
       </list>
-    </property>
-    <property name="entityInterceptor">
-      <ref bean="springInstantiator"/>
-    </property>
+    </property>  
   </bean>
 
   <bean name="preInitializeSessionFactory" class="org.sipfoundry.sipxconfig.common.SpringBeanPreInitializer">
@@ -223,21 +209,12 @@
   <!--
     - H I B E R N A T E   S E S S I O N
   -->
-  <bean id="hibernateInterceptor" class="org.springframework.orm.hibernate5.HibernateInterceptor">
-    <property name="sessionFactory">
-      <ref bean="sessionFactory" />
-    </property>
-    <property name="entityInterceptor">
-      <ref local="springInstantiator" />
-    </property>
+  <bean id="hibernateInterceptor" class="org.sipfoundry.sipxconfig.common.SipxOpenSessionInterceptor">
+    <property name="sessionFactory" ref="sessionFactory"/>
   </bean>
-
-  <bean id="readOnlyHibernateInterceptor" parent="hibernateInterceptor">
-    <property name="flushModeName" value="FLUSH_NEVER" />
-  </bean>
-
+  
   <!-- springInstantiator will force hibernate to create new objects through Spring -->
-  <bean id="springInstantiator" class="org.sipfoundry.sipxconfig.search.IndexingInterceptor" scope="prototype">
+  <bean id="springInstantiator" class="org.sipfoundry.sipxconfig.search.IndexingInterceptor" >
     <property name="sessionFactory" ref="sessionFactory" />
     <property name="indexer" ref="fastIndexer" />
     <property name="beanIndexHelper" ref="beanIndexHelper"/>
@@ -265,9 +242,7 @@
   </bean>
   
   <bean id="onDeleteAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
-    <property name="advice">
-      <ref local="onDeleteEventDispatcher" />
-    </property>
+    <property name="advice" ref="onDeleteEventDispatcher" />
     <property name="patterns">
       <list>
         <!-- AnyClass.deleteAnyThing(Object, ...) -->
@@ -276,9 +251,7 @@
     </property>
   </bean>
   <bean id="onSaveAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
-    <property name="advice">
-      <ref local="onSaveEventDispatcher" />
-    </property>
+    <property name="advice" ref="onSaveEventDispatcher" />
     <property name="patterns">
       <list>
         <!-- AnyClass.saveAnything(Object, ...) -->
@@ -299,9 +272,7 @@
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.common.event.DaoEventPublisher</value>
     </property>
-    <property name="target">
-      <ref local="daoEventPublisherImpl" />
-    </property>
+    <property name="target" ref="daoEventPublisherImpl" />
     <property name="interceptorNames">
       <list>
         <value>hibernateInterceptor</value>
@@ -314,22 +285,18 @@
 
   <bean id="onDeleteEventDispatcher" class="org.sipfoundry.sipxconfig.common.event.DaoEventDispatcher"
     factory-method="createDeleteDispatcher">
-    <property name="publisher">
-      <ref local="daoEventPublisher" />
-    </property>
+    <property name="publisher" ref="daoEventPublisher" />
   </bean>
 
   <bean id="onSaveEventDispatcher" class="org.sipfoundry.sipxconfig.common.event.DaoEventDispatcher"
     factory-method="createSaveDispatcher">
-    <property name="publisher">
-      <ref local="daoEventPublisher" />
-    </property>
+    <property name="publisher" ref="daoEventPublisher" />
   </bean>
 
   <!--
     - V E L O C I T Y
   -->
-  <bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+  <bean id="velocityEngine" class="org.apache.velocity.spring.VelocityEngineFactoryBean">
     <property name="resourceLoaderPath">
       <value>file:${sysdir.etc}</value>
     </property>
@@ -340,7 +307,7 @@
     </property>
   </bean>
 
-  <bean id="velocityEngineClasspath" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+  <bean id="velocityEngineClasspath" class="org.apache.velocity.spring.VelocityEngineFactoryBean">
     <property name="resourceLoaderPath">
       <value>classpath:org/sipfoundry/sipxconfig</value>
     </property>
@@ -352,27 +319,20 @@
   </bean>
 
   <!--
-    - E H C A C H E
+    - J C A C H E
   -->
-  <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
-    <property name="configLocation">
-      <value>classpath:ehcache.xml</value>
-    </property>
+  <bean id="cacheManager" class="org.springframework.cache.jcache.JCacheManagerFactoryBean">
+    <property name="cacheManagerUri" value="classpath:ehcache.xml"/>
   </bean>
 
-  <bean id="methodCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
-    <property name="cacheManager">
-      <ref local="cacheManager" />
-    </property>
-    <property name="cacheName">
-      <value>org.taha.cache.METHOD_CACHE</value>
-    </property>
+  <bean id="methodCache" factory-bean="cacheManager" factory-method="getCache">
+    <constructor-arg value="org.taha.cache.METHOD_CACHE"/>
+    <constructor-arg value="java.lang.Object"/>
+    <constructor-arg value="java.lang.Object"/>
   </bean>
 
   <bean id="methodCacheInterceptor" class="org.taha.interceptor.MethodCacheInterceptor">
-    <property name="cache">
-      <ref local="methodCache" />
-    </property>
+    <property name="cache" ref="methodCache"/>
   </bean>
 
   <!-- Interceptor to be used for all background tasks -->

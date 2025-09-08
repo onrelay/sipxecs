@@ -14,43 +14,420 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
+import java.lang.AutoCloseable;
+import java.lang.UnsupportedOperationException;
+import java.lang.IllegalStateException;
 
 import org.apache.commons.lang3.ArrayUtils;
+
+import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.dao.support.DaoSupport;
+import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Join;
+
 import org.hibernate.Session;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.engine.SessionImplementor;
+import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.metamodel.model.domain.EntityDomainType;
 import org.hibernate.persister.entity.EntityPersister;
+
 import org.sipfoundry.sipxconfig.common.event.DaoEventPublisher;
 import org.sipfoundry.sipxconfig.setting.BeanWithSettings;
 import org.sipfoundry.sipxconfig.setting.Storage;
 import org.sipfoundry.sipxconfig.setting.ValueStorage;
-import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.orm.hibernate5.HibernateCallback;
-import org.springframework.orm.hibernate5.HibernateTemplate;
-import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 
-public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements DataObjectSource<T> {
+
+public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObjectSource<T> {
+    
+    private SessionFactory m_sessionFactory;
+
     private DaoEventPublisher m_daoEventPublisher;
 
-    public T load(Class<T> c, Serializable id) {
-        return getHibernateTemplate().load(c, id);
-    }
+    public static class SessionTransaction implements AutoCloseable {
 
-    protected void saveBeanWithSettings(BeanWithSettings bean) {
-        updateBeanValueStorage(bean);
-        if (bean.isNew()) {
-            getHibernateTemplate().save(bean);
-        } else {
-            getHibernateTemplate().merge(bean);
+        private Session m_session = null;
+        private Transaction m_transaction = null;
+        private boolean m_openedSession = false;
+
+        public SessionTransaction(SessionFactory sessionFactory) {
+
+            try {
+                // Try the configured current session
+                m_session = sessionFactory.getCurrentSession();
+            } catch (org.hibernate.HibernateException e) {
+                // No current session, open a new one
+                m_session = sessionFactory.openSession();
+                m_openedSession = true;
+            }
+
+            try {
+                m_transaction = m_session.beginTransaction();
+
+            } catch( UnsupportedOperationException e ) {
+                
+                if( "The application must supply JDBC connections".equals( e.getMessage() ) ) {
+                    throw new IllegalStateException( "JDBC interface not ready");
+                }
+                else {
+                    throw e;
+                }
+            }
+        }
+
+        public Session getSession() {
+            return m_session;
+        }
+
+        public Transaction getTransaction() {
+            return m_transaction;
+        }
+
+        public boolean getOpenedSession() {
+            return m_openedSession;
+        }
+
+        @Override
+        public void close() {
+            try {
+                if (m_transaction != null && m_transaction.isActive() && !m_transaction.getRollbackOnly()) {
+                    m_transaction.commit();
+                }
+            } catch (RuntimeException e) {
+                if (m_transaction != null && m_transaction.isActive()) {
+                    m_transaction.rollback();
+                }
+                throw e;
+            } finally {
+                if (m_openedSession && m_session != null && m_session.isOpen()) {
+                    m_session.close();
+                }
+            }
         }
     }
 
+    public SipxHibernateDaoSupport() {
+    }
+
+    public DaoEventPublisher getDaoEventPublisher() {
+        return m_daoEventPublisher;
+    }
+
+    public void setDaoEventPublisher(DaoEventPublisher daoEventPublisher) {
+        m_daoEventPublisher = daoEventPublisher;
+    }
+
+    protected final void checkDaoConfig() {
+      if (m_sessionFactory == null) {
+         throw new IllegalArgumentException("SessionFactory not set");
+      }
+    }
+
+    protected final SessionTransaction getSessionTransaction()  {
+       return new SessionTransaction( getSessionFactory() );
+    }
+
+    public SessionFactory getSessionFactory() {
+        return m_sessionFactory;
+    }
+
+    public void setSessionFactory( SessionFactory sessionFactory ) {
+        m_sessionFactory = sessionFactory;
+    }
+
+    public T load(Class<T> klass, Serializable id) {
+        return loadEntity( klass, id );
+    }
+
+    @Transactional
+    public <S extends Object> S loadEntity(Class<S> klass, Serializable id) {
+   
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+    
+            return session.byId(klass).load(id);
+        }
+    }
+
+    @Transactional
+    public <S extends Object> List<S> loadAllEntities(Class<S> klass) {
+
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+    
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<S> cq = cb.createQuery(klass);
+            cq.from(klass);
+            return session.createQuery(cq).getResultList();
+        } catch( IllegalStateException e ) {
+            // server not ready
+            return new ArrayList<S>();
+        }
+    }
+
+    @Transactional
+    public <S extends Object> S findEntity(Class<S> klass, Serializable id) {
+
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+    
+            return (S) session.find(klass,id);
+        } catch( IllegalStateException e ) {
+            // server not ready
+            return null;
+        }
+    }
+
+    @Transactional
+    public <S extends Object> void persistEntity(S entity) {
+
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+    
+            session.persist(entity);
+        } catch( IllegalStateException e ) {
+            // server not ready
+        }
+    }
+
+    @Transactional
+    public <S extends Object> S mergeEntity(S entity) {
+
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+    
+            return (S) session.merge(entity);
+        } catch( IllegalStateException e ) {
+            // server not ready
+            return entity;
+        }
+    }
+
+    @Transactional
+    public <S extends Object> void refreshEntity(S entity) {
+
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+
+            session.refresh(entity);
+        } catch( IllegalStateException e ) {
+            // server not ready
+        }
+    }
+
+    @Transactional
+    public <S extends Object> void removeEntity(S entity) {
+
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+
+            session.remove(entity);
+        } catch( IllegalStateException e ) {
+            // server not ready
+        }
+    }
+
+    @Transactional
+    public <S extends Object> void removeAllEntities(Collection<S> entities) {
+
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+
+            for (S entity : entities) {
+                session.remove(entity);
+            }
+        } catch( IllegalStateException e ) {
+            // server not ready
+        }
+    }
+
+    @Transactional
+    public <S extends Object> void evictEntity(S entity) {
+
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+    
+            session.evict(entity);
+        } catch( IllegalStateException e ) {
+            // server not ready
+        }
+    }
+
+    @Transactional
+    public void flush() {
+        
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+    
+            session.flush();
+        } catch( IllegalStateException e ) {
+            // server not ready
+        }
+    }
+
+    @Transactional
+    public void clear() {
+        
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+
+            session.clear();
+        } catch( IllegalStateException e ) {
+            // server not ready
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional
+    public <S> List<S> findByNamedParam(String queryText, String[] paramNames, Object[] values, Class<S> resultClass) {
+        
+        if( paramNames.length != values.length ) {
+            throw new RuntimeException("queryNames and values must have same size");
+        }
+        
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+
+            Query<S> query = session.createQuery(queryText, resultClass);
+            for( int i = 0; i < paramNames.length; i++ ) {
+
+                query = query.setParameter(paramNames[i], values[i]);
+            }
+            return query.getResultList();
+        } catch( IllegalStateException e ) {
+            // server not ready
+            return new ArrayList<S>();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <S> List<S> findByNamedParam(String queryText, String paramName, Object value, Class<S> resultClass) {
+        
+        return findByNamedParam( queryText, new String[] { paramName },  new Object[] { value }, resultClass );
+    }
+
+    @SuppressWarnings("unchecked")
+    public <S> List<S> find(String queryText, Class<S> resultClass) {
+        
+        return findByNamedParam( queryText, new String[0],  new Object[0], resultClass );
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional
+    public <S> List<S> findByNamedQueryAndNamedParam(String queryName, String[] paramNames, Object[] values, Class<S> resultClass) {
+        
+        if( paramNames.length != values.length ) {
+            throw new RuntimeException("queryNames and values must have same size");
+        }
+        
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+
+            Query<S> query = session.createNamedQuery(queryName, resultClass);
+            for( int i = 0; i < paramNames.length; i++ ) {
+
+                query = query.setParameter(paramNames[i], values[i]);
+            }
+            return query.getResultList();
+        } catch( IllegalStateException e ) {
+            // server not ready
+            return new ArrayList<S>();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <S> List<S> findByNamedQueryAndNamedParam(String queryName, String paramName, Object value, Class<S> resultClass) {
+        
+        return findByNamedQueryAndNamedParam( queryName, new String[] { paramName },  new Object[] { value }, resultClass );
+    }
+
+
+    @SuppressWarnings("unchecked")
+    @Transactional
+    public <S> List<S> findByNamedQuery(String queryName, Object[] values, Class<S> resultClass) {
+
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+    
+            Query<S> query = session.createNamedQuery(queryName, resultClass);
+            for( int i = 0; i < values.length; i++ ) {
+
+                query = query.setParameter(i + 1, values[i]);
+            }
+            return query.getResultList();
+        } catch( IllegalStateException e ) {
+            // server not ready
+            return new ArrayList<S>();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <S> List<S> findByNamedQuery(String queryName, Object value, Class<S> resultClass) {
+
+        return findByNamedQuery( queryName, new Object[] { value }, resultClass );
+    }
+
+    @SuppressWarnings("unchecked")
+    public <S> List<S> findByNamedQuery(String queryName, Class<S> resultClass) {
+
+        return findByNamedQuery( queryName, new Object[0], resultClass );
+    }
+
+    @Transactional
+    protected void saveBeanWithSettings(BeanWithSettings bean) {
+        updateBeanValueStorage(bean);
+ 
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+    
+            if (bean.isNew()) {
+                session.persist(bean);
+            } else {
+                session.merge(bean);
+            }
+        } catch( IllegalStateException e ) {
+            // server not ready
+        }
+    }
+
+    @Transactional
     protected void saveOrUpdateBeanWithSettings(BeanWithSettings bean) {
         updateBeanValueStorage(bean);
-        getHibernateTemplate().saveOrUpdate(bean);
+    
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+    
+            session.merge(bean);
+        } catch( IllegalStateException e ) {
+            // server not ready
+        }
     }
 
     private void updateBeanValueStorage(BeanWithSettings bean) {
@@ -59,10 +436,19 @@ public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements D
         bean.setValueStorage(cleanStorage);
     }
 
+    @Transactional
     protected void deleteBeanWithSettings(BeanWithSettings bean) {
         // avoid hibernate errors about new object references when calling delete on parent object
         bean.setValueStorage(clearUnsavedValueStorage(bean.getValueStorage()));
-        getHibernateTemplate().delete(bean);
+        
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+    
+            session.remove(bean);
+        } catch( IllegalStateException e ) {
+            // server not ready
+        }
     }
 
     /**
@@ -74,18 +460,22 @@ public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements D
      * @param bean bean to duplicate
      * @param queryName name of the query to be executed (define in *.hbm.xml file)
      */
+    @Transactional
     public BeanWithId duplicateBean(BeanWithId bean, String queryName) {
         BeanWithId copy = bean.duplicate();
 
         if (bean instanceof NamedObject) {
-            // Give the new bean a unique name by prepending "copyOf" to the source
-            // bean's name until we get a name that hasn't been used yet.
-            HibernateTemplate template = getHibernateTemplate();
             NamedObject namedCopy = (NamedObject) copy;
             namedCopy.setName(((NamedObject) bean).getName());
-            do {
-                namedCopy.setName("CopyOf" + namedCopy.getName());
-            } while (DaoUtils.checkDuplicatesByNamedQuery(template, copy, queryName, namedCopy.getName(), null));
+          
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+    
+                do {
+                    namedCopy.setName("CopyOf" + namedCopy.getName());
+                } while (DaoUtils.checkDuplicatesByNamedQuery(session, copy, queryName, namedCopy.getName(), null));
+            }
         }
 
         return copy;
@@ -97,19 +487,52 @@ public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements D
         return loadBeansByPage(beanClass, groupId, null, firstRow, pageSize, orderBy, orderAscending);
     }
 
-    @SuppressWarnings("rawtypes")
-    public List<T> loadBeansByPage(Class beanClass, Integer groupId, Integer branchId, int firstRow, int pageSize,
-            String[] orderBy, boolean orderAscending) {
-        DetachedCriteria c = DetachedCriteria.forClass(beanClass);
-        addByGroupCriteria(c, groupId);
-        addByBranchCriteria(c, branchId);
-        if (orderBy != null) {
-            for (String o : orderBy) {
-                Order order = orderAscending ? Order.asc(o) : Order.desc(o);
-                c.addOrder(order);
+    @Transactional
+    public List<T> loadBeansByPage(Class<T> beanClass, Integer groupId, Integer branchId, int firstRow, int pageSize,
+                                String[] orderBy, boolean orderAscending) {
+        
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<T> cq = cb.createQuery(beanClass);
+            Root<T> root = cq.from(beanClass);
+
+            List<Predicate> predicates = new ArrayList<>();
+            
+            Predicate groupPredicate = addByGroupCriteria(cb, root, groupId);
+            if (groupPredicate != null) {
+                predicates.add(groupPredicate);
             }
+            
+            Predicate branchPredicate = addByBranchCriteria(cb, root, branchId);
+            if (branchPredicate != null) {
+                predicates.add(branchPredicate);
+            }
+
+            if (!predicates.isEmpty()) {
+                cq.where(cb.and(predicates.toArray(new Predicate[0])));
+            }
+
+            if (orderBy != null) {
+                List<Order> orders = new ArrayList<>();
+                for (String o : orderBy) {
+                    orders.add(orderAscending ? cb.asc(root.get(o)) : cb.desc(root.get(o)));
+                }
+                cq.orderBy(orders);
+            }
+
+            TypedQuery<T> query = session.createQuery(cq);
+            query.setFirstResult(firstRow);
+            query.setMaxResults(pageSize);
+
+            return query.getResultList();
+
+        } catch( IllegalStateException e ) {
+            // server not ready
+            return new ArrayList<T>();
         }
-        return (List<T>)getHibernateTemplate().findByCriteria(c, firstRow, pageSize);
     }
 
     @SuppressWarnings("rawtypes")
@@ -124,37 +547,86 @@ public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements D
      * Return the count of beans of type beanClass in the specified group. If groupId is null,
      * then don't filter by group, just count all the beans.
      */
-    @SuppressWarnings("rawtypes")
-    public int getBeansInGroupCount(Class beanClass, Integer groupId) {
-        DetachedCriteria crit = DetachedCriteria.forClass(beanClass);
-        addByGroupCriteria(crit, groupId);
-        crit.setProjection(Projections.rowCount());
-        List results = getHibernateTemplate().findByCriteria(crit);
-        return ((Long) DataAccessUtils.requiredSingleResult(results)).intValue();
+    @Transactional
+    public <T> int getBeansInGroupCount(Class<T> beanClass, Integer groupId) {
+        
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+            Root<T> root = cq.from(beanClass);
+
+            Predicate groupPredicate = addByGroupCriteria(cb, root, groupId);
+            if (groupPredicate != null) {
+                cq.where(groupPredicate);
+            }
+
+            cq.select(cb.count(root));
+
+            Long count = session.createQuery(cq).getSingleResult();
+
+            return count.intValue();
+
+        } catch( IllegalStateException e ) {
+            // server not ready
+            return 0;
+        }
     }
 
+    @Transactional
     protected void removeAll(Class<?> klass, Collection<Integer> ids) {
-        HibernateTemplate template = getHibernateTemplate();
-        Collection<Object> entities = new ArrayList<>(ids.size());
-        for (Iterator<Integer> i = ids.iterator(); i.hasNext();) {
-            Integer id = (Integer) i.next();
-            Object entity = template.load(klass, id);
-            entities.add(entity);
-            m_daoEventPublisher.publishDelete(entity);
+        
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();
+    
+            Collection<Object> entities = new ArrayList<>(ids.size());
+
+            for (Integer id : ids) {
+                Object entity = session.find(klass, id); 
+                if (entity != null) {
+                    entities.add(entity);
+                    m_daoEventPublisher.publishDelete(entity);
+                }
+            }
+
+            for (Object entity : entities) {
+                session.remove(entity);
+            }
+
+            session.flush();
+
+        } catch( IllegalStateException e ) {
+            // server not ready
         }
-        template.deleteAll(entities);
-        // HACK: this is to fix XCF-1732, it should not be needed but FLASH_AUTO strategy does not
-        // work here
-        template.flush();
     }
 
+    @Transactional
     protected void removeAll(Class<?> klass) {
-        HibernateTemplate template = getHibernateTemplate();
-        List<?> entities = template.loadAll(klass);
-        for (Object entity : entities) {
-            m_daoEventPublisher.publishDelete(entity);
+        
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();    
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<?> cq = cb.createQuery(klass);
+            cq.from(klass);
+
+            List<?> entities = session.createQuery(cq).getResultList();
+
+            for (Object entity : entities) {
+                m_daoEventPublisher.publishDelete(entity);
+                session.remove(entity);
+            }
+
+            session.flush(); // Optional: ensure deletions are flushed immediately
+       
+        } catch( IllegalStateException e ) {
+            // server not ready
         }
-        template.deleteAll(entities);
+        
     }
 
     protected Storage clearUnsavedValueStorage(Storage storage) {
@@ -169,33 +641,46 @@ public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements D
      * Returns the original value of an object before it was modified by application. Represent
      * the original value from the database.
      */
+    @Transactional
     protected Object getOriginalValue(PrimaryKeySource obj, String propertyName) {
-        GetOriginalValueCallback callback = new GetOriginalValueCallback(obj, propertyName);
-        Object originalValue = getHibernateTemplate().executeWithNativeSession(callback);
-        return originalValue;
+        
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();    
+         
+            return new GetOriginalValueCallback(obj, propertyName).doInSession(session);
+        } catch( IllegalStateException e ) {
+            // server not ready
+            return null;
+        }
     }
 
     /**
      * Update a Criteria object for filtering beans by group membership. If groupId is null, then
      * don't filter by group.
      */
-    public static void addByGroupCriteria(DetachedCriteria crit, Integer groupId) {
+    public static <T> Predicate addByGroupCriteria(CriteriaBuilder cb, Root<T> root, Integer groupId) {
         if (groupId != null) {
-            crit.createCriteria("groups", "g").add(Restrictions.eq("g.id", groupId));
+            Join<Object, Object> groupsJoin = root.join("groups");
+            return cb.equal(groupsJoin.get("id"), groupId);
         }
+        return null;
     }
+
 
     /**
      * Update a Criteria object for filtering beans by branch membership. If brnachId is null,
      * then don't filter by branch.
      */
-    public static void addByBranchCriteria(DetachedCriteria crit, Integer branchId) {
+    public static <T> Predicate addByBranchCriteria(CriteriaBuilder cb, Root<T> root, Integer branchId) {
         if (branchId != null) {
-            crit.createCriteria("branch", "b").add(Restrictions.eq("b.id", branchId));
+            Join<Object, Object> branchJoin = root.join("branch");
+            return cb.equal(branchJoin.get("id"), branchId);
         }
+        return null;
     }
 
-    static class GetOriginalValueCallback implements HibernateCallback<Object> {
+    static class GetOriginalValueCallback {
         private final PrimaryKeySource m_object;
         private final String m_propertyName;
 
@@ -204,31 +689,30 @@ public class SipxHibernateDaoSupport<T> extends HibernateDaoSupport implements D
             m_propertyName = propertyName;
         }
 
-        public Object doInHibernate(Session session) {
-            SessionImplementor si = (SessionImplementor) session;
-            EntityPersister ep = si.getEntityPersister(null, m_object);
-
-            String[] propNames = ep.getPropertyNames();
-            int propIndex = ArrayUtils.indexOf(propNames, m_propertyName);
-            if (propIndex < 0) {
-                throw new IllegalArgumentException("Property '" + m_propertyName + "' not found on object '"
-                        + m_object.getClass() + "'");
-            }
-
+        public Object doInSession(Session session) {
+            Class<?> entityClass = m_object.getClass();
             Serializable id = (Serializable) m_object.getPrimaryKey();
-            Object[] props = ep.getDatabaseSnapshot(id, si);
-            if (props == null) {
+
+            Object dbObject = session.byId(entityClass).load(id);
+            if (dbObject == null) {
                 return null;
             }
-            return props[propIndex];
+
+            try {
+                PropertyDescriptor[] props = Introspector.getBeanInfo(entityClass).getPropertyDescriptors();
+                for (PropertyDescriptor prop : props) {
+                    if (prop.getName().equals(m_propertyName)) {
+                        Method getter = prop.getReadMethod();
+                        if (getter != null) {
+                            return getter.invoke(dbObject);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to access property '" + m_propertyName + "'", e);
+            }
+
+            return null;
         }
-    }
-
-    public DaoEventPublisher getDaoEventPublisher() {
-        return m_daoEventPublisher;
-    }
-
-    public void setDaoEventPublisher(DaoEventPublisher daoEventPublisher) {
-        m_daoEventPublisher = daoEventPublisher;
     }
 }

@@ -17,26 +17,27 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
+import org.springframework.transaction.annotation.Transactional;
+
 import org.sipfoundry.sipxconfig.bridge.BridgeSbc;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.device.BeanFactoryModelSource;
 
-public class SbcMigrationContextImpl extends SipxHibernateDaoSupport implements SbcMigrationContext {
+public class SbcMigrationContextImpl extends SipxHibernateDaoSupport<Sbc> implements SbcMigrationContext {
     public static final Log LOG = LogFactory.getLog(SbcMigrationContextImpl.class);
     private static final String SQL = "alter table sbc drop column address";
     private SbcDeviceManager m_sbcDeviceManager;
     private BeanFactoryModelSource<SbcDescriptor> m_sbcModelSource;
 
     private Sbc getSbc(Integer id) {
-        return (Sbc) getHibernateTemplate().load(Sbc.class, id);
+        return (Sbc) super.loadEntity(Sbc.class, id);
     }
 
     public void migrateSbc() {
-        List sbcs = getHibernateTemplate().findByNamedQuery("allSbcs");
-        for (Iterator i = sbcs.iterator(); i.hasNext();) {
-            Object[] row = (Object[]) i.next();
+        List<Object[]> rows = super.findByNamedQuery("allSbcs",Object[].class);
+        for( Object[] row : rows ) {
             Integer sbcId = (Integer) row[0];
             String address = (String) row[1];
             if (sbcId == null || address == null) {
@@ -50,8 +51,8 @@ public class SbcMigrationContextImpl extends SipxHibernateDaoSupport implements 
                 if (sbcDevice instanceof BridgeSbc) {
                     ((BridgeSbc) sbcDevice).updateBridgeLocationId();
                 }
-                getHibernateTemplate().save(sbc);
-                getHibernateTemplate().flush();
+                super.persistEntity(sbc);
+                super.flush();
             } catch (UserException e) {
                 LOG.warn("cannot migrate sbcs", e);
             }
@@ -67,21 +68,26 @@ public class SbcMigrationContextImpl extends SipxHibernateDaoSupport implements 
         sbcDevice.setName(address + "_" + System.currentTimeMillis());
         sbcDevice.setAddress(address);
         m_sbcDeviceManager.saveSbcDevice(sbcDevice);
-        getHibernateTemplate().flush();
+        super.flush();
 
         return sbcDevice.getId();
     }
 
+    @Transactional
     private void cleanSchema() {
-        try {
-            Session currentSession = getHibernateTemplate().getSessionFactory().getCurrentSession();
-            Connection connection = currentSession.connection();
-            Statement statement = connection.createStatement();
-            statement.addBatch(SQL);
-            statement.executeBatch();
-            statement.close();
-        } catch (SQLException e) {
-            LOG.warn("cleaning schema", e);
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            session.doWork(connection -> {
+                try (Statement statement = connection.createStatement()) {
+                    statement.addBatch(SQL);
+                    statement.executeBatch();
+                } catch (SQLException e) {
+                    LOG.warn("cleaning schema", e);
+                }
+            });
         }
     }
 

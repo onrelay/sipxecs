@@ -24,7 +24,6 @@ import org.easymock.EasyMock;
 import org.sipfoundry.sipxconfig.common.event.DaoEventListener;
 import org.sipfoundry.sipxconfig.common.event.DaoEventPublisherImpl;
 import org.sipfoundry.sipxconfig.gateway.Gateway;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 
 /**
  * DialPlanContextImplTest
@@ -125,7 +124,6 @@ public class DialPlanContextImplTest extends TestCase {
 
         MockDialPlanContextImpl(DialPlan plan) {
             m_plan = plan;
-            setHibernateTemplate(createMock(HibernateTemplate.class));
             DaoEventPublisherImpl stubPub = new DaoEventPublisherImpl();
             stubPub.divertEvents(this);
             setDaoEventPublisher(stubPub);

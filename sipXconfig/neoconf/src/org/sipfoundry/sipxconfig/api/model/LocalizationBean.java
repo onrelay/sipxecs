@@ -1,6 +1,6 @@
 package org.sipfoundry.sipxconfig.api.model;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.sipfoundry.sipxconfig.localization.Localization;
 

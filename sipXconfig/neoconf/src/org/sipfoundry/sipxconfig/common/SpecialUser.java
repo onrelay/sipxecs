@@ -44,7 +44,7 @@ public class SpecialUser extends BeanWithId implements Replicable {
     private String m_sipPassword;
 
     public SpecialUser() {
-        // required by Hibernater
+        // required by Hibernate
     }
 
     /**
@@ -57,7 +57,7 @@ public class SpecialUser extends BeanWithId implements Replicable {
     }
 
     public void setType(String type) {
-        m_type = SpecialUserType.valueOf(type);
+        m_type = (type != null ? SpecialUserType.valueOf(type) : null);
     }
 
     public void setType(SpecialUserType type) {
@@ -65,11 +65,11 @@ public class SpecialUser extends BeanWithId implements Replicable {
     }
 
     public String getType() {
-        return m_type.toString();
+        return m_type != null ? m_type.toString() : null;
     }
 
     public String getUserName() {
-        return m_type.getUserName();
+        return m_type != null ? m_type.getUserName() : null;
     }
 
     public void setSipPassword(String sipPassword) {
@@ -118,7 +118,9 @@ public class SpecialUser extends BeanWithId implements Replicable {
     @Override
     public Map<String, Object> getMongoProperties(String domain) {
         Map<String, Object> props = new HashMap<String, Object>();
-        props.put(UID, getUserName());
+        if( m_type != null ) {
+            props.put(UID, getUserName());
+        }
         return props;
     }
 

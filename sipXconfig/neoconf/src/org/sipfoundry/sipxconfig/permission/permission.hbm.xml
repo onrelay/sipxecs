@@ -6,6 +6,10 @@
   <class name="Permission" table="permission">
     <id name="id" column="permission_id" type="int" unsaved-value="-1">
       <generator class="native" />
+      <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="permission_seq">timezone_seq</param>
+        <param name="increment_size">1</param>
+      </generator>
     </id>
     <property name="description" />
     <property name="label" />
@@ -17,4 +21,4 @@
   <query name="anotherPermissionWithTheSameLabel">
     <![CDATA[select count (*) from Permission p where p.id != :id and p.label = :label]]>
   </query>
-</hibernate-mapping>
+  </hibernate-mapping>

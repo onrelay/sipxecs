@@ -14,8 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.common.DataObjectSource;
 import org.sipfoundry.sipxconfig.search.BeanAdaptor.Identity;
-import org.springframework.orm.hibernate5.HibernateObjectRetrievalFailureException;
-
+import org.springframework.orm.ObjectRetrievalFailureException;
 /**
  * Tries to load bean from DataObjectSource if the object cannot be loaded catches exception and returns null
  * IdentityToBean
@@ -33,7 +32,7 @@ public class IdentityToBean<T> implements Transformer {
         try {
             Identity<T> i = (Identity<T>) identity;
             return m_source.load(i.getBeanClass(), i.getBeanId());
-        } catch (HibernateObjectRetrievalFailureException e) {
+        } catch (ObjectRetrievalFailureException e) {
             LOG.error("Object not found: " + identity, e);
             return null;
         }

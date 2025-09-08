@@ -165,9 +165,9 @@ public class BranchManagerImplTestIntegration extends ImdbTestCase {
 
     public void testSetup() throws Exception {
         TestHelper.cleanInsert("ClearDb.xml");
-        getHibernateTemplate().flush();
+        getCurrentSession().flush();
         loadDataSet("branch/branches_with-tz.db.xml");
-        getHibernateTemplate().flush();
+        getCurrentSession().flush();
 
         m_branchManager.getBranches();
 

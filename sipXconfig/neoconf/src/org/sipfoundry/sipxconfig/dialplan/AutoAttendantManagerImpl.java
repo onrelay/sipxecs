@@ -36,9 +36,8 @@ import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.dialplan.attendant.AutoAttendantSettings;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.Interval;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.WorkingHours;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.forwarding.Schedule;
 import org.sipfoundry.sipxconfig.ivr.Ivr;
@@ -87,11 +86,11 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
 
         clearUnsavedValueStorage(aa.getValueStorage());
         if (aa.isNew()) {
-            getHibernateTemplate().save(aa);
+            super.persistEntity(aa);
         } else {
-            getHibernateTemplate().merge(aa);
+            super.mergeEntity(aa);
         }
-        getHibernateTemplate().flush();
+        super.flush();
         getDaoEventPublisher().publishSave(aa);
     }
 
@@ -116,20 +115,21 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
 
     private AutoAttendant getAttendant(String systemId) {
         String query = "from AutoAttendant a where a.systemId = :systemId";
-        List<AutoAttendant> operatorList = (List<AutoAttendant>)getHibernateTemplate().findByNamedParam(query, "systemId", systemId);
+        List<AutoAttendant> operatorList = 
+            (List<AutoAttendant>)super.findByNamedParam(query, "systemId", systemId, AutoAttendant.class);
 
         return DaoUtils.requireOneOrZero(operatorList, query);
     }
 
     @Override
     public List<AutoAttendant> getAutoAttendants() {
-        List<AutoAttendant> aas = getHibernateTemplate().loadAll(AutoAttendant.class);
+        List<AutoAttendant> aas = super.loadAllEntities(AutoAttendant.class);
         return aas;
     }
 
     @Override
     public AutoAttendant getAutoAttendant(Integer id) {
-        return getHibernateTemplate().load(AutoAttendant.class, id);
+        return super.loadEntity(AutoAttendant.class, id);
     }
 
     @Override
@@ -169,9 +169,9 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         }
 
         attendant.setValueStorage(clearUnsavedValueStorage(attendant.getValueStorage()));
-        getHibernateTemplate().refresh(attendant);
+        super.refreshEntity(attendant);
 
-        Collection<AttendantRule> attendantRules = getHibernateTemplate().loadAll(AttendantRule.class);
+        Collection<AttendantRule> attendantRules = super.loadAllEntities(AttendantRule.class);
         Collection<DialingRule> affectedRules = new ArrayList<DialingRule>();
         for (AttendantRule rule : attendantRules) {
             if (rule.checkAttendant(attendant)) {
@@ -196,13 +196,13 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
             specialMode.setAttendant(null);
             specialMode.setEnabled(false);
             if (specialMode.isNew()) {
-                getHibernateTemplate().save(specialMode);
+                super.persistEntity(specialMode);
             } else {
-                getHibernateTemplate().merge(specialMode);
+                super.mergeEntity(specialMode);
             }
         }
 
-        getHibernateTemplate().delete(attendant);
+        super.removeEntity(attendant);
     }
 
     @Override
@@ -235,7 +235,8 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
     }
 
     private Collection<AutoAttendant> getAutoAttendantsWithName(String alias) {
-        return (Collection<AutoAttendant>)getHibernateTemplate().findByNamedQueryAndNamedParam("autoAttendantIdsWithName", "value", alias);
+        return (Collection<AutoAttendant>)super.findByNamedQueryAndNamedParam(
+            "autoAttendantIdsWithName", "value", alias, AutoAttendant.class );
     }
 
     @Override
@@ -254,9 +255,9 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         attendant = createSystemAttendant(attendantId);
         attendant.addGroup(getDefaultAutoAttendantGroup());
         if (attendant.isNew()) {
-            getHibernateTemplate().save(attendant);
+            super.persistEntity(attendant);
         } else {
-            getHibernateTemplate().merge(attendant);
+            super.mergeEntity(attendant);
         }
         getDaoEventPublisher().publishSave(attendant);
         return attendant;
@@ -284,9 +285,9 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
      */
     @Override
     public void clear() {
-        List<AutoAttendant> attendants = getHibernateTemplate().loadAll(AutoAttendant.class);
+        List<AutoAttendant> attendants = super.loadAllEntities(AutoAttendant.class);
         getDaoEventPublisher().publishDelete(attendants);
-        getHibernateTemplate().deleteAll(attendants);
+        super.removeAllEntities(attendants);
     }
 
     @Override
@@ -313,9 +314,9 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
 
         specialMode.setAttendant(null);
         if (specialMode.isNew()) {
-            getHibernateTemplate().save(specialMode);
+            super.persistEntity(specialMode);
         } else {
-            getHibernateTemplate().merge(specialMode);
+            super.mergeEntity(specialMode);
         }
         getDaoEventPublisher().publishSave(specialMode);
     }
@@ -345,15 +346,15 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
             specialMode.setAttendant(aa);
         }
         if (specialMode.isNew()) {
-            getHibernateTemplate().save(specialMode);
+            super.persistEntity(specialMode);
         } else {
-            getHibernateTemplate().merge(specialMode);
+            super.mergeEntity(specialMode);
         }
         getDaoEventPublisher().publishSave(specialMode);
     }
 
     private AttendantSpecialMode loadAttendantSpecialMode() {
-        List<AttendantSpecialMode> asm = getHibernateTemplate().loadAll(AttendantSpecialMode.class);
+        List<AttendantSpecialMode> asm = super.loadAllEntities(AttendantSpecialMode.class);
         AttendantSpecialMode specialMode = DataAccessUtils.singleResult(asm);
         return specialMode;
     }
@@ -376,8 +377,11 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
     public boolean manageLiveAttendant(String code, boolean enable) {
         try {
             Collection<AttendantRule> rules = 
-                (Collection<AttendantRule>)getHibernateTemplate().findByNamedQueryAndNamedParam("aaRulesForCode",
-                    "code", code);
+                (Collection<AttendantRule>)super.findByNamedQueryAndNamedParam(
+                    "aaRulesForCode",
+                    "code", 
+                    code,
+                    AttendantRule.class);
             AttendantRule rule = DaoUtils.requireOneOrZero(rules, "aaByCode");
             rule.setLiveAttendantEnabled(enable);
             if (!enable) {
@@ -394,7 +398,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
                     Schedule schedule = rule.getSchedule();
                     if (schedule != null) {
                         WorkingHours[] hours = new WorkingHours[1];
-                        WorkingTime wt = new WorkingTime();
+                        WorkingTimeAttendant wt = new WorkingTimeAttendant();
                         hours[0] = new WorkingHours();
                         TimeZone utc = TimeZone.getTimeZone("UTC");
                         Calendar cal = Calendar.getInstance(utc);
@@ -402,13 +406,13 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
                         hours[0].setStop(cal.getTime());
                         hours[0].setDay(ScheduledDay.getScheduledDay(cal.get(Calendar.DAY_OF_WEEK)));
                         wt.setWorkingHours(hours);
-                        List<Interval> intervals = wt.calculateValidTime(utc);
+                        List<WorkingHours.Interval> intervals = wt.calculateValidTime(utc);
                         int intervalNow = intervals.get(0).getStart();
-                        List<Interval> scheduleIntervals = schedule.getWorkingTime().calculateValidTime(
+                        List<WorkingHours.Interval> scheduleIntervals = schedule.getWorkingTimeAttendant().calculateValidTime(
                                 TimeZone.getDefault());
                         int dif = 0;
                         int firstStartInWeek = 0;
-                        for (Interval interval : scheduleIntervals) {
+                        for (WorkingHours.Interval interval : scheduleIntervals) {
                             if (interval.getStart() < firstStartInWeek || firstStartInWeek == 0) {
                                 firstStartInWeek = interval.getStart();
                             }
@@ -447,7 +451,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
             } else {
                 rule.setLiveAttendantExpire(null);
             }
-            getHibernateTemplate().save(rule);
+            super.persistEntity(rule);
             getDaoEventPublisher().publishSave(rule);
             return true;
         } catch (Exception ex) {
@@ -460,14 +464,15 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         LOG.trace("Check live attendant expiration");
         // hibernate query to load all Live AA rules enabled and night on disable
         // check if current time after expiration time, if so then re enable rule
-        Collection<AttendantRule> rules = (Collection<AttendantRule>)getHibernateTemplate().findByNamedQuery("disabledLiveAaRules");
+        Collection<AttendantRule> rules = 
+            (Collection<AttendantRule>)super.findByNamedQuery("disabledLiveAaRules", AttendantRule.class);
         for (AttendantRule rule : rules) {
             LOG.debug("found rule " + rule.getExtension() + " will expire at " + rule.getLiveAttendantExpire());
             if (rule.getLiveAttendantExpire() != null && new Date().after(rule.getLiveAttendantExpire())) {
                 LOG.info("Expiration passed, reenable " + rule.getExtension());
                 rule.setLiveAttendantEnabled(true);
                 rule.setLiveAttendantExpire(null);
-                getHibernateTemplate().merge(rule);
+                super.mergeEntity(rule);
                 getDaoEventPublisher().publishSave(rule);
             }
         }
@@ -513,7 +518,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
     public AutoAttendant getAutoAttendantByName(String attendantName) {
         String query = "from AutoAttendant a where a.name = :name";
         List<AutoAttendant> operatorList = 
-            (List<AutoAttendant>)getHibernateTemplate().findByNamedParam(query, "name", attendantName);
+            (List<AutoAttendant>)super.findByNamedParam(query, "name", attendantName,AutoAttendant.class);
 
         return DaoUtils.requireOneOrZero(operatorList, query);
     }

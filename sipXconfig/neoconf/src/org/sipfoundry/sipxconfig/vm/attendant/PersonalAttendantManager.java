@@ -21,16 +21,16 @@ import java.util.List;
 
 import org.sipfoundry.sipxconfig.common.User;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
+import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 
-public abstract class PersonalAttendantManager extends HibernateDaoSupport {
+public abstract class PersonalAttendantManager extends SipxHibernateDaoSupport<PersonalAttendant> {
 
     public PersonalAttendant loadPersonalAttendantForUser(User user) {
         PersonalAttendant pa = findPersonalAttendant(user);
         if (pa == null) {
             pa = new PersonalAttendant();
             pa.setUser(user);
-            getHibernateTemplate().merge(pa);
+            super.mergeEntity(pa);
         }
         return pa;
     }
@@ -42,26 +42,28 @@ public abstract class PersonalAttendantManager extends HibernateDaoSupport {
     public final void removePersonalAttendantForUser(User user) {
         PersonalAttendant pa = findPersonalAttendant(user);
         if (pa != null) {
-            getHibernateTemplate().delete(pa);
+            super.removeEntity(pa);
         }
     }
 
     public final void storePersonalAttendant(PersonalAttendant pa) {
         if (pa.isNew()) {
-            getHibernateTemplate().save(pa);
+            super.persistEntity(pa);
         } else {
-            getHibernateTemplate().merge(pa);
+            super.mergeEntity(pa);
         }
     }
 
     public final void clearPersonalAttendants() {
-        List<PersonalAttendant> allPersonalAttendants = getHibernateTemplate().loadAll(PersonalAttendant.class);
-        getHibernateTemplate().deleteAll(allPersonalAttendants);
+        List<PersonalAttendant> allPersonalAttendants = super.loadAllEntities(PersonalAttendant.class);
+        super.removeAllEntities(allPersonalAttendants);
     }
 
     private PersonalAttendant findPersonalAttendant(User user) {
-        Collection pas = getHibernateTemplate().findByNamedQueryAndNamedParam("personalAttendantForUser", "user",
-                user);
+        Collection<PersonalAttendant> pas = super.findByNamedQueryAndNamedParam("personalAttendantForUser", 
+            "user",
+            user,
+            PersonalAttendant.class);
         return (PersonalAttendant) DataAccessUtils.singleResult(pas);
     }
 

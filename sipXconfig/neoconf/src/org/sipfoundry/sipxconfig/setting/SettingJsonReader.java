@@ -17,12 +17,12 @@ package org.sipfoundry.sipxconfig.setting;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class SettingJsonReader {
 
     public void read(PersistableSettings settings, JsonNode node) {
-        Iterator<Entry<String, JsonNode>> fields = node.getFields();
+        Iterator<Entry<String, JsonNode>> fields = node.fields();
         while (fields.hasNext()) {
             Entry<String, JsonNode> setting = fields.next();
             settings.setSettingValue(setting.getKey(), setting.getValue().asText());
@@ -30,7 +30,7 @@ public class SettingJsonReader {
     }
 
     public void read(Setting settings, JsonNode node) {
-        Iterator<Entry<String, JsonNode>> fields = node.getFields();
+        Iterator<Entry<String, JsonNode>> fields = node.fields();
         while (fields.hasNext()) {
             Entry<String, JsonNode> setting = fields.next();
             settings.getSetting(setting.getKey()).setValue(setting.getValue().asText());

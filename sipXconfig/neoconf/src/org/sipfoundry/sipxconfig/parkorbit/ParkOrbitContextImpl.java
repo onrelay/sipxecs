@@ -42,7 +42,7 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class ParkOrbitContextImpl extends SipxHibernateDaoSupport<Object> implements ParkOrbitContext, BeanFactoryAware,
+public class ParkOrbitContextImpl extends SipxHibernateDaoSupport<ParkOrbit> implements ParkOrbitContext, BeanFactoryAware,
         FeatureProvider, DaoEventListener {
     private static final String VALUE = "value";
     private static final String QUERY_PARK_ORBIT_IDS_WITH_ALIAS = "parkOrbitIdsWithAlias";
@@ -70,9 +70,9 @@ public class ParkOrbitContextImpl extends SipxHibernateDaoSupport<Object> implem
         }
 
         if (parkOrbit.isNew()) {
-            getHibernateTemplate().save(parkOrbit);
+            super.persistEntity(parkOrbit);
         } else {
-            getHibernateTemplate().merge(parkOrbit);
+            super.mergeEntity(parkOrbit);
         }
         getDaoEventPublisher().publishSave(parkOrbit);
     }
@@ -85,15 +85,18 @@ public class ParkOrbitContextImpl extends SipxHibernateDaoSupport<Object> implem
     }
 
     public ParkOrbit loadParkOrbit(Integer id) {
-        return (ParkOrbit) getHibernateTemplate().load(ParkOrbit.class, id);
+        return (ParkOrbit) super.loadEntity(ParkOrbit.class, id);
     }
 
-    public Collection getParkOrbits() {
-        return getHibernateTemplate().loadAll(ParkOrbit.class);
+    public Collection<ParkOrbit> getParkOrbits() {
+        return super.loadAllEntities(ParkOrbit.class);
     }
 
-    public Collection getParkOrbits(Integer locationId) {
-        return getHibernateTemplate().findByNamedQueryAndNamedParam("parkOrbitsByServer", "locationId", locationId);
+    public Collection<ParkOrbit> getParkOrbits(Integer locationId) {
+        return super.findByNamedQueryAndNamedParam("parkOrbitsByServer", 
+            "locationId", 
+            locationId,
+            ParkOrbit.class );
     }
 
     public String getDefaultMusicOnHold() {
@@ -104,14 +107,14 @@ public class ParkOrbitContextImpl extends SipxHibernateDaoSupport<Object> implem
         BackgroundMusic backgroundMusic = getBackgroundMusic();
         backgroundMusic.setMusic(music);
         if (backgroundMusic.isNew()) {
-            getHibernateTemplate().save(backgroundMusic);
+            super.persistEntity(backgroundMusic);
         } else {
-            getHibernateTemplate().merge(backgroundMusic);
+            super.mergeEntity(backgroundMusic);
         }
     }
 
     private BackgroundMusic getBackgroundMusic() {
-        List musicList = getHibernateTemplate().loadAll(BackgroundMusic.class);
+        List musicList = super.loadAllEntities(BackgroundMusic.class);
         if (!musicList.isEmpty()) {
             return (BackgroundMusic) musicList.get(0);
         }
@@ -126,14 +129,20 @@ public class ParkOrbitContextImpl extends SipxHibernateDaoSupport<Object> implem
     public boolean isAliasInUse(String alias) {
         // Look for the ID of a park orbit with the specified alias as its name or extension.
         // If there is one, then the alias is in use.
-        List objs = getHibernateTemplate().findByNamedQueryAndNamedParam(QUERY_PARK_ORBIT_IDS_WITH_ALIAS, VALUE,
-                alias);
+        List<Integer> objs = super.findByNamedQueryAndNamedParam(
+                QUERY_PARK_ORBIT_IDS_WITH_ALIAS, 
+                VALUE,
+                alias,
+                Integer.class);
         return SipxCollectionUtils.safeSize(objs) > 0;
     }
 
     public Collection getBeanIdsOfObjectsWithAlias(String alias) {
-        Collection ids = getHibernateTemplate().findByNamedQueryAndNamedParam(QUERY_PARK_ORBIT_IDS_WITH_ALIAS,
-                VALUE, alias);
+        Collection<Integer> ids = super.findByNamedQueryAndNamedParam(
+                QUERY_PARK_ORBIT_IDS_WITH_ALIAS,
+                VALUE, 
+                alias,
+                Integer.class);
         Collection bids = BeanId.createBeanIdCollection(ids, ParkOrbit.class);
         return bids;
     }
@@ -215,8 +224,12 @@ public class ParkOrbitContextImpl extends SipxHibernateDaoSupport<Object> implem
 
     @Override
     public ParkOrbit loadParkOrbitByName(String name) {
-        List<ParkOrbit> conferences = (List<ParkOrbit>)getHibernateTemplate().findByNamedQueryAndNamedParam(PARK_ORBIT_BY_NAME,
-                VALUE, name);
+        List<ParkOrbit> conferences = 
+            (List<ParkOrbit>)super.findByNamedQueryAndNamedParam(
+                PARK_ORBIT_BY_NAME,
+                VALUE, 
+                name,
+                ParkOrbit.class);
         return (ParkOrbit) DataAccessUtils.singleResult(conferences);
     }
 

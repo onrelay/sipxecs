@@ -19,10 +19,12 @@ package org.sipfoundry.sipxconfig.nattraversal;
 import java.util.Collection;
 import java.util.Collections;
 
+
 import org.sipfoundry.sipxconfig.cfgmgt.DeployConfigOnEdit;
 import org.sipfoundry.sipxconfig.feature.Feature;
 import org.sipfoundry.sipxconfig.setting.PersistableSettings;
 import org.sipfoundry.sipxconfig.setting.Setting;
+
 
 public class NatSettings extends PersistableSettings implements DeployConfigOnEdit {
     public static final int START_RTP_PORT = 30000;

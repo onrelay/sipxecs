@@ -35,12 +35,12 @@ import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
 import org.sipfoundry.sipxconfig.setup.SetupListener;
 import org.sipfoundry.sipxconfig.setup.SetupManager;
+import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 
-public class BackupManagerImpl extends HibernateDaoSupport implements BackupManager,
+public class BackupManagerImpl extends SipxHibernateDaoSupport<BackupPlan> implements BackupManager,
         BeanFactoryAware, SetupListener {
     private FeatureManager m_featureManager;
     private Collection<ArchiveProvider> m_providers;
@@ -82,7 +82,7 @@ public class BackupManagerImpl extends HibernateDaoSupport implements BackupMana
 
     @Override
     public void saveBackupPlan(BackupPlan plan) {
-        getHibernateTemplate().saveOrUpdate(plan);
+        super.mergeEntity(plan);
     }
 
     @Override
@@ -131,7 +131,7 @@ public class BackupManagerImpl extends HibernateDaoSupport implements BackupMana
 
     @Override
     public Collection<BackupPlan> getBackupPlans() {
-        return getHibernateTemplate().loadAll(BackupPlan.class);
+        return super.loadAllEntities(BackupPlan.class);
     }
 
     @Override

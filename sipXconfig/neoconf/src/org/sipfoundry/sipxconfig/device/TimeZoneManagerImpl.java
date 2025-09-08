@@ -14,22 +14,20 @@ import java.util.TimeZone;
 
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 
-public class TimeZoneManagerImpl extends SipxHibernateDaoSupport implements TimeZoneManager {
+public class TimeZoneManagerImpl extends SipxHibernateDaoSupport<DeviceTimeZone> implements TimeZoneManager {
 
     public void setDeviceTimeZone(DeviceTimeZone dtz) {
-        HibernateTemplate hibernate = getHibernateTemplate();
         if (dtz.isNew()) {
-            hibernate.save(dtz);
+            super.persistEntity(dtz);
         } else {
-            hibernate.merge(dtz);
+            super.mergeEntity(dtz);
         }
         getDaoEventPublisher().publishSave(dtz);
     }
 
     public DeviceTimeZone getDeviceTimeZone() {
-        Collection<DeviceTimeZone> timeZones = getHibernateTemplate().loadAll(DeviceTimeZone.class);
+        Collection<DeviceTimeZone> timeZones = super.loadAllEntities(DeviceTimeZone.class);
         DeviceTimeZone dtz  = DataAccessUtils.singleResult(timeZones);
         if (dtz != null) {
             return dtz;

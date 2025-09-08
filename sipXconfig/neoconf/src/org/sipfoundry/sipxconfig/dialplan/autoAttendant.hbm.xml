@@ -5,9 +5,10 @@
 
   <class name="AutoAttendant" table="auto_attendant">
     <id name="id" column="auto_attendant_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">auto_attendant_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">auto_attendant_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="name" />
     <property name="language" />
@@ -41,11 +42,12 @@
 
   <class name="AttendantSpecialMode" table="attendant_special_mode">
     <id name="id" column="attendant_special_mode_id" type="int" unsaved-value="-1" />
-    <many-to-one name="attendant" column="auto_attendant_id" class="AutoAttendant" />
+    <many-to-one name="attendant" column="auto_attendant_id" class="org.sipfoundry.sipxconfig.dialplan.AutoAttendant" />
     <property name="enabled" />
   </class>
 
   <query name="autoAttendantIdsWithName">
     <![CDATA[select aa.id from AutoAttendant aa where aa.name = :value]]>
   </query>
-</hibernate-mapping>
+  
+  </hibernate-mapping>

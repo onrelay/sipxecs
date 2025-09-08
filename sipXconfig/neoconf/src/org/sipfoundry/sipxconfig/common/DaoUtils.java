@@ -19,11 +19,13 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.functors.ChainedTransformer;
-import org.hibernate.Criteria;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
+
 import org.sipfoundry.sipxconfig.branch.Branch;
 import org.sipfoundry.sipxconfig.common.BeanWithId.IdToBean;
 import org.sipfoundry.sipxconfig.common.event.DaoEventPublisher;
@@ -31,8 +33,7 @@ import org.sipfoundry.sipxconfig.phone.Phone;
 import org.sipfoundry.sipxconfig.phone.PhoneContext;
 import org.sipfoundry.sipxconfig.setting.BeanWithGroups;
 import org.sipfoundry.sipxconfig.setting.Group;
-import org.springframework.orm.hibernate5.HibernateCallback;
-import org.springframework.orm.hibernate5.HibernateTemplate;
+
 
 /**
  * Utilities for Hibernate DAOs
@@ -51,50 +52,57 @@ public final class DaoUtils {
      * specified value. If exception is non-null, then throw the exception instead of returning
      * true.
      *
-     * @param hibernate spring hibernate template
+     * @param session spring session 
      * @param beanClass klass of the entity bean, it's usually one of the base classes of the obj
      *        and not obj.getClass()
      * @param bean object to be checked
      * @param propName name of the property to be checked
      * @param exception exception to throw if query returns other object than passed in the query
      */
-    public static boolean checkDuplicates(HibernateTemplate hibernate, Class< ? extends BeanWithId> beanClass,
-            BeanWithId bean, String propName, UserException exception) {
+    public static boolean checkDuplicates(
+            Session session,
+            Class<? extends BeanWithId> beanClass,
+            BeanWithId bean,
+            String propName,
+            UserException exception) {
+
         Object propValue = getProperty_(bean, propName);
         if (propValue == null) {
             return false;
         }
-        final Criterion expression = Restrictions.eq(propName, propValue);
-        final Class<?> klass = beanClass;
-        HibernateCallback<Object> callback = new HibernateCallback<Object>() {
-            @Override
-            public Object doInHibernate(Session session) {
-                Criteria criteria = session.createCriteria(klass).add(expression)
-                        .setProjection(Projections.property(ID_PROPERTY_NAME));
-                return criteria.list();
-            }
-        };
-        List<Integer> objs = (List<Integer>)hibernate.execute(callback);
-        return checkDuplicates(bean, objs, exception);
+
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Integer> cq = cb.createQuery(Integer.class);
+        Root<? extends BeanWithId> root = cq.from(beanClass);
+
+        cq.select(root.get("id"))
+        .where(cb.equal(root.get(propName), propValue));
+
+        List<Integer> idList = session.createQuery(cq).getResultList();
+        return checkDuplicates(bean, idList, exception);
     }
 
     /**
      * Return true if query returns objects other than obj. Used to check for duplicates. If
      * exception is non-null, then throw the exception instead of returning true.
      *
-     * @param hibernate spring hibernate template
+     * @param session spring session 
      * @param obj object to be checked
      * @param queryName name of the query to be executed (define in *.hbm.xml file)
      * @param value parameter for the query
      * @param exception exception to throw if query returns other object than passed in the query
      */
-    public static boolean checkDuplicatesByNamedQuery(HibernateTemplate hibernate, BeanWithId obj, String queryName,
+    public static boolean checkDuplicatesByNamedQuery(Session session, BeanWithId obj, String queryName,
             Object value, UserException exception) {
         if (value == null) {
             return false;
         }
 
-        List<Integer> objs = (List<Integer>)hibernate.findByNamedQueryAndNamedParam(queryName, "value", value);
+        @SuppressWarnings("unchecked")
+        List<Integer> objs = session.createNamedQuery(queryName, Integer.class)
+                                    .setParameter("value", value)
+                                    .getResultList();
+
         return checkDuplicates(obj, objs, exception);
     }
 
@@ -171,13 +179,13 @@ public final class DaoUtils {
     /**
      * Returns the collection of loaded hibernate beans
      *
-     * @param hibernate hibernate template
+     * @param session spring session 
      * @param klass klass of the objects to be loaded
      * @param ids collection of object ids
      * @return newly created collection of objects loaded by hibernate
      */
-    public static Collection<Object> loadBeanByIds(HibernateTemplate hibernate, Class<?> klass, Collection<Integer> ids) {
-        IdToBean idToBean = new IdToBean(hibernate, klass);
+    public static Collection<Object> loadBeanByIds(Session session, Class<?> klass, Collection<Integer> ids) {
+        IdToBean idToBean = new IdToBean(session, klass);
         return CollectionUtils.collect(ids, idToBean);
     }
 
@@ -201,49 +209,48 @@ public final class DaoUtils {
      *
      * After operation is performed all the beans are saved.
      */
-    public static void doForAllBeanIds(HibernateTemplate hibernate,
+    public static void doForAllBeanIds(
+            Session session,
             DaoEventPublisher eventPublisher,
             Transformer<Object, Object> beanTransformer,
             Class<?> klass,
             Collection<Integer> ids) {
-        IdToBean idToBean = new IdToBean(hibernate, klass);
 
         Transformer<Integer, Object> transformer = new ChainedTransformer<>(
-                new Transformer[] { idToBean, beanTransformer });
+            new Transformer[] {
+                (Transformer<Integer, Object>) id -> session.find(klass, id),
+                beanTransformer
+            });
 
         Collection<Object> beans = CollectionUtils.collect(ids, transformer);
 
-        for (Object item : beans) {
-            eventPublisher.publishSave(item);
+        for (Object bean : beans) {
+            eventPublisher.publishSave(bean);
+            session.merge(bean);  // merge as we go
         }
 
-        hibernate.execute(session -> {
-            for (Object bean : beans) {
-                session.saveOrUpdate(bean);
-            }
-            return null;
-        });
     }
 
-    public static void addToGroup(HibernateTemplate hibernate,
+    public static void addToGroup(Session session,
                                   DaoEventPublisher eventPublisher,
                                   Integer groupId,
                                   Class<?> klass,
                                   Collection<Integer> ids) {
-        Group group = hibernate.load(Group.class, groupId);
+        Group group = session.byId(Group.class).load(groupId);
         Transformer<Object, Object> addTag = new BeanWithGroups.AddTag(group);
-        doForAllBeanIds(hibernate, eventPublisher, addTag, klass, ids);
+        doForAllBeanIds(session, eventPublisher, addTag, klass, ids);
     }
 
-    public static void removeFromGroup(HibernateTemplate hibernate,
-                                       DaoEventPublisher eventPublisher,
-                                       Integer groupId,
-                                       Class<?> klass,
-                                       Collection<Integer> ids) {
-        Group group = hibernate.load(Group.class, groupId);
+    public static void removeFromGroup(Session session,
+                                    DaoEventPublisher eventPublisher,
+                                    Integer groupId,
+                                    Class<?> klass,
+                                    Collection<Integer> ids) {
+        Group group = session.find(Group.class, groupId);
         Transformer<Object, Object> removeTag = new BeanWithGroups.RemoveTag(group);
-        doForAllBeanIds(hibernate, eventPublisher, removeTag, klass, ids);
+        doForAllBeanIds(session, eventPublisher, removeTag, klass, ids);
     }
+
     /**
      * Executes the given closure for all users.
      *

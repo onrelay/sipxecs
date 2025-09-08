@@ -37,6 +37,7 @@ import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 
 public class SetupManagerImpl implements SetupManager, ApplicationListener<ApplicationEvent>, BeanFactoryAware {
     private static final Log LOG = LogFactory.getLog(SetupManagerImpl.class);
@@ -127,49 +128,57 @@ public class SetupManagerImpl implements SetupManager, ApplicationListener<Appli
 
     @Override
     public void setup(Context c) {
-        if (m_setup || !StringUtils.equals
-            (m_configManager.getDomainManager().getConfiguredIp(), m_configManager.getLocationManager().getPrimaryIp())) {
-            return;
-        }
 
-        m_context = c;
-        if (m_enabled) {
-            // There's no special detection when we're migrating v.s. starting up
-            // only that migration tasks should run first so setup tasks can ensure
-            // data is valid state before setup
-            for (MigrationListener l : getMigrationListeners()) {
-                l.migrate(this);
+        try {
+            if (m_setup || !StringUtils.equals
+                (m_configManager.getDomainManager().getConfiguredIp(), m_configManager.getLocationManager().getPrimaryIp())) {
+                return;
             }
 
-            // fairly critical these are initialized first. Other listeners can use normal deps management
-            m_configManager.getDomainManager().setup(this);
-            m_configManager.getLocationManager().setup(this);
-            m_indexTrigger.setup(this);
-            m_coreContext.setup(this);
-            List<SetupListener> again = new ArrayList<SetupListener>();
-            Collection<SetupListener> todo = getSetupListeners();
-            int lastCount = 0; // guard again infinite loop where setup listener never returns done
-            while (!todo.isEmpty() && todo.size() != lastCount) {
-                for (SetupListener l : todo) {
-                    if (!l.setup(this)) {
-                        again.add(l);
-                    }
+            m_context = c;
+            if (m_enabled) {
+                // There's no special detection when we're migrating v.s. starting up
+                // only that migration tasks should run first so setup tasks can ensure
+                // data is valid state before setup
+                for (MigrationListener l : getMigrationListeners()) {
+                    l.migrate(this);
                 }
-                lastCount = todo.size();
-                todo = again;
-                LOG.info(todo.size() + " setup listeners will be called again");
-                again = new ArrayList<SetupListener>();
-            }
-            if (todo.size() > 0) {
-                LOG.error(todo.size() + " setup listeners never return 'true' signifying they were done");
-            }
-        }
-        m_setup = true;
 
-        if (m_triggerConfigOnStartup) {
-            m_configManager.configureAllFeaturesEverywhere();
+                // fairly critical these are initialized first. Other listeners can use normal deps management
+                m_configManager.getDomainManager().setup(this);
+                m_configManager.getLocationManager().setup(this);
+                m_indexTrigger.setup(this);
+                m_coreContext.setup(this);
+                List<SetupListener> again = new ArrayList<SetupListener>();
+                Collection<SetupListener> todo = getSetupListeners();
+                int lastCount = 0; // guard again infinite loop where setup listener never returns done
+                while (!todo.isEmpty() && todo.size() != lastCount) {
+                    for (SetupListener l : todo) {
+                        if (!l.setup(this)) {
+                            again.add(l);
+                        }
+                    }
+                    lastCount = todo.size();
+                    todo = again;
+                    LOG.info(todo.size() + " setup listeners will be called again");
+                    again = new ArrayList<SetupListener>();
+                }
+                if (todo.size() > 0) {
+                    LOG.error(todo.size() + " setup listeners never return 'true' signifying they were done");
+                }
+            }
+            m_setup = true;
+
+            if (m_triggerConfigOnStartup) {
+                m_configManager.configureAllFeaturesEverywhere();
+            }
+        } catch( IllegalStateException e ) {
+            LOG.warn("Server is not ready", e );
+        } catch ( CannotGetJdbcConnectionException e ) {
+            LOG.warn("Server is not reachable", e );
         }
     }
+
 
     public void setIndexTrigger(IndexTrigger indexTrigger) {
         m_indexTrigger = indexTrigger;

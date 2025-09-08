@@ -10,7 +10,7 @@ package org.sipfoundry.sipxconfig.phonebook;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 

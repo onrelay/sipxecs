@@ -102,7 +102,7 @@ public class SaaConfiguration implements ConfigProvider, DaoEventListener, ResLi
         context.put("sharedUsers", users);
         context.put("domainName", domainName);
         try {
-            m_velocityEngine.mergeTemplate("sipxsaa/appearance-groups.vm", context, wtr);
+            m_velocityEngine.mergeTemplate("sipxsaa/appearance-groups.vm", "UTF-8", context, wtr);
         } catch (Exception e) {
             throw new IOException(e);
         }

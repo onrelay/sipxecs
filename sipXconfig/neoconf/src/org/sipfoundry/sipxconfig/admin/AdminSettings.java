@@ -17,6 +17,7 @@ package org.sipfoundry.sipxconfig.admin;
 import java.util.Collection;
 import java.util.Collections;
 
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -184,10 +185,15 @@ public class AdminSettings extends PersistableSettings implements DeployConfigOn
             return StringUtils.EMPTY;
         }
         String noSpaces = corsDomains.replaceAll("\\s", StringUtils.EMPTY);
+
+        // One domain: word char start, then letters/digits/dot/dash
         String validDomainRegex = "\\w[\\w\\.\\-]*";
-        String validDomainListRegex = String.format("%s[%s,]*", validDomainRegex, validDomainRegex);
-        if (!noSpaces.matches(validDomainListRegex)) {
-            throw new IllegalArgumentException("Invalid domain list. List must match " + validDomainListRegex);
+
+        // List of domains: domain ( , domain )*
+        String validDomainListRegex = String.format("(%s)(,%s)*", validDomainRegex, validDomainRegex);
+
+        if (!noSpaces.matches(validDomainListRegex) && !noSpaces.isEmpty()) {
+            throw new IllegalArgumentException("Invalid domain list. Expected comma-separated domains, got: " + corsDomains);
         }
 
         return noSpaces;

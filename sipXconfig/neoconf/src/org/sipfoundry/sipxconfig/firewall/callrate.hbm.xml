@@ -5,9 +5,10 @@
 
   <class name="CallRateRule" table="call_rate_rule">
     <id name="id" column="call_rate_rule_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">call_rate_rule_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">call_rate_rule_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="name"/>
     <property name="position"/>
@@ -28,5 +29,4 @@
   <query name="orderedCallRates">
     <![CDATA[from CallRateRule rate order by rate.position]]>
   </query>
-
 </hibernate-mapping>

@@ -2,15 +2,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:task="http://www.springframework.org/schema/task"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd 
-                      http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+                      http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
   <bean id="firewallManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.firewall.FirewallManager</value>
     </property>
     <property name="target">
-      <ref local="firewallManagerImpl" />
+      <ref bean="firewallManagerImpl" />
     </property>
   </bean>
 
@@ -43,7 +43,7 @@
       <value>org.sipfoundry.sipxconfig.firewall.CallRateManager</value>
     </property>
     <property name="target">
-      <ref local="callRateManagerImpl" />
+      <ref bean="callRateManagerImpl" />
     </property>
   </bean>
 
@@ -52,7 +52,7 @@
   </bean>
   
   <bean id="bannedTimer" class="org.sipfoundry.sipxconfig.firewall.BannedTimer">
-    <property name="bannedApi" ref="restClient"/>
+    <property name="bannedApi" ref="bannedApi"/>
     <property name="firewallManager" ref="firewallManager"/>
     <property name="key" value="${apiban.key}"/>
   </bean>

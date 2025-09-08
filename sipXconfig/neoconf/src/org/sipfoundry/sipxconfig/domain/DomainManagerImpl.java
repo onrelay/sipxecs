@@ -52,7 +52,7 @@ public class DomainManagerImpl extends SipxHibernateDaoSupport<Domain> implement
     public Domain getEditableDomain() {
         try {
             Domain d = getDomain().clone();
-            getHibernateTemplate().evict(d);
+            super.evictEntity(d);
             return d;
         } catch (CloneNotSupportedException impossible) {
             throw new IllegalStateException(impossible);
@@ -79,7 +79,7 @@ public class DomainManagerImpl extends SipxHibernateDaoSupport<Domain> implement
                         config.setSipRealm(m_configuredRealm);
                         config.addAlias(m_configuredIp);
                         config.addAlias(m_configuredFqdn);
-                        getHibernateTemplate().saveOrUpdate(config);
+                        super.mergeEntity(config);
                         d2 = reloadDomainFromDb();
                     }
                     d2.setNetworkName(m_configuredDomain);
@@ -112,7 +112,7 @@ public class DomainManagerImpl extends SipxHibernateDaoSupport<Domain> implement
     }
 
     private Domain reloadDomainFromDb() {
-        getHibernateTemplate().flush();
+        super.flush();
         Domain reload = loadDomainFromDb();
         if (reload == null) {
             throw new DomainNotInitializedException();
@@ -121,7 +121,7 @@ public class DomainManagerImpl extends SipxHibernateDaoSupport<Domain> implement
     }
 
     private Domain loadDomainFromDb() {
-        Collection<Domain> domains = (Collection<Domain>)getHibernateTemplate().findByNamedQuery("domain");
+        Collection<Domain> domains = (Collection<Domain>)super.findByNamedQuery("domain", Domain.class);
         return (Domain) DataAccessUtils.singleResult(domains);
     }
 
@@ -143,14 +143,14 @@ public class DomainManagerImpl extends SipxHibernateDaoSupport<Domain> implement
         if (!domain.getId().equals(m_domain.getId())) {
             throw new IllegalStateException("Cannnot change domain id");
         }
-        Domain d = getHibernateTemplate().merge(domain);
-        getHibernateTemplate().update(d);
-        getHibernateTemplate().flush();
+        Domain d = super.mergeEntity(domain);
+        super.mergeEntity(d);
+        super.flush();
         m_domain = null;
     }
 
     public Localization getExistingLocalization() {
-        List<Localization> l = getHibernateTemplate().loadAll(Localization.class);
+        List<Localization> l = super.loadAllEntities(Localization.class);
         return (Localization) DataAccessUtils.singleResult(l);
     }
 
@@ -184,11 +184,11 @@ public class DomainManagerImpl extends SipxHibernateDaoSupport<Domain> implement
      * For use in tests only.
      */
     public void setNullDomain() {
-        Collection<Domain> domains = getHibernateTemplate().loadAll(Domain.class);
+        Collection<Domain> domains = super.loadAllEntities(Domain.class);
         if (!domains.isEmpty()) {
-            getHibernateTemplate().deleteAll(domains);
+            super.removeAllEntities(domains);
             getDaoEventPublisher().publishDeleteCollection(domains);
-            getHibernateTemplate().flush();
+            super.flush();
         }
         m_domain = null;
     }

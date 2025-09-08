@@ -2,7 +2,7 @@ package org.sipfoundry.sipxconfig.api.model;
 
 import java.util.Collection;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "Strings")
 public class StringList {

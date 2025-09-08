@@ -53,7 +53,7 @@ import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
 import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
 import org.sipfoundry.sipxconfig.snmp.SnmpManager;
 
-public class NetworkQueueManagerImpl extends SipxHibernateDaoSupport implements NetworkQueueManager, ConfigProvider,
+public class NetworkQueueManagerImpl extends SipxHibernateDaoSupport<Object> implements NetworkQueueManager, ConfigProvider,
     AddressProvider, FeatureProvider, FirewallProvider, ProcessProvider {
     private BeanWithSettingsDao<NetworkQueueSettings> m_settingsDao;
 

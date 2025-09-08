@@ -128,7 +128,6 @@ domainManagerImpl.configuredFqdn=$(sipx.host).$(sipx.net_domain)
 domainManagerImpl.configuredIp=$(sipx.bind_ip)
 locationsManagerImpl.primaryIp=$(sipx.master_address)
 locationsManagerImpl.primaryFqdn=$(sipx.master_fqdn)
-mongoReplicaSetManager.primaryFqdn=$(sipx.master_fqdn)
 ";
 
     any::
@@ -149,7 +148,7 @@ bundle edit_line timezone_contents(timezone) {
 
 bundle edit_line empty_postgres_pwd {
   insert_lines:
-      "password=";     
+      "postgres-pwd.password=";     
   delete_lines:  
     any::
       ".*";  

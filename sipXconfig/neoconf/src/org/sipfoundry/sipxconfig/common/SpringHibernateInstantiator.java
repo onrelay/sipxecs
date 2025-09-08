@@ -22,17 +22,23 @@ import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.map.LazyMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.hibernate.CallbackException;
-import org.hibernate.EmptyInterceptor;
-import org.hibernate.EntityMode;
+import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
-import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.type.Type;
-import org.sipfoundry.sipxconfig.common.event.HibernateEntityChangeProvider;
-import org.sipfoundry.sipxconfig.systemaudit.ConfigChangeAction;
+import org.hibernate.metamodel.mapping.EntityMappingType;
+import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.metamodel.spi.MappingMetamodelImplementor;
+
+
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
+
+import org.sipfoundry.sipxconfig.common.event.HibernateEntityChangeProvider;
+import org.sipfoundry.sipxconfig.systemaudit.ConfigChangeAction;
 
 /**
  * Enables Spring to create the hibernate object. Use to allow Spring to manage object
@@ -41,7 +47,7 @@ import org.springframework.beans.factory.ListableBeanFactory;
  * Note: it inherits from IndexingInterceptor: only one interceptor can be registered with
  * hibernate session.
  */
-public class SpringHibernateInstantiator extends EmptyInterceptor implements BeanFactoryAware {
+public class SpringHibernateInstantiator implements Interceptor, BeanFactoryAware {
     private static final Log LOG = LogFactory.getLog(SpringHibernateInstantiator.class);
     private ListableBeanFactory m_beanFactory;
     private SessionFactory m_sessionFactory;
@@ -56,9 +62,11 @@ public class SpringHibernateInstantiator extends EmptyInterceptor implements Bea
     /**
      * This implementation only supports BeanWithId objects with integer ids
      */
-    public Object instantiate(String entityName, EntityMode entityMode, Serializable id) {
-        ClassMetadata classMetadata = m_sessionFactory.getClassMetadata(entityName);
-        Class<?> clazz = classMetadata.getMappedClass(entityMode);
+    public Object instantiate(String entityName, Serializable id) {
+        SessionFactoryImplementor sfi = (SessionFactoryImplementor) m_sessionFactory;
+        MappingMetamodelImplementor metamodel = sfi.getMappingMetamodel();
+        EntityMappingType entityMapping = metamodel.getEntityDescriptor(entityName);
+        Class<?> clazz = entityMapping.getJavaType().getJavaTypeClass();
         return instantiate(clazz, id);
     }
 
@@ -103,24 +111,22 @@ public class SpringHibernateInstantiator extends EmptyInterceptor implements Bea
         }
     }
 
-    @Override
     public boolean onSave(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
         EntityDecorator decorator = getDecorator(entity);
         if (decorator != null) {
             decorator.onSave(entity, id);
         }
         m_inserts.add(new HbEntity(entity, id, null, null, propertyNames, types, state));
-        return super.onSave(entity, id, state, propertyNames, types);
+        return true;
     }
 
-    @Override
     public void onDelete(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
         EntityDecorator decorator = getDecorator(entity);
         if (decorator != null) {
             decorator.onDelete(entity, id);
         }
         m_deletes.add(new HbEntity(entity, id, null, null, propertyNames, types, state));
-        super.onDelete(entity, id, state, propertyNames, types);
+
     }
 
     private EntityDecorator getDecorator(Object entity) {
@@ -156,26 +162,23 @@ public class SpringHibernateInstantiator extends EmptyInterceptor implements Bea
         return m_beanFactory;
     }
 
+
     public void setSessionFactory(SessionFactory sessionFactory) {
         m_sessionFactory = sessionFactory;
     }
 
-    @Override
     public boolean onFlushDirty(Object obj, Serializable id, Object[] newValues, Object[] oldValues,
             String[] properties, Type[] types) throws CallbackException {
         m_updates.add(new HbEntity(obj, id, newValues, oldValues, properties, types, null));
-        return super.onFlushDirty(obj, id, oldValues, newValues, properties, types);
+        return true;
     }
 
-    @Override
     public void onCollectionUpdate(Object collection, Serializable key) throws CallbackException {
         for (HibernateEntityChangeProvider provider : getHbEntityChangeProviders()) {
             provider.onConfigChangeCollectionUpdate(collection, key);
         }
-        super.onCollectionUpdate(collection, key);
     }
 
-    @Override
     public void postFlush(Iterator iterator) {
         HbEntity hbEntity = null;
         for (Iterator<HbEntity> it = m_inserts.iterator(); it.hasNext();) {

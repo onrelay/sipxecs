@@ -46,7 +46,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
  * NOTE: This implementation pays no attention to efficiency. Should work in caching or optimize
  * queries accordingly if found to be inefficient during testing.
  */
-public class FeatureManagerImpl extends SipxHibernateDaoSupport implements BeanFactoryAware, FeatureManager,
+public class FeatureManagerImpl extends SipxHibernateDaoSupport<Object> implements BeanFactoryAware, FeatureManager,
         DaoEventListener, BundleProvider {
     private ListableBeanFactory m_beanFactory;
     private Collection<FeatureProvider> m_providers;
@@ -312,8 +312,11 @@ public class FeatureManagerImpl extends SipxHibernateDaoSupport implements BeanF
 
     @Override
     public List<Location> getLocationsForEnabledFeature(LocationFeature feature) {
-        List<Location> locations = (List<Location>) getHibernateTemplate().findByNamedQueryAndNamedParam(
-                "locationsForEnabledFeature", "featureId", feature.getId());
+        List<Location> locations = (List<Location>) super.findByNamedQueryAndNamedParam(
+                "locationsForEnabledFeature", 
+                "featureId", 
+                feature.getId(),
+                Location.class);
         return locations;
     }
 

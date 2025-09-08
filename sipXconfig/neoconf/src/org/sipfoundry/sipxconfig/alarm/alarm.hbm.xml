@@ -5,9 +5,10 @@
 
   <class name="AlarmServer" table="alarm_server">
     <id name="id" column="alarm_server_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">alarm_server_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">alarm_server_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="alarmNotificationEnabled" />
     <property name="fromEmailAddress" />
@@ -15,9 +16,10 @@
 
   <class name="AlarmGroup" table="alarm_group">
     <id name="id" column="alarm_group_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">alarm_group_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">alarm_group_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="name" />
     <property name="description" />
@@ -40,9 +42,10 @@
 
   <class name="AlarmTrapReceiver" table="alarm_receiver">
     <id name="id" column="alarm_receiver_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">alarm_receiver_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">alarm_receiver_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="hostAddress" column="address" not-null="true" type="string"/>
     <property name="port" column="port" not-null="true" type="int"/>
@@ -51,9 +54,7 @@
   <query name="countAlarmGroupWithSameName">
     <![CDATA[select count (*) from AlarmGroup pg where pg.id = :alarmGroupId and pg.name = :alarmGroupName]]>
   </query>
-
   <query name="anotherAlarmGroupWithSameName">
     <![CDATA[select count (*) from AlarmGroup pg where pg.name = :alarmGroupName]]>
   </query>
-
 </hibernate-mapping>

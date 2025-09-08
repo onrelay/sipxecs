@@ -40,10 +40,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.Version;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.module.SimpleModule;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -267,7 +267,7 @@ public class BackupApi extends ServerResource {
 
     void readPlan(BackupPlan plan, JsonNode node) {
         Set<String> ids = new HashSet<String>();
-        Iterator<JsonNode> nIds = node.get("definitionIds").getElements();
+        Iterator<JsonNode> nIds = node.get("definitionIds").elements();
         while (nIds.hasNext()) {
             ids.add(nIds.next().asText());
         }

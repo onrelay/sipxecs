@@ -9,16 +9,11 @@
  */
 package org.sipfoundry.sipxconfig.phonebook;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.addAll;
-import static org.apache.commons.collections4.CollectionUtils.filter;
-import static org.apache.commons.collections4.CollectionUtils.find;
-import static org.apache.commons.collections4.CollectionUtils.select;
-import static org.apache.commons.lang3.StringUtils.join;
-import static org.sipfoundry.sipxconfig.common.DaoUtils.checkDuplicates;
-import static org.sipfoundry.sipxconfig.common.DaoUtils.requireOneOrZero;
-import static org.springframework.dao.support.DataAccessUtils.singleResult;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
+import java.util.Arrays;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,6 +25,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -67,12 +63,22 @@ import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.type.SqlTypes;
+
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.transaction.annotation.Transactional;
+
 import org.sipfoundry.commons.userdb.profile.UserProfile;
 import org.sipfoundry.commons.userdb.profile.UserProfileService;
 import org.sipfoundry.sipxconfig.bulk.BulkParser;
 import org.sipfoundry.sipxconfig.bulk.csv.CsvWriter;
 import org.sipfoundry.sipxconfig.bulk.vcard.VCardParserException;
+import org.sipfoundry.sipxconfig.common.DaoUtils;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.DataCollectionUtil;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
@@ -81,9 +87,7 @@ import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.common.event.DaoEventListener;
 import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
 import org.sipfoundry.sipxconfig.setting.Group;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
+
 
 import com.glaforge.i18n.io.CharsetToolkit;
 
@@ -115,7 +119,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
 
     @Override
     public Collection<Phonebook> getPhonebooks() {
-        Collection<Phonebook> books = getHibernateTemplate().loadAll(Phonebook.class);
+        Collection<Phonebook> books = super.loadAllEntities(Phonebook.class);
         if (!books.isEmpty()) {
             Collection<Phonebook> privatePhonebooks = new ArrayList<Phonebook>();
             for (Phonebook book : books) {
@@ -135,7 +139,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     /** {@inheritDoc */
     @Override
     public Collection<Phonebook> getAllPhonebooks() {
-        return getHibernateTemplate().loadAll(Phonebook.class);
+        return super.loadAllEntities(Phonebook.class);
     }
 
     @Override
@@ -153,49 +157,59 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     }
 
     public void deletePhonebook(Phonebook phonebook) {
-        getHibernateTemplate().delete(phonebook);
+        super.removeEntity(phonebook);
         getDaoEventPublisher().publishDelete(phonebook);
     }
 
     @Override
+    @Transactional
     public void savePhonebook(Phonebook phonebook) {
-        checkDuplicates(getHibernateTemplate(), Phonebook.class, phonebook, NAME, new DuplicatePhonebookName());
-        if (phonebook.isNew()) {
-            getHibernateTemplate().save(phonebook);
-        } else {
-            getHibernateTemplate().merge(phonebook);
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            DaoUtils.checkDuplicates(session, Phonebook.class, phonebook, NAME, new DuplicatePhonebookName());
+            if (phonebook.isNew()) {
+                super.persistEntity(phonebook);
+            } else {
+                super.mergeEntity(phonebook);
+            }
+            getDaoEventPublisher().publishSave(phonebook);
         }
-        getDaoEventPublisher().publishSave(phonebook);
     }
 
     @Override
     public PhonebookEntry getPhonebookEntry(Integer id) {
-        return getHibernateTemplate().load(PhonebookEntry.class, id);
+        return super.loadEntity(PhonebookEntry.class, id);
     }
 
     @Override
     public PhonebookEntry findPhonebookEntryByInternalId(String internalId) {
         String query = "phonebookEntryByInternalId";
-        List<PhonebookEntry> entries = (List<PhonebookEntry>)getHibernateTemplate().findByNamedQueryAndNamedParam(query,
-                PARAM_INTERNAL_ID, internalId);
-        return requireOneOrZero(entries, query);
+        List<PhonebookEntry> entries = (List<PhonebookEntry>)super.findByNamedQueryAndNamedParam(
+            query,
+            PARAM_INTERNAL_ID, 
+            internalId,
+            PhonebookEntry.class);
+        return DaoUtils.requireOneOrZero(entries, query);
     }
 
     @Override
     public void savePhonebookEntry(PhonebookEntry entry) {
-        getHibernateTemplate().saveOrUpdate(entry);
+        super.mergeEntity(entry);
         getDaoEventPublisher().publishSave(entry);
     }
 
     @Override
     public void updatePhonebookEntry(PhonebookEntry entry) {
-        getHibernateTemplate().merge(entry);
+        super.mergeEntity(entry);
         getDaoEventPublisher().publishSave(entry);
     }
 
     @Override
     public void deletePhonebookEntry(PhonebookEntry entry) {
-        getHibernateTemplate().delete(entry);
+        super.removeEntity(entry);
         getDaoEventPublisher().publishDelete(entry);
     }
 
@@ -217,7 +231,6 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
         }
         return null;
     }
-
     
     public void setCoreContext(CoreContext coreContext) {
         m_coreContext = coreContext;
@@ -256,14 +269,15 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     @Override
     public Phonebook getPhonebookByName(String name) {
         String query = "phoneBookByName";
-        Collection<Phonebook> books = (Collection<Phonebook>)getHibernateTemplate().findByNamedQueryAndNamedParam(query, NAME, name);
-        return requireOneOrZero(books, query);
+        Collection<Phonebook> books = (Collection<Phonebook>)super.findByNamedQueryAndNamedParam(
+            query, NAME, name, Phonebook.class);
+        return DaoUtils.requireOneOrZero(books, query);
     }
 
     @Override
     public Collection<Phonebook> getPublicPhonebooksByUser(User consumer) {
-        Collection<Phonebook> books = (Collection<Phonebook>)getHibernateTemplate().findByNamedQueryAndNamedParam("phoneBooksByUser",
-                PARAM_USER_ID, consumer.getId());
+        Collection<Phonebook> books = (Collection<Phonebook>)super.findByNamedQueryAndNamedParam("phoneBooksByUser",
+                PARAM_USER_ID, consumer.getId(), Phonebook.class);
         return books;
     }
 
@@ -273,7 +287,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
         Collection<Phonebook> phonebooks = getPublicPhonebooksByUser(consumer);
         Phonebook privatePhonebook = getPrivatePhonebook(consumer);
         if (privatePhonebook != null) {
-            addAll(phonebooks, privatePhonebook);
+            Collections.addAll(phonebooks, privatePhonebook);
         }
         return phonebooks;
     }
@@ -281,9 +295,12 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     @Override
     public Phonebook getPrivatePhonebook(User user) {
         String query = "privatePhoneBookByUser";
-        List<Phonebook> privateBooks = (List<Phonebook>)getHibernateTemplate().findByNamedQueryAndNamedParam(query, PARAM_USER_ID,
-                user.getId());
-        return requireOneOrZero(privateBooks, query);
+        List<Phonebook> privateBooks = (List<Phonebook>)super.findByNamedQueryAndNamedParam(
+            query, 
+            PARAM_USER_ID,
+            user.getId(),
+            Phonebook.class);
+        return DaoUtils.requireOneOrZero(privateBooks, query);
     }
 
     @Override
@@ -420,7 +437,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
 
         int totalSize = entries.size();
         if (!StringUtils.isEmpty(queryString) && !queryString.equals("null")) {
-            filter(entries, new PhonebookEntryPredicate(queryString));
+            CollectionUtils.filter(entries, new PhonebookEntryPredicate(queryString));
         }
 
         Collections.sort(new LinkedList(entries), new PhoneEntryComparator());
@@ -831,7 +848,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     public void onDelete(Object entity) {
         if (entity instanceof Group) {
             Group group = (Group) entity;
-            getHibernateTemplate().update(group);
+            super.mergeEntity(group);
             if (User.GROUP_RESOURCE_ID.equals(group.getResource())) {
                 for (Phonebook book : getPhonebooks()) {
                     DataCollectionUtil.removeByPrimaryKey(book.getConsumers(), group.getPrimaryKey());
@@ -905,7 +922,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     }
 
     private void deleteGoogleImportedEntries(String account, Phonebook phonebook) {
-        Collection existingEntries = select(phonebook.getEntries(), new GoogleEntrySearchPredicate(account));
+        Collection existingEntries = CollectionUtils.select(phonebook.getEntries(), new GoogleEntrySearchPredicate(account));
         phonebook.getEntries().removeAll(existingEntries);
 
     }
@@ -934,8 +951,9 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
             String uniqueKey = getEntryKey(fileEntry);
             fileEntry.setInternalId(uniqueKey);
 
-            PhonebookEntry oldEntry = (PhonebookEntry) find(phonebook.getEntries(), new FileEntrySearchPredicate(
-                    uniqueKey));
+            PhonebookEntry oldEntry = (PhonebookEntry)CollectionUtils.find(
+                phonebook.getEntries(), 
+                new FileEntrySearchPredicate(uniqueKey));
             phonebook.getEntries().remove(oldEntry);
 
             phonebook.addEntry(fileEntry);
@@ -968,25 +986,37 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
      *
      */
     @Override
+    @Transactional
     public Map<Integer, String[]> getPhonebookFilesName() {
-        Map<Integer, String[]> names = new TreeMap<Integer, String[]>();
+
+        Map<Integer, String[]> names = new TreeMap<>();
+
         try {
-            String query = "select phonebook_id, members_csv_filename, members_vcard_filename from phonebook;";
-            Session currentSession = getHibernateTemplate().getSessionFactory().getCurrentSession();
-            List<Object[]> entries = currentSession.createSQLQuery(query)
-                    .addScalar("phonebook_id", Hibernate.INTEGER)
-                    .addScalar("members_csv_filename", Hibernate.STRING)
-                    .addScalar("members_vcard_filename", Hibernate.STRING).list();
-            for (Object[] entry : entries) {
-                String[] files = {
-                    (String) entry[1], (String) entry[2]
-                };
-                names.put((Integer) entry[0], files);
+
+            try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+                String query = "select phonebook_id, members_csv_filename, members_vcard_filename from phonebook";
+
+                NativeQuery<Object[]> nativeQuery = session.createNativeQuery(query, Object[].class);
+
+                List<Object[]> entries = nativeQuery.getResultList();
+
+                for (Object[] entry : entries) {
+                    String[] files = {
+                        (String) entry[1],
+                        (String) entry[2]
+                    };
+                    names.put((Integer) entry[0], files);
+                }
             }
-            LOG.info("Extracted files names from " + names.size() + " phonebooks.");
+
+            LOG.info("Extracted file names from " + names.size() + " phonebooks.");
         } catch (HibernateException e) {
-            LOG.warn(e.getMessage());
+            LOG.warn("Failed to load phonebook file names", e);
         }
+
         return names;
     }
 
@@ -1013,7 +1043,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     }
 
     private static String getEntryKey(PhonebookEntry entry) {
-        return join(asList(entry.getNumber(), entry.getFirstName(), entry.getLastName()), '_');
+        return StringUtils.join(Arrays.asList(entry.getNumber(), entry.getFirstName(), entry.getLastName()), '_');
     }
 
     public String getEncoding(InputStream is) throws IOException {
@@ -1054,25 +1084,25 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
      */
     @Override
     public void updateFilePhonebookEntryInternalIds() {
-        Collection<FilePhonebookEntry> fileEntries = getHibernateTemplate().loadAll(FilePhonebookEntry.class);
+        Collection<FilePhonebookEntry> fileEntries = super.loadAllEntities(FilePhonebookEntry.class);
         for (FilePhonebookEntry entry : fileEntries) {
             entry.setInternalId(getEntryKey(entry));
         }
         for (FilePhonebookEntry entry : fileEntries) {
-            getHibernateTemplate().saveOrUpdate(entry);
+            super.mergeEntity(entry);
         }
     }
 
     @Override
     public GoogleDomain getGoogleDomain() {
-        List domains = getHibernateTemplate().loadAll(GoogleDomain.class);
-        GoogleDomain gd = (GoogleDomain) singleResult(domains);
+        List domains = super.loadAllEntities(GoogleDomain.class);
+        GoogleDomain gd = (GoogleDomain) DataAccessUtils.singleResult(domains);
         return gd;
     }
 
     @Override
     public void saveGoogleDomain(GoogleDomain gd) {
-        getHibernateTemplate().saveOrUpdate(gd);
+        super.mergeEntity(gd);
     }
 
     @Override

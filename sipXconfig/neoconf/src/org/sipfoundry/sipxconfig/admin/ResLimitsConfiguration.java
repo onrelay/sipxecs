@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -77,6 +78,8 @@ import org.springframework.beans.factory.ListableBeanFactory;
  * sipxrls-core-enabled = false
  * sipxsaa-core-enabled = false
  */
+
+
 public class ResLimitsConfiguration implements ConfigProvider, BeanFactoryAware {
     private static final Log LOG = LogFactory.getLog(ResLimitsConfiguration.class);
 

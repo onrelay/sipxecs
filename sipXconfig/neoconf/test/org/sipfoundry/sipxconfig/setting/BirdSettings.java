@@ -16,6 +16,7 @@
  */
 package org.sipfoundry.sipxconfig.setting;
 
+
 import org.sipfoundry.sipxconfig.test.TestHelper;
 
 public class BirdSettings extends PersistableSettings {

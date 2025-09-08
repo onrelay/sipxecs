@@ -11,13 +11,13 @@ package org.sipfoundry.sipxconfig.conference;
 
 import java.io.Serializable;
 
-import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
+import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 
-public class BridgeConferenceIdentityImpl extends HibernateDaoSupport  implements BridgeConferenceIdentity {
+public class BridgeConferenceIdentityImpl extends SipxHibernateDaoSupport<Conference>  implements BridgeConferenceIdentity {
     private Bridge m_bridge;
 
     public Conference load(Class c, Serializable id) {
-        Conference conf = (Conference) getHibernateTemplate().load(c, id);
+        Conference conf = (Conference) super.loadEntity(c, id);
         if (conf.getBridge().equals(m_bridge)) {
             return  conf;
         }

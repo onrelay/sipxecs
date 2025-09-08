@@ -37,7 +37,7 @@ import org.sipfoundry.sipxconfig.dialplan.AttendantRule;
 import org.sipfoundry.sipxconfig.dialplan.AutoAttendant;
 import org.sipfoundry.sipxconfig.dialplan.AutoAttendantManager;
 import org.sipfoundry.sipxconfig.dialplan.DialPlanContext;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.WorkingHours;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 import org.sipfoundry.sipxconfig.dialplan.config.XmlFile;
 import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.sipfoundry.sipxconfig.setting.BeanWithSettings;
@@ -85,7 +85,7 @@ public class AutoAttendantXmlConfig {
                         HOLIDAY_FORMAT.format(holidayPeriod.getEndDate()));
             }
         }
-        WorkingTime workingTimeAttendant = attendantRule.getWorkingTimeAttendant();
+        WorkingTimeAttendant workingTimeAttendant = attendantRule.getWorkingTimeAttendant();
         Element regularHoursEl = scheduleEl.addElement("regularhours");
         if (workingTimeAttendant.isEnabled()) {
             addId(regularHoursEl, workingTimeAttendant.getAttendant());

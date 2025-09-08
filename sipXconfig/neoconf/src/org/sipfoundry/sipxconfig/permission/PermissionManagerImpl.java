@@ -27,7 +27,6 @@ import org.sipfoundry.sipxconfig.commserver.imdb.ReplicationManager;
 import org.sipfoundry.sipxconfig.setting.ModelFilesContext;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 
 public class PermissionManagerImpl extends SipxHibernateDaoSupport<Permission> implements PermissionManager,
         DaoEventListener {
@@ -42,16 +41,16 @@ public class PermissionManagerImpl extends SipxHibernateDaoSupport<Permission> i
             throw new DuplicatePermissionLabelException(permission.getLabel());
         }
         if (permission.isNew()) {
-            getHibernateTemplate().save(permission);
+            super.persistEntity(permission);
         } else {
-            getHibernateTemplate().merge(permission);
+            super.mergeEntity(permission);
         }
         m_permissions = null;
         m_customPermissions = null;
     }
 
     public void deleteCallPermission(Permission permission) {
-        getHibernateTemplate().delete(permission);
+        super.removeEntity(permission);
         m_permissions = null;
         m_customPermissions = null;
     }
@@ -137,7 +136,7 @@ public class PermissionManagerImpl extends SipxHibernateDaoSupport<Permission> i
             Map<String, Permission> builtInPermissions = getBuiltInCallPermissions();
             return builtInPermissions.get(id);
         }
-        return super.load(c, id);
+        return super.loadEntity(c, id);
     }
 
     /**
@@ -207,7 +206,7 @@ public class PermissionManagerImpl extends SipxHibernateDaoSupport<Permission> i
     private Collection<Permission> loadCustomPermissions() {
         if (getSessionFactory() != null) {
             if (m_customPermissions == null) {
-                m_customPermissions = getHibernateTemplate().loadAll(Permission.class);
+                m_customPermissions = super.loadAllEntities(Permission.class);
             }
             return m_customPermissions;
         }
@@ -249,12 +248,13 @@ public class PermissionManagerImpl extends SipxHibernateDaoSupport<Permission> i
     }
 
     private boolean isLabelInUse(Permission permission) {
-        List count = getHibernateTemplate().findByNamedQueryAndNamedParam("anotherPermissionWithTheSameLabel",
+        List<Permission> count = super.findByNamedQueryAndNamedParam("anotherPermissionWithTheSameLabel",
                 new String[] {
                     "id", "label"
                 }, new Object[] {
                     permission.getId(), permission.getLabel()
-                });
+                },
+                Permission.class );
 
         return DataAccessUtils.intResult(count) > 0;
     }
@@ -271,10 +271,9 @@ public class PermissionManagerImpl extends SipxHibernateDaoSupport<Permission> i
      * Remove all custom permissions - mostly used for testing
      */
     public void clear() {
-        HibernateTemplate template = getHibernateTemplate();
         Collection<Permission> permissions = loadCustomPermissions();
         getDaoEventPublisher().publishDeleteCollection(permissions);
-        template.deleteAll(permissions);
+        super.removeAllEntities(permissions);
     }
 
     /**

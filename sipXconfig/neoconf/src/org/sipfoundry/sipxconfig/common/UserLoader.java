@@ -15,11 +15,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.query.Query;
+import org.hibernate.Session;
+import org.hibernate.type.StandardBasicTypes;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Query;
-import org.hibernate.Session;
+
+
 
 /** Helper class for loading users by query */
 public class UserLoader {
@@ -50,7 +54,7 @@ public class UserLoader {
     public List<User> loadUsersByPage(String search, Integer groupId, Integer branchId, int firstRow, int pageSize,
             String orderBy, boolean orderAscending) {
         // create the query
-        Query query = createUserQuery(search, groupId, branchId, orderBy, orderAscending, false);
+        Query<Integer> query = createUserQuery(search, groupId, branchId, orderBy, orderAscending, false);
 
         // execute the query and return results
         List<User> users = queryUsersByPage(query, firstRow, pageSize);
@@ -74,7 +78,7 @@ public class UserLoader {
         }
 
         // create the query
-        Query query = createUserQuery(search, groupId, null, null, true, false);
+        Query<Integer> query = createUserQuery(search, groupId, null, null, true, false);
 
         // execute it & get a bunch of IDs
         List<Integer> ids = query.list();
@@ -86,38 +90,40 @@ public class UserLoader {
 
     // Create and return the user query.
     // If getUserIdsOnly is true, then get just the user IDs, not the users.
-    private Query createUserQuery(String search, Integer groupId, Integer branchId, String orderBy,
-            boolean orderAscending, boolean getUserIdsOnly) {
+    private Query<Integer> createUserQuery(String search, Integer groupId, Integer branchId, String orderBy,
+                                    boolean orderAscending, boolean getUserIdsOnly) {
         init(getUserIdsOnly);
 
-        // add constraints
+        // Build dynamic HQL
         handleSearchConstraint(search, groupId);
         handleGroupConstraint(groupId);
         handleBranchConstraint(branchId);
 
-        // sort the results
         m_queryBuf.append(" order by u.");
         m_queryBuf.append(StringUtils.defaultIfEmpty(orderBy, "lastName"));
         m_queryBuf.append(orderAscending ? " asc " : " desc ");
 
-        // create the query and add parameters
-        Query query = m_session.createQuery(m_queryBuf.toString());
-        addParams(query);
+        // Create query using Hibernate's native Session
+        Session session = m_session; // assuming this is a Hibernate org.hibernate.Session
+        Query<Integer> query = session.createQuery(m_queryBuf.toString());
+
+        addParams(query); // still apply parameters
 
         return query;
     }
 
-    private void addParams(Query query) {
+    private void addParams(Query<Integer> query) {
         for (Map.Entry<String, Object> e : m_params.entrySet()) {
             String name = e.getKey();
             Object value = e.getValue();
+
             if (value instanceof Integer) {
-                Integer valueInt = (Integer) value;
-                query.setInteger(name, valueInt);
-            }
-            if (value instanceof String) {
-                String valueStr = (String) value;
-                query.setString(name, valueStr);
+                query.setParameter(name, (Integer) value, StandardBasicTypes.INTEGER);
+            } else if (value instanceof String) {
+                query.setParameter(name, (String) value, StandardBasicTypes.STRING);
+            } else {
+                // Fallback: let Hibernate infer the type
+                query.setParameter(name, value);
             }
         }
     }

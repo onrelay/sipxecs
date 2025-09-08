@@ -5,9 +5,10 @@
 
   <class name="DeviceTimeZone" table="timezone">
     <id name="id" column="timezone_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">timezone_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">timezone_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="offset" column="gmt_offset" />
     <property name="useDaylight" column="dstsavings_enabled" />

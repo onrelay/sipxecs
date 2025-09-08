@@ -5,9 +5,10 @@
 
   <class name="Address" table="address">
     <id name="id" column="address_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">addr_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">addr_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
       <property name="street" column="street" />
       <property name="zip" column="zip" />

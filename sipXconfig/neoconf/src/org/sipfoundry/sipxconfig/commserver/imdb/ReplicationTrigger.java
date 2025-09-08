@@ -36,7 +36,7 @@ import org.sipfoundry.sipxconfig.setting.Group;
 // If specific packages need to do specific things based on save/delete to specific objects, that
 // logic
 // should exist with the project.
-public class ReplicationTrigger extends SipxHibernateDaoSupport implements DaoEventListener {
+public class ReplicationTrigger extends SipxHibernateDaoSupport<Object> implements DaoEventListener {
     protected static final Log LOG = LogFactory.getLog(ReplicationTrigger.class);
 
     private ReplicationManager m_replicationManager;
@@ -49,7 +49,7 @@ public class ReplicationTrigger extends SipxHibernateDaoSupport implements DaoEv
         if (entity instanceof Replicable) {
             if (entity instanceof Group) {
                 // flush is necessary here in order to get consistent data
-                getHibernateTemplate().flush();
+                super.flush();
                 // It is important to replicate asynch since large groups might take a while to
                 // replicate
                 // and we want to return control to the page immediately.
@@ -57,7 +57,7 @@ public class ReplicationTrigger extends SipxHibernateDaoSupport implements DaoEv
             }
             m_replicationManager.replicateEntity((Replicable) entity);
         } else if (entity instanceof Branch) {
-            getHibernateTemplate().flush();
+            super.flush();
             // there is no file replication needed so we can trigger the branch replication
             // directly
             replicateEntityGroup(new BranchWorker(entity));

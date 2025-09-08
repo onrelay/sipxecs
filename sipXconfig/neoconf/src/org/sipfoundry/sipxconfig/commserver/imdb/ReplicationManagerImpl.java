@@ -120,7 +120,7 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> impl
         @Override
         public void execute(User user) {
             replicateEntity(user);
-            getHibernateTemplate().clear(); // clear the H session (see XX-9741)
+            ReplicationManagerImpl.this.clear(); // clear the H session (see XX-9741)
         }
     };
 
@@ -129,7 +129,7 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> impl
         @Override
         public void execute(User user) {
             replicateEntity(user, m_dataSet);
-            getHibernateTemplate().clear(); // clear the H session (see XX-9741)
+            ReplicationManagerImpl.this.clear(); // clear the H session (see XX-9741)
         }
     };
 
@@ -140,7 +140,7 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> impl
         @Override
         public void execute(User user) {
             replicateEntity(user, GROUP_DATASETS);
-            getHibernateTemplate().clear(); // clear the H session (see XX-9741)
+            ReplicationManagerImpl.this.clear(); // clear the H session (see XX-9741)
         }
     };
 
@@ -148,7 +148,7 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> impl
         @Override
         public void execute(User user) {
             replicateEntity(user, BRANCH_DATASETS);
-            getHibernateTemplate().clear(); // clear the H session (see XX-9741)
+            ReplicationManagerImpl.this.clear(); // clear the H session (see XX-9741)
         }
     };
 
@@ -156,7 +156,7 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> impl
         @Override
         public void execute(Phone phone) {
             replicateEntity(phone);
-            getHibernateTemplate().clear(); // clear the H session (see XX-9741)
+            ReplicationManagerImpl.this.clear(); // clear the H session (see XX-9741)
         }
     };
 
@@ -527,7 +527,7 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> impl
                 String uid = user.get(MongoConstants.UID).toString();
                 User u = m_coreContext.loadUserByUserName(uid);
                 replicateEntity(u, BRANCH_DATASETS);
-                getHibernateTemplate().clear(); // clear the H session (see XX-9741)
+                super.clear(); // clear the H session (see XX-9741)
             }
             LOG.info("End of regeneration of branch members.");
         } catch (Exception e) {
@@ -546,7 +546,7 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> impl
                     String uid = user.get(MongoConstants.UID).toString();
                     User u = m_coreContext.loadUserByUserName(uid);
                     replicateEntity(u, GROUP_DATASETS);
-                    getHibernateTemplate().clear(); // clear the H session (see XX-9741)
+                    super.clear(); // clear the H session (see XX-9741)
                 }
                 LOG.info("End of regeneration of group members.");
             } catch (Exception e) {
@@ -566,7 +566,7 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> impl
                     String serialNumber = phone.get(MongoConstants.SERIAL_NUMBER).toString();
                     Phone p = m_phoneContext.getPhoneBySerialNumber(serialNumber);
                     replicateEntity(p, PHONE_GROUP_DATASETS);
-                    getHibernateTemplate().clear(); // clear the H session (see XX-9741)
+                    super.clear(); // clear the H session (see XX-9741)
                 }
             } catch (Exception e) {
                 LOG.error(e);

@@ -18,7 +18,7 @@ import org.dbunit.dataset.IDataSet;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
 import org.sipfoundry.sipxconfig.test.TestHelper;
-import org.springframework.orm.hibernate5.HibernateObjectRetrievalFailureException;
+import org.springframework.orm.ObjectRetrievalFailureException;
 
 public class UploadTestIntegration extends IntegrationTestCase {
     private UploadManager m_uploadManager;
@@ -63,7 +63,7 @@ public class UploadTestIntegration extends IntegrationTestCase {
         try {
             m_uploadManager.loadUpload(id);
             fail();
-        } catch (HibernateObjectRetrievalFailureException x) {
+        } catch (ObjectRetrievalFailureException x) {
             assertTrue(true);
         }
 

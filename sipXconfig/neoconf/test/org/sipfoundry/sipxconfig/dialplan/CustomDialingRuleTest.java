@@ -27,8 +27,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime.WorkingHours;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 import org.sipfoundry.sipxconfig.dialplan.config.FullTransform;
 import org.sipfoundry.sipxconfig.dialplan.config.Transform;
 import org.sipfoundry.sipxconfig.forwarding.GeneralSchedule;
@@ -74,7 +74,7 @@ public class CustomDialingRuleTest {
         m_schedule = new GeneralSchedule();
         m_schedule.setName("Custom schedule");
         WorkingHours[] hours = new WorkingHours[1];
-        WorkingTime wt = new WorkingTime();
+        WorkingTimeAttendant wt = new WorkingTimeAttendant();
         hours[0] = new WorkingHours();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         cal.set(2006, Calendar.DECEMBER, 31, 10, 12);
@@ -85,7 +85,7 @@ public class CustomDialingRuleTest {
         hours[0].setDay(ScheduledDay.WEDNESDAY);
         wt.setWorkingHours(hours);
         wt.setEnabled(true);
-        m_schedule.setWorkingTime(wt);
+        m_schedule.setWorkingTimeAttendant(wt);
         DialPattern[] dialPatterns = new DialPattern[PATTERN_COUNT];
         for (int i = 0; i < dialPatterns.length; i++) {
             DialPattern p = new DialPattern();

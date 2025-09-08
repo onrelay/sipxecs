@@ -15,16 +15,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
+import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 
-public class IndexManagerImpl extends HibernateDaoSupport implements IndexManager {
+public class IndexManagerImpl extends SipxHibernateDaoSupport<Object> implements IndexManager {
     private static final Log LOG = LogFactory.getLog(IndexManagerImpl.class);
 
     private Indexer m_indexer;
     private BeanAdaptor m_beanAdaptor;
     private Class<?>[] m_indexedClasses;
-
-    private SessionFactory sessionFactory;
 
     /**
      * Loads all entities to be indexed.

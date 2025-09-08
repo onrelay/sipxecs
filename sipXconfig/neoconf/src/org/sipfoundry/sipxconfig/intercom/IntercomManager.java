@@ -16,7 +16,7 @@ import org.sipfoundry.sipxconfig.feature.GlobalFeature;
 import org.sipfoundry.sipxconfig.common.DataObjectSource;
 import org.sipfoundry.sipxconfig.phone.Phone;
 
-public interface IntercomManager extends DataObjectSource, DialingRuleProvider {
+public interface IntercomManager extends DataObjectSource<Intercom>, DialingRuleProvider {
     public static final GlobalFeature FEATURE = new GlobalFeature("intercom");
 
     public Intercom newIntercom();

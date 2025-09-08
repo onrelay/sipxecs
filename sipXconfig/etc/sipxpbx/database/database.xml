@@ -74,7 +74,7 @@
 <project name="database" basedir=".">
   <property name="sipxconfig.db.name" value="sipxconfig" />
   <property name="sipxconfig.db.user" value="@POSTGRESQL_USER@" />
-  <property name="sipxconfig.db.password" value="" />
+  <property name="postgres-pwd.password" value="" />
   <property name="sql.dir" location="${basedir}" />
   <property name="sipxpbx.conf.dir" location="${basedir}/.." />
   <property name="sipxconfig.db.url" value="jdbc:postgresql://localhost/${sipxconfig.db.name}" />
@@ -109,10 +109,10 @@
       <arg line="-U ${sipxconfig.db.user} ${sipxconfig.db.name}" />
     </exec>
     <!-- clear mongo db -->
-    <exec executable="mongo" outputproperty="eatme">
+    <exec executable="mongosh" outputproperty="eatme">
       <arg line="profiles --eval 'db.dropDatabase();'" />
     </exec>
-    <exec executable="mongo" outputproperty="eatme">
+    <exec executable="mongosh" outputproperty="eatme">
       <arg line="imdb --eval 'db.dropDatabase();'" />
     </exec>
   </target>
@@ -1593,7 +1593,7 @@
   <macrodef name="mongodb-patch">
     <attribute name="patch" />
     <sequential>
-      <exec executable="mongo">
+      <exec executable="mongosh">
         <arg line="${sql.dir}/@{patch}.js" />
       </exec>
       <mark-patch-applied patch="@{patch}" />
@@ -1611,7 +1611,7 @@
 
   <!-- Run SQL on SIPXCONFIG database -->
   <presetdef name="sipx-sql">
-    <sql driver="org.postgresql.Driver" url="${sipxconfig.db.url}" userid="${sipxconfig.db.user}" password="${sipxconfig.db.password}" classpath="${jdbc-driver.jar}" />
+    <sql driver="org.postgresql.Driver" url="${sipxconfig.db.url}" userid="${sipxconfig.db.user}" password="${postgres-pwd.password}" classpath="${jdbc-driver.jar}" />
   </presetdef>
   
   <!--

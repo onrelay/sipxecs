@@ -15,7 +15,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Query;
+
+import org.hibernate.query.NativeQuery;
+import org.hibernate.Session;
+
+import org.springframework.transaction.annotation.Transactional;
+
 import org.sipfoundry.sipxconfig.alias.AliasManager;
 import org.sipfoundry.sipxconfig.common.BeanId;
 import org.sipfoundry.sipxconfig.common.CoreContext;
@@ -29,12 +34,11 @@ import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.common.event.DaoEventListener;
 import org.sipfoundry.sipxconfig.commserver.SipxReplicationContext;
 import org.sipfoundry.sipxconfig.forwarding.CallSequence;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 
 /**
  * Hibernate implementation of the call group context
  */
-public class CallGroupContextImpl extends SipxHibernateDaoSupport implements CallGroupContext, DaoEventListener {
+public class CallGroupContextImpl extends SipxHibernateDaoSupport<CallGroup> implements CallGroupContext, DaoEventListener {
     private static final String VALUE = "value";
 
     private static final String QUERY_CALL_GROUP_IDS_WITH_NAME = "callGroupIdsWithName";
@@ -60,21 +64,28 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport implements Cal
 
     @Override
     public CallGroup loadCallGroup(Integer id) {
-        return getHibernateTemplate().load(CallGroup.class, id);
+        return super.loadEntity(CallGroup.class, id);
     }
     
     @Override
+    @Transactional
     public int getCallGroupId(String extension) {
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession()
-            .createSQLQuery(SQL_CALL_GROUP_EXTENSION);
-        q.setString("extension", extension);
-        return ((Number) q.uniqueResult()).intValue();
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            NativeQuery<?> q = session.createNativeQuery(SQL_CALL_GROUP_EXTENSION);
+            q.setParameter("extension", extension);
+            Number result = (Number) q.uniqueResult();
+            return result != null ? result.intValue() : 0; // handle null safely
+        }
     }
     
     @Override
     public Integer getCallGroupIdByAlias(String alias) {
-        List ids = getHibernateTemplate().findByNamedQueryAndNamedParam(
-                QUERY_CALL_GROUP_IDS_WITH_ALIAS, VALUE, alias);
+        List<Integer> ids = super.findByNamedQueryAndNamedParam(
+                QUERY_CALL_GROUP_IDS_WITH_ALIAS, VALUE, alias, Integer.class);
         return ids.size() > 0 ? (Integer)ids.get(0) : null;
     }
 
@@ -98,9 +109,9 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport implements Cal
             throw new DidInUseException(huntGroupTypeName, did);
         }
         if (callGroup.isNew()) {
-            getHibernateTemplate().save(callGroup);
+            super.persistEntity(callGroup);
         } else {
-            getHibernateTemplate().merge(callGroup);
+            super.mergeEntity(callGroup);
         }
         // activate call groups every time the call group is saved
         m_replicationContext.generate(callGroup);
@@ -116,15 +127,15 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport implements Cal
             CallGroup cg = (CallGroup) load(CallGroup.class, id);
             cgs.add(cg);
         }
-        removeAll(CallGroup.class, ids);
+        super.removeAll(CallGroup.class, ids);
 
         // activate call groups every time the call group is removed
         deactivateCallGroups(cgs);
     }
 
     public void removeCallGroupByAlias(String alias) {
-        List ids = getHibernateTemplate().findByNamedQueryAndNamedParam(
-                QUERY_CALL_GROUP_IDS_WITH_ALIAS, VALUE, alias);
+        List<Integer> ids = super.findByNamedQueryAndNamedParam(
+                QUERY_CALL_GROUP_IDS_WITH_ALIAS, VALUE, alias, Integer.class );
         removeCallGroups(ids);
     }
 
@@ -132,7 +143,7 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport implements Cal
     public void onDelete(Object entity) {
         if (entity instanceof User) {
             User user = (User) entity;
-            getHibernateTemplate().update(user);
+            super.mergeEntity(user);
             removeUser(user.getId());
         }
     }
@@ -168,23 +179,23 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport implements Cal
     }
 
     private void updateUser(Integer userId, boolean delete) {
-        final HibernateTemplate hibernate = getHibernateTemplate();
-        Collection rings = hibernate.findByNamedQueryAndNamedParam("userRingsForUserId", "userId", userId);
+        Collection<UserRing> rings = 
+            super.findByNamedQueryAndNamedParam("userRingsForUserId", "userId", userId, UserRing.class );
         for (Iterator i = rings.iterator(); i.hasNext();) {
             UserRing ring = (UserRing) i.next();
             CallGroup callGroup = ring.getCallGroup();
             if (delete) {
                 callGroup.removeRing(ring);
             }
-            hibernate.save(callGroup);
-            hibernate.flush();
+            super.persistEntity(callGroup);
+            super.flush();
             m_replicationContext.generate(callGroup);
         }
     }
 
     @Override
     public List<CallGroup> getCallGroups() {
-        return getHibernateTemplate().loadAll(CallGroup.class);
+        return super.loadAllEntities(CallGroup.class);
     }
 
     @Override
@@ -226,10 +237,9 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport implements Cal
      */
     @Override
     public void clear() {
-        HibernateTemplate template = getHibernateTemplate();
-        Collection<CallGroup> callGroups = template.loadAll(CallGroup.class);
+        Collection<CallGroup> callGroups = super.loadAllEntities(CallGroup.class);
         getDaoEventPublisher().publishDelete(callGroups);
-        template.deleteAll(callGroups);
+        super.removeAllEntities(callGroups);
         for (CallGroup cg : callGroups) {
             m_replicationContext.generate(cg);
         }
@@ -248,15 +258,21 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport implements Cal
     public boolean isAliasInUse(String alias) {
         // Look for the ID of a call group with the specified alias as its name or extension.
         // If there is one, then the alias is in use.
-        List objs = getHibernateTemplate().findByNamedQueryAndNamedParam(QUERY_CALL_GROUP_IDS_WITH_ALIAS, VALUE,
-                alias);
+        List<Integer> objs = super.findByNamedQueryAndNamedParam(
+                QUERY_CALL_GROUP_IDS_WITH_ALIAS, 
+                VALUE,
+                alias,
+                Integer.class);
         return SipxCollectionUtils.safeSize(objs) > 0;
     }
 
     @Override
     public Collection getBeanIdsOfObjectsWithAlias(String alias) {
-        List ids = getHibernateTemplate().findByNamedQueryAndNamedParam(QUERY_CALL_GROUP_IDS_WITH_ALIAS, VALUE,
-                alias);
+        List<Integer> ids = super.findByNamedQueryAndNamedParam(
+                QUERY_CALL_GROUP_IDS_WITH_ALIAS, 
+                VALUE,
+                alias,
+                Integer.class);
         Collection bids = BeanId.createBeanIdCollection(ids, CallGroup.class);
         return bids;
     }
@@ -284,7 +300,7 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport implements Cal
 
         for (CallGroup callGroup : changed) {
             // no need to trigger replication - do not use storeCallGroup
-            getHibernateTemplate().saveOrUpdate(callGroup);
+            super.mergeEntity(callGroup);
         }
     }
 

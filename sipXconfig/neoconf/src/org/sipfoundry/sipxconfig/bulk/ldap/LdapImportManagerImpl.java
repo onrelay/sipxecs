@@ -32,14 +32,15 @@ import org.sipfoundry.sipxconfig.bulk.UserPreview;
 import org.sipfoundry.sipxconfig.bulk.csv.Index;
 import org.sipfoundry.sipxconfig.bulk.csv.SimpleCsvWriter;
 import org.sipfoundry.sipxconfig.common.UserException;
+import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
+
 import org.springframework.ldap.SizeLimitExceededException;
 import org.springframework.ldap.control.PagedResultsDirContextProcessor;
 import org.springframework.ldap.core.CollectingNameClassPairCallbackHandler;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.NameClassPairMapper;
-import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 
-public class LdapImportManagerImpl extends HibernateDaoSupport implements LdapImportManager, AlarmProvider {
+public class LdapImportManagerImpl extends SipxHibernateDaoSupport<Object> implements LdapImportManager, AlarmProvider {
     private static final Log LOG = LogFactory.getLog("ldap_logger");
     private static final Log ALARM_LOG = LogFactory.getLog(LdapImportManagerImpl.class);
     private LdapTemplateFactory m_templateFactory;

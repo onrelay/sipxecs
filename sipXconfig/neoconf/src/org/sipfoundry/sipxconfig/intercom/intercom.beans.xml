@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   <!--
     - I N T E R C O M   M A N A G E R   I M P L
   -->
@@ -16,7 +16,7 @@
       <value>org.sipfoundry.sipxconfig.intercom.IntercomManager</value>
     </property>
     <property name="target">
-      <ref local="intercomManagerImpl" />
+      <ref bean="intercomManagerImpl" />
     </property>
   </bean>
 

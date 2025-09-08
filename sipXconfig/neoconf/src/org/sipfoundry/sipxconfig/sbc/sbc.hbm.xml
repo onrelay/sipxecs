@@ -3,11 +3,12 @@
 	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="org.sipfoundry.sipxconfig.sbc" default-lazy="false">
 
-  <class name="Sbc" table="sbc" abstract="true" discriminator-value="D">
+  <class name="Sbc" table="sbc" abstract="true" discriminator-value="S" >
     <id name="id" column="sbc_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">sbc_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">sbc_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <discriminator column="sbc_type" type="character" />
     <property name="enabled" />
@@ -33,9 +34,10 @@
 
   <class name="SbcDevice" table="sbc_device" discriminator-value="sbcGeneric">
     <id name="id" column="sbc_device_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">sbc_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">sbc_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <discriminator column="bean_id" />
     <property name="beanId" column="bean_id" insert="false" update="false" />
@@ -54,19 +56,15 @@
   <query name="sbcIds">
     <![CDATA[select sbc.id from SbcDevice sbc]]>
   </query>
-
   <query name="countSbcWithSameName">
     <![CDATA[select count (*) from SbcDevice sbc where sbc.id = :sbcId and sbc.name = :sbcName]]>
   </query>
-
   <query name="anotherSbcWithSameName">
     <![CDATA[select count (*) from SbcDevice sbc where sbc.name = :sbcName]]>
   </query>
-
   <query name="sbcsForSbcDeviceId">
     <![CDATA[from Sbc sbc where sbc.sbcDevice.id = :sbcId]]>
   </query>
-
   <sql-query name="allSbcs">
     <return-scalar type="int" column="id" />
     <return-scalar type="string" column="address" />
@@ -77,4 +75,5 @@
   <query name="countSbcsByType">
     <![CDATA[select count (*) from SbcDevice sbc where sbc.beanId = :sbcBeanId]]>
   </query>
-</hibernate-mapping>
+  
+  </hibernate-mapping>

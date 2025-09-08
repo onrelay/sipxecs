@@ -8,9 +8,10 @@
   -->
   <class name="BackupPlan" table="backup_plan" discriminator-value="L">
     <id name="id" column="backup_plan_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">backup_plan_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">backup_plan_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property column="backup_type" name="encodedType" not-null="true"/>
     <property column="def" name="encodedDefinitionString" not-null="true"/> 
@@ -26,9 +27,10 @@
   -->
   <class name="DailyBackupSchedule" table="daily_backup_schedule">
     <id name="id" column="daily_backup_schedule_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">daily_backup_schedule_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">daily_backup_schedule_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="enabled" />
     <property name="time" column="time_of_day" />

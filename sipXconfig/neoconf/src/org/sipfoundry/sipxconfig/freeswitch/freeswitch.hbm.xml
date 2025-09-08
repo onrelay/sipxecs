@@ -5,9 +5,10 @@
 
   <class name="FreeswitchExtension" table="freeswitch_extension" abstract="true" discriminator-value="A">
     <id name="id" column="freeswitch_ext_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">freeswitch_ext_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">freeswitch_ext_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <discriminator column="freeswitch_ext_type" type="character" />
     <property name="enabled" />
@@ -23,10 +24,11 @@
 
   <class name="FreeswitchCondition" table="freeswitch_condition">
     <id name="id" column="freeswitch_condition_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">freeswitch_condition_seq</param>
-      </generator>
-	</id>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">freeswitch_condition_seq</param>
+        <param name="increment_size">1</param>
+      </generator>	
+    </id>
     <property name="field"/>
     <property name="expression"/>
     <property name="regex"/>
@@ -38,10 +40,11 @@
 
   <class name="FreeswitchAction" table="freeswitch_action">
     <id name="id" column="freeswitch_action_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">freeswitch_action_seq</param>
-      </generator>
-	</id>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">freeswitch_action_seq</param>
+        <param name="increment_size">1</param>
+      </generator>	
+    </id>
     <property name="application"/>
     <property name="data"/>
   </class>
@@ -49,4 +52,5 @@
   <query name="freeswitchActionsWithData">
     <![CDATA[from FreeswitchAction action where action.data = :value]]>
   </query>
-</hibernate-mapping>
+  
+  </hibernate-mapping>

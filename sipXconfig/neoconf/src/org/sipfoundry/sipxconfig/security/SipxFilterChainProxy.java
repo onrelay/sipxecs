@@ -39,11 +39,16 @@ import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.FilterChainProxy;
+import org.springframework.security.web.SecurityFilterChain;
 
 public class SipxFilterChainProxy extends FilterChainProxy {
     private static final Log LOG = LogFactory.getLog(SipxFilterChainProxy.class);
     private DomainManager m_domainManager;
     private AdminContext m_adminCtx;
+
+    public SipxFilterChainProxy( List<SecurityFilterChain> filterChains ) {
+        super( filterChains );
+    }
 
     /**
      * If internal port is used, automatically authenticate using shared secret If other sipxecs

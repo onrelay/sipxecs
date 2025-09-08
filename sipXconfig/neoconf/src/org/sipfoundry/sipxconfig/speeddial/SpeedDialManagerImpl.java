@@ -153,14 +153,19 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
 
     @Override
     public List<SpeedDial> findSpeedDialForUserId(Integer userId) {
-        List<SpeedDial> speeddials = (List<SpeedDial>)getHibernateTemplate().findByNamedQueryAndNamedParam("speedDialForUserId",
-                "userId", userId);
+        List<SpeedDial> speeddials = (List<SpeedDial>)super.findByNamedQueryAndNamedParam("speedDialForUserId",
+                "userId", 
+                userId,
+                SpeedDial.class);
         return speeddials;
     }
 
     private List<SpeedDialGroup> findSpeedDialForGroupId(Integer groupId) {
-        List<SpeedDialGroup> speeddialGroups = (List<SpeedDialGroup>)getHibernateTemplate().findByNamedQueryAndNamedParam(
-                "speedDialForGroupId", "userGroupId", groupId);
+        List<SpeedDialGroup> speeddialGroups = (List<SpeedDialGroup>)super.findByNamedQueryAndNamedParam(
+                "speedDialForGroupId", 
+                "userGroupId", 
+                groupId,
+                SpeedDialGroup.class);
         return speeddialGroups;
     }
 
@@ -168,11 +173,11 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
     public void saveSpeedDial(SpeedDial speedDial) {
         verifyBlfs(speedDial);
         if (speedDial.isNew()) {
-            getHibernateTemplate().save(speedDial);
+            super.persistEntity(speedDial);
         } else {
-            getHibernateTemplate().merge(speedDial);
+            super.mergeEntity(speedDial);
         }
-        getHibernateTemplate().flush();
+        super.flush();
         User user = m_coreContext.loadUser(speedDial.getUser().getId());
         getDaoEventPublisher().publishSave(user);
     }
@@ -225,7 +230,7 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
     @Override
     public void speedDialSynchToGroup(User user) {
         deleteSpeedDialsForUser(user.getId());
-        getHibernateTemplate().flush();
+        super.flush();
         getDaoEventPublisher().publishSave(user);
     }
 
@@ -233,9 +238,9 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
     public void saveSpeedDialGroup(SpeedDialGroup speedDialGroup) {
         verifyBlfs(speedDialGroup);
         if (speedDialGroup.isNew()) {
-            getHibernateTemplate().save(speedDialGroup);
+            super.persistEntity(speedDialGroup);
         } else {
-            getHibernateTemplate().merge(speedDialGroup);
+            super.mergeEntity(speedDialGroup);
         }
         getDaoEventPublisher().publishSave(speedDialGroup.getUserGroup());
     }
@@ -244,7 +249,7 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
     public void deleteSpeedDialsForGroup(int groupId) {
         List<SpeedDialGroup> groups = findSpeedDialForGroupId(groupId);
         getDaoEventPublisher().publishDeleteCollection(groups);
-        getHibernateTemplate().deleteAll(groups);
+        super.removeAllEntities(groups);
     }
 
     @Override
@@ -252,7 +257,7 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
         List<SpeedDial> speedDials = findSpeedDialForUserId(userId);
         if (!speedDials.isEmpty()) {
             getDaoEventPublisher().publishDeleteCollection(speedDials);
-            getHibernateTemplate().deleteAll(speedDials);
+            super.removeAllEntities(speedDials);
         }
     }
 
@@ -343,7 +348,7 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
         if (entity instanceof User
                 || (entity instanceof Group && ((Group) entity).getResource().equals(User.GROUP_RESOURCE_ID))) {
             LOG.debug("rebuilding ~~id~xmpprlsclient entity..." + entity.getClass());
-            getHibernateTemplate().flush();
+            super.flush();
             SpecialUser su = m_coreContext.getSpecialUserAsSpecialUser(SpecialUserType.XMPP_SERVER);
             if (su != null) {
                 m_sipxReplicationContext.generate(m_coreContext

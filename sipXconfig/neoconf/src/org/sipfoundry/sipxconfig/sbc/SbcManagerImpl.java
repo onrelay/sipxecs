@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.Session;
+
 import org.sipfoundry.sipxconfig.common.DaoUtils;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.sipfoundry.sipxconfig.domain.Domain;
@@ -22,14 +24,14 @@ import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.orm.hibernate5.HibernateTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 public class SbcManagerImpl extends SipxHibernateDaoSupport<Sbc> implements SbcManager, BeanFactoryAware {
     private DomainManager m_domainManager;
     private BeanFactory m_beanFactory;
 
     public DefaultSbc getDefaultSbc() {
-        List<DefaultSbc> sbcs = getHibernateTemplate().loadAll(DefaultSbc.class);
+        List<DefaultSbc> sbcs = super.loadAllEntities(DefaultSbc.class);
         DefaultSbc sbc = (DefaultSbc) DataAccessUtils.singleResult(sbcs);
         return sbc;
     }
@@ -39,48 +41,54 @@ public class SbcManagerImpl extends SipxHibernateDaoSupport<Sbc> implements SbcM
         if (sbc == null) {
             sbc = new DefaultSbc();
             sbc.setRoutes(createDefaultSbcRoutes());
-            getHibernateTemplate().save(sbc);
+            super.persistEntity(sbc);
             //Need to flush - since there can be only one Default SBC in the database.
             //Otherwise, the hibernate session may not be aware of the fact that a default SBC is
             //already saved, so  you may end up having two default SBCs in the database.
-            getHibernateTemplate().flush();
+            super.flush();
             getDaoEventPublisher().publishSave(sbc);
         }
         return sbc;
     }
 
     public List<AuxSbc> loadAuxSbcs() {
-        return getHibernateTemplate().loadAll(AuxSbc.class);
+        return super.loadAllEntities(AuxSbc.class);
     }
 
     public void saveSbc(Sbc sbc) {
         if (sbc.isNew()) {
-            getHibernateTemplate().save(sbc);
+            super.persistEntity(sbc);
         } else {
-            getHibernateTemplate().merge(sbc);
+            super.mergeEntity(sbc);
         }
     }
 
     public AuxSbc loadSbc(Integer sbcId) {
-        return (AuxSbc) getHibernateTemplate().load(AuxSbc.class, sbcId);
+        return (AuxSbc) super.loadEntity(AuxSbc.class, sbcId);
     }
 
+    @Transactional
     public void removeSbcs(Collection<Integer> selectedRows) {
-        HibernateTemplate hibernate = getHibernateTemplate();
-        Collection<Object> sbcs = DaoUtils.loadBeanByIds(hibernate, AuxSbc.class, selectedRows);
-        getDaoEventPublisher().publishDeleteCollection(sbcs);
-        hibernate.deleteAll(sbcs);
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            Collection<Object> sbcs = DaoUtils.loadBeanByIds(session, AuxSbc.class, selectedRows);
+            getDaoEventPublisher().publishDeleteCollection(sbcs);
+            super.removeAllEntities(sbcs);
+        }
     }
 
     public void deleteSbc(Sbc sbc) {
-        getHibernateTemplate().delete(sbc);
+        super.removeEntity(sbc);
     }
 
     public SbcRoutes getRoutes() {
         SbcRoutes routes = new SbcRoutes();
         Set<String> sbcDomains = new HashSet<String>();
         Set<String> sbcSubnets = new HashSet<String>();
-        List<Sbc> sbcs = getHibernateTemplate().loadAll(Sbc.class);
+        List<Sbc> sbcs = super.loadAllEntities(Sbc.class);
         for (Sbc sbc : sbcs) {
             sbcDomains.addAll(sbc.getRoutes().getDomains());
             sbcSubnets.addAll(sbc.getRoutes().getSubnets());

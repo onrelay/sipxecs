@@ -24,11 +24,11 @@ import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.common.UserException;
-import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
+import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 
 import java.io.File;
 
-public class JasperReportContextImpl extends HibernateDaoSupport implements JasperReportContext {
+public class JasperReportContextImpl extends SipxHibernateDaoSupport<Object> implements JasperReportContext {
     private static final Log LOG = LogFactory.getLog(JasperReportContextImpl.class);
 
     private static final String ERROR_FILLING = "Error filling compiled report design ";

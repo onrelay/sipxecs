@@ -167,7 +167,7 @@ public class ForwardingRules extends RulesFile implements ApplicationContextAwar
         context.put("advancedCallHandling", 
             m_featureManager.isFeatureEnabled(FreeswitchFeature.FEATURE, getLocation()) ? m_advancedCallHandling.isEnabled() : false);
         try {
-            m_velocityEngine.mergeTemplate("commserver/forwardingrules.vm", context, writer);
+            m_velocityEngine.mergeTemplate("commserver/forwardingrules.vm", "UTF-8", context, writer);
         } catch (Exception e) {
             throw new IOException(e);
         }

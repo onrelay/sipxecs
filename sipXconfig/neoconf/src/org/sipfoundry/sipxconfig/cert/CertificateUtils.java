@@ -8,6 +8,7 @@
 package org.sipfoundry.sipxconfig.cert;
 
 import static java.lang.String.format;
+import java.nio.charset.StandardCharsets;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +44,7 @@ public final class CertificateUtils {
     private static final String PROVIDER = "BC";
     private static final int MAX_HEADER_LINE_COUNT = 512;
     private static final String START_RSA_KEY = "-----BEGIN RSA PRIVATE KEY-----";
+    private static final String END_RSA_KEY = "-----END RSA PRIVATE KEY-----";
 
     static {
         Security.addProvider(new BouncyCastleProvider());
@@ -150,8 +153,14 @@ public final class CertificateUtils {
         Runtime runtime = Runtime.getRuntime();
         try {
             Process process = runtime.exec("openssl rsa -in " + file.getAbsolutePath() + " -check");
-            String result = IOUtils.toString(process.getInputStream());
-            return StringUtils.join(new String []{START_RSA_KEY, StringUtils.substringAfter(result, START_RSA_KEY)});
+            String result = IOUtils.toString(process.getInputStream(), StandardCharsets.UTF_8);
+
+            String body = StringUtils.substringBetween(result, START_RSA_KEY, END_RSA_KEY);
+            if (body == null) {
+                throw new IllegalArgumentException("Could not parse RSA key from openssl output");
+            }
+
+            return START_RSA_KEY + System.lineSeparator() + body.trim() + System.lineSeparator() + END_RSA_KEY;
         } catch (Exception ex) {
             Log.error("Cannot Convert key to RSA ", ex);
             return null;

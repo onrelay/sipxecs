@@ -38,7 +38,6 @@ import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.util.CollectionUtils;
 
 public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> implements AlarmServerManager,
@@ -85,7 +84,7 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
 
     @Override
     public AlarmGroup loadAlarmGroup(Serializable id) {
-        return getHibernateTemplate().load(AlarmGroup.class, id);
+        return super.loadEntity(AlarmGroup.class, id);
     }
 
     private void clearAlarmStorage(String groupName, List<Alarm> alarms) {
@@ -109,12 +108,12 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
     public boolean removeAlarmGroups(Collection<Integer> groupsIds, List<Alarm> alarms) {
         boolean affectDefaultGroup = false;
         for (Integer id : groupsIds) {
-            AlarmGroup group = getHibernateTemplate().load(AlarmGroup.class, id);
+            AlarmGroup group = super.loadEntity(AlarmGroup.class, id);
             // Don't delete the default group.
             if (!isDefaultGroup(group)) {
                 // Remove matching group numbers from alarm before removing the alarm group.
                 clearAlarmStorage(group.getName(), alarms);
-                getHibernateTemplate().delete(group);
+                super.removeEntity(group);
                 getDaoEventPublisher().publishDelete(group);
             } else {
                 affectDefaultGroup = true;
@@ -151,7 +150,7 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
 
     @Override
     public AlarmServer getAlarmServer() {
-        List<AlarmServer> servers = getHibernateTemplate().loadAll(AlarmServer.class);
+        List<AlarmServer> servers = super.loadAllEntities(AlarmServer.class);
         AlarmServer server = (AlarmServer) DataAccessUtils.singleResult(servers);
         if (server == null) {
             server = newAlarmServer();
@@ -180,9 +179,8 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
 
     @Override
     public void saveAlarmServer(AlarmServer server) {
-        HibernateTemplate template = getHibernateTemplate();
-        template.saveOrUpdate(server);
-        template.flush();
+        super.mergeEntity(server);
+        super.flush();
     }
 
     @Override
@@ -214,14 +212,14 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
 
     @Override
     public List<AlarmGroup> getAlarmGroups() {
-        List<AlarmGroup> groups = getHibernateTemplate().loadAll(AlarmGroup.class);
+        List<AlarmGroup> groups = super.loadAllEntities(AlarmGroup.class);
 
         return groups;
     }
 
     @Override
     public AlarmGroup getAlarmGroupById(Integer alarmGroupId) {
-        return getHibernateTemplate().load(AlarmGroup.class, alarmGroupId);
+        return super.loadEntity(AlarmGroup.class, alarmGroupId);
     }
 
     @Override
@@ -270,7 +268,7 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
         if (group.isNew()) {
             // check if new object
             checkForDuplicateNames(group);
-            getHibernateTemplate().save(group);
+            super.persistEntity(group);
         } else {
             // on edit action - check if the group name for this group was modified
             // if the group name was changed then perform duplicate group name checking
@@ -285,7 +283,7 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
                     }
                 }
             }
-            getHibernateTemplate().merge(group);
+            super.mergeEntity(group);
         }
     }
 
@@ -310,23 +308,25 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
         if (groupName.equals(GROUP_NAME_DISABLED)) {
             return true;
         }
-        List count = getHibernateTemplate().findByNamedQueryAndNamedParam("anotherAlarmGroupWithSameName",
+        List count = super.findByNamedQueryAndNamedParam("anotherAlarmGroupWithSameName",
                 new String[] {
                     PARAM_ALARM_GROUP_NAME
                 }, new Object[] {
                     groupName
-                });
+                },
+                AlarmGroup.class);
 
         return DataAccessUtils.intResult(count) > 0;
     }
 
     private boolean isNameChanged(AlarmGroup group) {
-        List<Object> count = (List<Object>)getHibernateTemplate().findByNamedQueryAndNamedParam("countAlarmGroupWithSameName",
+        List<AlarmGroup> count = (List<AlarmGroup>)super.findByNamedQueryAndNamedParam("countAlarmGroupWithSameName",
                 new String[] {
                     PARAM_ALARM_GROUP_ID, PARAM_ALARM_GROUP_NAME
                 }, new Object[] {
                     group.getId(), group.getName()
-                });
+                },
+                AlarmGroup.class);
 
         return DataAccessUtils.intResult(count) == 0;
     }
@@ -341,7 +341,7 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
         for (AlarmGroup group : groups) {
             Set<User> users = group.getUsers();
             if (users.remove(entity)) {
-                getHibernateTemplate().saveOrUpdate(group);
+                super.mergeEntity(group);
             }
         }
     }
@@ -395,23 +395,23 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
 
     @Override
     public List<AlarmTrapReceiver> getAlarmTrapReceivers() {
-        return getHibernateTemplate().loadAll(AlarmTrapReceiver.class);
+        return super.loadAllEntities(AlarmTrapReceiver.class);
     }
 
     @Override
     public void saveAlarmTrapReceiver(AlarmTrapReceiver r) {
-        getHibernateTemplate().saveOrUpdate(r);
+        super.mergeEntity(r);
     }
 
     @Override
     public void deleteAlarmTrapReceiver(AlarmTrapReceiver r) {
-        getHibernateTemplate().delete(r);
+        super.removeEntity(r);
     }
 
     @Override
     public void saveAlarmTrapReceivers(List<AlarmTrapReceiver> receivers) {
         for (AlarmTrapReceiver receiver : receivers) {
-            getHibernateTemplate().saveOrUpdate(receiver);
+            super.mergeEntity(receiver);
         }
     }
 

@@ -5,9 +5,10 @@
 
   <class name="SpeedDial" table="speeddial">
     <id name="id" column="speeddial_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">speeddial_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">speeddial_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <many-to-one name="user" column="user_id" foreign-key="fk_speeddial_user" not-null="true" />
     <list name="buttons" table="speeddial_button">
@@ -23,9 +24,10 @@
 
   <class name="SpeedDialGroup" table="speeddial_group">
     <id name="id" column="speeddial_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">speeddial_group_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">speeddial_group_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <many-to-one name="userGroup" column="group_id" foreign-key="fk_speeddial_group" not-null="true" />
     <list name="buttons" table="speeddial_group_button">
@@ -41,8 +43,10 @@
 
   <query name="speedDialForUserId">
     <![CDATA[FROM SpeedDial sd WHERE sd.user.id = :userId]]>
-  </query>
+  </query>  
+  
   <query name="speedDialForGroupId">
     <![CDATA[FROM SpeedDialGroup sd WHERE sd.userGroup.id = :userGroupId]]>
   </query>
-</hibernate-mapping>
+  
+  </hibernate-mapping>

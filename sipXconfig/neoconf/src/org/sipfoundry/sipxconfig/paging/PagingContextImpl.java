@@ -46,7 +46,7 @@ import org.sipfoundry.sipxconfig.snmp.SnmpManager;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class PagingContextImpl extends SipxHibernateDaoSupport implements PagingContext,
+public class PagingContextImpl extends SipxHibernateDaoSupport<PagingGroup> implements PagingContext,
         AddressProvider, ProcessProvider, FirewallProvider, DnsProvider {
 
     /** Default ALERT-INFO - hardcoded in Polycom phone configuration */
@@ -83,12 +83,12 @@ public class PagingContextImpl extends SipxHibernateDaoSupport implements Paging
 
     @Override
     public List<PagingGroup> getPagingGroups() {
-        return getHibernateTemplate().loadAll(PagingGroup.class);
+        return super.loadAllEntities(PagingGroup.class);
     }
 
     @Override
     public PagingGroup getPagingGroupById(Integer pagingGroupId) {
-        return getHibernateTemplate().load(PagingGroup.class, pagingGroupId);
+        return super.loadEntity(PagingGroup.class, pagingGroupId);
     }
 
     void checkAliasUse(PagingGroup group, String prefix) {
@@ -104,14 +104,14 @@ public class PagingContextImpl extends SipxHibernateDaoSupport implements Paging
         if (group.isNew()) {
             // check if new object
             checkForDuplicateNames(group);
-            getHibernateTemplate().save(group);
+            super.persistEntity(group);
         } else {
             // on edit action - check if the group number for this group was modified
             // if the group number was changed then perform duplicate group number checking
             if (isNameChanged(group)) {
                 checkForDuplicateNames(group);
             }
-            getHibernateTemplate().merge(group);
+            super.mergeEntity(group);
         }
     }
 
@@ -122,23 +122,25 @@ public class PagingContextImpl extends SipxHibernateDaoSupport implements Paging
     }
 
     private boolean isNameInUse(PagingGroup group) {
-        List count = getHibernateTemplate().findByNamedQueryAndNamedParam("anotherPagingGroupWithSameName",
+        List<PagingGroup> count = super.findByNamedQueryAndNamedParam("anotherPagingGroupWithSameName",
                 new String[] {
                     PARAM_PAGING_GROUP_NUMBER
                 }, new Object[] {
                     group.getPageGroupNumber()
-                });
+                },
+                PagingGroup.class);
 
         return DataAccessUtils.intResult(count) > 0;
     }
 
     private boolean isNameChanged(PagingGroup group) {
-        List count = getHibernateTemplate().findByNamedQueryAndNamedParam("countPagingGroupWithSameName",
+        List count = super.findByNamedQueryAndNamedParam("countPagingGroupWithSameName",
                 new String[] {
                     PARAM_PAGING_GROUP_ID, PARAM_PAGING_GROUP_NUMBER
                 }, new Object[] {
                     group.getId(), group.getPageGroupNumber()
-                });
+                },
+                PagingGroup.class);
 
         return DataAccessUtils.intResult(count) == 0;
     }

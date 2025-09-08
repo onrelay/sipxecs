@@ -159,11 +159,14 @@ public class CertificateConfig implements ConfigProvider {
 
                 //store the full chain for openfire certificate
 
-                JavaKeyStore sslOpenfire = new JavaKeyStore();
+                if (openfireSslKey != null) {
 
-                sslOpenfire.addKeys(domain, openfireCert.toString(), new String(openfireSslKey));
+                    JavaKeyStore sslOpenfire = new JavaKeyStore();
 
-                sslOpenfire.storeIfDifferent(new File(dir, "ssl-openfire.keystore"));
+                    sslOpenfire.addKeys(domain, openfireCert.toString(), new String(openfireSslKey));
+
+                    sslOpenfire.storeIfDifferent(new File(dir, "ssl-openfire.keystore"));
+                }
 
             } // useLetsEncrypt
 
@@ -202,7 +205,7 @@ public class CertificateConfig implements ConfigProvider {
             context.put("caCertificate", true);
         }
         try {
-            m_velocityEngine.mergeTemplate("apache/ssl.conf.vm", context, writer);
+            m_velocityEngine.mergeTemplate("apache/ssl.conf.vm", "UTF-8", context, writer);
         } catch (Exception e) {
             throw new IOException(e);
         }

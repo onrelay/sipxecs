@@ -29,6 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.hibernate.Session;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,11 +56,10 @@ import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.test.PhonebookTestHelper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 
 public class PhonebookManagerTest extends BeanWithSettingsTestCase {
     GeneralPhonebookSettings settings;
-    HibernateTemplate m_hibernateTemplate;
+    Session m_session;
     JdbcTemplate m_jdbcTemplate;
 
     protected void setUp() throws Exception {
@@ -65,16 +69,18 @@ public class PhonebookManagerTest extends BeanWithSettingsTestCase {
         settings.setEveryoneEnabled(false);
         List<GeneralPhonebookSettings> settingsList = new ArrayList<GeneralPhonebookSettings>();
         settingsList.add(settings);
-        m_hibernateTemplate = createMock(HibernateTemplate.class);
-        m_hibernateTemplate.loadAll(GeneralPhonebookSettings.class);
+        m_session = createMock(Session.class);
+        CriteriaBuilder cb = m_session.getCriteriaBuilder();
+        CriteriaQuery<GeneralPhonebookSettings> cq = cb.createQuery(GeneralPhonebookSettings.class);
+        cq.from(GeneralPhonebookSettings.class);
+        m_session.createQuery(cq).getResultList();
         expectLastCall().andReturn(settingsList);
-        replay(m_hibernateTemplate);
+        replay(m_session);
         m_jdbcTemplate = createMock(JdbcTemplate.class);
     }
 
     public void testGetEmptyPhonebookRows() {
         PhonebookManagerImpl context = new PhonebookManagerImpl();
-        context.setHibernateTemplate(m_hibernateTemplate);
         assertEquals(0, context.getEntries(new Phonebook()).size());
     }
 
@@ -86,7 +92,6 @@ public class PhonebookManagerTest extends BeanWithSettingsTestCase {
         coreContextControl.replay();
         PhonebookManagerImpl context = new PhonebookManagerImpl();
         context.setCoreContext(coreContext);
-        context.setHibernateTemplate(m_hibernateTemplate);
         context.setConfigJdbcTemplate(m_jdbcTemplate);
 
         //This just performs DATABASE query - see PhonebookManagerTestIntegration. Here we can
@@ -401,7 +406,6 @@ public class PhonebookManagerTest extends BeanWithSettingsTestCase {
         Phonebook phonebook = new Phonebook();
         phonebook.setEntries(asList(entry, entry, entry2));
 
-        impl.setHibernateTemplate(m_hibernateTemplate);
         Collection<PhonebookEntry> entries = impl.getEntries(phonebook);
         assertEquals(2, entries.size());
         Iterator<PhonebookEntry> it = entries.iterator();

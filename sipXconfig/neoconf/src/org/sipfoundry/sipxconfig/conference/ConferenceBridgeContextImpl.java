@@ -18,11 +18,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Order;
 import org.sipfoundry.sipxconfig.alias.AliasManager;
 import org.sipfoundry.sipxconfig.common.BeanId;
 import org.sipfoundry.sipxconfig.common.ExtensionInUseException;
@@ -38,8 +41,7 @@ import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.orm.hibernate5.HibernateCallback;
-import org.springframework.orm.hibernate5.HibernateTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Conference> implements BeanFactoryAware,
         ConferenceBridgeContext, DaoEventListener {
@@ -57,25 +59,25 @@ public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Confere
     private DomainManager m_domainManager;
 
     public List<Bridge> getBridges() {
-        return getHibernateTemplate().loadAll(Bridge.class);
+        return super.loadAllEntities(Bridge.class);
     }
 
     public void saveBridge(Bridge bridge) {
         if (bridge.isNew()) {
-            getHibernateTemplate().save(bridge);
+            super.persistEntity(bridge);
             // need to make sure that ID is set
-            getHibernateTemplate().flush();
+            super.flush();
         } else {
-            getHibernateTemplate().merge(bridge);
+            super.mergeEntity(bridge);
         }
     }
 
     public void saveConference(Conference conference) {
         validate(conference);
         if (conference.isNew()) {
-            getHibernateTemplate().save(conference);
+            super.persistEntity(conference);
         } else {
-            getHibernateTemplate().merge(conference);
+            super.mergeEntity(conference);
         }
     }
 
@@ -146,25 +148,25 @@ public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Confere
             bridges.add(bridge);
         }
         for( Bridge bridge : bridges ) {
-            getHibernateTemplate().saveOrUpdate(bridge);
+            super.mergeEntity(bridge);
         }
-        getHibernateTemplate().flush();
+        super.flush();
     }
 
     public Bridge loadBridge(Serializable id) {
-        return getHibernateTemplate().load(Bridge.class, id);
+        return super.loadEntity(Bridge.class, id);
     }
 
     public Bridge getBridgeByServer(String hostname) {
         // TODO JPA This is temporarily commented out until I can figure out why loading the
         // object in this way
         // does not load dependent objects like the service and location...
-        // List<Bridge> bridges = getHibernateTemplate().findByNamedQueryAndNamedParam(
-        // "bridgeByHost", VALUE, hostname);
+        // List<Bridge> bridges = super.findByNamedQueryAndNamedParam(
+        // "bridgeByHost", VALUE, hostname, Bridge.class);
         // return (Bridge) DataAccessUtils.singleResult(bridges2);
 
         Bridge bridgeForServer = null;
-        List<Bridge> bridges = getHibernateTemplate().loadAll(Bridge.class);
+        List<Bridge> bridges = super.loadAllEntities(Bridge.class);
         for (Bridge b : bridges) {
             if (b != null) {
                 if (b.getLocation() != null) {
@@ -179,24 +181,31 @@ public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Confere
     }
 
     public Conference loadConference(Serializable id) {
-        return getHibernateTemplate().load(Conference.class, id);
+        return super.loadEntity(Conference.class, id);
     }
 
     public Conference findConferenceByName(String name) {
-        List<Conference> conferences = (List<Conference>)getHibernateTemplate().findByNamedQueryAndNamedParam(CONFERENCE_BY_NAME,
-                VALUE, name);
+        List<Conference> conferences = (List<Conference>)super.findByNamedQueryAndNamedParam(
+            CONFERENCE_BY_NAME,
+            VALUE, 
+            name,
+            Conference.class );
         return DataAccessUtils.singleResult(conferences);
     }
 
     public Conference findConferenceByExtension(String extension) {
-        List<Conference> conferences = (List<Conference>)getHibernateTemplate().findByNamedQueryAndNamedParam(CONFERENCE_BY_EXTENSION,
-                VALUE, extension);
+        List<Conference> conferences = 
+            (List<Conference>)super.findByNamedQueryAndNamedParam(
+                CONFERENCE_BY_EXTENSION,
+                VALUE, 
+                extension,
+                Conference.class);
         return DataAccessUtils.singleResult(conferences);
     }    
     
     public void clear() {
         List<Bridge> bridges = getBridges();
-        getHibernateTemplate().deleteAll(bridges);
+        super.removeAllEntities(bridges);
     }
 
     // trivial get/set
@@ -209,56 +218,80 @@ public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Confere
     }
 
     public boolean isAliasInUse(String alias) {
-        List<Integer> confIds = (List<Integer>)getHibernateTemplate().findByNamedQueryAndNamedParam(CONFERENCE_IDS_WITH_ALIAS, VALUE, alias);
+        List<Integer> confIds = (List<Integer>)super.findByNamedQueryAndNamedParam(
+            CONFERENCE_IDS_WITH_ALIAS, VALUE, alias, Integer.class );
         return !confIds.isEmpty();
     }
 
     public Collection<BeanId> getBeanIdsOfObjectsWithAlias(String alias) {
-        Collection<Integer> ids = (Collection<Integer>)getHibernateTemplate().findByNamedQueryAndNamedParam(CONFERENCE_IDS_WITH_ALIAS, VALUE,
-                alias);
+        Collection<Integer> ids = (Collection<Integer>)super.findByNamedQueryAndNamedParam(
+            CONFERENCE_IDS_WITH_ALIAS, VALUE, alias, Integer.class);
         Collection<BeanId> bids = BeanId.createBeanIdCollection(ids, Conference.class);
         return bids;
     }
 
     public List<Conference> findConferencesByOwner(User owner) {
-        List<Conference> conferences = (List<Conference>)getHibernateTemplate().findByNamedQueryAndNamedParam("conferencesByOwner",
-                OWNER, owner);
+        List<Conference> conferences = (List<Conference>)super.findByNamedQueryAndNamedParam(
+            "conferencesByOwner",
+            OWNER, 
+            owner,
+            Conference.class );
         return conferences;
     }
 
-    private Criteria filterConferencesCriteria(final Integer bridgeId, final Integer ownerGroupId, Session session) {
-        Criteria criteria = session.createCriteria(Conference.class);
-        criteria.createCriteria("bridge", "b").add(Restrictions.eq("b.id", bridgeId));
-        if (ownerGroupId != null) {
-            criteria.createCriteria(OWNER, "o").createCriteria("groups", "g")
-                    .add(Restrictions.eq("g.id", ownerGroupId));
-        }
-        return criteria;
+
+
+private Query<Conference> filterConferencesCriteria(final Integer bridgeId, final Integer ownerGroupId, Session session) {
+    CriteriaBuilder cb = session.getCriteriaBuilder();
+    CriteriaQuery<Conference> cq = cb.createQuery(Conference.class);
+    Root<Conference> root = cq.from(Conference.class);
+
+    // Join bridge
+    Join<Object, Object> bridgeJoin = root.join("bridge");
+    Predicate bridgePredicate = cb.equal(bridgeJoin.get("id"), bridgeId);
+
+    Predicate finalPredicate = bridgePredicate;
+
+    if (ownerGroupId != null) {
+        // Join owner -> groups
+        Join<Object, Object> ownerJoin = root.join("owner"); // assuming OWNER is "owner"
+        Join<Object, Object> groupJoin = ownerJoin.join("groups");
+        Predicate groupPredicate = cb.equal(groupJoin.get("id"), ownerGroupId);
+        finalPredicate = cb.and(finalPredicate, groupPredicate);
     }
+
+    cq.select(root).where(finalPredicate).distinct(true);
+
+    return session.createQuery(cq);
+}
 
     public List<Conference> getAllConferences() {
-        return getHibernateTemplate().loadAll(Conference.class);
+        return super.loadAllEntities(Conference.class);
     }
 
+    @Transactional
     public List<Conference> filterConferences(final Integer bridgeId, final Integer ownerGroupId) {
-        HibernateCallback<Object> callback = new HibernateCallback<>() {
-            public Object doInHibernate(Session session) {
-                Criteria criteria = filterConferencesCriteria(bridgeId, ownerGroupId, session);
-                return criteria.list();
-            }
-        };
-        return (List<Conference>)getHibernateTemplate().execute(callback);
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            Query<Conference> query = filterConferencesCriteria(bridgeId, ownerGroupId, session);
+            return query.getResultList();
+        }
     }
 
     public List<Conference> searchConferences(final String searchTerm) {
         String searchTermLike = (new StringBuilder()).append(PERCENT).append(searchTerm).append(PERCENT).toString();
         List<Conference> conferences = new ArrayList<Conference>();
-        List<Object[]> results = (List<Object[]>)getHibernateTemplate().findByNamedQueryAndNamedParam("searchConferences",
+        List<Object[]> results = (List<Object[]>)super.findByNamedQueryAndNamedParam(
+            "searchConferences",
                 new String[] {
                     "name", "ext", "description", "ownerName", "ownerUName"
                 }, new String[] {
                     searchTermLike, searchTerm, searchTermLike, searchTermLike, searchTerm
-                });
+                },
+                Object[].class);
         for (Object[] result : results) {
             for (int i = 0; i < result.length; i++) {
                 if (result[i] instanceof Conference) {
@@ -269,36 +302,79 @@ public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Confere
         return conferences;
     }
 
+    @Transactional
     public int countFilterConferences(final Integer bridgeId, final Integer ownerGroupId) {
-        HibernateCallback<Object> callback = new HibernateCallback<>() {
-            public Object doInHibernate(Session session) {
-                Criteria criteria = filterConferencesCriteria(bridgeId, ownerGroupId, session);
-                criteria.setProjection(Projections.rowCount());
-                List<Object> results = criteria.list();
-                return results;
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+            Root<Conference> root = cq.from(Conference.class);
+
+            // Join to bridge and add predicate
+            Join<?, ?> bridgeJoin = root.join("bridge");
+            Predicate predicate = cb.equal(bridgeJoin.get("id"), bridgeId);
+
+            // Optional join to owner -> groups
+            if (ownerGroupId != null) {
+                Join<?, ?> ownerJoin = root.join("owner");
+                Join<?, ?> groupJoin = ownerJoin.join("groups");
+                Predicate groupPredicate = cb.equal(groupJoin.get("id"), ownerGroupId);
+                predicate = cb.and(predicate, groupPredicate);
             }
-        };
-        List<Long> list = (List<Long>)getHibernateTemplate().execute(callback);
-        Long count = list.get(0);
-        return count.intValue();
+
+            cq.select(cb.count(root)).where(predicate);
+
+            // Wrap result as List to match original return shape
+            Long count = session.createQuery(cq).getSingleResult();
+        
+            List<Long> list = List.of(count);;
+            return (list != null && !list.isEmpty()) ? list.get(0).intValue() : 0;
+        }
     }
 
+    @Transactional
     public List<Conference> filterConferencesByPage(final Integer bridgeId, final Integer ownerGroupId,
             final int firstRow, final int pageSize, final String[] orderBy, final boolean orderAscending) {
 
-        HibernateCallback<Object> callback = new HibernateCallback<>() {
-            public Object doInHibernate(Session session) {
-                Criteria criteria = filterConferencesCriteria(bridgeId, ownerGroupId, session);
-                criteria.setFirstResult(firstRow);
-                criteria.setMaxResults(pageSize);
-                for (int i = 0; i < orderBy.length; i++) {
-                    Order order = orderAscending ? Order.asc(orderBy[i]) : Order.desc(orderBy[i]);
-                    criteria.addOrder(order);
-                }
-                return criteria.list();
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Conference> cq = cb.createQuery(Conference.class);
+            Root<Conference> root = cq.from(Conference.class);
+
+            // Build predicates same as before
+            Join<Object, Object> bridgeJoin = root.join("bridge");
+            Predicate predicate = cb.equal(bridgeJoin.get("id"), bridgeId);
+
+            if (ownerGroupId != null) {
+                Join<Object, Object> ownerJoin = root.join("owner");
+                Join<Object, Object> groupsJoin = ownerJoin.join("groups");
+                Predicate ownerGroupPredicate = cb.equal(groupsJoin.get("id"), ownerGroupId);
+                predicate = cb.and(predicate, ownerGroupPredicate);
             }
-        };
-        return (List<Conference>)getHibernateTemplate().execute(callback);
+
+            cq.where(predicate);
+
+            // Build order list dynamically
+            if (orderBy != null && orderBy.length > 0) {
+                List<Order> orders = new ArrayList<>();
+                for (String orderProp : orderBy) {
+                    orders.add(orderAscending ? cb.asc(root.get(orderProp)) : cb.desc(root.get(orderProp)));
+                }
+                cq.orderBy(orders);
+            }
+
+            Query<Conference> query = session.createQuery(cq);
+            query.setFirstResult(firstRow);
+            query.setMaxResults(pageSize);
+
+            return query.getResultList();
+        }
     }
 
     public String getAddressSpec(Conference conference) {
@@ -307,9 +383,11 @@ public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Confere
     }
 
     public Bridge getBridgeForLocationId(Integer locationId) {
-        HibernateTemplate hibernate = getHibernateTemplate();
-        List<Bridge> servers = (List<Bridge>)hibernate.findByNamedQueryAndNamedParam("bridgeForLocationId", "locationId",
-                locationId);
+        List<Bridge> servers = (List<Bridge>)super.findByNamedQueryAndNamedParam(
+            "bridgeForLocationId", 
+            "locationId",
+            locationId,
+            Bridge.class);
 
         return DataAccessUtils.singleResult(servers);
     }
@@ -321,7 +399,7 @@ public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Confere
 
     @Override
     public void removeBridge(Bridge bridge) {
-        getHibernateTemplate().delete(bridge);
+        super.removeEntity(bridge);
     }
 
     @Override

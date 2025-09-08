@@ -7,7 +7,7 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans
      					http://www.springframework.org/schema/beans/spring-beans.xsd 
      					http://www.springframework.org/schema/util 
-     					http://www.springframework.org/schema/util/spring-util-2.0.xsd 
+     					http://www.springframework.org/schema/util/spring-util.xsd 
      					http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd 
      					http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd 
      					http://cxf.apache.org/jaxrs-client 
@@ -19,8 +19,8 @@
     <import resource="classpath:META-INF/cxf/cxf.xml"/>
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml"/>
 
-    <jaxrs-client:client id="restClient" address="https://apiban.org/api/${apiban.key}/" serviceClass="org.sipfoundry.sipxconfig.apiban.BannedApi" inheritHeaders="true">
-        <jaxrs-client:headers>
+    <jaxrs-client:client id="bannedApi" address="https://apiban.org/api/${apiban.key}/" serviceClass="org.sipfoundry.sipxconfig.apiban.BannedApi" inheritHeaders="true">
+		<jaxrs-client:headers>
             <entry key="json" value="application/json" />
         </jaxrs-client:headers>
     </jaxrs-client:client>
@@ -37,18 +37,13 @@
         	    <sec:keyStore type="JKS" password="changeit"
                       file="/etc/pki/java/cacerts"/>
       	    </sec:trustManagers>
-      	    <sec:cipherSuitesFilter>
-        	    <!-- these filters ensure that a ciphersuite with
-             	export-suitable or null encryption is used,
-             	but exclude anonymous Diffie-Hellman key change as
-             	this is vulnerable to man-in-the-middle attacks -->
-        		<sec:include>.*_EXPORT_.*</sec:include>
-        		<sec:include>.*_EXPORT1024_.*</sec:include>
-        		<sec:include>.*_WITH_DES_.*</sec:include>
-        		<sec:include>.*_WITH_AES_.*</sec:include>
-        		<sec:include>.*_WITH_NULL_.*</sec:include>
-        		<sec:exclude>.*_DH_anon_.*</sec:exclude>
-      		</sec:cipherSuitesFilter>
+			<sec:cipherSuitesFilter>
+				<sec:include>.*TLS_ECDHE.*AES.*</sec:include>
+				<sec:include>.*TLS_DHE.*AES.*</sec:include>
+				<sec:include>.*TLS_AES_.*</sec:include> <!-- TLS 1.3 -->
+				<sec:exclude>.*_NULL_.*</sec:exclude>
+				<sec:exclude>.*_anon_.*</sec:exclude>
+			</sec:cipherSuitesFilter>
     	</tlsClientParameters>
 	</conduit>
 </beans>

@@ -43,7 +43,7 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
         m_defaultLanguage = defaultLanguage;
         // Calling getLocalization() populates the localization table
         // when empty
-        getLocalization();
+        //getLocalization();
     }
 
     @Override
@@ -88,7 +88,7 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
 
     @Override
     public Localization getLocalization() {
-        List<Localization> l = getHibernateTemplate().loadAll(Localization.class);
+        List<Localization> l = super.loadAllEntities(Localization.class);
         Localization localization = DataAccessUtils.singleResult(l);
         if (localization == null) {
             // The localization table is empty - create a new localization using
@@ -97,9 +97,9 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
             localization.setRegion(m_defaultRegion);
             localization.setLanguage(m_defaultLanguage);
             if (localization.isNew()) {
-                getHibernateTemplate().save(localization);
+                super.persistEntity(localization);
             } else {
-                getHibernateTemplate().merge(localization);
+                super.mergeEntity(localization);
             }
         }
         return localization;
@@ -121,11 +121,11 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
         localization.setRegion(regionBeanId);
         m_applicationContext.publishEvent(new RegionUpdatedEvent(this, regionBeanId));
         if (localization.isNew()) {
-            getHibernateTemplate().save(localization);
+            super.persistEntity(localization);
         } else {
-            getHibernateTemplate().merge(localization);
+            super.mergeEntity(localization);
         }
-        getHibernateTemplate().flush();
+        super.flush();
         getDaoEventPublisher().publishSave(localization);
     }
 
@@ -147,11 +147,11 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
         // The language has been changed - handle the change
         localization.setLanguage(language);
         if (localization.isNew()) {
-            getHibernateTemplate().save(localization);
+            super.persistEntity(localization);
         } else {
-            getHibernateTemplate().merge(localization);
+            super.mergeEntity(localization);
         }
-        getHibernateTemplate().flush();
+        super.flush();
         // TODO: do we really need this? It does not seem to be caught anywhere!
         getDaoEventPublisher().publishSave(localization);
         // Copy default AutoAttendant prompts in the currently applied language
@@ -174,11 +174,11 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
         actualLocalization.setLanguage(language);
         
         if (actualLocalization.isNew()) {
-            getHibernateTemplate().save(actualLocalization);
+            super.persistEntity(actualLocalization);
         } else {
-            getHibernateTemplate().merge(actualLocalization);
+            super.mergeEntity(actualLocalization);
         }        
-        getHibernateTemplate().flush();
+        super.flush();
         getDaoEventPublisher().publishSave(actualLocalization);
         if (updateRegion) {
             m_applicationContext.publishEvent(new RegionUpdatedEvent(this, region));            

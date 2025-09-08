@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   
   <bean id="sbcManagerImpl" class="org.sipfoundry.sipxconfig.sbc.SbcManagerImpl" parent="abstractDaoImpl">
     <property name="domainManager" ref="domainManager" />
@@ -9,7 +9,7 @@
   <bean id="sbcManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.sbc.SbcManager" />
     <property name="target">
-      <ref local="sbcManagerImpl" />
+      <ref bean="sbcManagerImpl" />
     </property>
   </bean>
   
@@ -75,13 +75,13 @@
 
   <bean id="sbcDeviceSource" class="org.sipfoundry.sipxconfig.sbc.SbcDeviceSource">
     <property name="sbcDeviceManager">
-      <ref local="sbcDeviceManager" />
+      <ref bean="sbcDeviceManager" />
     </property>
   </bean>
 
   <bean id="sbcRestartManager" class="org.sipfoundry.sipxconfig.device.ScheduledRestartManagerImpl">
     <property name="deviceSource">
-      <ref local="sbcDeviceSource" />
+      <ref bean="sbcDeviceSource" />
     </property>
     <property name="jobContext" ref="jobContext" />
     <property name="sleepInterval" value="5000" />
@@ -90,10 +90,10 @@
 
   <bean id="eagerSbcProfileManager" class="org.sipfoundry.sipxconfig.device.ProfileManagerImpl">
     <property name="deviceSource">
-      <ref local="sbcDeviceSource" />
+      <ref bean="sbcDeviceSource" />
     </property>
     <property name="restartManager">
-      <ref local="sbcRestartManager" />
+      <ref bean="sbcRestartManager" />
     </property>
     <property name="jobContext" ref="jobContext" />
     <property name="systemAuditManager" ref="systemAuditManager" />
@@ -101,7 +101,7 @@
 
   <bean id="sbcProfileManager" class="org.sipfoundry.sipxconfig.device.LazyProfileManagerImpl" init-method="init">
     <property name="target">
-      <ref local="eagerSbcProfileManager" />
+      <ref bean="eagerSbcProfileManager" />
     </property>
     <property name="sleepInterval" value="5000" />
   </bean>
@@ -117,7 +117,7 @@
       <value>org.sipfoundry.sipxconfig.sbc.SbcMigrationContext</value>
     </property>
     <property name="target">
-      <ref local="sbcMigrationContextImpl" />
+      <ref bean="sbcMigrationContextImpl" />
     </property>
   </bean>
 

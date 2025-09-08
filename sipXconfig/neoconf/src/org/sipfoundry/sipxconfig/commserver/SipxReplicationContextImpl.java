@@ -27,6 +27,8 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.ApplicationListener;
+import org.springframework.transaction.annotation.Transactional;
+
 
 /*
  * (non-Javadoc)
@@ -36,6 +38,7 @@ import org.springframework.context.ApplicationListener;
  * By heavy replication operations we mean operations that take a lot of time when are performed, usually
  * on a large number of users. (generate all data, generate 1 dataset)
  */
+@Transactional(readOnly = true)
 public class SipxReplicationContextImpl implements ApplicationEventPublisherAware, SipxReplicationContext,
         ApplicationListener<LanguageUpdatedEvent>, SetupListener {
     private static final Log LOG = LogFactory.getLog(SipxReplicationContextImpl.class);

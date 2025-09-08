@@ -18,8 +18,8 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name = "File")
 @XmlType(propOrder = {

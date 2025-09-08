@@ -13,6 +13,8 @@ import static java.lang.String.format;
 import static org.springframework.dao.support.DataAccessUtils.intResult;
 import static org.springframework.dao.support.DataAccessUtils.singleResult;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collections;
@@ -22,10 +24,12 @@ import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.sipfoundry.sipxconfig.common.ReplicationsFinishedEvent;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.sipfoundry.sipxconfig.common.UserException;
@@ -38,7 +42,6 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.hibernate5.HibernateCallback;
 
 public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> implements LocationsManager,
         ApplicationListener<ApplicationEvent>, SetupListener {
@@ -60,7 +63,7 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
     /** Return the replication URLs, retrieving them on demand */
     @Override
     public Location[] getLocations() {
-        List<Location> locationList = getHibernateTemplate().loadAll(Location.class);
+        List<Location> locationList = super.loadAllEntities(Location.class);
         Collections.sort(locationList);
         Location[] locationArray = new Location[locationList.size()];
         locationList.toArray(locationArray);
@@ -69,14 +72,14 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
 
     @Override
     public List<Location> getLocationsList() {
-        List<Location> locations = getHibernateTemplate().loadAll(Location.class);
+        List<Location> locations = super.loadAllEntities(Location.class);
         Collections.sort(locations);
         return locations;
     }
 
     @Override
     public Location getLocation(int id) {
-        return getHibernateTemplate().load(Location.class, id);
+        return super.loadEntity(Location.class, id);
     }
 
     @Override
@@ -89,27 +92,32 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
         return loadLocationByUniqueProperty("address", address);
     }
 
+    @Transactional
     private Location loadLocationByUniqueProperty(String propName, Object propValue) {
-        final Criterion expression = Restrictions.eq(propName, propValue);
 
-        HibernateCallback<Object> callback = new HibernateCallback<Object>() {
-            @Override
-            public Object doInHibernate(Session session) {
-                Criteria criteria = session.createCriteria(Location.class).add(expression);
-                return criteria.list();
-            }
-        };
-        List<Location> locations = (List<Location>)getHibernateTemplate().execute(callback);
-        Location location = singleResult(locations);
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
 
-        return location;
+            Session session = sessionTransaction.getSession();
+        
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Location> cq = cb.createQuery(Location.class);
+            Root<Location> root = cq.from(Location.class);
+
+            Predicate predicate = cb.equal(root.get(propName), propValue);
+            cq.where(predicate);
+
+            Query<Location> query = session.createQuery(cq);
+            List<Location> locations = query.getResultList();
+
+            return singleResult(locations);
+        }
     }
 
     /**
      * Stores location without publishing events. Used for migrating locations.
      *
      * @Override public void storeMigratedLocation(Location location) {
-     *           getHibernateTemplate().saveOrUpdate(location); }
+     *           super.mergeEntity(location); }
      */
 
     @Override
@@ -119,33 +127,37 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
                 throw new UserException(DUPLICATE_FQDN_OR_IP, location.getFqdn(), location.getAddress());
             }
             location.setCallTraffic(true);
-            getHibernateTemplate().save(location);
+            super.persistEntity(location);
         } else {
             if (location.hasFqdnOrIpChangedOnSave() && isFqdnOrIpInUseExceptThis(location)) {
                 throw new UserException(DUPLICATE_FQDN_OR_IP, location.getFqdn(), location.getAddress());
             }
-            getHibernateTemplate().merge(location);
+            super.mergeEntity(location);
         }
     }
 
     private boolean isFqdnOrIpInUseExceptThis(Location location) {
-        List count = getHibernateTemplate().findByNamedQueryAndNamedParam(
-                "anotherLocationWithSameFqdnOrIpExceptThis", new String[] {
+        List count = super.findByNamedQueryAndNamedParam(
+                "anotherLocationWithSameFqdnOrIpExceptThis", 
+                new String[] {
                     LOCATION_PROP_ID, LOCATION_PROP_NAME, LOCATION_PROP_IP
-                }, new Object[] {
+                }, 
+                new Object[] {
                     location.getId(), location.getFqdn(), location.getAddress()
-                });
+                },
+                Object.class);
 
         return intResult(count) > 0;
     }
+    
 
     @Override
     public void deleteLocation(Location location) {
         if (location.isPrimary()) {
             throw new UserException("&error.delete.primary", location.getFqdn());
         }
-        Location merge = getHibernateTemplate().merge(location);
-        getHibernateTemplate().delete(merge);
+        Location merge = super.mergeEntity(location);
+        super.removeEntity(merge);
     }
 
     @Override
@@ -197,7 +209,7 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
                 // profiles finishes
                 continue;
             }
-            getHibernateTemplate().merge(location);
+            super.mergeEntity(location);
         }
     }
 

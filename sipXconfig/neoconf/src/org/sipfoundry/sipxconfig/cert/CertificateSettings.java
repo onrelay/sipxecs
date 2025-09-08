@@ -7,6 +7,7 @@
  */
 package org.sipfoundry.sipxconfig.cert;
 
+
 import org.sipfoundry.sipxconfig.domain.Domain;
 import org.sipfoundry.sipxconfig.setting.PersistableSettings;
 import org.sipfoundry.sipxconfig.setting.Setting;

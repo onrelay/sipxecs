@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;

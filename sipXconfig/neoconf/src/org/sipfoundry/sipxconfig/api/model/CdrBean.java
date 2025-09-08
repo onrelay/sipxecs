@@ -17,8 +17,8 @@ package org.sipfoundry.sipxconfig.api.model;
 import java.text.DateFormat;
 import java.util.Date;
 
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 import org.joda.time.Period;
 import org.sipfoundry.commons.extendedcdr.ExtendedCdrBean;

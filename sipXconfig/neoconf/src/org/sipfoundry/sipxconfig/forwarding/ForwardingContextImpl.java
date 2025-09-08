@@ -18,7 +18,15 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
-import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.type.SqlTypes;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
+
 import org.sipfoundry.sipxconfig.cfgmgt.ConfigManager;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.DSTChangeEvent;
@@ -32,11 +40,7 @@ import org.sipfoundry.sipxconfig.dialplan.AttendantRule;
 import org.sipfoundry.sipxconfig.dialplan.DialPlanContext;
 import org.sipfoundry.sipxconfig.dialplan.DialingRule;
 import org.sipfoundry.sipxconfig.setting.Group;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.hibernate5.HibernateTemplate;
+
 
 /**
  * ForwardingContextImpl
@@ -61,7 +65,7 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
      * This version just assumes that CallSequence id is the same as user id. More general
      * implementation would run a query. <code>
      *      String ringsForUser = "from CallSequence cs where cs.user = :user";
-     *      hibernate.findByNamedParam(ringsForUser, "user", user);
+     *      super.findByNamedParam(ringsForUser, "user", user);
      * </code>
      *
      * @param user for which CallSequence object is retrieved
@@ -81,33 +85,31 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
 
     @Override
     public void saveCallSequence(CallSequence callSequence) {
-        getHibernateTemplate().update(callSequence);
+        super.mergeEntity(callSequence);
         m_coreContext.saveUser(callSequence.getUser());
     }
 
     @Override
     public CallSequence getCallSequenceForUserId(Integer userId) {
-        HibernateTemplate hibernate = getHibernateTemplate();
-        return hibernate.get(CallSequence.class, userId);
+        return super.findEntity(CallSequence.class, userId);
     }
 
     private void removeCallSequenceForUserId(Integer userId) {
         CallSequence callSequence = getCallSequenceForUserId(userId);
         callSequence.clear();
-        getHibernateTemplate().update(callSequence);
+        super.mergeEntity(callSequence);
         getDaoEventPublisher().publishDelete(callSequence);
-        getHibernateTemplate().flush();
+        super.flush();
     }
 
     public void removeSchedulesForUserID(Integer userId) {
         List schedules = getPersonalSchedulesForUserId(userId);
-        getHibernateTemplate().deleteAll(schedules);
+        super.removeAllEntities(schedules);
     }
 
     @Override
     public Ring getRing(Integer id) {
-        HibernateTemplate hibernate = getHibernateTemplate();
-        return hibernate.load(Ring.class, id);
+        return super.loadEntity(Ring.class, id);
     }
 
     /**
@@ -115,18 +117,27 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
      *
      * @return list of CallSequence objects
      */
+    @Transactional
     private List<CallSequence> loadAllCallSequences() {
-        List<CallSequence> callSequences = new ArrayList<CallSequence>();
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession()
-        .createSQLQuery(SQL_CALLSEQUENCE_IDS).addScalar("user_id", Hibernate.INTEGER);
-        List<Integer> ids = q.list();
-        for (Integer id : ids) {
-            CallSequence cs = getCallSequenceForUserId(id);
-            if (CollectionUtils.isNotEmpty(cs.getRings())) {
-                callSequences.add(cs);
+        
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            List<CallSequence> callSequences = new ArrayList<>();
+
+            // Native SQL query returning scalar (Integer) results
+            List<Integer> ids = session.createNativeQuery(SQL_CALLSEQUENCE_IDS, Integer.class).getResultList();
+
+            for (Integer id : ids) {
+                CallSequence cs = getCallSequenceForUserId(id);
+                if (CollectionUtils.isNotEmpty(cs.getRings())) {
+                    callSequences.add(cs);
+                }
             }
+
+            return callSequences;
         }
-        return callSequences;
     }
 
     public void setCoreContext(CoreContext coreContext) {
@@ -143,26 +154,33 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
 
     @Override
     public List<Schedule> getPersonalSchedulesForUserId(Integer userId) {
-        HibernateTemplate hibernate = getHibernateTemplate();
 
-        return (List<Schedule>)hibernate.findByNamedQueryAndNamedParam("userSchedulesForUserId", PARAM_USER_ID, userId);
+        return (List<Schedule>)super.findByNamedQueryAndNamedParam("userSchedulesForUserId", 
+            PARAM_USER_ID, 
+            userId,
+            Schedule.class);
     }
 
     public List<Ring> getRingsForScheduleId(Integer scheduleId) {
-        HibernateTemplate hibernate = getHibernateTemplate();
 
-        return (List<Ring>)hibernate.findByNamedQueryAndNamedParam("ringsForScheduleId", PARAM_SCHEDULE_ID, scheduleId);
+        return (List<Ring>)super.findByNamedQueryAndNamedParam("ringsForScheduleId", 
+            PARAM_SCHEDULE_ID, 
+            scheduleId,
+            Ring.class );
     }
 
     private List<DialingRule> getDialingRulesForScheduleId(Integer scheduleId) {
-        HibernateTemplate hibernate = getHibernateTemplate();
 
-        return (List<DialingRule>)hibernate.findByNamedQueryAndNamedParam("dialingRulesForScheduleId", PARAM_SCHEDULE_ID, scheduleId);
+        return (List<DialingRule>)super.findByNamedQueryAndNamedParam(
+            "dialingRulesForScheduleId", 
+            PARAM_SCHEDULE_ID, 
+            scheduleId,
+            DialingRule.class );
     }
 
     @Override
     public Schedule getScheduleById(Integer scheduleId) {
-        return getHibernateTemplate().load(Schedule.class, scheduleId);
+        return super.loadEntity(Schedule.class, scheduleId);
     }
 
     @Override
@@ -170,14 +188,14 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
         if (schedule.isNew()) {
             // check if new object
             checkForDuplicateNames(schedule);
-            getHibernateTemplate().save(schedule);
+            super.persistEntity(schedule);
         } else {
             // on edit action - check if the name for this schedule was modified
             // if the name was changed then perform duplicate name checking
             if (isNameChanged(schedule)) {
                 checkForDuplicateNames(schedule);
             }
-            getHibernateTemplate().merge(schedule);
+            super.mergeEntity(schedule);
             List<Ring> rings = getRingsForScheduleId(schedule.getId());
             Collection<CallSequence> css = new HashSet<CallSequence>();
             if (rings != null) {
@@ -197,38 +215,46 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
     }
 
     private boolean isNameInUse(Schedule schedule) {
-        List count = null;
+        List<Schedule> count = null;
         if (schedule instanceof UserSchedule) {
-            count = getHibernateTemplate().findByNamedQueryAndNamedParam("anotherUserScheduleWithTheSameName",
+            count = super.findByNamedQueryAndNamedParam("anotherUserScheduleWithTheSameName",
                     new String[] {
                         PARAM_USER_ID, PARAM_NAME
                     }, new Object[] {
                         schedule.getUser().getId(), schedule.getName()
-                    });
+                    },
+                    Schedule.class);
         } else if (schedule instanceof UserGroupSchedule) {
-            count = getHibernateTemplate().findByNamedQueryAndNamedParam("anotherUserGroupScheduleWithTheSameName",
+            count = super.findByNamedQueryAndNamedParam("anotherUserGroupScheduleWithTheSameName",
                     new String[] {
                         PARAM_USER_GROUP_ID, PARAM_NAME
                     }, new Object[] {
                         schedule.getUserGroup().getId(), schedule.getName()
-                    });
+                    },
+                    Schedule.class);
         } else if (schedule instanceof GeneralSchedule) {
-            count = getHibernateTemplate().findByNamedQueryAndNamedParam("anotherGeneralScheduleWithTheSameName",
-                    PARAM_NAME, schedule.getName());
+            count = super.findByNamedQueryAndNamedParam("anotherGeneralScheduleWithTheSameName",
+                    PARAM_NAME, 
+                    schedule.getName(),
+                    Schedule.class);
         } else if (schedule instanceof FeatureSchedule) {
-            count = getHibernateTemplate().findByNamedQueryAndNamedParam("anotherFeatureScheduleWithTheSameName",
-                PARAM_NAME, schedule.getName());
+            count = super.findByNamedQueryAndNamedParam("anotherFeatureScheduleWithTheSameName",
+                PARAM_NAME, 
+                schedule.getName(),
+                Schedule.class);
         }
 
         return DataAccessUtils.intResult(count) > 0;
     }
 
     private boolean isNameChanged(Schedule schedule) {
-        List<Object> count = (List<Object>)getHibernateTemplate().findByNamedQueryAndNamedParam("countScheduleWithSameName", new String[] {
+        List<Schedule> count = (List<Schedule>)super.findByNamedQueryAndNamedParam(
+            "countScheduleWithSameName", new String[] {
             PARAM_SCHEDULE_ID, PARAM_NAME
         }, new Object[] {
             schedule.getId(), schedule.getName()
-        });
+        },
+        Schedule.class);
 
         return DataAccessUtils.intResult(count) == 0;
     }
@@ -241,12 +267,12 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
             schedules.add(schedule);
             getDaoEventPublisher().publishDelete(schedule);
         }
-        getHibernateTemplate().deleteAll(schedules);
+        super.removeAllEntities(schedules);
     }
 
     @Override
     public List<UserGroupSchedule> getAllUserGroupSchedules() {
-        return getHibernateTemplate().loadAll(UserGroupSchedule.class);
+        return super.loadAllEntities(UserGroupSchedule.class);
     }
 
     @Override
@@ -262,26 +288,29 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
 
     @Override
     public List<UserGroupSchedule> getSchedulesForUserGroupId(Integer userGroupId) {
-        HibernateTemplate hibernate = getHibernateTemplate();
 
-        return (List<UserGroupSchedule>)hibernate.findByNamedQueryAndNamedParam("userSchedulesForUserGroupId", PARAM_USER_GROUP_ID,
-                userGroupId);
+        return (List<UserGroupSchedule>)super.findByNamedQueryAndNamedParam("userSchedulesForUserGroupId", 
+            PARAM_USER_GROUP_ID,
+            userGroupId,
+            UserGroupSchedule.class);
     }
 
     @Override
     public List<GeneralSchedule> getAllGeneralSchedules() {
-        return getHibernateTemplate().loadAll(GeneralSchedule.class);
+        return super.loadAllEntities(GeneralSchedule.class);
     }
 
     @Override
     public List<FeatureSchedule> getAllFeatureSchedules() {
-        return getHibernateTemplate().loadAll(FeatureSchedule.class);
+        return super.loadAllEntities(FeatureSchedule.class);
     }
 
     @Override
     public List<FeatureSchedule> getSchedulesForFeatureId(String featureId) {
-        return (List<FeatureSchedule>)getHibernateTemplate().findByNamedQueryAndNamedParam("schedulesForFeatureId", PARAM_FEATURE_ID,
-            featureId);
+        return (List<FeatureSchedule>)super.findByNamedQueryAndNamedParam("schedulesForFeatureId", 
+            PARAM_FEATURE_ID,
+            featureId,
+            FeatureSchedule.class);
     }
 
     @Override
@@ -307,8 +336,8 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
 
     @Override
     public void clearSchedules() {
-        Collection<Schedule> schedules = getHibernateTemplate().loadAll(Schedule.class);
-        getHibernateTemplate().deleteAll(schedules);
+        Collection<Schedule> schedules = super.loadAllEntities(Schedule.class);
+        super.removeAllEntities(schedules);
     }
 
     @Override
@@ -342,7 +371,7 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
                         rule.setSchedule(null);
                     }
                     for (DialingRule rule : rules) {
-                        getHibernateTemplate().saveOrUpdate(rule);
+                        super.mergeEntity(rule);
                     }
                     for (DialingRule rule : rules) {
                         if (rule instanceof AttendantRule) {
@@ -363,7 +392,7 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
                         css.add(ring.getCallSequence());
                     }
                     for (Ring ring : rings) {
-                        getHibernateTemplate().saveOrUpdate(ring);
+                        super.mergeEntity(ring);
                     }
                 }
                 notifyCommserver(css);

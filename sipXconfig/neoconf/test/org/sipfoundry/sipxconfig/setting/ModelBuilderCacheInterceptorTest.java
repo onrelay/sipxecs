@@ -12,9 +12,9 @@ package org.sipfoundry.sipxconfig.setting;
 import java.io.File;
 import java.io.Serializable;
 
+import javax.cache.Cache;
+
 import junit.framework.TestCase;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
 
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
@@ -36,20 +36,22 @@ public class ModelBuilderCacheInterceptorTest extends TestCase {
         File file2 = new File("cde");
         File file3 = new File("abc");
 
-        Element el1 = new Element(file1.getPath(), (Serializable) abc);
+        String key1 = file1.getPath();
+        String key2 = file2.getPath();
+        String key3 = file3.getPath(); // same as key1
 
         IMocksControl cacheControl = EasyMock.createControl();
-        Cache cache = cacheControl.createMock(Cache.class);
+        Cache<String, Serializable> cache = cacheControl.createMock(Cache.class);
 
-        EasyMock.expect(cache.get(file1.getPath())).andReturn(null);
-        cache.put(ElementEquals.matches("abc"));
+        EasyMock.expect(cache.get(key1)).andReturn(null);
+        cache.put(EasyMock.eq(key1), EasyMock.eq(abc));
         EasyMock.expectLastCall();
 
-        EasyMock.expect(cache.get(file2.getPath())).andReturn(null);
-        cache.put(ElementEquals.matches("cde"));
+        EasyMock.expect(cache.get(key2)).andReturn(null);
+        cache.put(EasyMock.eq(key2), EasyMock.eq(cde));
         EasyMock.expectLastCall();
 
-        EasyMock.expect(cache.get(file3.getPath())).andReturn(el1);
+        EasyMock.expect(cache.get(key3)).andReturn(abc);
 
         cacheControl.replay();
 
@@ -73,28 +75,5 @@ public class ModelBuilderCacheInterceptorTest extends TestCase {
 
         modelBuilderControl.verify();
         cacheControl.verify();
-    }
-
-    /** Match all elements with the same key */
-    private static class ElementEquals implements IArgumentMatcher {
-        public static Element matches(String key) {
-            EasyMock.reportMatcher(new ElementEquals(key));
-            return null;
-        }
-
-        private String m_key;
-
-        public ElementEquals(String key) {
-            m_key = key;
-        }
-
-        public void appendTo(StringBuffer buffer) {
-            buffer.append(m_key);
-        }
-
-        public boolean matches(Object argument) {
-            Element el = (Element) argument;
-            return el.getKey().equals(m_key);
-        }
     }
 }

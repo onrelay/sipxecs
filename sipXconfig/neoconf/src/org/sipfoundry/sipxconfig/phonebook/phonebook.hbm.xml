@@ -5,9 +5,10 @@
 
   <class name="Phonebook" table="phonebook">
     <id name="id" column="phonebook_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">phonebook_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">phonebook_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="name" />
     <property name="description" />
@@ -33,15 +34,15 @@
           join pb.consumers as pbconsumers
           join u.groups as ugroups
       where pbconsumers.id = ugroups.id and u.id = :userId]]>
-  </query>
+  </query>  
   <query name="phoneBookByName">
     <![CDATA[
       select pb from Phonebook as pb
       where pb.name = :name]]>
-  </query>
+  </query>  
   <query name="privatePhoneBookByUser">
     <![CDATA[
       select pb from Phonebook as pb
       where pb.user.id = :userId]]>
   </query>
-</hibernate-mapping>
+  </hibernate-mapping>

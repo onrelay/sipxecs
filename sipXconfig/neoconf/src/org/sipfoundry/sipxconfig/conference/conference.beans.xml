@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean name="conferenceBridge" class="org.sipfoundry.sipxconfig.conference.Bridge" scope="prototype" parent="beanWithSettings">
     <property name="localizationContext" ref="localizationContext"/>
@@ -28,7 +28,7 @@
 
   <bean id="activeConferenceContext" class="org.springframework.aop.framework.ProxyFactoryBean">
     <property name="target">
-      <ref local="activeConferenceContextImpl" />
+      <ref bean="activeConferenceContextImpl" />
     </property>
   </bean>
 

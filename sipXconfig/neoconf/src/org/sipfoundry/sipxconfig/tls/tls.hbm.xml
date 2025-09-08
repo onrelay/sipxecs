@@ -8,9 +8,10 @@
 
   <class name="TlsPeer" table="tls_peer">
     <id name="id" column="tls_peer_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">tls_peer_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">tls_peer_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="name" />
     <many-to-one name="internalUser" column="internal_user_id" class="org.sipfoundry.sipxconfig.common.InternalUser" cascade="all"/>
@@ -19,5 +20,4 @@
   <query name="tlsPeerByName">
     <![CDATA[select peer from TlsPeer peer where peer.name = :name]]>
   </query>
-
 </hibernate-mapping>

@@ -5,9 +5,10 @@
 
   <class name="PagingGroup" table="paging_group">
     <id name="id" column="paging_group_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">paging_group_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">paging_group_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="pageGroupNumber" />
     <property name="description" />
@@ -27,8 +28,7 @@
   <query name="countPagingGroupWithSameName">
     <![CDATA[select count (*) from PagingGroup pg where pg.id = :pagingGroupId and pg.pageGroupNumber = :pageGroupNumber]]>
   </query>
-
   <query name="anotherPagingGroupWithSameName">
     <![CDATA[select count (*) from PagingGroup pg where pg.pageGroupNumber = :pageGroupNumber]]>
   </query>
-</hibernate-mapping>
+  </hibernate-mapping>

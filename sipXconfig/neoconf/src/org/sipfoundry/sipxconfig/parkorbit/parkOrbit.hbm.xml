@@ -8,9 +8,10 @@
   <class name="BackgroundMusic" table="park_orbit" discriminator-value="H"
     polymorphism="explicit">
     <id name="id" column="park_orbit_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">park_orbit_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">park_orbit_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <discriminator column="orbit_type" type="character" force="true" />
     <property name="music" />
@@ -24,9 +25,10 @@
   -->
   <class name="ParkOrbit" table="park_orbit" discriminator-value="P" polymorphism="explicit">
     <id name="id" column="park_orbit_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">park_orbit_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">park_orbit_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <discriminator column="orbit_type" type="character" force="true" />
     <property name="music" />
@@ -50,13 +52,10 @@
   <query name="parkOrbitIdsWithAlias">
     <![CDATA[select orbit.id from ParkOrbit orbit where orbit.name = :value or orbit.extension = :value]]>
   </query>
-
     <query name="parkOrbitByName">
     <![CDATA[select orbit from ParkOrbit orbit where orbit.name = :value]]>
   </query>
-
   <query name="parkOrbitsByServer">
     <![CDATA[from ParkOrbit orbit where orbit.location.id = :locationId]]>
   </query>
-
 </hibernate-mapping>

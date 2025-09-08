@@ -165,7 +165,7 @@ SPRING_XML = \
 
 validate-xml : $(SPRING_XML)
 	xmllint --noout \
-	  --schema $(SIPX_DATADIR)/schema/spring-beans-2.0.xsd  \
+	  --schema $(SIPX_DATADIR)/schema/spring-beans.xsd  \
 	$^
 
 clean :

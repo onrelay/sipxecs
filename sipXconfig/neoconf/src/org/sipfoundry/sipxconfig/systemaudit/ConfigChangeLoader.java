@@ -19,6 +19,7 @@ package org.sipfoundry.sipxconfig.systemaudit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedTransferQueue;
+import java.lang.IllegalStateException;
 
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.search.SearchableBean;
@@ -31,14 +32,19 @@ public class ConfigChangeLoader {
     private FeatureManager m_featureManager;
 
     public void run() {
-        if (!m_featureManager.isFeatureEnabled(SystemAuditManager.FEATURE)) {
-            return;
-        }
-        List<SearchableBean> persistableConfigChanges = new ArrayList<SearchableBean>();
-        m_configChangeQueue.drainTo(persistableConfigChanges);
-        if (!persistableConfigChanges.isEmpty()) {
-            m_searchableService.storeBulkDocs(
-                    ConfigChangeContext.SYSTEM_AUDIT_INDEX, persistableConfigChanges);
+
+        try {
+            if (!m_featureManager.isFeatureEnabled(SystemAuditManager.FEATURE)) {
+                return;
+            }
+            List<SearchableBean> persistableConfigChanges = new ArrayList<SearchableBean>();
+            m_configChangeQueue.drainTo(persistableConfigChanges);
+            if (!persistableConfigChanges.isEmpty()) {
+                m_searchableService.storeBulkDocs(
+                        ConfigChangeContext.SYSTEM_AUDIT_INDEX, persistableConfigChanges);
+            }
+        } catch( IllegalStateException e ) {
+            // Server is not ready
         }
     }
 

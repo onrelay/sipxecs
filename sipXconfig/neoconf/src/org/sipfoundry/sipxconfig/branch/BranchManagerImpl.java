@@ -18,11 +18,15 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
+
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.DaoUtils;
 import org.sipfoundry.sipxconfig.common.Replicable;
@@ -35,8 +39,7 @@ import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setup.SetupListener;
 import org.sipfoundry.sipxconfig.setup.SetupManager;
 import org.sipfoundry.sipxconfig.time.NtpManager;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.orm.hibernate5.HibernateCallback;
+
 
 public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
         implements BranchManager, SetupListener, DaoEventListener {
@@ -56,7 +59,7 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
 
     @Override
     public Branch retrieveBranch(Integer branchId) {
-        return getHibernateTemplate().get(Branch.class, branchId);
+        return super.findEntity(Branch.class, branchId);
     }
 
     @Override
@@ -71,9 +74,9 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
             checkForDuplicateName(branch);
         }
         if (!branch.isNew()) {
-            getHibernateTemplate().merge(branch);
+            super.mergeEntity(branch);
         } else {
-            getHibernateTemplate().save(branch);
+            super.persistEntity(branch);
         }
     }
 
@@ -116,7 +119,7 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
                 sqlUpdates.add("delete from branch_branch where branch_id=" + id);
                 sqlUpdates.add("delete from branch_branch where associated_branch_id=" + id);
                 sqlUpdates.add("delete from branch where branch_id=" + id);
-                getHibernateTemplate().evict(branch);
+                super.evictEntity(branch);
             }
             if (!sqlUpdates.isEmpty()) {
                 m_jdbcTemplate.batchUpdate(sqlUpdates.toArray(new String[sqlUpdates.size()]));
@@ -125,9 +128,9 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
                 }
                 for (User user : affectedUsers) {
                     // need to reload and replicate the affected users
-                    getHibernateTemplate().refresh(user);
+                    super.refreshEntity(user);
                     for (Group group : user.getGroups()) {
-                        getHibernateTemplate().refresh(group);
+                        super.refreshEntity(group);
                     }
                     m_replicationManager.replicateEntity(user);
                 }
@@ -140,24 +143,30 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
 
     @Override
     public List<Branch> getBranches() {
-        List<Branch> branches = getHibernateTemplate().loadAll(Branch.class);
+        List<Branch> branches = super.loadAllEntities(Branch.class);
         return branches;
     }
 
+    @Transactional
     private Branch loadBranchByUniqueProperty(String propName, String propValue) {
-        final Criterion expression = Restrictions.eq(propName, propValue);
 
-        HibernateCallback<Object> callback = new HibernateCallback<>() {
-            @Override
-            public Object doInHibernate(Session session) {
-                Criteria criteria = session.createCriteria(Branch.class).add(expression);
-                return criteria.list();
-            }
-        };
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
 
-        List<Branch> branches = (List<Branch>)getHibernateTemplate().execute(callback);
-        Branch branch = (Branch) DaoUtils.requireOneOrZero(branches, expression.toString());
-        return branch;
+            Session session = sessionTransaction.getSession();
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Branch> cq = cb.createQuery(Branch.class);
+            Root<Branch> root = cq.from(Branch.class);
+
+            // Build predicate: propName = propValue
+            Predicate predicate = cb.equal(root.get(propName), propValue);
+            cq.where(predicate);
+
+            Query<Branch> query = session.createQuery(cq);
+
+            List<Branch> branches = query.getResultList();
+            return DaoUtils.requireOneOrZero(branches, predicate.toString());
+        }
     }
 
     @Override
@@ -167,18 +176,30 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
     }
 
     @Override
+    @Transactional
     public List<?> getFeatureNames(Integer branchId, String sqlQuery, Class<?> c) {
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession().createSQLQuery(sqlQuery).addEntity(c);
-        q.setInteger("branchId", branchId);
-        List<?> names = q.list();
-        return names;
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            Query<?> q = session.createNativeQuery(sqlQuery, c);
+            q.setParameter("branchId", branchId);
+            return q.getResultList();
+        }
     }
 
     @Override
-    public List< ? > getFeatureNames(String sqlQuery, Class< ? > c) {
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession().createSQLQuery(sqlQuery).addEntity(c);
-        List<?> names = q.list();
-        return names;
+    @Transactional
+    public List<?> getFeatureNames(String sqlQuery, Class<?> c) {
+        
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            Query<?> q = session.createNativeQuery(sqlQuery, c);
+            return q.getResultList();
+        }
     }
 
     @Override

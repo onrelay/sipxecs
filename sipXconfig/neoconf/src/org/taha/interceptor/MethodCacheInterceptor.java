@@ -18,8 +18,7 @@ package org.taha.interceptor;
 
 import java.io.Serializable;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
+import javax.cache.Cache;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -29,82 +28,85 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * @author <a href="mailto:irbouh@gmail.com">Omar Irbouh</a>
- * @since 2004.10.07
+ * JSR-107 compatible Method Cache Interceptor
+ * Originally by Omar Irbouh (irbouh@gmail.com)
  */
 public class MethodCacheInterceptor implements MethodInterceptor, InitializingBean {
     private static final Log logger = LogFactory.getLog(MethodCacheInterceptor.class);
 
-    private Cache cache;
+    private Cache<String, Serializable> cache;
 
     /**
-     * sets cache name to be used
+     * Set the JCache (javax.cache) cache to be used.
      */
-    public void setCache(Cache cache_) {
-        this.cache = cache_;
+    public void setCache(Cache<String, Serializable> cache) {
+        this.cache = cache;
     }
 
     /**
-     * Checks if required attributes are provided.
+     * Validates that a cache has been injected.
      */
-    public void afterPropertiesSet() throws Exception {
+    @Override
+    public void afterPropertiesSet() {
         Assert.notNull(cache, "A cache is required. Use setCache(Cache) to provide one.");
     }
 
     /**
-     * main method caches method result if method is configured for caching method results must be
-     * serializable
+     * Intercepts method execution and caches the result.
      */
+    @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         String targetName = invocation.getThis().getClass().getName();
         String methodName = invocation.getMethod().getName();
         Object[] arguments = invocation.getArguments();
-        Object result;
 
-        logger.debug("looking for method result in cache");
+        logger.debug("Looking for method result in cache");
         String cacheKey = getCacheKey(targetName, methodName, arguments);
-        Element element = cache.get(cacheKey);
-        if (element == null) {
-            // call target/sub-interceptor
-            logger.debug("calling intercepted method");
-            result = invocation.proceed();
+        Serializable result = cache.get(cacheKey);
 
-            // cache method result
-            logger.debug("caching result");
-            element = new Element(cacheKey, (Serializable) result);
-            cache.put(element);
+        if (result == null) {
+            logger.debug("Calling intercepted method");
+            Object invocationResult = invocation.proceed();
+
+            if (!(invocationResult instanceof Serializable)) {
+                throw new IllegalArgumentException("Cached result must be Serializable: " + invocationResult);
+            }
+
+            logger.debug("Caching result");
+            result = (Serializable) invocationResult;
+            cache.put(cacheKey, result);
         }
-        return element.getValue();
+
+        return result;
     }
 
     /**
-     * creates cache key: targetName.methodName.argument0.argument1...
+     * Builds cache key: targetName.methodName.argument0.argument1...
      */
     private String getCacheKey(String targetName, String methodName, Object[] arguments) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(targetName).append(".").append(methodName);
-        if ((arguments != null) && (arguments.length != 0)) {
-            for (int i = 0; i < arguments.length; i++) {
-                sb.append(".").append(getCacheKey(arguments[i]));
+        StringBuilder sb = new StringBuilder();
+        sb.append(targetName).append('.').append(methodName);
+        if (arguments != null && arguments.length > 0) {
+            for (Object arg : arguments) {
+                sb.append('.').append(getCacheKey(arg));
             }
         }
-
         return sb.toString();
     }
 
+    /**
+     * Recursively builds key string from objects or arrays.
+     */
     public static String getCacheKey(Object o) {
         if (o == null) {
-            return "";
+            return "null";
         }
 
-        // TODO Collections
-
-        if (Object[].class.isAssignableFrom(o.getClass())) {
-            Object[] a = (Object[]) o;
-            StringBuffer sb = new StringBuffer();
+        if (o instanceof Object[]) {
+            StringBuilder sb = new StringBuilder();
             sb.append('[');
-            for (int i = 0; i < a.length; i++) {
-                sb.append(getCacheKey(a[i])).append(',');
+            for (Object item : (Object[]) o) {
+                sb.append(getCacheKey(item)).append(',');
             }
             sb.append(']');
             return sb.toString();

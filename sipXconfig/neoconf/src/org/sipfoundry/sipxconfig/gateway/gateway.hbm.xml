@@ -7,9 +7,10 @@
   -->
   <class name="Gateway" table="gateway" discriminator-value="gwGeneric">
     <id name="id" column="gateway_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">gateway_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">gateway_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <discriminator column="bean_id" />
     <property name="name" />
@@ -55,9 +56,10 @@
   <!-- L I N E -->
   <class name="FxoPort" table="fxo_port">
     <id name="id" column="fxo_port_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">fxo_port_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">fxo_port_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <many-to-one name="gateway" column="gateway_id" class="Gateway" not-null="true" insert="false"
       update="false" foreign-key="fk_fxo_port_gateway" />
@@ -68,15 +70,12 @@
   <query name="gatewayIds">
     <![CDATA[select g.id from Gateway g]]>
   </query>
-
   <query name="gatewayIdsWithSerialNumber">
-    <![CDATA[select g.id from Gateway g where g.serialNumber = :value]]>
+   <![CDATA[select g.id from Gateway g where g.serialNumber = :value]]>
   </query>
-
   <query name="gatewaysForBranch">
     <![CDATA[from Gateway g where g.branch = :branch]]>
   </query>
-
   <sql-query name="sipTrunks">
     <return-scalar type="int" column="id" />
     <return-scalar type="string" column="address" />

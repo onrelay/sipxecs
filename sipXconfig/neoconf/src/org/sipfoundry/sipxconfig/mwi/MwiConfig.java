@@ -109,7 +109,7 @@ public class MwiConfig implements ConfigProvider {
         }
         context.put("mwiUrl", ivrApi.toString() + "/mwi");
         try {
-            m_velocityEngine.mergeTemplate("sipxstatus/status-plugin.vm", context, wtr);
+            m_velocityEngine.mergeTemplate("sipxstatus/status-plugin.vm", "UTF-8", context, wtr);
         } catch (Exception e) {
             throw new IOException(e);
         }

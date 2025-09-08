@@ -7,9 +7,10 @@
   -->
   <class name="Ring" table="ring">
     <id name="id" column="ring_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">ring_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">ring_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="number" />
     <property name="expiration" />
@@ -27,7 +28,8 @@
     <id name="id" column="user_id" type="int" unsaved-value="-1">
       <generator class="foreign">
         <param name="property">user</param>
-      </generator>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <one-to-one name="user" class="org.sipfoundry.sipxconfig.common.User" constrained="true" />
     <list name="rings" cascade="all-delete-orphan">
@@ -37,22 +39,30 @@
     </list>
   </class>
 
-  <class name="Schedule" table="schedule" abstract="true" discriminator-value="S">
+  <class name="Schedule" table="schedule" abstract="true" discriminator-value="X" >
     <id name="id" column="schedule_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">schedule_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">schedule_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <discriminator column="schedule_type" type="character" />
     <property name="name" />
     <property name="description" />
-    <component name="workingTime" class="org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime">
-      <array name="workingHours" table="schedule_hours" batch-size="7">
-        <key column="schedule_id" foreign-key="fk_schedule_hours_schedule" />
-        <list-index column="schedule_hours_id" />
-        <composite-element class="org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTime$WorkingHours">
+    <component name="workingTimeAttendant" class="org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant">
+      <many-to-one name="attendant" column="working_time_attendant_id" class="org.sipfoundry.sipxconfig.dialplan.AutoAttendant"
+          cascade="none" foreign-key="fk_attendant_working_hours_attendant_dialing_rule" />
+      <property name="enabled" column="working_time_attendant_enabled" />
+      <array name="workingHours" 
+            table="attendant_working_hours" 
+            batch-size="7">
+        <key column="attendant_dialing_rule_id"
+            foreign-key="fk_attendant_working_hours_attendant_dialing_rule" />
+        <index column="index" />
+        <composite-element class="org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours">
           <property name="start" type="org.sipfoundry.sipxconfig.common.UtcTimestampType" />
-          <property name="stop" type="org.sipfoundry.sipxconfig.common.UtcTimestampType" />
+          <property name="stop"  type="org.sipfoundry.sipxconfig.common.UtcTimestampType" />
+          <property name="enabled" />
           <property name="day" type="org.sipfoundry.sipxconfig.common.ScheduledDay$UserType" />
         </composite-element>
       </array>
@@ -75,38 +85,31 @@
   </class>
 
   <query name="userSchedulesForUserId">
-    <![CDATA[from UserSchedule schedule where schedule.user.id = :userId order by schedule.name]]>
+      <![CDATA[from UserSchedule schedule where schedule.user.id = :userId order by schedule.name]]>
   </query>
-
   <query name="userSchedulesForUserGroupId">
     <![CDATA[from UserGroupSchedule schedule where schedule.userGroup.id = :userGroupId order by schedule.name]]>
   </query>
-
   <query name="ringsForScheduleId">
     <![CDATA[from Ring ring where ring.schedule.id = :scheduleId]]>
   </query>
-
   <query name="schedulesForFeatureId">
     <![CDATA[from FeatureSchedule schedule where schedule.featureId = :featureId order by schedule.name]]>
   </query>
-
   <query name="countScheduleWithSameName">
     <![CDATA[select count (*) from Schedule sch where sch.id = :scheduleId and sch.name = :name]]>
   </query>
-
   <query name="anotherUserScheduleWithTheSameName">
     <![CDATA[select count (*) from UserSchedule sch where sch.user.id = :userId and sch.name = :name]]>
   </query>
-
   <query name="anotherUserGroupScheduleWithTheSameName">
     <![CDATA[select count (*) from UserGroupSchedule sch where sch.userGroup.id = :userGroupId and sch.name = :name]]>
   </query>
-
   <query name="anotherGeneralScheduleWithTheSameName">
     <![CDATA[select count (*) from GeneralSchedule sch where sch.name = :name]]>
   </query>
-
   <query name="anotherFeatureScheduleWithTheSameName">
     <![CDATA[select count (*) from FeatureSchedule sch where sch.name = :name]]>
   </query>
-</hibernate-mapping>
+  
+  </hibernate-mapping>

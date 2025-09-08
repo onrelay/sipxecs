@@ -9,13 +9,13 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
+import org.hibernate.Session;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.Transformer;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 
 /**
  * BeanWithId - simplify implementation of the model layer
@@ -135,16 +135,21 @@ public class BeanWithId implements PrimaryKeySource, Cloneable {
     }
 
     public static final class IdToBean implements Transformer {
-        private final HibernateTemplate m_template;
-        private final Class m_klass;
+        private final Session m_session;
+        private final Class<?> m_klass;
 
-        public IdToBean(HibernateTemplate template, Class klass) {
-            m_template = template;
-            m_klass = klass;
+        public IdToBean(Session session, Class<?> klass) {
+            this.m_session = session;
+            this.m_klass = klass;
         }
 
+        @Override
         public Object transform(Object input) {
-            return m_template.load(m_klass, (Serializable) input);
+            Object entity = m_session.find(m_klass, (Serializable) input);
+            if (entity == null) {
+                throw new RuntimeException("Entity not found: " + input);
+            }
+            return entity;        
         }
     }
 

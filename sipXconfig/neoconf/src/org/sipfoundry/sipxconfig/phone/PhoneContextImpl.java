@@ -22,16 +22,29 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Query;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Subquery;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.transaction.annotation.Transactional;
+
 import org.sipfoundry.commons.util.ShortHash;
 import org.sipfoundry.sipxconfig.alarm.AlarmDefinition;
 import org.sipfoundry.sipxconfig.alarm.AlarmProvider;
@@ -58,14 +71,6 @@ import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.setting.SettingDao;
 import org.sipfoundry.sipxconfig.speeddial.SpeedDial;
 import org.sipfoundry.sipxconfig.speeddial.SpeedDialManager;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.orm.hibernate5.HibernateTemplate;
 
 /**
  * Context for entire sipXconfig framework. Holder for service layer bean factories.
@@ -162,32 +167,34 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
         m_beanFactory = beanFactory;
     }
 
-    @Override
-    public void flush() {
-        getHibernateTemplate().flush();
-    }
 
     @Override
+    @Transactional
     public void storePhone(Phone phone) {
-        boolean isNew;
-        HibernateTemplate hibernate = getHibernateTemplate();
-        String serialNumber = phone.getSerialNumber();
-        if (!phone.getModel().isSerialNumberValid(serialNumber)) {
-            throw new InvalidSerialNumberException(serialNumber, phone.getModel().getSerialNumberPattern());
-        }
-        DaoUtils.checkDuplicatesByNamedQuery(hibernate, phone, QUERY_PHONE_ID_BY_SERIAL_NUMBER, serialNumber,
-                new DuplicateSerialNumberException(serialNumber));
 
-        phone.setValueStorage(clearUnsavedValueStorage(phone.getValueStorage()));
-        isNew = phone.isNew();
-        if (isNew) {
-            hibernate.save(phone);
-            LOG.error(String.format(ALARM_PHONE_ADDED, phone.getSerialNumber()));
-        } else {
-            hibernate.merge(phone);
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            boolean isNew;
+            String serialNumber = phone.getSerialNumber();
+            if (!phone.getModel().isSerialNumberValid(serialNumber)) {
+                throw new InvalidSerialNumberException(serialNumber, phone.getModel().getSerialNumberPattern());
+            }
+            DaoUtils.checkDuplicatesByNamedQuery(session, phone, QUERY_PHONE_ID_BY_SERIAL_NUMBER, serialNumber,
+                    new DuplicateSerialNumberException(serialNumber));
+
+            phone.setValueStorage(clearUnsavedValueStorage(phone.getValueStorage()));
+            isNew = phone.isNew();
+            if (isNew) {
+                super.persistEntity(phone);
+                LOG.error(String.format(ALARM_PHONE_ADDED, phone.getSerialNumber()));
+            } else {
+                super.mergeEntity(phone);
+            }
+            super.flush();
+            getDaoEventPublisher().publishSave(phone);
         }
-        flush();
-        getDaoEventPublisher().publishSave(phone);
     }
 
     @Override
@@ -198,7 +205,7 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
         for (Line line : phone.getLines()) {
             line.setValueStorage(clearUnsavedValueStorage(line.getValueStorage()));
         }
-        getHibernateTemplate().delete(phone);
+        super.removeEntity(phone);
         LOG.error(String.format(ALARM_PHONE_DELETED, phone.getId(), phone.getSerialNumber()));
     }
 
@@ -206,9 +213,9 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
     public void storeLine(Line line) {
         line.setValueStorage(clearUnsavedValueStorage(line.getValueStorage()));
         if (line.isNew()) {
-            getHibernateTemplate().save(line);
+            super.persistEntity(line);
         } else {
-            getHibernateTemplate().merge(line);
+            super.mergeEntity(line);
         }
         getDaoEventPublisher().publishSave(line);
     }
@@ -216,12 +223,12 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
     @Override
     public void deleteLine(Line line) {
         line.setValueStorage(clearUnsavedValueStorage(line.getValueStorage()));
-        getHibernateTemplate().delete(line);
+        super.removeEntity(line);
     }
 
     @Override
     public Line loadLine(Integer id) {
-        Line line = getHibernateTemplate().load(Line.class, id);
+        Line line = super.loadEntity(Line.class, id);
         return line;
     }
 
@@ -248,17 +255,17 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
 
     @Override
     public List<Phone> loadPhones() {
-        return getHibernateTemplate().loadAll(Phone.class);
+        return super.loadAllEntities(Phone.class);
     }
 
     @Override
     public List<Integer> getAllPhoneIds() {
-        return (List<Integer>)getHibernateTemplate().findByNamedQuery("phoneIds");
+        return (List<Integer>)super.findByNamedQuery("phoneIds", Integer.class);
     }
 
     @Override
     public Phone loadPhone(Integer id) {
-        Phone phone = getHibernateTemplate().load(Phone.class, id);
+        Phone phone = super.loadEntity(Phone.class, id);
         return phone;
     }
 
@@ -269,15 +276,21 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
 
     @Override
     public Integer getPhoneIdBySerialNumber(String serialNumber) {
-        List<Integer> objs = (List<Integer>)getHibernateTemplate().findByNamedQueryAndNamedParam(QUERY_PHONE_ID_BY_SERIAL_NUMBER, VALUE,
-                serialNumber);
+        List<Integer> objs = (List<Integer>)super.findByNamedQueryAndNamedParam(
+            QUERY_PHONE_ID_BY_SERIAL_NUMBER, 
+            VALUE,
+            serialNumber,
+            Integer.class );
         return (Integer) DaoUtils.requireOneOrZero(objs, QUERY_PHONE_ID_BY_SERIAL_NUMBER);
     }
 
     @Override
     public Phone getPhoneBySerialNumber(String serialNumber) {
-        List<Phone> objs = (List<Phone>)getHibernateTemplate().findByNamedQueryAndNamedParam(QUERY_PHONE_BY_SERIAL_NUMBER, VALUE,
-                serialNumber);
+        List<Phone> objs = (List<Phone>)super.findByNamedQueryAndNamedParam(
+            QUERY_PHONE_BY_SERIAL_NUMBER, 
+            VALUE,
+            serialNumber,
+            Phone.class);
         return DaoUtils.requireOneOrZero(objs, QUERY_PHONE_BY_SERIAL_NUMBER);
     }
 
@@ -321,8 +334,8 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
     }
 
     private void deleteAll(String query) {
-        Collection<Object> c = (Collection<Object>)getHibernateTemplate().find(query);
-        getHibernateTemplate().deleteAll(c);
+        Collection<Object> c = (Collection<Object>)super.find(query, Object.class);
+        super.removeAllEntities(c);
     }
 
     @Override
@@ -364,15 +377,21 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
 
     @Override
     public Collection<Phone> getPhonesByGroupId(Integer groupId) {
-        Collection<Phone> phones = (Collection<Phone>)getHibernateTemplate().findByNamedQueryAndNamedParam("phonesByGroupId",
-                "groupId", groupId);
+        Collection<Phone> phones = (Collection<Phone>)super.findByNamedQueryAndNamedParam(
+            "phonesByGroupId",
+            "groupId", 
+            groupId,
+            Phone.class);
         return phones;
     }
 
     @Override
     public Collection<Phone> getPhonesByGroupName(String groupName) {
-        Collection<Phone> phones = (Collection<Phone>)getHibernateTemplate().findByNamedQueryAndNamedParam("phonesByGroupName",
-            "groupName", groupName);
+        Collection<Phone> phones = (Collection<Phone>)super.findByNamedQueryAndNamedParam(
+            "phonesByGroupName",
+            "groupName", 
+            groupName,
+            Phone.class);
         return phones;
     }
 
@@ -470,12 +489,20 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
 
     @Override
     public Collection<Phone> getPhonesByUserId(Integer userId) {
-        return (Collection<Phone>)getHibernateTemplate().findByNamedQueryAndNamedParam("phonesByUserId", USER_ID, userId);
+        return (Collection<Phone>)super.findByNamedQueryAndNamedParam(
+            "phonesByUserId", 
+            USER_ID, 
+            userId,
+            Phone.class);
     }
 
     @Override
     public Collection<Phone> getPhonesByUserName(String userName) {
-        return (Collection<Phone>)getHibernateTemplate().findByNamedQueryAndNamedParam("phonesByUserName", USER_NAME, userName);
+        return (Collection<Phone>)super.findByNamedQueryAndNamedParam(
+            "phonesByUserName", 
+            USER_NAME, 
+            userName,
+            Phone.class);
     }
 
     @Override
@@ -486,19 +513,36 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
         Object[] paramsValues = {
             userId, modelId
         };
-        Collection<Phone> phones = (Collection<Phone>)getHibernateTemplate().findByNamedQueryAndNamedParam(
-                "phonesByUserIdAndPhoneModel", paramsNames, paramsValues);
+        Collection<Phone> phones = (Collection<Phone>)super.findByNamedQueryAndNamedParam(
+                "phonesByUserIdAndPhoneModel", 
+                paramsNames, 
+                paramsValues,
+                Phone.class);
         return phones;
     }
 
     @Override
+    @Transactional
     public void addToGroup(Integer groupId, Collection<Integer> ids) {
-        DaoUtils.addToGroup(getHibernateTemplate(), getDaoEventPublisher(), groupId, Phone.class, ids);
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            DaoUtils.addToGroup(session, getDaoEventPublisher(), groupId, Phone.class, ids);
+        }
     }
 
     @Override
+    @Transactional
     public void removeFromGroup(Integer groupId, Collection<Integer> ids) {
-        DaoUtils.removeFromGroup(getHibernateTemplate(), getDaoEventPublisher(), groupId, Phone.class, ids);
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            DaoUtils.removeFromGroup(session, getDaoEventPublisher(), groupId, Phone.class, ids);
+        }
     }
 
     @Override
@@ -529,8 +573,7 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
     }
 
     private Collection<PhonebookEntry> filterPhonebookEntries(Collection<PhonebookEntry> entries) {
-        Collection<PhonebookEntry> entriesToRemove = select(entries, new InvalidGoogleEntrySearchPredicate());
-        entries.removeAll(entriesToRemove);
+        entries.removeIf(new InvalidGoogleEntrySearchPredicate());
         return entries;
     }
 
@@ -584,82 +627,139 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
     }
 
     @Override
-    public List<Phone> loadPhonesWithNoLinesByPage(int firstRow, int pageSize, String[] orderBy,
-            boolean orderAscending) {
-        DetachedCriteria c = DetachedCriteria.forClass(Phone.class);
-        addByNoLinesCriteria(c);
-        if (orderBy != null) {
-            for (String o : orderBy) {
-                Order order = orderAscending ? Order.asc(o) : Order.desc(o);
-                c.addOrder(order);
+    @Transactional
+    public List<Phone> loadPhonesWithNoLinesByPage(int firstRow, int pageSize, String[] orderBy, boolean orderAscending) {
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Phone> cq = cb.createQuery(Phone.class);
+            Root<Phone> root = cq.from(Phone.class);
+
+            // addByNoLinesCriteria equivalent:
+            // lines collection is empty
+            // JPA does not have direct isEmpty on collection join, so we do a subquery NOT EXISTS
+            Subquery<Long> subquery = cq.subquery(Long.class);
+            Root<Phone> subRoot = subquery.from(Phone.class);
+            Join<Object, Object> linesJoin = subRoot.join(LINES, JoinType.LEFT);
+            subquery.select(cb.count(linesJoin));
+            subquery.where(cb.equal(subRoot, root));
+
+            Predicate noLinesPredicate = cb.equal(subquery, 0L);
+            cq.where(noLinesPredicate);
+
+            // ordering
+            if (orderBy != null && orderBy.length > 0) {
+                List<Order> orders = new ArrayList<>();
+                for (String prop : orderBy) {
+                    orders.add(orderAscending ? cb.asc(root.get(prop)) : cb.desc(root.get(prop)));
+                }
+                cq.orderBy(orders);
             }
+
+            Query<Phone> query = session.createQuery(cq);
+            query.setFirstResult(firstRow);
+            query.setMaxResults(pageSize);
+
+            return query.getResultList();
         }
-        return (List<Phone>)getHibernateTemplate().findByCriteria(c, firstRow, pageSize);
     }
 
-    @Override
+    @Transactional
     public int getPhonesWithNoLinesCount() {
-        DetachedCriteria crit = DetachedCriteria.forClass(Phone.class);
-        addByNoLinesCriteria(crit);
-        crit.setProjection(Projections.rowCount());
-        List results = getHibernateTemplate().findByCriteria(crit);
-        return ((Long) DataAccessUtils.requiredSingleResult(results)).intValue();
-    }
 
-    @Override
-    public List<Phone> getPhonesWithLinesLike(String value) {
-        DetachedCriteria crit = DetachedCriteria.forClass(Phone.class);
-        addByFilteredInternalLinesCriteria(crit, value);
-        List<Phone> phones = (List<Phone>)getHibernateTemplate().findByCriteria(crit);
-        crit = DetachedCriteria.forClass(Phone.class);
-        addByExternalLinesCriteria(crit);
-        List<Phone> extLinePhones = (List<Phone>)getHibernateTemplate().findByCriteria(crit);
-        List<Phone> phonesToRemove = new ArrayList<Phone>();
-        for (Phone phone : extLinePhones) {
-            boolean remove = true;
-            for (Line line : phone.getLines()) {
-                if (StringUtils.contains(line.getDisplayLabel(), value)) {
-                    remove = false;
-                }
-                if (!remove) {
-                    break;
-                }
-            }
-            if (remove) {
-                phonesToRemove.add(phone);
-            }
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+            Root<Phone> root = cq.from(Phone.class);
+
+            // no lines subquery same as above
+            Subquery<Long> subquery = cq.subquery(Long.class);
+            Root<Phone> subRoot = subquery.from(Phone.class);
+            Join<Object, Object> linesJoin = subRoot.join(LINES, JoinType.LEFT);
+            subquery.select(cb.count(linesJoin));
+            subquery.where(cb.equal(subRoot, root));
+
+            Predicate noLinesPredicate = cb.equal(subquery, 0L);
+
+            cq.select(cb.count(root)).where(noLinesPredicate);
+
+            Long count = session.createQuery(cq).getSingleResult();
+            return count.intValue();
         }
-        extLinePhones.removeAll(phonesToRemove);
-        phones.addAll(extLinePhones);
-        return phones;
     }
 
-    public static void addByNoLinesCriteria(DetachedCriteria crit) {
-        crit.add(Restrictions.isEmpty(LINES));
+    @Transactional
+    public List<Phone> getPhonesWithLinesLike(String value) {
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+
+            // First query: internal lines with user.userName like %value%
+            CriteriaQuery<Phone> cqInternal = cb.createQuery(Phone.class);
+            Root<Phone> rootInternal = cqInternal.from(Phone.class);
+
+            Join<Object, Object> linesJoinInternal = rootInternal.join(LINES);
+            Join<Object, Object> userJoin = linesJoinInternal.join(FIELD_USER);
+
+            String pattern = "%" + value + "%";
+            Predicate userNameLike = cb.like(userJoin.get("userName"), pattern);
+
+            cqInternal.select(rootInternal).distinct(true).where(userNameLike);
+            List<Phone> internalPhones = session.createQuery(cqInternal).getResultList();
+
+            // Second query: phones with external lines (lines.user is null)
+            CriteriaQuery<Phone> cqExternal = cb.createQuery(Phone.class);
+            Root<Phone> rootExternal = cqExternal.from(Phone.class);
+            Join<Object, Object> linesJoinExternal = rootExternal.join(LINES);
+
+            Predicate userIsNull = cb.isNull(linesJoinExternal.get(FIELD_USER));
+            cqExternal.select(rootExternal).distinct(true).where(userIsNull);
+
+            List<Phone> externalPhones = session.createQuery(cqExternal).getResultList();
+
+            // Filter externalPhones to keep only those with any line's displayLabel containing value
+            List<Phone> filteredExternalPhones = new ArrayList<>();
+            for (Phone phone : externalPhones) {
+                boolean matches = phone.getLines().stream()
+                    .anyMatch(line -> line.getDisplayLabel() != null && line.getDisplayLabel().contains(value));
+                if (matches) {
+                    filteredExternalPhones.add(phone);
+                }
+            }
+
+            // Combine and return
+            internalPhones.addAll(filteredExternalPhones);
+            return internalPhones;
+        }
+
     }
 
-    public static void addByFilteredInternalLinesCriteria(DetachedCriteria crit, String value) {
-        String sqlValue = new StringBuilder(PERCENT).append(value).append(PERCENT).toString();
-        crit.createCriteria(LINES).
-            createAlias(FIELD_USER, FIELD_USER).
-            add(Restrictions.like("user.userName", sqlValue));
+    public static Predicate addByExternalLinesPredicate(Root<Phone> root, CriteriaBuilder cb) {
+        // Join the lines collection on Phone
+        Join<Phone, Line> linesJoin = root.join(LINES);
+        // Return the predicate lines.user IS NULL
+        return cb.isNull(linesJoin.get(FIELD_USER));
     }
 
-    public static void addByExternalLinesCriteria(DetachedCriteria crit) {
-        crit.createCriteria(LINES).add(Restrictions.isNull(FIELD_USER));
-    }
-
-    static class InvalidGoogleEntrySearchPredicate implements Predicate {
-
+    static class InvalidGoogleEntrySearchPredicate implements java.util.function.Predicate<PhonebookEntry> {
         @Override
-        public boolean evaluate(Object phonebookEntry) {
-            if (phonebookEntry instanceof GooglePhonebookEntry) {
-                GooglePhonebookEntry entry = (GooglePhonebookEntry) phonebookEntry;
-                return ((isEmpty(entry.getFirstName()) && isEmpty(entry.getLastName())) || isEmpty(entry.getNumber()));
+        public boolean test(PhonebookEntry entry) {
+            if (entry instanceof GooglePhonebookEntry) {
+                GooglePhonebookEntry gEntry = (GooglePhonebookEntry) entry;
+                return (isEmpty(gEntry.getFirstName()) && isEmpty(gEntry.getLastName()))
+                    || isEmpty(gEntry.getNumber());
             }
             return false;
         }
-
     }
 
     @Override
@@ -680,17 +780,31 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
         }
     }
 
+    @Transactional
     private int getPhoneGroupWeight(int phoneId) {
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession()
-            .createSQLQuery(String.format(SQL_PHONE_GROUP_WEIGHT, phoneId));
-        return q.list().size() > 0 ? (Integer) q.uniqueResult() : 0;
 
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            org.hibernate.query.NativeQuery<?> q = session.createNativeQuery(SQL_PHONE_GROUP_WEIGHT);
+            q.setParameter("phoneId", phoneId);
+            Number result = (Number) q.uniqueResult();
+            return result != null ? result.intValue() : 0;
+        }
     }
 
+    @Transactional
     private int getGroupWeight(int groupId) {
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession()
-            .createSQLQuery(String.format(SQL_GROUP_WEIGHT, groupId));
-        return q.list().size() > 0 ? (Integer) q.uniqueResult() : 0;
 
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            org.hibernate.query.NativeQuery<?> q = session.createNativeQuery(SQL_GROUP_WEIGHT);
+            q.setParameter("groupId", groupId);
+            Number result = (Number) q.uniqueResult();
+            return result != null ? result.intValue() : 0;
+        }
     }
 }

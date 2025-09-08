@@ -25,6 +25,10 @@ public class ApibanApiImpl implements ApibanApi {
         }        
     }
 
+    public BannedApi getBannedApi() {
+        return m_bannedApi;
+    }
+
     public void setBannedApi(BannedApi bannedApi) {
         m_bannedApi = bannedApi;
     }       

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="callGroupContextImpl" class="org.sipfoundry.sipxconfig.callgroup.CallGroupContextImpl" parent="abstractDaoImpl">
     <property name="coreContext" ref="coreContextImpl" />
@@ -11,7 +11,7 @@
   <bean id="callGroupContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.callgroup.CallGroupContext" />
     <property name="target">
-      <ref local="callGroupContextImpl" />
+      <ref bean="callGroupContextImpl" />
     </property>
   </bean>
 

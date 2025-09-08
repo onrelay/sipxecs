@@ -7,6 +7,7 @@
 	</configSuffixes>
 	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
+		<config>src/org/sipfoundry/sipxconfig/system.beans.xml</config>
 		<config>src/org/sipfoundry/sipxconfig/phone/phone.beans.xml</config>
 		<config>src/org/sipfoundry/sipxconfig/bulk/csv/csv.beans.xml</config>
 		<config>src/org/sipfoundry/sipxconfig/setting/setting.beans.xml</config>
@@ -19,7 +20,6 @@
 		<config>src/org/sipfoundry/sipxconfig/gateway/gateway.beans.xml</config>
 		<config>src/org/sipfoundry/sipxconfig/phone/acme/acme-models.beans.xml</config>
 		<config>src/org/sipfoundry/sipxconfig/permission/permission.beans.xml</config>
-		<config>src/org/sipfoundry/sipxconfig/system.beans.xml</config>
 		<config>src/org/sipfoundry/sipxconfig/vm/vm.beans.xml</config>
 		<config>src/org/sipfoundry/sipxconfig/acd/acd.beans.xml</config>
 		<config>src/org/sipfoundry/sipxconfig/alias/alias.beans.xml</config>
@@ -47,6 +47,7 @@
 			<allowBeanDefinitionOverriding>false</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/org/sipfoundry/sipxconfig/system.beans.xml</config>
 				<config>src/org/sipfoundry/sipxconfig/acd/acd.beans.xml</config>
 				<config>src/org/sipfoundry/sipxconfig/alias/alias.beans.xml</config>
 				<config>src/org/sipfoundry/sipxconfig/bulk/bulk.beans.xml</config>
@@ -58,7 +59,6 @@
 				<config>src/org/sipfoundry/sipxconfig/phone/phone.beans.xml</config>
 				<config>src/org/sipfoundry/sipxconfig/search/search.beans.xml</config>
 				<config>src/org/sipfoundry/sipxconfig/setting/setting.beans.xml</config>
-				<config>src/org/sipfoundry/sipxconfig/system.beans.xml</config>
 				<config>src/org/sipfoundry/sipxconfig/upload/upload.beans.xml</config>
 				<config>src/org/sipfoundry/sipxconfig/device/device.beans.xml</config>
 				<config>src/org/sipfoundry/sipxconfig/bulk/ldap/ldap.beans.xml</config>

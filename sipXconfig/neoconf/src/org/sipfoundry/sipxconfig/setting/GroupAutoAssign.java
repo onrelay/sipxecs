@@ -27,7 +27,7 @@ import org.sipfoundry.sipxconfig.conference.Conference;
 import org.sipfoundry.sipxconfig.conference.ConferenceBridgeContext;
 import org.sipfoundry.sipxconfig.vm.MailboxManager;
 import org.sipfoundry.sipxconfig.vm.MailboxPreferences;
-import org.springframework.orm.hibernate5.HibernateObjectRetrievalFailureException;
+import org.springframework.orm.ObjectRetrievalFailureException;
 
 public class GroupAutoAssign {
 
@@ -155,7 +155,7 @@ public class GroupAutoAssign {
         Bridge bridge = null;
         try {
             bridge = m_bridgeContext.loadBridge(bridgeId);
-        } catch (HibernateObjectRetrievalFailureException horfe) {
+        } catch (ObjectRetrievalFailureException horfe) {
             LOG.warn(String.format("Unable to create a conference for new user %s; the user group \"%s\" "
                     + "references a non-existent conference bridge ID: %d", user.getUserName(), conferenceGroup
                     .getName(), bridgeId));

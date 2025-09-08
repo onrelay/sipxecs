@@ -26,12 +26,14 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
-import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.query.Query;
+import org.hibernate.query.NativeQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.sipfoundry.commons.diddb.Did;
 import org.sipfoundry.commons.diddb.DidService;
 import org.sipfoundry.commons.userdb.profile.Address;
@@ -55,7 +57,8 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.orm.hibernate5.HibernateCallback;
+import org.springframework.transaction.annotation.Transactional;
+
 
 public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> implements CoreContext,
        ApplicationContextAware, SetupListener {
@@ -110,6 +113,8 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     private static final String FIRST = "first";
     private static final String PAGE_SIZE = "pageSize";
     private static final String USER_ID = "user_id";
+    private static final String BRANCH_ID = "branchId";
+    private static final String USERNAME = "username";
 
     private DomainManager m_domainManager;
     private SettingDao m_settingDao;
@@ -224,9 +229,9 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             user.getUserProfile().setBranchAddress(new Address());
         }
         if (user.isNew()) {
-            getHibernateTemplate().save(user);
+            super.persistEntity(user);
         } else {
-            getHibernateTemplate().merge(user);
+            super.mergeEntity(user);
         }
         return newUserName;
     }
@@ -271,7 +276,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public void deleteUser(User user) {
-        getHibernateTemplate().delete(user);
+        super.removeEntity(user);
     }
 
     @Override
@@ -293,7 +298,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             }
         }
         getDaoEventPublisher().publishDeleteCollection(users);
-        getHibernateTemplate().deleteAll(users);
+        super.removeAllEntities(users);
         getDaoEventPublisher().publishAfterDeleteCollection(users);
         return affectAdmin;
     }
@@ -310,17 +315,17 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             users.add(user);
         }
         getDaoEventPublisher().publishDeleteCollection(users);
-        getHibernateTemplate().deleteAll(users);
+        super.removeAllEntities(users);
     }
 
     @Override
     public User loadUser(Integer id) {
-        return load(User.class, id);
+        return super.load(User.class, id);
     }
 
     @Override
     public User getUser(Integer id) {
-        return getHibernateTemplate().get(User.class, id);
+        return super.findEntity(User.class, id);
     }
 
     @Override
@@ -328,20 +333,24 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
         return loadUserByNamedQueryAndNamedParam("userByUserName", VALUE, userName);
     }
 
+    @Transactional
     private User loadUserByUniqueProperty(String propName, String propValue) {
-        final Criterion expression = Restrictions.eq(propName, propValue);
 
-        HibernateCallback<Object> callback = new HibernateCallback<>() {
-            @Override
-            public Object doInHibernate(Session session) {
-                Criteria criteria = session.createCriteria(User.class).add(expression);
-                return criteria.list();
-            }
-        };
-        List<User> users = (List<User>)getHibernateTemplate().execute(callback);
-        User user = (User) DaoUtils.requireOneOrZero(users, expression.toString());
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
 
-        return user;
+            Session session = sessionTransaction.getSession();
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<User> cq = cb.createQuery(User.class);
+            Root<User> root = cq.from(User.class);
+
+            Predicate predicate = cb.equal(root.get(propName), propValue);
+            cq.where(predicate);
+
+            List<User> users = session.createQuery(cq).getResultList();
+
+            return DaoUtils.requireOneOrZero(users, predicate.toString());
+        }
     }
 
     @Override
@@ -395,7 +404,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public List<User> loadUserByAdmin() {
-        return (List<User>)getHibernateTemplate().findByNamedQuery(USER_ADMIN);
+        return (List<User>)super.findByNamedQuery(USER_ADMIN,User.class);
     }
 
     /**
@@ -414,8 +423,12 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public Collection<User> getUsersForBranch(Branch branch) {
-        Collection<User> users = (Collection<User>)getHibernateTemplate().findByNamedQueryAndNamedParam("usersForBranch", "branch",
-                branch);
+        Collection<User> users = 
+            (Collection<User>)super.findByNamedQueryAndNamedParam(
+                "usersForBranch", 
+                "branch",
+                branch,
+                User.class );
         return users;
     }
 
@@ -518,7 +531,11 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     private User loadUserByNamedQueryAndNamedParam(String queryName, String paramName, Object value) {
-        List<User> usersColl = (List<User>)getHibernateTemplate().findByNamedQueryAndNamedParam(queryName, paramName, value);
+        List<User> usersColl = (List<User>)super.findByNamedQueryAndNamedParam(
+                queryName, 
+                paramName, 
+                value,
+                User.class);
         Set<User> users = new HashSet<>(usersColl); // eliminate duplicates
         if (users.size() > 1) {
             throw new IllegalStateException("The database has more than one user matching the query " + queryName
@@ -537,21 +554,21 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
      * properties.
      */
     @Override
+    @Transactional
     public List<User> loadUserByTemplateUser(final User userTemplate) {
-        HibernateCallback<Object> callback = new HibernateCallback<>() {
-            @Override
-            public Object doInHibernate(Session session) {
-                UserLoader loader = new UserLoader(session);
-                return loader.loadUsers(userTemplate);
-            }
-        };
-        List<User> users = (List<User>)getHibernateTemplate().execute(callback);
-        return users;
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            UserLoader loader = new UserLoader(session);
+            return loader.loadUsers(userTemplate);
+        }
     }
 
     @Override
     public List<User> loadUsers() {
-        return getHibernateTemplate().loadAll(User.class);
+        return super.loadAllEntities(User.class);
     }
 
     @Override
@@ -571,19 +588,20 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public int getUsersInGroupWithSearchCount(final Integer groupId, final String searchString) {
         int numUsers = 0;
         if (!StringUtils.isEmpty(searchString)) {
-            HibernateCallback<Object> callback = new HibernateCallback<>() {
-                @Override
-                public Object doInHibernate(Session session) {
-                    UserLoader loader = new UserLoader(session);
-                    return loader.countUsers(searchString, groupId);
-                }
-            };
-            Integer count = (Integer) getHibernateTemplate().execute(callback);
-            numUsers = count.intValue();
-        } else {
+
+            try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+                UserLoader loader = new UserLoader(session);
+                Integer count = (Integer) loader.countUsers(searchString, groupId);
+                numUsers = count.intValue();
+            }
+        } 
+        else {
             numUsers = getUsersInGroupCount(groupId);
         }
         return numUsers;
@@ -591,35 +609,41 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public List<User> getSharedUsers() {
-        List<User> sharedUsers = (List<User>)getHibernateTemplate().findByNamedQueryAndNamedParam("sharedUsers", "isShared",
-                true);
+        List<User> sharedUsers = 
+        (List<User>)super.findByNamedQueryAndNamedParam(
+                "sharedUsers", 
+                "isShared",
+                true,
+                User.class );
         return sharedUsers;
     }
 
     @Override
+    @Transactional
     public List<User> loadUsersByPage(final String search, final Integer groupId, final Integer branchId,
             final int firstRow, final int pageSize, final String orderBy, final boolean orderAscending) {
+       
         if (StringUtils.equals(search, DISABLED) || StringUtils.equals(search, ENABLED)
                 || StringUtils.equals(search, LDAP)) {
             return loadUsersByUserProfileAndPage(search, firstRow, pageSize);
         }
-        HibernateCallback<Object> callback = new HibernateCallback<>() {
-            @Override
-            public Object doInHibernate(Session session) {
-                if (StringUtils.equals(search, PHANTOM)) {
-                    Query query = getHibernateTemplate().getSessionFactory().getCurrentSession().
-                        createQuery(PHANTOM_USERS_QUERY);
-                    query.setFirstResult(firstRow);
-                    query.setMaxResults(pageSize);
-                    return query.list();
-                }
-                UserLoader loader = new UserLoader(session);
-                return loader
-                        .loadUsersByPage(search, groupId, branchId, firstRow, pageSize, orderBy, orderAscending);
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            if (StringUtils.equals(search, PHANTOM)) {
+                Query query = session.createQuery(PHANTOM_USERS_QUERY);
+                query.setFirstResult(firstRow);
+                query.setMaxResults(pageSize);
+                return query.list();
             }
-        };
-        List<User> users = (List<User>)getHibernateTemplate().execute(callback);
-        return users;
+
+            UserLoader loader = new UserLoader(session);
+            List<User> users = (List<User>)loader.loadUsersByPage(
+                search, groupId, branchId, firstRow, pageSize, orderBy, orderAscending);;
+            return users;
+        }
     }
 
     private List<User> loadUsersByUserProfileAndPage(String search, int firstRow, int pageSize) {
@@ -633,38 +657,48 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public List<User> loadUsersByPage(int first, int pageSize) {
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession()
-                .createSQLQuery("select * from users where user_type='C' "
-                + "order by user_id limit :pageSize offset :first")
-                .addEntity(User.class);
-        q.setInteger(FIRST, first);
-        q.setInteger(PAGE_SIZE, pageSize);
-        List<User> users = q.list();
-        return users;
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            Query<User> q = session.createNativeQuery(
+                "select * from users where user_type='C' order by user_id limit :" + PAGE_SIZE + " offset :" + FIRST,
+                User.class);
+            q.setParameter(FIRST, first);
+            q.setParameter(PAGE_SIZE, pageSize);
+            return q.getResultList();
+        }
     }
 
     @Override
+    @Transactional
     public List<Integer> loadUserIdsByPage(int first, int pageSize) {
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession()
-                .createSQLQuery("select user_id from users where user_type='C' order"
-                    + " by user_id limit :pageSize offset :first")
-                .addScalar(USER_ID, Hibernate.INTEGER);
-        q.setInteger(FIRST, first);
-        q.setInteger(PAGE_SIZE, pageSize);
-        List<Integer> users = q.list();
-        return users;
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            Query<Integer> q = session.createNativeQuery(
+                "select " + USER_ID + " from users where user_type='C' order by user_id limit :" + PAGE_SIZE + " offset :" + FIRST,
+                Integer.class);
+            q.setParameter(FIRST, first);
+            q.setParameter(PAGE_SIZE, pageSize);
+            return q.getResultList();
+        }
     }
 
     @Override
     public List<InternalUser> loadInternalUsers() {
-        return getHibernateTemplate().loadAll(InternalUser.class);
+        return super.loadAllEntities(InternalUser.class);
     }
 
     @Override
     public void clear() {
-        List<Object> c = (List<Object>)getHibernateTemplate().find(QUERY_USER);
-        getHibernateTemplate().deleteAll(c);
+        List<Object> c = (List<Object>)super.find(QUERY_USER, Object.class);
+        super.removeAllEntities(c);
     }
     /**
      * Create a superadmin user with an empty pin. This is used to recover from the loss of all
@@ -725,7 +759,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
         Group allAgentsGroup = m_settingDao.getGroupByName(User.GROUP_RESOURCE_ID, AGENT_GROUP_NAME);
         if (allAgentsGroup != null) {
             user.getGroups().add(allAgentsGroup);
-            getHibernateTemplate().merge(user);
+            super.mergeEntity(user);
         }
     }
 
@@ -791,8 +825,8 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public List<User> getGroupMembers(Group group) {
-        List<User> users = (List<User>)getHibernateTemplate().findByNamedQueryAndNamedParam("userGroupMembers",
-                QUERY_PARAM_GROUP_ID, group.getId());
+        List<User> users = (List<User>)super.findByNamedQueryAndNamedParam("userGroupMembers",
+                QUERY_PARAM_GROUP_ID, group.getId(), User.class );
         return users;
     }
 
@@ -823,8 +857,8 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public List<String> getGroupMembersNames(Group group) {
-        List<String> userNames = (List<String>)getHibernateTemplate().findByNamedQueryAndNamedParam("userNamesGroupMembers",
-                QUERY_PARAM_GROUP_ID, group.getId());
+        List<String> userNames = (List<String>)super.findByNamedQueryAndNamedParam("userNamesGroupMembers",
+                QUERY_PARAM_GROUP_ID, group.getId(), String.class);
         return userNames;
     }
 
@@ -847,110 +881,172 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public Collection<Integer> getBranchMembersByPage(int bid, int first, int pageSize) {
-        Query q = getHibernateTemplate()
-                .getSessionFactory()
-                .getCurrentSession()
-                .createSQLQuery(
-                        "select users.user_id from users left outer join user_group on "
-                        + "users.user_id=user_group.user_id "
-                        + "left outer join group_storage on user_group.group_id=group_storage.group_id "
-                        + "where group_storage.branch_id=:branchId or users.branch_id=:branchId "
-                        + "order by users.user_id limit :pageSize offset :first").addScalar(USER_ID, Hibernate.INTEGER);
-        q.setInteger("branchId", bid);
-        q.setInteger(FIRST, first);
-        q.setInteger(PAGE_SIZE, pageSize);
-        List<Integer> users = q.list();
-        return users;
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            String sql = """
+                select users.user_id
+                from users
+                left outer join user_group on users.user_id = user_group.user_id
+                left outer join group_storage on user_group.group_id = group_storage.group_id
+                where group_storage.branch_id = :branchId or users.branch_id = :branchId
+                order by users.user_id
+                limit :pageSize offset :first
+            """;
+
+            NativeQuery<Integer> query = session.createNativeQuery(sql, Integer.class);
+            query.setParameter(BRANCH_ID, bid);
+            query.setParameter(FIRST, first);
+            query.setParameter(PAGE_SIZE, pageSize);
+
+            return query.getResultList();
+        }
     }
 
     @Override
+    @Transactional
     public boolean isAliasInUse(String alias) {
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession()
-        .createSQLQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS).addScalar(USER_ID, Hibernate.INTEGER);
-        q.setString(ALIAS, alias);
-        List<Integer> userIds = q.list();
-        if (SipxCollectionUtils.safeSize(userIds) > 0) {
-            return true;
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            NativeQuery<Integer> query = session
+                .createNativeQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS, Integer.class);
+            query.setParameter(ALIAS, alias);
+
+            List<Integer> userIds = query.getResultList();
+
+            if (SipxCollectionUtils.safeSize(userIds) > 0) {
+                return true;
+            }
+
+            // Fallback check in user profile DB
+            return getUserProfileService().isImIdInUse(alias);
         }
-        // check im id in user profile db
-        return getUserProfileService().isImIdInUse(alias);
     }
     
     @Override
+    @Transactional
     public boolean isAliasInUseExceptDid(String alias) {
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession()
-        .createSQLQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS_EXCEPT_DID).addScalar(USER_ID, Hibernate.INTEGER);
-        q.setString(ALIAS, alias);
-        List<Integer> userIds = q.list();
-        if (SipxCollectionUtils.safeSize(userIds) > 0) {
-            return true;
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            NativeQuery<Integer> query = session
+                .createNativeQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS_EXCEPT_DID, Integer.class);
+            query.setParameter(ALIAS, alias);
+
+            List<Integer> userIds = query.getResultList();
+
+            if (SipxCollectionUtils.safeSize(userIds) > 0) {
+                return true;
+            }
+
+            // Fallback check in user profile DB
+            return getUserProfileService().isImIdInUse(alias);
         }
-        // check im id in user profile db
-        return getUserProfileService().isImIdInUse(alias);
     }
 
     @Override
+    @Transactional
     public boolean isAliasInUseForOthers(String alias, String username) {
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession()
-        .createSQLQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS_EXCEPT_THIS).addScalar(USER_ID, Hibernate.INTEGER);
-        q.setString(ALIAS, alias);
-        q.setString("username", username);
-        List<Integer> userIds = q.list();
-        if (SipxCollectionUtils.safeSize(userIds) > 0) {
-            return true;
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            NativeQuery<Integer> query = session
+                .createNativeQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS_EXCEPT_THIS, Integer.class);
+            query.setParameter(ALIAS, alias);
+            query.setParameter(USERNAME, username);
+
+            List<Integer> userIds = query.getResultList();
+
+            if (SipxCollectionUtils.safeSize(userIds) > 0) {
+                return true;
+            }
         }
-        // check im id in user profile db
+
+        // Fallback check in user profile DB
         return getUserProfileService().isAliasInUse(alias, username);
     }
 
     @Override
+    @Transactional
     public Collection<BeanId> getBeanIdsOfObjectsWithAlias(String alias) {
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession()
-        .createSQLQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS).addScalar(USER_ID, Hibernate.INTEGER);
-        q.setString(ALIAS, alias);
-        List<Integer> ids = q.list();
-        String username = getUserProfileService().getUsernameByImId(alias);
-        if (username != null) {
-            User user = loadUserByUserName(username);
-            Integer userId = user.getId();
-            if (!ids.contains(userId)) {
-                ids.add(userId);
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            NativeQuery<Integer> query = session
+                .createNativeQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS, Integer.class);
+            query.setParameter(ALIAS, alias);
+
+            List<Integer> ids = query.getResultList();
+
+            String username = getUserProfileService().getUsernameByImId(alias);
+            if (username != null) {
+                User user = loadUserByUserName(username);
+                Integer userId = user.getId();
+                if (!ids.contains(userId)) {
+                    ids.add(userId);
+                }
             }
+
+            return BeanId.createBeanIdCollection(ids, User.class);
         }
-        Collection<BeanId> bids = BeanId.createBeanIdCollection(ids, User.class);
-        return bids;
     }
 
     @Override
+    @Transactional
     public void addToGroup(Integer groupId, Collection<Integer> ids) {
-        Group group = getHibernateTemplate().load(Group.class, groupId);
-        for (Integer id : ids) {
-            User user = loadUser(id);
-            if (!user.isGroupAvailable(group)) {
-                throw new UserException("&branch.validity.error", user.getUserName(), user.getSite().getName(),
-                        group.getBranch().getName());
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            Group group = super.loadEntity(Group.class, groupId);
+            for (Integer id : ids) {
+                User user = loadUser(id);
+                if (!user.isGroupAvailable(group)) {
+                    throw new UserException("&branch.validity.error", user.getUserName(), user.getSite().getName(),
+                            group.getBranch().getName());
+                }
             }
+            DaoUtils.addToGroup(session, getDaoEventPublisher(), groupId, User.class, ids);
         }
-        DaoUtils.addToGroup(getHibernateTemplate(), getDaoEventPublisher(), groupId, User.class, ids);
     }
 
     @Override
+    @Transactional
     public void removeFromGroup(Integer groupId, Collection<Integer> ids) {
-        DaoUtils.removeFromGroup(getHibernateTemplate(), getDaoEventPublisher(), groupId, User.class, ids);
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            DaoUtils.removeFromGroup(session, getDaoEventPublisher(), groupId, User.class, ids);
+        }
     }
 
     @Override
     public List<User> getGroupSupervisors(Group group) {
-        List<User> objs = (List<User>)getHibernateTemplate().findByNamedQueryAndNamedParam("groupSupervisors",
-                QUERY_PARAM_GROUP_ID, group.getId());
+        List<User> objs = (List<User>)super.findByNamedQueryAndNamedParam("groupSupervisors",
+                QUERY_PARAM_GROUP_ID, group.getId(), User.class );
         return objs;
     }
 
     @Override
     public List<User> getUsersThatISupervise(User supervisor) {
-        List<User> objs = (List<User>)getHibernateTemplate().findByNamedQueryAndNamedParam("usersThatISupervise",
-                "supervisorId", supervisor.getId());
+        List<User> objs = (List<User>)super.findByNamedQueryAndNamedParam("usersThatISupervise",
+                "supervisorId", supervisor.getId(), User.class );
         return objs;
     }
 
@@ -993,8 +1089,8 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public User getSpecialUser(SpecialUserType specialUserType) {
-        List<SpecialUser> specialUsersOfType = (List<SpecialUser>)getHibernateTemplate().findByNamedQueryAndNamedParam(
-                SPECIAL_USER_BY_TYPE, SPECIAL_USER_TYPE, specialUserType.name());
+        List<SpecialUser> specialUsersOfType = (List<SpecialUser>)super.findByNamedQueryAndNamedParam(
+                SPECIAL_USER_BY_TYPE, SPECIAL_USER_TYPE, specialUserType.name(), SpecialUser.class );
         SpecialUser specialUser = DataAccessUtils.singleResult(specialUsersOfType);
         if (specialUser == null) {
             return null;
@@ -1051,8 +1147,8 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public SpecialUser getSpecialUserAsSpecialUser(SpecialUserType specialUserType) {
-        List<SpecialUser> specialUsersOfType = (List<SpecialUser>)getHibernateTemplate().findByNamedQueryAndNamedParam(
-                SPECIAL_USER_BY_TYPE, SPECIAL_USER_TYPE, specialUserType.name());
+        List<SpecialUser> specialUsersOfType = (List<SpecialUser>)super.findByNamedQueryAndNamedParam(
+                SPECIAL_USER_BY_TYPE, SPECIAL_USER_TYPE, specialUserType.name(), SpecialUser.class );
         SpecialUser specialUser = DataAccessUtils.singleResult(specialUsersOfType);
         if (specialUser == null) {
             return null;
@@ -1071,17 +1167,27 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public int getPhantomUsersCount() {
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession()
-                .createSQLQuery(SQL_QUERY_PHANTOM_USERS);
-        return ((Number) q.uniqueResult()).intValue();
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+            NativeQuery<?> query = session.createNativeQuery(SQL_QUERY_PHANTOM_USERS);
+            Number result = (Number) query.getSingleResult();
+            return result != null ? result.intValue() : 0;
+        }
     }
 
     @Override
+    @Transactional
     public int getPhantomUsersWithoutSuperadminCount() {
-        Query q = getHibernateTemplate().getSessionFactory().getCurrentSession()
-                .createSQLQuery(SQL_QUERY_PHANTOM_USERS_WITHOUT_SUPERADMIN);
-        return ((Number) q.uniqueResult()).intValue();
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+            NativeQuery<?> query = session.createNativeQuery(SQL_QUERY_PHANTOM_USERS_WITHOUT_SUPERADMIN);
+            Number result = (Number) query.getSingleResult();
+            return result != null ? result.intValue() : 0;
+        }
     }
 
     @Override
@@ -1090,7 +1196,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             User specialUser = getSpecialUser(type);
             if (specialUser == null) {
                 SpecialUser newSpecialUser = new SpecialUser(type);
-                getHibernateTemplate().saveOrUpdate(newSpecialUser);
+                super.mergeEntity(newSpecialUser);
                 getDaoEventPublisher().publishSave(newSpecialUser);
             }
         }

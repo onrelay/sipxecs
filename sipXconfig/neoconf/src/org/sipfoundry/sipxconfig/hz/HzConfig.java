@@ -81,7 +81,7 @@ public class HzConfig implements ConfigProvider {
                 File f = new File(dir, "hz-config.xml");
                 Writer wtr = new FileWriter(f);
                 try {
-                    m_velocityEngine.mergeTemplate("hz-config.vm", context, wtr);
+                    m_velocityEngine.mergeTemplate("hz-config.vm", "UTF-8", context, wtr);
                 } finally {
                     IOUtils.closeQuietly(wtr);
                     m_hzContext.buildHzInstance(f);

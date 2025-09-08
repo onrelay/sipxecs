@@ -14,14 +14,14 @@
  */
 package org.sipfoundry.sipxconfig.api.model;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlEnumValue;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlEnumValue;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlType;
 
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.codehaus.jackson.annotate.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.sipfoundry.sipxconfig.dialplan.AttendantRule;
 import org.sipfoundry.sipxconfig.dialplan.AutoAttendant;
 import org.sipfoundry.sipxconfig.dialplan.CallPatternBean;
@@ -82,7 +82,7 @@ public class DialingRuleBean {
     private String m_workingTimeAttendant;
     private String m_holidayAttendant;
     private HolidayBean m_holidayAttendantPeriods;
-    private WorkingTimeBean m_workingTimeAttendantPeriods;
+    private WorkingTimeAttendantBean m_workingTimeAttendantPeriods;
     private boolean m_enableLiveAttendant;
 
     @XmlType(name = "ruleType")
@@ -159,7 +159,7 @@ public class DialingRuleBean {
             attendant = ((AttendantRule) rule).getHolidayAttendant().getAttendant();
             dialingRuleBean.setHolidayAttendantPeriods(HolidayBean.convertHolidayBean(
                 ((AttendantRule) rule).getHolidayAttendant()));
-            dialingRuleBean.setWorkingTimeAttendantPeriods(WorkingTimeBean.convertWorkingTimeBean(
+            dialingRuleBean.setWorkingTimeAttendantPeriods(WorkingTimeAttendantBean.convertWorkingTimeAttendantBean(
                 ((AttendantRule) rule).getWorkingTimeAttendant()));
             dialingRuleBean.setExtension(((AttendantRule) rule).getExtension());
             dialingRuleBean.setAttendantAliases(((AttendantRule) rule).getAttendantAliases());
@@ -377,11 +377,11 @@ public class DialingRuleBean {
         m_holidayAttendantPeriods = holidayAttendantPeriods;
     }
 
-    public WorkingTimeBean getWorkingTimeAttendantPeriods() {
+    public WorkingTimeAttendantBean getWorkingTimeAttendantPeriods() {
         return m_workingTimeAttendantPeriods;
     }
 
-    public void setWorkingTimeAttendantPeriods(WorkingTimeBean workingTimeAttendantPeriods) {
+    public void setWorkingTimeAttendantPeriods(WorkingTimeAttendantBean workingTimeAttendantPeriods) {
         m_workingTimeAttendantPeriods = workingTimeAttendantPeriods;
     }
 

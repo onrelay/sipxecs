@@ -25,7 +25,7 @@ public class ScheduleApiTestIntegration extends RestApiIntegrationTestCase {
         // create schedule
         String createSchedule =
             "{\"name\":\"Schedule1\",\"description\":\"Description1\",\"userId\":-1,\"groupId\":-1,\"type\":\"G\","
-            + "\"workingTime\":{\"workingHours\":[{\"enabled\":false,\"start\":32400000,\"stop\":64800000,\"scheduledDay\":\"Thursday\"}]}}";
+            + "\"workingTimeAttendant\":{\"workingHours\":[{\"enabled\":false,\"start\":32400000,\"stop\":64800000,\"scheduledDay\":\"Thursday\"}]}}";
         int code = postJsonString(createSchedule, "schedules");
         assertEquals(200, code);
         List<GeneralSchedule> genSchedules = m_forwardingContext.getAllGeneralSchedules();
@@ -38,19 +38,19 @@ public class ScheduleApiTestIntegration extends RestApiIntegrationTestCase {
         assertEquals(
                 String.format(
                         "{\"schedules\":[{\"id\":%s,\"name\":\"Schedule1\",\"description\":\"Description1\",\"userId\":-1,\"groupId\":-1,\"type\":\"G\","
-                        + "\"workingTime\":{\"workingHours\":[{\"enabled\":false,\"start\":32400000,\"stop\":64800000,\"scheduledDay\":\"Thursday\"}]}}]}", schedule.getId()), schedules);
+                        + "\"workingTimeAttendant\":{\"workingHours\":[{\"enabled\":false,\"start\":32400000,\"stop\":64800000,\"scheduledDay\":\"Thursday\"}]}}]}", schedule.getId()), schedules);
 
         // retrieve schedule
         String scheduleJson = getAsJson(String.format("schedules/%s", schedule.getId()));
         assertEquals(
                 String.format(
-                        "{\"id\":%s,\"name\":\"Schedule1\",\"description\":\"Description1\",\"userId\":-1,\"groupId\":-1,\"type\":\"G\",\"workingTime\":"
+                        "{\"id\":%s,\"name\":\"Schedule1\",\"description\":\"Description1\",\"userId\":-1,\"groupId\":-1,\"type\":\"G\",\"workingTimeAttendant\":"
                         + "{\"workingHours\":[{\"enabled\":false,\"start\":32400000,\"stop\":64800000,\"scheduledDay\":\"Thursday\"}]}}",
                         schedule.getId()), scheduleJson);
 
         // modify schedule
         String modifySchedule = "{\"name\":\"Schedule1Modified\",\"description\":\"Description1\",\"userId\":-1,\"groupId\":-1,\"type\":\"G\","
-            + "\"workingTime\":{\"workingHours\":[{\"enabled\":false,\"start\":32400000,\"stop\":64800000,\"scheduledDay\":\"Thursday\"}]}}";
+            + "\"workingTimeAttendant\":{\"workingHours\":[{\"enabled\":false,\"start\":32400000,\"stop\":64800000,\"scheduledDay\":\"Thursday\"}]}}";
         int putCode = putJsonString(modifySchedule, String.format("schedules/%s", schedule.getId()));
         assertEquals(200, putCode);
 
@@ -58,7 +58,7 @@ public class ScheduleApiTestIntegration extends RestApiIntegrationTestCase {
         scheduleJson = getAsJson(String.format("schedules/%s", schedule.getId()));
         assertEquals(
                 String.format(
-                        "{\"id\":%s,\"name\":\"Schedule1Modified\",\"description\":\"Description1\",\"userId\":-1,\"groupId\":-1,\"type\":\"G\",\"workingTime\":"
+                        "{\"id\":%s,\"name\":\"Schedule1Modified\",\"description\":\"Description1\",\"userId\":-1,\"groupId\":-1,\"type\":\"G\",\"workingTimeAttendant\":"
                         + "{\"workingHours\":[{\"enabled\":false,\"start\":32400000,\"stop\":64800000,\"scheduledDay\":\"Thursday\"}]}}", schedule.getId()), scheduleJson);
         //add period
         String period = "{\"enabled\":false,\"start\":34400000,\"stop\":64800000,\"scheduledDay\":\"Monday\"}";
@@ -69,7 +69,7 @@ public class ScheduleApiTestIntegration extends RestApiIntegrationTestCase {
         scheduleJson = getAsJson(String.format("schedules/%s", schedule.getId()));
         assertEquals(
                 String.format(
-                        "{\"id\":%s,\"name\":\"Schedule1Modified\",\"description\":\"Description1\",\"userId\":-1,\"groupId\":-1,\"type\":\"G\",\"workingTime\":"
+                        "{\"id\":%s,\"name\":\"Schedule1Modified\",\"description\":\"Description1\",\"userId\":-1,\"groupId\":-1,\"type\":\"G\",\"workingTimeAttendant\":"
                         + "{\"workingHours\":[{\"enabled\":false,\"start\":32400000,\"stop\":64800000,\"scheduledDay\":\"Thursday\"},"
                         + "{\"enabled\":false,\"start\":34400000,\"stop\":64800000,\"scheduledDay\":\"Monday\"}]}}", schedule.getId()), scheduleJson);
 
@@ -99,8 +99,8 @@ public class ScheduleApiTestIntegration extends RestApiIntegrationTestCase {
         String createSchedule =
             "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
             + "<Schedule><name>Schedule1</name><description>Description1</description><userId>-1</userId><groupId>-1</groupId><type>general</type>"
-            + "<workingTime><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
-            + "</workingHours></workingTime></Schedule>";
+            + "<workingTimeAttendant><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
+            + "</workingHours></workingTimeAttendant></Schedule>";
         int code = postXmlString(createSchedule, "schedules");
         assertEquals(200, code);
         List<GeneralSchedule> genSchedules = m_forwardingContext.getAllGeneralSchedules();
@@ -114,8 +114,8 @@ public class ScheduleApiTestIntegration extends RestApiIntegrationTestCase {
                 String.format(
                     "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
                         + "<Schedules><Schedule><id>%s</id><name>Schedule1</name><description>Description1</description><userId>-1</userId><groupId>-1</groupId><type>general</type>"
-                        + "<workingTime><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
-                        + "</workingHours></workingTime></Schedule></Schedules>", schedule.getId()), schedules);
+                        + "<workingTimeAttendant><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
+                        + "</workingHours></workingTimeAttendant></Schedule></Schedules>", schedule.getId()), schedules);
 
         // retrieve schedule
         String scheduleXml = getAsXml(String.format("schedules/%s", schedule.getId()));
@@ -123,15 +123,15 @@ public class ScheduleApiTestIntegration extends RestApiIntegrationTestCase {
                 String.format(
                     "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
                         + "<Schedule><id>%s</id><name>Schedule1</name><description>Description1</description><userId>-1</userId><groupId>-1</groupId><type>general</type>"
-                        + "<workingTime><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
-                        + "</workingHours></workingTime></Schedule>",
+                        + "<workingTimeAttendant><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
+                        + "</workingHours></workingTimeAttendant></Schedule>",
                         schedule.getId()), scheduleXml);
 
         // modify schedule
         String modifySchedule = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
             + "<Schedule><name>Schedule1Modified</name><description>Description1</description><userId>-1</userId><groupId>-1</groupId><type>general</type>"
-            + "<workingTime><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
-            + "</workingHours></workingTime></Schedule>";
+            + "<workingTimeAttendant><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
+            + "</workingHours></workingTimeAttendant></Schedule>";
 
         int putCode = putXmlString(modifySchedule, String.format("schedules/%s", schedule.getId()));
         assertEquals(200, putCode);
@@ -141,8 +141,8 @@ public class ScheduleApiTestIntegration extends RestApiIntegrationTestCase {
         assertEquals(String.format(
                     "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
                         + "<Schedule><id>%s</id><name>Schedule1Modified</name><description>Description1</description><userId>-1</userId><groupId>-1</groupId><type>general</type>"
-                        + "<workingTime><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
-                        + "</workingHours></workingTime></Schedule>", schedule.getId()), scheduleXml);
+                        + "<workingTimeAttendant><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
+                        + "</workingHours></workingTimeAttendant></Schedule>", schedule.getId()), scheduleXml);
         //add period
         String period = "<workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:04:00+02:00</stop>"
             + "<scheduledDay>MONDAY</scheduledDay></workingHours>";
@@ -153,9 +153,9 @@ public class ScheduleApiTestIntegration extends RestApiIntegrationTestCase {
         scheduleXml = getAsXml(String.format("schedules/%s", schedule.getId()));
         assertEquals(String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
                         + "<Schedule><id>%s</id><name>Schedule1Modified</name><description>Description1</description><userId>-1</userId><groupId>-1</groupId><type>general</type>"
-                        + "<workingTime><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
+                        + "<workingTimeAttendant><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
                         + "</workingHours><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:04:00+02:00</stop>"
-                        + "<scheduledDay>MONDAY</scheduledDay></workingHours></workingTime></Schedule>", schedule.getId()), scheduleXml);
+                        + "<scheduledDay>MONDAY</scheduledDay></workingHours></workingTimeAttendant></Schedule>", schedule.getId()), scheduleXml);
 
         //delete period
         int deletePeriod = delete(String.format("schedules/%s/period/1", schedule.getId()));
@@ -164,8 +164,8 @@ public class ScheduleApiTestIntegration extends RestApiIntegrationTestCase {
         scheduleXml= getAsXml(String.format("schedules/%s", schedule.getId()));
         assertEquals(String.format("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
                         + "<Schedule><id>%s</id><name>Schedule1Modified</name><description>Description1</description><userId>-1</userId><groupId>-1</groupId><type>general</type>"
-                        + "<workingTime><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
-                        + "</workingHours></workingTime></Schedule>", schedule.getId()), scheduleXml);
+                        + "<workingTimeAttendant><workingHours><enabled>false</enabled><start>1970-01-01T11:00:00+02:00</start><stop>1970-01-01T20:00:00+02:00</stop><scheduledDay>THURSDAY</scheduledDay>"
+                        + "</workingHours></workingTimeAttendant></Schedule>", schedule.getId()), scheduleXml);
 
         // delete schedule
         int deleteSchedule = delete(String.format("schedules/%s", schedule.getId()));

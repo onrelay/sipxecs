@@ -9,9 +9,46 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
-public class ImprovedNamingStrategy extends org.hibernate.cfg.ImprovedNamingStrategy {
+import org.hibernate.boot.model.naming.Identifier;
+import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 
-    public ImprovedNamingStrategy() {
-        super();
+public class ImprovedNamingStrategy implements PhysicalNamingStrategy {
+
+    @Override
+    public Identifier toPhysicalCatalogName(Identifier name, JdbcEnvironment context) {
+        return apply(name);
+    }
+
+    @Override
+    public Identifier toPhysicalSchemaName(Identifier name, JdbcEnvironment context) {
+        return apply(name);
+    }
+
+    @Override
+    public Identifier toPhysicalTableName(Identifier name, JdbcEnvironment context) {
+        return apply(name);
+    }
+
+    @Override
+    public Identifier toPhysicalSequenceName(Identifier name, JdbcEnvironment context) {
+        return apply(name);
+    }
+
+    @Override
+    public Identifier toPhysicalColumnName(Identifier name, JdbcEnvironment context) {
+        return apply(name);
+    }
+
+    private Identifier apply(Identifier name) {
+        if (name == null) return null;
+
+        String newName = convertCamelCaseToSnakeCase(name.getText());
+        return Identifier.toIdentifier(newName);
+    }
+
+    private String convertCamelCaseToSnakeCase(String name) {
+        // Simple camelCase to snake_case conversion:
+        return name.replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase();
     }
 }

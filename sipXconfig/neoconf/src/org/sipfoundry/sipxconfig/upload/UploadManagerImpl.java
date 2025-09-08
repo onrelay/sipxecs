@@ -42,7 +42,7 @@ public class UploadManagerImpl extends SipxHibernateDaoSupport<Upload> implement
     }
 
     public Upload loadUpload(Integer uploadId) {
-        return (Upload) getHibernateTemplate().load(Upload.class, uploadId);
+        return (Upload) super.loadEntity(Upload.class, uploadId);
     }
 
     public void saveUpload(Upload upload) {
@@ -70,7 +70,7 @@ public class UploadManagerImpl extends SipxHibernateDaoSupport<Upload> implement
     }
 
     public Collection<Upload> getUpload() {
-        return (Collection<Upload>)getHibernateTemplate().findByNamedQuery("upload");
+        return (Collection<Upload>)super.findByNamedQuery("upload", Upload.class);
     }
 
     public void clearMissingUploads(Collection<Upload> uploads) {
@@ -126,23 +126,31 @@ public class UploadManagerImpl extends SipxHibernateDaoSupport<Upload> implement
     }
 
     private List<Upload> getActiveUpload(UploadSpecification spec) {
-        List<Upload> existing = (List<Upload>)getHibernateTemplate().findByNamedQueryAndNamedParam(
-                "deployedUploadBySpecification", "spec", spec.getSpecificationId());
+        List<Upload> existing = (List<Upload>)super.findByNamedQueryAndNamedParam(
+                "deployedUploadBySpecification", 
+                "spec", 
+                spec.getSpecificationId(),
+                Upload.class);
         return existing;
     }
 
     private List<Upload> getUploadName(String name) {
-        List<Upload> existing = (List<Upload>)getHibernateTemplate().findByNamedQueryAndNamedParam("uploadName", NAME, name);
+        List<Upload> existing = (List<Upload>)super.findByNamedQueryAndNamedParam(
+            "uploadName",
+            NAME, 
+            name,
+            Upload.class);
         return existing;
     }
 
     private List<Upload> getUploadNameAndId(String name, int id) {
-        List<Upload> existing = (List<Upload>)getHibernateTemplate().findByNamedQueryAndNamedParam("uploadNameAndId",
+        List<Upload> existing = (List<Upload>)super.findByNamedQueryAndNamedParam("uploadNameAndId",
                 new String[] {
                     NAME, "id"
                 }, new Object[] {
                     name, id
-                });
+                },
+                Upload.class);
         return existing;
     }
 

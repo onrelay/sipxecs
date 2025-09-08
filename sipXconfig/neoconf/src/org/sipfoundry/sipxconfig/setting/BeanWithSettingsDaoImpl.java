@@ -18,6 +18,8 @@ package org.sipfoundry.sipxconfig.setting;
 
 import java.util.List;
 
+import org.hibernate.Session;
+
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -38,24 +40,28 @@ public class BeanWithSettingsDaoImpl<T extends BeanWithSettings> extends SipxHib
 
     @Override
     public T findOrCreateOne() {
-        List<T> all =  findAll();
-        return all.isEmpty() ? m_beanFactory.getBean(m_class) : all.get(0);
+        return m_beanFactory.getBean(m_class);
     }
 
     @Override
     public List<T> findAll() {
-        List<T> beans = (List<T>) getHibernateTemplate().loadAll(m_class);
-        return beans;
+        return List.of(m_beanFactory.getBean(m_class));
     }
 
     @Override
     public void upsert(T object) {
-        if (object.isNew()) {
-            getHibernateTemplate().save(object);
-        } else {
-            getHibernateTemplate().merge(object);
+
+        try (SessionTransaction tx = getSessionTransaction()) {
+
+            Session session = tx.getSession();
+
+            session.merge( object.getInitializeValueStorage() );  
+
+            session.flush();
+
+        } catch (IllegalStateException e) {
+            // server not ready
         }
-        getHibernateTemplate().flush();
     }
 
     @Override
