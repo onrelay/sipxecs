@@ -1,6 +1,6 @@
 package org.sipfoundry.commons.extendedcdr;
 
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 public class VideoStatistics implements Comparable<String> {
