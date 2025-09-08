@@ -2,6 +2,7 @@ config_opts['root'] = 'rocky-9-x86_64'
 config_opts['target_arch'] = 'x86_64'
 config_opts['legal_host_arches'] = ('x86_64',)
 config_opts['dist'] = 'el9'  # only useful for --resultdir variable subst
+config_opts['contentdir'] = 'pub'
 config_opts['releasever'] = '9'
 config_opts['basearc'] = 'x86_64'
 config_opts['rltype'] = ''
@@ -86,8 +87,8 @@ gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-9
 
 [devel]
 name=Rocky Linux $releasever - Devel WARNING! FOR BUILDROOT ONLY DO NOT LEAVE ENABLED
-mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=devel-$releasever
-#baseurl=http://dl.rockylinux.org/$contentdir/$releasever/devel/$basearch/os/
+#mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=devel-$releasever
+baseurl=http://dl.rockylinux.org/$contentdir/$releasever/devel/$basearch/os/
 gpgcheck=1
 enabled=1
 countme=1
