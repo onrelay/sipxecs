@@ -1,5 +1,6 @@
 include $(top_srcdir)/config/utility.am
 include $(top_srcdir)/config/java.am
+include $(top_srcdir)/config/jetty.am
 include $(top_srcdir)/common.am
 
 EXTRA_DIST = \
@@ -17,6 +18,7 @@ rest_SRC = \
 
 rest_DEPS = \
 	$(JAVAROOT) \
+	$(jetty_DEPS) \
 	$(call JavaDep, @SIPX_JAVADIR@/sipXcommons, $(rest_PKGS))
 
 $(JAR_FILE) : javac-rest Manifest.txt
