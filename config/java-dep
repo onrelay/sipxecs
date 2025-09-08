@@ -76,8 +76,12 @@ JarRepo=()
 for d in "${PkgDir[@]}"; do
   RepoName=
   test $Verbose && echo "Loading dependency map in ${d}"
-  source "${d}/.java-dep"
-  JarRepo=( $RepoName ${JarRepo[@]})
+  if [ -f "${d}/.java-dep" ]; then
+    source "${d}/.java-dep"
+    JarRepo=( $RepoName ${JarRepo[@]} )
+  else
+    test $Verbose && echo "Notice: No .java-dep file in ${d}, skipping"
+  fi
 done
 
 DepList=":"

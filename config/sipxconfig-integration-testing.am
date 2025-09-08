@@ -25,10 +25,8 @@ sipxconfig_web_test_PKGS = \
 	ez-vcard \
 	hivemind \
 	hivemind-lib \
-	jasper-compiler \
 	javassist \
 	jakarta.servlet-api \
-	jakarta.servlet.jsp-api \
 	jta \
 	not-yet-commons-ssl \
 	ognl \

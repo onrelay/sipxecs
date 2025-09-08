@@ -270,7 +270,7 @@ stylecmd_PKGS = \
 	checkstyle \
 	google-collection \
 	commons-beanutils-core \
-	commons-cli \
+	commons-cli \	
 	commons-logging \
 	antlr
 
@@ -368,3 +368,4 @@ jdoc-% : Makefile
 	  exit 1; \
 	fi
 	$(call ClassPathEnv,$($*_DEPS)) javadoc -d html @$<
+

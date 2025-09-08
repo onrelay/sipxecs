@@ -1,5 +1,7 @@
 sipxconfig_neoconf_PKGS = \
-	antlr \
+	antlr4 \
+	antlr4-runtime \
+	ant-contrib \
 	aopalliance \
 	bcpkix-jdk15on \
 	bcprov-jdk15on \
@@ -14,27 +16,30 @@ sipxconfig_neoconf_PKGS = \
 	commons-lang3 \
 	commons-logging \
 	commons-net \
+	oro \
 	gdata-client \
 	gdata-contacts \
 	gdata-contacts \
 	guessencoding \
-	hibernate \
-	hibernate-commons-annotations \
-	hibernate-jpa \
+	hibernate-core \
+	hibernate-models \
 	junit \
-	jackson-core-asl \
-	jackson-mapper-asl \
-	jackson-annotations \
 	jain-sip-sdp \
 	jakarta-oro \
-	jasper-runtime \
 	jasperreports \
 	jasperreports-pdf \
+	jasperreports-servlets \
 	jakarta.mail \
 	jakarta.activation-api \
+	jakarta.annotation-api \
+	jakarta.persistence-api \
+	jakarta.transaction-api \
 	jakarta.servlet-api \
-	jakarta.servlet.jsp-api \
+	jakarta.websocket-api \
+	jakarta.websocket-client-api \
 	jakarta.ws.rs-api \
+	jakarta.xml.bind-api \
+	jakarta.xml.ws-api \
 	jaxen \
 	jaxrpc \
 	jettison \
@@ -50,10 +55,13 @@ sipxconfig_neoconf_PKGS = \
 	org.restlet \
 	org.restlet.ext.json \
 	org.restlet.ext.spring \
-	org.restlet.ext.fileupload \
 	org.restlet.ext.servlet \
 	spring-aop \
 	spring-beans \
+	spring-boot-starter \
+	spring-boot-starter-mail \
+	spring-boot-starter-logging \
+	spring-boot-starter-web \
 	spring-context \
 	spring-context-support \
 	spring-core \
@@ -76,6 +84,7 @@ sipxconfig_neoconf_PKGS = \
 	spring-data-commons \
 	spring-data-mongodb \
 	spring-ldap-core \
+	spring-velocity-support \
 	postgresql \
 	saxpath \
 	serializer \
@@ -85,7 +94,10 @@ sipxconfig_neoconf_PKGS = \
 	snmp4j \
 	dom4j \
 	thumbnailator \
-	velocity \
+	micrometer-core \
+	micrometer-commons \
+	micrometer-observation \
+	velocity-engine-core \
 	velocity-tools-generic \
 	xercesImpl \
 	xmlrpc \
@@ -103,14 +115,16 @@ sipxconfig_neoconf_PKGS = \
 	cxf-rt-rs-extension-providers \
 	neethi \
 	xmlschema-core \
-	jackson-jaxrs \
+	jackson-jakarta-rs-json-provider \
+	jackson-jakarta-rs-base \
 	jackson-core \
 	jackson-databind \
 	jackson-annotations \
+	json \
 	woodstox-core-asl \
-	jaxb-api \
 	jaxb-core \
 	jaxb-impl \
+	jaxb-runtime \
 	stax2-api \
 	jcl-over-slf4j \
 	jaudiotagger \
@@ -138,7 +152,21 @@ sipxconfig_neoconf_PKGS = \
 	tapestry-annotations \
 	tapestry-contrib \
 	tapestry-framework \
-	validation-api
+	validation-api \
+	jboss-logging \
+	classmate \
+	ehcache \
+	cache-api \
+	byte-buddy \
+	angus-activation \
+	angus-core \
+	angus-mail \
+	logging-mailhandler \
+	imap \
+	pop3 \
+	smtp \
+	jcommon \
+	jfreechart
 
 sipxconfig_web_PKGS = \
 	$(sipxconfig_neoconf_PKGS) \
@@ -146,23 +174,13 @@ sipxconfig_web_PKGS = \
 	ant-launcher \
 	backport-util-concurrent \
 	c3p0 \
+	mchange-commons-java \
 	cglib-nodep \
 	commons-fileupload \
 	ez-vcard \
 	hivemind \
 	hivemind-lib \
-	jasper-compiler \
 	javassist \
-	jetty-server \
-	jetty-util \
-	jetty-http \
-	jetty-xml \
-	jetty-ee10-servlet \
-	jetty-ee10-servlets \
-	jetty-security \
-	jetty-deploy \
-	jetty-io \
-	jetty-ee10-webapp \
 	websocket-api \
 	websocket-client \
 	websocket-common \
@@ -176,5 +194,4 @@ sipxconfig_web_PKGS = \
 	tapestry-contrib \
 	tapestry-framework \
 	xpp3 
-
 
