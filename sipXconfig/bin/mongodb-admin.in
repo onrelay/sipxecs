@@ -34,10 +34,8 @@
 #    which server.  The tasks are then passed to the mongodb-admin
 #    script on the appropriate server to execute.
 
-# Deprecation note: intentionally using deprecated Connection class because 
-# class MongoClient is not available yet in pymongo on centos 6
-from pymongo import Connection
-from pymongo.errors import PyMongoError, AutoReconnect
+from pymongo import MongoClient
+from pymongo.errors import PyMongoError, AutoReconnect, OperationFailure
 from time import sleep
 
 import sys
@@ -46,7 +44,7 @@ import os
 import traceback
 import logging
 import argparse
-import commands
+import subprocess
 import json
 import struct
 import string
@@ -149,21 +147,38 @@ def initializedCheck(status):
 
 class MongoRSAdmin:
     def __init__(self, model_file, host_port, primary, dryrun):
-        if type(model_file) == dict:
+        if isinstance(model_file, dict):
             self.model = model_file
+        elif isinstance(model_file, str) and model_file:
+            try:
+                meta = json.load(open(model_file))
+                if 'model' in meta:
+                    self.model = meta['model']
+                else:
+                    self.model = meta
+            except Exception:
+                # If file is missing or invalid, use default structure
+                self.model = {
+                    "servers": {
+                        host_port: host_port
+                        },
+                    "arbiters": {},
+                    "replSet": "sipxecs"
+                }
         else:
-            meta = json.load(open(model_file))
-            # Allow reading of the model from output of mongodb-analyzer or a
-            # straight model file that would have been fed into mongodb-status --model file
-            if 'model' in meta:
-                self.model = meta['model']
-            else:
-                self.model = meta
+            # If model_file is None or not valid, use default structure
+            self.model = {
+                "servers": {
+                    host_port: host_port
+                    },
+                "arbiters": {},
+                "replSet": "sipxecs"
+            }
         self.host_port = host_port
         self.primary = primary
         self.dryrun = dryrun
         self.timeout = 0
-
+        
     def cmd_FORCE_SECONDARY(self):
         self.cmd_OBLITERATE()
         self.cmd_ADD()
@@ -172,18 +187,20 @@ class MongoRSAdmin:
         if not self.waitForConnection(self.host_port):
             raise MongoAdminException('Unable to connect to %s, will not be able to add to replication set.' % self.host_port)
 
-        # First call to add an arbiter can fail with a very specific error code for no apparent reason
-        # detect that error and immediate make call again.  Bug exhibited on mongo 2.2 on Fedora 16
         for i in range(2):
             try:
-                if self.isArbiter(self.host_port):
-                    self.mongoCommand(self.primaryRequired(), self.basicOperation('rs.addArb("%s")' % self.host_port))
-                else:
-                    self.mongoCommand(self.primaryRequired(), self.basicOperation('rs.add("%s")' % self.host_port))                
+                def functor(c):
+                    l = c['admin']
+                    if self.isArbiter(self.host_port):
+                        result = l.command({'replSetAdd': self.host_port, 'arbiterOnly': True})
+                    else:
+                        result = l.command({'replSetAdd': self.host_port})
+                    self.checkErr(result)
+                self.mongoCommand(self.primaryRequired(), functor)
                 break
             except MongoAdminException as e:
                 logging.debug("checking error %s" % e)
-                if e.code == 13144:                    
+                if e.code == 13144:
                     logging.debug('Initial call to adding server failed, making another attempt')
                     sleep(1)
                 else:
@@ -201,23 +218,35 @@ class MongoRSAdmin:
 
         def functor(c):
             try:
-              l = c['local']
-              config = self.eval(l, 'rs.config()')
-              if None == config:
-                  op = 'rs.initiate({"_id" : "%s", "version" : 1, "members" : ' \
-                      '[{ "_id" : 0, "host" : "%s"}]})' % (self.model['replSet'], 
-                      self.host_port)
-                  logging.debug('initializing replicaset')
-                  self.checkErr(self.eval(l, op))
-              else:
-                  logging.debug('replicaset already initialized')
-            except:
-              logging.debug('initializing replicaset')
-              op = 'rs.initiate({"_id" : "%s", "version" : 1, "members" : ' \
-                  '[{ "_id" : 0, "host" : "%s"}]})' % (self.model['replSet'], 
-                  self.host_port)
-              logging.debug('initializing replicaset')
-              self.checkErr(self.eval(l, op))
+                l = c['admin']
+                try:
+                    config = l.command({'replSetGetConfig': 1})
+                    version = config['config'].get('version', 1)
+                    new_version = version + 1
+                except Exception:
+                    version = 1
+                if not config or 'config' not in config:
+                    op = {
+                        'replSetInitiate': {
+                            "_id": self.model['replSet'],
+                            "version": new_version,
+                            "members": [{ "_id": 0, "host": self.host_port }]
+                        }
+                    }
+                    logging.debug('initializing replicaset')
+                    self.checkErr(l.command(op))
+                else:
+                    logging.debug('replicaset already initialized')
+            except Exception:
+                op = {
+                    'replSetInitiate': {
+                        "_id": self.model['replSet'],
+                        "version": 1,
+                        "members": [{ "_id": 0, "host": self.host_port }]
+                    }
+                }
+                logging.debug('initializing replicaset')
+                self.checkErr(l.command(op))
 
         self.mongoCommand(self.host_port, functor)
         if not self.waitFor(self.host_port, initializedCheck):
@@ -232,48 +261,65 @@ class MongoRSAdmin:
         #   [rsMgr] replSet error fatal, stopping replication
         #
         def functor(c):
-            l = c['local']
-            config = self.eval(l, "rs.config()")
+            l = c['admin']
+            config = l.command({'replSetGetConfig': 1})
             if not config and self.dryrun:
-                print 'RS:reconfig ' + self.host_port
-                return 
+                print('RS:reconfig ' + self.host_port)
+                return
 
             id = None
             maxId = 0
-            for m in config['members']:
+            members = config['config']['members'] if 'config' in config else []
+            for m in members:
                 if m['host'] == self.host_port:
                     id = m['_id']
                     break
                 maxId = max(maxId, m['_id'])
 
-            if id == None:
+            if id is None:
                 id = maxId + 1
 
-            cmd = 'rs.reconfig({"_id" : "%s", "members" : ' \
-                  '[{"_id" : %s, "host" : "%s"}]}, {force : true})' \
-                  % (self.model['replSet'], id, self.host_port)
-            config = self.eval(l, cmd)
+            new_config = {
+                "_id": self.model['replSet'],
+                "members": [{"_id": id, "host": self.host_port}]
+            }
+            new_config['version'] = config.get('version', 1) + 1
+            result = l.command({'replSetReconfig': new_config, 'force': True})
+            self.checkErr(result)
         self.mongoCommand(self.host_port, functor)
         self.waitFor(self.host_port, forcedPrimaryCheck)
         self.cmd_SET_MEMBER_META()
 
     def cmd_STEP_DOWN(self, seconds):
-        self.mongoCommand(self.host_port, self.basicOperation('rs.stepDown(%s)' % seconds))
+        def functor(c):
+            l = c['admin']
+            result = l.command({'replSetStepDown': int(seconds)})
+            self.checkErr(result)
+        self.mongoCommand(self.host_port, functor)
 
     def cmd_CHANGE_PRIORITY(self, priority):
-        self.mongoCommand(self.primaryRequired(),  self.memberCommand(self.host_port, 'priority = %s' % priority))
+        self.mongoCommand(self.primaryRequired(), self.memberCommand(self.host_port, 'priority', priority))
 
     def cmd_SET_MEMBER_META(self):
         mModel = self.memberModel(self.host_port)
         # Tags only meta right now, should convert priority and votes to this function
-        # instead of specialized functions
-        tags = ''
+        # instead of specialized functions        
+        tags = {}
         if 'tags' in mModel:
-            items = []
-            for tag,value in mModel['tags'].items():
-                items.append('"%s" : "%s"' % (tag, value))
-            tags = string.join(items, ', ')
-        functor = self.memberCommand(self.host_port, 'tags = {%s}' % tags)
+            tags = mModel['tags']
+        def functor(c):
+            l = c['admin']
+            config = l.command({'replSetGetConfig': 1})
+            if not config and self.dryrun:
+                print('RS:%s(tags)' % self.host_port)
+                return
+            members = config['config']['members'] if 'config' in config else []
+            index = self.requireMember(members, self.host_port)
+            members[index]['tags'] = tags
+            new_config = config['config']
+            new_config['version'] = new_config.get('version', 1) + 1
+            result = l.command({'replSetReconfig': new_config})
+            self.checkErr(result)
         self.mongoCommand(self.primaryRequired(), functor)
 
     def cmd_ADD_VOTE(self):
@@ -283,62 +329,60 @@ class MongoRSAdmin:
         self.set_votes(0)
 
     def primaryRequired(self):
-        if self.primary == None:
+        if self.primary is None:
             raise MongoAdminException('--primary parameter required')
         return self.primary
 
     def set_votes(self, votes):
-        self.mongoCommand(self.primaryRequired(),  self.memberCommand(self.host_port, 'votes = %d' % votes))
+        self.mongoCommand(self.primaryRequired(), self.memberCommand(self.host_port, 'votes', votes))
 
-    def memberCommand(self, host_port, memberCmd):
+    def memberCommand(self, host_port, field, value):
         def functor(c):
-            l = c['local']
-            config = self.eval(l, "rs.config()")
+            l = c['admin']
+            config = l.command({'replSetGetConfig': 1})
             if not config and self.dryrun:
-                print 'RS:%s(%s)' % (host_port, memberCmd)
+                print('RS:%s(%s = %s)' % (host_port, field, value))
                 return
-
-            index = self.requireMember(config['members'], host_port)
-            full_cmd = 'c = rs.config(); c.members[%d].%s; rs.reconfig(c);' 
-            cmd = full_cmd % (index, memberCmd)
-            config = self.eval(l, cmd)
+            members = config['config']['members'] if 'config' in config else []
+            index = self.requireMember(members, host_port)
+            members[index][field] = value
+            new_config = config['config']
+            new_config['version'] = config.get('version', 1) + 1
+            result = l.command({'replSetReconfig': new_config})
+            self.checkErr(result)
         return functor
 
     def requireMember(self, members, host_port):
-        for i in range(len(members)):
-            if members[i]['host'] == host_port:
+        for i, m in enumerate(members):
+            if m['host'] == host_port:
                 return i
         raise MongoAdminException("Could not find member %s" % host_port)
 
-# dont this this is nec.
-#        self.cmd_INITIALIZE()
-
     def cmd_RESYNC(self):
-        print "TODO"
+        print("TODO")
         
     def cmd_RENAME(self, new_name):
         def functor(c):
-            l = c['local']
-            config = self.eval(l, "rs.config()")
+            l = c['admin']
+            config = l.command({'replSetGetConfig': 1})
             if not config and self.dryrun:
-                print 'RS:RENAME(%s, %s)' % (self.host_port, new_name)
+                print('RS:RENAME(%s, %s)' % (self.host_port, new_name))
                 return
-
-            index = self.requireMember(config['members'], self.host_port)
-
-            # NOTE: Rename from localhost causes internal assertion. Tested: mongo server 2.0
-            full_cmd = 'c = rs.config(); c.members[%d].host = "%s"; rs.reconfig(c);' 
-            cmd = full_cmd % (index, new_name)
-            self.checkErr(self.eval(l, cmd))
-        self.mongoCommand(self.primaryRequired(), functor);
+            members = config['config']['members'] if 'config' in config else []
+            index = self.requireMember(members, self.host_port)
+            members[index]['host'] = new_name
+            new_config = config['config']
+            result = l.command({'replSetReconfig': new_config})
+            self.checkErr(result)
+        self.mongoCommand(self.primaryRequired(), functor)
 
     def run(self, args):
         member_name = 'cmd_' + args[0]
         member_args = args[1:]
-        try :
+        try:
             member = getattr(self, member_name)
             if self.dryrun:
-                print 'COMMAND:' + string.join(args, ' ')
+                print('COMMAND:' + ' '.join(args))
             member(*member_args)
 
         except AttributeError as e:
@@ -346,17 +390,25 @@ class MongoRSAdmin:
             raise MongoAdminException("Could not execute command %s (error %s)" % (args[0], e))
 
     def cmd_REMOVE(self):
-        self.mongoCommand(self.primaryRequired(), self.basicOperation('rs.remove("%s")' % self.host_port))
+        def functor(c):
+            l = c['admin']
+            result = l.command({'replSetRemove': self.host_port})
+            self.checkErr(result)
+        self.mongoCommand(self.primaryRequired(), functor)
 
     def cmd_REMOVE_EXTRA(self, extra):
-        self.mongoCommand(self.primaryRequired(), self.basicOperation('rs.remove("%s")' % extra))
+        def functor(c):
+            l = c['admin']
+            result = l.command({'replSetRemove': extra})
+            self.checkErr(result)
+        self.mongoCommand(self.primaryRequired(), functor)
 
     def nodeType(self, host_port):
         for stype in ['servers', 'arbiters']:
             if stype in self.model:
                 if host_port in self.model[stype]:
                     return stype
-        raise Exception('Could not find node' + host_port)
+        raise Exception('Could not find node ' + host_port)
 
     def isArbiter(self, host_port):
         return self.nodeType(host_port) == 'arbiters'
@@ -366,34 +418,19 @@ class MongoRSAdmin:
             if stype in self.model:
                 if host_port in self.model[stype]:
                     return self.model[stype][host_port]
-        raise Exception('Could not find node' + host_port)        
+        raise Exception('Could not find node ' + host_port)
 
     def isLocal(self):
         if 'local' in self.model:
             return self.model['local']
         return False
 
-    def eval(self, db, command):
-        c = db.connection
-        logging.debug("%s:%d - %s" % (c.host, c.port, command))
-        if self.dryrun:
-            print 'RS:' + command
-            return None
-        return db.eval(command)
-
-    def basicOperation(self, command):
-        def functor(c):
-            l = c['local']
-            err = self.eval(l, command)
-            self.checkErr(err)
-        return functor
-
     def mongoCommand(self, server, functor):
         if self.dryrun:
             c = DryRunConnection()
         else:
-            c = Connection(server)
-        try :
+            c = MongoClient(server)
+        try:
             functor(c)
         except AutoReconnect:
             # some commands succeed, but trigger a disconnect of all client
@@ -421,27 +458,26 @@ class MongoRSAdmin:
         ok = self.waitFor(host_port, None)
         if ok:
             # even though connection is available, still takes a few
-            # millis before commands work
+            # millis before commands work            
             sleep(3)
         return ok
 
     def waitFor(self, host_port, check):
         if self.dryrun or self.timeout == 0:
-          return True
+            return True
         x = host_port.partition(':')
         host = x[0]
         port = int(x[2])
         last_result = None
         for i in range(self.timeout):
             try:
-                c = Connection(host_port)
+                c = MongoClient(host_port)
                 if check is None:
                     return True
-                l = c['local']              
-                status = l.eval('rs.status()');
+                status = c['admin'].command("replSetGetStatus")
                 result = check(status)
-                if result == None:
-                    return True                
+                if result is None:
+                    return True
                 if result == ABORT_WAIT:
                     return False
                 if result == True:
@@ -450,11 +486,9 @@ class MongoRSAdmin:
                     logging.debug(result)
                 last_result = result
                 sleep(1)
-            except PyMongoError as e:
+            except PyMongoError:
                 sleep(1)
-
         return False
-        
 
 class MongoAdminRedhatOps(MongoRSAdmin):
     def __init__(self, model_file, host_port, primary, dryrun):
@@ -491,7 +525,7 @@ class MongoAdminRedhatOps(MongoRSAdmin):
         if self.dryrun:
             self.dbpath = '[%s:dbpath]' % self.cfg
         else:
-            ok, self.dbpath = commands.getstatusoutput('awk -F= \'/^dbpath *= */{print $2}\' "%s"' \
+            ok, self.dbpath = subprocess.getstatusoutput('awk -F= \'/^dbpath *= */{print $2}\' "%s"' \
                  % self.cfg)
         logging.debug("db path " + self.dbpath)
         self.lockfile = self.dbpath + "/mongod.lock"
@@ -556,14 +590,14 @@ class MongoAdminRedhatOps(MongoRSAdmin):
     def os_system(self, os_command):
         logging.debug(os_command)
         if self.dryrun:
-            print 'OS:' + os_command
+            print('OS:' + os_command)
             return 0
         else:
             return os.system(os_command)
 
     def down(self):
         if self.os_system(self.downCommand) != 0:
-          logging.debug('Could not stop mongod server, might be already down')
+            logging.debug('Could not stop mongod server, might be already down')
 
     def up(self):
         if self.os_system(self.upCommand) != 0:
@@ -578,13 +612,16 @@ class MongoAdminRedhatOps(MongoRSAdmin):
 # remain fairly flexible on file path because command might come
 # from ssh path
 def model_file(f):
+    if not f:
+        return None
     if f.startswith('/'):
-        return f
+        return f if os.path.isfile(f) else None
     if os.path.isfile(f):
         return f
     path = "%s/%s" % ("@SIPX_CFDATA@", f)
     if os.path.isfile(path):
         return path
+    return None
 
 if __name__ == '__main__':
     c = None
@@ -628,8 +665,8 @@ if __name__ == '__main__':
         if not args['host_port']:
             raise MongoAdminException('--host-port is a required for this option')
 
-        model = model_file(args['model'])
-        admin = MongoAdminRedhatOps(model, args['host_port'], args['primary'], args['dryrun'])
+        model_file = model_file(args['model'])
+        admin = MongoAdminRedhatOps(model_file, args['host_port'], args['primary'], args['dryrun'])
         admin.timeout = args['timeout']
         if len(args['action']) > 0:
             admin.run(args['action'])
@@ -647,9 +684,9 @@ if __name__ == '__main__':
     except :
         sys.stderr.write(traceback.format_exc())
         sys.stderr.write('\n')
-        exit(1)
-            
+        exit(1)    
+        
     finally:
-        if c != None:
+        if c is not None:
             logging.debug('closing connection')
             c.close()
