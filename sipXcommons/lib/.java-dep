@@ -9,11 +9,11 @@ RepoName=sipXcommons
 sipXcommons_dependency() {
   case $1 in
   axis)
-    pkg_push jaxrpc commons-logging saaj javamail;;
+    pkg_push jaxrpc saaj javamail;;
   jaxrpc)
     pkg_push commons-discovery;;
   javamail)
-    pkg_push activation;;
+    pkg_push jakarta.activation-api;;
   jain-sip-sdp)
     pkg_push log4j;;
   jetty)
@@ -23,7 +23,7 @@ sipXcommons_dependency() {
   xmlrpc-client)
     pkg_push xmlrpc-common;;
   xmlrpc-server)
-    pkg_push xmlrpc-common  jakarta.servlet commons-logging;;
+    pkg_push xmlrpc-common  jakarta.servlet;;
   gdata-contacts)
     pkg_push gdata-core gdata-client google-collect;;
   restlet-impl)
