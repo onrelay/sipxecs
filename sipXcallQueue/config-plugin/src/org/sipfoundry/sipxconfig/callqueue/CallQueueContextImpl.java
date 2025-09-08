@@ -22,7 +22,15 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hibernate.Query;
+import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
+import org.springframework.dao.support.DataAccessUtils;
+import org.hibernate.Session;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.SessionFactory;
+import org.springframework.transaction.annotation.Transactional;
+
 import org.sipfoundry.sipxconfig.alias.AliasManager;
 import org.sipfoundry.sipxconfig.cfgmgt.ConfigManager;
 import org.sipfoundry.sipxconfig.cfgmgt.ConfigRequest;
@@ -47,10 +55,6 @@ import org.sipfoundry.sipxconfig.feature.LocationFeature;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchAction;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchCondition;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchFeature;
-import org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.dao.support.DataAccessUtils;
 
 public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implements CallQueueContext, BeanFactoryAware,
         FeatureProvider {
@@ -137,7 +141,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
     public Collection<BeanId> getBeanIdsOfObjectsWithAlias(String alias) {
         Collection<BeanId> bids = new ArrayList<BeanId>();
 
-        List<CallQueue> lines = getHibernateTemplate().loadAll(CallQueue.class);
+        List<CallQueue> lines = super.loadAllEntities(CallQueue.class);
         for (CallQueue line : lines) {
             if (line.getExtension() != null && (line.getExtension().equals(alias) || line.getName().equals(alias))
                     || (line.getAlias() != null && line.getAlias().equals(alias))
@@ -174,7 +178,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
     }
 
     public void deleteExtension(CallQueueExtension ext) {
-        getHibernateTemplate().delete(ext);
+        super.removeEntity(ext);
     }
 
     public void saveExtension(CallQueueExtension extension) {
@@ -205,27 +209,30 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
         }
         removeNullActions(extension);
         if (extension.isNew()) {
-            getHibernateTemplate().saveOrUpdate(extension);
+            super.mergeEntity(extension);
         } else {
-            getHibernateTemplate().merge(extension);
+            super.mergeEntity(extension);
         }
     }
 
     @Override
     public CallQueueExtension getExtensionById(Integer extensionId) {
-        return getHibernateTemplate().load(CallQueueExtension.class, extensionId);
+        return super.loadEntity(CallQueueExtension.class, extensionId);
     }
 
     @Override
     public CallQueueExtension getExtensionByName(String extensionName) {
-        List<CallQueue> extensions = (List<CallQueue>)getHibernateTemplate().findByNamedQueryAndNamedParam(
-                QUERY_CALL_QUEUE_EXTENSIONS_WITH_NAMES, QUERY_PARAM_VALUE, extensionName);
+        List<CallQueue> extensions = (List<CallQueue>)super.findByNamedQueryAndNamedParam(
+                QUERY_CALL_QUEUE_EXTENSIONS_WITH_NAMES, 
+                QUERY_PARAM_VALUE, 
+                extensionName,
+                CallQueue.class );
         return DataAccessUtils.singleResult(extensions);
     }
 
     @Override
     public List<CallQueueExtension> getFreeswitchExtensions() {
-        return getHibernateTemplate().loadAll(CallQueueExtension.class);
+        return super.loadAllEntities(CallQueueExtension.class);
     }
 
     private void removeNullActions(CallQueueExtension extension) { // Should not be Tested
@@ -254,20 +261,20 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
     }
 
     public CallQueue loadCallQueue(Integer id) { // Tested
-        return (CallQueue) getHibernateTemplate().load(CallQueue.class, id);
+        return (CallQueue) super.loadEntity(CallQueue.class, id);
     }
     
     @Override
     public CallQueue getCallQueueByName(String name) {
         String query = "from CallQueue c where c.name = :name";
-        List<CallQueue> queueList = (List<CallQueue>)getHibernateTemplate().findByNamedParam(query, "name", name);
+        List<CallQueue> queueList = (List<CallQueue>)super.findByNamedParam(query, "name", name, CallQueue.class);
 
         return DaoUtils.requireOneOrZero(queueList, query);
     }
     
     public void duplicateCallQueues(Collection<Integer> ids) { // Tested
         for (Integer id : ids) {
-            CallQueue srcCallQueue = (CallQueue) getHibernateTemplate().load(CallQueue.class, id);
+            CallQueue srcCallQueue = (CallQueue) super.loadEntity(CallQueue.class, id);
             CallQueue newCallQueue = newCallQueue();
             // TODO: localize strings
             newCallQueue.setName(COPY_OF + srcCallQueue.getName());
@@ -287,7 +294,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
         for (Integer queueId : ids) {
             CallQueue queue = loadCallQueue(queueId);
             String extension = queue.getExtension();
-            getHibernateTemplate().delete(queue);
+            super.removeEntity(queue);
             m_fsDeployer.deleteQueue(extension);
         }
     }
@@ -299,12 +306,12 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
         }
         CallQueue queue = getCallQueueByName(name);
         String extension = queue.getExtension();
-        getHibernateTemplate().delete(queue);
+        super.removeEntity(queue);
         m_fsDeployer.deleteQueue(extension);
     }
 
     public Collection<CallQueue> getCallQueues() { // Test
-        return getHibernateTemplate().loadAll(CallQueue.class);
+        return super.loadAllEntities(CallQueue.class);
     }
 
     /* CallQueueCommand API */
@@ -348,11 +355,11 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
     }
 
     private CallQueueCommand loadCallQueueCommand(Integer id) { // Should not be Tested
-        return (CallQueueCommand) getHibernateTemplate().load(CallQueueCommand.class, id);
+        return (CallQueueCommand) super.loadEntity(CallQueueCommand.class, id);
     }
 
     private Collection<CallQueueCommand> getCallQueueCommands() { // Should not be Tested
-        return getHibernateTemplate().loadAll(CallQueueCommand.class);
+        return super.loadAllEntities(CallQueueCommand.class);
     }
 
     /* CallQueueAgent API */
@@ -364,8 +371,8 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
     
     @Override
     public CallQueueAgent getAgentByName(String agentName) {
-        List<CallQueueAgent> clients = (List<CallQueueAgent>)getHibernateTemplate().findByNamedQueryAndNamedParam(
-                QUERY_CALL_QUEUE_AGENT_WITH_NAME_OR_EXT, QUERY_PARAM_VALUE, agentName);
+        List<CallQueueAgent> clients = (List<CallQueueAgent>)super.findByNamedQueryAndNamedParam(
+                QUERY_CALL_QUEUE_AGENT_WITH_NAME_OR_EXT, QUERY_PARAM_VALUE, agentName, CallQueueAgent.class );
         return DataAccessUtils.singleResult(clients);
     }
 
@@ -390,23 +397,23 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
             queuesBefore = getCallQueueIds(callQueueAgent.getId());
         }
         if (isNew) {
-            getHibernateTemplate().save(callQueueAgent);
+            super.persistEntity(callQueueAgent);
         } else {
-            getHibernateTemplate().merge(callQueueAgent);
+            super.mergeEntity(callQueueAgent);
         }
-        getHibernateTemplate().flush();
+        super.flush();
         List<Integer> queuesAfter = getCallQueueIds(callQueueAgent.getId());
         queuesAfter = queuesAfter == null ? new ArrayList<Integer>() : queuesAfter;
         Collection<Integer> queuesToReload = CollectionUtils.union(queuesBefore, queuesAfter);
         m_fsDeployer.deployAgent(callQueueAgent, isNew);
         for (Integer callQueueId : queuesToReload) {
-            CallQueue queue = getHibernateTemplate().load(CallQueue.class, callQueueId);
+            CallQueue queue = super.loadEntity(CallQueue.class, callQueueId);
             m_fsDeployer.deployTiers(queue, callQueueAgent);
         }
     }
 
     public CallQueueAgent loadCallQueueAgent(Integer id) { // Tested
-        return (CallQueueAgent) getHibernateTemplate().load(CallQueueAgent.class, id);
+        return (CallQueueAgent) super.loadEntity(CallQueueAgent.class, id);
     }
 
     public void duplicateCallQueueAgents(Collection<Integer> ids) { // Tested
@@ -432,7 +439,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
         for (Integer agentId : ids) {
             CallQueueAgent agent = loadCallQueueAgent(agentId);
             String extension = agent.getExtension();
-            getHibernateTemplate().delete(agent);
+            super.removeEntity(agent);
             m_fsDeployer.deleteAgent(extension);
         }
 
@@ -442,17 +449,17 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
     public void deleteCallQueueAgent(String name) {        
         CallQueueAgent agent = getAgentByName(name);
         String extension = agent.getExtension();
-        getHibernateTemplate().delete(agent);
+        super.removeEntity(agent);
         m_fsDeployer.deleteAgent(extension);
     }
 
     public Collection<CallQueueAgent> getCallQueueAgents() { // Tested
-        return getHibernateTemplate().loadAll(CallQueueAgent.class);
+        return super.loadAllEntities(CallQueueAgent.class);
     }
 
     public Collection<CallQueueAgent> getCallQueueAgentsWithState() {
         Map<String, String> states = m_fsDeployer.getAgentState();
-        List<CallQueueAgent> agents = getHibernateTemplate().loadAll(CallQueueAgent.class);
+        List<CallQueueAgent> agents = super.loadAllEntities(CallQueueAgent.class);
         for (CallQueueAgent agent : agents) {
             String agentName = "agent-" + agent.getExtension();
             if (states.containsKey(agentName)) {
@@ -463,45 +470,75 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
     }
 
     @Override
-    public List<CallQueue> getAvaiableQueuesForAgent(Integer callqueueagentid) { // Tested
-        if (null == callqueueagentid) {
+    @Transactional
+    public List<CallQueue> getAvaiableQueuesForAgent(Integer callqueueagentid) {
+        if (callqueueagentid == null) {
             return Collections.EMPTY_LIST;
         }
-        Query query = getHibernateTemplate().getSessionFactory().getCurrentSession()
-                .createSQLQuery(
-                        "(SELECT q.* FROM freeswitch_extension q WHERE freeswitch_ext_type = 'q')" + " EXCEPT"
-                                + " (SELECT DISTINCT q.* FROM freeswitch_extension q"
-                                + " LEFT JOIN call_queue_tier t USING(freeswitch_ext_id)"
-                                + " WHERE t.call_queue_agent_id = :" + QUERY_PARAM_AGENT_ID + ")")
-                .addEntity(CallQueue.class).setParameter(QUERY_PARAM_AGENT_ID, callqueueagentid.intValue());
-        List<CallQueue> result = query.list();
-        return result;
+
+        String sql =
+            "(SELECT q.* FROM freeswitch_extension q WHERE freeswitch_ext_type = 'q') " +
+            "EXCEPT " +
+            "(SELECT DISTINCT q.* FROM freeswitch_extension q " +
+            "LEFT JOIN call_queue_tier t ON q.freeswitch_ext_id = t.freeswitch_ext_id " +
+            "WHERE t.call_queue_agent_id = :" + QUERY_PARAM_AGENT_ID + ")";
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            List<CallQueue> result = session
+                .createNativeQuery(sql, CallQueue.class)
+                .setParameter(QUERY_PARAM_AGENT_ID, callqueueagentid)
+                .getResultList();
+
+            return result;
+        }
     }
 
     @Override
-    public List<Integer> getCallQueueAgentsForQueue(Integer callqueueid) { // Tested
-        if (null == callqueueid) {
-            return Collections.EMPTY_LIST;
+    @Transactional
+    public List<Integer> getCallQueueAgentsForQueue(Integer callqueueid) {
+        if (callqueueid == null) {
+            return Collections.emptyList();
         }
-        Query query = getHibernateTemplate().getSessionFactory().getCurrentSession()
-            .createSQLQuery(
-                "SELECT DISTINCT t.call_queue_agent_id FROM call_queue_tier t WHERE t.freeswitch_ext_id = :"
-                        + QUERY_PARAM_QUEUE_ID).setParameter(QUERY_PARAM_QUEUE_ID, callqueueid.intValue());
-        List<Integer> result = query.list();
-        return result;
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            NativeQuery<Integer> query = session.createNativeQuery(
+                    "SELECT DISTINCT t.call_queue_agent_id FROM call_queue_tier t WHERE t.freeswitch_ext_id = :" + QUERY_PARAM_QUEUE_ID,
+                    Integer.class
+            );
+
+            query.setParameter(QUERY_PARAM_QUEUE_ID, callqueueid.intValue());
+
+            return query.getResultList();
+        }
     }
 
+    @Transactional
     private List<Integer> getCallQueueIds(Integer callqueueAgentId) {
-        if (null == callqueueAgentId) {
-            return Collections.EMPTY_LIST;
+        if (callqueueAgentId == null) {
+            return Collections.emptyList();
         }
-        Query query = getHibernateTemplate().getSessionFactory().getCurrentSession()
-            .createSQLQuery(
-                "SELECT q.freeswitch_ext_id FROM freeswitch_extension q INNER JOIN call_queue_tier t"
-                        + " ON q.freeswitch_ext_id=t.freeswitch_ext_id where t.call_queue_agent_id=:callqueueagentid")
-                .setParameter(QUERY_PARAM_AGENT_ID, callqueueAgentId);
-        List<Integer> result = query.list();
-        return result;
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
+            NativeQuery<Integer> query = session.createNativeQuery(
+                    "SELECT q.freeswitch_ext_id FROM freeswitch_extension q " +
+                    "INNER JOIN call_queue_tier t ON q.freeswitch_ext_id = t.freeswitch_ext_id " +
+                    "WHERE t.call_queue_agent_id = :" + QUERY_PARAM_AGENT_ID,
+                    Integer.class
+            );
+
+            query.setParameter(QUERY_PARAM_AGENT_ID, callqueueAgentId);
+
+            return query.getResultList();
+        }
     }
 
     @Override

@@ -20,9 +20,10 @@
 
   <class name="CallQueueAgent" table="call_queue_agent" discriminator-value="P" polymorphism="explicit">
     <id name="id" column="call_queue_agent_id" type="int" unsaved-value="-1">
-      <generator class="sequence">
-        <param name="sequence">call_queue_agent_seq</param>
-      </generator>
+       <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
+        <param name="sequence_name">call_queue_agent_seq</param>
+        <param name="increment_size">1</param>
+      </generator>    
     </id>
     <property name="name" />
     <property name="extension" />
@@ -45,11 +46,9 @@
     - Queries
   -->
   <query name="callQueueExtensionWithName">
-    <![CDATA[from CallQueueExtension ext where ext.name = :value]]>
+      <![CDATA[from CallQueueExtension ext where ext.name = :value]]>
   </query>
-
   <query name="callQueueAgentIds">
-    <![CDATA[from CallQueueAgent agent where agent.name = :value or agent.extension = :value]]>
+        <![CDATA[from CallQueueAgent agent where agent.name = :value or agent.extension = :value]]>
   </query>
-
 </hibernate-mapping>
