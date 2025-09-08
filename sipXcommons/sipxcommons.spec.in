@@ -21,6 +21,8 @@ BuildRequires: automake
 BuildRequires: shadow-utils
 BuildRequires: zip
 BuildRequires: rsync
+BuildRequires: jetty
+
 
 # disable JAR repacking. gwt for one won't repack
 %define __jar_repack %{nil}
@@ -28,6 +30,7 @@ BuildRequires: rsync
 Source: %name-%version.tar.gz
 
 Requires: shadow-utils
+Requires: jetty
 
 Requires: java-17-openjdk
 
@@ -76,14 +79,14 @@ fi
 %dir %attr(755,sipx,sipx) %{_datadir}/java/sipXecs
 %attr(755,sipx,sipx) %{_datadir}/java/sipXecs/sipXcommons
 %attr(755,root,root) %{_bindir}/java-dep
-%{_datadir}/sipxecs/schema/spring-beans-2.0.xsd
-%{_datadir}/sipxecs/schema/spring-util-2.0.xsd
-%{_datadir}/sipxecs/schema/spring-security-3.1.xsd
-%{_datadir}/sipxecs/schema/spring-task-4.0.xsd
+%{_datadir}/sipxecs/schema/spring-beans.xsd
+%{_datadir}/sipxecs/schema/spring-util.xsd
+%{_datadir}/sipxecs/schema/spring-security.xsd
+%{_datadir}/sipxecs/schema/spring-task.xsd
 %{_datadir}/sipxecs/schema/jaxrs.xsd
 %{_datadir}/sipxecs/schema/spring-context.xsd
 %{_datadir}/sipxecs/schema/spring-mvc.xsd
-%{_datadir}/sipxecs/schema/spring-websocket-4.0.xsd
+%{_datadir}/sipxecs/schema/spring-websocket.xsd
 %{_datadir}/sipxecs/schema/core.xsd
 %{_datadir}/sipxecs/schema/spring-all.xsd
 
