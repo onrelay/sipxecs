@@ -1,4 +1,4 @@
-mongo-cxx-driver_VER = 4.0.0
+mongo-cxx-driver_VER = 4.1.0
 mongo-cxx-driver_REL = 1
 mongo-cxx-driver_SRPM = mongo-cxx-driver-$(mongo-cxx-driver_VER)-$(mongo-cxx-driver_REL)$(RPM_DIST).src.rpm
 mongo-cxx-driver_SPEC = $(SRC)/mongo-cxx-driver/mongo-cxx-driver.spec
