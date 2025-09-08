@@ -9,19 +9,19 @@ sipXcom Documentation
 
    history
    features
+   environment
    installing
    upgrading
-   building
-   planning   
+   building   
    setup
    webui
    security
-   faq
+   planning
    troubleshooting
    monitoring
    maintenance
-   howto
-   apiref :hidden:
+   faq
+   howto   apiref :hidden:
    restapi
    soapapi
 

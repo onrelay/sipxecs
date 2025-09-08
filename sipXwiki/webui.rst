@@ -65,7 +65,7 @@ Some fields or options are hidden by default. For example, the user SIP password
 
       Command="$JavaCmd \
      -Dprocname=${procNameId} \
-     -XX:MaxPermSize=128M \
+     -XX:MaxMetaspaceSize=128M \
      -Xmx1024m \
      
   The java manual page (man java) suggests the maximum value would be 2048m::

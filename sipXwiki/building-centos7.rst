@@ -1,15 +1,52 @@
-.. index:: building
+.. index:: building-centos7
 
-.. _building:
+.. _building-centos7:
 
-============
-Building
-============
 
-Setup Environment
+=======================
+Building CentOS 7 (EOL)
+=======================
+
+Use Build Server
 -----------------
 
-Follow the :ref:`_environment` instructions to prepare your system for builds.
+To build the sipXcom source for execution or RPM generation on a physical server or cloud image, follow the instructions from installing_ to setup and configure a server.
+
+Use Docker Container
+-----------------
+
+To build sipXcom RPMs in a desktop or server Docker image, instantiate a container with the following command:
+
+    .. code-block:: bash
+        
+        docker run -it --hostname=sipxecs --name=sipxecs-centos7 --privileged \
+        --env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+        --label='org.label-schema.build-date=20201113' --label='org.label-schema.license=GPLv2' \
+        --label='org.label-schema.name=CentOS Base Image' --label='org.label-schema.schema-version=1.0' \
+        --label='org.label-schema.vendor=CentOS' --label='org.opencontainers.image.created=2020-11-13 00:00:00+00:00' \
+        --label='org.opencontainers.image.licenses=GPL-2.0-only' --label='org.opencontainers.image.title=CentOS Base Image' \
+        --label='org.opencontainers.image.vendor=CentOS' --runtime=runc -d centos:centos7
+
+Setup System
+-----------------
+
+- Log on as root via ssh
+
+  .. code-block:: bash
+    
+    yum update -y
+
+    yum install -y sudo git wget
+
+- If you are NOT using a Google Cloud image, you must add and install their artifact registry plugin:
+
+  .. code-block:: bash
+
+    wget -O /etc/yum.repos.d/artifact-registry-plugin.repo \
+        https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
+    
+    yum install -y yum-plugin-artifact-registry
+
 
 Add sipx User
 -----------------
@@ -42,7 +79,7 @@ sipXcom must be built by a user called *sipx* with sudo privileges.
 Checkout sipXcom
 -----------------
 
-Execute the following commands to checkout the default sipXcom repository:
+Execute the following commands to checkout the sipXcom repository:
 
   .. code-block:: bash
 
@@ -51,14 +88,6 @@ Execute the following commands to checkout the default sipXcom repository:
     cd /src
 
     git clone https://github.com/onrelay/sipxecs.git
-
-
-If you are looking to build a specific branch, specify it as follows:
-
-  .. code-block:: bash
-
-    git clone https://github.com/onrelay/sipxecs.git  --branch release-25.01-rocky9
-
 
 Build sipXcom
 -----------------------
@@ -109,13 +138,13 @@ The sipxecs-build script has the following additional options:
 
     sudo ./sipxecs-build [options]
 
-        **-p | --platform**: OS platform of sipxcom RPM to build, e.g. rocky-7=9 (default), centos-7
+        **-p | --platform**: OS platform of sipxcom RPM to build, e.g. centos-7 (default), rocky-9
 
         **-a | --architecture**: Hardware architecture of sipxcom RPM to build, e.g. x86_64 (default)
 
         **-s | --subproject**: subproject to build or sipx for building all RPMs, e.g. sipx (default), sipXconfig, sipXproxy
 
-        **-v | --version**: sipXcom cersion to build, e.g 25.01 (default)
+        **-v | --version**: sipXcom cersion to build, e.g 25.01 (default), 24.07
 
         **-r | --rpm**: Include this option if building rpms
 
@@ -136,6 +165,24 @@ For more advanced builds, sipXcom relies on GNU autoconf and make to build its s
     sudo mkdir -p /usr/local/sipx
 
     sudo chown sipx.sipx /usr/local/sipx
+
+- To exclude *oss_core* module from build:
+
+  .. code-block:: bash
+
+    sudo echo oss_core >> .modules-exclude
+
+    sudo yum install -y oss_core oss_core-devel oss_core-debuginfo
+
+    sudo mkdir -p /usr/local/sipx/lib
+
+    sudo ln -s /usr/lib64/liboss_core.la /usr/local/sipx/lib/liboss_core.la
+
+    sudo ln -s /usr/lib64/liboss_carp.la /usr/local/sipx/lib/liboss_carp.la
+
+    sudo mkdir -p /usr/local/sipx/opt
+
+    sudo ln -s /usr/opt/ossapp /usr/local/sipx/opt/ossapp
 
 - Configure:
 
@@ -176,7 +223,7 @@ For more advanced builds, sipXcom relies on GNU autoconf and make to build its s
 
   .. code-block:: bash
 
-    sudo ../configure --enable-rpm DISTRO="rocky-9-x86_64"
+    sudo ../configure --enable-rpm DISTRO="centos-7-x86_64"
 
     sudo make sipx.rpm
     

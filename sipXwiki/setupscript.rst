@@ -103,7 +103,7 @@ Click the 'Add Server' link at the top-right of the page. Enter the FQDN, IP, an
   .. image:: system_servers_addserver1.png
      :align: center
 
-The sipxcom RPMs should be installed on the secondary just as the primary during the :ref:`rpm-installation` step.
+The sipxcom RPMs should be installed on the secondary just as the primary during the :ref:`installing` step.
 
 :ref:`setup-script` on the secondary servers is similar to the primary. The script will first disable SElinux. Press any key to reboot::
 
