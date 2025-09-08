@@ -2,13 +2,13 @@
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns="http://www.example.com">
-    <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="spring-beans-2.0.xsd" />
-    <xs:import namespace="http://www.springframework.org/schema/task" schemaLocation="spring-task-4.0.xsd" />
-    <xs:import namespace="http://www.springframework.org/schema/security" schemaLocation="spring-security-3.1.xsd" />
+    <xs:import namespace="http://www.springframework.org/schema/beans" schemaLocation="spring-beans.xsd" />
+    <xs:import namespace="http://www.springframework.org/schema/task" schemaLocation="spring-task.xsd" />
+    <xs:import namespace="http://www.springframework.org/schema/security" schemaLocation="spring-security.xsd" />
     <xs:import namespace="http://cxf.apache.org/jaxrs" schemaLocation="jaxrs.xsd" />
     <xs:import namespace="http://www.springframework.org/schema/context" schemaLocation="spring-context.xsd" />
-    <xs:import namespace="http://www.springframework.org/schema/websocket" schemaLocation="spring-websocket-4.0.xsd" />
+    <xs:import namespace="http://www.springframework.org/schema/websocket" schemaLocation="spring-websocket.xsd" />
     <xs:import namespace="http://www.springframework.org/schema/mvc" schemaLocation="spring-mvc.xsd" />
-    <xs:import namespace="http://www.springframework.org/schema/util" schemaLocation="spring-util-2.0.xsd" />
+    <xs:import namespace="http://www.springframework.org/schema/util" schemaLocation="spring-util.xsd" />
     <xs:import namespace="http://cxf.apache.org/core" schemaLocation="core.xsd" />
 </xs:schema>
