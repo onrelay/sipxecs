@@ -32,9 +32,9 @@ now = datetime.datetime.now()
 # where
 #    0 = ok, 1 = dead
 #    cmd1 = if dead, command to run to start process back up
-for i in range(len(procs) / 2):
+for i in range(len(procs) // 2):
     if procs[2 * i] == '1':
         cmd = procs[(2 * i ) + 1].split()
-        print now.strftime("%Y-%m-%d %H:%M"), "Starting dead process ", cmd[1]
+        print(now.strftime("%Y-%m-%d %H:%M"), "Starting dead process ", cmd[1])
         # we're going to exercise all cfengine bundles so services to be started in proper order 
         os.system("@SIPX_BINDIR@/sipxagent")

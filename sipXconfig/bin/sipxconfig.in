@@ -86,7 +86,7 @@ export CLASSPATH=`echo @SIPX_CONFDIR@ ${Dependencies} ${PluginDir}/*.jar | sed -
 #source @SIPX_CONFDIR@/postgres-pwd.properties
 
 value=`cat @SIPX_CONFDIR@/postgres-pwd.properties`
-prefix="password="
+prefix="postgres-pwd.password="
 password=${value#$prefix}
 
 # Incase system failed suddenly, clear previous locks
@@ -112,7 +112,7 @@ databaseCommand() {
       -Dlog.dir=${LogDir} \
       -Dtmp.dir=${TmpDir} \
       -Dsipxconfig.db.user=@POSTGRESQL_USER@ \
-      -Dsipxconfig.db.password='${password}' \
+      -Dpostgres-pwd.password='${password}' \
       ${SIPXCONFIG_ANT_OPTS} \
       -f @SIPX_CONFDIR@/database/database.xml \
       $@"
@@ -187,6 +187,9 @@ buildCommand() {
      -Djetty.server.Request.maxFormKeys=2000 \
      -Djetty.home=${JettyHomeDir} \
      -Djetty.base=${JettyBaseDir} \
+     -Dtmp.dir=${TmpDir} \
+     -Dsipxconfig.db.user=@POSTGRESQL_USER@ \
+     -Dpostgres-pwd.password='${password}' \
      -Djetty.sslContext.keyStorePath=${KeyStore} \
      -Djetty.sslContext.keyStorePassword=changeit \
      -Djetty.sslContext.trustStorePath=${TrustStore} \
@@ -215,10 +218,12 @@ start() {
   clearIndexLocks
   buildCommand $prog
   if [[ -s "${KeyStore}" ]]; then
-    Command="$Command -jar ${JettyHomeDir}/start.jar --modules=ssl"
+    Command="$Command -jar ${JettyHomeDir}/start.jar --modules=https"
   else 
     Command="$Command -jar ${JettyHomeDir}/start.jar" 
   fi
+  touch ${LogDir}/sipxconfig.log
+  chown @SIPXPBXUSER@:@SIPXPBXUSER@ ${LogDir}/sipxconfig.log
   $Command >> ${LogDir}/sipxconfig.log 2>&1
   if [ -n "${NoFork}" ] ; then
     killAnyOrphans @SIPXPBXUSER@ $regex
