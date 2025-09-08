@@ -281,6 +281,7 @@ function addCentOS7Repos()
     echo "Begin addCentOS7Repos()"
 
     LOCAL_REPO=${BUILD_DIR}/repo/CentOS_7/${ARCHITECTURE}
+    LOCAL_SOURCE_REPO=${BUILD_DIR}/repo/CentOS_7/source
 
     echo "Done addCentOS7Repos()"
 }
@@ -290,6 +291,7 @@ function addCentOS9Repos()
     echo "Begin addCentOS9Repos()"
 
     LOCAL_REPO=${BUILD_DIR}/repo/CentOS_9/${ARCHITECTURE}
+    LOCAL_SOURCE_REPO=${BUILD_DIR}/repo/CentOS_9/source
 
     rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
@@ -307,6 +309,7 @@ function addRocky9Repos()
     echo "Begin addRocky9Repos()"
 
     LOCAL_REPO=${BUILD_DIR}/repo/Rocky_9/${ARCHITECTURE}
+    LOCAL_SOURCE_REPO=${BUILD_DIR}/repo/Rocky_9/source
 
     rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
@@ -652,19 +655,34 @@ function build()
     if [ -z "${RPM}" ]; then
 
         sudo make ${SUBPROJECT}
+
+        ERROR=$?
+        if [ ${ERROR} -ne 0 ]; then 
+            echo "make error, exiting sipxecs-build"
+            exit ${ERROR}
+        fi 
     
     else
 
         echo "RPMs will be generated locally at ${LOCAL_REPO}"
 
-        sudo make ${SUBPROJECT}.rpm       
-    fi
+        sudo make ${SUBPROJECT}.rpm  
 
-    ERROR=$?
-    if [ ${ERROR} -ne 0 ]; then 
-        echo "make error, exiting sipxecs-build"
-        exit ${ERROR}
-    fi 
+        ERROR=$?
+        if [ ${ERROR} -ne 0 ]; then 
+            echo "make error, exiting sipxecs-build"
+            exit ${ERROR}
+        fi 
+
+        echo "Cleaning up old RPMs"
+
+        repomanage --keep=1 --old ${LOCAL_REPO} | grep .rpm | xargs rm
+        createrepo --update  ${LOCAL_REPO}
+
+        repomanage --keep=1 --old ${LOCAL_SOURCE_REPO} | grep .src.rpm | xargs rm
+        createrepo --update  ${LOCAL_SOURCE_REPO}
+
+    fi
 
     echo "Done build()"
 }
