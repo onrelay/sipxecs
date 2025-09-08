@@ -418,7 +418,6 @@ ISO_ADD_OS = \
   jakarta-commons-dbcp-* \
   jakarta-commons-discovery-0* \
   jakarta-commons-httpclient-3.* \
-  jakarta-commons-logging-* \
   jakarta-commons-pool-1.* \
   jakarta-taglibs-standard-1.* \
   jasper-libs-* \
