@@ -47,7 +47,7 @@ EOF
 args.parse!
 
 raise '--template [ERB FILE] missing' if $template.nil?
-raise '--in [YAML FILE] missing' if $template.nil?
+raise '--in [YAML FILE] missing' if $yaml.nil?
 
 data = YAML::load_file($yaml)
 

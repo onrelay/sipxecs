@@ -202,7 +202,7 @@ setting up for the first time or if you know you are only going to setup one
 server. This can make configuration easier.  You can always change the value
 later.
 EOF
-  sip_domain = prompt_default("Enter \e[0;31mSIP domain\e[m name", net.domain, :sip_domain)
+  sip_domain = prompt_default("Enter \e[0;31mSIP domain\e[m name", "#{net.host}.#{net.domain}", :sip_domain)
   realm = prompt_default("Enter \e[0;31mSIP realm\e[m", sip_domain, :sip_realm)
   # shared secret is not really used anymore, but some servers still read it
   shared_secret = `head -c 18 /dev/urandom | base64`.chomp
@@ -261,23 +261,37 @@ def reset_all
   # cannot rely stop_sipxecs worked all the way
   cmd_no_die("killall -9 java")
 
-  Dir.foreach($cfdatadir) { |f|
-    next if f == '.' or f == '..'
-    fname = "#{$cfdatadir}/#{f}"
+  # Remove files in cfdatadir except defaults folder
+  Dir.glob("#{$cfdatadir}/*").each do |fname|
     if File.directory?(fname)
-      next if f == 'defaults'
-      rm_files fname
+      next if File.basename(fname) == 'defaults'
+      rm_files(fname)
     else
-      rm_file fname
+      rm_file(fname)
     end
-  }
+  end
+
+  # Remove mongodir and mongoarbiterdir contents
   rm_files($mongodir)
   rm_files($mongoarbiterdir)
+
   reset
-  cfe = ["#{$root_cfenginedir}/ppkeys/*", "#{$root_cfenginedir}/state/*", "#{$root_cfenginedir}/*.tcdb" ]
-  Dir.glob(cfe).each {|f|
-    rm_file(f)
-  }
+
+  # Clean up cfengine files
+  cfe_patterns = [
+    "#{$root_cfenginedir}/ppkeys/*",
+    "#{$root_cfenginedir}/state/*",
+    "#{$root_cfenginedir}/*.tcdb"
+  ]
+  cfe_patterns.each do |pattern|
+    Dir.glob(pattern).each do |fname|
+      if File.directory?(fname)
+        rm_files(fname)
+      else
+        rm_file(fname)
+      end
+    end
+  end
   rm_files("#{$home_dir}/.cfagent")
   rm_files("#{$tmp_dir}")
 
@@ -331,14 +345,6 @@ def cmd_no_die(cmd)
 end
 
 def network_settings
-  # if it is centos 7 use nmtui else use system-config-network-tui
-  os = `uname -r`
-  if os.include? ".el7."
-    tui = "/usr/bin/nmtui"
-  else
-    tui = "/usr/sbin/system-config-network-tui"
-  end
-
   change = false
   while true
     net = get_network(true)
@@ -347,7 +353,7 @@ def network_settings
     reprompt = prompt_confirm("Would you like to configure your system\'s \e[0;31m network settings\e[m?") unless $prompt[:noui]
     if reprompt
       change = true
-      system(tui)
+      system("/usr/bin/nmtui")
       system("/usr/bin/systemctl reload network.service")
     else
       break
@@ -398,6 +404,10 @@ end
 def get_network(force = false)
   return $network if (!force and defined? $network)
   $network = Network.new
+end
+
+def update_config_access
+  FileUtils.chown_R($user, $group, $cfdatadir)
 end
 
 class Network
@@ -685,6 +695,7 @@ create_pid_folders
 network_settings
 disable_firewalld
 custom_hook
+update_config_access
 role_settings = nil
 
 while true
@@ -702,8 +713,9 @@ end
 
 # First pass generated cfdata info
 if is_primary?
-  puts "Initial setup, this may take a few minutes..."
+  puts "Initial setup, please wait..."
   exit 1 unless run_command("#{$bindir}/sipxagent #{'-v ' if $verbose} -d setup")
+  update_config_access
   puts "Finishing system configuration, almost done..."
 else  
   if $sync_time
@@ -720,12 +732,12 @@ EOF
       run_command("/usr/sbin/ntpd -gnq#{'d' if $verbose} -c #{tmp_ntp}")
     end
   end
-  puts "Configuring system, this may take a few minutes..."
+  puts "Configuring system, please wait..."
 end
 
 # 2nd pass operates on cfdata info
 ok = run_command("#{$bindir}/sipxagent #{'-v ' if $verbose}")
-FileUtils.chown_R($user, $group, $cfdatadir)
+update_config_access
 if !ok
   puts "failed."
   exit 1
