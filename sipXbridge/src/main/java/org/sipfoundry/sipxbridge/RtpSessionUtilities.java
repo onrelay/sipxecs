@@ -159,7 +159,10 @@ public class RtpSessionUtilities {
 			if (peerDat.getItspInfo() == null
 					|| peerDat.getItspInfo().isGlobalAddressingUsed()) {
 				if (Gateway.getGlobalAddress() != null) {
-					SipUtilities.setGlobalAddresses(newInvite);	        
+
+					String transport = peerProvider.getListeningPoints()[0].getTransport();
+
+					SipUtilities.setGlobalAddresses(newInvite, transport);	        
 				} else {
 					javax.sip.header.ReasonHeader warning = ProtocolObjects.headerFactory
 							.createReasonHeader("SipXbridge", ReasonCode.SIPXBRIDGE_CONFIG_ERROR,

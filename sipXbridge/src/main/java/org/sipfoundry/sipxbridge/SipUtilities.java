@@ -1641,12 +1641,10 @@ class SipUtilities {
 	 *
 	 * @param request
 	 */
-	static void setGlobalAddresses(Request request) {
+
+	static void setGlobalAddresses(Request request, String transport ) {
 	    try {
-	    	
-	        String transport = ((ViaHeader) request.getHeader(ViaHeader.NAME))
-	                            .getTransport().toLowerCase();
-	                            	        
+	    	         	        
 	        SipURI sipUri = ProtocolObjects.addressFactory.createSipURI(null,
 	                        Gateway.getGlobalAddress());
 	        
@@ -1982,9 +1980,11 @@ class SipUtilities {
 				 * Request is bound to the WAN.
 				 */
 				if (DialogContext.get(dialog).getItspInfo() == null
-						|| DialogContext.get(dialog).getItspInfo()
-								.isGlobalAddressingUsed()) {
-					SipUtilities.setGlobalAddresses(request);
+						|| DialogContext.get(dialog).getItspInfo().isGlobalAddressingUsed()) {
+
+					String transport = provider.getListeningPoints()[0].getTransport();
+
+					SipUtilities.setGlobalAddresses(request, transport);
 					SipUtilities.addWanAllowHeaders(request);
 					request.removeHeader(SupportedHeader.NAME);
 

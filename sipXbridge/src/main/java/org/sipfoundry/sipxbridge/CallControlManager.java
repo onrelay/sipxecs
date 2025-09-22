@@ -356,7 +356,10 @@ class CallControlManager implements SymmitronResetHandler {
             if (provider == Gateway.getLanProvider()
                     && (peerDialogContext.getItspInfo() == null || peerDialogContext.getItspInfo()
                             .isGlobalAddressingUsed())) {
-                SipUtilities.setGlobalAddresses(newRequest);
+
+                String transport = peerDialogContext.getSipProvider().getListeningPoints()[0].getTransport();
+
+                SipUtilities.setGlobalAddresses(newRequest, transport);
             }
 
             /*

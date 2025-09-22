@@ -519,13 +519,15 @@ public class BackToBackUserAgent implements Comparable {
             .get(replacedDialogPeerDialog);
             Request reInvite = replacedDialogPeerDialog.createRequest(Request.INVITE);
 
-            ItspAccountInfo accountInfo = replacedDialogPeerDialogApplicationData
-            .getItspInfo();
+            ItspAccountInfo accountInfo = replacedDialogPeerDialogApplicationData.getItspInfo();
             /*
              * Patch up outbound re-INVITE.
              */
             if (accountInfo == null || accountInfo.isGlobalAddressingUsed()) {
-                SipUtilities.setGlobalAddresses(reInvite);
+
+                String transport = 
+                    replacedDialogPeerDialogApplicationData.getSipProvider().getListeningPoints()[0].getTransport();
+                SipUtilities.setGlobalAddresses(reInvite, transport );
             }
 
             SessionDescription sessionDescription = SipUtilities
@@ -1125,6 +1127,7 @@ public class BackToBackUserAgent implements Comparable {
             Request referRequest = requestEvent.getRequest();
             ItspAccountInfo itspInfo = DialogContext.get(peerDialog).getItspInfo();
             SipProvider wanProvider = ((DialogExt) peerDialog).getSipProvider();
+            String transport = wanProvider.getListeningPoints()[0].getTransport();
 
             Request outboundRefer = peerDialog.createRequest(Request.REFER);
 
@@ -1156,7 +1159,7 @@ public class BackToBackUserAgent implements Comparable {
             outboundRefer.setHeader(outboundReferToHeader);
 
             if (itspInfo == null || itspInfo.isGlobalAddressingUsed()) {
-                SipUtilities.setGlobalAddresses(outboundRefer);
+                SipUtilities.setGlobalAddresses(outboundRefer, transport);
             }
 
             SipUtilities.addWanAllowHeaders(outboundRefer);
@@ -2263,8 +2266,12 @@ public class BackToBackUserAgent implements Comparable {
                 Request reInvite = peerDialog.createRequest(Request.INVITE);
                 SipUtilities.addWanAllowHeaders(reInvite);
                 if ( peerDat.getSipProvider() != Gateway.getLanProvider()) {
+
                     if (peerDat.getItspInfo() == null || peerDat.getItspInfo().isGlobalAddressingUsed() ) {
-                        SipUtilities.setGlobalAddresses(reInvite);
+
+                        String transport = peerDat.getSipProvider().getListeningPoints()[0].getTransport();
+
+                        SipUtilities.setGlobalAddresses(reInvite, transport);
                     }
                 }
 

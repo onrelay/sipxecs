@@ -260,6 +260,9 @@ class DialogContext {
                     }
 
                     SipProvider provider = ((DialogExt) dialog).getSipProvider();
+                
+                    String transport = provider.getListeningPoints()[0].getTransport();
+
                     RtpSession rtpSession = getRtpSession();
                     if (rtpSession == null || rtpSession.getReceiver() == null) {
                         return;
@@ -292,7 +295,7 @@ class DialogContext {
                     }
 
                     if (getItspInfo() == null || getItspInfo().isGlobalAddressingUsed()) {
-                        SipUtilities.setGlobalAddresses(request);
+                        SipUtilities.setGlobalAddresses(request, transport );
                     }
 
 
@@ -753,11 +756,6 @@ class DialogContext {
                 SipUtilities.addWanAllowHeaders(reInvite);
 
                 SipProvider provider = ((DialogExt) peerDialog).getSipProvider();
- 
-                /* OR: fails, must select other side transport
-
-                String transport = getTransport();
-                */
                 
                 String transport = provider.getListeningPoints()[0].getTransport();
                                                 
@@ -772,9 +770,9 @@ class DialogContext {
                 AcceptHeader acceptHeader = ProtocolObjects.headerFactory.createAcceptHeader(
                         "application", "sdp");
                 reInvite.setHeader(acceptHeader);
-                if ( provider == Gateway.getWanProvider(transport) &&
+                if ( provider != Gateway.getLanProvider() &&
                 		(this.itspInfo == null || this.itspInfo.isGlobalAddressingUsed())) {
-                	SipUtilities.setGlobalAddresses(reInvite);
+                	SipUtilities.setGlobalAddresses(reInvite, transport );
                 }
 
                 /*
@@ -1262,14 +1260,15 @@ class DialogContext {
         try {
             Request bye = dialog.createRequest(Request.BYE);
            
-
             if ( getSipProvider() != Gateway.getLanProvider() ) {
             	
                 if ( logger.isDebugEnabled() ) logger.debug("DialogContext.forwardBye: Send BYE to WAN side with itspInfo: " + itspInfo );
             	
                 if ( itspInfo == null || itspInfo.isGlobalAddressingUsed()) {
                 	
-                    SipUtilities.setGlobalAddresses(bye);
+                    String transport = getSipProvider().getListeningPoints()[0].getTransport();
+
+                    SipUtilities.setGlobalAddresses(bye, transport);
                 }
             }
             else {
@@ -1340,7 +1339,9 @@ class DialogContext {
         	
             if ( itspInfo == null || itspInfo.isGlobalAddressingUsed()) {
             	
-                SipUtilities.setGlobalAddresses(bye);
+                String transport = getSipProvider().getListeningPoints()[0].getTransport();
+
+                SipUtilities.setGlobalAddresses(bye, transport);
             }
         }
         else {
