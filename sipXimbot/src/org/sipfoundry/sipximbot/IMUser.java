@@ -30,22 +30,36 @@ import org.apache.hc.core5.http.HttpEntity;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.MessageListener;
-import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.chat2.Chat;
+import org.jivesoftware.smack.chat2.ChatManager;
+import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
+import org.jivesoftware.smack.roster.Roster;
+import org.jivesoftware.smack.roster.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+
+import org.jxmpp.jid.EntityBareJid;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.stringprep.XmppStringprepException;
+
+
+
 import org.sipfoundry.commons.freeswitch.ConferenceMember;
 import org.sipfoundry.commons.freeswitch.FreeSwitchEventSocket;
 import org.sipfoundry.commons.freeswitch.FreeSwitchEventSocketInterface;
 import org.sipfoundry.commons.freeswitch.Set;
+
 import org.sipfoundry.commons.userdb.User;
 import org.sipfoundry.commons.userdb.ValidUsers;
+
 import org.sipfoundry.sipximbot.CallHelper.CallHelperReturnCode;
 import org.sipfoundry.sipximbot.IMContext.Command;
 import org.sipfoundry.sipximbot.IMContext.Place;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -91,39 +105,43 @@ public class IMUser {
             m_resource = null;
             // m_atPlace = Place.WORK;
 
-            m_chat = m_con.getChatManager().createChat(jabberId, new MessageListener() {
+            ChatManager chatManager = ChatManager.getInstanceFor(m_con);
+
+            try {
+                m_chat = chatManager.chatWith(JidCreate.entityBareFrom(jabberId));
+            } catch( XmppStringprepException e ) {
+                LOG.error("Invalid jabberID: " + jabberId, e);
+                throw new RuntimeException( e );
+            }
+
+            chatManager.addIncomingListener(new IncomingChatMessageListener() {
                 @Override
-                public void processMessage(Chat chat, Message message) {
-                    if(message.getType() == Message.Type.error) {
+                public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
+                    if (message.getType() == Message.Type.error) {
                         // ignore error IMs
                         return;
                     }
 
-                    if(message.getBody() == null) {
+                    if (message.getBody() == null) {
                         return;
                     }
 
-                    String from = chat.getParticipant();
-                    if(from.indexOf('/') > 0) {
-                        from = from.substring(0, from.indexOf('/'));
-                    }
+                    String fromStr = from.asEntityBareJidString();
 
-
-                    User fromUser = IMBot.findUser(from);
+                    User fromUser = IMBot.findUser(fromStr);
 
                     boolean deleteRosterEntry = fromUser == null;
-                    if(fromUser != null) {
-                        deleteRosterEntry  = !fromUser.getUserName().equals(m_user.getUserName());
+                    if (fromUser != null) {
+                        deleteRosterEntry = !fromUser.getUserName().equals(m_user.getUserName());
                     }
 
-                    if(deleteRosterEntry) {
+                    if (deleteRosterEntry) {
                         // likely user has been deleted
-                        m_chat.removeMessageListener(this);
-                        RosterEntry entry = m_con.getRoster().getEntry(from);
+                        RosterEntry entry = Roster.getInstanceFor(m_con).getEntry(from);
                         try {
-                            m_con.getRoster().removeEntry(entry);
-                        } catch (XMPPException e) {
-
+                            Roster.getInstanceFor(m_con).removeEntry(entry);
+                        } catch (Exception e) {
+                            LOG.warn("Error removing roster entry for " + fromStr, e);
                         }
                         return;
                     }
@@ -131,14 +149,14 @@ public class IMUser {
                     // update our view of the user
                     m_user = fromUser;
 
-                    LOG.debug("From " + from + " IM: " + message.getBody());
+                    LOG.debug("From " + fromStr + " IM: " + message.getBody());
 
-                    synchronized(this) {
-                        m_resource = message.getFrom();
+                    synchronized (this) {
+                        m_resource = message.getFrom().toString();
                         m_context.setResource(m_resource);
                         boolean cmdComplete = m_context.receivedIM(message.getBody());
 
-                        if(cmdComplete) {
+                        if (cmdComplete) {
                             String cmdResult = ProcessCmd(message.getBody());
                             if (cmdResult.length() > 0) {
                                 sendIM(cmdResult);
@@ -325,14 +343,21 @@ public class IMUser {
             try {
                 Message message = new Message();
                 if(m_resource != null) {
-                    message.setTo(m_resource);
+                    message.setTo(JidCreate.entityBareFrom(m_resource));
                 } else {
-                    message.setTo(m_chat.getParticipant());
+                    message.setTo(m_chat.getXmppAddressOfChatPartner());
                 }
                 message.setBody(msg);
-                m_chat.sendMessage(message);
-            } catch (XMPPException e) {
-                LOG.error("exception in sendIM " + e.getMessage());
+                m_chat.send(message);
+            } 
+            catch (XmppStringprepException e) {
+                LOG.error("Stringprep exception in send IM " + e.getMessage());
+            }
+            catch (NotConnectedException e) {
+                LOG.error("Not connected exception in send IM " + e.getMessage());
+            }
+            catch (InterruptedException e) {
+                LOG.error("Interrupted exception in send IM " + e.getMessage());
             }
         }
 

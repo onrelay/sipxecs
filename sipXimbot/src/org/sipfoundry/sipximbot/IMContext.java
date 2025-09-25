@@ -2,10 +2,19 @@ package org.sipfoundry.sipximbot;
 
 import java.util.Date;
 import java.util.StringTokenizer;
+
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.Chat;
+
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.EntityBareJid;
+import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.stringprep.XmppStringprepException;
+
+import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+
 
 /*
  *  this class is responsible with conversing with the user until a command has
@@ -175,15 +184,22 @@ public class IMContext {
         try {
             Message message = new Message();
             if(m_resource != null) {
-                message.setTo(m_resource);
+                message.setTo(JidCreate.entityBareFrom(m_resource));
             } else {
-                message.setTo(m_chat.getParticipant());
+                message.setTo(m_chat.getXmppAddressOfChatPartner());
             }
             message.setBody(msg);
-            m_chat.sendMessage(message);
-        } catch (XMPPException e) {
-            LOG.error("IMContext.sendMsg XMPP Exception: " + m_chat.getParticipant());
-        }         
+            m_chat.send(message);
+        } 
+        catch (NotConnectedException e) {
+            LOG.error("IMContext.sendMsg not connected exception: " + m_chat.getXmppAddressOfChatPartner());
+        } 
+        catch (XmppStringprepException e) {
+            LOG.error("IMContext.sendMsg stringprep exception: " + m_chat.getXmppAddressOfChatPartner());
+        } 
+        catch (InterruptedException e) {
+            LOG.error("IMContext.sendMsg interrupted exception: " + m_chat.getXmppAddressOfChatPartner());
+        }        
     }
     
     private void parseFindCmd(StringTokenizer st) {

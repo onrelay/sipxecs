@@ -1,12 +1,19 @@
 imbot_PKGS = \
 	sipxcommons \
 	log4j \
-	smack \
-	smackx \
+	smack-core \
+	smack-extensions \
+	smack-im \
+	smack-tcp \
+	minidns-core \
+	tinder \
+	whack \
+	jxmpp-core \
+	jxmpp-jid \
 	commons-io \
 	commons-codec \
 	commons-lang \
-	commons-logging \
+	commons-logging-jakarta  \
 	httpclient5 \
 	httpcore5 \
 	jakarta.servlet \
@@ -17,5 +24,5 @@ imbot_PKGS = \
 	ws-commons-util \
 	jcl-over-slf4j \
 	slf4j-api \
-	slf4j-log4j12 \
-	hazelcast-all
+	slf4j-reload4j \
+	hazelcast

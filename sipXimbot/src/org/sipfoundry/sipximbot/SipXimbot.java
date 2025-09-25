@@ -15,7 +15,7 @@ import org.sipfoundry.commons.hz.HzMediaEvent;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ITopic;
+import com.hazelcast.topic.ITopic;
 
 public class SipXimbot {
     static final Logger LOG = Logger.getLogger("org.sipfoundry.sipximbot");

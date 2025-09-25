@@ -15,23 +15,32 @@
 package org.sipfoundry.sipximbot;
 
 import org.apache.log4j.Logger;
+
+import com.hazelcast.topic.Message;
+import com.hazelcast.topic.MessageListener;
+
+import org.jxmpp.stringprep.XmppStringprepException;
+
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+
 import org.sipfoundry.commons.hz.HzImEvent;
 import org.sipfoundry.commons.userdb.User;
-
-import com.hazelcast.core.Message;
-import com.hazelcast.core.MessageListener;
 
 public class ImMessageListener implements MessageListener<HzImEvent> {
     static final Logger LOG = Logger.getLogger("org.sipfoundry.sipximbot");
 
     @Override
     public void onMessage(Message<HzImEvent> message) {
-        HzImEvent event = message.getMessageObject();
-        if (event.getType() == HzImEvent.Type.ADD_MYBUDDY_TO_ROSTER) {
-            String userId = event.getUserId();
-            User user = FullUsers.INSTANCE.isValidUser(userId);
-            LOG.debug("Add mybuddy to ROSTER for: " + userId);
-            IMBot.AddToRoster(user);
+        try {
+            HzImEvent event = message.getMessageObject();
+            if (event.getType() == HzImEvent.Type.ADD_MYBUDDY_TO_ROSTER) {
+                String userId = event.getUserId();
+                User user = FullUsers.INSTANCE.isValidUser(userId);
+                LOG.debug("Add mybuddy to ROSTER for: " + userId);
+                IMBot.addToRoster(user);
+            }
+        } catch( XmppStringprepException | NotConnectedException | InterruptedException e ) {
+            LOG.error("Error handling message: " + message, e );
         }
     }
 
