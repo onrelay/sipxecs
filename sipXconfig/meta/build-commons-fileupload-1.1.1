@@ -5,11 +5,11 @@
 
 # Get 1.1 sources
 
-svn co http://svn.apache.org/repos/asf/jakarta/commons/proper/fileupload/tags/FILEUPLOAD_1_1 commons-fileupload-1.1.1
+svn co http://svn.apache.org/repos/asf/jakarta/commons/proper/fileupload/tags/FILEUPLOAD_1_1 commons-fileupload-jakarta-1.1.1
 
 # Apply the patch
 
-cd commons-fileupload-1.1.1
+cd commons-fileupload-jakarta-1.1.1
 patch -p0 < ../lowercase-fix.patch
 
 # Build using ant

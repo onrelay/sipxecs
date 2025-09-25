@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.TimeZone;
 
 import junit.framework.JUnit4TestAdapter;
@@ -73,19 +74,20 @@ public class CustomDialingRuleTest {
     public void setUp() throws Exception {
         m_schedule = new GeneralSchedule();
         m_schedule.setName("Custom schedule");
-        WorkingHours[] hours = new WorkingHours[1];
-        WorkingTimeAttendant wt = new WorkingTimeAttendant();
-        hours[0] = new WorkingHours();
+        List<WorkingHours> workingHours = new ArrayList<WorkingHours>();
+        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        WorkingHours workingHoursItem = new WorkingHours();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         cal.set(2006, Calendar.DECEMBER, 31, 10, 12);
-        hours[0].setStart(cal.getTime());
+        workingHoursItem.setStart(cal.getTime());
         cal.set(2006, Calendar.DECEMBER, 31, 11, 88);
-        hours[0].setStop(cal.getTime());
-        hours[0].setEnabled(true);
-        hours[0].setDay(ScheduledDay.WEDNESDAY);
-        wt.setWorkingHours(hours);
-        wt.setEnabled(true);
-        m_schedule.setWorkingTimeAttendant(wt);
+        workingHoursItem.setStop(cal.getTime());
+        workingHoursItem.setEnabled(true);
+        workingHoursItem.setDay(ScheduledDay.WEDNESDAY);
+        workingHours.add(workingHoursItem);
+        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.setEnabled(true);
+        m_schedule.setWorkingTimeAttendant(workingTimeAttendant);
         DialPattern[] dialPatterns = new DialPattern[PATTERN_COUNT];
         for (int i = 0; i < dialPatterns.length; i++) {
             DialPattern p = new DialPattern();

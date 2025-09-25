@@ -26,7 +26,7 @@ import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 
 @XmlRootElement(name = "workingTimeAttendant")
 public class WorkingTimeAttendantBean {
-    private WorkingHoursBean[] m_workingHours;
+    private List<WorkingHoursBean> m_workingHours;
 
     public static WorkingTimeAttendantBean convertWorkingTimeAttendantBean(WorkingTimeAttendant workingTimeAttendant) {
         List<WorkingHoursBean> workingHoursList = new ArrayList<WorkingHoursBean>();
@@ -34,30 +34,29 @@ public class WorkingTimeAttendantBean {
             workingHoursList.add(WorkingHoursBean.convertWorkingHours(workingHours));
         }
         WorkingTimeAttendantBean workingTimeAttendantBean = new WorkingTimeAttendantBean();
-        workingTimeAttendantBean.setWorkingHours(workingHoursList.toArray(new WorkingHoursBean[workingHoursList.size()]));
+        workingTimeAttendantBean.setWorkingHours(workingHoursList);
         return workingTimeAttendantBean;
     }
 
     public static WorkingTimeAttendant convertToWorkingTimeAttendant(WorkingTimeAttendantBean workingTimeAttendantBean) {
         WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
-        WorkingHours[] workingHoursArray = new WorkingHours[workingTimeAttendantBean.getWorkingHours().length];
-        int i = 0;
+        ArrayList<WorkingHours> workingHours = new ArrayList<WorkingHours>();
         for (WorkingHoursBean workingHoursBean : workingTimeAttendantBean.getWorkingHours()) {
-            workingHoursArray[i++] = (WorkingHoursBean.convertToWorkingHours(workingHoursBean));
+            workingHours.add( WorkingHoursBean.convertToWorkingHours(workingHoursBean) );
         }
-        workingTimeAttendant.setWorkingHours(workingHoursArray);
+        workingTimeAttendant.setWorkingHours(workingHours);
         return workingTimeAttendant;
     }
 
-    public void setWorkingHours(WorkingHoursBean[] workingHours) {
+    public void setWorkingHours(List<WorkingHoursBean> workingHours) {
         m_workingHours = workingHours;
     }
 
     @XmlElement(name = "workingHours")
     @JsonProperty(value = "workingHours")
-    public WorkingHoursBean[] getWorkingHours() {
+    public List<WorkingHoursBean> getWorkingHours() {
         if (m_workingHours == null) {
-            m_workingHours = new WorkingHoursBean[0];
+            m_workingHours = new ArrayList<WorkingHoursBean>();
         }
         return m_workingHours;
     }

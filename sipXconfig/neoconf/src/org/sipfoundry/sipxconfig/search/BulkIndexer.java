@@ -33,9 +33,11 @@ public class BulkIndexer implements Indexer {
         try {
             Document document = new Document();
             if (m_beanAdaptor.documentFromBean(document, bean, id, state, fieldNames, types)) {
+                open();
                 m_writer.addDocument(document);
             }
         } catch (IOException e) {
+            close();
             throw new RuntimeException(e);
         }
     }
@@ -46,14 +48,19 @@ public class BulkIndexer implements Indexer {
 
     public void open() {
         try {
-            m_writer = m_indexSource.getWriter(true);
+            if( m_writer == null ) {
+                m_writer = m_indexSource.getWriter(true);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public void close() {
-        LuceneUtils.closeQuietly(m_writer);
+        if( m_writer != null ) {
+            LuceneUtils.closeQuietly(m_writer);
+            m_writer = null;
+        }
     }
 
     public void setIndexSource(IndexSource indexSource) {

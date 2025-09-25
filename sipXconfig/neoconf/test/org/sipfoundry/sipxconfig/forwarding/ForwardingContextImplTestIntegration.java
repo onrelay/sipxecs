@@ -215,20 +215,21 @@ public class ForwardingContextImplTestIntegration extends ImdbTestCase {
 
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         c.set(1970, Calendar.JANUARY, 1);
-        WorkingTimeAttendant wt = new WorkingTimeAttendant();
+        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
 
-        WorkingHours[] hours = new WorkingHours[1];
-        hours[0] = new WorkingHours();
-        hours[0].setDay(ScheduledDay.SUNDAY);
+        List<WorkingHours> workingHours = new ArrayList<WorkingHours>();
+
+        workingHours.add( new WorkingHours() );
+        workingHours.get(0).setDay(ScheduledDay.SUNDAY);
         c.set(Calendar.HOUR_OF_DAY, 9);
         c.set(Calendar.MINUTE, 0);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 18);
         c.set(Calendar.MINUTE, 0);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
         Schedule schedule = new UserSchedule();
         schedule.setUser(user);

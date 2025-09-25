@@ -36,7 +36,7 @@ public class SpringValidatorFactory implements ValidatorFactory {
         ArrayList validators = new ArrayList();
         BeanFactory factory = m_beanFactorySource.getBeanFactory();
         for (int i = 0; i < tokens.length; i++) {
-            // FIXME: switch to look in hivemind first, then spring to ensure
+            // FIXME: switch to look in hivemind-jakarta first, then spring to ensure
             // beans such as "required" don't accidently get picked up as validators
             if (factory.containsBean(tokens[i])) {
                 Validator v = (Validator) factory.getBean(tokens[i]);

@@ -23,9 +23,6 @@
     <property name="domainManager" ref="domainManager"/>
   </bean>
   
-  <bean id="passwordPolicyImpl" class="org.sipfoundry.sipxconfig.admin.PasswordPolicyImpl">
-  </bean>
-  
   <bean id="adminSettings" class="org.sipfoundry.sipxconfig.admin.AdminSettings" parent="settingsBean">
   	<property name="passwordPolicy" ref="passwordPolicyImpl"/>
   	<property name="logLevelKeys">
@@ -37,25 +34,29 @@
     </property>
   </bean>
 
-  <bean id="adminConfig" class="org.sipfoundry.sipxconfig.admin.AdminConfig">
-    <property name="adminContext" ref="adminContext"/>
+  <bean id="passwordPolicyImpl" class="org.sipfoundry.sipxconfig.admin.PasswordPolicyImpl">
   </bean>
   
   <bean id="proxyResLimits" class="org.sipfoundry.sipxconfig.admin.ResLimitsConfigImpl">
     <property name="prefix" value="sipxproxy-"/>
   </bean>
+
   <bean id="publisherResLimits" class="org.sipfoundry.sipxconfig.admin.ResLimitsConfigImpl">
     <property name="prefix" value="sipxpublisher-"/>
   </bean>
+
   <bean id="registrarResLimits" class="org.sipfoundry.sipxconfig.admin.ResLimitsConfigImpl">
     <property name="prefix" value="sipxregistry-"/>
   </bean>
+
   <bean id="rlsResLimits" class="org.sipfoundry.sipxconfig.admin.ResLimitsConfigImpl">
     <property name="prefix" value="sipxrls-"/>
   </bean>
+
   <bean id="saaResLimits" class="org.sipfoundry.sipxconfig.admin.ResLimitsConfigImpl">
     <property name="prefix" value="sipxsaa-"/>
   </bean> 
+
 
   <bean id="resLimitsConfiguration" class="org.sipfoundry.sipxconfig.admin.ResLimitsConfiguration">
     <property name="adminContext" ref="adminContext"/>

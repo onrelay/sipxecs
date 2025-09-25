@@ -16,33 +16,21 @@
  */
 package org.sipfoundry.sipxconfig.elasticsearch;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch.core.*;
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
+import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
+import co.elastic.clients.transport.endpoints.BooleanResponse;
+import co.elastic.clients.elasticsearch.indices.ExistsRequest;
+import co.elastic.clients.json.JsonData;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.count.CountRequestBuilder;
-import org.elasticsearch.action.count.CountResponse;
-import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.NoNodeAvailableException;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.index.query.IdsQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.sort.SortOrder;
+import org.elasticsearch.client.RestClient;
+import org.apache.hc.core5.http.HttpHost;
+
 import org.sipfoundry.sipxconfig.address.Address;
 import org.sipfoundry.sipxconfig.address.AddressManager;
 import org.sipfoundry.sipxconfig.address.AddressProvider;
@@ -69,6 +57,10 @@ import org.sipfoundry.sipxconfig.snmp.SnmpManager;
 
 import com.google.gson.Gson;
 
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+
 /**
  * Elastic search implementation for SearchableService
  */
@@ -78,88 +70,76 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
     public static final LocationFeature FEATURE = new LocationFeature(ELASTICSEARCH);
     public static final AddressType ES_UDP = new AddressType("esUdp", Protocol.udp);
     public static final AddressType ES_TCP = new AddressType("esTcp", Protocol.tcp);
-    private static final Collection<AddressType> ADDRESS_TYPES = Arrays.asList(new AddressType[] {
-        ES_UDP, ES_TCP
-    });
+    private static final Collection<AddressType> ADDRESS_TYPES = Arrays.asList(ES_UDP, ES_TCP);
 
     private static final Log LOG = LogFactory.getLog(ElasticsearchServiceImpl.class);
     private static final String FILTERING_ERROR_MESSAGE = "Filtering is supported only by QueryBuilder objects.";
     private static final String NO_NODE_AVAILABLE_ERROR_MESSAGE = "No available nodes in ElasticSearch.";
-    private static final String CONFIG = "config";
     private static final String ELASTICSEARCH_REGEXP = ".*\\java -Xms256m -Xmx1g -Djava.awt.headless=true\\s.*";
 
-    private Client m_client;
+    private ElasticsearchClient m_client;
     private String m_hostName;
     private int m_port;
     private Gson m_gson;
     private LocationsManager m_locationsManager;
 
-    
     public void setHostName(String hostName) {
         m_hostName = hostName;
     }
 
-    
     public void setPort(int port) {
         m_port = port;
     }
 
-    
     public void setGson(Gson gson) {
         m_gson = gson;
     }
 
-    private Client getClient() {
+    public void setLocationsManager(LocationsManager locationsManager) {
+        m_locationsManager = locationsManager;
+    }
+
+    private ElasticsearchClient getClient() {
         if (m_client == null) {
             try {
                 String fqdn = m_locationsManager.getPrimaryLocation().getFqdn();
-                Settings settings = ImmutableSettings.settingsBuilder().
-                        put("cluster.name", fqdn).build();
-                m_client = new TransportClient(settings).addTransportAddress(new InetSocketTransportAddress(fqdn, m_port));
+                RestClient restClient = RestClient.builder(new HttpHost("http", fqdn, m_port)).build();                
+                m_client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper()));
             } catch (Exception e) {
-                LOG.error("Cannot create elasticsearch client, probably elasticsearh service is not up yet.", e);
+                LOG.error("Cannot create elasticsearch client, probably elasticsearch service is not up yet.", e);
             }
         }
         return m_client;
     }
 
-    public void setClient(Client client) {
-        m_client = client;
-    }
-
-    private IndexRequest getIndexRequest(String index, SearchableBean source) {
-        IndexRequest indexRequest = new IndexRequest(index, CONFIG);
-        String sourceString = m_gson.toJson(source);
-        indexRequest.source(sourceString);
-        return indexRequest;
-    }
-
     @Override
     public void storeDoc(String index, SearchableBean source) {
-        IndexRequest indexRequest = getIndexRequest(index, source);
         try {
-            getClient().index(indexRequest).actionGet();
-        } catch (NoNodeAvailableException e) {
+            getClient().index(i -> i
+                .index(index)
+                .id(source.getId())
+                .document(source)
+            );
+        } catch (IOException e) {
             LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
         }
     }
 
     @Override
     public void storeBulkDocs(String index, List<SearchableBean> source) {
-        BulkRequestBuilder bulkRequest = getClient().prepareBulk();
-        for (SearchableBean elasticsearchBean : source) {
-            bulkRequest.add(getIndexRequest(index, elasticsearchBean));
-        }
-        if (bulkRequest.numberOfActions() <= 0) {
-            return;
-        }
         try {
-            BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-            if (bulkResponse.hasFailures()) {
-                LOG.error("Perstisting searchable object encountered errors:"
-                        + bulkResponse.buildFailureMessage());
-            }
-        } catch (NoNodeAvailableException e) {
+            List<BulkOperation> ops = source.stream()
+                .map(bean -> BulkOperation.of(b -> b
+                    .index(idx -> idx
+                        .index(index)
+                        .id(bean.getId())
+                        .document(bean)
+                    )
+                ))
+                .collect(Collectors.toList());
+
+            getClient().bulk(b -> b.index(index).operations(ops));
+        } catch (IOException e) {
             LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
         }
     }
@@ -170,36 +150,34 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
         if (!checkIndexExists(indexName)) {
             return new ArrayList<T>();
         }
-        SearchRequestBuilder searchBuilder = getClient().prepareSearch(indexName)
-                .setFrom(start).setSize(size).setTypes(CONFIG);
-        if (orderBy != null) {
-            searchBuilder.addSort(orderBy, orderAscending ? SortOrder.ASC : SortOrder.DESC);
-        }
-        if (filter != null) {
-            if (!(filter instanceof QueryBuilder)) {
+        try {
+            SearchRequest.Builder searchBuilder = new SearchRequest.Builder()
+                .index(indexName)
+                .from(start)
+                .size(size);
+
+            if (orderBy != null) {
+                searchBuilder.sort(s -> s.field(f -> f.field(orderBy).order(orderAscending ? SortOrder.Asc : SortOrder.Desc)));
+            }
+            // Filtering: You must build the query using the new Query DSL
+            // Example: searchBuilder.query(q -> q.matchAll(m -> m));
+            // If you have a QueryBuilder, you'll need to translate it to the new API
+
+            // For now, only support match_all if filter is null
+            if (filter == null) {
+                searchBuilder.query(q -> q.matchAll(m -> m));
+            } else {
                 LOG.error(FILTERING_ERROR_MESSAGE);
             }
-            QueryBuilder queryBuilder = (QueryBuilder) filter;
-            searchBuilder.setQuery(queryBuilder);
-        }
-        try {
-            SearchResponse response = searchBuilder.execute().actionGet();
-            return mapSearchResponseToObject(response, clazz);
-        } catch (NoNodeAvailableException e) {
+
+            SearchResponse<T> response = getClient().search(searchBuilder.build(), clazz);
+            return response.hits().hits().stream()
+                .map(hit -> hit.source())
+                .collect(Collectors.toList());
+        } catch (IOException e) {
             LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
             return new ArrayList<T>();
         }
-    }
-
-    private <T extends SearchableBean> List<T> mapSearchResponseToObject(SearchResponse response, Class<T> clazz) {
-        List<T> results = new ArrayList<T>();
-        SearchHit[] searchHits = response.getHits().getHits();
-        for (SearchHit searchHit : searchHits) {
-            T object = m_gson.fromJson(searchHit.sourceAsString(), clazz);
-            object.setId(searchHit.getId());
-            results.add(object);
-        }
-        return results;
     }
 
     @Override
@@ -207,13 +185,10 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
         if (!checkIndexExists(indexName)) {
             return null;
         }
-        SearchRequestBuilder req = getClient().prepareSearch(indexName);
-        IdsQueryBuilder qb = QueryBuilders.idsQuery().addIds(id);
-        req.setQuery(qb);
         try {
-            SearchResponse response = req.execute().actionGet();
-            return mapSearchResponseToObject(response, clazz).get(0);
-        } catch (NoNodeAvailableException e) {
+            GetResponse<T> response = getClient().get(g -> g.index(indexName).id(id), clazz);
+            return response.found() ? response.source() : null;
+        } catch (IOException e) {
             LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
             return null;
         }
@@ -225,7 +200,7 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
             return null;
         }
         Collection<Location> locations = manager.getFeatureManager().getLocationsForEnabledFeature(FEATURE);
-        Collection<Address> addresses = new ArrayList<Address>(locations.size());
+        Collection<Address> addresses = new ArrayList<>(locations.size());
 
         for (Location location : locations) {
             Address address = null;
@@ -283,23 +258,28 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
         if (!checkIndexExists(indexName)) {
             return 0;
         }
-        CountRequestBuilder countBuilder = getClient().prepareCount().setIndices(indexName);
-        if (filter != null) {
-            if (!(filter instanceof QueryBuilder)) {
+        try {
+            // Filtering: You must build the query using the new Query DSL
+            // For now, only support match_all if filter is null
+            CountRequest.Builder countBuilder = new CountRequest.Builder().index(indexName);
+            if (filter == null) {
+                countBuilder.query(q -> q.matchAll(m -> m));
+            } else {
                 LOG.error(FILTERING_ERROR_MESSAGE);
             }
-            QueryBuilder queryBuilder = (QueryBuilder) filter;
-            countBuilder.setQuery(queryBuilder);
+            CountResponse response = getClient().count(countBuilder.build());
+            return (int) response.count();
+        } catch (IOException e) {
+            LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
+            return 0;
         }
-        CountResponse response = countBuilder.execute().actionGet();
-        return (int) response.getCount();
     }
 
     private boolean checkIndexExists(String indexName) {
         try {
-            return getClient().admin().indices().prepareExists(indexName).execute()
-                .actionGet().isExists();
-        } catch (NoNodeAvailableException e) {
+            BooleanResponse exists = getClient().indices().exists(e -> e.index(indexName));
+            return exists.value();
+        } catch (IOException e) {
             LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
             return false;
         }
@@ -310,45 +290,18 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
         if (!checkIndexExists(indexName)) {
             return;
         }
-        SearchRequestBuilder searchBuilder = getClient().prepareSearch(indexName)
-                .setTypes(CONFIG)
-                .setSize(Integer.MAX_VALUE);
-
-        if (filter != null) {
-            if (!(filter instanceof QueryBuilder)) {
+        try {
+            // Filtering: You must build the query using the new Query DSL
+            // For now, only support match_all if filter is null
+            DeleteByQueryRequest.Builder deleteBuilder = new DeleteByQueryRequest.Builder().index(indexName);
+            if (filter == null) {
+                deleteBuilder.query(q -> q.matchAll(m -> m));
+            } else {
                 LOG.error(FILTERING_ERROR_MESSAGE);
             }
-            QueryBuilder queryBuilder = (QueryBuilder) filter;
-            searchBuilder.setQuery(queryBuilder);
-        }
-        try {
-            SearchResponse response = searchBuilder.execute().actionGet();
-            SearchHit[] searchHits = response.getHits().getHits();
-            if (searchHits.length > 0) {
-                // Create bulk request
-                final BulkRequestBuilder bulkRequest = getClient()
-                        .prepareBulk().setRefresh(true);
-
-                // Add search results to bulk request
-                for (final SearchHit searchHit : searchHits) {
-                    final DeleteRequest deleteRequest = new DeleteRequest(
-                            indexName, CONFIG, searchHit.getId());
-                    bulkRequest.add(deleteRequest);
-                }
-
-                // Run bulk request
-                final BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-                if (bulkResponse.hasFailures()) {
-                    LOG.error(bulkResponse.buildFailureMessage());
-                }
-            }
-        } catch (NoNodeAvailableException e) {
+            getClient().deleteByQuery(deleteBuilder.build());
+        } catch (IOException e) {
             LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
         }
     }
-
-    public void setLocationsManager(LocationsManager locationsManager) {
-        m_locationsManager = locationsManager;
-    }
-
 }

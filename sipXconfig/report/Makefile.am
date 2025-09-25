@@ -12,7 +12,7 @@ report_PKGS = \
 	ant \
 	ant-launcher \
 	commons-digester \
-	commons-logging \
+	commons-logging-jakarta  \
 	commons-collections \
 	commons-beanutils-core \
 	ant-apache-regexp \

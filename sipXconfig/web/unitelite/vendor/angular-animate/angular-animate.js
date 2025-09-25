@@ -455,7 +455,7 @@ var $$rAFSchedulerFactory = ['$$rAF', function($$rAF) {
        <div ng-controller="mainController as main">
          <label>Show container? <input type="checkbox" ng-model="main.enterElement" /></label>
          <label>Animate children? <input type="checkbox" ng-model="main.animateChildren" /></label>
-         <hr>
+         <hr/>
          <div ng-animate-children="{{main.animateChildren}}">
            <div ng-if="main.enterElement" class="container">
              List of items:

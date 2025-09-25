@@ -68,19 +68,20 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
 
         Schedule schedule = new GeneralSchedule();
         schedule.setName("R1 Schedule");
-        WorkingHours[] hours = new WorkingHours[1];
-        WorkingTimeAttendant wt = new WorkingTimeAttendant();
-        hours[0] = new WorkingHours();
+        ArrayList<WorkingHours> workingHours = new ArrayList<WorkingHours>();
+        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        WorkingHours workingHoursItem = new WorkingHours();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         cal.set(2006, Calendar.DECEMBER, 31, 10, 00);
-        hours[0].setStart(cal.getTime());
+        workingHoursItem.setStart(cal.getTime());
         cal.set(2006, Calendar.DECEMBER, 31, 11, 00);
-        hours[0].setStop(cal.getTime());
-        hours[0].setEnabled(true);
-        hours[0].setDay(ScheduledDay.WEDNESDAY);
-        wt.setWorkingHours(hours);
-        wt.setEnabled(true);
-        schedule.setWorkingTimeAttendant(wt);
+        workingHoursItem.setStop(cal.getTime());
+        workingHoursItem.setEnabled(true);
+        workingHoursItem.setDay(ScheduledDay.WEDNESDAY);
+        workingHours.add(workingHoursItem);
+        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.setEnabled(true);
+        schedule.setWorkingTimeAttendant(workingTimeAttendant);
         m_forwardingContext.saveSchedule(schedule);
         r1.setSchedule(schedule);
 
@@ -245,20 +246,20 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
         holiday.addPeriod(getNewHolidayPeriod(format.parse("06-JUN-2005 00:00"), format.parse("06-JUN-2005 23:59")));
         holiday.addPeriod(getNewHolidayPeriod(format.parse("24-DEC-2005 00:00"), format.parse("24-DEC-2005 23:59")));
 
-        WorkingTimeAttendant wt = new WorkingTimeAttendant();
-        wt.setAttendant(autoAttendant);
-        WorkingHours[] workingHours = wt.getWorkingHours();
-        Date stop = workingHours[4].getStop();
+        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        workingTimeAttendant.setAttendant(autoAttendant);
+        List<WorkingHours> workingHours = workingTimeAttendant.getWorkingHours();
+        Date stop = workingHours.get(4).getStop();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(stop);
         calendar.add(Calendar.HOUR_OF_DAY, -1);
-        workingHours[4].setStop(calendar.getTime());
+        workingHours.get(4).setStop(calendar.getTime());
 
         AttendantRule rule = new AttendantRule();
         rule.setName("myattendantschedule");
         rule.setAfterHoursAttendant(sa);
         rule.setHolidayAttendant(holiday);
-        rule.setWorkingTimeAttendant(wt);
+        rule.setWorkingTimeAttendant(workingTimeAttendant);
 
         m_dialPlanContext.storeRule(rule);
         commit();

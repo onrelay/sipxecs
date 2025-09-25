@@ -25,13 +25,13 @@ gwt_PKGS = \
 	asm-commons \
 	asm-util \
 	colt \
-	gwt-user \
-	gwt-dev \
-	smartgwt \
+	gwt-user-jakarta \
+	gwt-dev-jakarta \
+	smartgwt-jakarta \
 	smartgwt-skins  \
 	tapestry-annotations \
 	tapestry-contrib \
-	tapestry-framework \
+	tapestry-framework-jakarta \
 	validation-api
 
 gwt_SRC = $(shell cd $(srcdir); find gwt -type f) 

@@ -29,7 +29,6 @@ import org.sipfoundry.sipxconfig.cfgmgt.ConfigUtils;
 import org.sipfoundry.sipxconfig.cfgmgt.KeyValueConfiguration;
 import org.sipfoundry.sipxconfig.cfgmgt.LoggerKeyValueConfiguration;
 import org.sipfoundry.sipxconfig.commserver.Location;
-import org.sipfoundry.sipxconfig.elasticsearch.ElasticsearchServiceImpl;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.setting.Setting;
 import org.sipfoundry.sipxconfig.setting.SettingUtil;
@@ -37,9 +36,9 @@ import org.sipfoundry.sipxconfig.setting.SettingUtil;
 public class AdminConfig implements ConfigProvider {
 
     private static final String SELINUX_FILE = "selinux.cfdat";
+    private static final String CONFIGSERVER_CONFIG_KEY = "configserver-config";
 
     private AdminContext m_adminContext;
-    private String m_adminSettingsKey = "configserver-config";
 
     @Override
     public void replicate(ConfigManager manager, ConfigRequest request) throws IOException {
@@ -50,7 +49,7 @@ public class AdminConfig implements ConfigProvider {
         
         Set<Location> locations = request.locations(manager);
         AdminSettings settings = m_adminContext.getSettings();
-        Setting adminSettings = settings.getSettings().getSetting(m_adminSettingsKey);
+        Setting configserverConfigSettings = settings.getSettings().getSetting(CONFIGSERVER_CONFIG_KEY);
         String password = settings.getPostgresPassword();
         
         for (Location l : locations) {
@@ -81,7 +80,7 @@ public class AdminConfig implements ConfigProvider {
             }
             String log4jFileName = "log4j.properties.part";
             String[] logLevelKeys = settings.getLogLevelKeys();
-            SettingUtil.writeLog4jSetting(adminSettings, dir, log4jFileName, logLevelKeys);
+            SettingUtil.writeLog4jSetting(configserverConfigSettings, dir, log4jFileName, logLevelKeys);
 
             Writer w = new FileWriter(new File(dir, "sipxconfig.properties.ui"));
             try {
@@ -94,7 +93,7 @@ public class AdminConfig implements ConfigProvider {
 
     void writeConfig(Writer w, AdminSettings settings) throws IOException {
         LoggerKeyValueConfiguration config = LoggerKeyValueConfiguration.equalsSeparated(w);
-        config.writeSettings(settings.getSettings().getSetting(m_adminSettingsKey));
+        config.writeSettings(settings.getSettings().getSetting(CONFIGSERVER_CONFIG_KEY));
     }
 
     public void setAdminContext(AdminContext adminContext) {

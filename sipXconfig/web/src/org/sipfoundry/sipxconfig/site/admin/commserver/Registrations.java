@@ -57,8 +57,7 @@ import org.sipfoundry.sipxconfig.components.SipxBasePage;
 import org.sipfoundry.sipxconfig.registrar.RegistrationContext;
 import org.sipfoundry.sipxconfig.registrar.RegistrationMetrics;
 import org.sipfoundry.sipxconfig.site.cdr.CdrReports;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 /**
  * Displays active and expired registrations
@@ -70,7 +69,7 @@ public abstract class Registrations extends SipxBasePage implements PageBeginRen
     
     public static final String PAGE = "admin/commserver/Registrations";
     
-    private static final Logger LOG = LoggerFactory.getLogger(Registrations.class);
+    private static final Logger LOG = Logger.getLogger(Registrations.class);
 
     @InjectObject(value = "spring:registrationContext")
     public abstract RegistrationContext getRegistrationContext();

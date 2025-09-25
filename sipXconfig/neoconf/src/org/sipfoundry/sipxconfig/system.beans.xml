@@ -23,12 +23,6 @@
     </constructor-arg>
   </bean>
 
-  <bean id="admin.properties" class="org.springframework.core.io.FileSystemResource">
-    <constructor-arg index="0">
-      <value>/etc/sipxpbx/admin.properties</value>
-    </constructor-arg>
-  </bean>
-
   <bean id="sysdir" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="ignoreUnresolvablePlaceholders" value="true"/>
     <property name="location" ref="sipxconfig.properties" />
@@ -56,12 +50,7 @@
     <property name="ignoreInvalidKeys" value="true" />
   </bean>
 
-  <bean class="org.springframework.beans.factory.config.PropertyOverrideConfigurer">
-    <property name="location" ref="admin.properties"/>
-    <property name="ignoreInvalidKeys" value="true" />
-  </bean>
-
-
+  
   <!--
     - P O S T G R E S
   -->
@@ -302,7 +291,7 @@
     </property>
     <property name="velocityPropertiesMap">
       <map>
-        <entry key="velocimacro.permissions.allow.inline.local.scope" value="true" />
+        <entry key="velocimacro.inline.local_scope" value="true" />
       </map>
     </property>
   </bean>
@@ -313,7 +302,7 @@
     </property>
     <property name="velocityPropertiesMap">
       <map>
-        <entry key="velocimacro.permissions.allow.inline.local.scope" value="true" />
+        <entry key="velocimacro.inline.local_scope" value="true" />
       </map>
     </property>
   </bean>

@@ -19785,7 +19785,7 @@ function $FilterProvider($provide) {
            <td>{{friend.phone}}</td>
          </tr>
        </table>
-       <hr>
+       <hr/>
        <label>Any: <input ng-model="search.$"></label> <br>
        <label>Name only <input ng-model="search.name"></label><br>
        <label>Phone only <input ng-model="search.phone"></label><br>
@@ -23763,7 +23763,7 @@ function checkboxInputType(scope, element, attr, ctrl, $sniffer, $browser, $filt
                Too long!</span>
            </div>
          </form>
-         <hr>
+         <hr/>
          <tt>user = {{user}}</tt><br/>
          <tt>myForm.userName.$valid = {{myForm.userName.$valid}}</tt><br/>
          <tt>myForm.userName.$error = {{myForm.userName.$error}}</tt><br/>
@@ -24392,11 +24392,11 @@ function classDirective(name, selector) {
           <input type="checkbox" ng-model="error">
           error (apply "has-error" class)
        </label>
-       <hr>
+       <hr/>
        <p ng-class="style">Using String Syntax</p>
        <input type="text" ng-model="style"
               placeholder="Type: bold strike red" aria-label="Type: bold strike red">
-       <hr>
+       <hr/>
        <p ng-class="[style1, style2, style3]">Using Array Syntax</p>
        <input ng-model="style1"
               placeholder="Type: bold, strike or red" aria-label="Type: bold, strike or red"><br>
@@ -24404,7 +24404,7 @@ function classDirective(name, selector) {
               placeholder="Type: bold, strike or red" aria-label="Type: bold, strike or red 2"><br>
        <input ng-model="style3"
               placeholder="Type: bold, strike or red" aria-label="Type: bold, strike or red 3"><br>
-       <hr>
+       <hr/>
        <p ng-class="[style4, {orange: warning}]">Using Array and Map Syntax</p>
        <input ng-model="style4" placeholder="Type: bold, strike" aria-label="Type: bold, strike"><br>
        <label><input type="checkbox" ng-model="warning"> warning (apply "orange" class)</label>
@@ -26414,7 +26414,7 @@ is set to `true`. The parse error is stored in `ngModel.$error.parse`.
             strip-br="true"
             required>Change me!</div>
         <span ng-show="myForm.myWidget.$error.required">Required!</span>
-       <hr>
+       <hr/>
        <textarea ng-model="userContent" aria-label="Dynamic textarea"></textarea>
       </form>
     </file>
@@ -30239,7 +30239,7 @@ var SelectController =
  *     <button ng-click="forceUnknownOption()">Force unknown option</button><br>
  *     <tt>singleSelect = {{data.singleSelect}}</tt>
  *
- *     <hr>
+ *     <hr/>
  *     <label for="multipleSelect"> Multiple select: </label><br>
  *     <select name="multipleSelect" id="multipleSelect" ng-model="data.multipleSelect" multiple>
  *       <option value="option-1">Option 1</option>
@@ -30276,7 +30276,7 @@ var SelectController =
  *       <option ng-repeat="option in data.availableOptions" value="{{option.id}}">{{option.name}}</option>
  *     </select>
  *   </form>
- *   <hr>
+ *   <hr/>
  *   <tt>repeatSelect = {{data.repeatSelect}}</tt><br/>
  * </div>
  * </file>
@@ -30308,7 +30308,7 @@ var SelectController =
  *       ng-options="option.name for option in data.availableOptions track by option.id"
  *       ng-model="data.selectedOption"></select>
  *   </form>
- *   <hr>
+ *   <hr/>
  *   <tt>option = {{data.selectedOption}}</tt><br/>
  * </div>
  * </file>
@@ -30542,7 +30542,7 @@ var styleDirective = valueFn({
  *         <br>
  *         <label for="input">This input must be filled if `required` is true: </label>
  *         <input type="text" ng-model="model" id="input" name="input" ng-required="required" /><br>
- *         <hr>
+ *         <hr/>
  *         required error set? = <code>{{form.input.$error.required}}</code><br>
  *         model = <code>{{model}}</code>
  *       </form>
@@ -30635,7 +30635,7 @@ var requiredDirective = function() {
  *         <br>
  *         <label for="input">This input is restricted by the current pattern: </label>
  *         <input type="text" ng-model="model" id="input" name="input" ng-pattern="regex" /><br>
- *         <hr>
+ *         <hr/>
  *         input valid? = <code>{{form.input.$valid}}</code><br>
  *         model = <code>{{model}}</code>
  *       </form>
@@ -30732,7 +30732,7 @@ var patternDirective = function() {
  *         <br>
  *         <label for="input">This input is restricted by the current maxlength: </label>
  *         <input type="text" ng-model="model" id="input" name="input" ng-maxlength="maxlength" /><br>
- *         <hr>
+ *         <hr/>
  *         input valid? = <code>{{form.input.$valid}}</code><br>
  *         model = <code>{{model}}</code>
  *       </form>

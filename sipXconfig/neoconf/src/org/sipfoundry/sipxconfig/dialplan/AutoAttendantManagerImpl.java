@@ -397,16 +397,17 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
                 } else {
                     Schedule schedule = rule.getSchedule();
                     if (schedule != null) {
-                        WorkingHours[] hours = new WorkingHours[1];
-                        WorkingTimeAttendant wt = new WorkingTimeAttendant();
-                        hours[0] = new WorkingHours();
+                        ArrayList<WorkingHours> workingHours = new ArrayList<WorkingHours>();
+                        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+                        WorkingHours workingHoursItem = new WorkingHours();
                         TimeZone utc = TimeZone.getTimeZone("UTC");
                         Calendar cal = Calendar.getInstance(utc);
-                        hours[0].setStart(cal.getTime());
-                        hours[0].setStop(cal.getTime());
-                        hours[0].setDay(ScheduledDay.getScheduledDay(cal.get(Calendar.DAY_OF_WEEK)));
-                        wt.setWorkingHours(hours);
-                        List<WorkingHours.Interval> intervals = wt.calculateValidTime(utc);
+                        workingHoursItem.setStart(cal.getTime());
+                        workingHoursItem.setStop(cal.getTime());
+                        workingHoursItem.setDay(ScheduledDay.getScheduledDay(cal.get(Calendar.DAY_OF_WEEK)));
+                        workingHours.add( workingHoursItem );
+                        workingTimeAttendant.setWorkingHours(workingHours);
+                        List<WorkingHours.Interval> intervals = workingTimeAttendant.calculateValidTime(utc);
                         int intervalNow = intervals.get(0).getStart();
                         List<WorkingHours.Interval> scheduleIntervals = schedule.getWorkingTimeAttendant().calculateValidTime(
                                 TimeZone.getDefault());

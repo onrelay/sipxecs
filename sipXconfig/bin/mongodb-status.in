@@ -32,9 +32,7 @@
 #    script on the appropriate server to execute.
 
 
-# Deprecation note: intentionally using deprecated Connection class because 
-# class MongoClient is not available yet in pymongo on centos 6
-from pymongo import Connection
+from pymongo import MongoClient
 from pymongo.errors import PyMongoError, AutoReconnect
 
 import sys
@@ -111,9 +109,9 @@ class CheckHostnameOrMissingConfig:
         # action will ultimately be to remove node.
         if primary_config:
             if 'members' in primary_config:
-                all_servers = meta.meta['model']['servers'].keys()
+                all_servers = list(meta.meta['model']['servers'].keys())
                 if 'arbiters' in meta.meta['model']:
-                    all_servers += meta.meta['model']['arbiters'].keys()
+                    all_servers += list(meta.meta['model']['arbiters'].keys())
                 for m in primary_config['members']:
                     found = False
                     if m['host'] not in all_servers:
@@ -277,27 +275,47 @@ class MongoAdmin:
 
     def loadMetaForHost(self, host_port):
         m = None
-        c = None
-        cfg = None
+        client = None
+
         try:
-            # Connection default i believe comes from OS and is generally 2 minutes and much
-            # too long. We want to support worst case of 11 of 12 nodes all unavailable.
-            c = Connection(host_port, connecttimeoutms=1000, sockettimeoutms=5000)
-            logging.debug('getting status')
-            l = c['local']
-            cfg = self.eval(l, 'processedconf=rs.config(); delete processedconf["settings"]; delete processedconf["protocolVersion"];processedconf')
-            status = self.eval(l, 'procstatus=rs.status();delete procstatus["heartbeatIntervalMillis"];delete procstatus["optimes"];procstatus')
-            m = {'server' : host_port, 'available': True, 'status' : status, 'config' : cfg}
-            c.close
-            c = None
+            # short timeouts so we don't hang if multiple nodes are down
+            client = MongoClient(
+                host_port,
+                serverSelectionTimeoutMS=1000,  # connection timeout
+                socketTimeoutMS=5000            # read timeout
+            )
+            logging.debug("getting status")
+            local_db = client["admin"]
+
+            # run replica set config
+            cfg = local_db.command("replSetGetConfig")["config"]
+
+            # strip unwanted keys (your old eval logic did this)
+            cfg.pop("settings", None)
+            cfg.pop("protocolVersion", None)
+
+            # run replica set status
+            status = local_db.command("replSetGetStatus")
+
+            # strip unwanted keys
+            status.pop("heartbeatIntervalMillis", None)
+            status.pop("optimes", None)
+
+            m = {
+                "server": host_port,
+                "available": True,
+                "status": status,
+                "config": cfg,
+            }
 
         except PyMongoError as e:
-            m = {'server' : host_port, 'available' : False}
+            logging.warning(f"MongoDB host {host_port} unavailable: {e}")
+            m = {"server": host_port, "available": False}
 
         finally:
-            if c != None:
-                logging.debug('closing connection')
-                c.close()
+            if client is not None:
+                logging.debug("closing connection")
+                client.close()
 
         return m
     
@@ -316,7 +334,12 @@ class MongoAdmin:
 
 class MongoJSONEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, bson.timestamp.Timestamp):
+        if isinstance(obj, bytes):
+            try:
+                return obj.decode('utf-8')
+            except UnicodeDecodeError:
+                return repr(obj)
+        elif isinstance(obj, bson.timestamp.Timestamp):
             return obj.time
         elif isinstance(obj, datetime.datetime):
             return obj.isoformat()

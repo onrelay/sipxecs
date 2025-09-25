@@ -26,9 +26,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xerces.dom.DocumentImpl;
 import org.sipfoundry.sipxconfig.bulk.BulkParser;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
 
 public class VcardParserImpl implements BulkParser {
     public static final String NAME = "N";
@@ -39,9 +43,10 @@ public class VcardParserImpl implements BulkParser {
 
     public void parse(Reader reader, Closure closure) {
         try {
-            DomParser parser = new DomParser();
-            Document document = new DocumentImpl();
-            parser.parse(reader, document);
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);   // usually good practice
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(new InputSource(reader));
 
             AddressBook addressBook = new AddressBook(document);
             for (Iterator vcards = addressBook.getVCards(); vcards.hasNext();) {

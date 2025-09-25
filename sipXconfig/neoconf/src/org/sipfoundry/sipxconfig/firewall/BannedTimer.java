@@ -2,7 +2,7 @@ package org.sipfoundry.sipxconfig.firewall;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.elasticsearch.common.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.apiban.BannedApi;
 
 public class BannedTimer {

@@ -53,8 +53,8 @@ Index: build.xml
    </property>
    <property name="javadocdir" value="${basedir}/dist/docs/api">
    </property>
--  <property name="final.name" value="commons-fileupload-1.1">
-+  <property name="final.name" value="commons-fileupload-1.1.1">
+-  <property name="final.name" value="commons-fileupload-jakarta-1.1">
++  <property name="final.name" value="commons-fileupload-jakarta-1.1.1">
    </property>
    <property name="proxy.host" value="">
    </property>

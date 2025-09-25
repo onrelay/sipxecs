@@ -53,8 +53,8 @@
       <many-to-one name="attendant" column="working_time_attendant_id" class="org.sipfoundry.sipxconfig.dialplan.AutoAttendant"
           cascade="none" foreign-key="fk_attendant_working_hours_attendant_dialing_rule" />
       <property name="enabled" column="working_time_attendant_enabled" />
-      <array name="workingHours" 
-            table="attendant_working_hours" 
+      <list name="workingHours"
+            table="attendant_working_hours"
             batch-size="7">
         <key column="attendant_dialing_rule_id"
             foreign-key="fk_attendant_working_hours_attendant_dialing_rule" />
@@ -65,7 +65,7 @@
           <property name="enabled" />
           <property name="day" type="org.sipfoundry.sipxconfig.common.ScheduledDay$UserType" />
         </composite-element>
-      </array>
+      </list>
     </component>
     <many-to-one name="user" column="user_id" class="org.sipfoundry.sipxconfig.common.User" />
     <many-to-one name="userGroup" column="group_id" class="org.sipfoundry.sipxconfig.setting.Group" />

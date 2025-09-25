@@ -14,36 +14,41 @@
 #
 # Elasticsearch configuration for working with sipxecs
 #
-
 bundle agent elasticsearch {
+
   methods:
     primary::
       "any" usebundle => elasticsearch_config;
+      "any" usebundle => elasticsearch_index_settings;
+
     fedora16_or_greater::
-      "any" usebundle => "elasticsearch_systemctl_running";
+      "any" usebundle => elasticsearch_systemctl_running;
+
     !fedora16_or_greater::
-      "any" usebundle => "elasticsearch_sysv_running";
+      "any" usebundle => elasticsearch_sysv_running;
 }
 
+# --- Manage configuration files ---
 bundle agent elasticsearch_config {
+
   files:
     any::
       "/etc/elasticsearch/elasticsearch.yml"
-        comment => "configure elasticsearch",
+        comment => "Configure Elasticsearch (node-level settings only)",
         create => "true",
         perms => mog("644", "root", "root"),
         edit_line => elasticsearch_config_file,
         classes => if_repaired("restart_elasticsearch");
 
       "/etc/security/limits.d/99-elasticsearch-nproc.conf"
-        comment => "setup elasticsearch limits",
+        comment => "Setup Elasticsearch limits",
         create => "true",
         perms => m("644"),
         edit_line => elasticsearch_limits_contents,
         classes => if_repaired("restart_elasticsearch");
-     
 }
 
+# --- Manage nofile limits ---
 bundle edit_line elasticsearch_limits_contents {
   insert_lines:
 "elasticsearch soft    nofile    65536
@@ -51,6 +56,7 @@ elasticsearch hard    nofile    65536
 ";
 }
 
+# --- Edit elasticsearch.yml safely for ES 8.x ---
 bundle edit_line elasticsearch_config_file {
   vars:
     "tmpDir" slist => readstringlist("$(sipx.SIPX_CFDATA)/$(sipx.location_id)/elasticsearch.yml.part", "tmpDir=", "\n", 1, 4000);
@@ -70,10 +76,24 @@ bundle edit_line elasticsearch_config_file {
       "script.engine.groovy.inline.aggs: on";
       "cluster.name: $(sipx.host).$(sipx.net_domain)";
       "node.name: $(sipx.host)$(sipx.net_domain)";
-      "index.number_of_replicas: 0";
       "discovery.zen.ping.multicast.enabled: false";
 }
 
+# --- Apply replicas to existing indices and template for new indices ---
+bundle agent elasticsearch_index_settings {
+
+  commands:
+    any::
+      "/usr/bin/curl"
+        comment => "Set auto_expand_replicas=0-1 for all existing indices",
+        args => "-s -X PUT 'http://localhost:9200/_all/_settings?preserve_existing=true' -H 'Content-Type: application/json' -d '{\"index\":{\"auto_expand_replicas\":\"0-1\"}}'";
+
+      "/usr/bin/curl"
+        comment => "Create default index template with auto_expand_replicas=0-1 for new indices",
+        args => "-s -X PUT 'http://localhost:9200/_index_template/default_template' -H 'Content-Type: application/json' -d '{\"index_patterns\":[\"*\"],\"template\":{\"settings\":{\"auto_expand_replicas\":\"0-1\"}}}'";
+}
+
+# --- SysV init service management ---
 bundle agent elasticsearch_sysv_running {
   vars:
     any::
@@ -82,6 +102,7 @@ bundle agent elasticsearch_sysv_running {
   methods:
     !elasticsearch::
       "any" usebundle => rh_systemctl_status("disable elasticsearch");
+
     elasticsearch::
       "any" usebundle => rh_systemctl_status("enable elasticsearch");
 
@@ -102,6 +123,7 @@ bundle agent elasticsearch_sysv_running {
         args => "restart";
 }
 
+# --- systemd service management ---
 bundle agent elasticsearch_systemctl_running {
   vars:
     any::

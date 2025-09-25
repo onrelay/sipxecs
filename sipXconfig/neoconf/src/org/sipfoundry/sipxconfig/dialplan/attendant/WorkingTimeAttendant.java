@@ -23,7 +23,7 @@ import org.sipfoundry.sipxconfig.common.ScheduledDay;
 import org.sipfoundry.sipxconfig.common.UserException;
 
 public class WorkingTimeAttendant extends ScheduledAttendant {
-    private WorkingHours[] m_workingHours;
+    private List<WorkingHours> m_workingHours;
 
     /**
      * Initialization is a bit tricky - days here are numbered from 0 to 6, with - 0 being Monday
@@ -34,27 +34,30 @@ public class WorkingTimeAttendant extends ScheduledAttendant {
     public WorkingTimeAttendant() {
         final int days = ScheduledDay.DAYS_OF_WEEK.length;
         final int lastWorkingDay = Calendar.FRIDAY - Calendar.MONDAY;
-        m_workingHours = new WorkingHours[days];
+        m_workingHours = new ArrayList<WorkingHours>();
         for (int i = 0; i < days; i++) {
-            WorkingHours whs = new WorkingHours();
+            WorkingHours workingHoursItem = new WorkingHours();
             int dayOfWeek = (i + Calendar.SUNDAY) % days + 1;
-            whs.setDay(ScheduledDay.getScheduledDay(dayOfWeek));
-            whs.setEnabled(i <= lastWorkingDay);
-            m_workingHours[i] = whs;
+            workingHoursItem.setDay(ScheduledDay.getScheduledDay(dayOfWeek));
+            workingHoursItem.setEnabled(i <= lastWorkingDay);
+            m_workingHours.add( workingHoursItem );
         }
     }
 
-    public WorkingHours[] getWorkingHours() {
+    public List<WorkingHours> getWorkingHours() {
         return m_workingHours;
     }
 
-    public void setWorkingHours(WorkingHours[] workingHours) {
+    public void setWorkingHours(List<WorkingHours> workingHours) {
         m_workingHours = workingHours;
     }
 
     public Object clone() throws CloneNotSupportedException {
         WorkingTimeAttendant clone = (WorkingTimeAttendant) super.clone();
-        clone.m_workingHours = m_workingHours.clone();
+        clone.m_workingHours = new ArrayList<WorkingHours>();
+        for( WorkingHours workingHoursItem : m_workingHours ) {
+            clone.m_workingHours.add( workingHoursItem );
+        }
         return clone;
     }
 
@@ -65,10 +68,10 @@ public class WorkingTimeAttendant extends ScheduledAttendant {
     }
 
     private List<WorkingHours.Interval> calculateValidTimes(int timeZoneOffsetInMinutes) {
-        WorkingHours[] workingHours = getWorkingHours();
+        List<WorkingHours> workingHours = getWorkingHours();
         List<WorkingHours.Interval> validTimeList = new ArrayList<WorkingHours.Interval>();
-        for (WorkingHours wk : workingHours) {
-            wk.addMinutesFromSunday(validTimeList, timeZoneOffsetInMinutes);
+        for (WorkingHours workingHoursItem : workingHours) {
+            workingHoursItem.addMinutesFromSunday(validTimeList, timeZoneOffsetInMinutes);
         }
         return validTimeList;
     }

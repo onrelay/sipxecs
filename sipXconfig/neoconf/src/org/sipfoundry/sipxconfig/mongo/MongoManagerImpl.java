@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.elasticsearch.common.lang3.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.commons.diddb.Did;
 import org.sipfoundry.commons.diddb.DidPool;
 import org.sipfoundry.commons.diddb.DidPoolService;

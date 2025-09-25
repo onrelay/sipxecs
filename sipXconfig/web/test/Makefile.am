@@ -35,15 +35,15 @@ test_PKGS = \
 	js \
 	junit \
 	jwebunit \
-	jwebunit-core \
-	jwebunit-htmlunit-plugin \
+	jwebunit-core-jakarta  \
+	jwebunit-htmlunit-plugin-jakarta \
 	nekohtml \
 	p6spy \
 	regexp \
 	sac \
 	slf4j-api \
 	xmlunit \
-	slf4j-log4j12 \
+	slf4j-reload4j \
 	spring-mock
 
 test_DEPS = \

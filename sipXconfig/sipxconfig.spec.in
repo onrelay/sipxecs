@@ -164,7 +164,7 @@ ln -sfn ../../../../../usr/share/jetty/lib/jakarta.servlet-api-*.jar %{buildroot
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/bson-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/mongodb-driver-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/micrometer-commons-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
-ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/micrometer-core-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/micrometer-core-jakarta-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/micrometer-observation-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/spring-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-beanutils-core-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
@@ -174,7 +174,7 @@ ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-digester-*.jar
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-collections4-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-lang-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-lang3-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
-ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-logging-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-logging-jakarta -*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-net-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/hibernate-core-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/hibernate-models-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
@@ -197,7 +197,7 @@ ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jakarta.transaction-ap
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jakarta.websocket-api-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jakarta.websocket-client-api-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jakarta.mail-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
-ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/hazelcast-all-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/hazelcast-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jboss-logging-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/classmate-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/byte-buddy-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
@@ -207,7 +207,7 @@ ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/velocity-*.jar %{build
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/org.restlet-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/org.restlet.ext.spring-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/gson-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
-ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/tapestry-framework-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/tapestry-framework-jakarta-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/hivemind-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/hibernate-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/elasticsearch-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
@@ -228,7 +228,7 @@ ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/postgresql-*.jar %{bui
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/bcpkix-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/bcprov-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jcommon-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
-ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jfreechart-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jfreechart-jakarta-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/sipxcommons.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXconfig/sipxconfig-neoconf.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXconfig/sipxconfig-web.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/

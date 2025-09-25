@@ -82,4 +82,5 @@ mailboxManagerImpl.stdpromptDirectory=@wwwdir@/doc/stdprompts
 
 # yum command exists on system?
 packageUpdateManager.yumCapable=@YUM_EXISTS@
+
 # ======= BEGIN NEW INSTALLATION SETTINGS =================

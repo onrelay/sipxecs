@@ -89,12 +89,12 @@ public class AutoAttendantXmlConfig {
         Element regularHoursEl = scheduleEl.addElement("regularhours");
         if (workingTimeAttendant.isEnabled()) {
             addId(regularHoursEl, workingTimeAttendant.getAttendant());
-            WorkingHours[] workingHours = workingTimeAttendant.getWorkingHours();
-            for (WorkingHours hours : workingHours) {
-                if (hours.isEnabled()) {
-                    Element dayEl = regularHoursEl.addElement(hours.getDay().getName().toLowerCase());
-                    dayEl.addElement("from").setText(hours.getStartTime());
-                    dayEl.addElement("to").setText(hours.getStopTime());
+            List<WorkingHours> workingHours = workingTimeAttendant.getWorkingHours();
+            for (WorkingHours workingHoursItem : workingHours ) {
+                if (workingHoursItem.isEnabled()) {
+                    Element dayEl = regularHoursEl.addElement(workingHoursItem.getDay().getName().toLowerCase());
+                    dayEl.addElement("from").setText(workingHoursItem.getStartTime());
+                    dayEl.addElement("to").setText(workingHoursItem.getStopTime());
                 }
             }
         }

@@ -136,13 +136,8 @@ public class ScheduleApiImpl implements ScheduleApi {
         Schedule schedule = m_forwardingContext.getScheduleById(scheduleId);
         if (schedule != null) {
             WorkingHours wHours = WorkingHoursBean.convertToWorkingHours(whBean);
-            WorkingHours[] existingWHours = schedule.getWorkingTimeAttendant().getWorkingHours();
-            WorkingHours[] newWorkingHours = new WorkingHours[existingWHours.length + 1];
-            int i;
-            for (i = 0; i < existingWHours.length; i++) {
-                newWorkingHours[i] = existingWHours[i];
-            }
-            newWorkingHours[i] = wHours;
+            List<WorkingHours> newWorkingHours = schedule.getWorkingTimeAttendant().getWorkingHours();
+            newWorkingHours.add( wHours );
             schedule.getWorkingTimeAttendant().setWorkingHours(newWorkingHours);
             m_forwardingContext.saveSchedule(schedule);
             return Response.ok().build();
@@ -154,17 +149,11 @@ public class ScheduleApiImpl implements ScheduleApi {
     @Override
     public Response deletePeriod(Integer scheduleId, Integer index) {
         Schedule schedule = m_forwardingContext.getScheduleById(scheduleId);
-        WorkingHours[] existingWHours = schedule.getWorkingTimeAttendant().getWorkingHours();
-        int exLength = existingWHours.length;
-        WorkingHours[] wHoursToSave = new WorkingHours[exLength - 1];
-        if (schedule != null && exLength > 0 && index > 0 && index < exLength) {
-            for (int i = 0; i < exLength; i++) {
-                int j = 0;
-                if (i != index) {
-                    wHoursToSave[j++] = existingWHours[i];
-                }
-            }
-            schedule.getWorkingTimeAttendant().setWorkingHours(wHoursToSave);
+        List<WorkingHours> newWorkingHours = schedule.getWorkingTimeAttendant().getWorkingHours();
+        if (schedule != null && index > 0 && index < newWorkingHours.size() ) {
+
+            newWorkingHours.remove( index.intValue() );
+            schedule.getWorkingTimeAttendant().setWorkingHours(newWorkingHours);
             m_forwardingContext.saveSchedule(schedule);
             return Response.ok().build();
         }

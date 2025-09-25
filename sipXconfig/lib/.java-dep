@@ -10,7 +10,7 @@ sipXconfig_dependency() {
        commons-beanutils-core \
        commons-collections \
        commons-digester \
-       commons-logging \
+       commons-logging-jakarta  \
        dbunit \
        dom4j \
        easymock \
@@ -28,7 +28,6 @@ sipXconfig_dependency() {
        sipxcommons \
        velocity-engine-core \
        velocity-tools-generic \
-       xercesImpl \
        xmlunit
     return 1;;
   esac

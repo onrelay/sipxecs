@@ -225,9 +225,6 @@ public class GeneralAuditHandler extends AbstractSystemAuditHandler {
             } else if (storedSnapshot instanceof Map) {
                 Map<Object, Object> oldMap = (Map<Object, Object>) storedSnapshot;
                 oldIterator = oldMap.values().iterator();
-            } else if (storedSnapshot instanceof WorkingHours[]) {
-                WorkingHours[] oldMap = (WorkingHours[]) storedSnapshot;
-                oldIterator = new ArrayIterator(oldMap);
             } else {
                 return;
             }

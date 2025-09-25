@@ -58,12 +58,12 @@ public abstract class EditSchedule extends UserBasePage {
 
     public abstract WorkingHours getWorkingHour();
 
-    public abstract void setWorkingHour(WorkingHours hours);
+    public abstract void setWorkingHour(WorkingHours workingHoursItem);
 
     @Persist(value = CLIENT)
-    public abstract WorkingHours[] getWorkingHours();
+    public abstract List<WorkingHours> getWorkingHours();
 
-    public abstract void setWorkingHours(WorkingHours[] hours);
+    public abstract void setWorkingHours(List<WorkingHours> workingHours);
 
     public abstract int getIndex();
 
@@ -81,11 +81,11 @@ public abstract class EditSchedule extends UserBasePage {
 
         super.pageBeginRender(event);
 
-        WorkingHours[] workingHoursList = null;
+        List<WorkingHours> workingHours = null;
         Schedule schedule = null;
         if (getScheduleId() != null) {
             schedule = getForwardingContext().getScheduleById(getScheduleId());
-            workingHoursList = schedule.getWorkingTimeAttendant().getWorkingHours();
+            workingHours = schedule.getWorkingTimeAttendant().getWorkingHours();
         } else {
             if (getResource().equals("usr_sch")) {
                 schedule = new UserSchedule();
@@ -100,12 +100,12 @@ public abstract class EditSchedule extends UserBasePage {
                 ((FeatureSchedule) schedule).setFeatureId(getFeatureId());
             }
             WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
-            workingHoursList = new WorkingHours[0];
-            workingTimeAttendant.setWorkingHours(workingHoursList);
+            workingHours = new ArrayList<WorkingHours>();
+            workingTimeAttendant.setWorkingHours(workingHours);
             schedule.setWorkingTimeAttendant(workingTimeAttendant);
         }
         setSchedule(schedule);
-        setWorkingHours(workingHoursList);
+        setWorkingHours(workingHours);
     }
 
     public void newSchedule(String resourceId, String featureId, String returnPage) {
@@ -128,14 +128,13 @@ public abstract class EditSchedule extends UserBasePage {
             return;
         }
         if (ACTION_ADD.equals(getAction())) {
-            WorkingHours[] workingHours = getWorkingHours();
+            List<WorkingHours> workingHours = getWorkingHours();
             List<WorkingHours> newWorkingHours = new ArrayList<WorkingHours>();
-            for (int i = 0; i < workingHours.length; i++) {
-                newWorkingHours.add(workingHours[i]);
+            for (int i = 0; i < workingHours.size(); i++) {
+                newWorkingHours.add(workingHours.get(i));
             }
             newWorkingHours.add(new WorkingHours());
-            WorkingHours[] returnedWorkingHours = new WorkingHours[0];
-            setWorkingHours(newWorkingHours.toArray(returnedWorkingHours));
+            setWorkingHours(newWorkingHours);
         }
     }
 
@@ -153,13 +152,12 @@ public abstract class EditSchedule extends UserBasePage {
     }
 
     public void deletePeriod(int position) {
-        WorkingHours[] workingHours = getWorkingHours();
+        List<WorkingHours> workingHours = getWorkingHours();
         List<WorkingHours> newWorkingHours = new ArrayList<WorkingHours>();
-        for (int i = 0; i < workingHours.length; i++) {
-            newWorkingHours.add(workingHours[i]);
+        for (int i = 0; i < workingHours.size(); i++) {
+            newWorkingHours.add(workingHours.get(i));
         }
         newWorkingHours.remove(position);
-        WorkingHours[] returnedWorkingHours = new WorkingHours[0];
-        setWorkingHours(newWorkingHours.toArray(returnedWorkingHours));
+        setWorkingHours(newWorkingHours);
     }
 }

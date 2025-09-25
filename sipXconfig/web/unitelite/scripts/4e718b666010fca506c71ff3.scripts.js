@@ -6323,7 +6323,7 @@ uw.
           var spanParent      = template +
           '<div class="col-sm-8">' +
             '<span data-ng-bind-html="treeVal | linky"></span>' +
-          '</div><hr>';
+          '</div><hr/>';
           var spanChildren    = template +
           '<div class="form-group-child col-sm-12 clearfix"' +
             'data-ng-repeat="(k, v) in treeVal track by $index">' +
@@ -6332,14 +6332,14 @@ uw.
           var inputParent     = template +
           '<div class="col-sm-8">' +
             '<input type="text" class="form-control" data-ng-model="treeParent[treeKey]">' +
-          '</div><hr>';
+          '</div><hr/';
           var selectParent    = template +
           '<div class="col-sm-8">' +
             '<select class="form-control" data-ng-model="treeParent[treeKey]" data-ng-change="profileForm.$setDirty();">' +
               '<option data-ng-selected="treeParent[treeKey] === true">True</option>' +
               '<option data-ng-selected="treeParent[treeKey] === false">False</option>' +
             '</select>' +
-          '</div><hr>';
+          '</div><hr/';
           var inputChildren   = template + '<div class="form-group-child col-sm-12 clearfix"' +
             'data-ng-repeat="(k, v) in treeVal track by $index">' +
             '<div data-tree data-tree-key="k" data-tree-val="v" data-tree-input data-tree-parent="treeParent[treeKey]"></div>' +

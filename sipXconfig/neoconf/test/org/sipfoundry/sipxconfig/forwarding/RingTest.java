@@ -12,6 +12,8 @@ package org.sipfoundry.sipxconfig.forwarding;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.List;
+import java.util.ArrayList;
 
 import junit.framework.TestCase;
 
@@ -48,28 +50,28 @@ public class RingTest extends TestCase {
         ring.setType(AbstractRing.Type.IMMEDIATE);
 
         Schedule schedule = new UserSchedule();
-        WorkingHours[] hours = new WorkingHours[1];
-        WorkingTimeAttendant wt = new WorkingTimeAttendant();
-        hours[0] = new WorkingHours();
+        List<WorkingHours> workingHours = new ArrayList<WorkingHours>();
+        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        workingHours.add( new WorkingHours() );
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         cal.set(2006, Calendar.DECEMBER, 31, 10, 00);
-        hours[0].setStart(cal.getTime());
+        workingHours.get(0).setStart(cal.getTime());
         Integer startHour = Integer.valueOf(cal.get(Calendar.HOUR_OF_DAY));
         Integer startMinute = Integer.valueOf(cal.get(Calendar.MINUTE));
         cal.set(2006, Calendar.DECEMBER, 31, 11, 00);
-        hours[0].setStop(cal.getTime());
+        workingHours.get(0).setStop(cal.getTime());
         Integer stopHour = Integer.valueOf(cal.get(Calendar.HOUR_OF_DAY));
         Integer stopMinute = Integer.valueOf(cal.get(Calendar.MINUTE));
-        hours[0].setEnabled(true);
-        hours[0].setDay(ScheduledDay.WEDNESDAY);
-        wt.setWorkingHours(hours);
-        wt.setEnabled(true);
-        schedule.setWorkingTimeAttendant(wt);
+        workingHours.get(0).setEnabled(true);
+        workingHours.get(0).setDay(ScheduledDay.WEDNESDAY);
+        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.setEnabled(true);
+        schedule.setWorkingTimeAttendant(workingTimeAttendant);
 
         ring.setSchedule(schedule);
 
         int offset = TimeZone.getDefault().getOffset((new Date()).getTime()) / 60000;
-        Integer minutesFromSunday = (hours[0].getDay().getDayOfWeek() - 1) * 24 * 60;
+        Integer minutesFromSunday = (workingHours.get(0).getDay().getDayOfWeek() - 1) * 24 * 60;
         Integer startWithTimezone = minutesFromSunday + startHour * 60 + startMinute - offset;
         Integer stopWithTimezone = minutesFromSunday + stopHour * 60 + stopMinute - offset;
         String expected = Integer.toHexString(startWithTimezone) + ":"

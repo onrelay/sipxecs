@@ -69,6 +69,8 @@ JettyHomeDir=@SIPX_JETTY_HOME@
 JettyBaseDir=@SIPX_CONFDIR@/jetty
 KeyStore=@SIPX_CONFDIR@/ssl/ssl-web.keystore
 TrustStore=@SIPX_CONFDIR@/ssl/authorities.jks
+CachingProvider=org.ehcache.jsr107.EhcacheCachingProvider
+Logger=org.apache.commons.logging.impl.Log4JLogger
 prog=sipxconfig
 regex="Dprocname=sipxconfig"
 waitForListenPortTime=900
@@ -92,6 +94,21 @@ password=${value#$prefix}
 # Incase system failed suddenly, clear previous locks
 clearIndexLocks() {
   rm ${IndexDir}/*.lock 2>/dev/null
+}
+
+# Incase system failed suddenly, clear previous locks
+checkVarFolders() {
+
+  if [ ! -f ${TmpDir} ]; then
+    mkdir -p ${TmpDir}
+  fi
+  chown -R @SIPXPBXUSER@:@SIPXPBXGROUP@ ${TmpDir}
+
+  if [ ! -f ${LogDir} ]; then
+    mkdir -p ${LogDir}
+  fi
+  chown -R @SIPXPBXUSER@:@SIPXPBXGROUP@ ${LogDir}
+
 }
 
 # Turn control over to ant to run database command
@@ -178,11 +195,12 @@ buildCommand() {
      ${SIPXCONFIG_OPTS} \
      ${TrustStoreOpts} \
      -Djava.io.tmpdir=${TmpDir} \
+     -Djavax.cache.spi.CachingProvider=${CachingProvider} \
      -Dorg.apache.lucene.lockdir=${IndexDir} \
-     -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger \
+     -Dorg.apache.commons.logging.Log=${Logger} \
      -Djetty.lib.dir=@SIPX_JAVADIR@/sipXconfig \
      -Djetty.conf.dir=@SIPX_CONFDIR@ \
-     -Djetty.tmp.dir=@SIPX_TMPDIR@ \
+     -Djetty.tmp.dir=${TmpDir} \
      -Djetty.log.dir=${LogDir} \
      -Djetty.server.Request.maxFormKeys=2000 \
      -Djetty.home=${JettyHomeDir} \
@@ -200,6 +218,7 @@ buildCommand() {
 
 runTask() {
   setupCheck
+  checkVarFolders
   databaseCommand upgrade
   databaseVersionCheck    
   buildCommand task-$taskId
@@ -212,6 +231,7 @@ runTask() {
 # Run Web interface
 start() {
   setupCheck
+  checkVarFolders
   mongoUpgradeCheck
   databaseCommand upgrade
   databaseVersionCheck

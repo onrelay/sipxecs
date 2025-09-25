@@ -15,67 +15,36 @@
   ~ limitations under the License.
   -->
 
-<hazelcast xsi:schemaLocation="http://www.hazelcast.com/schema/config hazelcast-config-3.1.xsd"
-           xmlns="http://www.hazelcast.com/schema/config"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <group>
-        <name>hazelcast-sipxecs</name>
-        <password>hazelcast-sipxecs</password>
-    </group>
-    <management-center enabled="false"/>
+<hazelcast xmlns="http://www.hazelcast.com/schema/config"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.hazelcast.com/schema/config
+                               https://www.hazelcast.com/schema/config/hazelcast-config-5.5.xsd">
+
+    <cluster-name>hazelcast-sipxecs</cluster-name>
+
+    <management-center />
+
+    <properties>
+        <property name="hazelcast.logging.type">slf4j</property>
+    </properties>
+
+    <partition-group enabled="false"/>
+
     <network>
-        <port auto-increment="true">6701</port>
+        <port auto-increment="true" port-count="100">6701</port>
         <join>
             <multicast enabled="false">
                 <multicast-group>224.2.2.3</multicast-group>
                 <multicast-port>54327</multicast-port>
             </multicast>
             <tcp-ip enabled="true">
-#foreach( $addr in $addresses )
-                <interface>$addr</interface>
-#end
+                #foreach( $addr in $addresses )
+                <member>$addr</member>
+                #end
             </tcp-ip>
-
-            <aws enabled="false"/>
         </join>
         <interfaces enabled="false"/>
         <ssl enabled="false" />
         <socket-interceptor enabled="false" />
-        <symmetric-encryption enabled="false">
-            <!--
-               encryption algorithm such as
-               DES/ECB/PKCS5Padding,
-               PBEWithMD5AndDES,
-               AES/CBC/PKCS5Padding,
-               Blowfish,
-               DESede
-            -->
-            <algorithm>PBEWithMD5AndDES</algorithm>
-            <!-- salt value to use when generating the secret key -->
-            <salt>thesalt</salt>
-            <!-- pass phrase to use when generating the secret key -->
-            <password>thepass</password>
-            <!-- iteration count to use when generating the secret key -->
-            <iteration-count>19</iteration-count>
-        </symmetric-encryption>
-        <asymmetric-encryption enabled="false">
-            <!-- encryption algorithm -->
-            <algorithm>RSA/NONE/PKCS1PADDING</algorithm>
-            <!-- private key password -->
-            <keyPassword>thekeypass</keyPassword>
-            <!-- private key alias -->
-            <keyAlias>local</keyAlias>
-            <!-- key store type -->
-            <storeType>JKS</storeType>
-            <!-- key store password -->
-            <storePassword>thestorepass</storePassword>
-            <!-- path to the key store -->
-            <storePath>keystore</storePath>
-        </asymmetric-encryption>
     </network>
-    <partition-group enabled="false"/>
-    <properties>
-        <property name="hazelcast.logging.type">slf4j</property>
-    </properties>
-
 </hazelcast>

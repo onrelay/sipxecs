@@ -83,8 +83,8 @@ public abstract class Schedule extends BeanWithId implements SystemAuditable {
 
     public void checkForValidSchedule() {
         WorkingTimeAttendant workingTimeAttendant = getWorkingTimeAttendant();
-        WorkingHours[] workingHours = workingTimeAttendant.getWorkingHours();
-        if (workingHours == null || workingHours.length == 0) {
+        List<WorkingHours> workingHours = workingTimeAttendant.getWorkingHours();
+        if (workingHours == null || workingHours.size() == 0) {
             throw new ScheduleException();
         }
         workingTimeAttendant.checkValid();

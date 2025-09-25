@@ -56,15 +56,15 @@ public class WorkingTimeAttendantTest extends TestCase {
     }
 
     public void testInitAttendantWorkingTime() {
-        WorkingTimeAttendant wt = new WorkingTimeAttendant();
-        WorkingHours[] workingHours = wt.getWorkingHours();
-        assertEquals(7, workingHours.length);
-        assertTrue(workingHours[0].isEnabled());
-        assertEquals(ScheduledDay.MONDAY, workingHours[0].getDay());
-        assertTrue(workingHours[4].isEnabled());
-        assertFalse(workingHours[5].isEnabled());
-        assertFalse(workingHours[6].isEnabled());
-        assertEquals(ScheduledDay.SUNDAY, workingHours[6].getDay());
+        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        List<WorkingHours> workingHours = workingTimeAttendant.getWorkingHours();
+        assertEquals(7, workingHours.size());
+        assertTrue(workingHours.get(0).isEnabled());
+        assertEquals(ScheduledDay.MONDAY, workingHours.get(0).getDay());
+        assertTrue(workingHours.get(4).isEnabled());
+        assertFalse(workingHours.get(5).isEnabled());
+        assertFalse(workingHours.get(6).isEnabled());
+        assertEquals(ScheduledDay.SUNDAY, workingHours.get(6).getDay());
     }
 
     public void testGeneralAddMinutesFromSunday() {
@@ -337,36 +337,36 @@ public class WorkingTimeAttendantTest extends TestCase {
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         c.set(1970, Calendar.JANUARY, 1);
 
-        WorkingTimeAttendant wt = new WorkingTimeAttendant();
-        assertFalse(wt.overlappingPeriods());
+        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        assertFalse(workingTimeAttendant.overlappingPeriods());
 
-        WorkingHours[] hours = new WorkingHours[2];
-        hours[0] = new WorkingHours();
-        hours[1] = new WorkingHours();
-        wt.setWorkingHours(hours);
+        List<WorkingHours> workingHours = new ArrayList<WorkingHours>();
+        workingHours.add(new WorkingHours());
+        workingHours.add(new WorkingHours());
+        workingTimeAttendant.setWorkingHours(workingHours);
 
-        hours[0].setDay(ScheduledDay.SUNDAY);
-        hours[1].setDay(ScheduledDay.SUNDAY);
+        workingHours.get(0).setDay(ScheduledDay.SUNDAY);
+        workingHours.get(1).setDay(ScheduledDay.SUNDAY);
 
         // First schedule : SUNDAY, 03:03 -> 15:10
         // Second schedule : SUNDAY, 12:00 -> 17:23
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 10);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 12);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 17);
         c.set(Calendar.MINUTE, 23);
-        hours[1].setStop(c.getTime());
+        workingHours.get(1).setStop(c.getTime());
 
-        assertTrue(wt.overlappingPeriods());
+        assertTrue(workingTimeAttendant.overlappingPeriods());
 
         // First schedule : SUNDAY, 03:03 -> 15:10
         // Second schedule : SUNDAY, 01:00 -> 08:23
@@ -374,87 +374,87 @@ public class WorkingTimeAttendantTest extends TestCase {
         // Second schedule : SUNDAY, 08:00 -> 10:23
         c.set(Calendar.HOUR_OF_DAY, 2);
         c.set(Calendar.MINUTE, 15);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 17);
         c.set(Calendar.MINUTE, 10);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 8);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 10);
         c.set(Calendar.MINUTE, 23);
-        hours[1].setStop(c.getTime());
+        workingHours.get(2).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
-        assertTrue(wt.overlappingPeriods());
+        assertTrue(workingTimeAttendant.overlappingPeriods());
 
         // First schedule : SUNDAY, 08:13 -> 10:10
         // Second schedule : SUNDAY, 03:00 -> 17:23
         c.set(Calendar.HOUR_OF_DAY, 8);
         c.set(Calendar.MINUTE, 13);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 10);
         c.set(Calendar.MINUTE, 10);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 17);
         c.set(Calendar.MINUTE, 23);
-        hours[1].setStop(c.getTime());
+        workingHours.get(1).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
-        assertTrue(wt.overlappingPeriods());
+        assertTrue(workingTimeAttendant.overlappingPeriods());
 
         // First schedule : SUNDAY, 03:03 -> 15:00
         // Second schedule : SUNDAY, 15:00 -> 20:23
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 10);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 1);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 8);
         c.set(Calendar.MINUTE, 23);
-        hours[1].setStop(c.getTime());
+        workingHours.get(1).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
-        assertTrue(wt.overlappingPeriods());
+        assertTrue(workingTimeAttendant.overlappingPeriods());
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 0);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 20);
         c.set(Calendar.MINUTE, 23);
-        hours[1].setStop(c.getTime());
+        workingHours.get(1).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
-        assertFalse(wt.overlappingPeriods());
+        assertFalse(workingTimeAttendant.overlappingPeriods());
 
         // First schedule : SUNDAY, 03:03 -> 15:00
         // Second schedule : SUNDAY, 01:00 -> 03:03
@@ -462,91 +462,91 @@ public class WorkingTimeAttendantTest extends TestCase {
         // Second schedule : SUNDAY, 18:00 -> 20:23
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 0);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 1);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[1].setStop(c.getTime());
+        workingHours.get(1).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
-        assertFalse(wt.overlappingPeriods());
+        assertFalse(workingTimeAttendant.overlappingPeriods());
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 0);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 18);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 20);
         c.set(Calendar.MINUTE, 23);
-        hours[1].setStop(c.getTime());
+        workingHours.get(1).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
-        assertFalse(wt.overlappingPeriods());
+        assertFalse(workingTimeAttendant.overlappingPeriods());
 
         // First schedule : SUNDAY, 03:03 -> 15:00
         // Second schedule : MONDAY, 08:00 -> 14:23
-        hours[0].setDay(ScheduledDay.SUNDAY);
-        hours[1].setDay(ScheduledDay.MONDAY);
+        workingHours.get(0).setDay(ScheduledDay.SUNDAY);
+        workingHours.get(1).setDay(ScheduledDay.MONDAY);
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 0);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 8);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 14);
         c.set(Calendar.MINUTE, 23);
-        hours[1].setStop(c.getTime());
+        workingHours.get(1).setStop(c.getTime());
 
-        assertFalse(wt.overlappingPeriods());
+        assertFalse(workingTimeAttendant.overlappingPeriods());
     }
 
     public void testCheckValid() {
-        WorkingTimeAttendant wt = new WorkingTimeAttendant();
+        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
 
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         c.set(1970, Calendar.JANUARY, 1);
 
-        WorkingHours[] hours = new WorkingHours[1];
-        hours[0] = new WorkingHours();
+        List<WorkingHours> workingHours = new ArrayList<WorkingHours>();
+        workingHours.add( new WorkingHours() );
 
-        hours[0].setDay(ScheduledDay.SUNDAY);
+        workingHours.get(0).setDay(ScheduledDay.SUNDAY);
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 2);
         c.set(Calendar.MINUTE, 5);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
         try {
-            wt.checkValid();
+            workingTimeAttendant.checkValid();
             fail("Should throw a InvalidPeriodException");
         } catch (InvalidPeriodException ex) {
             assertTrue(true);
@@ -554,16 +554,16 @@ public class WorkingTimeAttendantTest extends TestCase {
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 6);
         c.set(Calendar.MINUTE, 5);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
         try {
-            wt.checkValid();
+            workingTimeAttendant.checkValid();
             assertTrue(true);
         } catch (InvalidPeriodException ex) {
             fail("Shouldn't throw a InvalidPeriodException");
@@ -571,14 +571,14 @@ public class WorkingTimeAttendantTest extends TestCase {
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         try {
-            wt.checkValid();
+            workingTimeAttendant.checkValid();
             fail("Should throw a SameStartAndStopHoursException");
         } catch (SameStartAndStopHoursException ex) {
             assertTrue(true);
@@ -586,46 +586,46 @@ public class WorkingTimeAttendantTest extends TestCase {
 
         c.set(Calendar.HOUR_OF_DAY, 12);
         c.set(Calendar.MINUTE, 30);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 18);
         c.set(Calendar.MINUTE, 40);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         try {
-            wt.checkValid();
+            workingTimeAttendant.checkValid();
             assertTrue(true);
         } catch (SameStartAndStopHoursException ex) {
             fail("Shouldn't throw a SameStartAndStopHoursException");
         }
 
-        hours = new WorkingHours[2];
-        hours[0] = new WorkingHours();
-        hours[1] = new WorkingHours();
+        workingHours = new ArrayList<WorkingHours>();
+        workingHours.add( new WorkingHours() );
+        workingHours.add( new WorkingHours() );
 
-        hours[0].setDay(ScheduledDay.SUNDAY);
-        hours[1].setDay(ScheduledDay.SUNDAY);
+        workingHours.get(0).setDay(ScheduledDay.SUNDAY);
+        workingHours.get(1).setDay(ScheduledDay.SUNDAY);
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 10);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 12);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 17);
         c.set(Calendar.MINUTE, 23);
-        hours[1].setStop(c.getTime());
+        workingHours.get(1).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
         try {
-            wt.checkValid();
+            workingTimeAttendant.checkValid();
             fail("Should throw a OverlappingPeriodsException");
         } catch (OverlappingPeriodsException ex) {
             assertTrue(true);
@@ -633,24 +633,24 @@ public class WorkingTimeAttendantTest extends TestCase {
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 10);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 1);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 8);
         c.set(Calendar.MINUTE, 23);
-        hours[1].setStop(c.getTime());
+        workingHours.get(1).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
         try {
-            wt.checkValid();
+            workingTimeAttendant.checkValid();
             fail("Should throw a OverlappingPeriodsException");
         } catch (OverlappingPeriodsException ex) {
             assertTrue(true);
@@ -658,24 +658,24 @@ public class WorkingTimeAttendantTest extends TestCase {
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 0);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 20);
         c.set(Calendar.MINUTE, 23);
-        hours[1].setStop(c.getTime());
+        workingHours.get(1).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
         try {
-            wt.checkValid();
+            workingTimeAttendant.checkValid();
             assertTrue(true);
         } catch (OverlappingPeriodsException ex) {
             fail("Shouldn't throw a OverlappingPeriodsException");
@@ -683,24 +683,24 @@ public class WorkingTimeAttendantTest extends TestCase {
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 0);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 1);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[1].setStop(c.getTime());
+        workingHours.get(1).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
         try {
-            wt.checkValid();
+            workingTimeAttendant.checkValid();
             assertTrue(true);
         } catch (OverlappingPeriodsException ex) {
             fail("Shouldn't throw a OverlappingPeriodsException");
@@ -708,50 +708,50 @@ public class WorkingTimeAttendantTest extends TestCase {
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 0);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 18);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 20);
         c.set(Calendar.MINUTE, 23);
-        hours[1].setStop(c.getTime());
+        workingHours.get(1).setStop(c.getTime());
 
-        wt.setWorkingHours(hours);
+        workingTimeAttendant.setWorkingHours(workingHours);
 
         try {
-            wt.checkValid();
+            workingTimeAttendant.checkValid();
             assertTrue(true);
         } catch (OverlappingPeriodsException ex) {
             fail("Shouldn't throw a OverlappingPeriodsException");
         }
 
-        hours[0].setDay(ScheduledDay.SUNDAY);
-        hours[1].setDay(ScheduledDay.MONDAY);
+        workingHours.get(0).setDay(ScheduledDay.SUNDAY);
+        workingHours.get(1).setDay(ScheduledDay.MONDAY);
 
         c.set(Calendar.HOUR_OF_DAY, 3);
         c.set(Calendar.MINUTE, 3);
-        hours[0].setStart(c.getTime());
+        workingHours.get(0).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 15);
         c.set(Calendar.MINUTE, 0);
-        hours[0].setStop(c.getTime());
+        workingHours.get(0).setStop(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 8);
         c.set(Calendar.MINUTE, 0);
-        hours[1].setStart(c.getTime());
+        workingHours.get(1).setStart(c.getTime());
 
         c.set(Calendar.HOUR_OF_DAY, 14);
         c.set(Calendar.MINUTE, 23);
-        hours[1].setStop(c.getTime());
+        workingHours.get(1).setStop(c.getTime());
 
         try {
-            wt.checkValid();
+            workingTimeAttendant.checkValid();
             assertTrue(true);
         } catch (OverlappingPeriodsException ex) {
             fail("Shouldn't throw a OverlappingPeriodsException");

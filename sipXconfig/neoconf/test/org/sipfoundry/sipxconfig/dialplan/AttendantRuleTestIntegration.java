@@ -142,30 +142,31 @@ public class AttendantRuleTestIntegration extends MongoTestIntegration {
 
         // add live attendant schedule
         Schedule schedule = new GeneralSchedule();
-        WorkingHours[] hours = new WorkingHours[1];
-        WorkingTimeAttendant wt = new WorkingTimeAttendant();
-        hours[0] = new WorkingHours();
+        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        List<WorkingHours> workingHours = new ArrayList<WorkingHours>();
+        WorkingHours workingHoursItem = new WorkingHours();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         cal.set(2014, Calendar.MARCH, 7, 10, 00);
-        hours[0].setStart(cal.getTime());
+        workingHoursItem.setStart(cal.getTime());
         Integer startHour = Integer.valueOf(cal.get(Calendar.HOUR_OF_DAY));
         Integer startMinute = Integer.valueOf(cal.get(Calendar.MINUTE));
         cal.set(2014, Calendar.MARCH, 7, 11, 00);
-        hours[0].setStop(cal.getTime());
+        workingHoursItem.setStop(cal.getTime());
         Integer stopHour = Integer.valueOf(cal.get(Calendar.HOUR_OF_DAY));
         Integer stopMinute = Integer.valueOf(cal.get(Calendar.MINUTE));
-        hours[0].setEnabled(true);
-        hours[0].setDay(ScheduledDay.FRIDAY);
-        wt.setWorkingHours(hours);
-        wt.setEnabled(true);
-        schedule.setWorkingTimeAttendant(wt);
+        workingHoursItem.setEnabled(true);
+        workingHoursItem.setDay(ScheduledDay.FRIDAY);
+        workingHours.add(workingHoursItem);
+        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.setEnabled(true);
+        schedule.setWorkingTimeAttendant(workingTimeAttendant);
         schedule.setName("live attendant schedule");
         m_forwardingContext.saveSchedule(schedule);
         rule.setSchedule(schedule);
         m_dialPlanContext.storeRule(rule);
 
         int offset = TimeZone.getDefault().getOffset((new Date()).getTime()) / 60000;
-        Integer minutesFromSunday = (hours[0].getDay().getDayOfWeek() - 1) * 24 * 60;
+        Integer minutesFromSunday = (workingHours.get(0).getDay().getDayOfWeek() - 1) * 24 * 60;
         Integer startWithTimezone = minutesFromSunday + startHour * 60 + startMinute - offset;
         Integer stopWithTimezone = minutesFromSunday + stopHour * 60 + stopMinute - offset;
         String expected = Integer.toHexString(startWithTimezone) + ":" + Integer.toHexString(stopWithTimezone);

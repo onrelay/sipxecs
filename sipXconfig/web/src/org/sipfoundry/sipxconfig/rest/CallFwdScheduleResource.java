@@ -214,20 +214,20 @@ public class CallFwdScheduleResource extends UserResource {
         return periodBeans;
     }
 
-    private static WorkingHours[] fromPeriodBeanList(List<PeriodBean> periodBeans) {
-        List<WorkingHours> wHours = new ArrayList<WorkingHours>();
+    private static List<WorkingHours> fromPeriodBeanList(List<PeriodBean> periodBeans) {
+        List<WorkingHours> workingHours = new ArrayList<WorkingHours>();
 
         for (PeriodBean bean : periodBeans) {
-            WorkingHours wHour = new WorkingHours();
+            WorkingHours workingHoursItem = new WorkingHours();
 
-            wHour.setDay(ScheduledDay.getScheduledDay(bean.getScheduledDay()));
-            wHour.setStartTimeOfDay(bean.getStart());
-            wHour.setStopTimeOfDay(bean.getEnd());
+            workingHoursItem.setDay(ScheduledDay.getScheduledDay(bean.getScheduledDay()));
+            workingHoursItem.setStartTimeOfDay(bean.getStart());
+            workingHoursItem.setStopTimeOfDay(bean.getEnd());
 
-            wHours.add(wHour);
+            workingHours.add(workingHoursItem);
         }
 
-        return wHours.toArray(new WorkingHours[wHours.size()]);
+        return workingHours;
     }
 
     private static class ScheduleBean {
