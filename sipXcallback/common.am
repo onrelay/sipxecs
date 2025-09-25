@@ -11,7 +11,7 @@ sipxcall_PKGS = \
 	bson  \	
 	sipxcommons \
 	slf4j-api \
-	slf4j-log4j12 \
+	slf4j-reload4j \
 	spring-beans \
 	spring-web \
 	spring-context \
@@ -24,6 +24,6 @@ sipxcall_PKGS = \
 	spring-data-commons \
 	spring-data-mongodb \
 	aopalliance \
-	hazelcast-all
+	hazelcast
 
 sipxcall_JAVAROOT = $(abspath $(top_builddir)/src/classes)

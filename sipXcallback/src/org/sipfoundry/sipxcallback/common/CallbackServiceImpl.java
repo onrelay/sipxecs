@@ -33,11 +33,11 @@ import org.sipfoundry.commons.mongo.MongoConstants;
 import org.sipfoundry.commons.userdb.ValidUsers;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.hazelcast.core.Cluster;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IAtomicReference;
-import com.hazelcast.core.IQueue;
-import com.hazelcast.core.Member;
+import com.hazelcast.cp.IAtomicReference;
+import com.hazelcast.collection.IQueue;
+import com.hazelcast.cluster.Member;
+import com.hazelcast.cluster.Cluster;
 
 import org.bson.Document;
 import com.mongodb.client.MongoCollection;
@@ -218,8 +218,7 @@ public class CallbackServiceImpl implements CallbackService {
 
         // initiate on "primary" hazelcast instance only
         if ((hazelcastCluster.getLocalMember().equals(hazelcastMembers.iterator().next()))) {
-            IAtomicReference<Object> initiated = m_hazelcastInstance
-                    .getAtomicReference(HAZELCAST_CALLBACK_QUEUE_INITIATED);
+            IAtomicReference<Boolean> initiated = getAtomicReference(HAZELCAST_CALLBACK_QUEUE_INITIATED);
             // initiate the queue if needed
             if (initiated.get() == null) {
                 LOG.debug("Setting up Hazelcast callback queue.");
@@ -233,7 +232,7 @@ public class CallbackServiceImpl implements CallbackService {
 
     @Override
     public IAtomicReference<Boolean> getAtomicReference(String key) {
-        return m_hazelcastInstance.getAtomicReference(key);
+        return m_hazelcastInstance.getCPSubsystem().getAtomicReference(key);
     }
 
     @Override

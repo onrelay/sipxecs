@@ -18,7 +18,7 @@ package org.sipfoundry.sipxcallback.common;
 
 import java.util.Queue;
 
-import com.hazelcast.core.IAtomicReference;
+import com.hazelcast.cp.IAtomicReference;
 
 public interface CallbackService {
 
