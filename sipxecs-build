@@ -293,14 +293,6 @@ function addCentOS9Repos()
     LOCAL_REPO=${BUILD_DIR}/repo/CentOS_9/${ARCHITECTURE}
     LOCAL_SOURCE_REPO=${BUILD_DIR}/repo/CentOS_9/source
 
-    rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
-
-    wget -O /etc/yum.repos.d/elasticsearch.repo \
-      https://storage.googleapis.com/sipxecs/artifact-registry/elasticsearch.repo
-
-    wget -O /etc/yum.repos.d/mongodb-org-8.0.repo \
-      https://storage.googleapis.com/sipxecs/artifact-registry/mongodb-org-8.0.repo
-
     echo "Done addCentOS9Repos()"
 }
 
@@ -310,14 +302,6 @@ function addRocky9Repos()
 
     LOCAL_REPO=${BUILD_DIR}/repo/Rocky_9/${ARCHITECTURE}
     LOCAL_SOURCE_REPO=${BUILD_DIR}/repo/Rocky_9/source
-
-    rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
-
-    wget -O /etc/yum.repos.d/elasticsearch.repo \
-      https://storage.googleapis.com/sipxecs/artifact-registry/elasticsearch.repo
-
-    wget -O /etc/yum.repos.d/mongodb-org-8.0.repo \
-      https://storage.googleapis.com/sipxecs/artifact-registry/mongodb-org-8.0.repo
 
     echo "Done addRocky9Repos()"
 }
@@ -446,7 +430,8 @@ function setupRocky9()
 
     echo "installing rpms from sipXecs repo"
     dnf config-manager --enable sipxcom
-    sudo dnf install ${INSTALL_OPTIONS} freeswitch-devel
+    sudo dnf install ${INSTALL_OPTIONS} freeswitch-devel elasticsearch mongodb-database-tools mongodb-mongosh mongodb-org mongodb-org-database \
+        mongodb-org-database-tools-extra mongodb-org-mongos mongodb-org-server mongodb-org-tools
 
     ERROR=$?
     if [ ${ERROR} -ne 0 ]; then 
@@ -498,26 +483,6 @@ function setupRocky9()
         fi 
     fi
 
-    echo "installing elasticsearch from elasticsearch repo"
-    dnf config-manager --enable elasticsearch
-    sudo dnf install ${INSTALL_OPTIONS} elasticsearch
-
-    ERROR=$?
-    if [ ${ERROR} -ne 0 ]; then 
-        echo "dnf install error, exiting sipxecs-build"
-        exit ${ERROR}
-    fi 
-
-    echo "installing MongoDB from mongodb-org-8.0 repo"
-    dnf config-manager --enable mongodb-org-8.0
-    sudo dnf install ${INSTALL_OPTIONS} mongodb-org
-
-    ERROR=$?
-    if [ ${ERROR} -ne 0 ]; then 
-        echo "dnf install error, exiting sipxecs-build"
-        exit ${ERROR}
-    fi 
-    
 
     if [ "${RPM}" != "" ]; then
 
