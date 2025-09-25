@@ -327,10 +327,7 @@ function configure()
     if [ -z "${RPM}" ]; then
         sudo ../configure
     else
-        sudo yum install -y createrepo rpm-build mock
-        sudo wget http://li.nux.ro/download/nux/misc/el7/x86_64/thttpd-2.25b-33.el7.nux.x86_64.rpm
-        sudo rpm -ivh thttpd-2.25b-33.el7.nux.x86_64.rpm
-        rm -f thttpd-2.25b-33.el7.nux.x86_64.rpm
+        sudo yum install -y createrepo rpm-build mock thttpd
         sudo usermod -a -G mock sipx
         
         sudo ../configure --enable-rpm DISTRO="${PLATFORM}-${ARCHITECTURE}"
