@@ -25,8 +25,7 @@ import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.sipfoundry.commons.userdb.User;
 import org.sipfoundry.commons.userdb.ValidUsers;
 import org.sipfoundry.commons.util.UnfortunateLackOfSpringSupportFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Presence;
 
@@ -34,7 +33,7 @@ public class PresenceEventListenerImpl implements PresenceEventListener {
     Map<String, SipPresenceBean> m_presenceCache = null;
     ValidUsers m_users = UnfortunateLackOfSpringSupportFactory.getValidUsers();
 
-    private static final Logger logger = LoggerFactory.getLogger(PresenceEventListenerImpl.class);
+    private static final Logger logger = Logger.getLogger(PresenceEventListenerImpl.class);
 
     public PresenceEventListenerImpl (Map<String, SipPresenceBean> presenceCache) {
         m_presenceCache = presenceCache;

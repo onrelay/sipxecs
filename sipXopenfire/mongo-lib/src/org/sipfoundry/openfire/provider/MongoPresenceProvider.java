@@ -18,38 +18,57 @@ package org.sipfoundry.openfire.provider;
 
 import java.util.Date;
 
-import org.jivesoftware.openfire.provider.PresenceProvider;
-import org.jivesoftware.util.StringUtils;
-
 import org.bson.Document;
+import org.jivesoftware.util.StringUtils;
+import org.jivesoftware.openfire.XMPPServer;
+import org.jivesoftware.openfire.session.Session;
+import org.xmpp.packet.Presence;
+import org.bson.conversions.Bson;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.FindIterable;
-import com.mongodb.WriteConcern;
-import com.mongodb.client.model.UpdateOptions;
-import com.mongodb.client.model.Updates;
 import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.IndexOptions;
 
+/**
+ * MongoDB-backed storage for offline presence.
+ * Automatically persists offline presence when users go offline.
+ */
+public class MongoPresenceProvider extends BaseMongoProvider {
 
-public class MongoPresenceProvider extends BaseMongoProvider implements PresenceProvider {
     private static final String COLLECTION_NAME = "ofPresence";
+
+    public static final class TimePresence {
+        private final long lastActivity;
+        private final String presence;
+
+        public TimePresence(long lastActivity, String presence) {
+            this.lastActivity = lastActivity;
+            this.presence = presence;
+        }
+
+        public long getLastActivity() { return lastActivity; }
+        public String getPresence() { return presence; }
+
+        @Override
+        public String toString() {
+            return "TimePresence{lastActivity=" + lastActivity + ", presence='" + presence + "'}";
+        }
+    }
 
     public MongoPresenceProvider() {
         setDefaultCollectionName(COLLECTION_NAME);
         MongoCollection<Document> presenceCollection = getDefaultCollection();
 
-        Document index = new Document("username", 1);
-        presenceCollection.createIndex(index);
+        // Ensure index on username (unique per user)
+        presenceCollection.createIndex(new Document("username", 1), new IndexOptions().unique(true));
+
     }
 
-    @Override
     public void deleteOfflinePresenceFromDB(String username) {
         MongoCollection<Document> presenceCollection = getDefaultCollection();
-        Document toRemove = new Document("username", username);
-
-        presenceCollection.deleteMany(toRemove);
+        Bson query = new Document("username", username);
+        presenceCollection.deleteMany(query);
     }
 
-    @Override
     public void insertOfflinePresenceIntoDB(String username, String offlinePresence, Date offlinePresenceDate) {
         MongoCollection<Document> presenceCollection = getDefaultCollection();
         Document query = new Document("username", username);
@@ -57,31 +76,30 @@ public class MongoPresenceProvider extends BaseMongoProvider implements Presence
         Document updateDoc = new Document()
             .append("username", username)
             .append("offlinePresence", offlinePresence)
-            .append("offlinePresenceDate", StringUtils.dateToMillis(offlinePresenceDate));
+            .append("offlinePresenceDate", offlinePresenceDate.getTime());
 
         ReplaceOptions options = new ReplaceOptions().upsert(true);
-
         presenceCollection.replaceOne(query, updateDoc, options);
     }
 
-    @Override
     public TimePresence loadOfflinePresence(String username) {
         MongoCollection<Document> presenceCollection = getDefaultCollection();
-        Document toFind = new Document("username", username);
+        Document query = new Document("username", username);
 
-        Document entry = presenceCollection.find(toFind).first();
-        TimePresence tp;
-
+        Document entry = presenceCollection.find(query).first();
         if (entry != null) {
-            String lastActivity = (String) entry.get("offlinePresenceDate");
-            String presence = (String) entry.get("offlinePresence");
+            Object lastActivityObj = entry.get("offlinePresenceDate");
+            long lastActivity = 0L;
+            if (lastActivityObj instanceof Number) {
+                lastActivity = ((Number) lastActivityObj).longValue();
+            } else if (lastActivityObj != null) {
+                lastActivity = Long.parseLong(lastActivityObj.toString());
+            }
 
-            tp = new TimePresence(Long.valueOf(lastActivity), presence);
+            String presence = entry.getString("offlinePresence");
+            return new TimePresence(lastActivity, presence);
         } else {
-            tp = new TimePresence(NULL_LONG, "NULL");
+            return null;
         }
-
-        return tp;
     }
-
 }

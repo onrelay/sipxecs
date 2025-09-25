@@ -18,7 +18,7 @@ package org.sipfoundry.openfire.vcard;
 
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
-import org.jivesoftware.openfire.provider.VCardProvider;
+import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.vcard.VCardManager;
 import org.sipfoundry.openfire.vcard.synchserver.ContactInfoHandler;
 import org.sipfoundry.openfire.vcard.synchserver.Util;
@@ -28,17 +28,29 @@ public class ContactInfoHandlerImpl implements ContactInfoHandler {
 
     @Override
     public void notifyContactChange(String userName) {
-        VCardProvider provider = VCardManager.getProvider();
-        Element userVCard = provider.loadVCard(userName);
         try {
-            logger.debug("Start synchronizing vcard");
-            VCardManager.getInstance().setVCard(userName, userVCard);
+            VCardManager vCardManager = XMPPServer.getInstance().getVCardManager();
+            
+            // Load the user's current vCard from Openfire
+            Element userVCard = vCardManager.getVCard(userName);
+
+            if (userVCard == null) {
+                logger.warn("No existing vCard found for user: " + userName);
+                return;
+            }
+
+            logger.debug("Start synchronizing vCard for user: " + userName);
+
+            // Update the vCard in Openfire
+            vCardManager.setVCard(userName, userVCard);
+
+            // Update the avatar and notify clients
             Util.updateAvatar(userName, userVCard);
-            // Sending announcement to the client
             Util.notify(userName);
-            logger.debug("Finished synchronizing vcard");
+
+            logger.debug("Finished synchronizing vCard for user: " + userName);
         } catch (Exception e) {
-            logger.error("Cannot synchronize VCard for: " + userName);
+            logger.error("Cannot synchronize vCard for user: " + userName, e);
         }
     }
 }

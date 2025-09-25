@@ -21,7 +21,7 @@ public class GroupProviderTest extends BaseMongoTest {
 
     @Test
     public void testCreateNonExistingGroup() throws GroupAlreadyExistsException {
-        GroupProvider provider = new MongoGroupProviderAlt();
+        GroupProvider provider = new MongoGroupProvider();
         Group g = provider.createGroup("testGrp");
 
         assertEquals(0L, getImdb().getCollection("entity").count());
@@ -30,7 +30,7 @@ public class GroupProviderTest extends BaseMongoTest {
 
     @Test
     public void testCreateExistingGroup() throws GroupAlreadyExistsException {
-        GroupProvider provider = new MongoGroupProviderAlt();
+        GroupProvider provider = new MongoGroupProvider();
 
         insertGroup("testGrp");
 
@@ -42,7 +42,7 @@ public class GroupProviderTest extends BaseMongoTest {
 
     @Test
     public void testSearchWildcardPrefix() {
-        GroupProvider provider = new MongoGroupProviderAlt();
+        GroupProvider provider = new MongoGroupProvider();
 
         insertGroup("testGrp");
         insertGroup("additional");
@@ -57,7 +57,7 @@ public class GroupProviderTest extends BaseMongoTest {
 
     @Test
     public void testSearchWildcardSuffix() {
-        GroupProvider provider = new MongoGroupProviderAlt();
+        GroupProvider provider = new MongoGroupProvider();
 
         insertGroup("testGrp");
         insertGroup("additional");
@@ -72,7 +72,7 @@ public class GroupProviderTest extends BaseMongoTest {
 
     @Test
     public void testSearchWildcardMiddle() {
-        GroupProvider provider = new MongoGroupProviderAlt();
+        GroupProvider provider = new MongoGroupProvider();
 
         insertGroup("testGrp");
         insertGroup("additional");
@@ -87,7 +87,7 @@ public class GroupProviderTest extends BaseMongoTest {
 
     @Test
     public void testSearchWildcardAll() {
-        GroupProvider provider = new MongoGroupProviderAlt();
+        GroupProvider provider = new MongoGroupProvider();
 
         insertGroup("testGroup");
         insertGroup("additional");

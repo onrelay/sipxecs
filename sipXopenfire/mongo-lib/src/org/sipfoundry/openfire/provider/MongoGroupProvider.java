@@ -43,8 +43,8 @@ import org.bson.Document;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
 
-public class MongoGroupProviderAlt extends AbstractGroupProvider {
-    private static final Logger log = Logger.getLogger(MongoGroupProviderAlt.class);
+public class MongoGroupProvider extends AbstractGroupProvider {
+    private static final Logger log = Logger.getLogger(MongoGroupProvider.class);
 
     private static final String COLLECTION_NAME = "entity";
 

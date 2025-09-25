@@ -23,17 +23,16 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.XPath;
 import org.dom4j.xpath.DefaultXPath;
+import org.dom4j.DocumentHelper;
+import org.dom4j.io.SAXReader;
+import org.jivesoftware.openfire.PrivateStorage;
 import org.jivesoftware.openfire.XMPPServer;
-import org.jivesoftware.openfire.provider.PrivateStorageProvider;
-import org.jivesoftware.openfire.provider.ProviderFactory;
 import org.sipfoundry.openfire.muc.RoomManager;
 
 public class SipXBookmarkManager {
     private static final Logger log = Logger.getLogger(SipXBookmarkManager.class);
 
     private static SipXBookmarkManager instance;
-
-    private final PrivateStorageProvider provider = ProviderFactory.getPrivateStorageProvider();
 
     private static final String CONFERENCE_DOMAIN = "conference"
             + XMPPServer.getInstance().getServerInfo().getXMPPDomain();
@@ -69,9 +68,19 @@ public class SipXBookmarkManager {
 
         if (existingRoom == null) {
             Element newRoom = RoomManager.buildBookmarkElement(bookmarkName, bookmarkJid);
-
             currentRooms.add(newRoom);
-            provider.add(owner, currentRooms);
+
+            // Wrap bookmarks into <storage xmlns='storage:bookmarks'>
+            Element storageElement = DocumentHelper.createElement("storage");
+            storageElement.addAttribute("xmlns", "storage:bookmarks");
+
+            for (Object room : currentRooms.elements()) {
+                storageElement.add(((Element)room).createCopy());
+            }
+
+            // Save to private storage
+            PrivateStorage storage = XMPPServer.getInstance().getPrivateStorage();
+            storage.add(owner, storageElement);
         } else {
             log.debug(String.format("Bookmark %s[%s] for user %s already exists", bookmarkName, bookmarkJid, owner));
         }
@@ -89,11 +98,21 @@ public class SipXBookmarkManager {
         @SuppressWarnings("unchecked")
         List<Node> matches = roomPath.selectNodes(currentRooms);
 
-        if (matches.size() > 0) {
+        if (!matches.isEmpty()) {
             for (Node match : matches) {
                 currentRooms.remove(match);
             }
-            provider.add(owner, currentRooms);
+
+            // Re-wrap in <storage xmlns='storage:bookmarks'>
+            Element storageElement = DocumentHelper.createElement("storage");
+            storageElement.addAttribute("xmlns", "storage:bookmarks");
+
+            for (Object child : currentRooms.elements()) {
+                storageElement.add(((Element) child).createCopy());
+            }
+
+            PrivateStorage storage = XMPPServer.getInstance().getPrivateStorage();
+            storage.add(owner, storageElement);
         }
     }
 }

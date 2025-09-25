@@ -27,11 +27,11 @@ import org.jivesoftware.openfire.PresenceManager;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.XMPPServerInfo;
 import org.jivesoftware.openfire.handler.PresenceUpdateHandler;
-import org.jivesoftware.openfire.provider.VCardProvider;
 import org.jivesoftware.openfire.user.User;
 import org.jivesoftware.openfire.user.UserManager;
 import org.jivesoftware.openfire.vcard.VCardEventDispatcher;
 import org.jivesoftware.openfire.vcard.VCardManager;
+import org.jivesoftware.openfire.vcard.VCardProvider;
 import org.sipfoundry.openfire.sync.job.Job;
 import org.xmpp.packet.Presence;
 

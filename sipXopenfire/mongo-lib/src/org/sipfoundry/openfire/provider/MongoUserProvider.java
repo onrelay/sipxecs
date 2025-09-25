@@ -35,7 +35,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.group.GroupManager;
-import org.jivesoftware.openfire.provider.UserProvider;
+import org.jivesoftware.openfire.user.UserProvider;
 import org.jivesoftware.openfire.user.User;
 import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.sipfoundry.commons.userdb.ValidUsers;
@@ -48,11 +48,15 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.conversions.Bson;
 
-public class MongoUserProviderAlt implements UserProvider {
+public class MongoUserProvider extends BaseMongoProvider implements UserProvider {
     public static final String SIP_UID = "sipUid";
-    private static final Logger log = Logger.getLogger(MongoUserProviderAlt.class);
+    private static final Logger log = Logger.getLogger(MongoUserProvider.class);
 
     private static final String COLLECTION_NAME = "entity";
+
+    public MongoUserProvider() {
+        setDefaultCollectionName(COLLECTION_NAME);
+    }
 
     @Override
     public User loadUser(String username) throws UserNotFoundException {
@@ -65,7 +69,7 @@ public class MongoUserProviderAlt implements UserProvider {
             actualUsername = username.substring(0, username.lastIndexOf("@"));
         }
 
-        MongoCollection<Document> userCollection = getCollection();
+        MongoCollection<Document> userCollection = getDefaultCollection();
         Document query = new Document();
 
         query.put("ent", "user");
@@ -118,7 +122,7 @@ public class MongoUserProviderAlt implements UserProvider {
 
     @Override
     public int getUserCount() {
-        MongoCollection<Document> userCollection = getCollection();
+        MongoCollection<Document> userCollection = getDefaultCollection();
         Document query = new Document();
 
         query.put("ent", "user");
@@ -146,7 +150,7 @@ public class MongoUserProviderAlt implements UserProvider {
     @Override
     public Collection<User> getUsers(int startIndex, int numResults) {
         List<User> users = new ArrayList<User>();
-        MongoCollection<Document> userCollection = getCollection();
+        MongoCollection<Document> userCollection = getDefaultCollection();
         Document query = new Document();
 
         query.put("ent", "user");
@@ -224,7 +228,7 @@ public class MongoUserProviderAlt implements UserProvider {
         Bson mongoQuery = Filters.or(orConditions);
 
         List<User> users = new ArrayList<>();
-        MongoCollection<Document> userCollection = getCollection();
+        MongoCollection<Document> userCollection = getDefaultCollection();
 
         for (Document userObj : userCollection.find(mongoQuery).skip(startIndex).limit(numResults)) {
             users.add(fromDocument(userObj));
@@ -271,11 +275,6 @@ public class MongoUserProviderAlt implements UserProvider {
         return u;
     }
 
-    private static MongoCollection<Document> getCollection() {
-        MongoDatabase db = UnfortunateLackOfSpringSupportFactory.getImdb();
-
-        return db.getCollection(COLLECTION_NAME);
-    }
     
     private static String appendDomain(String userName) {
         if (userName.indexOf("@") == -1) {

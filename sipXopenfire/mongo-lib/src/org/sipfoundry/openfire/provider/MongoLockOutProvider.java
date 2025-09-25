@@ -20,7 +20,7 @@ import java.util.Date;
 
 import org.bson.BasicBSONObject;
 import org.jivesoftware.openfire.lockout.LockOutFlag;
-import org.jivesoftware.openfire.provider.LockOutProvider;
+import org.jivesoftware.openfire.lockout.LockOutProvider;
 import org.jivesoftware.util.StringUtils;
 
 import org.bson.Document;

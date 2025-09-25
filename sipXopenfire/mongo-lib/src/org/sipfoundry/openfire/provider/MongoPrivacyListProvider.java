@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.jivesoftware.openfire.privacy.PrivacyList;
-import org.jivesoftware.openfire.provider.PrivacyListProvider;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -37,24 +36,21 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.FindIterable;
 
-
-public class MongoPrivacyListProvider extends BaseMongoProvider implements PrivacyListProvider {
+public class MongoPrivacyListProvider extends BaseMongoProvider {
     private static final Logger log = Logger.getLogger(MongoPrivacyListProvider.class);
     private static final String COLLECTION_NAME = "ofPrivacyList";
 
     private static final int POOL_SIZE = 50;
     private static final long POOL_TIMEOUT_SECONDS = 30;
 
-    /**
-     * Pool of SAX Readers. SAXReader is not thread safe so we need to have a pool of readers.
-     */
-    private final BlockingQueue<SAXReader> m_xmlReaders = new LinkedBlockingQueue<SAXReader>(POOL_SIZE);
+    /** Pool of SAX Readers. SAXReader is not thread safe. */
+    private final BlockingQueue<SAXReader> m_xmlReaders = new LinkedBlockingQueue<>(POOL_SIZE);
 
     public MongoPrivacyListProvider() {
         setDefaultCollectionName(COLLECTION_NAME);
         MongoCollection<Document> prvListCollection = getDefaultCollection();
 
-        // Modern index creation using Indexes helper
+        // Create index on username
         prvListCollection.createIndex(Indexes.ascending("username"));
 
         for (int i = 0; i < POOL_SIZE; i++) {
@@ -64,7 +60,6 @@ public class MongoPrivacyListProvider extends BaseMongoProvider implements Priva
         }
     }
 
-    @Override
     public Map<String, Boolean> getPrivacyLists(String username) {
         Map<String, Boolean> privacyLists = new HashMap<>();
         MongoCollection<Document> prvListCollection = getDefaultCollection();
@@ -76,16 +71,12 @@ public class MongoPrivacyListProvider extends BaseMongoProvider implements Priva
         for (Document dbObj : results) {
             String name = dbObj.getString("name");
             Boolean isDefault = dbObj.getBoolean("isDefault");
-
             privacyLists.put(name, isDefault);
         }
-
         return privacyLists;
     }
 
-    @Override
     public PrivacyList loadPrivacyList(String username, String listName) {
-        PrivacyList privacyList = null;
         MongoCollection<Document> prvListCollection = getDefaultCollection();
 
         Bson query = Filters.and(
@@ -94,16 +85,10 @@ public class MongoPrivacyListProvider extends BaseMongoProvider implements Priva
         );
         Bson projection = Projections.include("list", "isDefault");
 
-        Document grpPropsObj = prvListCollection.find(query).projection(projection).first();
-
-        if (grpPropsObj != null) {
-            privacyList = buildPrivacyList(username, listName, grpPropsObj);
-        }
-
-        return privacyList;
+        Document dbObj = prvListCollection.find(query).projection(projection).first();
+        return dbObj != null ? buildPrivacyList(username, listName, dbObj) : null;
     }
 
-    @Override
     public PrivacyList loadDefaultPrivacyList(String username) {
         MongoCollection<Document> prvListCollection = getDefaultCollection();
 
@@ -113,20 +98,10 @@ public class MongoPrivacyListProvider extends BaseMongoProvider implements Priva
         );
         Bson projection = Projections.include("list", "name");
 
-        Document grpPropsObj = prvListCollection.find(query)
-                                                .projection(projection)
-                                                .first();
-
-        PrivacyList privacyList = null;
-
-        if (grpPropsObj != null) {
-            privacyList = buildPrivacyList(username, null, grpPropsObj);
-        }
-
-        return privacyList;
+        Document dbObj = prvListCollection.find(query).projection(projection).first();
+        return dbObj != null ? buildPrivacyList(username, null, dbObj) : null;
     }
 
-    @Override
     public void createPrivacyList(String username, PrivacyList list) {
         MongoCollection<Document> prvListCollection = getDefaultCollection();
 
@@ -139,7 +114,6 @@ public class MongoPrivacyListProvider extends BaseMongoProvider implements Priva
         prvListCollection.insertOne(toInsert);
     }
 
-    @Override
     public void updatePrivacyList(String username, PrivacyList list) {
         MongoCollection<Document> prvListCollection = getDefaultCollection();
 
@@ -154,10 +128,8 @@ public class MongoPrivacyListProvider extends BaseMongoProvider implements Priva
         prvListCollection.updateOne(query, update);
     }
 
-    @Override
     public void deletePrivacyList(String username, String listName) {
         MongoCollection<Document> prvListCollection = getDefaultCollection();
-
         Document query = new Document()
             .append("username", username)
             .append("name", listName);
@@ -165,12 +137,9 @@ public class MongoPrivacyListProvider extends BaseMongoProvider implements Priva
         prvListCollection.deleteOne(query);
     }
 
-    @Override
     public void deletePrivacyLists(String username) {
         MongoCollection<Document> prvListCollection = getDefaultCollection();
-
         Document query = new Document("username", username);
-
         prvListCollection.deleteMany(query);
     }
 
@@ -178,25 +147,19 @@ public class MongoPrivacyListProvider extends BaseMongoProvider implements Priva
         PrivacyList privacyList = null;
         String list = (String) dbObj.get("list");
         Boolean isDefault = (Boolean) dbObj.get("isDefault");
-        if (isDefault == null) {
-            isDefault = false;
-        }
+        if (isDefault == null) isDefault = false;
 
         SAXReader xmlReader = null;
         try {
-            // Get a sax reader from the pool
             xmlReader = m_xmlReaders.poll(POOL_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             Element listElement = xmlReader.read(new StringReader(list)).getRootElement();
-            String actualListName = listName != null ? listName : (String) dbObj.get("name");
-            log.debug("Creating privacy list for username=" + username + "; actualListName=" + actualListName + "; isDefault=" + isDefault + "; listElement=" + listElement);
+            String actualListName = listName != null ? listName : dbObj.getString("name");
+            log.debug("Creating privacy list for username=" + username + "; actualListName=" + actualListName + "; isDefault=" + isDefault);
             privacyList = new PrivacyList(username, actualListName, isDefault, listElement);
         } catch (Exception e) {
             log.error("Error reading privacy list", e);
         } finally {
-            // Return the sax reader to the pool
-            if (xmlReader != null) {
-                m_xmlReaders.add(xmlReader);
-            }
+            if (xmlReader != null) m_xmlReaders.add(xmlReader);
         }
         return privacyList;
     }

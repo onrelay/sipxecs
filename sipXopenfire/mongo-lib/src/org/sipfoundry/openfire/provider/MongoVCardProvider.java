@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.jivesoftware.openfire.provider.VCardProvider;
+import org.jivesoftware.openfire.vcard.VCardProvider;
 import org.jivesoftware.util.AlreadyExistsException;
 import org.jivesoftware.util.NotFoundException;
 import org.sipfoundry.commons.mongo.MongoFactory;

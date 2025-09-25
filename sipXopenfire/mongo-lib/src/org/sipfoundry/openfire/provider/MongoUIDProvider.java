@@ -16,14 +16,13 @@
  */
 package org.sipfoundry.openfire.provider;
 
-import org.jivesoftware.openfire.provider.UIDProvider;
 
 import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.UpdateOptions;
 
-public class MongoUIDProvider extends BaseMongoProvider implements UIDProvider {
+public class MongoUIDProvider extends BaseMongoProvider{
     private static final String COLLECTION_NAME = "ofId";
 
     public MongoUIDProvider() {
@@ -34,8 +33,7 @@ public class MongoUIDProvider extends BaseMongoProvider implements UIDProvider {
         idCollection.createIndex(Indexes.ascending("idType"));
     }
 
-    @Override
-    public long[] getNextBlock(int type, int blockSize) {
+    public long[] nextBlock(int type, int blockSize) {
         long[] result = new long[2]; // we just return the min and max ids
         MongoCollection<Document> idCollection = getDefaultCollection();
 

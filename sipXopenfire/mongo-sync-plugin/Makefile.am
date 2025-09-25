@@ -14,11 +14,12 @@ jardir = @SIPX_JAVADIR@/sipXopenfire/plugins
 
 jar_PKGS = \
 	log4j \
+	dom4j \
 	commons-collections \
 	commons-collections4 \
 	spring-data-mongodb \
 	sipxcommons \
-	openfire \
+	xmppserver-jakarta \
 	commons-lang \
 	commons-lang3 \
 	bson \

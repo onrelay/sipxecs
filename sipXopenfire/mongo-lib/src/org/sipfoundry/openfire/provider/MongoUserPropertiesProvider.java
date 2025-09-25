@@ -19,14 +19,12 @@ package org.sipfoundry.openfire.provider;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jivesoftware.openfire.provider.UserPropertiesProvider;
-
 import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Filters;
 
-public class MongoUserPropertiesProvider extends BaseMongoProvider implements UserPropertiesProvider {
+public class MongoUserPropertiesProvider extends BaseMongoProvider  {
     private static final String COLLECTION_NAME = "ofUserProp";
 
     public MongoUserPropertiesProvider() {
@@ -36,7 +34,6 @@ public class MongoUserPropertiesProvider extends BaseMongoProvider implements Us
         usrPropsCollection.createIndex(Indexes.ascending("username", "name"));
     }
 
-    @Override
     public Map<String, String> loadProperties(String username) {
         Map<String, String> props = new HashMap<String, String>();
         MongoCollection<Document> usrPropsCollection = getDefaultCollection();
@@ -54,12 +51,10 @@ public class MongoUserPropertiesProvider extends BaseMongoProvider implements Us
         return props;
     }
 
-    @Override
     public void insertProperty(String username, String propName, String propValue) {
         // nothing to do
     }
 
-    @Override
     public String getPropertyValue(String username, String propName) {
         MongoCollection<Document> usrPropsCollection = getDefaultCollection();
         Document usrPropObj = getPropObject(usrPropsCollection, username, propName);
@@ -72,19 +67,16 @@ public class MongoUserPropertiesProvider extends BaseMongoProvider implements Us
         return propValue;
     }
 
-    @Override
     public void updateProperty(String username, String propName, String propValue) {
         // nothing to do
     }
 
-    @Override
     public boolean deleteUserProperties(String username) {
         // nothing to do
 
         return true;
     }
 
-    @Override
     public void deleteProperty(String username, String propName) {
         // nothing to do
     }

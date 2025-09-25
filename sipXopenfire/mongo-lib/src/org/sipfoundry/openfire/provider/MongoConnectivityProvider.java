@@ -16,18 +16,24 @@
  */
 package org.sipfoundry.openfire.provider;
 
-import org.jivesoftware.openfire.provider.ConnectivityProvider;
 import org.sipfoundry.commons.util.UnfortunateLackOfSpringSupportFactory;
 
-public class MongoConnectivityProvider implements ConnectivityProvider {
+/**
+ * Helper for verifying connectivity (e.g. to Mongo or other external DB).
+ * The Openfire 5.0.1 API no longer defines a ConnectivityProvider interface.
+ */
+public class MongoConnectivityProvider {
 
-    @Override
+    /**
+     * Verifies that the configured Mongo DB (or external storage) is reachable.
+     *
+     * @throws IllegalArgumentException if connectivity verification fails
+     */
     public void verifyDataSource() throws IllegalArgumentException {
         try {
             UnfortunateLackOfSpringSupportFactory.getOpenfiredb();
         } catch (Exception e) {
-            throw new IllegalArgumentException(e);
+            throw new IllegalArgumentException("Mongo connectivity verification failed", e);
         }
     }
-
 }

@@ -21,26 +21,27 @@ import java.util.Collection;
 
 import org.jivesoftware.openfire.component.ExternalComponentConfiguration;
 import org.jivesoftware.openfire.component.ExternalComponentConfiguration.Permission;
-import org.jivesoftware.openfire.provider.ExternalComponentProvider;
+import org.jivesoftware.openfire.component.ExternalComponentManager;
 
 import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 
-
-public class MongoExternalComponentProvider extends BaseMongoProvider implements ExternalComponentProvider {
+public class MongoExternalComponentProvider extends BaseMongoProvider {
     private static final String COLLECTION_NAME = "ofExtComponentConf";
 
-    public MongoExternalComponentProvider() {
+    private ExternalComponentManager m_externalComponentManager;
+
+    public MongoExternalComponentProvider(ExternalComponentManager externalComponentManager) {
         setDefaultCollectionName(COLLECTION_NAME);
         MongoCollection<Document> extCompCollection = getDefaultCollection();
 
         Document index = new Document("subdomain", 1);
-
         extCompCollection.createIndex(index);
+
+        m_externalComponentManager = externalComponentManager;
     }
 
-    @Override
     public ExternalComponentConfiguration getConfiguration(String subdomain, boolean useWildcard) {
         ExternalComponentConfiguration conf = null;
         MongoCollection<Document> extCompCollection = getDefaultCollection();
@@ -56,7 +57,6 @@ public class MongoExternalComponentProvider extends BaseMongoProvider implements
             String permission = (String) confObj.get("permission");
             conf = new ExternalComponentConfiguration(subdomain, false, Permission.valueOf(permission), secret);
         } else if (useWildcard) {
-            // Use Filters.regex to build regex query
             confObj = extCompCollection.find(
                 Filters.and(
                     Filters.regex("subdomain", subdomain),
@@ -70,53 +70,40 @@ public class MongoExternalComponentProvider extends BaseMongoProvider implements
                 conf = new ExternalComponentConfiguration(subdomain, false, Permission.valueOf(permission), secret);
             }
         }
-
         return conf;
     }
 
-    @Override
     public void addConfiguration(ExternalComponentConfiguration configuration) {
         MongoCollection<Document> extCompCollection = getDefaultCollection();
-
         Document toInsert = new Document();
-
         toInsert.put("subdomain", configuration.getSubdomain());
         toInsert.put("wildcard", configuration.isWildcard());
         toInsert.put("permission", configuration.getPermission().toString());
         toInsert.put("secret", configuration.getSecret());
-
         extCompCollection.insertOne(toInsert);
     }
 
-    @Override
     public Collection<ExternalComponentConfiguration> getConfigurations(Permission permission) {
-        Collection<ExternalComponentConfiguration> confs = new ArrayList<ExternalComponentConfiguration>();
+        Collection<ExternalComponentConfiguration> confs = new ArrayList<>();
         MongoCollection<Document> extCompCollection = getDefaultCollection();
 
         Document query = new Document();
-
         query.put("permission", permission != null ? permission.toString() : null);
 
         for (Document confObj : extCompCollection.find(query)) {
             String subdomain = (String) confObj.get("subdomain");
             String secret = (String) confObj.get("secret");
             Boolean wildcard = (Boolean) confObj.get("wildcard");
-
             confs.add(new ExternalComponentConfiguration(subdomain, wildcard, permission, secret));
         }
-
         return confs;
     }
 
-    @Override
     public void deleteConfigurationFromDB(ExternalComponentConfiguration configuration) {
         MongoCollection<Document> extCompCollection = getDefaultCollection();
-
         Document toDelete = new Document();
-
         toDelete.put("subdomain", configuration.getSubdomain());
         toDelete.put("wildcard", configuration.isWildcard());
-
         extCompCollection.deleteOne(toDelete);
     }
 }

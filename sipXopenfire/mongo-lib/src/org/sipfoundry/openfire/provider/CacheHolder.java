@@ -16,13 +16,17 @@
  */
 package org.sipfoundry.openfire.provider;
 
-import java.util.Collection;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 import org.jivesoftware.util.cache.Cache;
 import org.jivesoftware.util.cache.CacheFactory;
+import org.jivesoftware.util.cache.Cacheable;
 
 /**
  * Config doesn't use names as primary keys, whereas Openfire does. Thus, an update in config
@@ -33,8 +37,31 @@ import org.jivesoftware.util.cache.CacheFactory;
  * CacheFactory will use a distributed cache when used in a clustered environment.
  */
 public class CacheHolder {
+
+    public static final class StringCollectionCacheable implements Cacheable {
+        private final Collection<String> values;
+
+        public StringCollectionCacheable(Collection<String> values) {
+            this.values = values;
+        }
+
+        public Collection<String> getValues() {
+            return values;
+        }
+
+        @Override
+        public int getCachedSize() {
+            // crude estimate: number of elements * average string size
+            int size = 0;
+            for (String s : values) {
+                size += (s == null ? 0 : s.length() * 2);
+            }
+            return size;
+        }
+    }
+
     private static final Cache<String, String> USER_CACHE = CacheFactory.createCache("mongoUser");
-    private static final Cache<String, Collection<String>> USER_GROUP_CACHE = CacheFactory.createCache("mongoGroupUser");
+    private static final Cache<String, StringCollectionCacheable> USER_GROUP_CACHE = CacheFactory.createCache("mongoGroupUser");
     private static final Cache<String, String> GROUP_CACHE = CacheFactory.createCache("mongoGroup");
     private static final Cache<Long, String> MUC_ROOM_CACHE = CacheFactory.createCache("mongoMucRoom");
 
@@ -51,11 +78,12 @@ public class CacheHolder {
     }
     
     public static void putUserGroups(String id, Collection<String> groups) {
-        USER_GROUP_CACHE.put(id, groups);
+        USER_GROUP_CACHE.put(id, new StringCollectionCacheable(groups)); 
     }
     
-    public static Collection<String> getUserGroups(String id) {
-        return USER_GROUP_CACHE.get(id);
+    public static List<String> getUserGroups(String id) {
+        StringCollectionCacheable groups = USER_GROUP_CACHE.get(id);
+        return groups != null ? new ArrayList<>(groups.getValues()) : null; 
     }
     
     public static void removeUserGroups(String id) {
@@ -89,7 +117,7 @@ public class CacheHolder {
 
     public static void removeGroupByName(String name) {
         if (name != null) {
-            Set<String> ids = new HashSet<String>();
+            Set<String> ids = new HashSet<>();
             for (Map.Entry<String, String> entry : GROUP_CACHE.entrySet()) {
                 if (name.equals(entry.getValue())) {
                     ids.add(entry.getKey());

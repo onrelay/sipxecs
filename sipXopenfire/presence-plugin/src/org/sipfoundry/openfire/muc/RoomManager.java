@@ -17,6 +17,7 @@
 package org.sipfoundry.openfire.muc;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.dom4j.DocumentHelper;
@@ -28,13 +29,15 @@ import org.jivesoftware.openfire.muc.ConflictException;
 import org.jivesoftware.openfire.muc.ForbiddenException;
 import org.jivesoftware.openfire.muc.HistoryStrategy;
 import org.jivesoftware.openfire.muc.MUCRoom;
+import org.jivesoftware.openfire.muc.Affiliation;
+import org.jivesoftware.openfire.muc.Role;
 import org.jivesoftware.openfire.muc.MultiUserChatService;
 import org.jivesoftware.openfire.muc.NotAllowedException;
-import org.jivesoftware.openfire.muc.cluster.UpdateHistoryStrategy;
-import org.jivesoftware.openfire.provider.PrivateStorageProvider;
-import org.jivesoftware.openfire.provider.ProviderFactory;
+import org.jivesoftware.openfire.PrivateStorage;
+import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.util.AlreadyExistsException;
 import org.sipfoundry.openfire.plugin.presence.SipXBookmarkManager;
+import org.sipfoundry.openfire.plugin.presence.SipXOpenfirePlugin;
 import org.xmpp.packet.JID;
 
 public class RoomManager {
@@ -49,7 +52,6 @@ public class RoomManager {
     private static final String BOOKMARK_AUTOJOIN = "autojoin";
     private static final String BOOKMARK_JID = "jid";
 
-    private static final PrivateStorageProvider PROVIDER = ProviderFactory.getPrivateStorageProvider();
 
     public static MultiUserChatService createChatRoomService(String subdomain) {
         MultiUserChatService mucService = XMPPServer.getInstance().getMultiUserChatManager()
@@ -58,14 +60,15 @@ public class RoomManager {
             try {
                 mucService = XMPPServer.getInstance().getMultiUserChatManager()
                         .createMultiUserChatService(subdomain, "default MUC service", false);
+
                 Collection<JID> admins = XMPPServer.getInstance().getAdmins();
                 JID admin = admins.iterator().next();
                 mucService.addSysadmin(admin);
-                mucService.setLogConversationsTimeout(60);
-                mucService.setLogConversationBatchSize(100);
-                HistoryStrategy historyStrategy = new HistoryStrategy(null);
+
+                // Configure history strategy directly on the service
+                HistoryStrategy historyStrategy = mucService.getHistoryStrategy();
                 historyStrategy.setType(HistoryStrategy.Type.none);
-                new UpdateHistoryStrategy(subdomain, historyStrategy).run();
+
                 mucService.enableService(true, true);
                 mucService.setRoomCreationRestricted(false);
             } catch (Exception ex) {
@@ -88,11 +91,12 @@ public class RoomManager {
                 mucService = XMPPServer.getInstance().getMultiUserChatManager()
                         .createMultiUserChatService(MUC_SUBDOMAIN, DEFAULT_DESCRIPTION, false);
                 mucService.addSysadmin(admin);
-                mucService.setLogConversationsTimeout(60);
-                mucService.setLogConversationBatchSize(100);
-                HistoryStrategy historyStrategy = new HistoryStrategy(null);
+                HistoryStrategy historyStrategy = mucService.getHistoryStrategy();
                 historyStrategy.setType(HistoryStrategy.Type.none);
-                new UpdateHistoryStrategy(MUC_SUBDOMAIN, historyStrategy).run();
+                for (MUCRoom mucRoom : SipXOpenfirePlugin.getInstance().getMUCRooms()) {
+                    mucRoom.setLogEnabled(false); 
+                    mucRoom.setPersistent(true);  
+                }
                 mucService.enableService(true, true);
                 mucService.setRoomCreationRestricted(false);
             } catch (AlreadyExistsException ex) {
@@ -104,48 +108,56 @@ public class RoomManager {
         MUCRoom mucRoom = null;
         if (mucService != null) {
             try {
+
                 JID jid = new JID(confOwner);
-                mucRoom = mucService.getChatRoom(name, jid);
+                mucRoom = mucService.getChatRoom(name); // no JID parameter in 5.x
 
                 mucRoom.setNaturalLanguageName(name);
 
-                // update bookmark
                 ensureBookmark(mucRoom, jid);
 
-                mucRoom.unlock(mucRoom.getRole());
+                Collection<JID> owners = mucRoom.getOwners();
+                JID actorJID = owners.isEmpty() ? jid : owners.iterator().next();
+                mucRoom.unlock(Affiliation.owner);
 
                 mucRoom.setPersistent(true);
 
-                // add new owner and remove all others.
-                // Note: cannot remove all first then add as this throws ConflictException
+                // Set the new owner and remove all others
                 if (!mucRoom.getOwners().contains(jid)) {
-                    mucRoom.addOwner(jid, mucRoom.getRole());
+                    mucRoom.addOwner(jid, Affiliation.owner); 
                 }
-                for (JID formerOwner : mucRoom.getOwners()) {
+
+                // Remove all other former owners
+                for (JID formerOwner : new ArrayList<>(mucRoom.getOwners())) {
                     if (!formerOwner.equals(jid)) {
-                        mucRoom.addNone(formerOwner, mucRoom.getRole());
+                        mucRoom.addNone(formerOwner, Affiliation.owner);
                     }
                 }
 
-                for (JID admins : XMPPServer.getInstance().getAdmins()) {
-                    if (!mucRoom.getOwners().contains(admins)) {
-                        mucRoom.addOwner(jid, mucRoom.getRole());
+                // Ensure server admins are owners
+                for (JID admin : XMPPServer.getInstance().getAdmins()) {
+                    if (!mucRoom.getOwners().contains(admin)) {
+                        mucRoom.addOwner(admin,  Affiliation.owner);
                     }
                 }
 
                 mucRoom.setCanAnyoneDiscoverJID(true);
                 mucRoom.setChangeNickname(true);
                 mucRoom.setModerated(moderated);
-                mucRoom.setMembersOnly(membersOnly);
+                mucRoom.setMembersOnly(membersOnly, Affiliation.owner, actorJID);
                 mucRoom.setRegistrationEnabled(true);
                 mucRoom.setPublicRoom(publicRoom);
+
                 mucRoom.setCanOccupantsInvite(false);
                 mucRoom.setDescription(description != null ? description : "");
                 mucRoom.setPassword(pin);
                 mucRoom.setCanOccupantsChangeSubject(true);
                 mucRoom.setChangeNickname(true);
                 mucRoom.setLogEnabled(false);
+
+                // Persist the changes
                 mucRoom.saveToDB();
+
             } catch (NotAllowedException e) {
                 logger.warn(String.format("Error creating room %s. %s", name, e.getMessage()));
             } catch (ForbiddenException e) {
@@ -175,7 +187,8 @@ public class RoomManager {
         Element bookmarks = DocumentHelper.createElement(STORAGE_TAG);
         bookmarks.add(NAMESPACE);
 
-        return PROVIDER.get(owner, bookmarks, new SAXReader());
+        PrivateStorage storage = XMPPServer.getInstance().getPrivateStorage();
+        return storage.get(owner, bookmarks);
     }
 
     public static Element buildBookmarkElement(String bookmarkName, String jid) {

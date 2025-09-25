@@ -10,12 +10,11 @@ cfg_PKGS = \
 	spring-velocity-support \
 	spring-core \
 	spring-tx \
-	xercesImpl \
 	sipxconfig-neoconf \
 	sipxconfig-web \
 	tapestry-annotations \
-	tapestry-framework \
-	hivemind \
+	tapestry-framework-jakarta \
+	hivemind-jakarta \
 	log4j
 
 plugin_JAR_PKGS = \
@@ -53,8 +52,9 @@ plugin_PKGS = \
 	thumbnailator \
 	xmlrpc-common \
 	commons-digester \
-	commons-logging \
+	commons-logging-jakarta  \
 	commons-beanutils-core \
+	commons-codec \
 	spring-context \
 	spring-data-commons \
 	spring-data-mongodb \
@@ -64,6 +64,7 @@ plugin_PKGS = \
 	spring-expression \
 	spring-jdbc \
 	jakarta.xml.bind-api \
+	jakarta.servlet.jsp.jstl-api  \
 	bson \
 	mongodb-driver-core \
 	mongodb-driver-sync \
@@ -72,9 +73,16 @@ plugin_PKGS = \
 	log4j \
 	xmlrpc-server \
 	xmlrpc-client \
-	smack \
-	smackx \
-	openfire
+	smack-core \
+	smack-extensions \
+	smack-im \
+	smack-tcp \
+	minidns-core \
+	tinder \
+	whack \
+	jxmpp-core \
+	jxmpp-jid \
+	xmppserver-jakarta
 
 provider_PKGS = \
 	sipxcommons \
@@ -92,7 +100,7 @@ synchserver_PKGS = \
 	xmlrpc-server \
 	log4j \
 	commons-digester \
-	openfire \
+	xmppserver-jakarta \
 	dom4j 
 
 

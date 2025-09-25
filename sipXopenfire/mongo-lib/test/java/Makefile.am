@@ -21,14 +21,14 @@ test_RESOURCES = $(shell cd $(srcdir); find . \( \
 test_PKGS = \
 	$(plugin_PKGS) \
 	junit \
-	openfire
+	xmppserver-jakarta
 
 test_DEPS = \
 	$(srcdir) \
 	$(JAVAROOT) \
 	$(mongoplugin_JAVAROOT) \
 	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons,$(test_PKGS)) \
-	@OPENFIRE_HOME@/lib/slf4j-log4j12.jar \
+	@OPENFIRE_HOME@/lib/slf4j-reload4j.jar \
 	@SIPX_JAVADIR@/sipXopenfire/lib/sipx-openfire-vcard-synchserver.jar
 
 precommit : check

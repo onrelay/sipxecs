@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.jivesoftware.database.SequenceManager;
-import org.jivesoftware.openfire.provider.RosterItemProvider;
+import org.jivesoftware.openfire.roster.RosterItemProvider;
 import org.jivesoftware.openfire.roster.RosterItem;
 import org.jivesoftware.openfire.user.UserAlreadyExistsException;
 import org.jivesoftware.openfire.user.UserNotFoundException;

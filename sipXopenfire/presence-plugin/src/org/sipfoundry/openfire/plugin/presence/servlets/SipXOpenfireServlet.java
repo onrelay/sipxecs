@@ -18,8 +18,7 @@ import org.apache.xmlrpc.XmlRpcRequest;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.XmlRpcServletServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class SipXOpenfireServlet extends HttpServlet {
     /**
@@ -31,7 +30,7 @@ public class SipXOpenfireServlet extends HttpServlet {
 
     private static final ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<>();
 
-    private static final Logger log = LoggerFactory.getLogger(SipXOpenfireServlet.class);
+    private static final Logger log = Logger.getLogger(SipXOpenfireServlet.class);
 
     public void init(ServletConfig servletConfig, String serverName, String serviceName, Class< ? > provider)
             throws ServletException {

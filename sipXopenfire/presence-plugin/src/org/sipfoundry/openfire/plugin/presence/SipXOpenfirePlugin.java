@@ -36,17 +36,21 @@ import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.container.Plugin;
 import org.jivesoftware.openfire.container.PluginClassLoader;
 import org.jivesoftware.openfire.container.PluginManager;
+import org.jivesoftware.openfire.container.PluginMetadataHelper;
 import org.jivesoftware.openfire.group.Group;
 import org.jivesoftware.openfire.group.GroupAlreadyExistsException;
 import org.jivesoftware.openfire.group.GroupManager;
 import org.jivesoftware.openfire.group.GroupNotFoundException;
+import org.jivesoftware.openfire.group.GroupNameInvalidException;
 import org.jivesoftware.openfire.interceptor.InterceptorManager;
-import org.jivesoftware.openfire.muc.MUCRole;
-import org.jivesoftware.openfire.muc.MUCRole.Affiliation;
+import org.jivesoftware.openfire.muc.Role;
+import org.jivesoftware.openfire.muc.Affiliation;
 import org.jivesoftware.openfire.muc.MUCRoom;
+import org.jivesoftware.openfire.muc.MUCOccupant;
 import org.jivesoftware.openfire.muc.MultiUserChatManager;
 import org.jivesoftware.openfire.muc.MultiUserChatService;
 import org.jivesoftware.openfire.muc.NotAllowedException;
+import org.jivesoftware.openfire.muc.ForbiddenException;
 import org.jivesoftware.openfire.spi.PresenceManagerImpl;
 import org.jivesoftware.openfire.user.User;
 import org.jivesoftware.openfire.user.UserAlreadyExistsException;
@@ -413,16 +417,33 @@ public class SipXOpenfirePlugin implements Plugin, Component {
             if (extrasDirNameForClassLoader != null) {
                 extrasDirNameForClassLoader += "/extras/sipXecs";
                 log.info("extras directory is " + extrasDirNameForClassLoader);
-                /*
-                 * PluginClassLoader automatically adds /lib to the supplied directory so pass it
-                 * a directory that does not already have it
-                 */
+
                 PluginClassLoader pluginClassLoader = (PluginClassLoader) this.getClass().getClassLoader();
-                pluginClassLoader.addDirectory(new File(extrasDirNameForClassLoader), false);
 
                 String extrasDirName = extrasDirNameForClassLoader + "/lib";
                 File extrasDir = new File(extrasDirName);
-                loadExtras(pluginClassLoader, extrasDir);
+
+                if (extrasDir.exists() && extrasDir.isDirectory()) {
+                    File[] jars = extrasDir.listFiles((dir, name) -> name.endsWith(".jar"));
+                    if (jars != null) {
+                        for (File jar : jars) {
+                            try {
+                                URL url = jar.toURI().toURL();
+                                log.info("Loading extra JAR into plugin classloader: " + url);
+
+                                // Reflectively call URLClassLoader.addURL (PluginClassLoader is a subclass)
+                                java.lang.reflect.Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+                                addURL.setAccessible(true);
+                                addURL.invoke(pluginClassLoader, url);
+
+                            } catch (Exception e) {
+                                log.error("Failed to load extra JAR: " + jar, e);
+                            }
+                        }
+                    }
+                } else {
+                    log.warn("Extras lib directory does not exist: " + extrasDir.getAbsolutePath());
+                }
             } else {
                 log.error("Could not determine the extras directory name " + System.getProperties());
             }
@@ -516,12 +537,12 @@ public class SipXOpenfirePlugin implements Plugin, Component {
 
     @Override
     public String getName() {
-        return pluginManager.getName(this);
+        return PluginMetadataHelper.getName(this);
     }
 
     @Override
     public String getDescription() {
-        return pluginManager.getDescription(this);
+        return PluginMetadataHelper.getDescription(this);
     }
 
     @Override
@@ -590,7 +611,8 @@ public class SipXOpenfirePlugin implements Plugin, Component {
             // Return component presence
             return presence;
         }
-        if (targetJID.getNode() == null || !UserManager.getInstance().isRegisteredUser(targetJID.getNode())) {
+
+        if (targetJID.getNode() == null || !userManager.isRegisteredUser(targetJID, true )) {
             // Sender is requesting presence information of an anonymous user
             throw new UserNotFoundException("Username is null");
         }
@@ -770,7 +792,7 @@ public class SipXOpenfirePlugin implements Plugin, Component {
         user.getProperties().put(SIP_PWD, sipPassword);
     }
 
-    public void update(XmppGroup group) throws GroupAlreadyExistsException, GroupNotFoundException {
+    public void update(XmppGroup group) throws GroupAlreadyExistsException, GroupNotFoundException, GroupNameInvalidException {
         log.debug("update Group " + group.getGroupName());
 
         boolean isAllAdminGroup = false;
@@ -828,8 +850,9 @@ public class SipXOpenfirePlugin implements Plugin, Component {
                 removeUserFromGroup(jid, group.getGroupName());
             }
 
-        } catch (GroupNotFoundException ex) {
+        } catch (GroupNotFoundException groupNotFoundException ) {
             log.info("Group: " + group.getGroupName() + " does not exist - create it");
+
             Group openfireGroup = groupManager.createGroup(group.getGroupName());
             if (group.getDescription() != null) {
                 openfireGroup.setDescription(group.getDescription());
@@ -849,6 +872,7 @@ public class SipXOpenfirePlugin implements Plugin, Component {
                 String userJid = XmppAccountInfo.appendDomain(member.getJid());
                 addUserToGroup(userJid, group.getGroupName(), isAllAdminGroup);
             }
+
         }
     }
 
@@ -1088,7 +1112,7 @@ public class SipXOpenfirePlugin implements Plugin, Component {
         return mucRoom.getMembers();
     }
 
-    public Map<String, String> getMucRoomAttributes(String domain, String roomName) throws NotFoundException {
+    public Map<String, String> getMucRoomAttributes(String domain, String roomName) throws NotFoundException, NotAllowedException {
         MultiUserChatService mucService = this.multiUserChatManager.getMultiUserChatService(domain);
         MUCRoom mucRoom = mucService.getChatRoom(roomName);
         if (mucRoom == null) {
@@ -1111,33 +1135,51 @@ public class SipXOpenfirePlugin implements Plugin, Component {
     }
 
     public void setMucRoomAttributes(String domain, String roomName, Map<String, String> newAttributes)
-            throws NotFoundException {
+            throws NotFoundException, ForbiddenException, NotAllowedException {
         MultiUserChatService mucService = this.multiUserChatManager.getMultiUserChatService(domain);
         MUCRoom mucRoom = mucService.getChatRoom(roomName);
         if (mucRoom == null) {
             throw new NotFoundException("Room not found " + domain + " roomName " + roomName);
         }
+
         Map<String, String> attribs = newAttributes;
+
         boolean isModerated = Boolean.parseBoolean(attribs.get("isModerated"));
         mucRoom.setModerated(isModerated);
+
         boolean isLogEnabled = Boolean.parseBoolean(attribs.get("isLogEnabled"));
         mucRoom.setLogEnabled(isLogEnabled);
+
         boolean isMembersOnly = Boolean.parseBoolean(attribs.get("isMembersOnly"));
-        mucRoom.setMembersOnly(isMembersOnly);
+        // Pick an actor (first owner, or an admin if none exists)
+        JID actorJID = mucRoom.getOwners().isEmpty()
+                ? XMPPServer.getInstance().getAdmins().iterator().next()
+                : mucRoom.getOwners().iterator().next();
+        mucRoom.setMembersOnly(isMembersOnly, Affiliation.owner, actorJID);
+
         boolean isPublicRoom = Boolean.parseBoolean(attribs.get("isPublicRoom"));
         mucRoom.setPublicRoom(isPublicRoom);
+
         boolean isLoginRestrictedToNickName = Boolean.parseBoolean(attribs.get("isLoginRestrictedToNickName"));
         mucRoom.setLoginRestrictedToNickname(isLoginRestrictedToNickName);
+
         boolean isRegistrationEnabled = Boolean.parseBoolean(attribs.get("isRegistrationEnabled"));
         mucRoom.setRegistrationEnabled(isRegistrationEnabled);
+
         boolean canAnyoneDiscoverJID = Boolean.parseBoolean(attribs.get("canAnyoneDiscoverJID"));
         mucRoom.setCanAnyoneDiscoverJID(canAnyoneDiscoverJID);
+
         boolean canChangeNickName = Boolean.parseBoolean(attribs.get("canChangeNickName"));
         mucRoom.setChangeNickname(canChangeNickName);
+
         boolean canOccupantsInvite = Boolean.parseBoolean(attribs.get("canOccupantsInvite"));
         mucRoom.setCanOccupantsInvite(canOccupantsInvite);
+
         boolean canOccupantsChangeSubject = Boolean.parseBoolean(attribs.get("canOccupantsChangeSubject"));
         mucRoom.setCanOccupantsChangeSubject(canOccupantsChangeSubject);
+
+        // Persist the changes
+        mucRoom.saveToDB();
     }
 
     public String getConferenceName(String domain, String roomName) throws NotFoundException {
@@ -1224,10 +1266,16 @@ public class SipXOpenfirePlugin implements Plugin, Component {
     }
 
     public Collection<MUCRoom> getMUCRooms() {
-        HashSet<MUCRoom> retval = new HashSet<MUCRoom>();
-        for (MultiUserChatService mucService : this.multiUserChatManager.getMultiUserChatServices()) {
-            List<MUCRoom> chatRooms = mucService.getChatRooms();
-            retval.addAll(chatRooms);
+        Set<MUCRoom> retval = new HashSet<>();
+        MultiUserChatManager mucManager = this.multiUserChatManager;
+
+        for (MultiUserChatService mucService : mucManager.getMultiUserChatServices()) {
+            for (String roomName : mucService.getAllRoomNames()) {
+                MUCRoom room = mucService.getChatRoom(roomName); 
+                if (room != null) {
+                    retval.add(room);
+                }
+            }
         }
         return retval;
     }
@@ -1267,18 +1315,32 @@ public class SipXOpenfirePlugin implements Plugin, Component {
 
     public void kickOccupant(String subdomain, String roomName, String password, String memberJid, String reason)
             throws NotAllowedException {
-        MUCRoom mucRoom = this.multiUserChatManager.getMultiUserChatService(subdomain).getChatRoom(roomName);
+
+        MUCRoom mucRoom = this.multiUserChatManager
+                .getMultiUserChatService(subdomain)
+                .getChatRoom(roomName);
+
+        if (mucRoom == null) {
+            throw new NotAllowedException("Room not found");
+        }
+
         String roomPassword = mucRoom.getPassword();
         if (password == null && roomPassword != null) {
             throw new NotAllowedException("Password mismatch");
         }
-        if (mucRoom.getPassword() != null && !mucRoom.getPassword().equals(password)) {
+        if (roomPassword != null && !roomPassword.equals(password)) {
             throw new NotAllowedException("Password mismatch");
         }
+
         JID actorJID = mucRoom.getOwners().iterator().next();
         JID memberJID = new JID(memberJid);
-        mucRoom.kickOccupant(memberJID, actorJID, reason);
 
+        MUCOccupant occupant = mucRoom.getOccupantByFullJID(memberJID);
+        if (occupant != null) {
+            mucRoom.removeOccupant(occupant);
+        } else {
+            throw new NotAllowedException("Occupant not found: " + memberJid);
+        }
     }
 
     public void inviteOccupant(String subdomain, String roomName, String memberJid, String password, String reason)
@@ -1303,11 +1365,11 @@ public class SipXOpenfirePlugin implements Plugin, Component {
             throw new NotAllowedException("Owner is not in te room -- cannot invite");
         }
 
-        List<MUCRole> roles = mucRoom.getOccupantsByBareJID(ownerJid);
+        List<MUCOccupant> occupants = mucRoom.getOccupantsByBareJID(ownerJid);
         JID memberJID = new JID(memberJid);
-        for (MUCRole role : roles) {
-            if (role.getAffiliation() == Affiliation.owner) {
-                mucRoom.sendInvitation(memberJID, reason, role, null);
+        for (MUCOccupant occupant : occupants) {
+            if (occupant.getAffiliation() == Affiliation.owner) {
+                mucRoom.sendInvitation(memberJID, reason, Affiliation.owner, occupant.getUserAddress(), null);
                 break;
             }
         }

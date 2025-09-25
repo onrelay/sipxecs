@@ -21,13 +21,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.sipfoundry.openfire.sqa.SipEventBean.DialogState;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class SipPresenceBean {
     private String m_statusMessage;
     private String m_callingPartiId;
-    private static final Logger logger = LoggerFactory.getLogger(SipPresenceBean.class);
+    private static final Logger logger = Logger.getLogger(SipPresenceBean.class);
     private Map<String, DialogState> m_dialogStates = new HashMap<String, DialogState>();
 
     public SipPresenceBean(String statusMessage, String callingPartiId) {

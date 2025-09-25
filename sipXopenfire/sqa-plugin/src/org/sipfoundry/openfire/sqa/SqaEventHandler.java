@@ -33,8 +33,7 @@ import org.sipfoundry.commons.userdb.ValidUsers;
 import org.sipfoundry.commons.util.UnfortunateLackOfSpringSupportFactory;
 import org.sipfoundry.openfire.sqa.SipEventBean.DialogElement;
 import org.sipfoundry.sqaclient.SQAEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Presence;
@@ -44,7 +43,7 @@ public class SqaEventHandler implements Runnable {
     private final JAXBContext m_context;
     private final SQAEvent m_event;
     private final XMPPServer m_server = XMPPServer.getInstance();
-    private static final Logger logger = LoggerFactory.getLogger(SqaEventHandler.class);
+    private static final Logger logger = Logger.getLogger(SqaEventHandler.class);
     ValidUsers m_users = UnfortunateLackOfSpringSupportFactory.getValidUsers();
     Map<String, SipPresenceBean> m_presenceCache;
 

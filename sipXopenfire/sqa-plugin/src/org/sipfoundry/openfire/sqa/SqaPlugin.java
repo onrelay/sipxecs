@@ -38,14 +38,13 @@ import org.jivesoftware.util.JiveProperties;
 import org.sipfoundry.commons.util.UnfortunateLackOfSpringSupportFactory;
 import org.sipfoundry.sqaclient.SQAEvent;
 import org.sipfoundry.sqaclient.SQAWatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class SqaPlugin implements Plugin {
     Map<String, SipPresenceBean> m_presenceCache = new HashMap<String, SipPresenceBean>();
 
     private static final String INITALIZATION_EXCEPTION = "SqaPlugin initialization exception";
-    private static final Logger logger = LoggerFactory.getLogger(SqaPlugin.class);
+    private static final Logger logger = Logger.getLogger(SqaPlugin.class);
     @Override
     public void initializePlugin(PluginManager manager, File pluginDirectory) {
         String configNode = System.getProperty("confignode", "true");

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.jivesoftware.openfire.group.GroupAlreadyExistsException;
 import org.jivesoftware.openfire.group.GroupNotFoundException;
+import org.jivesoftware.openfire.group.GroupNameInvalidException;;
 import org.sipfoundry.openfire.plugin.presence.SipXOpenfirePlugin;
 
 public class XmppGroup extends XmppConfigurationElement {
@@ -84,7 +85,7 @@ public class XmppGroup extends XmppConfigurationElement {
     }
 
     @Override
-    public void update() throws GroupAlreadyExistsException, GroupNotFoundException {
+    public void update() throws GroupAlreadyExistsException, GroupNotFoundException, GroupNameInvalidException {
         SipXOpenfirePlugin.getInstance().update(this);
     }
 

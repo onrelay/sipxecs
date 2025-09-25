@@ -22,17 +22,14 @@ import java.io.StringWriter;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.jivesoftware.openfire.provider.PrivateStorageProvider;
-import org.jivesoftware.openfire.user.User;
 
 import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Indexes;
 
-public class MongoPrivateStorageProvider extends BaseMongoProvider implements PrivateStorageProvider {
+public class MongoPrivateStorageProvider extends BaseMongoProvider {
     private static final Logger log = Logger.getLogger(MongoPrivateStorageProvider.class);
 
     private static final String COLLECTION_NAME = "ofPrivate";
@@ -41,10 +38,10 @@ public class MongoPrivateStorageProvider extends BaseMongoProvider implements Pr
         setDefaultCollectionName(COLLECTION_NAME);
         MongoCollection<Document> prvStorageCollection = getDefaultCollection();
 
+        // Modern index creation
         prvStorageCollection.createIndex(Indexes.ascending("username", "namespace", "name"));
     }
 
-    @Override
     public void add(String username, Element data) {
         log.debug(String.format("Writing private data for %s", username));
         try {
@@ -53,69 +50,63 @@ public class MongoPrivateStorageProvider extends BaseMongoProvider implements Pr
             log.debug(String.format("Writing private data %s", writer.toString()));
 
             MongoCollection<Document> prvStorageCollection = getDefaultCollection();
-            Document query = new Document();
-            query.put("username", username);
-            query.put("namespace", data.getNamespaceURI());
+            Document query = new Document()
+                .append("username", username)
+                .append("namespace", data.getNamespaceURI());
 
             Document existing = prvStorageCollection.find(query).first();
 
             if (existing == null) {
                 log.debug("new data");
-                Document toInsert = new Document();
-                toInsert.put("username", username);
-                toInsert.put("namespace", data.getNamespaceURI());
-                toInsert.put("name", data.getName());
-                toInsert.put("privateData", writer.toString());
-
+                Document toInsert = new Document()
+                    .append("username", username)
+                    .append("namespace", data.getNamespaceURI())
+                    .append("name", data.getName())
+                    .append("privateData", writer.toString());
                 prvStorageCollection.insertOne(toInsert);
             } else {
                 log.debug("existing data");
-                Document updated = new Document(existing);
-                updated.put("name", data.getName());
-                updated.put("privateData", writer.toString());
-
-                // Replace the whole document matching query with updated document
+                Document updated = new Document(existing)
+                    .append("name", data.getName())
+                    .append("privateData", writer.toString());
                 prvStorageCollection.replaceOne(query, updated);
             }
         } catch (IOException e) {
-            log.error("Error storing data: " + e.getMessage());
+            log.error("Error storing data: " + e.getMessage(), e);
         }
     }
 
-    @Override
     public Element get(String username, Element data, SAXReader reader) {
         MongoCollection<Document> prvStorageCollection = getDefaultCollection();
-        Document query = new Document();
+        Document query = new Document()
+            .append("username", username)
+            .append("namespace", data.getNamespaceURI());
+
         Element result = data;
-
-        query.put("username", username);
-        query.put("namespace", data.getNamespaceURI());
         log.debug(String.format("Retrieving data for user %s and namespace %s", username, data.getNamespaceURI()));
-        Document existing = prvStorageCollection.find(query).first();
 
+        Document existing = prvStorageCollection.find(query).first();
         if (existing != null) {
             String prvData = ((String) existing.get("privateData")).trim();
-
             try {
                 org.dom4j.Document doc = reader.read(new StringReader(prvData));
                 result = doc.getRootElement();
-            } catch (DocumentException e) {
-                log.error("Error retrieving data: " + e.getMessage());
+            } catch (Exception e) {
+                log.error("Error retrieving data: " + e.getMessage(), e);
             }
         }
-        log.debug(String.format("Found data: %s", result.asXML()));
 
+        log.debug(String.format("Found data: %s", result.asXML()));
         return result;
     }
 
-    @Override
-    public void userDeleting(User user, Map<String, Object> params) {
+    public void userDeleting(String username) {
         MongoCollection<Document> prvStorageCollection = getDefaultCollection();
-        Document toDelete = new Document();
-
-        toDelete.put("username", user.getUsername());
-
+        Document toDelete = new Document().append("username", username);
         prvStorageCollection.deleteOne(toDelete);
+    }
 
+    public void userDeleting(org.jivesoftware.openfire.user.User user, Map<String, Object> params) {
+        userDeleting(user.getUsername());
     }
 }

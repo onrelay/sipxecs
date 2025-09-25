@@ -16,60 +16,49 @@
  */
 package org.sipfoundry.openfire.provider;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import org.jivesoftware.openfire.group.DefaultGroupPropertyMap;
 import org.jivesoftware.openfire.group.Group;
 import org.jivesoftware.openfire.group.GroupAlreadyExistsException;
-import org.jivesoftware.openfire.provider.GroupPropertiesProvider;
+import org.jivesoftware.openfire.group.GroupManager;
 import org.jivesoftware.util.PersistableMap;
 
 import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 
-public class MongoGroupPropertiesProvider extends BaseMongoProvider implements GroupPropertiesProvider {
+public class MongoGroupPropertiesProvider extends BaseMongoProvider  {
     private static final String COLLECTION_NAME = "ofGroupProp";
 
-    // GPN = group property name
     private static final String GPN_DISPLAY_NAME = "sharedRoster.displayName";
     private static final String GPN_SHOW_IN_ROSTER = "sharedRoster.showInRoster";
 
-    public MongoGroupPropertiesProvider() {
+    private final GroupManager m_groupManager;
+
+    public MongoGroupPropertiesProvider(GroupManager groupManager) {
         setDefaultCollectionName(COLLECTION_NAME);
         MongoCollection<Document> grpPropsCollection = getDefaultCollection();
 
         Document index = new Document()
             .append("groupname", 1)
             .append("name", 1);
-
-        // createIndex replaces ensureIndex
         grpPropsCollection.createIndex(index);
+
+        m_groupManager = groupManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public PersistableMap<String, String> loadProperties(Group group) {
-        PersistableMap<String, String> grpProps = new DefaultGroupPropertyMap<String, String>(group);
-
+        PersistableMap<String, String> grpProps = new DefaultGroupPropertyMap<>(group);
         MongoCollection<Document> grpPropsCollection = getDefaultCollection();
 
-        Document query = new Document();
-
-        query.put("groupname", group.getName());
-
+        Document query = new Document("groupname", group.getName());
         for (Document grpPropsObj : grpPropsCollection.find(query)) {
             String propName = (String) grpPropsObj.get("name");
             String propValue = (String) grpPropsObj.get("propValue");
             grpProps.put(propName, propValue, false);
         }
 
-        // if missing, add properties without persisting and handle persistence separately
-        // trying to add with persistence will trigger in infinite recursion
         if (grpProps.get(GPN_DISPLAY_NAME) == null) {
             grpProps.put(GPN_DISPLAY_NAME, group.getName(), false);
             insertProperty(group.getName(), GPN_DISPLAY_NAME, group.getName());
@@ -82,112 +71,59 @@ public class MongoGroupPropertiesProvider extends BaseMongoProvider implements G
         return grpProps;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void insertProperty(String groupName, String propName, String propValue) {
         MongoCollection<Document> grpPropsCollection = getDefaultCollection();
-
         Document toInsert = new Document()
             .append("groupname", groupName)
             .append("name", propName)
             .append("propValue", propValue);
-
         grpPropsCollection.insertOne(toInsert);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void updateProperty(String groupName, String propName, String propValue) {
-        // nothing to do
+        // noop for now
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void deleteProperty(String groupName, String propName) {
-        // nothing to do
+        // noop for now
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean deleteGroupProperties(String groupName) {
-        // nothing to do
-
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<String> getSharedGroupsNames() {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Collection<String> getPublicSharedGroupNames() {
         return search(GPN_SHOW_IN_ROSTER, "everybody");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Collection<String> getVisibleGroupNames(String userGroup) {
         MongoCollection<Document> grpPropsCollection = getDefaultCollection();
 
-        Document query = new Document();
+        Document query = new Document()
+            .append("name", "sharedRoster.groupList")
+            .append("propValue", Pattern.compile("\\.*" + userGroup + "\\.*"));
 
-        query.put("name", "sharedRoster.groupList");
-        query.put("propValue", Pattern.compile("\\.*" + userGroup + "\\.*"));
-
-        Set<String> names = new HashSet<String>();
-
+        Set<String> names = new HashSet<>();
         for (Document propObj : grpPropsCollection.find(query)) {
             names.add((String) propObj.get("groupName"));
         }
-
         return names;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean setName(String oldName, String newName) throws GroupAlreadyExistsException {
-        // nothing to do
-
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Collection<String> search(String key, String value) {
         MongoCollection<Document> grpPropsCollection = getDefaultCollection();
+        Document query = new Document()
+            .append("name", key)
+            .append("propValue", value);
 
-        Document query = new Document();
-
-        query.put("name", key);
-        query.put("propValue", value);
-
-        Set<String> names = new HashSet<String>();
-
+        Set<String> names = new HashSet<>();
         for (Document propObj : grpPropsCollection.find(query)) {
             names.add((String) propObj.get("groupName"));
         }
-
         return names;
     }
 }

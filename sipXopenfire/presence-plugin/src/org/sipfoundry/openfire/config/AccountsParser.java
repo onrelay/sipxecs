@@ -24,7 +24,6 @@ import org.apache.log4j.SimpleLayout;
 import org.jivesoftware.openfire.group.Group;
 import org.jivesoftware.openfire.group.GroupManager;
 import org.jivesoftware.openfire.muc.MUCRoom;
-import org.jivesoftware.openfire.provider.ProviderFactory;
 import org.sipfoundry.commons.confdb.Conference;
 import org.sipfoundry.commons.confdb.ConferenceService;
 import org.sipfoundry.commons.userdb.User;
@@ -244,7 +243,6 @@ public class AccountsParser {
                 } else {
                     logger.info("Pruning Unwanted Xmpp chatroom " + domain + ":" + mucRoomInOpenfire.getName());
                     mucRoomInOpenfire.destroyRoom(null, "not a managed chat");
-                    ProviderFactory.getMUCProvider().deleteFromDB(mucRoomInOpenfire);
                     // when IM room is deleted, delete bookmark as well if necessary
                     if (SipXBookmarkManager.isInitialized()) {
                         SipXBookmarkManager manager = SipXBookmarkManager.getInstance();

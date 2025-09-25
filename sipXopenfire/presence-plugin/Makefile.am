@@ -46,8 +46,16 @@ test_SRC = $(shell cd $(srcdir); find test -type f -name '*.java')
 test_PKGS = \
 	$(plugin_PKGS) \
 	junit \
-	smackx \
-	openfire
+	smack-core \
+	smack-extensions \
+	smack-im \
+	smack-tcp \
+	minidns-core \
+	tinder \
+	whack \
+	jxmpp-core \
+	jxmpp-jid \
+	xmppserver-jakarta
 
 test_DEPS = \
 	$(JAVAROOT) \

@@ -10,10 +10,12 @@ import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.openfire.interceptor.PacketRejectedException;
-import org.jivesoftware.openfire.muc.MUCRole;
+import org.jivesoftware.openfire.muc.Role;
+import org.jivesoftware.openfire.muc.MUCOccupant;
 import org.jivesoftware.openfire.muc.MUCRoom;
 import org.jivesoftware.openfire.session.Session;
 import org.jivesoftware.openfire.user.UserNotFoundException;
@@ -251,8 +253,8 @@ public class DefaultMessagePacketInterceptor extends AbstractMessagePacketInterc
                                                 + " " + plugin.getLocalizer().localize("audioconference.prompt"));
                                         throw new PacketRejectedException();
                                     }
-                                    for (MUCRole occupant : chatRoom.getOccupants()) {
-                                        if (occupant.getRole() != MUCRole.Role.none) {
+                                    for (MUCOccupant occupant : chatRoom.getOccupants()) {
+                                        if (occupant.getRole() != Role.none) {
                                             String occupantJID = occupant.getUserAddress().toBareJID();
                                             log.info("occupantJID " + occupantJID);
                                             String mapKey = message.getID() + occupantJID;
@@ -388,11 +390,14 @@ public class DefaultMessagePacketInterceptor extends AbstractMessagePacketInterc
      * the SIP domain to it
      */
     private String mapArbitraryNameToSipEndpoint(MUCRoom room, String name) throws Exception {
-        String sipEndpoint;
+        String sipEndpoint = null;
         try {
-            MUCRole occupant = room.getOccupant(name);
-            String occupantJID = occupant.getUserAddress().toBareJID();
-            sipEndpoint = plugin.getSipId(occupantJID);
+            List<MUCOccupant> occupants = room.getOccupantsByNickname(name);
+            if( occupants.size() > 0 ) {
+                MUCOccupant occupant = occupants.get(0);
+                String occupantJID = occupant.getUserAddress().toBareJID();
+                sipEndpoint = plugin.getSipId(occupantJID);
+            }
         } catch (Exception ex) {
             sipEndpoint = mapArbitraryNameToSipEndpoint(name);
         }

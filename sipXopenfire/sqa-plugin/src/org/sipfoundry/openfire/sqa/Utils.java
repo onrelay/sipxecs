@@ -18,12 +18,11 @@ package org.sipfoundry.openfire.sqa;
 
 import org.apache.commons.lang.StringUtils;
 import org.sipfoundry.commons.userdb.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.xmpp.packet.Presence;
 
 public class Utils {
-    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+    private static final Logger logger = Logger.getLogger(Utils.class);
 
     public static String getDisplayName(User user, String sipId) {
         if (user == null) {

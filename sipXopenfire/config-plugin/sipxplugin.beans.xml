@@ -43,23 +43,9 @@
 			</entry>
 			<entry>
 				<key>
-					<value>provider.externalComponent.className</value>
-				</key>
-				<value>org.sipfoundry.openfire.provider.MongoExternalComponentProvider
-				</value>
-			</entry>
-			<entry>
-				<key>
 					<value>provider.group.className</value>
 				</key>
-				<value>org.sipfoundry.openfire.provider.MongoGroupProviderAlt
-				</value>
-			</entry>
-			<entry>
-				<key>
-					<value>provider.groupprops.className</value>
-				</key>
-				<value>org.sipfoundry.openfire.provider.MongoGroupPropertiesProvider
+				<value>org.sipfoundry.openfire.provider.MongoGroupProvider
 				</value>
 			</entry>
 			<entry>
@@ -71,45 +57,11 @@
 			</entry>
 			<entry>
 				<key>
-					<value>provider.offline.className</value>
-				</key>
-				<value>org.sipfoundry.openfire.provider.MongoOfflineMessageProvider
-				</value>
-			</entry>
-			<entry>
-				<key>
-					<value>provider.presence.className</value>
-				</key>
-				<value>org.sipfoundry.openfire.provider.MongoPresenceProvider
-				</value>
-			</entry>
-			<entry>
-				<key>
-					<value>provider.privacylist.className</value>
-				</key>
-				<value>org.sipfoundry.openfire.provider.MongoPrivacyListProvider
-				</value>
-			</entry>
-			<entry>
-				<key>
-					<value>provider.privatestorage.className</value>
-				</key>
-				<value>org.sipfoundry.openfire.provider.MongoPrivateStorageProvider
-				</value>
-			</entry>
-			<entry>
-				<key>
-					<value>provider.pubsub.className</value>
+					<value>provider.pubsub-persistence.className</value>
 				</key>
 				<value>org.sipfoundry.openfire.provider.MongoPubSubProvider</value>
 			</entry>
-			<entry>
-				<key>
-					<value>provider.remoteServer.className</value>
-				</key>
-				<value>org.sipfoundry.openfire.provider.MongoRemoteServerProvider
-				</value>
-			</entry>
+
 			<entry>
 				<key>
 					<value>provider.roster.className</value>
@@ -125,23 +77,9 @@
 			</entry>
 			<entry>
 				<key>
-					<value>provider.uid.className</value>
-				</key>
-				<value>org.sipfoundry.openfire.provider.MongoUIDProvider</value>
-			</entry>
-			<entry>
-				<key>
 					<value>provider.user.className</value>
 				</key>
-				<value>org.sipfoundry.openfire.provider.MongoUserProviderAlt
-				</value>
-			</entry>
-			<entry>
-				<key>
-					<value>provider.userprops.className</value>
-				</key>
-				<value>org.sipfoundry.openfire.provider.MongoUserPropertiesProvider
-				</value>
+				<value>org.sipfoundry.openfire.provider.MongoUserProvider</value>
 			</entry>
 			<entry>
 				<key>
@@ -221,4 +159,5 @@
     </property>
     <property name="featureId" value="instantMessage"/>
   </bean>  
+  
 </beans>

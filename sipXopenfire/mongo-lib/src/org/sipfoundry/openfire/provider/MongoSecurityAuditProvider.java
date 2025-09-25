@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.jivesoftware.database.SequenceManager;
 import org.jivesoftware.openfire.XMPPServer;
-import org.jivesoftware.openfire.provider.SecurityAuditProvider;
+import org.jivesoftware.openfire.security.SecurityAuditProvider;
 import org.jivesoftware.openfire.security.EventNotFoundException;
 import org.jivesoftware.openfire.security.SecurityAuditEvent;
 import org.jivesoftware.util.JiveConstants;
