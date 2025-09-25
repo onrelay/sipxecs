@@ -19,7 +19,7 @@ import java.util.concurrent.Callable;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.ITopic;
+import com.hazelcast.topic.ITopic;
 
 public class HzPublisherTask implements Callable<Object> {
 

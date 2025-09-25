@@ -8,7 +8,15 @@ commons_PKGS = \
 	dom4j \
 	ice4j \
 	log4j \
-	smackx \
+	smack-core \
+	smack-extensions \
+	smack-im \
+	smack-tcp \
+	minidns-core \
+	tinder \
+	whack \
+	jxmpp-core \
+	jxmpp-jid \
 	xml \
 	junit \
 	postgresql \
@@ -24,7 +32,7 @@ commons_PKGS = \
 	commons-collections \
 	commons-collections4 \
 	commons-cli \
-	commons-logging \
+	commons-logging-jakarta  \
 	xstream \
 	xmlrpc-client \
 	spring-beans \
@@ -58,8 +66,8 @@ commons_PKGS = \
 	spring-core \
 	spring-webmvc \	
 	joda-time \
-	hazelcast-all \
-	reflections \
+	hazelcast \
+	reflections-jakarta \
 	guava \
 	jackson-annotations \
 	jackson-databind \
