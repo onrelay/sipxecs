@@ -407,7 +407,9 @@ def get_network(force = false)
 end
 
 def update_config_access
-  FileUtils.chown_R($user, $group, $cfdatadir)
+  if File.exists?($cfdatadir) 
+    FileUtils.chown_R($user, $group, $cfdatadir)
+  end
 end
 
 class Network

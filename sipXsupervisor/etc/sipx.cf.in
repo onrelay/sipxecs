@@ -216,19 +216,18 @@ bundle agent update_from_master {
 
   files:
     !primary::
-      # root own files only as extra measure against tampering, but not strict requirement
       "@SIPX_CFDATA@"
         handle => "update_global",
         copy_from => master_files("$(server)","$(master[SIPX_CFDATA][1])"),
         depth_search => recurse("1"),
-        perms => m("644"),
+        perms => mog("644","$(sipx.SIPXPBXUSER)","$(sipx.SIPXPBXGROUP)"),
         classes => if_notkept("fatal_error");
 
       "@SIPX_CFDATA@/$(sipx.location_id)"
         handle => "update_location",
         copy_from => master_files("$(server)","$(master[SIPX_CFDATA][1])/$(sipx.location_id)"),
         depth_search => recurse("inf"),
-        perms => m("644"),
+        perms => mog("644","$(sipx.SIPXPBXUSER)","$(sipx.SIPXPBXGROUP)"),
         classes => if_notkept("fatal_error");
 
   reports:
