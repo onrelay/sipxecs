@@ -1,5 +1,5 @@
 event_PKGS = \
-	commons-logging \
+	commons-logging-jakarta  \
 	commons-lang \
 	commons-io \
 	commons-codec \

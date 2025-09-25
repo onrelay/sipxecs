@@ -24,13 +24,13 @@ iantaocbilling_PKGS = \
 	sipxconfig-web \
 	commons-io \
 	commons-lang \
-	commons-logging \
+	commons-logging-jakarta  \
 	mongodb-driver-core \
 	mongodb-driver-sync   \
 	bson  \	
 	jakarta.persistence-api \
 	tapestry-annotations \
-	tapestry-framework \
+	tapestry-framework-jakarta \
 	spring-core \
 	spring-tx \
 	spring-jdbc \

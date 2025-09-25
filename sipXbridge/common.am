@@ -3,7 +3,7 @@ bridge_PKGS = \
 	commons-beanutils-core \
 	commons-collections \
 	commons-digester \
-	commons-logging \
+	commons-logging-jakarta  \
 	commons-codec \
 	dnsjava \
 	jain-sip-sdp \
@@ -14,5 +14,5 @@ bridge_PKGS = \
 	xmlrpc-client \
 	xmlrpc-server \
 	slf4j-api \
-	slf4j-log4j12
+	slf4j-reload4j
 	

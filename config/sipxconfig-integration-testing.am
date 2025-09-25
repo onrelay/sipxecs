@@ -9,7 +9,6 @@ sipxconfig_test_integration_core_PKGS = \
 	junitperf \
 	org.json \
 	p6spy \
-	spring-mock \
 	xml-apis \
 	xmlunit \
 	cxf-rt-transports-http-jetty
@@ -21,10 +20,10 @@ sipxconfig_web_test_PKGS = \
 	backport-util-concurrent \
 	c3p0 \
 	cglib-nodep \
-	commons-fileupload \
+	commons-fileupload-jakarta \
 	ez-vcard \
-	hivemind \
-	hivemind-lib \
+	hivemind-jakarta \
+	hivemind-lib-jakarta \
 	javassist \
 	jakarta.servlet-api \
 	jta \
@@ -33,7 +32,7 @@ sipxconfig_web_test_PKGS = \
 	rome \
 	tapestry-annotations \
 	tapestry-contrib \
-	tapestry-framework \
+	tapestry-framework-jakarta \
 	xpp3 \
 	jackson-core \
 	jackson-databind \

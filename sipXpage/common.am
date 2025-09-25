@@ -2,7 +2,7 @@ page_PKGS = \
 	commons-codec \
 	commons-lang \
 	commons-io \
-	commons-logging \
+	commons-logging-jakarta  \
 	dom4j \
 	dnsjava \
 	jain-sip-sdp \

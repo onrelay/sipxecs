@@ -271,7 +271,7 @@ stylecmd_PKGS = \
 	google-collection \
 	commons-beanutils-core \
 	commons-cli \	
-	commons-logging \
+	commons-logging-jakarta  \
 	antlr
 
 stylecmd_DEPS = \

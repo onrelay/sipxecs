@@ -3,7 +3,7 @@ ivr_PKGS = \
 	commons-digester \
 	commons-beanutils-core \
 	commons-io \
-	commons-logging \
+	commons-logging-jakarta  \
 	commons-lang \
 	dom4j \
 	iText \
@@ -20,11 +20,11 @@ ivr_PKGS = \
 	org.restlet \
 	sipxcommons \
 	slf4j-api \
-	slf4j-log4j12 \
+	slf4j-reload4j \
 	cglib \
 	xmlrpc-common \
 	ws-commons-util \
-	commons-fileupload \
+	commons-fileupload-jakarta \
 	xmlrpc-client \
 	xmlrpc-server \
 	spring-beans \
@@ -40,7 +40,7 @@ ivr_PKGS = \
 	spring-data-commons \
 	spring-data-mongodb \
 	joda-time \
-	hazelcast-all \
+	hazelcast \
 	mongodb-driver-core \
 	mongodb-driver-sync \
 	bson

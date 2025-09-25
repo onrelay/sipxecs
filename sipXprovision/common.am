@@ -4,18 +4,17 @@ cfg_PKGS = \
 	velocity-engine-core \
 	commons-lang \
 	commons-io \
-	commons-logging \
+	commons-logging-jakarta  \
 	dom4j \
 	jakarta.persistence-api \
 	spring-beans \
 	spring-core \
 	spring-tx \
 	spring-velocity-support \
-	xercesImpl \
 	sipxconfig-neoconf \
 	sipxconfig-web \
 	tapestry-annotations \
-	tapestry-framework \
+	tapestry-framework-jakarta \
 	hivemind
 
 provision_PKGS = \
@@ -25,7 +24,7 @@ provision_PKGS = \
 	commons-collections \
 	commons-lang \
 	commons-io \
-	commons-logging \
+	commons-logging-jakarta  \
 	jakarta.persistence-api \
 	jakarta.servlet \
 	velocity

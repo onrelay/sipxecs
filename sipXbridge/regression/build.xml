@@ -14,8 +14,8 @@
 	   <pathelement location="${commons-digester}" />
 	   <pathelement location="${commons-collections}" />
 	   <pathelement location="${commons-beanutils}" />
- 	   <pathelement location="${commons-logging-api}" />
-	   <pathelement location="${commons-logging}" />
+ 	   <pathelement location="${commons-logging-jakarta -api}" />
+	   <pathelement location="${commons-logging-jakarta }" />
 	   <pathelement location="${dnsjava}" />
 	   <pathelement location="lib/regression-tester.jar" />
 	</path>

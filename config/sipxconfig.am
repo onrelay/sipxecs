@@ -14,7 +14,7 @@ sipxconfig_neoconf_PKGS = \
 	commons-io \
 	commons-lang \
 	commons-lang3 \
-	commons-logging \
+	commons-logging-jakarta  \
 	commons-net \
 	oro \
 	gdata-client \
@@ -50,7 +50,7 @@ sipxconfig_neoconf_PKGS = \
 	lucene-analyzers-common \
 	lucene-queryparser \
 	lucene-suggest \
-	mime-dir-j-vcard4j \
+	mime-dir-j-vcard4j-jakarta \
 	mysql-connector-java \
 	org.restlet \
 	org.restlet.ext.json \
@@ -90,23 +90,24 @@ sipxconfig_neoconf_PKGS = \
 	serializer \
 	sipxcommons \
 	slf4j-api \
-	slf4j-log4j12 \
+	slf4j-reload4j \
 	snmp4j \
 	dom4j \
 	thumbnailator \
-	micrometer-core \
+	micrometer-core-jakarta \
 	micrometer-commons \
 	micrometer-observation \
 	velocity-engine-core \
 	velocity-tools-generic \
-	xercesImpl \
-	xmlrpc \
+	xmlrpc-jakarta \
 	xstream \
 	jedis \
 	jradius-core \
 	jradius-dictionary \
 	gnu-crypto \
-	smack \
+	smack-core \
+	smack-extensions \
+	smack-im \
 	cxf-core \
     cxf-rt-rs-client \
 	cxf-rt-rs-service-description \
@@ -129,10 +130,14 @@ sipxconfig_neoconf_PKGS = \
 	jcl-over-slf4j \
 	jaudiotagger \
 	spring-websocket \
-	hazelcast-all \
-	reflections \
+	hazelcast \
+	reflections-jakarta \
 	guava \
 	elasticsearch \
+	elasticsearch-java \
+	elasticsearch-rest-client \
+	httpclient5 \
+	httpcore5 \
 	gson \
 	commons-cli \
 	mongodb-driver-core \
@@ -143,15 +148,15 @@ sipxconfig_neoconf_PKGS = \
 	asm-commons \
 	asm-util \
 	colt \
-	gwt-user \
-	gwt-dev \
-	smartgwt \
+	gwt-user-jakarta \
+	gwt-dev-jakarta \
+	smartgwt-jakarta \
 	smartgwt-skins \
-	hivemind \
-	hivemind-lib \
+	hivemind-jakarta \
+	hivemind-lib-jakarta \
 	tapestry-annotations \
 	tapestry-contrib \
-	tapestry-framework \
+	tapestry-framework-jakarta \
 	validation-api \
 	jboss-logging \
 	classmate \
@@ -166,7 +171,7 @@ sipxconfig_neoconf_PKGS = \
 	pop3 \
 	smtp \
 	jcommon \
-	jfreechart
+	jfreechart-jakarta
 
 sipxconfig_web_PKGS = \
 	$(sipxconfig_neoconf_PKGS) \
@@ -176,22 +181,17 @@ sipxconfig_web_PKGS = \
 	c3p0 \
 	mchange-commons-java \
 	cglib-nodep \
-	commons-fileupload \
+	commons-fileupload-jakarta \
 	ez-vcard \
-	hivemind \
-	hivemind-lib \
+	hivemind-jakarta \
+	hivemind-lib-jakarta \
 	javassist \
-	websocket-api \
-	websocket-client \
-	websocket-common \
-	websocket-server \
-	websocket-servlet \
 	jta \
 	not-yet-commons-ssl \
 	ognl \
 	rome \
 	tapestry-annotations \
 	tapestry-contrib \
-	tapestry-framework \
+	tapestry-framework-jakarta \
 	xpp3 
 

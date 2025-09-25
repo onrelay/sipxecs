@@ -22,9 +22,9 @@ customcallerid_PKGS = \
 	commons-io \
 	commons-collections \
 	commons-collections4 \
-	commons-logging \
+	commons-logging-jakarta  \
 	jakarta.persistence-api \
-	tapestry-framework \
+	tapestry-framework-jakarta \
 	tapestry-annotations \
 	spring-data-mongodb \
 	spring-context \
@@ -32,7 +32,7 @@ customcallerid_PKGS = \
 	mongodb-driver-core \
 	mongodb-driver-sync \
 	bson  \	
-	hivemind \
+	hivemind-jakarta \
 	sipxcommons \
 	sipxconfig-neoconf \
 	sipxconfig-web

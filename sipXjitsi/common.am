@@ -2,7 +2,7 @@ sipxjitsi_PKGS = \
 	log4j \
 	commons-lang \
 	commons-io \
-	commons-logging \ 
+	commons-logging-jakarta  \ 
 	commons-beanutils-core \
 	jakarta.servlet-api \
 	commons-collections \

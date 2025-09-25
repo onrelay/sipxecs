@@ -10,22 +10,21 @@ cfg_PKGS = \
 	spring-core \
 	spring-tx \
 	spring-velocity-support \
-	xercesImpl \
 	sipxconfig-neoconf \
 	sipxconfig-web \
 	tapestry-annotations \
-	tapestry-framework \
+	tapestry-framework-jakarta \
 	hivemind
 
 recording_PKGS = \
 	sipxcommons \
 	log4j \
 	slf4j-api \
-	slf4j-log4j12 \
+	slf4j-reload4j \
 	commons-io \
 	commons-codec \
 	httpclient5 \
-	commons-logging \
+	commons-logging-jakarta  \
 	jakarta.servlet \
 	jakarta.persistence-api \
 	mongodb-driver-core \
@@ -39,4 +38,4 @@ recording_PKGS = \
 	spring-tx \
 	spring-expression \
 	commons-lang \
-	hazelcast-all
+	hazelcast

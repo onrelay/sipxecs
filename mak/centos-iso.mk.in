@@ -734,7 +734,6 @@ ISO_ADD_OS = \
   which-* \
   wireless-tools-* \
   wsdl4j-1.* \
-  xalan-j2-2.* \
   xcb-util-0.* \
   xerces-c-3.* \
   xinetd-* \

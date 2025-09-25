@@ -2,7 +2,7 @@ tcpdumplog_PKGS = \
 	sipxconfig-neoconf \
 	commons-io \
 	commons-lang \
-	commons-logging \
+	commons-logging-jakarta  \
 	log4j \
 	sipxcommons \
 	postgresql \

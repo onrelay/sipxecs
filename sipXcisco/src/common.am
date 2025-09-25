@@ -3,7 +3,7 @@ cisco_PKGS = \
 	commons-lang \
 	commons-io \
 	commons-collections \
-	commons-logging \
+	commons-logging-jakarta  \
 	spring-beans \
 	sipxcommons \
 	sipxconfig-neoconf \

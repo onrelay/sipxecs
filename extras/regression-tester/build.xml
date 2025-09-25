@@ -12,8 +12,8 @@
 	   <pathelement location="${commons-digester}" />
 	   <pathelement location="${commons-collections}" />
 	   <pathelement location="${commons-beanutils}" />
- 	   <pathelement location="${commons-logging-api}" />
-	   <pathelement location="${commons-logging}" />
+ 	   <pathelement location="${commons-logging-jakarta -api}" />
+	   <pathelement location="${commons-logging-jakarta }" />
 	   <pathelement location="${dnsjava}" />
 	</path>
 	  <target name="compile"  description="compile the source no tests">

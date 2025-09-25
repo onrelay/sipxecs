@@ -2,7 +2,7 @@ cmcprov_PKGS = \
 	log4j \
 	commons-lang \
 	commons-io \
-	commons-logging \
+	commons-logging-jakarta  \
 	jakarta.servlet-api \
 	commons-collections \
 	spring-security-config \

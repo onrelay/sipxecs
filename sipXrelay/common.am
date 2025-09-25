@@ -3,7 +3,7 @@ relay_PKGS = \
 	commons-beanutils-core \
 	commons-collections \
 	commons-digester \
-	commons-logging \
+	commons-logging-jakarta  \
 	dnsjava \
 	jain-sip-sdp \
 	jakarta.servlet \
