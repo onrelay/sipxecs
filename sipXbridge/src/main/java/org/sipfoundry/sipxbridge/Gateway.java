@@ -48,6 +48,7 @@ import gov.nist.javax.sip.clientauthutils.AuthenticationHelper;
 
 import org.ice4j.Transport;
 
+
 /**
  * The main class
  *
@@ -1169,9 +1170,9 @@ public class Gateway {
      */
     static int getGlobalPort(String transport) {
 
-        int port = Gateway.accountManager.getBridgeConfiguration().getGlobalPort() != -1 ? Gateway.accountManager
-                .getBridgeConfiguration().getGlobalPort() : Gateway.accountManager.getBridgeConfiguration()
-                .getExternalPort();
+        int port = Gateway.accountManager.getBridgeConfiguration().getGlobalPort() != -1 ? 
+            Gateway.accountManager.getBridgeConfiguration().getGlobalPort() : 
+            Gateway.accountManager.getBridgeConfiguration().getExternalPort();
 
         if (transport.equalsIgnoreCase("tls")) {
             return port + 1;

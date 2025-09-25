@@ -336,7 +336,7 @@ public class RegistrationManager {
         String callId = SipUtilities.getCallId(request);
         Request newRequest = SipUtilities.createRegistrationRequest(Gateway.getWanProvider(itspAccount.getOutboundTransport()), itspAccount,
                 callId, SipUtilities.getSeqNumber(request));
-        SipUtilities.setGlobalAddresses(newRequest);
+        SipUtilities.setGlobalAddresses(newRequest, itspAccount.getOutboundTransport());
         if ( request.getHeader(AuthorizationHeader.NAME) != null ) {
             // Need to fix up the authorization header to point to the ITSP
             AuthorizationHeader authorizationHeader = (AuthorizationHeader) request.getHeader(AuthorizationHeader.NAME);

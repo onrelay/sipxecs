@@ -356,7 +356,10 @@ class CallControlManager implements SymmitronResetHandler {
             if (provider == Gateway.getLanProvider()
                     && (peerDialogContext.getItspInfo() == null || peerDialogContext.getItspInfo()
                             .isGlobalAddressingUsed())) {
-                SipUtilities.setGlobalAddresses(newRequest);
+
+                String transport = peerDialogContext.getSipProvider().getListeningPoints()[0].getTransport();
+
+                SipUtilities.setGlobalAddresses(newRequest, transport);
             }
 
             /*
@@ -949,6 +952,44 @@ class CallControlManager implements SymmitronResetHandler {
 
         } catch (Exception ex) {
             logger.error("problem sending OK to PRACK", ex);
+        }
+    }
+
+        /**
+     * Process an incoming UPDATE.
+     *
+     * @param requestEvent -- the UPDATE request event.
+     */
+    private void processUpdate(RequestEvent requestEvent) {
+        try {
+            SipProvider provider = (SipProvider) requestEvent.getSource();
+            if ( logger.isDebugEnabled() ) logger.debug("processUpdate");
+
+            ServerTransaction serverTransactionId = requestEvent.getServerTransaction();
+            /*
+             * send 200 OK for UPDATE
+             */
+            Response updateOk = SipUtilities.createResponse(serverTransactionId, Response.OK);
+
+            Dialog dialog = requestEvent.getDialog();
+            DialogContext dialogContext = DialogContext.get(dialog);
+            ContactHeader requestContactHeader = (ContactHeader) requestEvent.getRequest().getHeader(ContactHeader.NAME);
+            String contactUser;   
+            if (requestContactHeader != null) {
+                SipURI contactURI = (SipURI) requestContactHeader.getAddress().getURI();
+                contactUser = contactURI.getUser();
+            }  else {
+                contactUser = Gateway.SIPXBRIDGE_USER;
+            }
+            
+            ItspAccountInfo itspAccount = dialogContext.getItspInfo();
+              ContactHeader contactHeader = SipUtilities.createContactHeader(provider, itspAccount,contactUser, serverTransactionId);
+            updateOk.setHeader(contactHeader);
+
+            serverTransactionId.sendResponse(updateOk);
+
+        } catch (Exception ex) {
+            logger.error("problem sending OK to UPDATE", ex);
         }
     }
 
@@ -3270,6 +3311,8 @@ logger.debug("SEv Delaying ACK");
             processRefer(requestEvent);
         } else if (method.equals(Request.PRACK)) {
             processPrack(requestEvent);
+        } else if (method.equals(Request.UPDATE)) {
+            processUpdate(requestEvent);
         }
 
     }

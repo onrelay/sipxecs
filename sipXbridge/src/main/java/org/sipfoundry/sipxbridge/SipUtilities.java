@@ -538,7 +538,7 @@ class SipUtilities {
 				.createAddress(fromUri);
 
 		FromHeader fromHeader = ProtocolObjects.headerFactory.createFromHeader(
-				fromAddress, Long.valueOf(Math.abs(new java.util.Random()
+				fromAddress, new Long(Math.abs(new java.util.Random()
 						.nextLong())).toString());
 
 		Address toAddress = ProtocolObjects.addressFactory.createAddress(toUri);
@@ -664,7 +664,7 @@ class SipUtilities {
 					.createAddress(fromUri);
 
 			FromHeader fromHeader = ProtocolObjects.headerFactory
-					.createFromHeader(fromAddress, Long.valueOf(Math
+					.createFromHeader(fromAddress, new Long(Math
 							.abs(new java.util.Random().nextLong())).toString());
 
 			Address toAddress = ProtocolObjects.addressFactory
@@ -773,11 +773,9 @@ class SipUtilities {
 			String fromUser = ((SipURI) from.getAddress().getURI()).getUser();
 			String fromDomain = ((SipURI) from.getAddress().getURI()).getHost();
 			String fromDisplayName = from.getAddress().getDisplayName();
-			/*
 			if (fromDisplayName == null || fromDisplayName.isEmpty()) {
 				fromDisplayName = "sipxbridge";
 			}
-			*/
 
 			Address address = itspAccount.getCallerAlias(from.getAddress());
 			if (address != null && passertedIdentityHeader == null ) {
@@ -831,11 +829,11 @@ class SipUtilities {
                            fromUser, domain);
            fromHeader = ProtocolObjects.headerFactory.createFromHeader(
                    ProtocolObjects.addressFactory.createAddress(fromUri),
-				   Long.valueOf(Math.abs(new java.util.Random().nextLong())).toString());
+				   new Long(Math.abs(new java.util.Random().nextLong())).toString());
 
-			fromHeader.setTag(Long.valueOf(Math.abs(new java.util.Random()
+			fromHeader.setTag(new Long(Math.abs(new java.util.Random()
 					.nextLong())).toString());
-			if (!domain.equals("anonymous.invalid") && fromDisplayName != null && !fromDisplayName.isEmpty() ) {
+			if (!domain.equals("anonymous.invalid") && fromDisplayName != null ) {
 				// Set the from header display name.
 				fromHeader.getAddress().setDisplayName(fromDisplayName);
 			}
@@ -860,7 +858,7 @@ class SipUtilities {
 
 			requestUri.removePort();
 
-			fromHeader.setTag(Long.valueOf(Math.abs(new java.util.Random()
+			fromHeader.setTag(new Long(Math.abs(new java.util.Random()
 					.nextLong())).toString());
 
 			SipURI toUri = ProtocolObjects.addressFactory.createSipURI(toUser,
@@ -1031,7 +1029,7 @@ class SipUtilities {
 				for (Iterator it1 = formats.iterator(); it1.hasNext();) {
 					Object format = it1.next();
 					try{
-						int fmt = Integer.valueOf(format.toString());
+						int fmt = new Integer(format.toString());
 						retval.add(fmt);
 					} catch (NumberFormatException nfex) {
 						logger.warn("Unexpected format:" + format + " - No Need to kill the call", nfex);
@@ -1089,7 +1087,7 @@ class SipUtilities {
 							.getMediaFormats(true);
 					for (Iterator it1 = formats.iterator(); it1.hasNext();) {
 						Object format = it1.next();
-						int fmt = Integer.valueOf(format.toString());
+						int fmt = new Integer(format.toString());
 						if (fmt != 100 && fmt != 101 && fmt != 19) {
 							retval.add(fmt);
 						}
@@ -1298,7 +1296,7 @@ class SipUtilities {
 						
 						Object format = it1.next();
 						try {
-							Integer fmt = Integer.valueOf(format.toString());
+							Integer fmt = new Integer(format.toString());
 							if (filteredCodecs.contains(fmt)) {
 								
 								 if ( logger.isDebugEnabled())   logger.debug("Removing filtered codec from media formats: " + fmt );
@@ -1643,12 +1641,10 @@ class SipUtilities {
 	 *
 	 * @param request
 	 */
-	static void setGlobalAddresses(Request request) {
+
+	static void setGlobalAddresses(Request request, String transport ) {
 	    try {
-	    	
-	        String transport = ((ViaHeader) request.getHeader(ViaHeader.NAME))
-	                            .getTransport().toLowerCase();
-	                            	        
+	    	         	        
 	        SipURI sipUri = ProtocolObjects.addressFactory.createSipURI(null,
 	                        Gateway.getGlobalAddress());
 	        
@@ -1984,9 +1980,11 @@ class SipUtilities {
 				 * Request is bound to the WAN.
 				 */
 				if (DialogContext.get(dialog).getItspInfo() == null
-						|| DialogContext.get(dialog).getItspInfo()
-								.isGlobalAddressingUsed()) {
-					SipUtilities.setGlobalAddresses(request);
+						|| DialogContext.get(dialog).getItspInfo().isGlobalAddressingUsed()) {
+
+					String transport = provider.getListeningPoints()[0].getTransport();
+
+					SipUtilities.setGlobalAddresses(request, transport);
 					SipUtilities.addWanAllowHeaders(request);
 					request.removeHeader(SupportedHeader.NAME);
 
@@ -2469,7 +2467,7 @@ class SipUtilities {
 			if (message instanceof Request) {
 				triggeredBy = "request";
 			} else {
-				responseCode = Integer.valueOf(((Response) message).getStatusCode())
+				responseCode = new Integer(((Response) message).getStatusCode())
 						.toString();
 			}
 			return SipUtilities.createReferencesHeader(callId, branchId,
