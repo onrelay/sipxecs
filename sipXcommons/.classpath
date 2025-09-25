@@ -36,10 +36,11 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons-collections4-4.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-digester-2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-discovery-0.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons-fileupload-1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-fileupload-jakarta-1.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-io-2.19.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-lang-2.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-lang3-3.17.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-logging-jakarta-1.3.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-net-3.11.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cxf-core-4.1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cxf-rt-frontend-jaxrs-4.1.2.jar"/>
@@ -54,9 +55,10 @@
 	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/easymock-5.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-3.10.8-jakarta.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/elasticsearch-1.7.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/elasticsearch-9.1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/elasticsearch-java-9.1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/elasticsearch-rest-client-9.1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ez-vcard-0.9.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/freemarker-2.3.19.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gdata-client-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gdata-contacts-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gdata-core-1.0.jar"/>
@@ -65,13 +67,13 @@
 	<classpathentry exported="true" kind="lib" path="lib/gson-2.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/guessencoding-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/guava-11.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/gwt-dev-2.12.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/gwt-user-2.12.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hazelcast-all-3.3-EA.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gwt-dev-jakarta-2.12.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gwt-user-jakarta-2.12.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hazelcast-5.5.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-7.0.6.Final.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-models-1.0.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hivemind-1.1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hivemind-lib-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hivemind-jakarta-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hivemind-lib-jakarta-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/htmlunit-2.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/htmlunit-core-js-2.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/httpclient5-5.5.jar"/>
@@ -93,6 +95,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.mail-2.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.persistence-api-3.2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.servlet-api-6.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jakarta.servlet.jsp.jstl-api-3.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.transaction-api-2.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.websocket-api-2.2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.websocket-client-api-2.2.0.jar"/>
@@ -115,7 +118,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jcommon-1.0.13.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jedis-2.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jettison-1.3.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jfreechart-1.0.10.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jfreechart-jakarta-1.0.10.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/joda-time-2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jradius-core-1.1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jradius-dictionary-1.1.4.jar"/>
@@ -124,15 +127,15 @@
 	<classpathentry exported="true" kind="lib" path="lib/json-20250517.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsonassert-1.2.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jsoup-1.7.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jstl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jta.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/junit-4.8.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/junitperf-1.9.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jwebunit-core-2.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jwebunit-htmlunit-plugin-2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jwebunit-core-jakarta -2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jwebunit-htmlunit-plugin-jakarta-jakarta-2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jxmpp-core-1.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jxmpp-jid-1.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ldapbp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.15.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/logkit-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/logging-mailhandler-2.0.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-analyzers-common-4.10.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-core-4.10.4.jar"/>
@@ -144,13 +147,14 @@
 	<classpathentry exported="true" kind="lib" path="lib/lucene-sandbox-4.10.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-suggest-4.10.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mchange-commons-java-0.3.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/micrometer-commons-1.15.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/micrometer-core-1.15.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/micrometer-observation-1.15.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/micrometer-commons-1.15.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/micrometer-core-jakarta-1.15.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/micrometer-observation-1.15.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mime-dir-j-api-2.2.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/mime-dir-j-vcard4j-1.4.1-patch.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/mongodb-driver-core-5.4.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/mongodb-driver-sync-5.4.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mime-dir-j-vcard4j-jakarta-1.4.1-patch.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/minidns-core-1.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mongodb-driver-core-5.6.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mongodb-driver-sync-5.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mysql-connector-java-5.1.20-bin.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/neethi-3.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/nekohtml-1.9.12.jar"/>
@@ -158,7 +162,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/not-yet-commons-ssl-0.3.11.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/odmg-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ognl-2.7.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/openfire-3.9.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.json_2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.restlet-2.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/org.restlet.ext.json-2.6.0.jar"/>
@@ -169,18 +172,20 @@
 	<classpathentry exported="true" kind="lib" path="lib/poi-3.5-FINAL-20090928.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/pop3-2.0.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/postgresql-42.7.5.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/reflections-0.9.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/reflections-jakarta-0.9.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/regexp-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/rome-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saaj.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/sac-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saxpath-1.0fcs.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/serializer-2.7.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-1.7.33.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/slf4j-log4j12-1.7.33.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/smack-3.3.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/smackx-3.3.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/smartgwt-14.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-api-2.0.17.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/slf4j-reload4j-2.0.17.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smack-core-4.4.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smack-extensions-4.4.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smack-im-4.4.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smack-tcp-4.4.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smartgwt-jakarta-14.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smartgwt-skins-14.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/snmp4j-2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smtp-2.0.4.jar"/>
@@ -202,7 +207,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/spring-jdbc-6.2.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-ldap-core-3.2.12.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-messaging-6.2.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/spring-mock-2.0.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-orm-6.2.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-security-cas-6.4.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-security-config-6.4.5.jar"/>
@@ -221,28 +225,23 @@
 	<classpathentry exported="true" kind="lib" path="lib/stax2-api-3.1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/tapestry-annotations-4.1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/tapestry-contrib-4.1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/tapestry-framework-4.1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/tapestry-framework-jakarta-4.1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/thumbnailator-0.4.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/tinder-2.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/validation-api-2.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/velocity-engine-core-2.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/velocity-tools-generic-3.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/websocket-api-9.4.57.v20241219.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/websocket-client-9.4.57.v20241219.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/websocket-common-9.4.57.v20241219.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/websocket-server-9.4.57.v20241219.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/websocket-servlet-9.4.57.v20241219.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/whack-3.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/woodstox-core-asl-4.3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws-commons-util-1.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xalan-2.7.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xerces_resolver-2.9.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xercesImpl-2.9.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xml-apis.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-jakarta-2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-client-5.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-common-5.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-server-5.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlschema-core-2.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlunit-1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmppserver-jakarta-5.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xpp3-1.1.4c.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xstream-1.4.8.jar"/>
 	<classpathentry kind="output" path="bin.eclipse/classes"/>

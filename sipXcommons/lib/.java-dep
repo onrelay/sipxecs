@@ -29,7 +29,7 @@ sipXcommons_dependency() {
   restlet-impl)
     pkg_push restlet;;
   jasperreports)
-    pkg_push iText jfreechart jcommon poi xalan;;
+    pkg_push iText jcommon poi;;
   # technically ehcache is not required but really should be included.
   hibernate)
     pkg_push ehcache;;
@@ -37,8 +37,8 @@ sipXcommons_dependency() {
   jetticon)
     pkg_push stax-api;;
   # A version of vCard4J patched to implement the Mime-Dir and vCard Java API.
-  mime-dir-j-vcard4j)
-    pkg_push xercesImpl xalan javamail jakarta.servlet mime-dir-j-api;;
+  mime-dir-j-vcard4j-jakarta)
+    pkg_push javamail jakarta.servlet mime-dir-j-api;;
   *);;
   esac
 }
