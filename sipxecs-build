@@ -243,4 +243,194 @@ function setupRepos()
     echo "Done setupRepos()"
 }
 
+function setupCentOS7() 
+{
+    echo "Begin setupCentOS7()"
+
+    sudo yum install -y make autoconf automake 
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "yum install error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    sed -i 's/obsoletes=1/obsoletes=0/' /etc/yum.conf
+
+    sudo yum install -y libtool gcc-c++ openssl-devel libmcrypt-devel libtool-ltdl-devel \
+        pcre-devel pcre-devel findutils  db4-devel iptables iproute boost-devel libpcap-devel libdnet-devel xmlrpc-c-devel \
+        libevent-devel poco-devel libconfig-devel hiredis-devel gtest-devel leveldb-devel cppunit-devel gperftools-devel \
+        c-ares-devel libdb4-cxx-devel libdb-cxx-devel popt-devel xerces-c-devel zeromq-devel libev-devel v8-devel httpd unixODBC-devel \
+        mock rsync gem systemd-sysv mongo-cxx-driver-devel libuuid-devel swig cfengine openfire resiprocate-libs \
+        dart-sdk createrepo unzip checkpolicy policycoreutils policycoreutils-python freeswitch-devel bcg729-devel java-1.8.0-openjdk-devel 
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "yum install error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    cd ${SOURCE_DIR}    
+    sudo mkdir -p /usr/local/sipx
+    sudo chown sipx.sipx /usr/local/sipx
+
+    echo "Using legacy oss_core for CentOS"
+    sudo yum install -y oss_core oss_core-devel oss_core-debuginfo
+    sudo mkdir -p /usr/local/sipx/lib
+    sudo ln -s /usr/lib64/liboss_core.la /usr/local/sipx/lib/liboss_core.la
+    sudo ln -s /usr/lib64/liboss_carp.la /usr/local/sipx/lib/liboss_carp.la
+    sudo mkdir -p /usr/local/sipx/opt
+    sudo ln -s /usr/opt/ossapp /usr/local/sipx/opt/ossapp
+
+    cd ${BUILD_DIR}
+    sudo echo oss_core > .modules-exclude
+
+    echo "Done setupCentOS7()"
+}
+
+function setupCentOS9() 
+{
+    echo "Begin setupCentOS9()"
+
+    setupCentOS7
+
+    echo "Done setupCentOS9()"
+}
+
+function setupRocky9() 
+{
+    echo "Begin setupRocky9()"
+
+    echo "Done setupRocky9()"
+}
+
+
+function configure() 
+{
+    echo "Begin configure()"
+
+    sed -i "/^AC_INIT.*/ s//AC_INIT(sipX, ${VERSION}, ${SIPXCOM_USER_GROUP})/" ${SOURCE_DIR}/configure.ac
+
+    cd ${SOURCE_DIR}
+    sudo autoreconf -ivf
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "autoreconf error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    cd ${BUILD_DIR}
+
+    sudo echo '$(sipx_all)' > .modules-include
+
+    if [ -z "${RPM}" ]; then
+        sudo ../configure
+    else
+        sudo yum install -y createrepo rpm-build mock thttpd
+        sudo usermod -a -G mock sipx
+        
+        sudo ../configure --enable-rpm DISTRO="${PLATFORM}-${ARCHITECTURE}"
+    fi
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "configure error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    echo "Done configure()"
+}
+
+
+function build() 
+{
+    echo "Begin build()"
+
+    cd ${BUILD_DIR}
+
+
+ 
+    # The make command may kick a permission error when creating RPMs
+
+    if [ -z "${RPM}" ]; then
+
+        sudo make ${SUBPROJECT}
+    
+    else
+
+        echo "RPMs will be generated locally at ${LOCAL_REPO}"
+
+        sudo make ${SUBPROJECT}.rpm       
+    fi
+
+    ERROR=$?
+    if [ ${ERROR} -ne 0 ]; then 
+        echo "make error, exiting sipxecs-build"
+        exit ${ERROR}
+    fi 
+
+    echo "Done build()"
+}
+
+function install() 
+{
+    echo "Begin install()"
+
+    cd ${BUILD_DIR}
+
+    # 'repomanage' lists the most recent RPMs in a directory
+    sudo yum localinstall -y $(repomanage ${LOCAL_REPO})
+
+    echo "Done install()"
+}
+
+function main()
+{
+
+    echo "Starting ${THIS_MASTER_BUILD_SCRIPT}"
+
+    checkUser
+
+    checkInput $@
+
+    checkSELinux
+
+    init
+
+    setupRepos
+
+    case $PLATFORM in
+
+        "centos-7")
+            setupCentOS7
+            ;;
+
+        "centos-9")
+            setupCentOS9
+            ;;
+
+        "rocky-9")
+            setupRocky9
+            ;;
+
+        *)
+            echo "Error: Unknown platform ${PLATFORM}"
+            exit 1
+            ;;
+    esac
+    
+    configure
+
+    build
+
+    if [ ! -z "${INSTALL}" ]; then
+
+        install
+
+    fi
+
+    echo "Finished ${THIS_MASTER_BUILD_SCRIPT}"
+}
+
 main $@
