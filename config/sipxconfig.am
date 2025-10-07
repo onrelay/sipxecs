@@ -16,6 +16,7 @@ sipxconfig_neoconf_PKGS = \
 	commons-lang3 \
 	commons-logging-jakarta  \
 	commons-net \
+	commons-pool \
 	oro \
 	gdata-client \
 	gdata-contacts \
@@ -50,6 +51,7 @@ sipxconfig_neoconf_PKGS = \
 	lucene-analyzers-common \
 	lucene-queryparser \
 	lucene-suggest \
+	lucene-backward-codecs \
 	mime-dir-j-vcard4j-jakarta \
 	mysql-connector-java \
 	org.restlet \
@@ -136,6 +138,9 @@ sipxconfig_neoconf_PKGS = \
 	elasticsearch \
 	elasticsearch-java \
 	elasticsearch-rest-client \
+	elasticsearch-x-content \
+	httpclient \
+	httpcore \
 	httpclient5 \
 	httpcore5 \
 	gson \
