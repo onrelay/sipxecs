@@ -189,31 +189,36 @@ buildCommand() {
 
   # -Dprocname needs to be early in the command so cfengine can detect it
   Command="$JavaCmd \
-     -Dprocname=${procNameId} \
-     -XX:MaxMetaspaceSize=128M \
-     -Xmx1024m \
-     ${SIPXCONFIG_OPTS} \
-     ${TrustStoreOpts} \
-     -Djava.io.tmpdir=${TmpDir} \
-     -Djavax.cache.spi.CachingProvider=${CachingProvider} \
-     -Dorg.apache.lucene.lockdir=${IndexDir} \
-     -Dorg.apache.commons.logging.Log=${Logger} \
-     -Djetty.lib.dir=@SIPX_JAVADIR@/sipXconfig \
-     -Djetty.conf.dir=@SIPX_CONFDIR@ \
-     -Djetty.tmp.dir=${TmpDir} \
-     -Djetty.log.dir=${LogDir} \
-     -Djetty.server.Request.maxFormKeys=2000 \
-     -Djetty.home=${JettyHomeDir} \
-     -Djetty.base=${JettyBaseDir} \
-     -Dtmp.dir=${TmpDir} \
-     -Dsipxconfig.db.user=@POSTGRESQL_USER@ \
-     -Dpostgres-pwd.password='${password}' \
-     -Djetty.sslContext.keyStorePath=${KeyStore} \
-     -Djetty.sslContext.keyStorePassword=changeit \
-     -Djetty.sslContext.trustStorePath=${TrustStore} \
-     -Djetty.sslContext.trustStorePassword=changeit \
-     -Djetty.sslContext.excludeProtocols=SSLv3 \
-     -Djava.awt.headless=true"
+    -Dprocname=${procNameId} \
+    -Xms512m \
+    -Xmx2048m \
+    -XX:MetaspaceSize=256m \
+    -XX:MaxMetaspaceSize=512m \
+    -XX:+UseG1GC \
+    -XX:+UseStringDeduplication \
+    ${SIPXCONFIG_OPTS} \
+    ${TrustStoreOpts} \
+    --add-opens java.base/java.lang=ALL-UNNAMED \
+    -Djava.io.tmpdir=${TmpDir} \
+    -Djavax.cache.spi.CachingProvider=${CachingProvider} \
+    -Dorg.apache.lucene.lockdir=${IndexDir} \
+    -Dorg.apache.commons.logging.Log=${Logger} \
+    -Djetty.lib.dir=@SIPX_JAVADIR@/sipXconfig \
+    -Djetty.conf.dir=@SIPX_CONFDIR@ \
+    -Djetty.tmp.dir=${TmpDir} \
+    -Djetty.log.dir=${LogDir} \
+    -Djetty.server.Request.maxFormKeys=2000 \
+    -Djetty.home=${JettyHomeDir} \
+    -Djetty.base=${JettyBaseDir} \
+    -Dtmp.dir=${TmpDir} \
+    -Dsipxconfig.db.user=@POSTGRESQL_USER@ \
+    -Dpostgres-pwd.password='${password}' \
+    -Djetty.sslContext.keyStorePath=${KeyStore} \
+    -Djetty.sslContext.keyStorePassword=changeit \
+    -Djetty.sslContext.trustStorePath=${TrustStore} \
+    -Djetty.sslContext.trustStorePassword=changeit \
+    -Djetty.sslContext.excludeProtocols=SSLv3 \
+    -Djava.awt.headless=true"
 }
 
 runTask() {
