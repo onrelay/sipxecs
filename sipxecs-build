@@ -380,6 +380,9 @@ function setupRocky9()
 {
     echo "Begin setupRocky9()"
 
+    echo "setting java version to 17"
+    alternatives --set java java-17-openjdk.x86_64
+
     echo "installing build tools"
     sudo dnf install ${INSTALL_OPTIONS} make autoconf automake libtool epel-release cmake gem httpd hostname
 
