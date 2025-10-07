@@ -26,7 +26,7 @@ import org.apache.tapestry.callback.PageCallback;
 import org.apache.tapestry.event.PageBeginRenderListener;
 import org.apache.tapestry.event.PageEndRenderListener;
 import org.apache.tapestry.event.PageEvent;
-import org.elasticsearch.common.lang3.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.commons.diddb.AbstractDecoratedIterator;
 import org.sipfoundry.commons.diddb.Did;

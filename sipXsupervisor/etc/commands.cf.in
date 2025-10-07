@@ -41,11 +41,3 @@ bundle agent last_seen_report {
       "/usr/local/sbin/cf-report"
         args => "-IKvf @SIPX_CFINPUTS@/plugin.d/lib/commands.cf";
 }
-
-body reporter control {
-  reports => { 
-    "last_seen" 
-  };
-  build_directory => "$(commands.upload_dir)";
-  report_output => "csv";
-}

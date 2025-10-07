@@ -15,6 +15,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 import org.sipfoundry.sipxconfig.commserver.LocationsManager;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
 import org.sipfoundry.sipxconfig.freeswitch.FreeswitchFeature;
@@ -29,8 +31,7 @@ public class CallQueueContextImplTestIntegration extends IntegrationTestCase {
     private FeatureManager m_featureManager;
     private LocationsManager m_locationsManager;
 
-    @Override
-    protected ConfigurableApplicationContext createApplicationContext(String[] locations) {
+    public ConfigurableApplicationContext createApplicationContext(String[] locations) {
         List<String> jars = new ArrayList<String>();
         jars.add("classpath:/org/sipfoundry/sipxconfig/system.beans.xml");
         jars.add("classpath:/sipxplugin.beans.xml");

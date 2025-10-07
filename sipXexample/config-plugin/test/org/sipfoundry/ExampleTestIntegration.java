@@ -10,8 +10,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class ExampleTestIntegration extends IntegrationTestCase {    
     private Example m_example;
     
-    @Override
-    protected ConfigurableApplicationContext createApplicationContext(String[] locations) {
+    public ConfigurableApplicationContext createApplicationContext(String[] locations) {
         List<String> jars = new ArrayList<String>();
         jars.add("classpath:/org/sipfoundry/sipxconfig/system.beans.xml");
         jars.add("classpath:/sipxplugin.beans.xml");

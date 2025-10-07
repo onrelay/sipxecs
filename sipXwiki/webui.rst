@@ -64,9 +64,10 @@ Some fields or options are hidden by default. For example, the user SIP password
   It is configured in the /etc/init.d/sipxconfig file::
 
       Command="$JavaCmd \
-     -Dprocname=${procNameId} \
-     -XX:MaxMetaspaceSize=128M \
-     -Xmx1024m \
+      -Dprocname=${procNameId} \
+      -XX:MetaspaceSize=256M \
+      -XX:MaxMetaspaceSize=512M \
+      -Xmx1024m \
      
   The java manual page (man java) suggests the maximum value would be 2048m::
 
