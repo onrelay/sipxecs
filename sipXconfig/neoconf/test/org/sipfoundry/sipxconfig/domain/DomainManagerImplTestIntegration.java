@@ -9,6 +9,11 @@
  */
 package org.sipfoundry.sipxconfig.domain;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import org.dbunit.Assertion;
 import org.dbunit.dataset.ITable;
 import org.dbunit.dataset.ReplacementDataSet;

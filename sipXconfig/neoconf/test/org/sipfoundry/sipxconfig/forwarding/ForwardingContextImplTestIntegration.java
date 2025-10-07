@@ -9,8 +9,12 @@
  */
 package org.sipfoundry.sipxconfig.forwarding;
 
-
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+
 import static org.sipfoundry.sipxconfig.commserver.imdb.MongoTestCaseHelper.assertObjectWithIdFieldValuePresent;
 
 import java.sql.SQLException;

@@ -3,6 +3,12 @@ package org.sipfoundry.sipxconfig.bulk.ldap;
 import java.util.Collection;
 import java.util.Map;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.sipfoundry.sipxconfig.bulk.ldap.LdapSystemSettings.AuthenticationOptions;
 import org.sipfoundry.sipxconfig.common.CronSchedule;
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;

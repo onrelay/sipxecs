@@ -7,6 +7,10 @@ package org.sipfoundry.sipxconfig.bulk.ldap;
 
 import java.util.Collection;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
 
 public class AttrMapTestIntegration extends IntegrationTestCase {

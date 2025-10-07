@@ -13,6 +13,9 @@ import junit.framework.TestCase;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
+
 import org.apache.lucene.index.Term;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.phone.Phone;
@@ -35,8 +38,7 @@ public class DefaultBeanAdaptorTest extends TestCase {
     public void testGetBeanIndentity() throws Exception {
         // cannot mock documents
         Document doc = new Document();
-        doc.add(new Field("id", "org.sipfoundry.sipxconfig.common.User:36", Field.Store.YES,
-                Field.Index.NOT_ANALYZED));
+        doc.add(new StringField("id", "org.sipfoundry.sipxconfig.common.User:36", Field.Store.YES));
 
         Identity beanIdentity = m_adaptor.getBeanIdentity(doc);
         assertSame(User.class, beanIdentity.getBeanClass());
@@ -46,8 +48,7 @@ public class DefaultBeanAdaptorTest extends TestCase {
     public void testGetBeanIndentityWrongClass() throws Exception {
         // cannot mock documents
         Document doc = new Document();
-        doc.add(new Field("id", "org.sipfoundry.sipxconfig.common.Xyz:36", Field.Store.YES,
-                Field.Index.NOT_ANALYZED));
+        doc.add(new StringField("id", "org.sipfoundry.sipxconfig.common.Xyz:36", Field.Store.YES));
 
         Identity beanIdentity = m_adaptor.getBeanIdentity(doc);
         assertNull(beanIdentity);
@@ -56,8 +57,7 @@ public class DefaultBeanAdaptorTest extends TestCase {
     public void testGetBeanIndentityWrongId() throws Exception {
         // cannot mock documents
         Document doc = new Document();
-        doc.add(new Field("id", "org.sipfoundry.sipxconfig.common.User:aaa", Field.Store.YES,
-                Field.Index.NOT_ANALYZED));
+        doc.add(new StringField("id", "org.sipfoundry.sipxconfig.common.User:aaa", Field.Store.YES));
 
         Identity beanIdentity = m_adaptor.getBeanIdentity(doc);
         assertNull(beanIdentity);
@@ -93,12 +93,11 @@ public class DefaultBeanAdaptorTest extends TestCase {
 
     public void test() {
         Document doc = new Document();
-        doc.add(new Field("name", "abc", Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(new Field("extension", "1234", Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(new Field("description", "bongo", Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new TextField("name", "abc", Field.Store.YES));
+        doc.add(new TextField("extension", "1234", Field.Store.YES));
+        doc.add(new TextField("description", "bongo", Field.Store.YES));
+        doc.add(new StringField("id", "org.sipfoundry.sipxconfig.common.User:36", Field.Store.YES));
 
-        doc.add(new Field("id", "org.sipfoundry.sipxconfig.common.User:36", Field.Store.YES,
-                Field.Index.NOT_ANALYZED));
 
         Identity beanIdentity = m_adaptor.getBeanIdentity(doc);
         assertEquals("bongo", beanIdentity.getDescription());

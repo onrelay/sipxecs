@@ -86,7 +86,7 @@ public class SearchManagerImpl implements SearchManager {
             if (sort == null) {
                 docs = searcher.search(query, TOP_HITS);
             } else {
-                TopFieldCollector collector = TopFieldCollector.create(sort, TOP_HITS, true, false, false, true);
+                TopFieldCollector collector = TopFieldCollector.create(sort, TOP_HITS, null, Integer.MAX_VALUE);
                 searcher.search(query, collector);
                 docs = collector.topDocs();
             }
@@ -137,7 +137,7 @@ public class SearchManagerImpl implements SearchManager {
      * @return newly created query object
      */
     Query parseUserQuery(String queryText) throws ParseException {
-        QueryParser parser = new QueryParser(Version.LUCENE_30, Indexer.DEFAULT_FIELD, m_analyzer);
+        QueryParser parser = new QueryParser(Indexer.DEFAULT_FIELD, m_analyzer);
         Query query = parser.parse(queryText);
         if (query instanceof TermQuery) {
             TermQuery termQuery = (TermQuery) query;
@@ -152,9 +152,10 @@ public class SearchManagerImpl implements SearchManager {
             Query userQuery = parseUserQuery(queryText);
             Term classTerm = new Term(Indexer.CLASS_FIELD, entityClass.getName());
             TermQuery classQuery = new TermQuery(classTerm);
-            BooleanQuery query = new BooleanQuery();
-            query.add(classQuery, BooleanClause.Occur.MUST);
-            query.add(userQuery, BooleanClause.Occur.MUST);
+            BooleanQuery.Builder builder = new BooleanQuery.Builder();
+            builder.add(classQuery, BooleanClause.Occur.MUST);
+            builder.add(userQuery, BooleanClause.Occur.MUST);
+            BooleanQuery query = builder.build();
             Sort sort = createSortFromFields(sortFields, orderAscending);
             return search(query, firstResult, pageSize, sort, transformer);
         } catch (ParseException e) {

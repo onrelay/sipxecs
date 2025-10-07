@@ -17,6 +17,10 @@ package org.sipfoundry.sipxconfig.firewall;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+
 import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Collections;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.firewall.CallRateLimit.CallRateInterval;

@@ -8,6 +8,9 @@ package org.sipfoundry.sipxconfig.commserver.imdb;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.sipfoundry.commons.mongo.MongoConstants;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.test.ImdbTestCase;

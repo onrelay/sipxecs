@@ -11,6 +11,9 @@ package org.sipfoundry.sipxconfig.search;
 
 import java.util.Collection;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;

@@ -12,6 +12,9 @@ package org.sipfoundry.sipxconfig.bulk.csv;
 import java.io.InputStream;
 import java.io.StringWriter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.apache.commons.io.IOUtils;
 import org.sipfoundry.sipxconfig.common.CoreContextImpl;
 import org.sipfoundry.sipxconfig.domain.DomainManager;

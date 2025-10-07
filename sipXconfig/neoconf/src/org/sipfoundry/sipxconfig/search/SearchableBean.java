@@ -25,4 +25,6 @@ public interface SearchableBean extends PrimaryKeySource {
 
     public void setId(String id);
 
+    public String getId();
+
 }

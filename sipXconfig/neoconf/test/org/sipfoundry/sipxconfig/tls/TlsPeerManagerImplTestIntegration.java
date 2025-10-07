@@ -15,6 +15,11 @@ import static org.sipfoundry.sipxconfig.commserver.imdb.MongoTestCaseHelper.asse
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.permission.PermissionName;
 import org.sipfoundry.sipxconfig.test.ImdbTestCase;

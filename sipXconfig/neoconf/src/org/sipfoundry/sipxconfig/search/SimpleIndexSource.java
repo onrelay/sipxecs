@@ -53,7 +53,7 @@ public class SimpleIndexSource implements IndexSource {
      * @throws IOException
      */
     protected Directory createDirectory(File file) throws IOException {
-        return FSDirectory.open(file);
+        return FSDirectory.open(file.toPath());
     }
 
     public void setIndexDirectoryName(String indexDirectoryName) {
@@ -72,7 +72,7 @@ public class SimpleIndexSource implements IndexSource {
     }
 
     public IndexWriter getWriter(boolean createNew) throws IOException {
-        IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_4_10_4, m_analyzer);
+        IndexWriterConfig iwc = new IndexWriterConfig( m_analyzer);
         iwc.setOpenMode(createNew || m_createIndex ? OpenMode.CREATE : OpenMode.APPEND);
         IndexWriter writer = new IndexWriter(getDirectory(), iwc);
         m_createIndex = false;

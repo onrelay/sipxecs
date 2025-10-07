@@ -9,6 +9,8 @@
  */
 package org.sipfoundry.sipxconfig.commserver.imdb;
 
+import static org.junit.Assert.fail;
+
 import static org.sipfoundry.commons.mongo.MongoConstants.BUTTONS;
 import static org.sipfoundry.commons.mongo.MongoConstants.DIALPAD;
 import static org.sipfoundry.commons.mongo.MongoConstants.DISTRIB_LISTS;

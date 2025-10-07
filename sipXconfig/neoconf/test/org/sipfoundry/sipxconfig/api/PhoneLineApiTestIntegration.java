@@ -2,7 +2,12 @@ package org.sipfoundry.sipxconfig.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+
 import org.sipfoundry.sipxconfig.phone.PhoneContext;
 import org.sipfoundry.sipxconfig.test.RestApiIntegrationTestCase;
 import org.sipfoundry.sipxconfig.test.TestHelper;

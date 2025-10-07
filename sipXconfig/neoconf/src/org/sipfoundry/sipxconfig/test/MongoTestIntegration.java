@@ -14,6 +14,9 @@
  */
 package org.sipfoundry.sipxconfig.test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 

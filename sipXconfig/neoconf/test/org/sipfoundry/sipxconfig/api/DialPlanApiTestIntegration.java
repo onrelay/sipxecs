@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+
 import org.sipfoundry.sipxconfig.dialplan.AttendantRule;
 import org.sipfoundry.sipxconfig.dialplan.DialPlanContext;
 import org.sipfoundry.sipxconfig.dialplan.DialPlanSetup;

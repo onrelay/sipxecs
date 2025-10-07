@@ -9,6 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.backup;
 
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collection;

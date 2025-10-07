@@ -12,6 +12,12 @@ package org.sipfoundry.sipxconfig.authcode;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+
 import org.sipfoundry.sipxconfig.acccode.AuthCode;
 import org.sipfoundry.sipxconfig.acccode.AuthCodeManager;
 import org.sipfoundry.sipxconfig.acccode.AuthCodeSettings;

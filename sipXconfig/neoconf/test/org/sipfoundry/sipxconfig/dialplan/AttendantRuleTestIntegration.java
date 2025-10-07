@@ -18,11 +18,16 @@ package org.sipfoundry.sipxconfig.dialplan;
 
 import static org.sipfoundry.commons.mongo.MongoConstants.ALIASES;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+
+import static org.junit.Assert.assertTrue;
 
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
 import org.sipfoundry.sipxconfig.commserver.imdb.MongoTestCaseHelper;

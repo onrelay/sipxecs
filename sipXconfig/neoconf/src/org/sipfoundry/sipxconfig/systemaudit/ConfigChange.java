@@ -135,4 +135,9 @@ public class ConfigChange implements SearchableBean {
         this.m_id = id;
     }
 
+    @Override
+    public String getId() {
+        return m_id;
+    }
+
 }

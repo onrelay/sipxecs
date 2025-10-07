@@ -9,12 +9,11 @@
  */
 package org.sipfoundry.sipxconfig.test;
 
-import static org.easymock.EasyMock.createNiceMock;
+import static java.lang.String.format;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +21,21 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.sipfoundry.commons.userdb.profile.UserProfileService;
+import org.sipfoundry.sipxconfig.common.event.DaoEventListener;
+import org.sipfoundry.sipxconfig.common.event.DaoEventPublisherImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.TransactionException;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.logging.Log;
@@ -32,30 +46,67 @@ import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ReplacementDataSet;
 import org.dbunit.operation.DatabaseOperation;
-import org.hibernate.SessionFactory;
-import org.sipfoundry.commons.userdb.profile.UserProfileService;
-import org.sipfoundry.sipxconfig.common.SpringHibernateInstantiator;
-import org.sipfoundry.sipxconfig.common.event.DaoEventListener;
-import org.sipfoundry.sipxconfig.common.event.DaoEventPublisherImpl;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.annotation.AbstractAnnotationAwareTransactionalTests;
 
-public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransactionalTests {
+
+@Transactional
+public abstract class IntegrationTestCase {
     private static final String ROOT_RES_PATH = "/org/sipfoundry/sipxconfig/";
     private static final Log LOG = LogFactory.getLog(IntegrationTestCase.class);
     private static final String CANNOT_SET_PROP_MSG = "Unable to set property %s on target %s";
 
+    @Autowired(required = false)
     private SessionFactory m_sessionFactory;
+
     private JdbcTemplate m_db;
     private Map<Object, Map<String, Object>> m_modifiedContextObjectMap;
+
+    private int transactionsStarted = 0;
+    private PlatformTransactionManager transactionManager;
+    protected TransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
+    protected TransactionStatus transactionStatus;
+
+    private boolean complete = false;
+
+    @Autowired(required = false)
     private DaoEventPublisherImpl m_daoEventPublisher;
+
+    @Autowired(required = false)
     private UserProfileService m_userProfileService;
+
+    @Autowired(required = false)
     private MongoTemplate m_profilesDb;
 
     public IntegrationTestCase() {
-        setAutowireMode(AUTOWIRE_BY_NAME);
+        // no-op constructor for subclass use
+    }
+
+
+   public final void setUp() throws Exception {
+
+         this.onSetUpBeforeTransaction();
+
+         this.onStartNewTransaction();
+
+         try {
+            this.onSetUpInTransaction();
+         } catch (Exception var2) {
+            this.endTransaction();
+            throw var2;
+         }
+   }
+
+    protected final void tearDown() throws Exception {
+         try {
+            this.onTearDownInTransaction();
+         } finally {
+            this.endTransaction();
+         }
+      
+         this.onTearDownAfterTransaction();
+   }
+
+    protected int countRowsInTable(String tableName) {
+        return db().queryForObject("SELECT COUNT(*) FROM " + tableName, Integer.class);
     }
 
     protected void sql(String resource) throws IOException {
@@ -73,38 +124,51 @@ public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransac
     }
 
     protected void divertDaoEvents(DaoEventListener listener) {
-        m_daoEventPublisher.divertEvents(listener);
+        if (m_daoEventPublisher != null) {
+            m_daoEventPublisher.divertEvents(listener);
+        }
     }
 
     protected void disableDaoEventPublishing() {
-        DaoEventListener stub = createNiceMock(DaoEventListener.class);
-        m_daoEventPublisher.divertEvents(stub);
+        if (m_daoEventPublisher != null) {
+            DaoEventListener stub = org.easymock.EasyMock.createNiceMock(DaoEventListener.class);
+            m_daoEventPublisher.divertEvents(stub);
+        }
     }
 
-    @Override
+    protected void onSetUpBeforeTransaction() throws Exception {
+        // default no-op; override in subclass if needed
+    }
+
+    protected void onStartNewTransaction() throws Exception {
+        // default no-op; override in subclass if needed
+    }
+
     protected void onSetUpInTransaction() throws Exception {
-        super.onSetUpInTransaction();
         m_modifiedContextObjectMap = new HashMap<Object, Map<String, Object>>();
     }
-    @Override
+
+
     protected void onTearDownInTransaction() throws Exception {
-        super.onTearDownInTransaction();
         if (m_modifiedContextObjectMap != null) {
             resetContext();
         }
         m_profilesDb.dropCollection("userProfile");
     }
 
-    @Override
+    protected void onTearDownAfterTransaction() throws Exception {
+        // default no-op; override in subclass if needed
+    }
+
+
     public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = m_db;
+        this.m_db = new JdbcTemplate(dataSource);
     }
 
     public void setConfigJdbcTemplate(JdbcTemplate db) {
         m_db = db;
     }
 
-    @Override
     protected String[] getConfigLocations() {
         // There are many interdependencies between spring files so in general you need
         // to load them all. However, if you do have isolated spring file, this is definitely
@@ -116,18 +180,6 @@ public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransac
         };
     }
 
-    @Override
-    public void runBare() throws Throwable {
-        try {
-            super.runBare();
-        } catch (SQLException e) {
-            dumpSqlExceptionMessages(e);
-            throw e;
-        } catch (DataIntegrityViolationException e) {
-            dumpSqlExceptionMessages(e);
-            throw e;
-        }
-    }
 
     void dumpSqlExceptionMessages(SQLException e) {
         for (SQLException next = e; next != null; next = next.getNextException()) {
@@ -146,8 +198,6 @@ public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransac
         try {
             IDataSet dataSet = TestHelper.loadDataSetFlat(resource);
             DatabaseOperation.CLEAN_INSERT.execute(connection, dataSet);
-        } catch (RuntimeException e) {
-            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -168,24 +218,15 @@ public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransac
 
     protected IDatabaseConnection getConnection() {
         final IDatabaseConnection[] dbunitConnectionHolder = new IDatabaseConnection[1];
-
         m_sessionFactory.getCurrentSession().doWork(connection -> {
             IDatabaseConnection dbunitConnection = new DatabaseConnection(connection);
             DatabaseConfig config = dbunitConnection.getConfig();
-            config.setFeature("http://www.dbunit.org/features/batchedStatements", true);
-
+            config.setFeature(DatabaseConfig.FEATURE_BATCHED_STATEMENTS, true);
             dbunitConnectionHolder[0] = dbunitConnection;
         });
-
         return dbunitConnectionHolder[0];
     }
 
-    /**
-     * Flush hibernate session.
-     *
-     * Flush need to be called after hibernate/spring operations, before testing the content of
-     * the database with jdbcTemplate or DBUnit assertions.
-     */
     protected void flush() {
         m_sessionFactory.getCurrentSession().flush();
     }
@@ -194,13 +235,14 @@ public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransac
         m_sessionFactory.getCurrentSession().evict(o);
     }
 
-    /**
-     * Commit everything to database. useful when debugging and want to run queries from another app. Also
-     * useful in some circumstances when subsequent sql requires it.  Note, tests are allowed to leave
-     * data in database after execution.  It's up to each test to clear all existing data before execution.
-     */
     protected void commit() {
-        transactionManager.commit(transactionStatus);
+        if (transactionManager == null) {
+            throw new IllegalStateException("No transaction manager available");
+        }
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionStatus status = transactionManager.getTransaction(def);
+        transactionManager.commit(status);
     }
 
     protected void clear() {
@@ -211,54 +253,31 @@ public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransac
         m_sessionFactory = sessionFactory;
     }
 
-    /**
-     * Modifies a concrete object from the spring context.  Any modifications will be be
-     * rolled back in the tearDown
-     * @param target The context object to modify
-     * @param propertyName The property of the the target to modify
-     * @param originalValue The original value, used to roll back in the tearDown
-     * @param valueForTest The value to be set in the target for this test
-     */
     protected void modifyContext(Object target, String propertyName, Object originalValue, Object valueForTest) {
-        if (!m_modifiedContextObjectMap.containsKey(target)) {
-            m_modifiedContextObjectMap.put(target, new HashMap<String, Object>());
-        }
-
-        Map<String, Object> originalContextObjectValueMap = m_modifiedContextObjectMap.get(target);
-        originalContextObjectValueMap.put(propertyName, originalValue);
-
+        m_modifiedContextObjectMap.computeIfAbsent(target, k -> new HashMap<>()).put(propertyName, originalValue);
         try {
             BeanUtils.setProperty(target, propertyName, valueForTest);
-        } catch (IllegalAccessException e) {
-            LOG.error(format(CANNOT_SET_PROP_MSG, propertyName, target), e);
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             LOG.error(format(CANNOT_SET_PROP_MSG, propertyName, target), e);
         }
     }
 
-    /**
-     * Roll back any changes made to context objects via the modifyContext method
-     */
     private void resetContext() {
-        for (Object target : m_modifiedContextObjectMap.keySet()) {
-            Map<String, Object> originalValueMap = m_modifiedContextObjectMap.get(target);
-            for (String propertyName : originalValueMap.keySet()) {
-                Object originalValue = originalValueMap.get(propertyName);
+        for (Map.Entry<Object, Map<String, Object>> entry : m_modifiedContextObjectMap.entrySet()) {
+            Object target = entry.getKey();
+            Map<String, Object> props = entry.getValue();
+            for (Map.Entry<String, Object> propEntry : props.entrySet()) {
                 try {
-                    BeanUtils.setProperty(target, propertyName, originalValue);
-                    originalValueMap.remove(propertyName);
-                } catch (IllegalAccessException e) {
-                    LOG.error(format(CANNOT_SET_PROP_MSG, propertyName, target), e);
-                } catch (InvocationTargetException e) {
-                    LOG.error(format(CANNOT_SET_PROP_MSG, propertyName, target), e);
+                    BeanUtils.setProperty(target, propEntry.getKey(), propEntry.getValue());
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    LOG.error(format(CANNOT_SET_PROP_MSG, propEntry.getKey(), target), e);
                 }
             }
-
-            m_modifiedContextObjectMap.remove(target);
         }
-
-        assertTrue(m_modifiedContextObjectMap.isEmpty());
-        m_daoEventPublisher.stopDivertingEvents();
+        m_modifiedContextObjectMap.clear();
+        if (m_daoEventPublisher != null) {
+            m_daoEventPublisher.stopDivertingEvents();
+        }
     }
 
     public void setDaoEventPublisherImpl(DaoEventPublisherImpl daoEventPublisher) {
@@ -277,7 +296,6 @@ public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransac
         return m_sessionFactory.getCurrentSession();
     }
 
-
     public UserProfileService getUserProfileService() {
         return m_userProfileService;
     }
@@ -293,4 +311,32 @@ public abstract class IntegrationTestCase extends AbstractAnnotationAwareTransac
     public void setProfilesDb(MongoTemplate template) {
         m_profilesDb = template;
     }
+
+    protected void endTransaction() {
+      if (this.transactionStatus != null) {
+         try {
+            if (!this.complete) {
+               this.transactionManager.rollback(this.transactionStatus);
+            } else {
+               this.transactionManager.commit(this.transactionStatus);
+            }
+         } finally {
+            this.transactionStatus = null;
+         }
+      }
+
+   }
+
+   protected void startNewTransaction() throws TransactionException {
+      if (this.transactionStatus != null) {
+         throw new IllegalStateException("Cannot start new transaction without ending existing transaction: Invoke endTransaction() before startNewTransaction()");
+      } else if (this.transactionManager == null) {
+         throw new IllegalStateException("No transaction manager set");
+      } else {
+         this.transactionStatus = this.transactionManager.getTransaction(this.transactionDefinition);
+         ++this.transactionsStarted;
+         this.complete = true;
+      }
+   }
 }
+

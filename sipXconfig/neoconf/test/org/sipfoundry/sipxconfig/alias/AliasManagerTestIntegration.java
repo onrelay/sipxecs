@@ -11,6 +11,10 @@ package org.sipfoundry.sipxconfig.alias;
 
 import java.util.Collection;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+ 
 import org.sipfoundry.sipxconfig.common.BeanId;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;

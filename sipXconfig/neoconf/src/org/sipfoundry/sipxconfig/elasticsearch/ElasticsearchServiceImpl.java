@@ -29,7 +29,7 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.elasticsearch.client.RestClient;
-import org.apache.hc.core5.http.HttpHost;
+import org.apache.http.HttpHost; 
 
 import org.sipfoundry.sipxconfig.address.Address;
 import org.sipfoundry.sipxconfig.address.AddressManager;
@@ -99,11 +99,16 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
         m_locationsManager = locationsManager;
     }
 
+    public void setClient( ElasticsearchClient client ) {
+        m_client = client;
+    }
+
     private ElasticsearchClient getClient() {
         if (m_client == null) {
             try {
                 String fqdn = m_locationsManager.getPrimaryLocation().getFqdn();
-                RestClient restClient = RestClient.builder(new HttpHost("http", fqdn, m_port)).build();                
+                // Use org.apache.http.HttpHost (from httpclient 4.x)
+                RestClient restClient = RestClient.builder(new HttpHost(fqdn, m_port, "http")).build();
                 m_client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper()));
             } catch (Exception e) {
                 LOG.error("Cannot create elasticsearch client, probably elasticsearch service is not up yet.", e);

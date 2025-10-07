@@ -19,6 +19,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.dialplan.CustomDialingRule;
 import org.sipfoundry.sipxconfig.dialplan.DialPlanContext;

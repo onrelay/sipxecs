@@ -59,8 +59,10 @@ import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.store.ByteBuffersDirectory;
 import org.apache.lucene.util.Version;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -523,13 +525,13 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
      */
     @Override
     public Collection<PhonebookEntry> search(Collection<Phonebook> phonebooks, String queryString, User portalUser) {
-        RAMDirectory index = new RAMDirectory();
+        ByteBuffersDirectory index = new ByteBuffersDirectory();
         Collection<PhonebookEntry> phonebookEntries = getEntries(phonebooks, portalUser);
 
         Map<String, PhonebookEntry> usersToEntries = new HashMap<String, PhonebookEntry>();
         try {
             Analyzer analyzer = new StandardAnalyzer();
-            IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_4_10_4, analyzer);
+            IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
             iwc.setOpenMode(OpenMode.CREATE);
             IndexWriter indexWriter = new IndexWriter(index, iwc);
             for (PhonebookEntry entry : phonebookEntries) {
@@ -607,15 +609,16 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     }
 
     private void addIdToDoc(Document doc, String id) {
-        doc.add(new Field(FIELD_ID, id, Field.Store.YES, Field.Index.NOT_ANALYZED));
+        // Use StringField for exact match, not analyzed
+        doc.add(new StringField(FIELD_ID, id, Field.Store.YES));
     }
 
     private void addTextFieldToDocument(Document doc, String value) {
         if (value != null) {
-            doc.add(new Field(FIELD_CONTENT, value, Field.Store.NO, Field.Index.ANALYZED));
+            // Use TextField for analyzed text
+            doc.add(new TextField(FIELD_CONTENT, value, Field.Store.NO));
         }
     }
-
     @Override
     public void reset() {
         for (Phonebook phonebook : getPhonebooks()) {

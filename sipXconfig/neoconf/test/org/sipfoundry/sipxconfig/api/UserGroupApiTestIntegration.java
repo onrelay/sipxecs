@@ -15,6 +15,8 @@
 package org.sipfoundry.sipxconfig.api;
 
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.test.RestApiIntegrationTestCase;

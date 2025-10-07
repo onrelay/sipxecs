@@ -9,6 +9,7 @@
  */
 package org.sipfoundry.sipxconfig.alarm;
 
+import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,6 +20,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import org.sipfoundry.sipxconfig.admin.AdminContext;
 import org.sipfoundry.sipxconfig.common.CoreContext;

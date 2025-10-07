@@ -16,6 +16,9 @@
  */
 package org.sipfoundry.sipxconfig.common.profile;
 
+import static org.junit.Assert.assertEquals;
+
+
 import org.sipfoundry.commons.userdb.profile.UserProfile;
 import org.sipfoundry.commons.userdb.profile.UserProfileService;
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;

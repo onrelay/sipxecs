@@ -1,5 +1,7 @@
 package org.sipfoundry.sipxconfig.api;
 
+import static org.junit.Assert.assertEquals;
+
 import org.sipfoundry.sipxconfig.test.RestApiIntegrationTestCase;
 import org.skyscreamer.jsonassert.JSONAssert;
 

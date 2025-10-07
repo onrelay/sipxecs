@@ -11,6 +11,7 @@ package org.sipfoundry.sipxconfig.phone;
 
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 import java.util.Collections;

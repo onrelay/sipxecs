@@ -12,10 +12,14 @@ package org.sipfoundry.sipxconfig.search;
 import java.util.Collection;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.util.Version;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.phone.Phone;
@@ -255,7 +259,7 @@ public class SearchManagerImplTestIntegration extends IntegrationTestCase {
 
     public void testParseQuery() throws Exception {
         SearchManagerImpl impl = new SearchManagerImpl();
-        impl.setAnalyzer(new StandardAnalyzer(Version.LUCENE_30));
+        impl.setAnalyzer(new StandardAnalyzer());
 
         Query query = impl.parseUserQuery("kuku");
         assertTrue(query instanceof PrefixQuery);

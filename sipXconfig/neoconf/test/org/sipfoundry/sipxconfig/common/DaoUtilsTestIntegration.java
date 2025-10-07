@@ -9,6 +9,10 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
 
 public class DaoUtilsTestIntegration extends IntegrationTestCase {

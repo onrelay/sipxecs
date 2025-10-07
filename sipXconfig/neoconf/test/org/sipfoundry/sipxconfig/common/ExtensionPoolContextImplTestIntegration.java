@@ -9,6 +9,10 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
+
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
 
 public class ExtensionPoolContextImplTestIntegration extends IntegrationTestCase {

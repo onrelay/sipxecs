@@ -7,6 +7,11 @@ package org.sipfoundry.sipxconfig.commserver;
 
 import java.io.File;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
+
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
 import org.sipfoundry.sipxconfig.test.TestHelper;
 

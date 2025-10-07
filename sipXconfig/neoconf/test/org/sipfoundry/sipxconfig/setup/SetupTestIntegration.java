@@ -16,6 +16,9 @@
  */
 package org.sipfoundry.sipxconfig.setup;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
 
 public class SetupTestIntegration extends IntegrationTestCase {

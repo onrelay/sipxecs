@@ -23,6 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.Term;
 import org.hibernate.type.Type;
 import org.sipfoundry.sipxconfig.acccode.AuthCode;
@@ -128,16 +130,13 @@ public class DefaultBeanAdaptor implements BeanAdaptor, BeanFactoryAware {
         m_indexedClasses = indexedClasses;
     }
 
-    /**
-     * @return true if the document should be added to index
-     */
     public boolean documentFromBean(Document document, Object bean, Serializable id, Object[] state,
             String[] fieldNames, Type[] types) {
         if (!indexClass(document, bean.getClass())) {
             return false;
         }
-        document.add(new Field(BeanWithId.ID_PROPERTY, getKeyword(bean, id), Field.Store.YES,
-                Field.Index.NOT_ANALYZED));
+        document.add(new StringField(BeanWithId.ID_PROPERTY, getKeyword(bean, id), Field.Store.YES));
+
         for (int i = 0; i < fieldNames.length; i++) {
             Object value = state[i];
             if (value != null) {
@@ -150,54 +149,51 @@ public class DefaultBeanAdaptor implements BeanAdaptor, BeanFactoryAware {
     private boolean indexField(Document document, Object state, String fieldName, Type type) {
         if (Arrays.binarySearch(FIELDS, fieldName) >= 0) {
             // index all fields we know about
-            document.add(new Field(fieldName, (String) state, Field.Store.YES, Field.Index.ANALYZED));
-            document.add(new Field(Indexer.DEFAULT_FIELD, (String) state, Field.Store.NO, Field.Index.ANALYZED));
+            document.add(new TextField(fieldName, (String) state, Field.Store.YES));
+            document.add(new TextField(Indexer.DEFAULT_FIELD, (String) state, Field.Store.NO));
             return true;
         } else if (String.class.equals(type.getReturnedClass())) {
-            // index all strings with the exception of the fields explicitly listed as sensitive
+            // index all strings except sensitive fields
             if (Arrays.binarySearch(SENSITIVE_FIELDS, fieldName) < 0) {
-                document.add(new Field(Indexer.DEFAULT_FIELD, (String) state, Field.Store.NO, Field.Index.ANALYZED));
+                document.add(new TextField(Indexer.DEFAULT_FIELD, (String) state, Field.Store.NO));
             }
             return true;
         } else if (fieldName.equals("aliases")) {
-            Set aliases = (Set) state;
-            for (Iterator a = aliases.iterator(); a.hasNext();) {
-                String alias = (String) a.next();
-                document.add(new Field("alias", alias, Field.Store.NO, Field.Index.ANALYZED));
-                document.add(new Field(Indexer.DEFAULT_FIELD, alias, Field.Store.NO, Field.Index.ANALYZED));
+            Set<?> aliases = (Set<?>) state;
+            for (Object a : aliases) {
+                String alias = (String) a;
+                document.add(new TextField("alias", alias, Field.Store.NO));
+                document.add(new TextField(Indexer.DEFAULT_FIELD, alias, Field.Store.NO));
             }
             return true;
-        }  else if (state instanceof ValueStorage) {
-            // handle settings values
+        } else if (state instanceof ValueStorage) {
             ValueStorage valueStorage = (ValueStorage) state;
-            Map databaseValues = valueStorage.getDatabaseValues();
-            Set<String> keySet = databaseValues.keySet();
-            for (String key : keySet) {
+            Map<String, Object> databaseValues = valueStorage.getDatabaseValues();
+            for (String key : databaseValues.keySet()) {
                 if (Arrays.binarySearch(FIELDS, key) >= 0) {
                     String value = databaseValues.get(key).toString();
-                    document.add(new Field(key, value, Field.Store.YES, Field.Index.ANALYZED));
-                    document.add(new Field(Indexer.DEFAULT_FIELD, value, Field.Store.NO, Field.Index.ANALYZED));
+                    document.add(new TextField(key, value, Field.Store.YES));
+                    document.add(new TextField(Indexer.DEFAULT_FIELD, value, Field.Store.NO));
                 }
             }
             return true;
         } else if (state instanceof IndexedBean) {
             IndexedBean indexedBean = (IndexedBean) state;
             for (String value : indexedBean.getIndexValues()) {
-                document.add(new Field(NAME, value, Field.Store.YES, Field.Index.ANALYZED));
-                document.add(new Field(Indexer.DEFAULT_FIELD, value, Field.Store.NO, Field.Index.ANALYZED));
+                document.add(new TextField(NAME, value, Field.Store.YES));
+                document.add(new TextField(Indexer.DEFAULT_FIELD, value, Field.Store.NO));
             }
             return true;
         } else if (state instanceof Collection<?>) {
             Collection<?> collection = (Collection<?>) state;
-            for (Iterator a = collection.iterator(); a.hasNext();) {
-                Object object = a.next();
+            for (Object object : collection) {
                 if (!(object instanceof IndexedBean)) {
                     break;
                 }
                 IndexedBean condition = (IndexedBean) object;
                 for (String value : condition.getIndexValues()) {
-                    document.add(new Field(NAME, value, Field.Store.NO, Field.Index.ANALYZED));
-                    document.add(new Field(Indexer.DEFAULT_FIELD, value, Field.Store.NO, Field.Index.ANALYZED));
+                    document.add(new TextField(NAME, value, Field.Store.NO));
+                    document.add(new TextField(Indexer.DEFAULT_FIELD, value, Field.Store.NO));
                 }
                 return true;
             }
@@ -206,10 +202,10 @@ public class DefaultBeanAdaptor implements BeanAdaptor, BeanFactoryAware {
     }
 
     public boolean indexClass(Document doc, Class beanClass) {
-        for (int i = 0; i < m_indexedClasses.length; i++) {
-            Class klass = m_indexedClasses[i];
+        for (Class klass : m_indexedClasses) {
             if (klass.isAssignableFrom(beanClass)) {
-                doc.add(new Field(Indexer.CLASS_FIELD, klass.getName(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+                // exact match class field
+                doc.add(new StringField(Indexer.CLASS_FIELD, klass.getName(), Field.Store.YES));
                 return true;
             }
         }

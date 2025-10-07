@@ -41,18 +41,18 @@ public class UserSearchManagerImpl implements UserSearchManager {
         Term classTerm = new Term(Indexer.CLASS_FIELD, User.class.getName());
         TermQuery classQuery = new TermQuery(classTerm);
 
-        BooleanQuery userQuery = new BooleanQuery();
+        BooleanQuery.Builder userQueryBuilder = new BooleanQuery.Builder();
 
         String firstName = user.getFirstName();
         if (StringUtils.isNotBlank(firstName)) {
             Query q = new PrefixQuery(new Term(User.FIRST_NAME_PROP, firstName.toLowerCase()));
-            userQuery.add(q, BooleanClause.Occur.MUST);
+            userQueryBuilder.add(q, BooleanClause.Occur.MUST);
         }
 
         String lastName = user.getLastName();
         if (StringUtils.isNotBlank(lastName)) {
             Query q = new PrefixQuery(new Term(User.LAST_NAME_PROP, lastName.toLowerCase()));
-            userQuery.add(q, BooleanClause.Occur.MUST);
+            userQueryBuilder.add(q, BooleanClause.Occur.MUST);
         }
 
         String userName = user.getUserName();
@@ -60,21 +60,25 @@ public class UserSearchManagerImpl implements UserSearchManager {
             userName = userName.toLowerCase();
             Query qName = new PrefixQuery(new Term(User.USER_NAME_PROP, userName));
             Query qAlias = new PrefixQuery(new Term("alias", userName));
-            BooleanQuery aliasOrNameQuery = new BooleanQuery();
-            aliasOrNameQuery.add(qName, BooleanClause.Occur.SHOULD);
-            aliasOrNameQuery.add(qAlias, BooleanClause.Occur.SHOULD);
 
-            userQuery.add(aliasOrNameQuery, BooleanClause.Occur.MUST);
+            BooleanQuery.Builder aliasOrNameQueryBuilder = new BooleanQuery.Builder();
+            aliasOrNameQueryBuilder.add(qName, BooleanClause.Occur.SHOULD);
+            aliasOrNameQueryBuilder.add(qAlias, BooleanClause.Occur.SHOULD);
+            BooleanQuery aliasOrNameQuery = aliasOrNameQueryBuilder.build();
+            userQueryBuilder.add(aliasOrNameQuery, BooleanClause.Occur.MUST);
         }
 
+         BooleanQuery userQuery = userQueryBuilder.build();
+
         // if no clauses were added just return class query
-        if (userQuery.getClauses().length == 0) {
+        if (userQuery.clauses().isEmpty()) {
             return classQuery;
         }
 
-        BooleanQuery query = new BooleanQuery();
-        query.add(classQuery, BooleanClause.Occur.MUST);
-        query.add(userQuery, BooleanClause.Occur.MUST);
+        BooleanQuery.Builder builder = new BooleanQuery.Builder();
+        builder.add(classQuery, BooleanClause.Occur.MUST);
+        builder.add(userQuery, BooleanClause.Occur.MUST);
+        BooleanQuery query = builder.build();
 
         LOG.debug(query);
         return query;

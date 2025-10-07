@@ -11,6 +11,12 @@ package org.sipfoundry.sipxconfig.commserver;
 
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.test.ImdbTestCase;
 

@@ -12,6 +12,9 @@ package org.sipfoundry.sipxconfig.device;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import static org.junit.Assert.assertEquals;
+
+
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
 
 public class TimeZoneManagerImplTestIntegration extends IntegrationTestCase {

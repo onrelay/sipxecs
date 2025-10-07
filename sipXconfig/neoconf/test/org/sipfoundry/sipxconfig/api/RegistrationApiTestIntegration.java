@@ -1,5 +1,7 @@
 package org.sipfoundry.sipxconfig.api;
 
+import static org.junit.Assert.assertEquals;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.sipfoundry.sipxconfig.common.CoreContext;

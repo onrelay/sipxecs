@@ -15,6 +15,8 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.commserver.imdb.RegistrationItem;
 import org.sipfoundry.sipxconfig.domain.DomainManager;

@@ -9,11 +9,19 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
+
 import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.gateway.Gateway;
 import org.sipfoundry.sipxconfig.gateway.acme.AcmeGateway;
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
 import org.springframework.context.ApplicationContext;
+import org.sipfoundry.sipxconfig.test.TestHelper;
 
 public class SpringHibernateInstantiatorTestIntegration
     extends IntegrationTestCase {
@@ -25,7 +33,7 @@ public class SpringHibernateInstantiatorTestIntegration
      * call this method
      */
     protected void init() throws Exception {
-        ApplicationContext m_applicationContext = getApplicationContext();
+        ApplicationContext m_applicationContext = TestHelper.getApplicationContext();
         m_instantiator = new SpringHibernateInstantiator();
         m_instantiator.setBeanFactory(m_applicationContext);
         // to make sure that test are valid

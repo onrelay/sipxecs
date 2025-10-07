@@ -19,6 +19,9 @@ package org.sipfoundry.sipxconfig.moh;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static org.junit.Assert.assertEquals;
+
+
 import org.sipfoundry.commons.mongo.MongoConstants;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.commserver.LocationsManager;

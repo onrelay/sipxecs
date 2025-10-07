@@ -14,58 +14,68 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
  * details.
  */
+
 package org.sipfoundry.sipxconfig.elasticsearch;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeBuilder;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.indices.DeleteIndexResponse;
+import co.elastic.clients.elasticsearch.indices.RefreshResponse;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
+
+import org.elasticsearch.client.RestClient;
+import org.apache.http.HttpHost;
+
+import com.google.gson.GsonBuilder;
 import org.sipfoundry.sipxconfig.search.SearchableBean;
 import org.sipfoundry.sipxconfig.systemaudit.ConfigChange;
 import org.sipfoundry.sipxconfig.systemaudit.ConfigChangeValue;
 import org.sipfoundry.sipxconfig.systemaudit.SystemAuditException;
 
-import com.google.gson.GsonBuilder;
-
 public class ElasticsearchServiceTest extends TestCase {
 
-    private static String INDEX = "testindex";
-    private static String UNIQUE_DETAILS = "52653";
+    private static final String INDEX = "testindex";
+    private static final String UNIQUE_DETAILS = "52653";
 
-    private Node m_node;
-    private Client m_client;
-    private ElasticsearchServiceImpl m_elasticsearchService;
+    private ElasticsearchClient client;
+    private ElasticsearchServiceImpl elasticsearchService;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        if (m_client != null) {
+        if (client != null) {
             return;
         }
-        m_node = NodeBuilder.nodeBuilder().local(true).node();
-        m_client = m_node.client();
-        m_elasticsearchService = new ElasticsearchServiceImpl();
-        m_elasticsearchService.setClient(m_client);
+
+        // Connect to a running ES cluster (default localhost:9200 for tests)
+        RestClient restClient = RestClient.builder(
+                new HttpHost("localhost", 9200, "http")
+        ).build();
+
+        RestClientTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        client = new ElasticsearchClient(transport);
+
+        elasticsearchService = new ElasticsearchServiceImpl();
+        elasticsearchService.setClient(client);
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.excludeFieldsWithoutExposeAnnotation();
-        m_elasticsearchService.setGson(gsonBuilder.create());
+        elasticsearchService.setGson(gsonBuilder.create());
     }
 
     @Override
     protected void tearDown() throws Exception {
         try {
-            m_client.admin().indices().delete(new DeleteIndexRequest(INDEX)).actionGet();
+            DeleteIndexResponse deleteResponse =
+                client.indices().delete(d -> d.index(INDEX));
         } catch (Exception e) {
-            // do nothing
+            // ignore, index may not exist
         }
-        m_client.close();
-        m_node.close();
     }
 
     public void testStoreElasticsearchBean() {
@@ -73,10 +83,10 @@ public class ElasticsearchServiceTest extends TestCase {
             waitForRefresh();
             SearchableBean testConfigChange = buildElasticsearchBean("Added", "Phone",
                     "52658", "200", "192.168.1.1", null, null, null);
-            m_elasticsearchService.storeDoc(INDEX, testConfigChange);
+            elasticsearchService.storeDoc(INDEX, testConfigChange);
             Thread.sleep(2000L);
-            int docCount = m_elasticsearchService.countDocs(INDEX, null);
-            assertEquals(docCount, 1);
+            int docCount = elasticsearchService.countDocs(INDEX, null);
+            assertEquals(1, docCount);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -91,15 +101,16 @@ public class ElasticsearchServiceTest extends TestCase {
                     UNIQUE_DETAILS, "200", "192.168.1.1", null, null, null);
             SearchableBean testConfigChange3 = buildElasticsearchBean("Added", "Phone",
                     "52658", "200", "192.168.1.1", null, null, null);
-            List<SearchableBean> docs = new ArrayList<SearchableBean>();
+
+            List<SearchableBean> docs = new ArrayList<>();
             docs.add(testConfigChange1);
             docs.add(testConfigChange2);
             docs.add(testConfigChange3);
-            m_elasticsearchService.storeBulkDocs(INDEX, docs);
+            elasticsearchService.storeBulkDocs(INDEX, docs);
 
-            List<ConfigChange> searchResponse = m_elasticsearchService.searchDocs(
+            List<ConfigChange> searchResponse = elasticsearchService.searchDocs(
                     INDEX, null, 0, 10, ConfigChange.class, ConfigChange.ACTION, true);
-            // expect 3 items because one is duplicated
+
             boolean itemFound = false;
             for (ConfigChange configChange : searchResponse) {
                 if (configChange.getDetails().equals(UNIQUE_DETAILS)) {
@@ -113,7 +124,7 @@ public class ElasticsearchServiceTest extends TestCase {
                     itemFound = true;
                 }
             }
-            assert(itemFound);
+            assertTrue(itemFound);
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -122,8 +133,8 @@ public class ElasticsearchServiceTest extends TestCase {
     public void testStoreBulkEmptyElasticsearchBeans() {
         try {
             waitForRefresh();
-            List<SearchableBean> docs = new ArrayList<SearchableBean>();
-            m_elasticsearchService.storeBulkDocs(INDEX, docs);
+            List<SearchableBean> docs = new ArrayList<>();
+            elasticsearchService.storeBulkDocs(INDEX, docs);
             assertTrue(true);
         } catch (Exception e) {
             fail(e.getMessage());
@@ -140,21 +151,23 @@ public class ElasticsearchServiceTest extends TestCase {
                     UNIQUE_DETAILS, "200", "192.168.1.1", null, null, null);
             SearchableBean testConfigChange3 = buildElasticsearchBean("Added", "Phone",
                     "52658", "200", "192.168.1.1", null, null, null);
-            List<SearchableBean> docs = new ArrayList<SearchableBean>();
+
+            List<SearchableBean> docs = new ArrayList<>();
             docs.add(testConfigChange1);
             docs.add(testConfigChange2);
             docs.add(testConfigChange3);
-            m_elasticsearchService.storeBulkDocs(INDEX, docs);
+            elasticsearchService.storeBulkDocs(INDEX, docs);
 
-            int docCount = m_elasticsearchService.countDocs(INDEX, null);
-            assert(docCount > 0);
+            int docCount = elasticsearchService.countDocs(INDEX, null);
+            assertTrue(docCount > 0);
         } catch (Exception e) {
             fail(e.getMessage());
         }
     }
 
-    private void waitForRefresh() throws InterruptedException {
-        m_client.admin().indices().refresh(new RefreshRequest(INDEX));
+    private void waitForRefresh() throws IOException {
+        RefreshResponse refreshResponse =
+            client.indices().refresh(r -> r.index(INDEX));
     }
 
     protected SearchableBean buildElasticsearchBean(String action, String type,

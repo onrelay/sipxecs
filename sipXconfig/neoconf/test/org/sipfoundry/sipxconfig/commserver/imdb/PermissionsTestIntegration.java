@@ -8,6 +8,11 @@
  *
  */
 package org.sipfoundry.sipxconfig.commserver.imdb;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+
 import static org.sipfoundry.sipxconfig.commserver.imdb.MongoTestCaseHelper.assertCollectionCount;
 import static org.sipfoundry.sipxconfig.commserver.imdb.MongoTestCaseHelper.assertObjectListFieldCount;
 import static org.sipfoundry.sipxconfig.commserver.imdb.MongoTestCaseHelper.assertObjectPresent;

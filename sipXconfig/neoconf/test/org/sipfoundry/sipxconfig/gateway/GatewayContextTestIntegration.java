@@ -15,6 +15,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import org.sipfoundry.sipxconfig.branch.BranchManager;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.device.Device;
@@ -24,6 +31,8 @@ import org.sipfoundry.sipxconfig.dialplan.InternationalRule;
 import org.sipfoundry.sipxconfig.dialplan.DialPlanSetup;
 import org.sipfoundry.sipxconfig.sbc.SbcDeviceManager;
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
+import org.sipfoundry.sipxconfig.test.TestHelper;
+
 
 public class GatewayContextTestIntegration extends IntegrationTestCase {
     private GatewayContext m_gatewayContext;
@@ -200,7 +209,7 @@ public class GatewayContextTestIntegration extends IntegrationTestCase {
         for (GatewayModel model : models) {
             Gateway gateway = m_gatewayContext.newGateway(model);
             String beanId = model.getBeanId();            
-            assertEquals(gateway.getClass(), getApplicationContext().getBean(beanId).getClass());
+            assertEquals(gateway.getClass(), TestHelper.getApplicationContext().getBean(beanId).getClass());
             if (beanId.equals("gwGeneric")) {
                 assertNull(gateway.getSettings());
             } else {

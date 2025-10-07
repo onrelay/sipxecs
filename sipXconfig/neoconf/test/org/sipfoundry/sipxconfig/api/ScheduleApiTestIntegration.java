@@ -3,6 +3,8 @@ package org.sipfoundry.sipxconfig.api;
 import java.util.List;
 
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+
 import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
 import org.sipfoundry.sipxconfig.forwarding.GeneralSchedule;
 import org.sipfoundry.sipxconfig.forwarding.Schedule;

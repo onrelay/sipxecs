@@ -13,6 +13,11 @@ package org.sipfoundry.sipxconfig.vm;
 import java.util.Collections;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+
+
 import org.sipfoundry.sipxconfig.common.AbstractUser;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;

@@ -13,7 +13,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.store.ByteBuffersDirectory;
 
 /**
  * Memory only indexing - suitable for testing TempIndexSource
@@ -23,7 +23,7 @@ public class TempIndexSource extends SimpleIndexSource {
 
     protected Directory createDirectory(File file_, boolean createDirectory) throws IOException {
         if (m_ramDirectory == null || createDirectory) {
-            m_ramDirectory = new RAMDirectory();
+            m_ramDirectory = new ByteBuffersDirectory();
         }
         return m_ramDirectory;
     }

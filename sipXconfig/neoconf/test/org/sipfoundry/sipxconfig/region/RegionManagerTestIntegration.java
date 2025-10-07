@@ -17,6 +17,9 @@ package org.sipfoundry.sipxconfig.region;
 import java.util.Collection;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
+
 import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
 

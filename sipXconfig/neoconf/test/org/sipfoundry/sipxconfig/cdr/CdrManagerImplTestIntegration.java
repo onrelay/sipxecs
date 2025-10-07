@@ -9,6 +9,9 @@
  */
 package org.sipfoundry.sipxconfig.cdr;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Date;

@@ -10,6 +10,9 @@
 
 package org.sipfoundry.sipxconfig.login;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.test.IntegrationTestCase;

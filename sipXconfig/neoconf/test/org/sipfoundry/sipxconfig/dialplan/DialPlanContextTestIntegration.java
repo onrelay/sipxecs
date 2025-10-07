@@ -21,6 +21,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.ArrayUtils;

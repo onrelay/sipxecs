@@ -15,6 +15,8 @@
 package org.sipfoundry.sipxconfig.api;
 
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+
 import org.sipfoundry.sipxconfig.phone.Phone;
 import org.sipfoundry.sipxconfig.phone.PhoneContext;
 import org.sipfoundry.sipxconfig.setting.Group;

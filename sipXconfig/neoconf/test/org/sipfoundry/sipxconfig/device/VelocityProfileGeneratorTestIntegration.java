@@ -9,6 +9,8 @@
  */
 package org.sipfoundry.sipxconfig.device;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 
