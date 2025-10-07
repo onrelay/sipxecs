@@ -28,11 +28,12 @@ bundle agent elasticsearch {
       "any" usebundle => elasticsearch_sysv_running;
 }
 
-# --- Manage configuration files ---
+# --- Manage configuration files and ownership ---
 bundle agent elasticsearch_config {
 
   files:
     any::
+      # Main node config
       "/etc/elasticsearch/elasticsearch.yml"
         comment => "Configure Elasticsearch (node-level settings only)",
         create => "true",
@@ -40,11 +41,19 @@ bundle agent elasticsearch_config {
         edit_line => elasticsearch_config_file,
         classes => if_repaired("restart_elasticsearch");
 
+      # nproc limits
       "/etc/security/limits.d/99-elasticsearch-nproc.conf"
         comment => "Setup Elasticsearch limits",
         create => "true",
         perms => m("644"),
         edit_line => elasticsearch_limits_contents,
+        classes => if_repaired("restart_elasticsearch");
+
+      # Fix ownership/group recursively for Elasticsearch config dir
+      "/etc/elasticsearch"
+        comment => "Ensure proper ownership and group for Elasticsearch files and directories",
+        perms => mog("*", "elasticsearch", "elasticsearch"),
+        depth_search => recurse("inf"),
         classes => if_repaired("restart_elasticsearch");
 }
 
@@ -56,7 +65,6 @@ elasticsearch hard    nofile    65536
 ";
 }
 
-# --- Edit elasticsearch.yml safely for ES 8.x ---
 bundle edit_line elasticsearch_config_file {
   vars:
     "tmpDir" slist => readstringlist("$(sipx.SIPX_CFDATA)/$(sipx.location_id)/elasticsearch.yml.part", "tmpDir=", "\n", 1, 4000);
@@ -69,14 +77,17 @@ bundle edit_line elasticsearch_config_file {
       "node.name.*";
       "index.number_of_replicas.*";
       "discovery.zen.ping.multicast.enabled.*";
+      "cluster.initial_master_nodes.*";
+      "network.host.*";
+      "http.port.*";
 
   insert_lines:
     any::
+      # Snapshot/repo paths
       "path.repo: [\"$(tmpDir)\", \"$(tmpDir)/elasticsearch_backup\"]";
-      "script.engine.groovy.inline.aggs: on";
-      "cluster.name: $(sipx.host).$(sipx.net_domain)";
-      "node.name: $(sipx.host)$(sipx.net_domain)";
-      "discovery.zen.ping.multicast.enabled: false";
+      "cluster.initial_master_nodes: [\"$(sipx.host)$(sipx.net_domain)\"]";
+      "network.host: localhost";
+      "http.port: 9200";
 }
 
 # --- Apply replicas to existing indices and template for new indices ---
