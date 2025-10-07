@@ -174,8 +174,9 @@ ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-digester-*.jar
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-collections4-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-lang-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-lang3-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
-ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-logging-jakarta -*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-logging-jakarta-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-net-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-pool-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/hibernate-core-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/hibernate-models-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/ehcache-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
@@ -184,6 +185,7 @@ ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/log4j-*.jar %{buildroo
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/c3p0-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/mchange-commons-java-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/cxf-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/javassist-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jaxb-core-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jaxb-impl-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jaxb-runtime-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
