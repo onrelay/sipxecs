@@ -116,19 +116,14 @@ Install and Update Dependencies
     dnf update -y
 
 
-- Install `wget` used for downloading RPMs
-
-  .. code-block:: bash
-
-    dnf install -y wget
-
-
 Setup Google Could Artifact registry
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you are NOT using a Google Cloud image, you must add and install their artifact registry plugin:
 
   .. code-block:: bash
+
+    dnf install -y wget
 
     wget -O /etc/yum.repos.d/artifact-registry-plugin.repo \
       https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo

@@ -46,6 +46,8 @@ Execute the following commands to checkout the default sipXcom repository:
 
   .. code-block:: bash
 
+    dnf install -y git
+
     mkdir /src
 
     cd /src
