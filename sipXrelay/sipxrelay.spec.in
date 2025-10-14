@@ -24,7 +24,6 @@ Requires: jetty
 
 Requires: sipxcommserverlib >= %version
 Requires: sipxcommons >= %version
-Requires: chkconfig
 
 
 Prefix: %_prefix
@@ -61,6 +60,6 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/sipxpbx/sipxrelay/log4j.properties
 
 %post
-if grep -q :on <<<`/sbin/chkconfig sipxrelay --list 2>&1`; then
-    /sbin/chkconfig sipxrelay reset
+if systemctl is-enabled --quiet sipxrelay.service; then
+    systemctl reenable sipxrelay.service >/dev/null 2>&1 || :
 fi

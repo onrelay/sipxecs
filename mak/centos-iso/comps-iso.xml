@@ -30,7 +30,6 @@
      <packagereq type='mandatory'>ca-certificates</packagereq>
      <packagereq type='mandatory'>centos-release</packagereq>
      <packagereq type='mandatory'>checkpolicy</packagereq>
-     <!-- packagereq type='mandatory'>chkconfig</packagereq -->
      <packagereq type='mandatory'>coreutils-libs</packagereq>
      <packagereq type='mandatory'>coreutils</packagereq>
      <packagereq type='mandatory'>cpio</packagereq>

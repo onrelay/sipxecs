@@ -21,7 +21,6 @@ Source: %name-%version.tar.gz
 
 Requires: sipxcommserverlib >= %version
 Requires: sipxcommons >= %version
-Requires: chkconfig
 
 %if %{?use_ibm_jvm}0
 Requires: java-ibm >= 1.6
@@ -63,6 +62,6 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/sipxpbx/sipxacccode/log4j.properties
 
 %post
-if grep -q :on <<<`/sbin/chkconfig sipxacccode --list 2>&1`; then
-    /sbin/chkconfig sipxacccode reset
+if systemctl is-enabled --quiet sipxacccode.service; then
+    systemctl reenable sipxacccode.service >/dev/null 2>&1 || :
 fi

@@ -10,14 +10,12 @@ if test -f /etc/SuSE-release; then
   NTPD_NAME="ntp"
 fi
 
-if ! /sbin/chkconfig $NTPD_NAME
-then
-    /sbin/chkconfig $NTPD_NAME on
-fi
+# Enable the service at boot 
+systemctl enable $NTPD_NAME.service >/dev/null 2>&1 || :
 
-if ! /sbin/service $NTPD_NAME status
-then
-    /sbin/service $NTPD_NAME start && remove_self
+# Start the service if not already running
+if ! systemctl is-active --quiet $NTPD_NAME.service; then
+    systemctl start $NTPD_NAME.service && remove_self
 else
     remove_self
 fi

@@ -2,7 +2,6 @@
 
 # sipxcdr - Startup script for sipxcdr
 
-# chkconfig: 35 98 15
 # description: sipxcdr is a CDR (Call Distribution Record) aggregration
 # processname: sipxcdr
 

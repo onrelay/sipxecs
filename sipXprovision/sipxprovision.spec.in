@@ -25,7 +25,6 @@ Source: %name-%version.tar.gz
 Obsoletes: sipxvxml
 
 Requires: sipxcommons >= %version
-Requires: chkconfig
 Requires: jetty
 BuildRequires: sipxconfig >= %version
 
@@ -64,6 +63,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/java/sipXecs/sipXconfig/plugins/provision-cfg-service.jar
 
 %post
-if grep -q :on <<<`/sbin/chkconfig sipxprovision --list 2>&1`; then
-    /sbin/chkconfig sipxprovision reset
+if systemctl is-enabled --quiet sipxprovision.service; then
+    systemctl reenable sipxprovision.service >/dev/null 2>&1 || :
 fi

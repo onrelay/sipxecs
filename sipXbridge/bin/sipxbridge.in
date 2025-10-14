@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # sipxbridge - Startup script for sipxbridge
-# chkconfig: 35 98 15 
 # description: sipxbridge is an SIP Trunking server
 # processname: sipxbridge
 

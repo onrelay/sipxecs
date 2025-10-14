@@ -1,7 +1,6 @@
 #!/bin/bash
 # sipxivr - Startup script for sipxivr
 
-# chkconfig: 35 97 15
 # description: sipxivr is a IVR subystem that uses FreeSWITCH as a media server
 # processname: sipxivr
 

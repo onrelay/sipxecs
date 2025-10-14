@@ -1,7 +1,6 @@
 #!@BASH@
 # sipxsqa - Startup script for sipxsqa
 
-# chkconfig: 35 96 15
 # description: sipxsqa is a SIP park for telecommunications
 # processname: sipXsqa
 

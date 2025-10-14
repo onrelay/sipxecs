@@ -74,7 +74,7 @@ cp $FILE_RESOLV_CONF $COPY_RESOLV_CONF
 
 # Stop and disable the NetworkManager service, which may not be running.
 service NetworkManager stop
-chkconfig NetworkManager off
+systemctl disable NetworkManager.service
 
 # Stop the network service too.  (Allows this script to work on CentOS 5 DHCP systems.)
 service network stop
@@ -106,7 +106,7 @@ echo "# Cloned by $0 for re-use with the 'network' service." >> $COPY_RESOLV_CON
 cp $COPY_RESOLV_CONF $FILE_RESOLV_CONF
 
 # Enable and start the network service.
-chkconfig network on
+systemctl enable network.service
 service network start
 
 # Show off the fruits of our labours.

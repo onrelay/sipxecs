@@ -1,7 +1,6 @@
 #!@BASH@
 # sipxsaa - Startup script for sipxsaa
 
-# chkconfig: 35 98 15
 # description: sipxsaa is a SIP presence for telecommunications
 # processname: sipXsaa
 

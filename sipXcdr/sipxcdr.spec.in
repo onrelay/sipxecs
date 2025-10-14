@@ -23,7 +23,6 @@ Source:   %name-%version.tar.gz
 
 Requires: sipxcommserverlib >= %version
 Requires: %name >= %version
-Requires: chkconfig
 Requires: postgresql-odbc
 Requires: stunnel
 Requires: ruby
@@ -86,9 +85,10 @@ if [ -f %{_sysconfdir}/cron.daily/callresolver_run ]; then
   rm -f %{_sysconfdir}/cron.daily/callresolver_run
 fi
 
-if grep -q :on <<<`/sbin/chkconfig sipxcdr --list 2>&1`; then
-    /sbin/chkconfig sipxcdr reset
+if systemctl is-enabled --quiet sipxcdr.service; then
+    systemctl reenable sipxcdr.service >/dev/null 2>&1 || :
 fi
+
 
 %preun
 # Uninstall the sipxcallresolver gem, unless this RPM uninstall is part of

@@ -26,7 +26,6 @@ Obsoletes: sipxvxml
 Requires: sipxcommserverlib >= %version
 Requires: sipxcommons >= %version
 Requires: sipxprompts >= %version
-Requires: chkconfig
 Requires: jetty
 
 Prefix: %_prefix
@@ -70,6 +69,6 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/sipxpbx/sipxivr/log4j.properties
 
 %post
-if grep -q :on <<<`/sbin/chkconfig sipxivr --list 2>&1`; then
-    /sbin/chkconfig sipxivr reset
+if systemctl is-enabled --quiet sipxivr.service; then
+    systemctl reenable sipxivr.service >/dev/null 2>&1 || :
 fi

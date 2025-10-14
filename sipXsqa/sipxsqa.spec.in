@@ -26,7 +26,6 @@ BuildRequires: sipxcommserverlib-devel  >= %version
 BuildRequires: sipxportlib-devel        >= %version
 
 Requires: libev
-Requires: chkconfig
 
 Source:   %name-%version.tar.gz
 
@@ -111,6 +110,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %post server
 setcap 'CAP_SYS_RESOURCE=+ep' %{_bindir}/sipxsqa
-if grep -q :on <<<`/sbin/chkconfig sipxsqa --list 2>&1`; then
-    /sbin/chkconfig sipxsqa reset
+if systemctl is-enabled --quiet sipxsqa.service; then
+    systemctl reenable sipxsqa.service >/dev/null 2>&1 || :
 fi
+
+

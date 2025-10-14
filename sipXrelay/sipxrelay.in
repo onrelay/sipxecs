@@ -1,7 +1,6 @@
 #!/bin/bash
 # sipxrelay - Startup script for sipxrelay
 
-# chkconfig: 35 80 15
 # description: sipxrelay is a media relay for telecommunications
 # processname: sipxrelay
 

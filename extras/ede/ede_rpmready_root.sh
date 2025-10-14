@@ -25,5 +25,5 @@ echo 0 >/selinux/enforce # This stops it right now, without a reboot.
 
 # Disable the Firewall (could be done from a GUI install, but just to be sure....)
 /sbin/service iptables stop
-/sbin/chkconfig iptables off
+systemctl disable iptables 
 

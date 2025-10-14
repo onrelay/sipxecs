@@ -105,8 +105,8 @@ EOF
 sed -i 's/ro root/ro quiet root/g' /boot/grub/grub.conf
 
 # Turn off unused services that listen on ports
-chkconfig portmap off
-chkconfig netfs off
-chkconfig nfslock off
+systemctl disable portmap.service
+systemctl disable netfs.service
+systemctl disable nfslock.service
 
 eject

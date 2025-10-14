@@ -20,7 +20,6 @@ Source: %name-%version.tar.gz
 Obsoletes: sipxvxml
 
 Requires: sipxcommons >= %version
-Requires: chkconfig
 Requires: jetty
 
 Prefix: %_prefix
@@ -54,6 +53,6 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,sipx,sipx) %{_datadir}/java/sipXecs/sipXevent
 
 %post
-if grep -q :on <<<`/sbin/chkconfig sipxevent --list 2>&1`; then
-    /sbin/chkconfig sipxevent reset
+if systemctl is-enabled --quiet sipxevent.service; then
+    systemctl reenable sipxevent.service >/dev/null 2>&1 || :
 fi

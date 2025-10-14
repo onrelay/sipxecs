@@ -23,7 +23,6 @@ Source: %name-%version.tar.gz
 
 Requires: sipxcommserverlib >= %version
 Requires: sipxcommons >= %version
-Requires: chkconfig
 Requires: jetty
 
 Prefix: %_prefix
@@ -61,6 +60,6 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/sipxpbx/sipxbridge/log4j.properties
 
 %post
-if grep -q :on <<<`/sbin/chkconfig sipxbridge --list 2>&1`; then
-    /sbin/chkconfig sipxbridge reset
+if systemctl is-enabled --quiet sipxbridge.service; then
+    systemctl reenable sipxbridge.service >/dev/null 2>&1 || :
 fi

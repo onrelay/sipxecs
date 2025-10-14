@@ -1,6 +1,5 @@
 #!/bin/bash
 #
-# chkconfig: 35 90 10
 # description: This script starts up the sipXpbx processes.
 #              Most of the real startup is done by the sipxsupervisor - it starts
 #              up all other sipXecs processes and ensures that they are

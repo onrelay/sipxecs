@@ -268,9 +268,7 @@ echo SELINUX=disabled > /etc/selinux/config
 echo 0 >/selinux/enforce
 
 ## Disable the Firewall (could be done from a GUI install, but just to be sure....)
-
-/sbin/service iptables stop
-/sbin/chkconfig iptables off
+systemctl disable iptables
 
 ## 'sip-redirect' tool binds to port 5060, which will cause problems, as sipXecs
 ## needs to use port 5060.  So disable and remove sip-redirect.
@@ -382,14 +380,14 @@ sed -i -e "s/\/var\/lib\/tftpboot/\/tftpboot/g" /etc/xinetd.d/tftp
 
 ## Enable FTP.
 
-/sbin/chkconfig vsftpd on
+systemctl enable vsftpd.service 
 /sbin/service vsftpd stop > /dev/null
 /sbin/service vsftpd start
 
 ## Enable postgresql.
 
 /sbin/service postgresql initdb > /dev/null
-/sbin/chkconfig postgresql on
+systemctl enable postgresql.service
 /sbin/service postgresql stop > /dev/null
 /sbin/service postgresql start
 

@@ -283,21 +283,6 @@ body copy_from copy_from_cfdatadir {
   compare => "digest";
 }
 
-#
-# Registers or deregisters a service into start with system on startup
-#
-bundle agent rh_chkconfig_status(s){
-  classes:
-    "${s}_enabled" expression => returnszero("/sbin/chkconfig ${s}", "noshell");
-
-  reports:
-    all::
-      "${g.pf} Service ${s} is enabled"
-        ifvarclass => "${s}_enabled";
-
-      "${g.pk} Service ${s} is not enabled"
-        ifvarclass => "!${s}_enabled";
-}
 
 #
 # Registers or deregisters a service into start with system on startup

@@ -55,9 +55,9 @@ bundle edit_line sipxlogwatcher_config_contents {
 bundle agent sipxlogwatcher_setup {
   methods:
     !src.sipxlogwatcher::
-      "any" usebundle => rh_chkconfig_status("sipxlogwatcher on");
+      "any" usebundle => rh_systemctl_status("enable sipxlogwatcher");
     !src.!sipxlogwatcher::
-      "any" usebundle => rh_chkconfig_status("sipxlogwatcher off");
+      "any" usebundle => rh_systemctl_status("disable sipxlogwatcher");
 }
 
 bundle agent sipxlogwatcher_running {

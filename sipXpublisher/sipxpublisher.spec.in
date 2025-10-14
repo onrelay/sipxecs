@@ -37,7 +37,6 @@ a simple XML plugin configuration file.
 %package devel
 Requires: %name
 Requires: sipxcommserverlib-devel >= %version
-Requires: chkconfig
 Group: Development/Libraries
 Vendor: SIPfoundry
 Summary: Header files for %name
@@ -80,6 +79,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 setcap 'CAP_SYS_RESOURCE=+ep' %{_bindir}/sipstatus
-if grep -q :on <<<`/sbin/chkconfig sipxpublisher --list 2>&1`; then
-    /sbin/chkconfig sipxpublisher reset
+if systemctl is-enabled --quiet sipxpublisher.service; then
+    systemctl reenable sipxpublisher.service >/dev/null 2>&1 || :
 fi

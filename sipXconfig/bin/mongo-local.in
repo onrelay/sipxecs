@@ -2,7 +2,6 @@
 
 # mongo-local - Startup script for mongo local database
 
-# chkconfig: 35 85 15
 # description: Mongodb local db
 # processname: mongod
 # config: /etc/mongo-local.conf

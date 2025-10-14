@@ -43,7 +43,6 @@ Requires: bind >= 9.3.4
 
 %if 0%{?rhel}
 Requires: mod_ssl
-Requires: chkconfig
 %endif
 
 Requires: sipxcalllib >= %version
@@ -228,12 +227,5 @@ if [ $1 = 0 ]; then
      initScript=sipxecs
   fi
   /etc/init.d/${initScript} stop &>/dev/null || :
-
-  if [ -x /sbin/chkconfig ]; then
-    # RedHat / Fedora
-    chkconfig --del ${initScript}
-  else
-    # SuSE
-    insserv -r sipxecs
-  fi
+  systemctl disable ${initScript}
 fi

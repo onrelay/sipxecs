@@ -1,7 +1,6 @@
 #!/bin/env bash
 
 # mongodb-sync - Copy changes made to one database into to another database
-# chkconfig: 35 95 10
 # description: Mongodb arbiter unblocks tie votes on new primary should it become unavailable
 # processname: mongodb-sync
 # config: @SIPX_CONFDIR@/mongodb-sync.conf

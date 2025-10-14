@@ -22,7 +22,6 @@ Source: %name-%version.tar.gz
 
 Requires: sipxcommserverlib >= %version
 Requires: sipxcommons >= %version
-Requires: chkconfig
 Requires: jetty
 
 Prefix: %_prefix
@@ -58,6 +57,6 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{_sysconfdir}/sipxpbx/sipxrest/log4j.properties
 
 %post
-if grep -q :on <<<`/sbin/chkconfig sipxrest --list 2>&1`; then
-    /sbin/chkconfig sipxrest reset
+if systemctl is-enabled --quiet sipxrest.service; then
+    systemctl reenable sipxrest.service >/dev/null 2>&1 || :
 fi

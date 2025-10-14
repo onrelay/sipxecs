@@ -2,7 +2,6 @@
 
 # ucd-snmp init file for snmptrapd
 #
-# chkconfig: - 50 50
 # description: Simple Network Management Protocol (SNMP) Trap Daemon
 #
 # processname: /usr/sbin/snmptrapd

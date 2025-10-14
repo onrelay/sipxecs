@@ -40,7 +40,6 @@ Source:   %name-%version.tar.gz
 
 Requires: shadow-utils
 Requires: zeromq
-Requires: chkconfig
 
 Requires: sipxcommserverlib >= %version
 Requires: sipxrelay >= %version
@@ -132,6 +131,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 setcap 'CAP_SYS_RESOURCE=+ep' %{_bindir}/sipXproxy
-if grep -q :on <<<`/sbin/chkconfig sipxproxy --list 2>&1`; then
-    /sbin/chkconfig sipxproxy reset
+if systemctl is-enabled --quiet sipxproxy.service; then
+    systemctl reenable sipxproxy.service >/dev/null 2>&1 || :
 fi

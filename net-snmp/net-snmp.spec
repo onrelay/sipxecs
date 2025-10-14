@@ -44,8 +44,6 @@ Patch11: net-snmp-5.7-mibs-perl-linking.patch
 Patch12: 0001-Support-for-listing-processes-specified-in-ucd-snmp-.patch
 Patch13: 0002-autotools-generated-output-for-pcre-fix.patch
 
-Requires(post): chkconfig
-Requires(preun): chkconfig
 # for /sbin/service
 Requires(preun): initscripts
 # for /bin/rm
@@ -418,14 +416,14 @@ echo "hello world" >> /tmp/snmp
 echo date >>/tmp/snmp
 /usr/bin/systemd-sysv-convert --save snmpd >/dev/null 2>&1 ||:
 /usr/bin/systemd-sysv-convert --save snmptrapd >/dev/null 2>&1 ||:
-/sbin/chkconfig --del snmpd >/dev/null 2>&1 || :
-/sbin/chkconfig --del snmptrapd >/dev/null 2>&1 || :
-/bin/systemctl try-restart snmpd.service >/dev/null 2>&1 || :
-/bin/systemctl try-restart snmptrapd.service >/dev/null 2>&1 || :
+systemctl disable snmpd.service >/dev/null 2>&1 || :
+systemctl disable snmptrapd.service >/dev/null 2>&1 || :
+systemctl try-restart snmpd.service >/dev/null 2>&1 || :
+systemctl try-restart snmptrapd.service >/dev/null 2>&1 || :
 
 %triggerpostun -n net-snmp-sysvinit -- net-snmp < 1:5.7-5
-/sbin/chkconfig --add snmpd >/dev/null 2>&1 || :
-/sbin/chkconfig --add snmptrapd >/dev/null 2>&1 || :
+systemctl enable snmpd.service >/dev/null 2>&1 || :
+systemctl enable snmptrapd.service >/dev/null 2>&1 || :
 
 %post libs -p /sbin/ldconfig
 
