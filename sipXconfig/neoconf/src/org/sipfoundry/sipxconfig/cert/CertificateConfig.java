@@ -23,6 +23,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.GroupPrincipal;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFileAttributes;
+import java.nio.file.attribute.UserPrincipal;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -58,6 +64,11 @@ public class CertificateConfig implements ConfigProvider {
 
             File dir = manager.getLocationDataDirectory(location);
 
+            PosixFileAttributeView dirView = Files.getFileAttributeView(dir.toPath(), PosixFileAttributeView.class);
+            PosixFileAttributes dirAttributes = dirView.readAttributes();
+            UserPrincipal dirOwner = dirAttributes.owner();
+            GroupPrincipal dirGroup = dirAttributes.group();
+
             boolean useLetsEncrypt = settings.getUseLetsEncrypt();
 
             File authDir = new File(dir, "authorities");
@@ -70,6 +81,8 @@ public class CertificateConfig implements ConfigProvider {
                 FileUtils.writeStringToFile(new File(authDir, authority + ".crt"), authCert, Charset.defaultCharset());
                 store.addAuthority(authority, authCert);
             }
+            updateOwnership( authDir, dirOwner, dirGroup );
+
             OutputStream authoritiesStore = null;
             try {
                 store.storeIfDifferent(new File(dir, "authorities.jks"));
@@ -196,6 +209,8 @@ public class CertificateConfig implements ConfigProvider {
         }
     }
 
+    
+
     public void write(Writer writer, boolean chainCertificate, boolean caCertificate) throws IOException {
         VelocityContext context = new VelocityContext();
         if (chainCertificate) {
@@ -208,6 +223,29 @@ public class CertificateConfig implements ConfigProvider {
             m_velocityEngine.mergeTemplate("apache/ssl.conf.vm", "UTF-8", context, writer);
         } catch (Exception e) {
             throw new IOException(e);
+        }
+    }
+
+    public static void updateOwnership(File file, UserPrincipal user, GroupPrincipal group) throws IOException {
+        if (file == null || !file.exists()) {
+            return;
+        }
+
+        // Apply ownership to the folder itself
+        Path path = file.toPath();
+        PosixFileAttributeView view = Files.getFileAttributeView(path, PosixFileAttributeView.class);
+        if (view != null) {
+            view.setOwner(user);
+            view.setGroup(group);
+        }
+
+        if (file.isDirectory()) {
+            File[] children = file.listFiles();
+            if (children != null) {
+                for (File child : children) {
+                    updateOwnership(child, user, group);
+                }
+            }
         }
     }
 
