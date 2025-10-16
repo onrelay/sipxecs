@@ -16,7 +16,12 @@ ENOTWRITABLE=8 #file not writable
 if [ -f /etc/redhat-release ]
 then
   # Redhat
-  . /etc/init.d/functions
+  echo_success() { 
+    echo "success"; 
+  }
+  echo_failure() { 
+    echo "failure"; 
+  }
 
   HTTP_DAEMON_START="@APACHE2_HTTPD@"
 
@@ -63,13 +68,7 @@ else
       echo failure
   }
 
-  if [ -f /etc/init.d/functions.sh ]
-  then
-       . /etc/init.d/functions.sh
-       HTTP_DAEMON_START="start-stop-daemon --start --chuid root --exec @APACHE2_HTTPD@ --"
-  else
-       HTTP_DAEMON_START="@APACHE2_HTTPD@"
-  fi
+  HTTP_DAEMON_START="@APACHE2_HTTPD@"
 fi
 
 sipx_config_exists() { # ( CONFIG-FILE )

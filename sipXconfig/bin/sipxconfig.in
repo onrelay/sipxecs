@@ -212,6 +212,8 @@ buildCommand() {
     -Dtmp.dir=${TmpDir} \
     -Dsipxconfig.db.user=@POSTGRESQL_USER@ \
     -Dpostgres-pwd.password='${password}' \
+    -Djava.net.preferIPv4Stack=true \
+    -Djava.net.preferIPv4Addresses=true \
     -Djetty.sslContext.keyStorePath=${KeyStore} \
     -Djetty.sslContext.keyStorePassword=changeit \
     -Djetty.sslContext.trustStorePath=${TrustStore} \
@@ -266,7 +268,7 @@ start() {
       #check if process was spawned
       checkRunningInstanceTimeout @SIPXPBXUSER@ $regex
       Status=$?
-      pid=`ps -u @SIPXPBXUSER@ -o pid,args | grep $regex | grep -v "grep" | awk '{print $1 }'`
+      pid=$(pgrep -u @SIPXPBXUSER@ -f "$regex")
       [ $Status -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
       checkIfListening $pid $waitForListenPortTime
       Status=$?

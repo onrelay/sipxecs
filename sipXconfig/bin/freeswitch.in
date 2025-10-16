@@ -7,8 +7,6 @@
 # config:
 # Author: gled
 
-# Source function library.
-. /etc/init.d/functions
 . /etc/sysconfig/network
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; echo; exit $ENOENT; }
 

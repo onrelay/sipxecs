@@ -9,7 +9,6 @@
 # config: /var/cfengine/masterfiles
 
 # Source function library.
-. /etc/init.d/functions
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; echo; exit $ENOENT; }
 
 config="@SIPX_CFINPUTS@/sipxsupervisord.cf"
@@ -35,7 +34,7 @@ start() {
 
   echo -n $config > $configid
   echo -n $"Starting $progName: "
-  daemon $exec -f $config
+  "$exec" -f "$config" &
   Status=$?
   [ $Status -eq 0 ] && touch $lockfile
 

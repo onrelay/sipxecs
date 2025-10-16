@@ -22,9 +22,6 @@
 # Description: Simple Network Management Protocol (SNMP) trap daemon
 ### END INIT INFO
 
-# source function library
-. /etc/init.d/functions
-
 OPTIONS="-Lsd -p /run/snmptrapd.pid"
 if [ -e /etc/sysconfig/snmptrapd ]; then
   . /etc/sysconfig/snmptrapd

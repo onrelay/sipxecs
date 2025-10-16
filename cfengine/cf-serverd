@@ -8,9 +8,6 @@
 # processname: cf-serverd
 # config: /var/cfengine/masterfiles
 
-# Source function library.
-. /etc/init.d/functions
-
 exec="/usr/local/sbin/cf-serverd"
 prog=$(basename $exec)
 

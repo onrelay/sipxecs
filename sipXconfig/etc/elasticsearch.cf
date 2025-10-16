@@ -48,13 +48,6 @@ bundle agent elasticsearch_config {
         perms => m("644"),
         edit_line => elasticsearch_limits_contents,
         classes => if_repaired("restart_elasticsearch");
-
-      # Fix ownership/group recursively for Elasticsearch config dir
-      "/etc/elasticsearch"
-        comment => "Ensure proper ownership and group for Elasticsearch files and directories",
-        perms => mog("*", "elasticsearch", "elasticsearch"),
-        depth_search => recurse("inf"),
-        classes => if_repaired("restart_elasticsearch");
 }
 
 # --- Manage nofile limits ---
@@ -86,7 +79,8 @@ bundle edit_line elasticsearch_config_file {
       # Snapshot/repo paths
       "path.repo: [\"$(tmpDir)\", \"$(tmpDir)/elasticsearch_backup\"]";
       "cluster.initial_master_nodes: [\"$(sipx.host)$(sipx.net_domain)\"]";
-      "network.host: localhost";
+      "network.host: 127.0.0.1";
+      "transport.host: 127.0.0.1";      
       "http.port: 9200";
 }
 

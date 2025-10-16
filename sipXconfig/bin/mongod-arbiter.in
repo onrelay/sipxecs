@@ -87,9 +87,6 @@ restart () {
 
 # Send TERM signal to process and wait up to 300 seconds for process to go away.
 # If process is still alive after 300 seconds, send KILL signal.
-# Built-in killproc() (found in /etc/init.d/functions) is on certain versions of Linux
-# where it sleeps for the full $delay seconds if process does not respond fast enough to
-# the initial TERM signal.
 mongo_killproc()
 {
   local pid_file=$1

@@ -20,9 +20,6 @@
 # Description: Simple Network Management Protocol (SNMP) Daemon
 ### END INIT INFO
 
-# source function library
-. /etc/init.d/functions
-
 
 OPTIONS="-LS0-6d -Lf /dev/null -p /run/snmpd.pid"
 if [ -e /etc/sysconfig/snmpd ]; then

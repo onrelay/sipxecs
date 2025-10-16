@@ -7,9 +7,6 @@
 # processname: cf-execd
 # config: /var/cfengine/inputs
 
-# Source function library.
-. /etc/init.d/functions
-
 exec="/usr/local/sbin/cf-execd"
 prog=$(basename $exec)
 
