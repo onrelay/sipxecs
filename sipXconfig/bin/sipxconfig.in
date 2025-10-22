@@ -296,7 +296,7 @@ databaseVersionCheck() {
     dbver=`psql --tuples-only --no-align \
            --command "select max(vh.version) from version_history vh;" \
            ${Database} @POSTGRESQL_USER@`
-    if [ $? -ne 0 -o "$dbver" = "" ]
+    if [ $? -ne 0 ] || [ -z "$dbver" ]
     then
         echo "Error: could not get the database version.  Exiting now."
         exit 1
