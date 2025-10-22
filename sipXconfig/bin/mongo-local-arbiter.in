@@ -65,7 +65,14 @@ start()
   ulimit -u 64000
 
   echo -n $"Starting mongod: "
-  daemon --user "$MONGO_USER" --check $mongod "$NUMACTL $mongod $OPTIONS >/dev/null 2>&1"
+  if pgrep -u "$MONGO_USER" -f "$mongod" > /dev/null 2>&1; then
+      echo "$mongod already running"
+      exit 0
+  fi
+
+  su -s /bin/bash -c "$NUMACTL $mongod $OPTIONS >/dev/null 2>&1 &" "$MONGO_USER"
+  pid=$!
+  echo "Started $mongod (PID $pid) as $MONGO_USER"
   RETVAL=$?
   echo
   [ $RETVAL -eq 0 ] && touch /var/lock/subsys/mongo-local-arbiter

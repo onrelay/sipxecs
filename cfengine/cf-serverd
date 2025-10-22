@@ -20,7 +20,7 @@ lockfile=/var/lock/subsys/$prog
 start() {
 	[ ! -f /var/cfengine/ppkeys/localhost.priv ] && /usr/sbin/cfkey
 	echo -n $"Starting $prog: "
-	daemon $exec
+	$exec &
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch $lockfile

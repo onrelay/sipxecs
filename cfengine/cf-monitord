@@ -24,7 +24,7 @@ lockfile=/var/lock/subsys/$prog
 
 start() {
     echo -n $"Starting GNU cfengine environmental history daemon: "
-    daemon $prog
+    $prog &
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && touch $lockfile

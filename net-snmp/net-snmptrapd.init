@@ -35,7 +35,7 @@ pidfile=/run/snmptrapd.pid
 start() {
 	[ -x $binary ] || exit 5
 	echo -n $"Starting $prog: "
-        daemon --pidfile=$pidfile /usr/sbin/snmptrapd $OPTIONS
+        /usr/sbin/snmptrapd $OPTIONS & echo $! > "$pidfile"
 	RETVAL=$?
 	echo
 	touch /var/lock/subsys/snmptrapd
