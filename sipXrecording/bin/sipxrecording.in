@@ -50,7 +50,7 @@ start() {
   export CLASSPATH=`echo @SIPX_CONFDIR@/sipxrecording @SIPX_JAVADIR@/{sipXrecording,sipXopenfire/plugins}/*.jar ${Dependencies} | sed -e 's/ /:/g'`  
   
   Command="$JavaCmd \
-    -Dprocname=sipxrecording \
+    -Dprocname="$prog" \
     -Dconf.dir=@SIPX_CONFDIR@ \
     -Dvar.dir=@SIPX_VARDIR@ \
     -Dhazelcast.config=@SIPX_CONFDIR@/hz-config.xml \
@@ -67,8 +67,8 @@ start() {
 }
 
 stop() {
-  echo -n $"Stopping sipxrecording: "
-  killproc -p "${pidfile}" "sipxrecording"
+  echo -n $"Stopping $prog: "
+  pkill -f "-Dprocname=$prog"
   Status=$?
   echo
   [ $Status -eq 0 ] && rm -f "${pidfile}"

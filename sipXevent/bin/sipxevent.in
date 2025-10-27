@@ -35,7 +35,7 @@ start() {
   export CLASSPATH=`echo @SIPX_CONFDIR@/sipxevent @SIPX_JAVADIR@/sipXevent/*.jar ${Dependencies} | sed -e 's/ /:/g'`  
   
   Command="$JavaCmd \
-    -Dprocname=sipxevent \
+    -Dprocname=$prog \
     -Dconf.dir=@SIPX_CONFDIR@ \
     -Dvar.dir=@SIPX_VARDIR@ \
     $JavaSslOpts \
@@ -53,7 +53,7 @@ start() {
 
 stop() {
   echo -n $"Stopping sipxevent: "
-  killproc -p "${pidfile}" "sipxevent"
+  pkill -f "-Dprocname=$prog"
   Status=$?
   echo
   [ $Status -eq 0 ] && rm -f "${pidfile}"

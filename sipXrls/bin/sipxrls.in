@@ -51,12 +51,13 @@ start() {
 
 stop() {
   echo -n $"Stopping $prog: "
-  killproc "${exec}"
+  pkill -f "$exec"
   Status=$?
   echo
   [ $Status -eq 0 ] && rm -f "${pidfile}"
   killAnyOrphans @SIPXPBXUSER@ $exec
 }
+
 
 restart() {
   stop

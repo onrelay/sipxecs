@@ -44,7 +44,7 @@ start() {
 
 stop() {
 	echo -n $"Stopping $prog: "
-	killproc -p $pidfile /usr/sbin/snmptrapd
+	pkill -f "$binary"
 	RETVAL=$?
 	echo
 	rm -f /var/lock/subsys/snmptrapd

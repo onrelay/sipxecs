@@ -32,12 +32,13 @@ start() {
 
 stop() {
     echo -n $"Stopping GNU cfengine environmental history daemon: "
-    killproc $exec
+    pkill -f "$exec"
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && rm -f $lockfile
     return $RETVAL
 }
+
 
 restart() {
     stop

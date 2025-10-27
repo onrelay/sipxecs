@@ -105,30 +105,44 @@ do_start() {
   fi
 }
 
+do_kill() {
+  if [ -f "$PIDFILE" ]; then
+      pid=$(cat "$PIDFILE")
+      if kill -0 "$pid" 2>/dev/null; then
+          kill -TERM "$pid"
+      fi
+  fi
+}
+
 do_stop() {
-  fspid=$(pidof $NAME)
+  fspid=$(pgrep -x "$NAME")
   status=$?
   $DAEMON $DAEMON_STOP_ARGS
   RETVAL=$?
-  [ $RETVAL = 0 ] && success $"$base shutdown" || failure $"$base shutdown"
+  if [ "$RETVAL" -eq 0 ]; then
+    echo "$base shutdown: success"
+  else
+    echo "$base shutdown: failed"
+  fi
   echo "Waiting for daemon to exit..."
   i=0
   while [[ $status -lt 1 && $i -lt 10 ]]
     do
     sleep 1
-      fspid=$(pidof $NAME)
+      fspid=$(pgrep -x "$NAME")
   status=$?
   i=$(expr $i + 1)
   done
   if [ $status -lt 1 ]; then
     echo "Process did not exit cleanly. Aborting..."
-    killproc $NAME
+    do_kill
   fi
   rm -f $LOCKFILE
   echo
   killAnyOrphans $FS_USER $DAEMON
   return $RETVAL
 }
+
 
 do_reload() {
   $FS_CLI -x "reloadXml"

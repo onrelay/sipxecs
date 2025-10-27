@@ -50,11 +50,21 @@ start() {
   chmod 644 @SIPX_LOGDIR@/sipXproxy.log
 }
 
-stop() {
-  echo -n $"Stopping sipXproxy: "
+killtimed() {
   # can take a while to shutdown because of relay
   # dont wait too long as service availability is in jeopardy
-  killproc -d 10 "${exec}"
+  pkill -${1:-TERM} -f "$exec"
+  timeout=10
+  while pgrep -f "$exec" >/dev/null && [ $timeout -gt 0 ]; do
+      sleep 1
+      timeout=$((timeout - 1))
+  done
+  pgrep -f "$exec" >/dev/null && pkill -KILL -f "$exec"
+}
+
+stop() {
+  echo -n $"Stopping sipXproxy: "
+  killtimed
   Status=$?
   echo
   [ $Status -eq 0 ] && rm -f "${pidfile}"

@@ -76,13 +76,14 @@ nofork() {
 
 stop() {
   echo -n $"Stopping $progName: "
-  killproc $prog
+  pkill -f "$exec"
   RETVAL=$?
   echo
   [ $RETVAL -eq 0 ] && rm -f $lockfile
   killAnyOrphans "root" $exec
   return $RETVAL
 }
+
 
 restart() {
   stop

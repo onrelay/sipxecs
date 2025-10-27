@@ -39,7 +39,7 @@ start() {
 
     # procname is there so cfengine can find it
     Command="$JavaCmd \
-      -Dprocname=sipximbot \
+      -Dprocname="$prog" \
       -Dconf.dir=@SIPX_CONFDIR@ \
       -Dlog.dir=@SIPX_LOGDIR@ \
       -Dvar.dir=@SIPX_VARDIR@ \
@@ -59,8 +59,8 @@ start() {
 }
 
 stop() {
-  echo -n $"Stopping sipximbot: "
-  killproc -p "${pidfile}" "sipximbot"
+  echo -n $"Stopping $prog: "
+  pkill -f "-Dprocname=$prog"
   Status=$?
   echo
   [ $Status -eq 0 ] && rm -f "${pidfile}"

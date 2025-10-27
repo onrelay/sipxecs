@@ -135,9 +135,18 @@ function start() {
   done
 }
 
+kill() {
+  if [ -f "$PIDFILE" ]; then
+      pid=$(cat "$PIDFILE")
+      if kill -0 "$pid" 2>/dev/null; then
+          kill -TERM "$pid"
+      fi
+  fi
+}
+
 function stop() {
   echo -n $"Stopping mongodb-sync: "
-  killproc -p $PIDFILE "mongodb-sync"
+  kill
   RETVAL=$?
   echo
   [ $RETVAL -eq 0 ] && rm -f $LOCKFILE

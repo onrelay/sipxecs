@@ -52,7 +52,7 @@ stop() {
                 RETVAL=1
                 failure
         else
-                killproc -p $pidfile $binary
+                pkill -f "$binary"
                 RETVAL=$?
                 [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/snmpd
         fi;
@@ -62,7 +62,7 @@ stop() {
 
 reload(){
         echo -n $"Reloading $prog: "
-        killproc -p $pidfile $binary -HUP
+        pkill -HUP -f "$binary"
         RETVAL=$?
         echo
         return $RETVAL

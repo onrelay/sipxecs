@@ -96,11 +96,11 @@ restart () {
 # If process is still alive after 300 seconds, send KILL signal.
 mongo_killproc()
 {
-  local pid_file=$1
+  local pidfile=$1
   local procname=$2
   local -i delay=300
   local -i duration=10
-  local pid=`pidofproc -p "${pid_file}" ${procname}`
+  [ -f "$pidfile" ] && local pid=$(cat "$pidfile")
 
   kill -TERM $pid >/dev/null 2>&1
   usleep 100000
@@ -115,7 +115,7 @@ mongo_killproc()
 
   checkpid $pid # returns 0 only if the process exists
   local RC=$?
-  [ "$RC" -eq 0 ] && failure "${procname} shutdown" || rm -f "${pid_file}"; success "${procname} shutdown"
+  [ "$RC" -eq 0 ] && failure "${procname} shutdown" || rm -f "${pidfile}"; success "${procname} shutdown"
   RC=$((! $RC)) # invert return code so we return 0 when process is dead.
   return $RC
 }

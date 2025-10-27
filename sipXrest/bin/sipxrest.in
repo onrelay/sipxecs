@@ -35,7 +35,7 @@ start() {
   export CLASSPATH=`echo @SIPX_CONFDIR@/sipxrest @SIPX_JAVADIR@/sipXrest/*.jar @SIPX_JAVADIR@/sipXrest/plugins/*.jar ${Dependencies} | sed -e 's/ /:/g'`    
   
   Command="$JavaCmd \
-      -Dprocname=sipxrest \
+      -Dprocname="$prog" \
       -Dconf.dir=@SIPX_CONFDIR@	\
       -Dplugin.dir=@SIPX_JAVADIR@/sipXrest/plugins \
 	  -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger \
@@ -54,8 +54,8 @@ start() {
 }
 
 stop() {
-  echo -n $"Stopping sipxrest: "
-  killproc -p "${pidfile}" "sipxrest"
+  echo -n $"Stopping $prog: "
+  pkill -f "-Dprocname=$prog"
   Status=$?
   echo
   [ $Status -eq 0 ] && rm -f "${pidfile}"

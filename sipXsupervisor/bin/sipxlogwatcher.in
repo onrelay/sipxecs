@@ -35,13 +35,14 @@ start() {
 
 stop() {
   echo -n $"Stopping $progName: "
-  killproc $prog
+  pkill -f "$exec"
   RETVAL=$?
   echo
   [ $RETVAL -eq 0 ] && rm -f $lockfile
   return $RETVAL
   killAnyOrphans "root" $prog
 }
+
 
 restart() {
   stop
@@ -50,7 +51,7 @@ restart() {
 
 reload() {
   echo -n $"Reloading $progName: "
-  killproc $prog -HUP
+  pkill -HUP -f "$exec"
   RETVAL=$?
   echo
   return $RETVAL
@@ -70,7 +71,7 @@ rh_status_q() {
 
 dump() {
   echo -n $"Dumping state of $progName in /tmp/sec.dump: "
-  killproc $prog -USR1
+  pkill -USR1 -f "$exec"
   RETVAL=$?
   echo
   return $RETVAL

@@ -25,12 +25,13 @@ start() {
 
 stop() {
 	echo -n $"Stopping $prog: "
-	killproc $prog
+	pkill -f "$exec"
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && rm -f $lockfile
 	return $RETVAL
 }
+
 
 
 restart() {
