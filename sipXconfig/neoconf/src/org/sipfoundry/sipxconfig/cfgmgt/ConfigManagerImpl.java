@@ -90,7 +90,7 @@ public class ConfigManagerImpl implements AddressProvider, ConfigManager, BeanFa
     // No strict host key checking is only for initial handshake. Once that passes, ssh will
     // check host name with key.
     private String m_remoteCommand = "/usr/bin/ssh -o 'StrictHostKeyChecking=no' "
-            + "-i %s/.cfagent/ppkeys/localhost.nopass.priv root@%s";
+            + "-i %s/.cfagent/ppkeys/localhost.nopass.priv %s@%s";
     private String m_remoteHostsFile = "%s/.ssh/known_hosts";
     private boolean m_flag;
     private SystemAuditManager m_systemAuditManager;
@@ -112,11 +112,15 @@ public class ConfigManagerImpl implements AddressProvider, ConfigManager, BeanFa
 
     @Override
     public String getRemoteCommand(String server) {
-        return String.format(m_remoteCommand, getHomeDir(), server);
+        return String.format(m_remoteCommand, getHomeDir(), getUser(), server);
     }
 
     private String getHomeDir() {
         return System.getProperty("user.home");
+    }
+
+    private String getUser() {
+        return System.getProperty("user.name");
     }
 
     private String getRemoteHostsFile() {

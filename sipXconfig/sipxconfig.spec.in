@@ -354,10 +354,12 @@ if systemctl is-enabled --quiet sipxconfig.service; then
     systemctl disable sipxconfig.service >/dev/null 2>&1 || :
 fi
 
+
 %triggerin -- freeswitch
-systemctl disable freeswitch.service
-# may not be running, so eat stderr
-/etc/init.d/freeswitch stop 1>/dev/null
+if systemctl list-unit-files | grep -q '^freeswitch\.service'; then
+    systemctl disable freeswitch.service >/dev/null 2>&1 || :
+    /etc/init.d/freeswitch stop 1>/dev/null
+fi
 
 %postun
 # uninstall lucene index and Jetty scratch dir on every install

@@ -64,6 +64,7 @@ PluginDir=@SIPX_JAVADIR@/sipXconfig/plugins
 CommonsLibDir=@SIPX_JAVADIR@/sipXcommons
 LogDir=@SIPX_LOGDIR@
 TmpDir=@SIPX_TMPDIR@
+HomeDir=/home/@SIPXPBXUSER@
 JettyHomeDir=@SIPX_JETTY_HOME@
 JettyBaseDir=@SIPX_CONFDIR@/jetty
 KeyStore=@SIPX_CONFDIR@/ssl/ssl-web.keystore
@@ -127,6 +128,7 @@ databaseCommand() {
       -Dlib.dir=${LibDir} \
       -Dlog.dir=${LogDir} \
       -Dtmp.dir=${TmpDir} \
+      -Duser.home=${HomeDir} \
       -Dsipxconfig.db.user=@POSTGRESQL_USER@ \
       -Dpostgres-pwd.password='${password}' \
       ${SIPXCONFIG_ANT_OPTS} \
@@ -210,6 +212,7 @@ buildCommand() {
     -Djetty.home=${JettyHomeDir} \
     -Djetty.base=${JettyBaseDir} \
     -Dtmp.dir=${TmpDir} \
+    -Duser.home=${HomeDir} \
     -Dsipxconfig.db.user=@POSTGRESQL_USER@ \
     -Dpostgres-pwd.password='${password}' \
     -Djava.net.preferIPv4Stack=true \

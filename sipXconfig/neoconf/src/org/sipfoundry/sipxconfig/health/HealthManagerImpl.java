@@ -80,7 +80,7 @@ public class HealthManagerImpl implements HealthManager, BeanFactoryAware, Setup
                 try {
                     provider.checkHealth(HealthManagerImpl.this);
                 } catch (Exception e) {
-                    LOG.error("non fatal exception checking health", e);
+                    LOG.error("exception checking health", e);
                     fail(e);
                 }
             }
