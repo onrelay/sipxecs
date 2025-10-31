@@ -12,6 +12,8 @@ DEFAULT_VERSION=25.01
 
 SIPXCOM_USER_GROUP=sipxcom-dev@googlegroups.com
 
+SIPXCOM_REPO=/etc/yum.repos.d/sipxcom.repo
+
 THIS_MASTER_BUILD_SCRIPT=$(readlink -f ${BASH_SOURCE[0]})
 
 SOURCE_DIR=$(dirname ${THIS_MASTER_BUILD_SCRIPT})
@@ -250,8 +252,10 @@ function addRepos()
 {
     echo "Begin addRepos()"
 
-    wget -O /etc/yum.repos.d/sipxcom.repo \
-        https://storage.googleapis.com/sipxecs/sipxcom/${VERSION}/${PLATFORM}-${ARCHITECTURE}/sipxcom.repo
+    if [ -z "${SIPXCOM_REPO}" ]; then
+        wget -O ${SIPXCOM_REPO} \
+            https://storage.googleapis.com/sipxecs/sipxcom/${VERSION}/${PLATFORM}-${ARCHITECTURE}/sipxcom.repo
+    fi
 
     case $PLATFORM in
 

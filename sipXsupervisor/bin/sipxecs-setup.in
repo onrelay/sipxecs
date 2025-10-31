@@ -31,24 +31,25 @@ $master_dat= "#{$cfdatadir}/defaults/master"
 $location_dat = "#{$cfdatadir}/defaults/location_id"
 $mongo_client_ini = "#{$cfdatadir}/1/mongo-client.ini"
 $log = "#{$logdir}/sipxagent.log"
-$verbose = false
+$verbose = true
 $advanced = false
 $exit_status = 0
 $prompt = {:primary => true}
 
 def run_command(cmd)
   puts cmd if $verbose
-  output = `#{cmd} 2>&1`
-  ok = $?.success?
-
+  ok = if $verbose
+         system(cmd)
+       else
+         system("#{cmd} > /dev/null 2>&1")
+       end
   unless ok
     puts
-    puts "run command #{cmd} failed with output:"
-    puts output
+    puts "Failure to run command #{cmd}. See #{$log} for details. After you"
+    puts "have addressed the issue, you may rerun this script."
     puts
   end
-
-  return ok
+  ok
 end
 
 def set_root_keys
@@ -716,27 +717,15 @@ end
 # First pass generated cfdata info
 if is_primary?
   puts "Initial setup, please wait..."
-  ok = run_command("#{$bindir}/sipxagent #{'-v ' if $verbose} -d setup")
+  # Run setup in foreground, blocking until complete
+  ok = run_command("#{$bindir}/sipxagent #{'-v ' if $verbose} setup")
   puts "run_command returned: #{ok.inspect}"
   exit 1 unless ok
+
   update_config_access
   puts "Finishing system configuration, almost done..."
-else  
-  if $sync_time
-    unless ntpd_running?
-      tmp_ntp = nil
-      puts "Synchronizing clocks with master server first..."
-      Tempfile.open('sipxecs-setup.ntp') {|f|
-        tmp_ntp = f.path
-        f.puts <<EOF
-driftfile /var/lib/ntp/drift
-server #{role_settings[:master_address]} iburst
-EOF
-      }
-      run_command("/usr/sbin/ntpd -gnq#{'d' if $verbose} -c #{tmp_ntp}")
-    end
-  end
-  puts "Configuring system, please wait..."
+else
+  # Sync clocks etc. for secondary nodes...
 end
 
 # 2nd pass operates on cfdata info
@@ -746,13 +735,15 @@ if !ok
   puts "failed."
   exit 1
 else
-  # this is necessary since sometimes SET_MEMBER_META signal does not take effect
-  exit 1 unless run_command "systemctl restart sipxconfig"
+  # Wait for sipxconfig service restart to complete
+  system("systemctl restart sipxconfig") || exit 1
+  system("systemctl is-active --quiet sipxconfig") || exit 1
+
   puts "done."
   net = get_network
   if is_primary?
     puts <<EOL
-\n
+
 In a few more minutes you will be able to access the administration
 interface from your web browser at the following URL:
 

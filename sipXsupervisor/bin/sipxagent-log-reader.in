@@ -1,4 +1,5 @@
 #!/usr/bin/ruby
+# encoding: UTF-8
 
 # Parse cfengine output and interpret results. Parse for potential erros
 # and ignore common ones.
@@ -15,6 +16,7 @@ end
 
 def parse(input, &block)
   while line = input.gets
+    line.force_encoding('UTF-8')
     token(:handle, /\s+Promise handle:\s+(.*)/.match(line).to_a, block)
     token(:comment, /\s+Comment:\s+(.*)$/.match(line).to_a, block)
     token(:info, /\s+\*\* Information:\s+(.*)/.match(line).to_a, block)
