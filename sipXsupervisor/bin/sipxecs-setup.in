@@ -736,8 +736,11 @@ if !ok
   exit 1
 else
   # Wait for sipxconfig service restart to complete
-  system("systemctl restart sipxconfig") || exit 1
-  system("systemctl is-active --quiet sipxconfig") || exit 1
+  system("systemctl restart sipxconfig")
+  exit 1 unless $?.success?
+
+  system("systemctl is-active --quiet sipxconfig")
+  exit 1 unless $?.success?
 
   puts "done."
   net = get_network
