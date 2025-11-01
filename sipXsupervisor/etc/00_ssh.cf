@@ -32,11 +32,11 @@ bundle agent 00_ssh {
 
   files:
     any::
-      "/root/.ssh/."
+      "$(userdata[6])/.ssh/."
        create => "true",
        perms => mog("700", "root", "root");
     
-      "/root/.ssh/authorized_keys"
+      "$(userdata[6])/.ssh/authorized_keys"
         create => "true",
         perms => mog("600", "root", "root"),
         edit_line => authorized_sipx_commands;
