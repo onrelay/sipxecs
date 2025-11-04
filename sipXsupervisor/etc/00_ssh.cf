@@ -60,18 +60,15 @@ bundle agent ssh_priv {
   files:
     "$(sshdir)"
       create => "true",
-      rxdirs => "false",
       perms  => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
     "$(sshdir)/authorized_keys"
       create => "true",
-      rxdirs => "false",
       perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
       edit_line => authorized_sipx_commands;
 
     "$(key)"
       create => "true",
-      rxdirs => "false",
       perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
   commands:
@@ -89,7 +86,6 @@ bundle agent ssh_pub {
   files:
     "$(00_ssh.key_file)"
       create => "true",
-      rxdirs => "false",
       perms  => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
   commands:
