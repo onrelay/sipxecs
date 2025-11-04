@@ -60,6 +60,7 @@ bundle agent ssh_priv {
   files:
     "$(sshdir)"
       create => "true",
+      directory => "true",
       perms  => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
     "$(sshdir)/authorized_keys"
