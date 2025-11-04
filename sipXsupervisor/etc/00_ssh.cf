@@ -29,17 +29,6 @@ bundle agent 00_ssh {
     primary::
       "any" usebundle => ssh_priv;
       "any" usebundle => ssh_pub;
-
-  files:
-    any::
-      "$(userdata[6])/.ssh/."
-       create => "true",
-       perms => mog("700", "root", "root");
-    
-      "$(userdata[6])/.ssh/authorized_keys"
-        create => "true",
-        perms => mog("600", "root", "root"),
-        edit_line => authorized_sipx_commands;
 }
 
 bundle edit_line authorized_sipx_commands {
@@ -57,8 +46,10 @@ bundle edit_line authorized_sipx_commands {
 bundle agent ssh_priv {
   vars:
     "passphrase" string => "Cfengine passphrase";
-    "userdata_no" int => getfields("$(sipx.SIPXPBXUSER):.*", "/etc/passwd",":","userdata");
-    "ppkdir" string => "$(userdata[6])/.cfagent/ppkeys";
+    "userdata_no" int => getfields("$(sipx.SIPXPBXUSER):.*", "/etc/passwd", ":", "userdata");
+    "home" string => "$(userdata[6])";
+    "sshdir" string => "$(home)/.ssh";
+    "ppkdir" string => "$(home)/.cfagent/ppkeys";
     "pvkey" string => "$(ppkdir)/localhost.priv";
     "key" string => "$(ppkdir)/localhost.nopass.priv";
 
@@ -67,15 +58,27 @@ bundle agent ssh_priv {
     "old" expression => isnewerthan("$(pvkey)", "$(key)");
 
   files:
+    "$(sshdir)"
+      create => "true",
+      rxdirs => "false",
+      perms  => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+
+    "$(sshdir)/authorized_keys"
+      create => "true",
+      rxdirs => "false",
+      perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
+      edit_line => authorized_sipx_commands;
+
     "$(key)"
       create => "true",
-      perms => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+      rxdirs => "false",
+      perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
   commands:
     primary.(missing|old)::
       "/usr/bin/openssl"
         comment => "Update private key copy",
-        args => "rsa -in $(ppkdir)/localhost.priv -passin 'pass:$(passphrase)' -out $(key)";
+        args => "rsa -in $(pvkey) -passin 'pass:$(passphrase)' -out $(key)";
 }
 
 bundle agent ssh_pub {
@@ -86,13 +89,13 @@ bundle agent ssh_pub {
   files:
     "$(00_ssh.key_file)"
       create => "true",
-      perms => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+      rxdirs => "false",
+      perms  => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
   commands:
     primary.(missing|old)::
-     "/usr/bin/ssh-keygen"
-       comment => "Update public ssh key",
-       args => "-y -f $(ssh_priv.key) > $(00_ssh.key_file)",
-       contain => in_shell;    
+      "/usr/bin/ssh-keygen"
+        comment => "Update public ssh key",
+        args => "-y -f $(ssh_priv.key) > $(00_ssh.key_file)",
+        contain => in_shell;
 }
-

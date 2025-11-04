@@ -33,15 +33,15 @@ body common control {
   };
 }
 
-body server control {
-  skipverify => { ".*" };
-  allowconnects => { @(sipx.allowed_addrs) };
-  allowallconnects => { @(sipx.allowed_addrs) };
-  maxconnections => "5";
-  trustkeysfrom => { @(sipx.allowed_addrs) };
-  logallconnections => "true";
-  cfruncommand => "/usr/local/sbin/cf-agent -Kvf @SIPX_CFINPUTS@/promises.cf";
-  allowusers => { @(sipx.allowed_users) };
+body server control
+{
+  allowconnects       => { @(sipx.allowed_addrs) };
+  allowallconnects    => { @(sipx.allowed_addrs) };
+  maxconnections      => "5";
+  trustkeysfrom       => { @(sipx.allowed_addrs) };
+  logallconnections   => "true";
+  cfruncommand        => "/usr/local/sbin/cf-agent -Kvf @SIPX_CFINPUTS@/promises.cf";
+  allowusers          => { @(sipx.allowed_users) };
 }
 
 body agent control {
