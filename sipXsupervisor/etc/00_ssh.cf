@@ -57,10 +57,10 @@ bundle agent ssh_priv {
     "missing" not => fileexists("$(key)");
     "old" expression => isnewerthan("$(pvkey)", "$(key)");
 
+
   files:
-    "$(sshdir)"
+   "$(sshdir)"
       create => "true",
-      directory => "true",
       perms  => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
     "$(sshdir)/authorized_keys"
