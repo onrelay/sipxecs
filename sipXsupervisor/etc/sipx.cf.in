@@ -530,11 +530,21 @@ body contain timeout(sec) {
 #       "any" usebundle => disallow_ssh_command("myservice-cool-command");
 #
 bundle agent allow_ssh_command(command) {
+
+  vars:
+    "userdata_no" int => getfields("$(sipx.SIPXPBXUSER):.*", "/etc/passwd", ":", "userdata");
+    "home" string => "$(userdata[6])";
+    "sshdir" string => "$(home)/.ssh";
+
   files:
+    "$(sshdir)/."
+      create => "true",
+      perms  => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+
     any::
-      "/root/.ssh/authorized_sipx_commands"
+      "$(sshdir)/authorized_sipx_commands"
         create => "true",
-        perms => mog("600", "root", "root"),
+        perms => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
         edit_line => insert_lines("$(command)");
 }
 
@@ -543,11 +553,17 @@ bundle agent allow_ssh_command(command) {
 # See allow_ssh_command for more info
 #
 bundle agent disallow_ssh_command(command) {
+
+  vars:
+    "userdata_no" int => getfields("$(sipx.SIPXPBXUSER):.*", "/etc/passwd", ":", "userdata");
+    "home" string => "$(userdata[6])";
+    "sshdir" string => "$(home)/.ssh";
+
   files:
     any::
-      "/root/.ssh/authorized_sipx_commands"
+      "$(sshdir)/.ssh/authorized_sipx_commands"
         create => "false",
-        perms => mog("600", "root", "root"),
+        perms => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
         edit_line => delete_lines_matching("^$(command)$");
 }
 
