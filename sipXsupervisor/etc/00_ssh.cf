@@ -40,8 +40,8 @@ bundle edit_line authorized_sipx_commands {
     "^.*\ssipx@primary$";
 
   insert_lines:
-    "from=\"$(sipx.master_address)\",command=\"$(sipx.SIPX_LIBEXECDIR)/sipx-allow-command ${SSH_ORIGINAL_COMMAND}\" $(key) sipx@primary";
-}
+    from="$(sipx.master_address)",command="$(sipx.SIPX_LIBEXECDIR)/sipx-allow-command ${SSH_ORIGINAL_COMMAND}" $(key) sipx@primary;
+  }
 
 bundle agent ssh_priv {
   vars:
