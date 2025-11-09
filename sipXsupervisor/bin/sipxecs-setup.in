@@ -717,9 +717,7 @@ end
 # First pass generated cfdata info
 if is_primary?
   puts "Initial setup, please wait..."
-  ok = run_command("#{$bindir}/sipxagent #{'-v ' if $verbose} -d setup")
-  puts "run_command returned: #{ok.inspect}"
-  exit 1 unless ok
+  exit 1 unless run_command("#{$bindir}/sipxagent #{'-v ' if $verbose} -d setup")
   update_config_access
   puts "Finishing system configuration, almost done..."
 else  
@@ -748,11 +746,8 @@ if !ok
   exit 1
 else
   # Wait for sipxconfig service restart to complete
-  system("systemctl restart sipxconfig")
-  exit 1 unless $?.success?
-
-  system("systemctl is-active --quiet sipxconfig")
-  exit 1 unless $?.success?
+  system("systemctl restart sipxconfig") || exit(1)
+  system("systemctl is-active --quiet sipxconfig") || exit(1)
 
   puts "done."
   net = get_network
