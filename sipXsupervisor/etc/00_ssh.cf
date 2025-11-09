@@ -27,14 +27,13 @@ bundle agent 00_ssh {
 
   methods:
     primary::
-      "any" usebundle => ssh_priv;
       "any" usebundle => ssh_pub;
+      "any" usebundle => ssh_priv;
 }
 
 bundle edit_line authorized_sipx_commands {
   vars:
-    any::
-      "key" string => readfile("$(00_ssh.key_file)", "1000");
+    "key" string => readfile("$(key_file)", "1000");
 
   delete_lines:
     "^.*\ssipx@primary$";
