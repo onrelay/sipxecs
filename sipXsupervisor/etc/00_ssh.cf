@@ -23,12 +23,51 @@
 
 bundle agent 00_ssh {
   vars:
+    "passphrase" string => "Cfengine passphrase";
+    "userdata_no" int => getfields("$(sipx.SIPXPBXUSER):.*", "/etc/passwd", ":", "userdata");
+    "home" string => "$(userdata[6])";
+    "sshdir" string => "$(home)/.ssh";
+    "ppkdir" string => "$(home)/.cfagent/ppkeys";
+    "pvkey" string => "$(ppkdir)/localhost.priv";
+    "privkey" string => "$(ppkdir)/localhost.nopass.priv";
     "key_file" string => "$(sipx.SIPX_CFDATA)/primary.ssh.pub";
+    "key" string => readfile("$(key_file)", "1000");
 
-  methods:
-    primary::
-      "any" usebundle => ssh_pub;
-      "any" usebundle => ssh_priv;
+  classes:
+    "priv_missing" not => fileexists("$(privkey)");
+    "priv_old" expression => isnewerthan("$(pvkey)", "$(privkey)");
+    "pub_missing" not => fileexists("$(key_file)");
+    "pub_old" expression => isnewerthan("$(privkey)", "$(key_file)");
+
+  files:
+    "$(sshdir)/."
+      create => "true",
+      perms  => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+
+    "$(sshdir)/authorized_keys"
+      create => "true",
+      perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
+      edit_line => authorized_sipx_commands;
+
+    "$(privkey)"
+      create => "true",
+      perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+
+    "$(key_file)"
+      create => "true",
+      perms  => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+
+  commands:
+    priv_missing|priv_old::
+      "/usr/bin/openssl"
+        comment => "Update private key copy",
+        args => "rsa -in $(pvkey) -passin 'pass:$(passphrase)' -out $(privkey)";
+
+    pub_missing|pub_old::
+      "/usr/bin/ssh-keygen"
+        comment => "Update public ssh key",
+        args => "-y -f $(privkey) > $(key_file)",
+        contain => in_shell;
 }
 
 bundle edit_line authorized_sipx_commands {
@@ -40,58 +79,4 @@ bundle edit_line authorized_sipx_commands {
 
   insert_lines:
     "from=\"$(sipx.master_address)\",command=\"$(sipx.SIPX_LIBEXECDIR)/sipx-allow-command ${SSH_ORIGINAL_COMMAND}\" $(key) sipx@primary";
-}
-
-bundle agent ssh_priv {
-  vars:
-    "passphrase" string => "Cfengine passphrase";
-    "userdata_no" int => getfields("$(sipx.SIPXPBXUSER):.*", "/etc/passwd", ":", "userdata");
-    "home" string => "$(userdata[6])";
-    "sshdir" string => "$(home)/.ssh";
-    "ppkdir" string => "$(home)/.cfagent/ppkeys";
-    "pvkey" string => "$(ppkdir)/localhost.priv";
-    "key" string => "$(ppkdir)/localhost.nopass.priv";
-
-  classes:
-    "missing" not => fileexists("$(key)");
-    "old" expression => isnewerthan("$(pvkey)", "$(key)");
-
-
-  files:
-   "$(sshdir)/."
-      create => "true",
-      perms  => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
-
-    "$(sshdir)/authorized_keys"
-      create => "true",
-      perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
-      edit_line => authorized_sipx_commands;
-
-    "$(key)"
-      create => "true",
-      perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
-
-  commands:
-    primary.(missing|old)::
-      "/usr/bin/openssl"
-        comment => "Update private key copy",
-        args => "rsa -in $(pvkey) -passin 'pass:$(passphrase)' -out $(key)";
-}
-
-bundle agent ssh_pub {
-  classes:
-    "missing" not => fileexists("$(00_ssh.key_file)");
-    "old" expression => isnewerthan("$(ssh_priv.key)", "$(00_ssh.key_file)");
-
-  files:
-    "$(00_ssh.key_file)"
-      create => "true",
-      perms  => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
-
-  commands:
-    primary.(missing|old)::
-      "/usr/bin/ssh-keygen"
-        comment => "Update public ssh key",
-        args => "-y -f $(ssh_priv.key) > $(00_ssh.key_file)",
-        contain => in_shell;
 }
