@@ -1,17 +1,18 @@
 #!/bin/sh
 conf=/home/sipx/.ssh/authorized_sipx_commands
-if ! test -f $conf; then
+if ! test -f "$conf"; then
    echo "No configured command" >&2
    exit 1
 fi
 
 export PATH=$PATH:@SIPX_BINDIR@:@SIPX_LIBEXECDIR@
 
-CMD=($@)
-if grep -e "^${CMD[0]}$" -e '^${CMD[0]}\s.*' $conf; then
-   # using exec seems appropriate given it's purpose, but not stricly nec.
-   exec $@
-else        
+CMD="$1"  # just the first word of the command
+
+# Check if the command starts with an allowed command
+if grep -q -E "^${CMD}" "$conf"; then
+   exec "$@"
+else
    echo "Command not allowed" >&2
    exit 1
 fi
