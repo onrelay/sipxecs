@@ -717,7 +717,7 @@ end
 # First pass generated cfdata info
 if is_primary?
   puts "Initial setup, please wait..."
-  exit 1 unless run_command("#{$bindir}/sipxagent #{'-v ' if $verbose} -d setup")
+  run_command("#{$bindir}/sipxagent #{'-v ' if $verbose} -d setup")
   update_config_access
   puts "Finishing system configuration, almost done..."
 else  
@@ -739,7 +739,7 @@ EOF
 end
 
 # 2nd pass operates on cfdata info
-ok = run_command("#{$bindir}/sipxagent #{'-v ' if $verbose}")
+run_command("#{$bindir}/sipxagent #{'-v ' if $verbose}")
 update_config_access
 if !ok
   puts "failed."

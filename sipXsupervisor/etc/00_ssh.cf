@@ -21,35 +21,36 @@
 #   disallow_ssh_command
 #
 
-bundle agent 00_ssh {
+bundle agent 00_ssh
+{
   vars:
-    "passphrase" string => "Cfengine passphrase";
-    "userdata_no" int => getfields("$(sipx.SIPXPBXUSER):.*", "/etc/passwd", ":", "userdata");
-    "home" string => "$(userdata[6])";
+    "home" string => getfields("$(sipx.SIPXPBXUSER):.*", "/etc/passwd", ":", "6");
     "sshdir" string => "$(home)/.ssh";
     "ppkdir" string => "$(home)/.cfagent/ppkeys";
     "pvkey" string => "$(ppkdir)/localhost.priv";
-    "privkey" string => "$(ppkdir)/localhost.nopass.priv";
+    "nopasskey" string => "$(ppkdir)/localhost.nopass.priv";
     "key_file" string => "$(sipx.SIPX_CFDATA)/primary.ssh.pub";
-    "key" string => readfile("$(key_file)", "1000");
+    "passphrase" string => "Cfengine passphrase";
 
   classes:
-    "priv_missing" not => fileexists("$(privkey)");
-    "priv_old" expression => isnewerthan("$(pvkey)", "$(privkey)");
-    "pub_missing" not => fileexists("$(key_file)");
-    "pub_old" expression => isnewerthan("$(privkey)", "$(key_file)");
+    "missing_nopass" not => fileexists("$(nopasskey)");
+    "old_nopass" expression => isnewerthan("$(pvkey)", "$(nopasskey)");
+
+    "missing_pub" not => fileexists("$(key_file)");
+    "old_pub" expression => isnewerthan("$(nopasskey)", "$(key_file)");
+
+    "sshdir_missing" not => isdir("$(sshdir)");
 
   files:
-    "$(sshdir)/."
+    "$(sshdir)"
       create => "true",
       perms  => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
     "$(sshdir)/authorized_keys"
       create => "true",
-      perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
-      edit_line => authorized_sipx_commands;
+      perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
-    "$(privkey)"
+    "$(nopasskey)"
       create => "true",
       perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
@@ -58,21 +59,29 @@ bundle agent 00_ssh {
       perms  => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
   commands:
-    priv_missing|priv_old::
+    primary.(missing_nopass|old_nopass)::
       "/usr/bin/openssl"
-        comment => "Update private key copy",
-        args => "rsa -in $(pvkey) -passin 'pass:$(passphrase)' -out $(privkey)";
+        comment => "Generate nopass private key"
+        args    => "rsa -in $(pvkey) -passin 'pass:$(passphrase)' -out $(nopasskey)";
 
-    pub_missing|pub_old::
+    primary.(missing_pub|old_pub)::
       "/usr/bin/ssh-keygen"
-        comment => "Update public ssh key",
-        args => "-y -f $(privkey) > $(key_file)",
+        comment => "Generate public key from nopass private key"
+        args    => "-y -f $(nopasskey) > $(key_file)"
         contain => in_shell;
+
+    primary.(missing_pub|old_pub)::
+      "/usr/bin/cf-agent"
+        comment => "Update authorized_keys with current public key"
+        args    => "-B edit_line -f /usr/share/sipxecs/cfinputs/plugin.d/00_ssh_edit_line.cf";
+
 }
 
-bundle edit_line authorized_sipx_commands {
+bundle edit_line authorized_sipx_commands
+{
   vars:
-    "key" string => readfile("$(key_file)", "1000");
+    any::
+      "key" string => readfile("$(key_file)", "1000");
 
   delete_lines:
     "^.*\ssipx@primary$";
