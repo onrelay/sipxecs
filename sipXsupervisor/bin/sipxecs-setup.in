@@ -739,7 +739,7 @@ EOF
 end
 
 # 2nd pass operates on cfdata info
-run_command("#{$bindir}/sipxagent #{'-v ' if $verbose}")
+ok = run_command("#{$bindir}/sipxagent #{'-v ' if $verbose}")
 update_config_access
 if !ok
   puts "failed."

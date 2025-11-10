@@ -45,11 +45,11 @@ bundle agent mongodb {
 
     any_mongo::
       "any" usebundle => allow_ssh_command("mongodb-admin");
-      "any" usebundle => rh_systemctl_status("enable disable-transparent-hugepages");
+      "any" usebundle => rh_systemctl_status("enable disable-transparent-hugepages.service");
 
     !any_mongo::
       "any" usebundle => disallow_ssh_command("mongodb-admin");
-      "any" usebundle => rh_systemctl_status("disable disable-transparent-hugepages");
+      "any" usebundle => rh_systemctl_status("disable disable-transparent-hugepages.service");
 
     any::
       "any" usebundle => mongodb_running;
