@@ -25,7 +25,8 @@ systemd_SCRIPTS = \
 	mongod-arbiter.service \
 	mongo-local.service \
 	mongo-local-arbiter.service \
-	mongodb-sync.service
+	mongodb-sync.service \
+	disable-transparent-hugepages.service
 
 bin_SCRIPTS = \
 	sipxconfig-archive \

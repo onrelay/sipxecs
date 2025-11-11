@@ -717,9 +717,14 @@ end
 # First pass generated cfdata info
 if is_primary?
   puts "Initial setup, please wait..."
-  run_command("#{$bindir}/sipxagent #{'-v ' if $verbose} -d setup")
-  update_config_access
-  puts "Finishing system configuration, almost done..."
+  ok = run_command("#{$bindir}/sipxagent #{'-v ' if $verbose} -d setup")
+  if !ok
+    puts "sipxconfig setup failed."
+    exit 1
+  else
+    update_config_access
+    puts "Finishing system configuration, almost done..."
+  end
 else  
   if $sync_time
     unless ntpd_running?
@@ -742,7 +747,7 @@ end
 ok = run_command("#{$bindir}/sipxagent #{'-v ' if $verbose}")
 update_config_access
 if !ok
-  puts "failed."
+  puts "sipxconfig start failed."
   exit 1
 else
   # Wait for sipxconfig service restart to complete
