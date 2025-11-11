@@ -189,11 +189,11 @@ class MongoMeta:
         return self.meta[host]
 
     def memberModel(self, host_port):
-        model = self.meta['model']
         for stype in ['servers', 'arbiters']:
-            if stype in model:
-                if host_port in model[stype]:
-                    return model[stype][host_port]
+            if stype in self.model:
+                for k, v in self.model[stype].items():
+                    if v == host_port:
+                        return v
         return None
 
     def statusMembers(self, predicate):        
