@@ -40,26 +40,32 @@ bundle agent 00_ssh
     "old_pub" expression => isnewerthan("$(nopasskey)", "$(key_file)");
     "keys_ready" expression => fileexists("$(key_file)");
 
-  # ensure directories and key files exist (no rxdirs usage)
   files:
-    # create .ssh directory (use trailing '/.' historically works to ensure dir)
+    # ensure .ssh directory exists
     "$(sshdir)/."
       create => "true",
       perms  => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
-    # ensure private nopass key path exists (file will be created/updated by commands)
+    # ensure nopass private key file path exists (will be created/updated by commands)
     "$(nopasskey)"
       create => "true",
       perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
-    # ensure public key file path exists (will be populated by ssh-keygen)
+    # ensure public key path exists (ssh-keygen will populate)
     "$(key_file)"
       create => "true",
       perms  => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
-  # generate keys in the correct order
+  # Create/edit authorized_keys ONLY when keys_ready (i.e. key_file exists)
+  files:
+    keys_ready::
+      "$(sshdir)/authorized_keys"
+        create => "true",
+        perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
+        edit_line => authorized_sipx_commands;
+
   commands:
-    # create non-passphrase private key if missing or older than original pvkey
+    # create non-passphrase private key if missing or older than source pvkey
     primary.(missing_nopass|old_nopass)::
       "/usr/bin/openssl"
         comment => "Generate nopass private key",
@@ -73,18 +79,18 @@ bundle agent 00_ssh
         contain => in_shell;
 }
 
-# Separate edit_line bundle that will be invoked only after key_file exists.
+# edit_line bundle that is safe because it's only invoked after keys_ready:: on authorized_keys
 bundle edit_line authorized_sipx_commands
 {
   vars:
     any::
-      # read the public key from the location created above. Use the bundle-qualified var.
+      # read the public key; should exist when this bundle is invoked
       "key" string => readfile("$(00_ssh.key_file)", "1000");
 
   delete_lines:
     "^.*\\ssipx@primary$";
 
   insert_lines:
-    # don't include ${SSH_ORIGINAL_COMMAND} in the authorized_keys line — wrapper reads it itself
+    # do NOT include ${SSH_ORIGINAL_COMMAND} here — the wrapper should use it
     "from=\"$(sipx.master_address)\",command=\"$(sipx.SIPX_LIBEXECDIR)/sipx-allow-command\" $(key) sipx@primary";
 }

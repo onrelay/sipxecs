@@ -1,0 +1,14 @@
+[Unit]
+Description=Disable Transparent Hugepages
+Documentation=http://sipxcom.org
+After=network.target syslog.target
+
+[Service]
+Type=oneshot
+ExecStart=@SIPX_SERVICEDIR@/disable-transparent-hugepages start
+RemainAfterExit=true
+ExecStop=@SIPX_SERVICEDIR@/disable-transparent-hugepages stop
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -186,34 +186,24 @@ bundle edit_line sipxopenfire_sipx_properties {
 }
 
 bundle agent sipxopenfire_running {
-  vars:
-    any::
-      "service" string => "/etc/init.d/openfire";
-      "service_command" string => ".*\s-Dprovider.properties.className=org.jivesoftware.util.FilePropertiesProvider\s.*";
-
   methods:
-    any::
-      "any" usebundle => find_service_by_command("$(service_command)","openfire_running","$(sipx.OPENFIRE_USER)");
     !src.sipxopenfire::
-      "any" usebundle => rh_systemctl_status("enable openfire.service");
+      "any" usebundle => rh_systemctl_status("enable sipxopenfire");
     !src.!sipxopenfire::
-      "any" usebundle => rh_systemctl_status("disable openfire.service");
+      "any" usebundle => rh_systemctl_status("disable sipxopenfire");
 
   commands:
     (!sipxopenfire|stop_sipxecs).openfire_running::
-      "$(service)"
-        comment => "stop sipxopenfire",
-        args => "stop";
+      "/bin/systemctl"
+        args => "stop sipxopenfire";
 
     sipxopenfire.!openfire_running.!stop_sipxecs::
-      "$(service)"
-        comment => "start sipxopenfire",
-        args => "start";
+      "/bin/systemctl"
+        args => "start sipxopenfire";
 
     sipxopenfire.openfire_running.(restart_sipxecs|restart_openfire)::
-      "$(service)"
-        comment => "restart sipxopenfire",
-        args => "restart";
+      "/bin/systemctl"
+        args => "restart sipxopenfire";
 }
 
 bundle edit_line sipxopenfire_log4j_properties_contents {
