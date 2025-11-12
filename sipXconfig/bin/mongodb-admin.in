@@ -159,19 +159,17 @@ class MongoRSAdmin:
             except Exception:
                 # If file is missing or invalid, use default structure
                 self.model = {
-                    "servers": {
-                        host_port: {}
-                        },
-                    "arbiters": {},
+                    "servers": [
+                        host_port
+                    ],
                     "replSet": "sipxecs"
                 }
         else:
             # If model_file is None or not valid, use default structure
             self.model = {
-                "servers": {
-                    host_port: {}
-                    },
-                "arbiters": {},
+                "servers": [
+                    host_port
+                ],
                 "replSet": "sipxecs"
             }
         self.host_port = host_port
@@ -417,7 +415,7 @@ class MongoRSAdmin:
         for stype in ['servers', 'arbiters']:
             if stype in self.model:
                 if host_port in self.model[stype]:
-                    return self.model[stype].get(host_port)
+                    return self.model[stype][host_port]
         raise Exception('Could not find node ' + host_port)
 
     def isLocal(self):
