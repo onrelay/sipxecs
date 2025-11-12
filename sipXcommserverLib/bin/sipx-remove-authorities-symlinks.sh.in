@@ -1,3 +1,4 @@
 #!/bin/sh
 
-find @SIPX_CONFDIR@/ssl/authorities -maxdepth 1 -type l | xargs rm
+find @SIPX_CONFDIR@/ssl/authorities -maxdepth 1 -type l -exec rm {} +
+
