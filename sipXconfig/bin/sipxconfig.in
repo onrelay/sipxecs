@@ -253,7 +253,7 @@ start() {
   fi
   touch ${LogDir}/sipxconfig.log
   chown @SIPXPBXUSER@:@SIPXPBXUSER@ ${LogDir}/sipxconfig.log
-  $Command >> ${LogDir}/sipxconfig.log 2>&1
+  echo "$Command" >> "${LogDir}/sipxconfig.log" 2>&1
   if [ -n "${NoFork}" ] ; then
     killAnyOrphans @SIPXPBXUSER@ $regex
     runuser -m -s @BASH@ @SIPXPBXUSER@ -c "${Command}"
