@@ -37,6 +37,7 @@ initd_SCRIPTS = \
 
 systemddir = /usr/lib/systemd/system
 systemd_SCRIPTS = \
+	sipxlogwatcher.service \
 	sipxsupervisor.service
 
 $(libexec_SCRIPTS) $(cfmod_SCRIPTS) $(initd_SCRIPTS) $(bin_SCRIPTS) $(systemd_SCRIPTS) : % : %.in Makefile
