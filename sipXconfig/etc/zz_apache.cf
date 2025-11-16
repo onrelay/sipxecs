@@ -102,7 +102,7 @@ bundle agent apache_config {
         comment => "install ssl certs info $(this.promiser)",
         create => "true",
         copy_from => copy_from_cfdata("$(sipx.location_id)/$(ssl_web)"),
-        perms => mog("600","root","root"),
+        perms => mog("644","root","root"),
         classes => if_repaired("restart_apache");
 
 }

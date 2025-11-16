@@ -539,12 +539,12 @@ bundle agent allow_ssh_command(command) {
   files:
     "$(sshdir)/."
       create => "true",
-      perms  => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+      perms  => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
     any::
       "$(sshdir)/authorized_sipx_commands"
         create => "true",
-        perms => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
+        perms => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
         edit_line => insert_lines("$(command)");
 }
 
@@ -563,7 +563,7 @@ bundle agent disallow_ssh_command(command) {
     any::
       "$(sshdir)/.ssh/authorized_sipx_commands"
         create => "false",
-        perms => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
+        perms => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
         edit_line => delete_lines_matching("^$(command)$");
 }
 

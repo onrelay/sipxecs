@@ -44,12 +44,12 @@ bundle agent 00_ssh
     # ensure .ssh directory exists
     "$(sshdir)/."
       create => "true",
-      perms  => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+      perms  => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
     # ensure nopass private key file path exists (will be created/updated by commands)
     "$(nopasskey)"
       create => "true",
-      perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+      perms  => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
     # ensure public key path exists (ssh-keygen will populate)
     "$(key_file)"
@@ -61,7 +61,7 @@ bundle agent 00_ssh
     keys_ready::
       "$(sshdir)/authorized_keys"
         create => "true",
-        perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
+        perms  => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
         edit_line => authorized_sipx_commands;
 
   commands:
