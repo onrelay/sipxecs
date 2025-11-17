@@ -55,7 +55,7 @@ def run(verbose, is_remote, is_raw, hosts, defines, undefines, bundles)
     analyzer = (is_raw ? '' : "| #{$bindir}/sipxagent-log-reader #{vstr}")
           
     if (is_remote || Process.uid != 0)
-      ok = cmd(verbose, "/usr/local/sbin/cf-runagent -t #{$timeout} -v #{hstr} -f #{$cfinputs}/sipxagent.cf -o '#{agentstr} -K' | tee -a #{$logfile} #{analyzer}")
+      ok = cmd(verbose, "/usr/local/sbin/cf-runagent -t #{$timeout} -v #{hstr} -f #{$cfinputs}/sipxagent.cf #{agentstr} --no-lock | tee -a #{$logfile} #{analyzer}")
     else 
       # Short-cut - If you're root and you're not remote, do not bother going thru 
       # sipxsupervisor.  This is handy if supervisor is dead or in the very initial
