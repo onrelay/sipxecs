@@ -57,7 +57,7 @@ public class UserProfileContext implements DaoEventListener, SetupListener {
         try {
             if (manager.isFalse(PROFILE_SETUP)) {
                 Resource defaultAvatar = new ClassPathResource(
-                        "org/sipfoundry/sipxconfig/common/profile/default_avatar.jpg");
+                        "org/sipfoundry/sipxconfig/common/profile/default_avatar.png");
                 m_userProfileService.saveAvatar("default", defaultAvatar.getInputStream(), false);
                 manager.setTrue(PROFILE_SETUP);
             }
