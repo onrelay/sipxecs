@@ -26,7 +26,7 @@ import org.bouncycastle.jce.X509Principal;
 import org.sipfoundry.sipxconfig.common.UserException;
 
 public class CertificateRequestGenerator extends AbstractCertificateCommon {
-    private String m_algorithm = "SHA1WithRSAEncryption";
+    private String m_algorithm = "SHA256WithRSAEncryption";
 
     public CertificateRequestGenerator(String domain, String fqdn) {
         super(domain, fqdn);

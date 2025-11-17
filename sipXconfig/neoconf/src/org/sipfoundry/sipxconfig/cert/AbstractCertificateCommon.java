@@ -26,7 +26,7 @@ public class AbstractCertificateCommon {
     private String m_dnsDomain;
     private String m_host;
     private int m_bitCount = DEFAULT_KEY_SIZE;
-    private String m_algorithm = "SHA1WithRSAEncryption";
+    private String m_algorithm = "SHA256WithRSAEncryption";
 
     protected AbstractCertificateCommon(String domain, String fqdn) {
         setDnsDomain(domain);

@@ -62,7 +62,7 @@ public class IMBot {
         }
 
         /*
-         * IMbot client computes the SHA1 hash of the avatar image data itself. Include this hash
+         * IMbot client computes the hash of the avatar image data itself. Include this hash
          * in the user's presence information as the XML character data of the <photo/> child of
          * an <x/> element qualified by the 'vcard-temp:x:update' namespace
          */
