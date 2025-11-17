@@ -49,7 +49,7 @@ bundle agent 00_ssh
     # ensure nopass private key file path exists (will be created/updated by commands)
     "$(nopasskey)"
       create => "true",
-      perms  => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+      perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
     # ensure public key path exists (ssh-keygen will populate)
     "$(key_file)"
