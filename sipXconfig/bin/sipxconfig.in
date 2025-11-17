@@ -93,7 +93,7 @@ password=${value#$prefix}
 
 # Incase system failed suddenly, clear previous locks
 clearIndexLocks() {
-  rm ${IndexDir}/*.lock 2>/dev/null
+  rm ${IndexDir}/*.lock  >> "${LogDir}/sipxconfig.log" 2>&1
 }
 
 # Incase system failed suddenly, clear previous locks
@@ -253,23 +253,22 @@ start() {
   fi
   touch ${LogDir}/sipxconfig.log
   chown @SIPXPBXUSER@:@SIPXPBXUSER@ ${LogDir}/sipxconfig.log
-  echo "$Command" >> "${LogDir}/sipxconfig.log" 2>&1
   if [ -n "${NoFork}" ] ; then
     killAnyOrphans @SIPXPBXUSER@ $regex
-    runuser -m -s @BASH@ @SIPXPBXUSER@ -c "${Command}"
+    runuser -m -s @BASH@ @SIPXPBXUSER@ -c "${Command}" >> "${LogDir}/sipxconfig.log" 2>&1
     Status=$?
   else
-    checkRunningInstance @SIPXPBXUSER@ $regex > /dev/null
+    checkRunningInstance @SIPXPBXUSER@ $regex  >> "${LogDir}/sipxconfig.log" 2>&1
     Status=$?
     [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
 
     echo -n $"Starting $prog: "
-    runuser -s @BASH@ @SIPXPBXUSER@ -c "${Command}" >/dev/null 2>&1 &
+    runuser -s @BASH@ @SIPXPBXUSER@ -c "${Command}"  >> "${LogDir}/sipxconfig.log" 2>&1 &
     echo $! > ${PidFile}
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningInstanceTimeout @SIPXPBXUSER@ $regex
+      checkRunningInstanceTimeout @SIPXPBXUSER@ $regex >> "${LogDir}/sipxconfig.log" 2>&1
       Status=$?
       pid=$(pgrep -u @SIPXPBXUSER@ -f "$regex")
       [ $Status -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
@@ -290,7 +289,7 @@ start() {
 databaseCheck() {
     psql --list --field-separator , --no-align --username @POSTGRESQL_USER@ \
     | cut -d , -f 1 \
-    | grep "${Database}"$ > /dev/null 2>&1
+    | grep "${Database}"$  >> "${LogDir}/sipxconfig.log" 2>&1
 }
 
 # Check the database version.  If it is wrong, then exit, because it's dangerous to
@@ -347,7 +346,7 @@ EOF
 stop() {
   echo -n $"Stopping $prog: "
   killAnyOrphans @SIPXPBXUSER@ $regex
-  checkRunningInstance @SIPXPBXUSER@ $regex > /dev/null
+  checkRunningInstance @SIPXPBXUSER@ $regex  >> "${LogDir}/sipxconfig.log" 2>&1
   Status=$?
   [ $Status -eq 0 ] && { echo_failure; echo; exit $ERUNNING; }
   [ $Status -eq 0 ] || { echo_success; echo; }
@@ -388,7 +387,7 @@ case "$1" in
     asyncrestart
     ;;
   condrestart)
-    checkRunningInstance @SIPXPBXUSER@ $regex > /dev/null
+    checkRunningInstance @SIPXPBXUSER@ $regex  >> "${LogDir}/sipxconfig.log" 2>&1
     Status=$?
     [ $Status -eq 0 ] && restart || :
     ;;
