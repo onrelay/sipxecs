@@ -49,20 +49,26 @@ def run(verbose, is_remote, is_raw, hosts, defines, undefines, bundles)
     dstr = (defines.empty? ? '' : "-D " + defines.join(','))
     nstr = (undefines.empty? ? '' : "-N " + undefines.join(','))
     bstr = (bundles.empty? ? '' : "-b " + bundles.join(','))
-    agentstr = "-v #{dstr} #{nstr} #{bstr}"
+
     hstr = (hosts.empty? ? '-H 127.0.0.1' : "-H " + hosts.join(','))
     vstr = (verbose ? '-v' : '')
     analyzer = (is_raw ? '' : "| #{$bindir}/sipxagent-log-reader #{vstr}")
-          
+
     if (is_remote || Process.uid != 0)
-      ok = cmd(verbose, "/usr/local/sbin/cf-runagent -t #{$timeout} -v #{hstr} -f #{$cfinputs}/sipxagent.cf #{agentstr} --no-lock | tee -a #{$logfile} #{analyzer}")
+      o_flags_list = ['-o "-v"', '-o "-K"']
+      o_flags_list << "-o '#{dstr.strip}'" unless dstr.empty?
+      o_flags_list << "-o '#{nstr.strip}'" unless nstr.empty?
+      o_flags_list << "-o '#{bstr.strip}'" unless bstr.empty?
+      o_flags_str = o_flags_list.join(' ')
+      ok = cmd(verbose, "/usr/local/sbin/cf-runagent -t #{$timeout} -v #{hstr} -f #{$cfinputs}/sipxagent.cf #{o_flags_str} | tee -a #{$logfile} #{analyzer}")
     else 
-      # Short-cut - If you're root and you're not remote, do not bother going thru 
-      # sipxsupervisor.  This is handy if supervisor is dead or in the very initial
-      # call to sipxecs-setup on primary when nothing is running yet
-      ok = cmd(verbose, "/usr/local/sbin/cf-agent #{agentstr} -IKf #{$cfinputs}/promises.cf | tee -a #{$logfile} #{analyzer}");
+      # Short-cut (local execution remains unchanged as it doesn't use cf-runagent's -o)
+      # Rebuild agentstr for local use:
+      agentstr_local = "-v #{dstr} #{nstr} #{bstr}".strip
+      ok = cmd(verbose, "/usr/local/sbin/cf-agent #{agentstr_local} -IKf #{$cfinputs}/promises.cf | tee -a #{$logfile} #{analyzer}");
+      
       FileUtils.chown($user, $group, $logfile)
-    end
+    end  
   end
   time2 = Time.now
   open("#{$logfile}", 'a') { |f|
