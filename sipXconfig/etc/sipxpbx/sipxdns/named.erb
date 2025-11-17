@@ -16,41 +16,40 @@ logging {
     null; 
   }; 
 };
-<% unless acl.nil?%>
-acl corpnets { <%= acl %> };<% end%>
+
+<% unless acl.nil? %>
+acl corpnets { <%= acl %> };
+<% end %>
+
 options {
   directory  "/var/named";
   dump-file "/var/named/data/cache_dump.db";
-  statistics-file "/var/named/data/named_stats.txt";<% unless acl.nil?%>
+  statistics-file "/var/named/data/named_stats.txt";
+<% unless acl.nil? %>
   allow-query { any; };
-  allow-recursion { corpnets; };<% end%>
+  allow-recursion { corpnets; };
+<% end %>
   filter-aaaa-on-v4 yes;
-  forwarders { <% 
-    forwarders.each {|forwarder| 
-%>
-    <%= forwarder %>; 
-<% 
-    } 
-%>  };
-};
-<%
-  views.each{|view|
-%>
-view <%=view[:name] %> { <%
-  # No addresses means this matched all clients
-  # so technically only last view should be null
-  if (view[:match_clients] != nil)
-%>
-  match-clients { <%
-    view[:match_clients].each{|ipaddr|
-%>
-    <%= ipaddr %>; <%
-    }
-%>
+
+  forwarders {
+<% if forwarders && forwarders.respond_to?(:each) %>
+<% forwarders.each do |forwarder| %>
+    <%= forwarder %>;
+<% end %>
+<% end %>
   };
-<%
-  end
-%>
+};
+
+<% if views && views.respond_to?(:each) %>
+<% views.each do |view| %>
+view <%= view[:name] %> {
+<% if view[:match_clients] %>
+  match-clients {
+<% view[:match_clients].each do |ipaddr| %>
+    <%= ipaddr %>;
+<% end %>
+  };
+<% end %>
 
   zone "<%= domain %>" IN {
     type master;
@@ -60,6 +59,5 @@ view <%=view[:name] %> { <%
     };
   };
 };
-<%
-  }
-%>
+<% end %>
+<% end %>
