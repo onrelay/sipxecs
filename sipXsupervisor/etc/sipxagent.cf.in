@@ -34,5 +34,6 @@ body runagent control {
   hosts => { @(sipx.allowed_addrs) };
   trustkey => "true";
   encrypt => "true";
+  key => "/var/cfengine/ppkeys/localhost.priv";   
 }
 
