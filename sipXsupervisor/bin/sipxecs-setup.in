@@ -723,7 +723,7 @@ if is_primary?
     exit 1
   else
     update_config_access
-    puts "Finishing system configuration, almost done..."
+    puts "Finishing system configuration ..."
   end
 else  
   if $sync_time
