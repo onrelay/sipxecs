@@ -27,7 +27,11 @@ end
 
 def run(verbose, is_remote, is_raw, hosts, defines, undefines, bundles)
 
-  if (Process.uid == 0 && is_remote) # uid == 0 for root?
+  localhost_only = (hosts.length == 1 && hosts[0] == "127.0.0.1")
+  empty_host = hosts.empty?
+  run_locally = localhost_only || empty_host || !is_remote 
+
+  if (Process.uid == 0 && !run_locally) # uid == 0 for root?
     #
     # You should not run cf-runagent as root because root user does not have all
     # the ssl keys setup. Only sipx user should. So if you are attemptng to run
@@ -55,10 +59,8 @@ def run(verbose, is_remote, is_raw, hosts, defines, undefines, bundles)
     vstr = verbose ? '-v' : ''
     analyzer = is_raw ? '' : "| #{$bindir}/sipxagent-log-reader #{vstr}"
 
-    localhost_only = (hosts.length == 1 && hosts[0] == "127.0.0.1")
-
-    if ((!is_remote || hosts.empty? || localhost_only) && Process.uid == 0)
-      # Shortcut: if root and not remote, run cf-agent directly
+    if (Process.uid == 0 && run_locally)
+      # Shortcut: if root and run locally, run cf-agent directly
       ok = cmd(
         verbose,
         "/usr/local/sbin/cf-agent #{agentstr} -IKf #{$cfinputs}/promises.cf | tee -a #{$logfile} #{analyzer}"
