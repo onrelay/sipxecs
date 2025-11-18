@@ -55,7 +55,9 @@ def run(verbose, is_remote, is_raw, hosts, defines, undefines, bundles)
     vstr = verbose ? '-v' : ''
     analyzer = is_raw ? '' : "| #{$bindir}/sipxagent-log-reader #{vstr}"
 
-    if ((!is_remote || hosts.empty?) && Process.uid == 0)
+    localhost_only = (hosts.length == 1 && hosts[0] == "127.0.0.1")
+
+    if ((!is_remote || hosts.empty? || localhost_only) && Process.uid == 0)
       # Shortcut: if root and not remote, run cf-agent directly
       ok = cmd(
         verbose,
