@@ -28,7 +28,7 @@ bundle agent 00_ssh
     "userdata_no" int => getfields("$(sipx.SIPXPBXUSER):.*", "/etc/passwd", ":", "userdata");
     "home" string => "$(userdata[6])";
     "sshdir" string => "$(home)/.ssh";
-    "ppkdir" string => "$(sshdir)/ppkeys";
+    "ppkdir" string => "$(home)/.cfagent/ppkeys";
     "pvkey" string => "$(ppkdir)/localhost.priv";
     "nopasskey" string => "$(ppkdir)/localhost.nopass.priv";
     "key_file" string => "$(sipx.SIPX_CFDATA)/primary.ssh.pub";
@@ -43,10 +43,6 @@ bundle agent 00_ssh
   files:
     # ensure .ssh directory exists
     "$(sshdir)/."
-      create => "true",
-      perms  => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
-
-    "$(ppkdir)/."
       create => "true",
       perms  => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 

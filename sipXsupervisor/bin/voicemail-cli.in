@@ -31,7 +31,7 @@ class Base
     @bin_dir = '@SIPX_BINDIR@'
     @ivrdir = '@SIPX_JAVADIR@/sipXivr'
     @out = $stdout
-    @ssh_params = "-o 'StrictHostKeyChecking=no' -i @SIPX_CONFDIR@/.ssh/ppkeys/localhost.nopass.priv"
+    @ssh_params = "-o 'StrictHostKeyChecking=no' -i @SIPX_CONFDIR@/.cfagent/ppkeys/localhost.nopass.priv"
     @data = sql_exec_output("SIPXCONFIG", "select l.ip_address from location l, feature_local fl where l.location_id=fl.location_id and fl.feature_id='ivr'")    
     @user = user
     redirect_output
