@@ -28,7 +28,7 @@ bundle agent 00_ssh
     "userdata_no" int => getfields("$(sipx.SIPXPBXUSER):.*", "/etc/passwd", ":", "userdata");
     "home" string => "$(userdata[6])";
     "sshdir" string => "$(home)/.ssh";
-    "ppkdir" string => "$(home)/.cfagent/ppkeys";
+    "ppkdir" string => "$(sshdir)/ppkeys";
     "pvkey" string => "$(ppkdir)/localhost.priv";
     "nopasskey" string => "$(ppkdir)/localhost.nopass.priv";
     "key_file" string => "$(sipx.SIPX_CFDATA)/primary.ssh.pub";
