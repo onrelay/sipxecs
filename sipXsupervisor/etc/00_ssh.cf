@@ -46,6 +46,10 @@ bundle agent 00_ssh
       create => "true",
       perms  => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
+    "$(ppkdir)/."
+      create => "true",
+      perms  => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+
     # ensure nopass private key file path exists (will be created/updated by commands)
     "$(nopasskey)"
       create => "true",
