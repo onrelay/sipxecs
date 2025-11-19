@@ -61,16 +61,16 @@ end
 def set_nonroot_keys
   run_command "su - #{$user} sh -c '/usr/local/sbin/cf-key'"
 
-  root_pub   = "#{root_keydir}/localhost.pub"
+  root_pub = "#{$root_keydir}/localhost.pub"
   md5name = `cf-key -p #{root_pub} 2>/dev/null`.strip
   md5file = "#{$user}-#{md5name}.pub"
 
-  run_command "cp #{root_pub} #{root_keydir}/#{md5file}"
-  run_command "chmod 600 #{root_keydir}/#{md5file}"
+  run_command "cp #{root_pub} #{$root_keydir}/#{md5file}"
+  run_command "chmod 600 #{$root_keydir}/#{md5file}"
 
-  run_command "cp #{root_pub} #{user_keydir}/#{md5file}"
-  run_command "chown #{$user}:#{$group} #{user_keydir}/#{md5file}"
-  run_command "chmod 600 #{user_keydir}/#{md5file}"
+  run_command "cp #{root_pub} #{$user_keydir}/#{md5file}"
+  run_command "chown #{$user}:#{$group} #{$user_keydir}/#{md5file}"
+  run_command "chmod 600 #{$user_keydir}/#{md5file}"
 end
 
 def disable_selinux
