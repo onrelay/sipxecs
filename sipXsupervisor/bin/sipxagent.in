@@ -27,34 +27,52 @@ end
 
 def run(verbose, is_remote, is_raw, hosts, defines, undefines, bundles)
 
-  # XX-10858 Log can get very large, so we limit it to 10K lines plus 
-  # size of last run
-  `sed -i -e :a -e '$q;N;100000,$D;ba' #{$logfile}` if File.exists?($logfile)
-
-  dstr = defines.empty?   ? '' : "-D " + defines.join(',')
-  nstr = undefines.empty? ? '' : "-N " + undefines.join(',')
-  bstr = bundles.empty?   ? '' : "-b " + bundles.join(',')
-  agentstr = "-v #{dstr} #{nstr} #{bstr}"
-
-  hstr = hosts.empty? ? '-H 127.0.0.1' : "-H " + hosts.join(',')
-  vstr = verbose ? '-v' : ''
-  analyzer = is_raw ? '' : "| #{$bindir}/sipxagent-log-reader #{vstr}"
-
   localhost_only = (hosts.length == 1 && hosts[0] == "127.0.0.1")
   empty_host = hosts.empty?
   run_locally = localhost_only || empty_host || !is_remote 
 
-  if (run_locally) 
-    ok = cmd(
-      verbose,
-      "/usr/local/sbin/cf-agent #{agentstr} -IKf #{$cfinputs}/promises.cf | tee -a #{$logfile} #{analyzer}"
-    )
-    FileUtils.chown($user, $group, $logfile)
+  if (Process.uid == 0 && !run_locally) # uid == 0 for root
+    #
+    # You should not run cf-runagent as root because root user does not have all
+    # the ssl keys setup. Only sipx user should. So if you are attemptng to run
+    # cf-agent remote as root, no problem, we'll switch you over automatically
+    # we need to go thru su so environment is setup properly
+    #
+
+    # !RECURSIVE
+    # Too many commands needs to run as proper user to try and run "su" on them all 
+    # so just call this script again as the proper user
+    ok = cmd(verbose, "su - #{$user} sh -c \"#{$bindir}/sipxagent #{$args.join(' ')}\"")
+
   else
-    ok = cmd(
-      verbose,
-      "/usr/local/sbin/cf-runagent -t #{$timeout} #{hstr} -f #{$cfinputs}/sipxagent.cf | tee -a #{$logfile} #{analyzer}"
-    )
+
+    # XX-10858 Log can get very large, so we limit it to 10K lines plus 
+    # size of last run
+    `sed -i -e :a -e '$q;N;100000,$D;ba' #{$logfile}` if File.exists?($logfile)
+
+    dstr = defines.empty?   ? '' : "-D " + defines.join(',')
+    nstr = undefines.empty? ? '' : "-N " + undefines.join(',')
+    bstr = bundles.empty?   ? '' : "-b " + bundles.join(',')
+    agentstr = "-v #{dstr} #{nstr} #{bstr}"
+
+    hstr = hosts.empty? ? '-H 127.0.0.1' : "-H " + hosts.join(',')
+    vstr = verbose ? '-v' : ''
+    analyzer = is_raw ? '' : "| #{$bindir}/sipxagent-log-reader #{vstr}"
+
+    if (Process.uid == 0 && run_locally)
+      # Shortcut: if root and run locally, run cf-agent directly
+      ok = cmd(
+        verbose,
+        "/usr/local/sbin/cf-agent #{agentstr} -IKf #{$cfinputs}/promises.cf | tee -a #{$logfile} #{analyzer}"
+      )
+      FileUtils.chown($user, $group, $logfile)
+    else
+      # Always run as sipx user per above logic
+      ok = cmd(
+        verbose,
+        "/usr/local/sbin/cf-runagent -t #{$timeout} #{hstr} -f #{$cfinputs}/sipxagent.cf | tee -a #{$logfile} #{analyzer}"
+      )
+    end
   end
   time2 = Time.now
   open("#{$logfile}", 'a') { |f|
