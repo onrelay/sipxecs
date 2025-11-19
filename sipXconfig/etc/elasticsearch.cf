@@ -1,26 +1,42 @@
+# Copyright (c) 2015 eZuce, Inc. All rights reserved.
+# Contributed to SIPfoundry under a Contributor Agreement
+
+# This software is free software; you can redistribute it and/or modify it under
+# the terms of the Affero General Public License (AGPL) as published by the
+# Free Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This software is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+
+#
+# Elasticsearch configuration for working with sipxecs
+#
+
 bundle agent elasticsearch {
 
   methods:
     primary::
       "any" usebundle => elasticsearch_config;
       "any" usebundle => elasticsearch_index_settings;
+
       "any" usebundle => elasticsearch_systemctl_running;
 }
 
-# --- Manage configuration files and ownership ---
+
 bundle agent elasticsearch_config {
 
   files:
     any::
-      # Main node config
       "/etc/elasticsearch/elasticsearch.yml"
-        comment => "Configure Elasticsearch (node-level settings only, minimal for sipXconfig)",
+        comment => "Configure Elasticsearch (node-level settings only)",
         create => "true",
         perms => mog("644", "root", "root"),
         edit_line => elasticsearch_config_file,
         classes => if_repaired("restart_elasticsearch");
 
-      # nproc limits
       "/etc/security/limits.d/99-elasticsearch-nproc.conf"
         comment => "Setup Elasticsearch limits",
         create => "true",
@@ -28,16 +44,16 @@ bundle agent elasticsearch_config {
         edit_line => elasticsearch_limits_contents,
         classes => if_repaired("restart_elasticsearch");
 
-      # Custom JVM options to reduce memory
-      "/etc/elasticsearch/jvm.options.d/sipxconfig.options"
-        comment => "Minimal heap for sipXconfig",
+      # JVM options – keep legacy settings but ensure correct file
+      "/etc/elasticsearch/jvm.options"
+        comment => "Ensure correct JVM settings",
         create => "true",
-        perms => mog("644", "root", "root"),
+        perms => mog("644","root","root"),
         edit_line => elasticsearch_jvm_options,
         classes => if_repaired("restart_elasticsearch");
 }
 
-# --- Manage nofile limits ---
+
 bundle edit_line elasticsearch_limits_contents {
   insert_lines:
 "elasticsearch soft    nofile    65536
@@ -45,13 +61,16 @@ elasticsearch hard    nofile    65536
 ";
 }
 
-# --- Manage elasticsearch.yml ---
+
 bundle edit_line elasticsearch_config_file {
+
   vars:
+    # sipx is always $user, do not hardcode
     "tmpDir" slist => readstringlist("$(sipx.SIPX_CFDATA)/$(sipx.location_id)/elasticsearch.yml.part", "tmpDir=", "\n", 1, 4000);
 
   delete_lines:
     any::
+      # Remove old/legacy/overridden settings
       "path.repo.*";
       "script.engine.groovy.inline.aggs.*";
       "cluster.name.*";
@@ -61,41 +80,33 @@ bundle edit_line elasticsearch_config_file {
       "cluster.initial_master_nodes.*";
       "network.host.*";
       "http.port.*";
-      "xpack.ml.enabled.*";
-      "xpack.security.enabled.*";
-      "xpack.monitoring.enabled.*";
-      "xpack.security.http.ssl.enabled.*";
-      "xpack.security.transport.ssl.enabled.*";
+      "xpack.*";     # remove all invalid xpack settings fully
 
   insert_lines:
     any::
-      # Snapshot/repo paths
       "path.repo: [\"$(tmpDir)\", \"$(tmpDir)/elasticsearch_backup\"]";
       "cluster.initial_master_nodes: [\"$(sipx.host)$(sipx.net_domain)\"]";
+
+      # Bind only to localhost for security
       "network.host: 127.0.0.1";
-      "transport.host: 127.0.0.1";      
+      "transport.host: 127.0.0.1";
       "http.port: 9200";
-      # Disable unused X-Pack features to reduce memory
-      "xpack.ml.enabled: false";
-      "xpack.security.enabled: false";
-      "xpack.monitoring.enabled: false";
-      "xpack.security.http.ssl.enabled: false";
-      "xpack.security.transport.ssl.enabled: false";
 }
 
-# --- Minimal JVM options for heap reduction ---
+
 bundle edit_line elasticsearch_jvm_options {
+
+  delete_lines:
+    any::
+      "^-Xms.*";
+      "^-Xmx.*";
+
   insert_lines:
-"-Xms512m
--Xmx1g
--XX:MaxDirectMemorySize=512m
--XX:+UseG1GC
--XX:+HeapDumpOnOutOfMemoryError
--XX:ErrorFile=/var/log/elasticsearch/hs_err_pid%p.log
-";
+    any::
+      "-Xms256m";
+      "-Xmx1g";
 }
 
-# --- Apply replicas to existing indices and template for new indices ---
 bundle agent elasticsearch_index_settings {
 
   commands:
@@ -105,25 +116,24 @@ bundle agent elasticsearch_index_settings {
         args => "-s -X PUT 'http://localhost:9200/_all/_settings?preserve_existing=true' -H 'Content-Type: application/json' -d '{\"index\":{\"auto_expand_replicas\":\"0-1\"}}'";
 
       "/usr/bin/curl"
-        comment => "Create default index template with auto_expand_replicas=0-1 for new indices",
+        comment => "Template for new indices: auto_expand_replicas=0-1",
         args => "-s -X PUT 'http://localhost:9200/_index_template/default_template' -H 'Content-Type: application/json' -d '{\"index_patterns\":[\"*\"],\"template\":{\"settings\":{\"auto_expand_replicas\":\"0-1\"}}}'";
 }
 
-# --- systemd service management ---
 bundle agent elasticsearch_systemctl_running {
   vars:
     any::
       "service" string => "elasticsearch.service";
 
   classes:
-    "elasticsearch_running" expression => returnszero("$(sipx.systemctl) is-active $(service)","noshell");
+    any::
+      "elasticsearch_running" expression => returnszero("$(sipx.systemctl) is-active $(service)","noshell");
 
   commands:
     (!elasticsearch|stop_sipxecs).elasticsearch_running::
       "$(sipx.systemctl)"
         comment => "stop elasticsearch",
         args => "stop $(service)";
-
       "$(sipx.systemctl)"
         comment => "disable elasticsearch",
         args => "disable $(service)";
@@ -132,7 +142,6 @@ bundle agent elasticsearch_systemctl_running {
       "$(sipx.systemctl)"
         comment => "start elasticsearch",
         args => "start $(service)";
-
       "$(sipx.systemctl)"
         comment => "enable elasticsearch",
         args => "enable $(service)";
