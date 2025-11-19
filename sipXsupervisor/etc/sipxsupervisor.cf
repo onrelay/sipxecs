@@ -35,7 +35,7 @@ bundle agent sipxsupervisor_config {
         comment => "add allowed addresses to sipxsupervisor",
         create => "true",
         perms => m("644"),
-	edit_defaults => empty,
+	      edit_defaults => empty,
         edit_line => sipxsupervisor_allowed_addrs,
         classes => if_repaired("restart_sipxsupervisor");
 
@@ -43,7 +43,7 @@ bundle agent sipxsupervisor_config {
         comment => "add allowed users to sipxsupervisor",
         create => "true",
         perms => m("644"),
-	edit_defaults => empty,
+	      edit_defaults => empty,
         edit_line => sipxsupervisor_allowed_users,
         classes => if_repaired("restart_sipxsupervisor");
 
