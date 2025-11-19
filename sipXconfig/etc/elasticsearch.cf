@@ -1,31 +1,10 @@
-# Copyright (c) 2015 eZuce, Inc. All rights reserved.
-# Contributed to SIPfoundry under a Contributor Agreement
-
-# This software is free software; you can redistribute it and/or modify it under
-# the terms of the Affero General Public License (AGPL) as published by the
-# Free Software Foundation; either version 3 of the License, or (at your option)
-# any later version.
-
-# This software is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-
-#
-# Elasticsearch configuration for working with sipxecs
-#
 bundle agent elasticsearch {
 
   methods:
     primary::
       "any" usebundle => elasticsearch_config;
       "any" usebundle => elasticsearch_index_settings;
-
-    fedora16_or_greater::
       "any" usebundle => elasticsearch_systemctl_running;
-
-    !fedora16_or_greater::
-      "any" usebundle => elasticsearch_sysv_running;
 }
 
 # --- Manage configuration files and ownership ---
@@ -35,7 +14,7 @@ bundle agent elasticsearch_config {
     any::
       # Main node config
       "/etc/elasticsearch/elasticsearch.yml"
-        comment => "Configure Elasticsearch (node-level settings only)",
+        comment => "Configure Elasticsearch (node-level settings only, minimal for sipXconfig)",
         create => "true",
         perms => mog("644", "root", "root"),
         edit_line => elasticsearch_config_file,
@@ -48,6 +27,14 @@ bundle agent elasticsearch_config {
         perms => m("644"),
         edit_line => elasticsearch_limits_contents,
         classes => if_repaired("restart_elasticsearch");
+
+      # Custom JVM options to reduce memory
+      "/etc/elasticsearch/jvm.options.d/sipxconfig.options"
+        comment => "Minimal heap for sipXconfig",
+        create => "true",
+        perms => mog("644", "root", "root"),
+        edit_line => elasticsearch_jvm_options,
+        classes => if_repaired("restart_elasticsearch");
 }
 
 # --- Manage nofile limits ---
@@ -58,6 +45,7 @@ elasticsearch hard    nofile    65536
 ";
 }
 
+# --- Manage elasticsearch.yml ---
 bundle edit_line elasticsearch_config_file {
   vars:
     "tmpDir" slist => readstringlist("$(sipx.SIPX_CFDATA)/$(sipx.location_id)/elasticsearch.yml.part", "tmpDir=", "\n", 1, 4000);
@@ -73,6 +61,11 @@ bundle edit_line elasticsearch_config_file {
       "cluster.initial_master_nodes.*";
       "network.host.*";
       "http.port.*";
+      "xpack.ml.enabled.*";
+      "xpack.security.enabled.*";
+      "xpack.monitoring.enabled.*";
+      "xpack.security.http.ssl.enabled.*";
+      "xpack.security.transport.ssl.enabled.*";
 
   insert_lines:
     any::
@@ -82,6 +75,24 @@ bundle edit_line elasticsearch_config_file {
       "network.host: 127.0.0.1";
       "transport.host: 127.0.0.1";      
       "http.port: 9200";
+      # Disable unused X-Pack features to reduce memory
+      "xpack.ml.enabled: false";
+      "xpack.security.enabled: false";
+      "xpack.monitoring.enabled: false";
+      "xpack.security.http.ssl.enabled: false";
+      "xpack.security.transport.ssl.enabled: false";
+}
+
+# --- Minimal JVM options for heap reduction ---
+bundle edit_line elasticsearch_jvm_options {
+  insert_lines:
+"-Xms512m
+-Xmx1g
+-XX:MaxDirectMemorySize=512m
+-XX:+UseG1GC
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:ErrorFile=/var/log/elasticsearch/hs_err_pid%p.log
+";
 }
 
 # --- Apply replicas to existing indices and template for new indices ---
@@ -98,36 +109,6 @@ bundle agent elasticsearch_index_settings {
         args => "-s -X PUT 'http://localhost:9200/_index_template/default_template' -H 'Content-Type: application/json' -d '{\"index_patterns\":[\"*\"],\"template\":{\"settings\":{\"auto_expand_replicas\":\"0-1\"}}}'";
 }
 
-# --- SysV init service management ---
-bundle agent elasticsearch_sysv_running {
-  vars:
-    any::
-      "service" string => "/etc/init.d/elasticsearch";
-
-  methods:
-    !elasticsearch::
-      "any" usebundle => rh_systemctl_status("disable elasticsearch");
-
-    elasticsearch::
-      "any" usebundle => rh_systemctl_status("enable elasticsearch");
-
-  commands:
-    (!elasticsearch|stop_sipxecs)::
-      "$(service)"
-        comment => "stop elasticsearch",
-        args => "stop";
-
-    elasticsearch::
-      "$(service)"
-        comment => "start elasticsearch",
-        args => "start";
-
-    elasticsearch.restart_elasticsearch::
-      "$(service)"
-        comment => "restart elasticsearch",
-        args => "restart";
-}
-
 # --- systemd service management ---
 bundle agent elasticsearch_systemctl_running {
   vars:
@@ -135,8 +116,7 @@ bundle agent elasticsearch_systemctl_running {
       "service" string => "elasticsearch.service";
 
   classes:
-    fedora16_or_greater::
-      "elasticsearch_running" expression => returnszero("$(sipx.systemctl) is-active $(service)","noshell");
+    "elasticsearch_running" expression => returnszero("$(sipx.systemctl) is-active $(service)","noshell");
 
   commands:
     (!elasticsearch|stop_sipxecs).elasticsearch_running::
