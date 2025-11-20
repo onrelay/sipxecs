@@ -231,6 +231,7 @@ ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/bcpkix-*.jar %{buildro
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/bcprov-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jcommon-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jfreechart-jakarta-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/backport-util-concurrent-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/sipxcommons.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXconfig/sipxconfig-neoconf.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXconfig/sipxconfig-web.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
@@ -293,6 +294,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) %{sipxpbxconf}/freeswitch/*
 %config(noreplace) %{sipxpbxconf}/ftp/*
 %config(noreplace) %{sipxpbxconf}/itspTemplates/*
+%config(noreplace) %{sipxpbxconf}/jetty/etc/*
 %config(noreplace) %{sipxpbxconf}/jetty/start.d/*
 %config(noreplace) %{sipxpbxconf}/jetty/webapps/*
 %config(noreplace) %{sipxpbxconf}/jetty/webapps-late/*
