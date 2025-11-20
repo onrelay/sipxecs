@@ -167,6 +167,7 @@ ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/micrometer-core-jakart
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/micrometer-observation-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/spring-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-beanutils-core-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-codec-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-io-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-collections-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-digester-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
