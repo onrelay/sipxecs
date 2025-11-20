@@ -21,15 +21,13 @@ bundle agent elasticsearch {
       "any" usebundle => elasticsearch_config;
       "any" usebundle => elasticsearch_index_settings;
       "any" usebundle => elasticsearch_systemctl_running;
-
 }
 
-# --- Manage configuration files and ownership ---
+# --- Manage configuration files ---
 bundle agent elasticsearch_config {
 
   files:
     any::
-      # Main node config
       "/etc/elasticsearch/elasticsearch.yml"
         comment => "Configure Elasticsearch (node-level settings only)",
         create => "true",
@@ -37,16 +35,22 @@ bundle agent elasticsearch_config {
         edit_line => elasticsearch_config_file,
         classes => if_repaired("restart_elasticsearch");
 
-      # nproc limits
       "/etc/security/limits.d/99-elasticsearch-nproc.conf"
         comment => "Setup Elasticsearch limits",
         create => "true",
         perms => m("644"),
         edit_line => elasticsearch_limits_contents,
         classes => if_repaired("restart_elasticsearch");
+
+      "/etc/elasticsearch/jvm.options"
+        comment => "Configure JVM heap size for Elasticsearch",
+        create => "true",
+        perms => mog("644","root","root"),
+        edit_line => elasticsearch_jvm_options,
+        classes => if_repaired("restart_elasticsearch");
 }
 
-# --- Manage nofile limits ---
+# --- nofile limits ---
 bundle edit_line elasticsearch_limits_contents {
   insert_lines:
 "elasticsearch soft    nofile    65536
@@ -54,7 +58,9 @@ elasticsearch hard    nofile    65536
 ";
 }
 
+# --- elasticsearch.yml content management ---
 bundle edit_line elasticsearch_config_file {
+
   vars:
     "tmpDir" slist => readstringlist("$(sipx.SIPX_CFDATA)/$(sipx.location_id)/elasticsearch.yml.part", "tmpDir=", "\n", 1, 4000);
 
@@ -68,19 +74,44 @@ bundle edit_line elasticsearch_config_file {
       "discovery.zen.ping.multicast.enabled.*";
       "cluster.initial_master_nodes.*";
       "network.host.*";
+      "transport.host.*";
       "http.port.*";
+
+      # Remove unwanted/unneeded X-Pack auto-settings
+      "xpack.ml.enabled.*";
+      "xpack.monitoring.enabled.*";
+      "xpack.security.enabled.*";
+      "xpack.security.transport.ssl.enabled.*";
+      "xpack.security.http.ssl.enabled.*";
 
   insert_lines:
     any::
-      # Snapshot/repo paths
       "path.repo: [\"$(tmpDir)\", \"$(tmpDir)/elasticsearch_backup\"]";
       "cluster.initial_master_nodes: [\"$(sipx.host)$(sipx.net_domain)\"]";
+
+      # Local-only, no external access
       "network.host: 127.0.0.1";
-      "transport.host: 127.0.0.1";      
+      "transport.host: 127.0.0.1";
       "http.port: 9200";
+
+      # Disable unused X-Pack features
+      "xpack.security.enabled: false";
+      "xpack.ml.enabled: false";
 }
 
-# --- Apply replicas to existing indices and template for new indices ---
+# --- JVM heap size control ---
+bundle edit_line elasticsearch_jvm_options {
+
+  delete_lines:
+      "^-Xms.*";
+      "^-Xmx.*";
+
+  insert_lines:
+      "-Xms256m";
+      "-Xmx512m";
+}
+
+# --- apply index replica policies ---
 bundle agent elasticsearch_index_settings {
 
   commands:
@@ -90,19 +121,19 @@ bundle agent elasticsearch_index_settings {
         args => "-s -X PUT 'http://localhost:9200/_all/_settings?preserve_existing=true' -H 'Content-Type: application/json' -d '{\"index\":{\"auto_expand_replicas\":\"0-1\"}}'";
 
       "/usr/bin/curl"
-        comment => "Create default index template with auto_expand_replicas=0-1 for new indices",
+        comment => "Template for new indices: auto_expand_replicas=0-1",
         args => "-s -X PUT 'http://localhost:9200/_index_template/default_template' -H 'Content-Type: application/json' -d '{\"index_patterns\":[\"*\"],\"template\":{\"settings\":{\"auto_expand_replicas\":\"0-1\"}}}'";
 }
 
-
-# --- systemd service management ---
+# --- systemd control ---
 bundle agent elasticsearch_systemctl_running {
   vars:
     any::
       "service" string => "elasticsearch.service";
 
   classes:
-    "elasticsearch_running" expression => returnszero("$(sipx.systemctl) is-active $(service)","noshell");
+    any::
+      "elasticsearch_running" expression => returnszero("$(sipx.systemctl) is-active $(service)","noshell");
 
   commands:
     (!elasticsearch|stop_sipxecs).elasticsearch_running::
