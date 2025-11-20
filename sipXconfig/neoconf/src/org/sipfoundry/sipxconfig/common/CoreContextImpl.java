@@ -146,38 +146,46 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     public abstract UserProfileService getUserProfileService();
 
     @Override
+    @Transactional
     public boolean getDebug() {
         return m_debug;
     }
 
+    @Transactional
     public void setDebug(boolean debug) {
         m_debug = debug;
     }
 
     @Override
+    @Transactional
     public String getAuthorizationRealm() {
         return m_domainManager.getAuthorizationRealm();
     }
 
+    @Transactional
     public void setMaxUserCount(int maxUserCount) {
         m_maxUserCount = maxUserCount;
     }
 
     @Override
+    @Transactional
     public String getDomainName() {
         return m_domainManager.getDomain().getName();
     }
 
+    @Transactional
     public void setAliasManager(AliasManager aliasManager) {
         m_aliasManager = aliasManager;
     }
 
     @Override
+    @Transactional
     public void setApplicationContext(ApplicationContext applicationContext) {
         m_applicationContext = applicationContext;
     }
 
     @Override
+    @Transactional
     public boolean saveUser(User user) {
         boolean newUserName = user.isNew();
         DuplicateEntity dup = null;
@@ -236,6 +244,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public String getOriginalUserName(User user) {
         return (String) getOriginalValue(user, USERNAME_PROP_NAME);
     }
@@ -245,6 +254,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
      *
      * @param maxUserCount -1 or represent infinite number
      */
+    @Transactional
     void checkMaxUsers(User user, int maxUserCount) {
         // allow edits to the Nth (or beyond) user
         if (!user.isNew()) {
@@ -274,11 +284,13 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public void deleteUser(User user) {
         super.removeEntity(user);
     }
 
     @Override
+    @Transactional
     public boolean deleteUsers(Collection<Integer> userIds) {
         if (userIds.isEmpty()) {
             // no users to delete => nothing to do
@@ -303,6 +315,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public void deleteUsersByUserName(Collection<String> userNames) {
         if (userNames.isEmpty()) {
             // no users to delete => nothing to do
@@ -318,16 +331,19 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public User loadUser(Integer id) {
         return super.load(User.class, id);
     }
 
     @Override
+    @Transactional
     public User getUser(Integer id) {
         return super.findEntity(User.class, id);
     }
 
     @Override
+    @Transactional
     public User loadUserByUserName(String userName) {
         return loadUserByNamedQueryAndNamedParam("userByUserName", VALUE, userName);
     }
@@ -353,11 +369,13 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public User loadUserByAlias(String alias) {
         return loadUserByNamedQueryAndNamedParam("userByAlias", VALUE, alias);
     }
 
     @Override
+    @Transactional
     public User loadUserByConfiguredImId(String imId) {
         Integer userId = getUserProfileService().getUserIdByImId(imId);
         if (userId != null) {
@@ -367,11 +385,13 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public User loadUserByUserNameOrAlias(String userNameOrAlias) {
         return loadUserByNamedQueryAndNamedParam(QUERY_USER_BY_NAME_OR_ALIAS, VALUE, userNameOrAlias);
     }
 
     @Override
+    @Transactional
     public List<User> loadUsersByAuthAccountName(String authAccountName) {
         List<User> users = new ArrayList<User>();
         List<Integer> userIds = getUserProfileService().getUserIdsByAuthAccountName(authAccountName);
@@ -382,6 +402,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public List<User> loadUsersByEmail(String email) {
         List<User> users = new ArrayList<User>();
         List<Integer> userIds = getUserProfileService().getUserIdsByEmail(email);
@@ -392,6 +413,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public List<User> loadUsersContainsEmail(String email) {
         List<User> users = new ArrayList<User>();
         List<Integer> userIds = getUserProfileService().getUserIdsContainsEmail(email);
@@ -402,6 +424,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public List<User> loadUserByAdmin() {
         return (List<User>)super.findByNamedQuery(USER_ADMIN,User.class);
     }
@@ -411,6 +434,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
      *
      * @param user
      */
+    @Transactional
     private void checkBranch(User user) {
         Branch inheritedBranch = user.getInheritedBranch();
         Branch branch = user.getBranch();
@@ -421,6 +445,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public Collection<User> getUsersForBranch(Branch branch) {
         Collection<User> users = 
             (Collection<User>)super.findByNamedQueryAndNamedParam(
@@ -443,6 +468,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
      * @return name that collides
      */
     @Override
+    @Transactional
     public DuplicateEntity checkForDuplicateNameOrAlias(User user) {
         String result = null;
         DuplicateEntity duplicateEntity = null;
@@ -519,6 +545,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
      * Given a collection of strings, look for duplicates. Return the first duplicate found, or
      * null if all strings are unique.
      */
+    @Transactional
     String checkForDuplicateString(Collection<String> strings) {
         Set<String> set = new TreeSet<String>();
         for (String str : strings) {
@@ -566,22 +593,26 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public List<User> loadUsers() {
         return super.loadAllEntities(User.class);
     }
 
     @Override
+    @Transactional
     public int getUsersCount() {
         return getUsersInGroupCount(null);
     }
 
     // returns only the number of users created by admin
     @Override
+    @Transactional
     public int getAllUsersCount() {
         return getBeansInGroupCount(AbstractUser.class, null);
     }
 
     @Override
+    @Transactional
     public int getUsersInGroupCount(Integer groupId) {
         return getBeansInGroupCount(User.class, groupId);
     }
@@ -607,6 +638,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public List<User> getSharedUsers() {
         List<User> sharedUsers = 
         (List<User>)super.findByNamedQueryAndNamedParam(
@@ -645,6 +677,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
         }
     }
 
+    @Transactional
     private List<User> loadUsersByUserProfileAndPage(String search, int firstRow, int pageSize) {
         List<UserProfile> profiles = getUserProfileService().getUserProfilesByEnabledProperty(search,
             firstRow, pageSize);
@@ -690,11 +723,13 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public List<InternalUser> loadInternalUsers() {
         return super.loadAllEntities(InternalUser.class);
     }
 
     @Override
+    @Transactional
     public void clear() {
         List<Object> c = (List<Object>)super.find(QUERY_USER, Object.class);
         super.removeAllEntities(c);
@@ -704,6 +739,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
      * users from the database.
      */
     @Override
+    @Transactional
     public void createAdminGroupAndInitialUserTask() {
         createAdminGroupAndInitialUser(null);
     }
@@ -718,6 +754,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
      * the password would then be the inverse hash of 'password' rather than 'password'.
      */
     @Override
+    @Transactional
     public void createAdminGroupAndInitialUser(String pin) {
         Group adminGroup = m_settingDao.getGroupByName(User.GROUP_RESOURCE_ID, ADMIN_GROUP_NAME);
         if (adminGroup == null) {
@@ -771,26 +808,31 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
         }
     }*/
 
+    @Transactional
     public void setSettingDao(SettingDao settingDao) {
         m_settingDao = settingDao;
     }
 
     @Override
+    @Transactional
     public List<Group> getGroups() {
         return m_settingDao.getGroups(USER_GROUP_RESOURCE_ID);
     }
 
     @Override
+    @Transactional
     public void storeGroup(Group group) {
         m_settingDao.saveGroup(group);
     }
 
     @Override
+    @Transactional
     public boolean deleteGroups(Collection<Integer> groupIds) {
         return m_settingDao.deleteGroups(groupIds);
     }
 
     @Override
+    @Transactional
     public List<Group> getAvailableGroups(User user) {
         List<Group> allGroups = getGroups();
         List<Group> availableGroups = new ArrayList<Group>();
@@ -803,6 +845,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public Group getGroupById(Integer groupId) {
         List<Group> groups = m_settingDao.getGroups(USER_GROUP_RESOURCE_ID);
         for (Group group : groups) {
@@ -815,6 +858,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public Group getGroupByName(String userGroupName, boolean createIfNotFound) {
         if (createIfNotFound) {
             return m_settingDao.getGroupCreateIfNotFound(USER_GROUP_RESOURCE_ID, userGroupName);
@@ -823,6 +867,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public List<User> getGroupMembers(Group group) {
         List<User> users = (List<User>)super.findByNamedQueryAndNamedParam("userGroupMembers",
                 QUERY_PARAM_GROUP_ID, group.getId(), User.class );
@@ -830,6 +875,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public Collection<Integer> getGroupMembersIds(Group group) {
         return m_jdbcTemplate.queryForList(
                 "select users.user_id from users join user_group on user_group.user_id=users.user_id where "
@@ -837,6 +883,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public Collection<Integer> getGroupMembersByPage(int gid, int first, int pageSize) {
         final List<Integer> ids = new LinkedList<Integer>();
         m_jdbcTemplate.query(String.format("select users.user_id from users join user_group on "
@@ -855,6 +902,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public List<String> getGroupMembersNames(Group group) {
         List<String> userNames = (List<String>)super.findByNamedQueryAndNamedParam("userNamesGroupMembers",
                 QUERY_PARAM_GROUP_ID, group.getId(), String.class);
@@ -862,6 +910,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public int getGroupMembersCount(int groupId) {
         return m_jdbcTemplate.queryForObject(
                 "select count(users.user_id) from users join user_group on user_group.user_id=users.user_id "
@@ -870,6 +919,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public int getBranchMembersCount(int branchId) {
         return m_jdbcTemplate.queryForObject(
                 "select count (users.user_id) from users left outer join "
@@ -1036,6 +1086,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public List<User> getGroupSupervisors(Group group) {
         List<User> objs = (List<User>)super.findByNamedQueryAndNamedParam("groupSupervisors",
                 QUERY_PARAM_GROUP_ID, group.getId(), User.class );
@@ -1043,12 +1094,14 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public List<User> getUsersThatISupervise(User supervisor) {
         List<User> objs = (List<User>)super.findByNamedQueryAndNamedParam("usersThatISupervise",
                 "supervisorId", supervisor.getId(), User.class );
         return objs;
     }
 
+    @Transactional
     public void setDomainManager(DomainManager domainManager) {
         m_domainManager = domainManager;
     }
@@ -1063,6 +1116,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
      *         with permission enabled
      */
     @Override
+    @Transactional
     public void checkForValidExtensions(Collection<String> aliases, PermissionName permission) {
         Collection<String> invalidExtensions = new ArrayList<String>();
         for (String extension : aliases) {
@@ -1087,6 +1141,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public User getSpecialUser(SpecialUserType specialUserType) {
         List<SpecialUser> specialUsersOfType = (List<SpecialUser>)super.findByNamedQueryAndNamedParam(
                 SPECIAL_USER_BY_TYPE, SPECIAL_USER_TYPE, specialUserType.name(), SpecialUser.class );
@@ -1145,6 +1200,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public SpecialUser getSpecialUserAsSpecialUser(SpecialUserType specialUserType) {
         List<SpecialUser> specialUsersOfType = (List<SpecialUser>)super.findByNamedQueryAndNamedParam(
                 SPECIAL_USER_BY_TYPE, SPECIAL_USER_TYPE, specialUserType.name(), SpecialUser.class );
@@ -1156,11 +1212,13 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public int getEnabledUsersCount() {
         return getUserProfileService().getEnabledUsersCount();
     }
 
     @Override
+    @Transactional
     public int getDisabledUsersCount() {
         return getUserProfileService().getDisabledUsersCount();
     }
@@ -1190,6 +1248,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     }
 
     @Override
+    @Transactional
     public void initializeSpecialUsers() {
         for (SpecialUserType type : SpecialUserType.values()) {
             User specialUser = getSpecialUser(type);
@@ -1208,6 +1267,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
      * @see org.sipfoundry.sipxconfig.common.ReplicableProvider#getReplicables()
      */
     @Override
+    @Transactional
     public List<Replicable> getReplicables() {
         List<Replicable> replicables = new ArrayList<Replicable>();
         for (SpecialUserType specialUserType : SpecialUserType.values()) {
@@ -1218,16 +1278,19 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
         return replicables;
     }
 
+    @Transactional
     public void setConfigJdbcTemplate(JdbcTemplate jdbcTemplate) {
         m_jdbcTemplate = jdbcTemplate;
     }
 
-        
+
+    @Transactional
     public void setDidService(DidService didService) {
         m_didService = didService;
     }
 
     @Override
+    @Transactional
     public boolean setup(SetupManager manager) {        
         if (manager.isFalse(AdminContext.FEATURE.getId())) {
             Location primary = manager.getConfigManager().getLocationManager().getPrimaryLocation();
