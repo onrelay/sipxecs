@@ -20,12 +20,8 @@ bundle agent elasticsearch {
     primary::
       "any" usebundle => elasticsearch_config;
       "any" usebundle => elasticsearch_index_settings;
-
-    fedora16_or_greater::
       "any" usebundle => elasticsearch_systemctl_running;
 
-    !fedora16_or_greater::
-      "any" usebundle => elasticsearch_sysv_running;
 }
 
 # --- Manage configuration files and ownership ---
@@ -98,35 +94,6 @@ bundle agent elasticsearch_index_settings {
         args => "-s -X PUT 'http://localhost:9200/_index_template/default_template' -H 'Content-Type: application/json' -d '{\"index_patterns\":[\"*\"],\"template\":{\"settings\":{\"auto_expand_replicas\":\"0-1\"}}}'";
 }
 
-# --- SysV init service management ---
-bundle agent elasticsearch_sysv_running {
-  vars:
-    any::
-      "service" string => "/etc/init.d/elasticsearch";
-
-  methods:
-    !elasticsearch::
-      "any" usebundle => rh_systemctl_status("disable elasticsearch");
-
-    elasticsearch::
-      "any" usebundle => rh_systemctl_status("enable elasticsearch");
-
-  commands:
-    (!elasticsearch|stop_sipxecs)::
-      "$(service)"
-        comment => "stop elasticsearch",
-        args => "stop";
-
-    elasticsearch::
-      "$(service)"
-        comment => "start elasticsearch",
-        args => "start";
-
-    elasticsearch.restart_elasticsearch::
-      "$(service)"
-        comment => "restart elasticsearch",
-        args => "restart";
-}
 
 # --- systemd service management ---
 bundle agent elasticsearch_systemctl_running {
@@ -135,8 +102,7 @@ bundle agent elasticsearch_systemctl_running {
       "service" string => "elasticsearch.service";
 
   classes:
-    fedora16_or_greater::
-      "elasticsearch_running" expression => returnszero("$(sipx.systemctl) is-active $(service)","noshell");
+    "elasticsearch_running" expression => returnszero("$(sipx.systemctl) is-active $(service)","noshell");
 
   commands:
     (!elasticsearch|stop_sipxecs).elasticsearch_running::
