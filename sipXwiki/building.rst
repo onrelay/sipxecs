@@ -9,7 +9,7 @@ Building
 Setup Environment
 -----------------
 
-Follow the :ref:`_environment` instructions to prepare your system for builds.
+Follow the :ref:`Environment <environment>` instructions to prepare your system for builds.
 
 Add sipx User
 -----------------
