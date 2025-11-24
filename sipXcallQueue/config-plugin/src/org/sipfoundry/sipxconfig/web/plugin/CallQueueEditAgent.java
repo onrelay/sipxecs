@@ -72,28 +72,28 @@ public abstract class CallQueueEditAgent extends PageWithCallback implements Pag
             return;
         }
 
-        CallQueueAgent callqueueagent = getCallQueueAgent();
+        CallQueueAgent callQueueAgent = getCallQueueAgent();
 
-        if (callqueueagent == null) {
+        if (callQueueAgent == null) {
             Integer id = getCallQueueAgentId();
             if (null != id) {
                 CallQueueContext context = getCallQueueContext();
-                callqueueagent = context.loadCallQueueAgent(id);
+                callQueueAgent = context.loadCallQueueAgent(id);
             } else {
-                callqueueagent = getCallQueueContext().newCallQueueAgent();
+                callQueueAgent = getCallQueueContext().newCallQueueAgent();
             }
         }
 
         if (getAddedUser() != null) {
             if (getAddedUser().size() == 1) {
                 Integer userId = getAddedUser().iterator().next();
-                callqueueagent.setExtension(getCoreContext().loadUser(userId).getUserName());
+                callQueueAgent.setExtension(getCoreContext().loadUser(userId).getUserName());
             } else {
                 getValidator().record(new ValidatorException(getMessages().getMessage("err.notUnique")));
             }
         }
 
-        setCallQueueAgent(callqueueagent);
+        setCallQueueAgent(callQueueAgent);
 
         if (getCallback() == null) {
             setReturnPage(CallQueuePage.PAGE);

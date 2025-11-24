@@ -75,7 +75,7 @@ public interface DialPlanContext extends DataObjectSource<DialingRule>, AliasOwn
 
     void setOperator(AutoAttendant attendant);
     
-    public Collection<InternalRule> getInternalRulesWithVoiceMailExtension(String extension);
+    public Collection<Integer> getInternalRulesWithVoiceMailExtension(String extension);
     
-    public Collection<AttendantRule> getAttendantRulesWithExtensionOrDid(String extension);
+    public Collection<Integer> getAttendantRulesWithExtensionOrDid(String extension);
 }

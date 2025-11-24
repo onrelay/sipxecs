@@ -86,7 +86,7 @@ public abstract class ListSbcDevices extends SipxBasePage {
         try {
             getSbcDeviceManager().checkForNewSbcDeviceCreation(model);
         } catch (UserException ex) {
-            validator.record(new ValidatorException(ex.format(getMessages().getMessage(ex.getMessage()))));
+            validator.record(new ValidatorException(ex.getMessage()));
             // reset SBCs's models combobox selected value
             setSbcDescriptor(null);
             return null;

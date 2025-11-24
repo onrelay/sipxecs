@@ -85,11 +85,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         checkRegEx(aa.getAllowDial(), "&error.invalid.allowDialExpression");
 
         clearUnsavedValueStorage(aa.getValueStorage());
-        if (aa.isNew()) {
-            super.persistEntity(aa);
-        } else {
-            super.mergeEntity(aa);
-        }
+        super.saveEntity(aa);
         super.flush();
         getDaoEventPublisher().publishSave(aa);
     }
@@ -185,7 +181,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
                 names.add(rule.getName());
             }
             String ruleNames = StringUtils.join(names.iterator(), ", ");
-            throw new AttendantInUseException(new Object[] {
+            throw new AttendantInUseException(new String[] {
                 ruleNames
             });
         }
@@ -195,11 +191,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         if (attendant.equals(specialMode.getAttendant())) {
             specialMode.setAttendant(null);
             specialMode.setEnabled(false);
-            if (specialMode.isNew()) {
-                super.persistEntity(specialMode);
-            } else {
-                super.mergeEntity(specialMode);
-            }
+            super.saveEntity(specialMode);
         }
 
         super.removeEntity(attendant);
@@ -234,14 +226,14 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         return aa;
     }
 
-    private Collection<AutoAttendant> getAutoAttendantsWithName(String alias) {
-        return (Collection<AutoAttendant>)super.findByNamedQueryAndNamedParam(
-            "autoAttendantIdsWithName", "value", alias, AutoAttendant.class );
+    private Collection<Integer> getAutoAttendantsWithName(String alias) {
+        return (Collection<Integer>)super.findByNamedQueryAndNamedParam(
+            "autoAttendantIdsWithName", "value", alias, Integer.class );
     }
 
     @Override
-    public Collection getBeanIdsOfObjectsWithAlias(String alias) {
-        Collection autoAttendants = getAutoAttendantsWithName(alias);
+    public Collection<BeanId> getBeanIdsOfObjectsWithAlias(String alias) {
+        Collection<Integer> autoAttendants = getAutoAttendantsWithName(alias);
         return BeanId.createBeanIdCollection(autoAttendants, AutoAttendant.class);
     }
 
@@ -254,11 +246,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         }
         attendant = createSystemAttendant(attendantId);
         attendant.addGroup(getDefaultAutoAttendantGroup());
-        if (attendant.isNew()) {
-            super.persistEntity(attendant);
-        } else {
-            super.mergeEntity(attendant);
-        }
+        super.saveEntity(attendant);
         getDaoEventPublisher().publishSave(attendant);
         return attendant;
     }
@@ -313,11 +301,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         }
 
         specialMode.setAttendant(null);
-        if (specialMode.isNew()) {
-            super.persistEntity(specialMode);
-        } else {
-            super.mergeEntity(specialMode);
-        }
+        super.saveEntity(specialMode);
         getDaoEventPublisher().publishSave(specialMode);
     }
 
@@ -344,12 +328,8 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
             specialMode.setAttendant(getAfterhour());
         } else {
             specialMode.setAttendant(aa);
-        }
-        if (specialMode.isNew()) {
-            super.persistEntity(specialMode);
-        } else {
-            super.mergeEntity(specialMode);
-        }
+        }          
+        super.saveEntity(specialMode);
         getDaoEventPublisher().publishSave(specialMode);
     }
 
@@ -452,7 +432,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
             } else {
                 rule.setLiveAttendantExpire(null);
             }
-            super.persistEntity(rule);
+            super.saveEntity(rule);
             getDaoEventPublisher().publishSave(rule);
             return true;
         } catch (Exception ex) {

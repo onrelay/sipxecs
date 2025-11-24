@@ -156,7 +156,7 @@ public class LdapRowInserterTest extends TestCase {
         }
 
         EasyMock.expect(coreContext.getGroupByName(SALES, true)).andReturn(salesGroup);
-        EasyMock.expect(coreContext.saveUser(joe)).andReturn(true).atLeastOnce();
+        coreContext.saveUser(joe);
         EasyMock.expect(ldapManager.retriveOverwritePin()).andReturn(new OverwritePinBean(100, true)).anyTimes();
         coreContextControl.replay();
 

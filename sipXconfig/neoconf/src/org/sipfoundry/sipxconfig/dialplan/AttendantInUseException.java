@@ -23,7 +23,7 @@ public class AttendantInUseException extends UserException {
     /**
      * List of rules to be deleted
      */
-    public AttendantInUseException(Object[] rules) {
+    public AttendantInUseException(String[] rules) {
         super(IN_USE, rules);
     }
 }

@@ -53,12 +53,12 @@ public class UploadManagerImpl extends SipxHibernateDaoSupport<Upload> implement
         if (!upload.isNew() && isExistingUploadNameUsed(upload.getName(), upload.getId())) {
             throw new AlreadyDeployedException(uploadName);
         }
-        saveBeanWithSettings(upload);
+        saveEntity(upload);
     }
 
     public void deleteUpload(Upload upload) {
         upload.remove();
-        deleteBeanWithSettings(upload);
+        removeEntity(upload);
     }
 
     public void deleteUploads(Collection<Integer> uploadIds) {
@@ -238,7 +238,7 @@ public class UploadManagerImpl extends SipxHibernateDaoSupport<Upload> implement
         }
 
         AlreadyDeployedException(int size, String label) {
-            super(ERROR_ALREADY_DEPLOYED_SIZE, size, label);
+            super(ERROR_ALREADY_DEPLOYED_SIZE, size + "", label);
         }
 
         AlreadyDeployedException(String name) {

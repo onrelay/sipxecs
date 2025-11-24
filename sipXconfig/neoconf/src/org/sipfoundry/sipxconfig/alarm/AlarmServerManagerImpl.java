@@ -265,10 +265,10 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
 
     @Override
     public void saveAlarmGroup(AlarmGroup group) {
+        
         if (group.isNew()) {
             // check if new object
             checkForDuplicateNames(group);
-            super.persistEntity(group);
         } else {
             // on edit action - check if the group name for this group was modified
             // if the group name was changed then perform duplicate group name checking
@@ -283,8 +283,8 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
                     }
                 }
             }
-            super.mergeEntity(group);
         }
+        super.saveEntity(group);
     }
 
     @Override

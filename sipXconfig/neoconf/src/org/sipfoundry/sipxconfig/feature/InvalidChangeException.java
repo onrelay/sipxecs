@@ -19,12 +19,12 @@ import org.sipfoundry.sipxconfig.common.UserException;
 @SuppressWarnings("serial")
 public class InvalidChangeException extends UserException {
 
-    public InvalidChangeException(String msg, Object... params) {
+    public InvalidChangeException(String msg, String... params) {
         super(msg, params);
     }
 
     public void appendRawParametersToMessage() {
-        Object[] params = getRawParams();
+        String[] params = getRawParams();
         if (params != null) {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < params.length; i++) {

@@ -20,12 +20,14 @@ import java.lang.reflect.Method;
 import java.lang.AutoCloseable;
 import java.lang.UnsupportedOperationException;
 import java.lang.IllegalStateException;
+import java.lang.IllegalAccessException;
+import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.beanutils.BeanUtils;
 
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.dao.support.DaoSupport;
-import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -150,7 +152,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         return loadEntity( klass, id );
     }
 
-    @Transactional
     public <S extends Object> S loadEntity(Class<S> klass, Serializable id) {
    
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
@@ -161,7 +162,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         }
     }
 
-    @Transactional
     public <S extends Object> List<S> loadAllEntities(Class<S> klass) {
 
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
@@ -178,7 +178,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         }
     }
 
-    @Transactional
     public <S extends Object> S findEntity(Class<S> klass, Serializable id) {
 
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
@@ -192,8 +191,27 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         }
     }
 
-    @Transactional
+    public <S extends Object> void saveEntity(S entity) {
+
+        boolean isNew = false;
+
+        if( entity instanceof BeanWithId ) {
+            isNew = ((BeanWithId)entity).isNew();
+        }
+
+        if( isNew ) {
+            persistEntity( entity );
+        }
+        else {
+            mergeEntity( entity );
+        }
+    }
+
     public <S extends Object> void persistEntity(S entity) {
+
+        if( entity instanceof BeanWithSettings ) {
+            updateBeanValueStorage( (BeanWithSettings)entity);
+        }
 
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
             
@@ -205,22 +223,29 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         }
     }
 
-    @Transactional
-    public <S extends Object> S mergeEntity(S entity) {
+    public <S extends Object> void mergeEntity(S entity) {
+
+        if( entity instanceof BeanWithSettings ) {
+            updateBeanValueStorage( (BeanWithSettings)entity);
+        }
 
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
             
             Session session = sessionTransaction.getSession();
+
+            S mergedEntity = session.merge(entity);
     
-            return (S) session.merge(entity);
-        } catch( IllegalStateException e ) {
-            // server not ready
-            return entity;
+            BeanUtils.copyProperties(mergedEntity, entity);
+
+        } catch( IllegalStateException | IllegalAccessException | InvocationTargetException e ) {
         }
     }
 
-    @Transactional
     public <S extends Object> void refreshEntity(S entity) {
+
+        if( entity instanceof BeanWithSettings ) {
+            updateBeanValueStorage( (BeanWithSettings)entity);
+        }
 
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
             
@@ -232,8 +257,11 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         }
     }
 
-    @Transactional
     public <S extends Object> void removeEntity(S entity) {
+
+        if( entity instanceof BeanWithSettings ) {
+            updateBeanValueStorage( (BeanWithSettings)entity);
+        }
 
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
             
@@ -245,23 +273,31 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         }
     }
 
-    @Transactional
     public <S extends Object> void removeAllEntities(Collection<S> entities) {
 
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
+        for (S entity : entities) {
 
-            for (S entity : entities) {
-                session.remove(entity);
+            if( entity instanceof BeanWithSettings ) {
+                updateBeanValueStorage( (BeanWithSettings)entity);
             }
-        } catch( IllegalStateException e ) {
-            // server not ready
+
+            try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+        
+                Session session = sessionTransaction.getSession();
+
+                session.remove(entity);
+                            
+            } catch( IllegalStateException e ) {
+                // server not ready
+            }
         }
     }
 
-    @Transactional
     public <S extends Object> void evictEntity(S entity) {
+
+        if( entity instanceof BeanWithSettings ) {
+            updateBeanValueStorage( (BeanWithSettings)entity);
+        }
 
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
             
@@ -273,7 +309,12 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         }
     }
 
-    @Transactional
+    private void updateBeanValueStorage(BeanWithSettings bean) {
+        Storage origStorage = bean.getValueStorage();
+        Storage cleanStorage = clearUnsavedValueStorage(origStorage);
+        bean.setValueStorage(cleanStorage);
+    }
+
     public void flush() {
         
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
@@ -286,7 +327,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         }
     }
 
-    @Transactional
     public void clear() {
         
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
@@ -300,7 +340,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
     }
 
     @SuppressWarnings("unchecked")
-    @Transactional
     public <S> List<S> findByNamedParam(String queryText, String[] paramNames, Object[] values, Class<S> resultClass) {
         
         if( paramNames.length != values.length ) {
@@ -336,7 +375,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
     }
 
     @SuppressWarnings("unchecked")
-    @Transactional
     public <S> List<S> findByNamedQueryAndNamedParam(String queryName, String[] paramNames, Object[] values, Class<S> resultClass) {
         
         if( paramNames.length != values.length ) {
@@ -367,7 +405,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
 
     @SuppressWarnings("unchecked")
-    @Transactional
     public <S> List<S> findByNamedQuery(String queryName, Object[] values, Class<S> resultClass) {
 
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
@@ -398,59 +435,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         return findByNamedQuery( queryName, new Object[0], resultClass );
     }
 
-    @Transactional
-    protected void saveBeanWithSettings(BeanWithSettings bean) {
-        updateBeanValueStorage(bean);
- 
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
-    
-            if (bean.isNew()) {
-                session.persist(bean);
-            } else {
-                session.merge(bean);
-            }
-        } catch( IllegalStateException e ) {
-            // server not ready
-        }
-    }
-
-    @Transactional
-    protected void saveOrUpdateBeanWithSettings(BeanWithSettings bean) {
-        updateBeanValueStorage(bean);
-    
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
-    
-            session.merge(bean);
-        } catch( IllegalStateException e ) {
-            // server not ready
-        }
-    }
-
-    private void updateBeanValueStorage(BeanWithSettings bean) {
-        Storage origStorage = bean.getValueStorage();
-        Storage cleanStorage = clearUnsavedValueStorage(origStorage);
-        bean.setValueStorage(cleanStorage);
-    }
-
-    @Transactional
-    protected void deleteBeanWithSettings(BeanWithSettings bean) {
-        // avoid hibernate errors about new object references when calling delete on parent object
-        bean.setValueStorage(clearUnsavedValueStorage(bean.getValueStorage()));
-        
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
-    
-            session.remove(bean);
-        } catch( IllegalStateException e ) {
-            // server not ready
-        }
-    }
-
     /**
      * Duplicate the bean and return the duplicate. If the bean is a NamedObject, then give the
      * duplicate a new, unique name. The queryName identifies a named query that returns the IDs
@@ -460,7 +444,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
      * @param bean bean to duplicate
      * @param queryName name of the query to be executed (define in *.hbm.xml file)
      */
-    @Transactional
     public BeanWithId duplicateBean(BeanWithId bean, String queryName) {
         BeanWithId copy = bean.duplicate();
 
@@ -487,7 +470,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         return loadBeansByPage(beanClass, groupId, null, firstRow, pageSize, orderBy, orderAscending);
     }
 
-    @Transactional
     public List<T> loadBeansByPage(Class<T> beanClass, Integer groupId, Integer branchId, int firstRow, int pageSize,
                                 String[] orderBy, boolean orderAscending) {
         
@@ -547,7 +529,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
      * Return the count of beans of type beanClass in the specified group. If groupId is null,
      * then don't filter by group, just count all the beans.
      */
-    @Transactional
     public <T> int getBeansInGroupCount(Class<T> beanClass, Integer groupId) {
         
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
@@ -575,7 +556,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         }
     }
 
-    @Transactional
     protected void removeAll(Class<?> klass, Collection<Integer> ids) {
         
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
@@ -603,7 +583,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         }
     }
 
-    @Transactional
     protected void removeAll(Class<?> klass) {
         
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
@@ -641,7 +620,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
      * Returns the original value of an object before it was modified by application. Represent
      * the original value from the database.
      */
-    @Transactional
     protected Object getOriginalValue(PrimaryKeySource obj, String propertyName) {
         
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {

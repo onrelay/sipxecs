@@ -47,11 +47,7 @@ public abstract class PersonalAttendantManager extends SipxHibernateDaoSupport<P
     }
 
     public final void storePersonalAttendant(PersonalAttendant pa) {
-        if (pa.isNew()) {
-            super.persistEntity(pa);
-        } else {
-            super.mergeEntity(pa);
-        }
+        super.saveEntity(pa);
     }
 
     public final void clearPersonalAttendants() {

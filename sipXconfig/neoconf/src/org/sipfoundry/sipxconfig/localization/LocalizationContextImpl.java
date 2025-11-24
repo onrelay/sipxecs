@@ -96,11 +96,7 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
             localization = new Localization();
             localization.setRegion(m_defaultRegion);
             localization.setLanguage(m_defaultLanguage);
-            if (localization.isNew()) {
-                super.persistEntity(localization);
-            } else {
-                super.mergeEntity(localization);
-            }
+            super.saveEntity(localization);
         }
         return localization;
     }
@@ -120,11 +116,7 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
 
         localization.setRegion(regionBeanId);
         m_applicationContext.publishEvent(new RegionUpdatedEvent(this, regionBeanId));
-        if (localization.isNew()) {
-            super.persistEntity(localization);
-        } else {
-            super.mergeEntity(localization);
-        }
+        super.saveEntity(localization);
         super.flush();
         getDaoEventPublisher().publishSave(localization);
     }
@@ -146,11 +138,9 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
         }
         // The language has been changed - handle the change
         localization.setLanguage(language);
-        if (localization.isNew()) {
-            super.persistEntity(localization);
-        } else {
-            super.mergeEntity(localization);
-        }
+
+        super.saveEntity(localization);
+
         super.flush();
         // TODO: do we really need this? It does not seem to be caught anywhere!
         getDaoEventPublisher().publishSave(localization);
@@ -173,11 +163,8 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
         actualLocalization.setRegion(region);        
         actualLocalization.setLanguage(language);
         
-        if (actualLocalization.isNew()) {
-            super.persistEntity(actualLocalization);
-        } else {
-            super.mergeEntity(actualLocalization);
-        }        
+        super.saveEntity(actualLocalization);
+      
         super.flush();
         getDaoEventPublisher().publishSave(actualLocalization);
         if (updateRegion) {

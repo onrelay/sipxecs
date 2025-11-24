@@ -349,11 +349,7 @@ public class LdapManagerImpl extends SipxHibernateDaoSupport<Object> implements 
 
     @Override
     public void setConnectionParams(LdapConnectionParams params) {
-        if (params.isNew()) {
-            super.persistEntity(params);
-        } else {
-            super.mergeEntity(params);
-        }
+        super.saveEntity( params );
         getDaoEventPublisher().publishSave(params);
     }
 

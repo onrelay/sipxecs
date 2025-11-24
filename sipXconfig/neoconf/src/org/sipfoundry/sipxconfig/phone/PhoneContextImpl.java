@@ -43,7 +43,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.transaction.annotation.Transactional;
 
 import org.sipfoundry.commons.util.ShortHash;
 import org.sipfoundry.sipxconfig.alarm.AlarmDefinition;
@@ -169,7 +168,6 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
 
 
     @Override
-    @Transactional
     public void storePhone(Phone phone) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -187,11 +185,9 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
             phone.setValueStorage(clearUnsavedValueStorage(phone.getValueStorage()));
             isNew = phone.isNew();
             if (isNew) {
-                super.persistEntity(phone);
                 LOG.error(String.format(ALARM_PHONE_ADDED, phone.getSerialNumber()));
-            } else {
-                super.mergeEntity(phone);
-            }
+            } 
+            super.saveEntity(phone);
             super.flush();
             getDaoEventPublisher().publishSave(phone);
         }
@@ -212,11 +208,9 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
     @Override
     public void storeLine(Line line) {
         line.setValueStorage(clearUnsavedValueStorage(line.getValueStorage()));
-        if (line.isNew()) {
-            super.persistEntity(line);
-        } else {
-            super.mergeEntity(line);
-        }
+        
+        super.saveEntity(line);
+
         getDaoEventPublisher().publishSave(line);
     }
 
@@ -522,7 +516,6 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
     }
 
     @Override
-    @Transactional
     public void addToGroup(Integer groupId, Collection<Integer> ids) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -534,7 +527,6 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
     }
 
     @Override
-    @Transactional
     public void removeFromGroup(Integer groupId, Collection<Integer> ids) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -627,7 +619,6 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
     }
 
     @Override
-    @Transactional
     public List<Phone> loadPhonesWithNoLinesByPage(int firstRow, int pageSize, String[] orderBy, boolean orderAscending) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -667,7 +658,6 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
         }
     }
 
-    @Transactional
     public int getPhonesWithNoLinesCount() {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -694,7 +684,6 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
         }
     }
 
-    @Transactional
     public List<Phone> getPhonesWithLinesLike(String value) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -780,7 +769,6 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
         }
     }
 
-    @Transactional
     private int getPhoneGroupWeight(int phoneId) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -794,7 +782,6 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
         }
     }
 
-    @Transactional
     private int getGroupWeight(int groupId) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {

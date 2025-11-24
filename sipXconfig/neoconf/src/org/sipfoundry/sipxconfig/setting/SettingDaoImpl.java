@@ -96,11 +96,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport<Object> implements S
 
     @Override
     public void storeValueStorage(ValueStorage storage) {
-        if (storage.isNew()) {
-            super.persistEntity(storage);
-        } else {
-            super.mergeEntity(storage);
-        }
+        super.saveEntity(storage);
     }
 
     @Override
@@ -119,11 +115,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport<Object> implements S
                 throw new UserException("&msg.error.renameAdminGroup");
             }
         }
-        if (group.isNew()) {
-            super.persistEntity(group);
-        } else {
-            super.mergeEntity(group);
-        }
+        super.saveEntity(group);
     }
 
     @Override
@@ -138,11 +130,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport<Object> implements S
 
         // Persist or merge each group
         for (Group group : groups) {
-            if (group.isNew()) {
-                super.persistEntity(group);
-            } else {
-                super.mergeEntity(group);
-            }
+            super.saveEntity(group);
         }
 
         // Notify DAO listeners
@@ -152,7 +140,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport<Object> implements S
     void assignWeightToNewGroups(Group group) {
         if (group.isNew() && group.getWeight() == null) {
             GroupWeight weight = new GroupWeight();
-            super.persistEntity(weight);
+            super.saveEntity(weight);
             group.setWeight(weight.getWeight());
             super.removeEntity(weight); // delete not strictly nec.
         }

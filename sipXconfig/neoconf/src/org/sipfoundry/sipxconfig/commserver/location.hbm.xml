@@ -49,7 +49,7 @@
       class="org.sipfoundry.sipxconfig.commserver.Location" />
     <many-to-one cascade="all" name="valueStorage" column="value_storage_id"
       class="org.sipfoundry.sipxconfig.setting.ValueStorage"/>
-    <set name="groups" table="settings_location_group" sort="natural" cascade="persist,merge">
+    <set name="groups" table="settings_location_group" sort="natural" cascade="merge">
       <key column="settings_with_location_id"/>
       <many-to-many column="group_id" class="org.sipfoundry.sipxconfig.setting.Group"/>
     </set>

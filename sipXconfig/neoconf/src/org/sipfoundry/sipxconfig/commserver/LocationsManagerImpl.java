@@ -13,7 +13,6 @@ import static java.lang.String.format;
 import static org.springframework.dao.support.DataAccessUtils.intResult;
 import static org.springframework.dao.support.DataAccessUtils.singleResult;
 
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -92,7 +91,6 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
         return loadLocationByUniqueProperty("address", address);
     }
 
-    @Transactional
     private Location loadLocationByUniqueProperty(String propName, Object propValue) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -127,13 +125,12 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
                 throw new UserException(DUPLICATE_FQDN_OR_IP, location.getFqdn(), location.getAddress());
             }
             location.setCallTraffic(true);
-            super.persistEntity(location);
         } else {
             if (location.hasFqdnOrIpChangedOnSave() && isFqdnOrIpInUseExceptThis(location)) {
                 throw new UserException(DUPLICATE_FQDN_OR_IP, location.getFqdn(), location.getAddress());
             }
-            super.mergeEntity(location);
         }
+        super.saveEntity(location);
     }
 
     private boolean isFqdnOrIpInUseExceptThis(Location location) {
@@ -156,8 +153,8 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
         if (location.isPrimary()) {
             throw new UserException("&error.delete.primary", location.getFqdn());
         }
-        Location merge = super.mergeEntity(location);
-        super.removeEntity(merge);
+        super.mergeEntity(location);
+        super.removeEntity(location);
     }
 
     @Override

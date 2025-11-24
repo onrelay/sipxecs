@@ -33,7 +33,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.TransactionException;
 
@@ -48,7 +47,6 @@ import org.dbunit.dataset.ReplacementDataSet;
 import org.dbunit.operation.DatabaseOperation;
 
 
-@Transactional
 public abstract class IntegrationTestCase {
     private static final String ROOT_RES_PATH = "/org/sipfoundry/sipxconfig/";
     private static final Log LOG = LogFactory.getLog(IntegrationTestCase.class);

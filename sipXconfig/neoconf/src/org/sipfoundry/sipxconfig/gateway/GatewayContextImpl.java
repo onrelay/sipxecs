@@ -23,7 +23,6 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.transaction.annotation.Transactional;
 
 import org.sipfoundry.sipxconfig.common.DaoUtils;
 import org.sipfoundry.sipxconfig.common.Replicable;
@@ -80,7 +79,6 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport<Object> implemen
         return (FxoPort) super.loadEntity(FxoPort.class, id);
     }
 
-    @Transactional
     public void saveGateway(Gateway gateway) {
         // Before storing the gateway, make sure that it has a unique name.
         // Throw an exception if it doesn't.
@@ -97,11 +95,8 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport<Object> implemen
             // Find if we are about to save a new gateway
             boolean isNew = gateway.isNew();
             // Store the updated gateway
-            if (isNew) {
-                super.persistEntity(gateway);
-            } else {
-                super.mergeEntity(gateway);
-            }
+            super.saveEntity(gateway);
+
             super.flush();
 
             if (isNew) {
@@ -167,7 +162,6 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport<Object> implemen
         return gateways;
     }
 
-    @Transactional
     public <T> List<T> getGatewayByType(final Class<T> type) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {

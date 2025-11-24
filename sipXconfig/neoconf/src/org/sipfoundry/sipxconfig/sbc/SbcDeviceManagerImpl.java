@@ -21,7 +21,6 @@ import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 import org.sipfoundry.sipxconfig.bridge.BridgeSbc;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
@@ -129,8 +128,8 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
         if (descriptor.getMaxAllowed() > -1) {
             int size = getSbcDevicesByDescriptor(descriptor).size();
             if (size >= maxAllowed) {
-                throw new UserException("sbc.creation.error", new Object[] {
-                    size, descriptor.getLabel()
+                throw new UserException("sbc.creation.error", new String[] {
+                    size + "", descriptor.getLabel()
                 });
             }
         }
@@ -174,13 +173,14 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
         if (isNew) {
             checkForNewSbcDeviceCreation(sbc.getModel());
             checkForDuplicateNames(sbc);
+
         } else {
             // if the sbc name was changed
             if (isNameChanged(sbc)) {
                 checkForDuplicateNames(sbc);
             }
         }
-        saveBeanWithSettings(sbc);
+        saveEntity(sbc);
 
         // Replicate occurs only when updating sbc device
         if (isNew) {

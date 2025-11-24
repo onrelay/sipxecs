@@ -31,7 +31,7 @@ public final class Validate {
     public static void maxLen(String field, String value, int len) {
         if (StringUtils.isNotBlank(value)) {
             if (value.length() > len) {
-                throw new ValidateException("&error.maxLen", field, len);
+                throw new ValidateException("&error.maxLen", field, len + "");
             }
         }
     }

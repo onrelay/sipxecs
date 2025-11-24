@@ -48,11 +48,7 @@ public class SettingsWithLocationDaoImpl<T extends SettingsWithLocation> extends
 
     @Override
     public void upsert(T bean) {
-        if (bean.isNew()) {
-            super.persistEntity(bean);
-        } else {
-            super.mergeEntity(bean);
-        }
+        super.saveEntity(bean);
     }
 
     @Override

@@ -104,15 +104,14 @@ public class PagingContextImpl extends SipxHibernateDaoSupport<PagingGroup> impl
         if (group.isNew()) {
             // check if new object
             checkForDuplicateNames(group);
-            super.persistEntity(group);
         } else {
             // on edit action - check if the group number for this group was modified
             // if the group number was changed then perform duplicate group number checking
             if (isNameChanged(group)) {
                 checkForDuplicateNames(group);
             }
-            super.mergeEntity(group);
         }
+        super.saveEntity(group);
     }
 
     private void checkForDuplicateNames(PagingGroup group) {

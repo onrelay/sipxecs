@@ -13,6 +13,7 @@ import java.text.MessageFormat;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 /**
  * Caught in application layer, this informs the user they've done something wrong. Despite being
@@ -38,7 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 public class UserException extends RuntimeException {
     private String m_message;
 
-    private Object[] m_params = ArrayUtils.EMPTY_OBJECT_ARRAY;
+    private String[] m_params = new String[0];
 
     public UserException() {
     }
@@ -47,21 +48,32 @@ public class UserException extends RuntimeException {
         super(cause);
     }
 
-    /**
-     * Create new exception
-     *
-     * @param message - message format (does not have to have any parameters)
-     * @param params - parameters to be passed to MessageFormat when displaying exception errror
-     */
-    public UserException(String message, Object... params) {
+    public UserException(String message, Throwable cause) {
+        super(cause);
+        m_message = message;
+    }
+
+    public UserException(String message, String... params) {
         m_message = message;
         m_params = params;
     }
 
     @Override
     public String getMessage() {
-        if (m_message != null) {
-            return format(m_message, m_params);
+        return getLocalizedMessage( m_message, m_params );
+    }
+
+    public String getLocalizedMessage( String localizedMessage, String[] localizedParams ) {
+
+        if (localizedMessage != null && getCause() != null ) {
+
+            String result = MessageFormat.format(localizedMessage, (Object[]){getCause().getLocalizedMessage()});
+            // Comment below out when done with development
+            result += "\n" + ExceptionUtils.getStackTrace( getCause() );
+            return result;
+        }
+        if (localizedMessage != null) {
+            return MessageFormat.format(localizedMessage, (Object[])localizedParams);
         }
         if (getCause() != null) {
             return getCause().getLocalizedMessage();
@@ -69,11 +81,7 @@ public class UserException extends RuntimeException {
         return StringUtils.EMPTY;
     }
 
-    public String format(String msgFormat, Object... params) {
-        return MessageFormat.format(msgFormat, params);
-    }
-
-    public Object[] getRawParams() {
+    public String[] getRawParams() {
         return m_params;
     }
 

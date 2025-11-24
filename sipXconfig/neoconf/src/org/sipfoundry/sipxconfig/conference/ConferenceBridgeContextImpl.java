@@ -41,7 +41,6 @@ import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Conference> implements BeanFactoryAware,
         ConferenceBridgeContext, DaoEventListener {
@@ -63,22 +62,14 @@ public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Confere
     }
 
     public void saveBridge(Bridge bridge) {
-        if (bridge.isNew()) {
-            super.persistEntity(bridge);
-            // need to make sure that ID is set
-            super.flush();
-        } else {
-            super.mergeEntity(bridge);
-        }
+
+        super.saveEntity(bridge);
+        super.flush();
     }
 
     public void saveConference(Conference conference) {
         validate(conference);
-        if (conference.isNew()) {
-            super.persistEntity(conference);
-        } else {
-            super.mergeEntity(conference);
-        }
+        super.saveEntity(conference);
     }
 
     public void validate(Conference conference) {
@@ -269,7 +260,6 @@ private Query<Conference> filterConferencesCriteria(final Integer bridgeId, fina
         return super.loadAllEntities(Conference.class);
     }
 
-    @Transactional
     public List<Conference> filterConferences(final Integer bridgeId, final Integer ownerGroupId) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -302,7 +292,6 @@ private Query<Conference> filterConferencesCriteria(final Integer bridgeId, fina
         return conferences;
     }
 
-    @Transactional
     public int countFilterConferences(final Integer bridgeId, final Integer ownerGroupId) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -335,7 +324,6 @@ private Query<Conference> filterConferencesCriteria(final Integer bridgeId, fina
         }
     }
 
-    @Transactional
     public List<Conference> filterConferencesByPage(final Integer bridgeId, final Integer ownerGroupId,
             final int firstRow, final int pageSize, final String[] orderBy, final boolean orderAscending) {
 

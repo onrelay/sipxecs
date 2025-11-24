@@ -12,7 +12,7 @@ package org.sipfoundry.sipxconfig.freeswitch.api;
 import org.sipfoundry.sipxconfig.common.UserException;
 
 public class FreeswitchApiException extends UserException {
-    public FreeswitchApiException(String key, Object... args) {
+    public FreeswitchApiException(String key, String... args) {
         super(key, args);
     }
 }

@@ -53,17 +53,14 @@ public abstract class EditUser extends UserBasePage implements PageBeginRenderLi
         saveGroups(getSettingDao(), user.getGroups());
         String oldUserName = getCoreContext().getOriginalUserName(user);
         String newUserName = user.getUserName();
-        boolean userNameChanged = getCoreContext().saveUser(user);
+        boolean userNameChanged = !oldUserName.equals(newUserName);
+        getCoreContext().saveUser(user);
 
         MailboxManager mmgr = getMailboxManager();
         if (mmgr.isEnabled() && userNameChanged) {
             mmgr.renameMailbox(oldUserName, newUserName);
         }
 
-//        if (userNameChanged) {
-//            // FIXME: this should be done automatically by speed dial manager
-//            getSpeedDialManager().activateResourceList();
-//        }
     }
 
     public void pageBeginRender(PageEvent event_) {

@@ -23,12 +23,12 @@ public class UserExceptionTest extends TestCase {
     }
 
     public void testUserExceptionMessageParam() {
-        Exception ex = new UserException("ku{0}ku", Integer.valueOf(3));
+        Exception ex = new UserException("ku{0}ku", "3");
         assertEquals("ku3ku", ex.getMessage());
     }
 
     public void testUserExceptionMessageParamParam() {
-        Exception ex = new UserException("k{1}u{0}ku", Integer.valueOf(3), "bingo");
+        Exception ex = new UserException("k{1}u{0}ku", "3", "bingo");
         assertEquals("kbingou3ku", ex.getMessage());
     }
 

@@ -319,7 +319,7 @@ public class Gateway extends Device implements Replicable, DeployConfigOnEdit, S
 
     private static class MaxPortsException extends UserException {
         public MaxPortsException(int max) {
-            super("Maximum number of ports is {0}", max);
+            super("Maximum number of ports is {0}", max + "");
         }
     }
 

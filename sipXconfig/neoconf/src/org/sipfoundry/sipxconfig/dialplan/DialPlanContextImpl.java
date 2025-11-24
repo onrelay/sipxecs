@@ -37,7 +37,6 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * DialPlanContextImpl is an implementation of DialPlanContext with hibernate support.
@@ -88,11 +87,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         validateRule(rule);
         DialPlan dialPlan = getDialPlan();
         dialPlan.addRule(position, rule);
-        if (dialPlan.isNew()) {
-            super.persistEntity(dialPlan);
-        } else {
-            super.mergeEntity(dialPlan);
-        }
+        super.saveEntity(dialPlan);
         getDaoEventPublisher().publishSave(dialPlan);
         m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.ADDED, AUDIT_LOG_CONFIG_TYPE, rule.getName());
     }
@@ -115,13 +110,11 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         }
         getDaoEventPublisher().publishSave(rule);
     }
-
     /**
      * Checks for duplicate names. Should be called before saving the rule.
      *
      * @param rule to be verified
      */
-    @Transactional
     private void validateRule(DialingRule rule) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -234,11 +227,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
 
         DialPlan dialPlan = getDialPlan();
         dialPlan.removeRules(selectedRows);
-        if (dialPlan.isNew()) {
-            super.persistEntity(dialPlan);
-        } else {
-            super.mergeEntity(dialPlan);
-        }
+        super.saveEntity(dialPlan);
         getDaoEventPublisher().publishSave(dialPlan);
         for (DialingRule rule : rulesToDelete) {
             m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.DELETED, AUDIT_LOG_CONFIG_TYPE, rule.getName());
@@ -255,11 +244,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
             rules.add(ruleDup);
         }
         getDaoEventPublisher().publishSave(dialPlan);
-        if (dialPlan.isNew()) {
-            super.persistEntity(dialPlan);
-        } else {
-            super.mergeEntity(dialPlan);
-        }
+        super.saveEntity(dialPlan);
     }
 
     public List<DialingRule> getGenerationRules(Location location) {
@@ -275,11 +260,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
     public void setOperator(AutoAttendant attendant) {
         DialPlan dialPlan = getDialPlan();
         dialPlan.setOperator(attendant);
-        if (dialPlan.isNew()) {
-            super.persistEntity(dialPlan);
-        } else {
-            super.mergeEntity(dialPlan);
-        }
+        super.saveEntity(dialPlan);
     }
 
     /**
@@ -301,6 +282,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         newDialPlan.setOperator(operator);
 
         super.persistEntity(newDialPlan);
+
         getDaoEventPublisher().publishSave(newDialPlan);
         // Flush the session to cause the delete to take immediate effect.
         // Otherwise we can get name collisions on dialing rules when we load the
@@ -336,11 +318,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
     public void moveRules(Collection<Integer> selectedRows, int step) {
         DialPlan dialPlan = getDialPlan();
         dialPlan.moveRules(selectedRows, step);
-        if (dialPlan.isNew()) {
-            super.persistEntity(dialPlan);
-        } else {
-            super.mergeEntity(dialPlan);
-        }
+        super.saveEntity(dialPlan);
         getDaoEventPublisher().publishSave(dialPlan);
     }
 
@@ -350,11 +328,7 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
     public void removeEmptyRules() {
         DialPlan dialPlan = getDialPlan();
         if (dialPlan.removeEmptyRules()) {
-            if (dialPlan.isNew()) {
-                super.persistEntity(dialPlan);
-            } else {
-                super.mergeEntity(dialPlan);
-            }
+            super.saveEntity(dialPlan);
             getDaoEventPublisher().publishSave(dialPlan);
         }
     }
@@ -440,14 +414,14 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
     public Collection<BeanId> getBeanIdsOfObjectsWithAlias(String alias) {
         Collection<BeanId> bids = new ArrayList<>();
 
-        Collection<InternalRule> internalRules = getInternalRulesWithVoiceMailExtension(alias);
-        for( InternalRule internalRule : internalRules ) {
-            bids.add(new BeanId(internalRule.getId(), InternalRule.class));
+        Collection<Integer> internalRuleIds = getInternalRulesWithVoiceMailExtension(alias);
+        for( Integer internalRuleId : internalRuleIds ) {
+            bids.add(new BeanId(internalRuleId, InternalRule.class));
         }
 
-        Collection<AttendantRule> attendantRules = getAttendantRulesWithExtensionOrDid(alias);
-        for( AttendantRule attendantRule : attendantRules ) {
-            bids.add(new BeanId(attendantRule.getId(), AttendantRule.class));
+        Collection<Integer> attendantRuleIds = getAttendantRulesWithExtensionOrDid(alias);
+        for( Integer attendantRuleId : attendantRuleIds ) {
+            bids.add(new BeanId(attendantRuleId, AttendantRule.class));
         }
 
         bids.addAll(getBeanIdsOfRulesWithAutoAttendantAlias(alias));
@@ -470,21 +444,21 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
     }
 
     @Override
-    public Collection<InternalRule> getInternalRulesWithVoiceMailExtension(String extension) {
-        return (Collection<InternalRule>)super.findByNamedQueryAndNamedParam(
+    public Collection<Integer> getInternalRulesWithVoiceMailExtension(String extension) {
+        return (Collection<Integer>)super.findByNamedQueryAndNamedParam(
             "internalRuleIdsWithVoiceMailExtension", 
             VALUE,
             extension,
-            InternalRule.class);
+            Integer.class);
     }
 
     @Override
-    public Collection<AttendantRule> getAttendantRulesWithExtensionOrDid(String extension) {
-        return (Collection<AttendantRule>)super.findByNamedQueryAndNamedParam(
+    public Collection<Integer> getAttendantRulesWithExtensionOrDid(String extension) {
+        return (Collection<Integer>)super.findByNamedQueryAndNamedParam(
             "attendantRuleIdsWithExtensionOrDid", 
             VALUE,
             extension,
-            AttendantRule.class);
+            Integer.class);
     }
 
     @Override

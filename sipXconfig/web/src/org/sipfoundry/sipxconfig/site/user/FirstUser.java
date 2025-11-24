@@ -85,6 +85,7 @@ public abstract class FirstUser extends SipxBasePage implements PageBeginRenderL
     }
 
     public void pageBeginRender(PageEvent event) {
+        /*
         // This page runs only when there are no users, and the first user
         // needs to be created. If a user exists, then bail out to the login page.
         // After we create the user, we'll land here and go to login.
@@ -92,6 +93,7 @@ public abstract class FirstUser extends SipxBasePage implements PageBeginRenderL
             LoginPage loginPage = (LoginPage) event.getRequestCycle().getPage(LoginPage.PAGE);
             throw new PageRedirectException(loginPage);
         }
+        */
         // Render licence only if it's required but not yet accepted.
         if (getTapestry().isLicenseRequired() && !isLicenseAccepted()) {
             setRenderLicense(true);
@@ -102,7 +104,6 @@ public abstract class FirstUser extends SipxBasePage implements PageBeginRenderL
 
     public void commit() {
         if (TapestryUtils.isValid(this)) {
-            // Create the superadmin user
             getCoreContext().createAdminGroupAndInitialUser(getPin());
         }
     }

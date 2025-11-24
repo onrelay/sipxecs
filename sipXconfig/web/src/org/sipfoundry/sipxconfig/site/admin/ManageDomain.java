@@ -94,7 +94,7 @@ public abstract class ManageDomain extends PageWithCallback implements PageBegin
         String s = StringUtils.join(getAliases(), ", ");
         if (s.length() > settings.getAliasLength()) {
             SipxValidationDelegate validator = (SipxValidationDelegate) TapestryUtils.getValidator(this);
-            validator.record(new UserException("&msg.aliasListTooLong", s.length()), getMessages());
+            validator.record(new UserException("&msg.aliasListTooLong", s.length() + ""), getMessages());
             return;
         }
 

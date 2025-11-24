@@ -18,7 +18,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
-import org.springframework.transaction.annotation.Transactional;
 
 import org.sipfoundry.sipxconfig.bridge.BridgeSbc;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
@@ -73,7 +72,6 @@ public class SbcMigrationContextImpl extends SipxHibernateDaoSupport<Sbc> implem
         return sbcDevice.getId();
     }
 
-    @Transactional
     private void cleanSchema() {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {

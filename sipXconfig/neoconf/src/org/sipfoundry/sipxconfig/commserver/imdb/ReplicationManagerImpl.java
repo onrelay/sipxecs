@@ -381,49 +381,53 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> impl
         if (isNew) {
             getDbCollection().insertOne(top);
         } else {
-            Document toUpdate = new Document();
-            toUpdate.put(ID, top.get(ID));
-            Document updateQ = new Document();
-            Document removeQ = new Document();
+            // The 'toUpdate' document is the filter for the update operation
+            Document filter = new Document();
+            filter.put(ID, top.get(ID));
+            
+            Document updateQuery = new Document();
+            Document removeQuery = new Document();
             for (String field : cleanCopy.keySet()) {
                 Object oldValue = cleanCopy.get(field);
                 Object newValue = top.get(field);
                 LOG.debug(String.format("field: %s;old: %s; new: %s", field, oldValue, newValue));
                 if (oldValue == null || !oldValue.equals(newValue)) {
                     if (newValue == null) {
-                        removeQ.put(field, StringUtils.EMPTY);
+                        removeQuery.put(field, StringUtils.EMPTY);
                     } else {
-                        updateQ.put(field, newValue);
+                        updateQuery.put(field, newValue);
                     }
                 }
             }
+            // Second loop iterates over 'top' keys to catch additions or changes present only in the new doc
             for (String field : top.keySet()) {
                 Object oldValue = cleanCopy.get(field);
                 Object newValue = top.get(field);
 
                 if (newValue != null && (oldValue == null || !oldValue.equals(newValue))) {
-                    updateQ.put(field, newValue);
+                    updateQuery.put(field, newValue);
                 }
             }
-            LOG.debug(String.format("Update query: %s: ", updateQ));
-            LOG.debug(String.format("Remove query: %s: ", removeQ));
-            Document set = new Document();
-            Document emptyObject = new Document();
+            
+            LOG.debug(String.format("Update query: %s: ", updateQuery));
+            LOG.debug(String.format("Remove query: %s: ", removeQuery));
+            
+            Document update = new Document();
             boolean isUpdated = false;
-            if (!updateQ.equals(emptyObject)) {
-                set.append("$set", updateQ);
+            if (!updateQuery.isEmpty()) { // Use isEmpty() instead of equals(emptyObject)
+                update.append("$set", updateQuery);
                 isUpdated = true;
             }
-            if (!removeQ.equals(emptyObject)) {
-                set.append("$unset", removeQ);
+            if (!removeQuery.isEmpty()) { // Use isEmpty() instead of equals(emptyObject)
+                update.append("$unset", removeQuery);
                 isUpdated = true;
             }
+            
             if (isUpdated) {
-                LOG.debug(String.format("Final query: %s: ", set));
-                getDbCollection().replaceOne(toUpdate, set);
+                LOG.debug(String.format("Final query: %s: ", update));
+                getDbCollection().updateOne(filter, update);
             }
         }
-
     }
 
     private void replicateEntity(Replicable entity, DataSet dataSet, Document top) {

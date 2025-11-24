@@ -143,8 +143,7 @@ public class DomainManagerImpl extends SipxHibernateDaoSupport<Domain> implement
         if (!domain.getId().equals(m_domain.getId())) {
             throw new IllegalStateException("Cannnot change domain id");
         }
-        Domain d = super.mergeEntity(domain);
-        super.mergeEntity(d);
+        super.mergeEntity(domain);
         super.flush();
         m_domain = null;
     }

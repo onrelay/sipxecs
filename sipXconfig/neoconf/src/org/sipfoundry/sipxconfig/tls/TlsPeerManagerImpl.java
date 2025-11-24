@@ -76,11 +76,7 @@ public class TlsPeerManagerImpl extends SipxHibernateDaoSupport<TlsPeer> impleme
         }
         String userName = StringUtils.deleteWhitespace(String.format(INTERNAL_NAME, tlsPeer.getName()));
         tlsPeer.getInternalUser().setUserName(userName);
-        if (!tlsPeer.isNew()) {
-            super.mergeEntity(tlsPeer);
-        } else {
-            super.persistEntity(tlsPeer);
-        }
+        super.saveEntity(tlsPeer);
     }
 
     @Override

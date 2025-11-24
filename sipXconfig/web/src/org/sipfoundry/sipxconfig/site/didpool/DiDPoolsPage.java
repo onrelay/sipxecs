@@ -312,9 +312,9 @@ public abstract class DiDPoolsPage extends SipxBasePage implements PageBeginRend
             EditDialRule page = (EditDialRule) cycle.getPage(EditDialRule.INTERNAL);
             page.setRuleType(DialingRuleType.INTERNAL);
             DialingRule rule = null;
-            Iterator rules = getDialPlanContext().getInternalRulesWithVoiceMailExtension(typeId).iterator();
+            Iterator<Integer> rules = getDialPlanContext().getInternalRulesWithVoiceMailExtension(typeId).iterator();
             if (rules.hasNext()) {
-                Integer id = (Integer)rules.next();
+                Integer id = rules.next();
                 rule = getDialPlanContext().getRule(id);
                 page.setRule(rule);
                 page.setRuleId(id);
@@ -353,18 +353,18 @@ public abstract class DiDPoolsPage extends SipxBasePage implements PageBeginRend
             while(iterator.hasNext()) {
                 Did did = (Did)iterator.next();
                 if (StringUtils.equals(DidType.TYPE_AUTO_ATTENDANT_DIALING_RULE.getName(), did.getType())) {
-                    Iterator rules = getDialPlanContext().getAttendantRulesWithExtensionOrDid(did.getTypeId()).iterator();
+                    Iterator<Integer> rules = getDialPlanContext().getAttendantRulesWithExtensionOrDid(did.getTypeId()).iterator();
                     if (rules.hasNext()) {
-                        Integer id = (Integer)rules.next();
+                        Integer id = rules.next();
                         AttendantRule rule = (AttendantRule)getDialPlanContext().getRule(id);
                         rule.setDid(null);
                         getDialPlanContext().storeRule(rule);
                     }
                 } 
                 else if (StringUtils.equals(DidType.TYPE_VOICEMAIL_DIALING_RULE.getName(), did.getType())) {
-                    Iterator rules = getDialPlanContext().getInternalRulesWithVoiceMailExtension(did.getTypeId()).iterator();
+                    Iterator<Integer> rules = getDialPlanContext().getInternalRulesWithVoiceMailExtension(did.getTypeId()).iterator();
                     if (rules.hasNext()) {
-                        Integer id = (Integer)rules.next();
+                        Integer id = rules.next();
                         InternalRule rule = (InternalRule)getDialPlanContext().getRule(id);
                         rule.setDid(null);
                         getDialPlanContext().storeRule(rule);

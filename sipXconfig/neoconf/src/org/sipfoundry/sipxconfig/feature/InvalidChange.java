@@ -42,7 +42,7 @@ public class InvalidChange {
 
     public static InvalidChange requires(Feature subject, LocationFeature required, Location where) {
         InvalidChangeException msg = new InvalidChangeException(ERROR_REQUIRED_FEATURE_AT_LOCATION,
-            subject, required, where.getHostname());
+            subject + "", required + "", where.getHostname());
         return new InvalidChange(required, where, msg);
     }
 
@@ -53,12 +53,12 @@ public class InvalidChange {
         }
         String errMessage = StringUtils.join(requiredHostnames.iterator(), ", ");
         InvalidChangeException msg = new InvalidChangeException(ERROR_REQUIRED_FEATURE_AT_LOCATION,
-            subject, required, errMessage);
+            subject + "", required + "", errMessage);
         return new InvalidChange(required, msg);
     }
 
     public static InvalidChange requires(Feature subject, Feature required) {
-        InvalidChangeException msg = new InvalidChangeException("&error.requiredFeature.{0}.{1}", subject, required);
+        InvalidChangeException msg = new InvalidChangeException("&error.requiredFeature.{0}.{1}", subject + "", required + "");
         return new InvalidChange(required, msg);
     }
 

@@ -17,7 +17,7 @@
     <property name="prefix"/>
     <property name="timeout"/>
     <property name="code"/>
-  	<set name="groups" table="intercom_phone_group" sort="natural" cascade="persist,merge">
+  	<set name="groups" table="intercom_phone_group" sort="natural" cascade="merge">
       <key column="intercom_id"/>
       <many-to-many column="group_id" class="org.sipfoundry.sipxconfig.setting.Group"/>
     </set>

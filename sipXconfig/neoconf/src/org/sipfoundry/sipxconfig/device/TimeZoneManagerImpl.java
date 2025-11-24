@@ -18,11 +18,7 @@ import org.springframework.dao.support.DataAccessUtils;
 public class TimeZoneManagerImpl extends SipxHibernateDaoSupport<DeviceTimeZone> implements TimeZoneManager {
 
     public void setDeviceTimeZone(DeviceTimeZone dtz) {
-        if (dtz.isNew()) {
-            super.persistEntity(dtz);
-        } else {
-            super.mergeEntity(dtz);
-        }
+        super.saveEntity(dtz);
         getDaoEventPublisher().publishSave(dtz);
     }
 

@@ -38,7 +38,7 @@ public class AttendantInUseExceptionTest extends TestCase {
         DialingRule rule3 = new CustomDialingRule();
         rule3.setName("def");
         rules.add(rule3);
-        Exception exception = new AttendantInUseException(new Object[]{"abc, bc, def"});
+        Exception exception = new AttendantInUseException(new String[]{"abc, bc, def"});
         assertEquals(AttendantInUseException.IN_USE, exception.getMessage());
 //        assertTrue(exception.getMessage().indexOf("abc, bc, def") > 0);
 //        assertFalse(exception.getMessage().indexOf("abc, bc, def,") > 0);

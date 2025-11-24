@@ -34,11 +34,7 @@ public class ExtensionPoolContextImpl extends SipxHibernateDaoSupport<ExtensionP
     }
 
     public void saveExtensionPool(ExtensionPool pool) {
-        if (pool.isNew()) {
-            super.persistEntity(pool);
-        } else {
-            super.mergeEntity(pool);
-        }
+        super.saveEntity(pool);
     }
 
     /**

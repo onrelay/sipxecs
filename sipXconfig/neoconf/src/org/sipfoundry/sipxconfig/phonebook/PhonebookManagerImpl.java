@@ -73,7 +73,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.transaction.annotation.Transactional;
 
 import org.sipfoundry.commons.userdb.profile.UserProfile;
 import org.sipfoundry.commons.userdb.profile.UserProfileService;
@@ -164,7 +163,6 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     }
 
     @Override
-    @Transactional
     public void savePhonebook(Phonebook phonebook) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -172,11 +170,9 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
             Session session = sessionTransaction.getSession();
 
             DaoUtils.checkDuplicates(session, Phonebook.class, phonebook, NAME, new DuplicatePhonebookName());
-            if (phonebook.isNew()) {
-                super.persistEntity(phonebook);
-            } else {
-                super.mergeEntity(phonebook);
-            }
+
+            super.saveEntity(phonebook);
+
             getDaoEventPublisher().publishSave(phonebook);
         }
     }
@@ -989,7 +985,6 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
      *
      */
     @Override
-    @Transactional
     public Map<Integer, String[]> getPhonebookFilesName() {
 
         Map<Integer, String[]> names = new TreeMap<>();

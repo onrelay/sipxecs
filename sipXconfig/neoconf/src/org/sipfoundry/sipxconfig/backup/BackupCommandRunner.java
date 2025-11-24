@@ -94,7 +94,7 @@ public class BackupCommandRunner {
             }
             int code = process.waitFor();
             if (code != 0) {
-                throw new UserException("&archive.command.failed", commandLine, code);
+                throw new UserException("&archive.command.failed", commandLine, code + "");
             }
             rdr = new FileReader(listFile);
             return IOUtils.toString(rdr);

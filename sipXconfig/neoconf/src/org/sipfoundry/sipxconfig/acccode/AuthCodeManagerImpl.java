@@ -115,14 +115,14 @@ public class AuthCodeManagerImpl extends SipxHibernateDaoSupport<AuthCode> imple
             throw new UserException("&blank.permission.error");
         }
         authCode.getInternalUser().setUserName(userName);
-        if (!authCode.isNew()) {
-            super.mergeEntity(authCode);
-        } else {
-            super.persistEntity(authCode);
+        boolean isNew = authCode.isNew();
+
+        super.saveEntity(authCode);
+        if (isNew) {
             // Need to update authname since we should have a real authcode id now
             userName = StringUtils.deleteWhitespace(String.format(INTERNAL_NAME, authCode.getId()));
-            LOG.info("::authcode interanl user name after save: " + authCode.getInternalUser().getUserName());
-            authCode.getInternalUser().setUserName(userName);
+            LOG.info("::authcode internal user name after save: " + authCode.getInternalUser().getUserName());
+               authCode.getInternalUser().setUserName(userName);
         }
     }
 

@@ -69,11 +69,7 @@ public class ParkOrbitContextImpl extends SipxHibernateDaoSupport<ParkOrbit> imp
             throw new ExtensionInUseException(parkOrbitTypeName, extension);
         }
 
-        if (parkOrbit.isNew()) {
-            super.persistEntity(parkOrbit);
-        } else {
-            super.mergeEntity(parkOrbit);
-        }
+        super.saveEntity(parkOrbit);
         getDaoEventPublisher().publishSave(parkOrbit);
     }
 
@@ -106,11 +102,7 @@ public class ParkOrbitContextImpl extends SipxHibernateDaoSupport<ParkOrbit> imp
     public void setDefaultMusicOnHold(String music) {
         BackgroundMusic backgroundMusic = getBackgroundMusic();
         backgroundMusic.setMusic(music);
-        if (backgroundMusic.isNew()) {
-            super.persistEntity(backgroundMusic);
-        } else {
-            super.mergeEntity(backgroundMusic);
-        }
+        super.saveEntity(backgroundMusic);
     }
 
     private BackgroundMusic getBackgroundMusic() {

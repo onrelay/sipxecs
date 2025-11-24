@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.DateFormat;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -230,6 +231,25 @@ public final class TapestryUtils {
             SipxValidationDelegate validator = (SipxValidationDelegate) delegate;
             validator.recordSuccess(msg);
         }
+    }
+
+    public static void recordError(IComponent page, String messageId, String arg) {
+        IValidationDelegate delegate = getValidator(page);
+        String message = null;
+        if (arg != null) {
+            message = MessageFormat.format(page.getMessages().getMessage(messageId), arg);
+        } else {
+            message = page.getMessages().getMessage(messageId);
+        }
+        delegate.record(message, ValidationConstraint.CONSISTENCY);
+    }
+
+    public static void recordError(IComponent page, Exception e) {
+        IValidationDelegate delegate = getValidator(page);
+
+        String message = MessageFormat.format(
+            page.getMessages().getMessage("msg.server.error"), e.getLocalizedMessage());
+        delegate.record(message, ValidationConstraint.CONSISTENCY);
     }
 
     /**

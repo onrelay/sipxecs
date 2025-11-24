@@ -25,7 +25,6 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Transactional;
 
 import org.sipfoundry.sipxconfig.cfgmgt.ConfigManager;
 import org.sipfoundry.sipxconfig.common.CoreContext;
@@ -117,7 +116,6 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
      *
      * @return list of CallSequence objects
      */
-    @Transactional
     private List<CallSequence> loadAllCallSequences() {
         
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -188,14 +186,14 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
         if (schedule.isNew()) {
             // check if new object
             checkForDuplicateNames(schedule);
-            super.persistEntity(schedule);
+            super.saveEntity(schedule);
         } else {
             // on edit action - check if the name for this schedule was modified
             // if the name was changed then perform duplicate name checking
             if (isNameChanged(schedule)) {
                 checkForDuplicateNames(schedule);
             }
-            super.mergeEntity(schedule);
+            super.saveEntity(schedule);
             List<Ring> rings = getRingsForScheduleId(schedule.getId());
             Collection<CallSequence> css = new HashSet<CallSequence>();
             if (rings != null) {

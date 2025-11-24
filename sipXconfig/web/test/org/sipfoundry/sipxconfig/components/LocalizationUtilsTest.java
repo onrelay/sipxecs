@@ -40,15 +40,15 @@ public class LocalizationUtilsTest extends TestCase {
     public void testLocalizeArray() {
         Messages messages = new DummyMessages();
 
-        Object[] array = null;
+        String[] array = null;
         assertNull(LocalizationUtils.localizeArray(messages, array));
         assertEquals(0, LocalizationUtils.localizeArray(messages).length);
 
-        Object[] result = LocalizationUtils.localizeArray(messages, "dummy", 4, "bongo", "&dummy", "&bongo", null);
+        String[] result = LocalizationUtils.localizeArray(messages, "dummy", "4", "bongo", "&dummy", "&bongo", null);
 
         assertEquals(6, result.length);
         assertEquals("dummy", result[0]);
-        assertEquals(4, result[1]);
+        assertEquals("4", result[1]);
         assertEquals("bongo", result[2]);
         assertEquals("dummy label", result[3]);
         assertEquals("[BONGO]", result[4]);
@@ -63,7 +63,7 @@ public class LocalizationUtilsTest extends TestCase {
         UserException e2 = new UserException("dummy");
         assertEquals("dummy", LocalizationUtils.localizeException(messages, e2));
 
-        UserException e3 = new UserException("&fmt", "&param", 7);
+        UserException e3 = new UserException("&fmt", "&param", "7");
         assertEquals("This is <param label> - 7", LocalizationUtils.localizeException(messages, e3));
     }
 

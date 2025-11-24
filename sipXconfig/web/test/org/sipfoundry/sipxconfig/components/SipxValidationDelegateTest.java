@@ -52,7 +52,7 @@ public class SipxValidationDelegateTest extends TestCase {
     }
 
     public void testRecordWithMessageAndParams() {
-        UserException exception = new UserException("&machine", "&raven", "10.1.3.4", 2);
+        UserException exception = new UserException("&machine", "&raven", "10.1.3.4", "2");
 
         SipxValidationDelegate delegate = new SipxValidationDelegate();
         delegate.record(exception, new DummyMessages());

@@ -29,7 +29,6 @@ import org.springframework.dao.support.DataAccessUtils;
 import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.SessionFactory;
-import org.springframework.transaction.annotation.Transactional;
 
 import org.sipfoundry.sipxconfig.alias.AliasManager;
 import org.sipfoundry.sipxconfig.cfgmgt.ConfigManager;
@@ -208,11 +207,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
             throw new SameExtensionException(ALIAS, DID);
         }
         removeNullActions(extension);
-        if (extension.isNew()) {
-            super.mergeEntity(extension);
-        } else {
-            super.mergeEntity(extension);
-        }
+        super.saveEntity(extension);
     }
 
     @Override
@@ -385,8 +380,9 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
         return true;
     }
 
-    public void saveCallQueueAgent(CallQueueAgent callQueueAgent) { // Tested
+    public void saveCallQueueAgent(CallQueueAgent callQueueAgent) { 
         // Check for duplicate names and extensions before saving the call queue
+        
         final String callQueueAgentTypeName = "&label.callQueueAgent";
         if (!checkForDuplicateAgentName(callQueueAgent)) {
             throw new NameInUseException(callQueueAgentTypeName, callQueueAgent.getName());
@@ -396,11 +392,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
         if (!isNew) {
             queuesBefore = getCallQueueIds(callQueueAgent.getId());
         }
-        if (isNew) {
-            super.persistEntity(callQueueAgent);
-        } else {
-            super.mergeEntity(callQueueAgent);
-        }
+        super.saveEntity(callQueueAgent);
         super.flush();
         List<Integer> queuesAfter = getCallQueueIds(callQueueAgent.getId());
         queuesAfter = queuesAfter == null ? new ArrayList<Integer>() : queuesAfter;
@@ -470,7 +462,6 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
     }
 
     @Override
-    @Transactional
     public List<CallQueue> getAvaiableQueuesForAgent(Integer callqueueagentid) {
         if (callqueueagentid == null) {
             return Collections.EMPTY_LIST;
@@ -497,7 +488,6 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
     }
 
     @Override
-    @Transactional
     public List<Integer> getCallQueueAgentsForQueue(Integer callqueueid) {
         if (callqueueid == null) {
             return Collections.emptyList();
@@ -518,7 +508,6 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
         }
     }
 
-    @Transactional
     private List<Integer> getCallQueueIds(Integer callqueueAgentId) {
         if (callqueueAgentId == null) {
             return Collections.emptyList();

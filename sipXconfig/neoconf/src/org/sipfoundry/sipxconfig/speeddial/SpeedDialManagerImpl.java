@@ -172,11 +172,7 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
     @Override
     public void saveSpeedDial(SpeedDial speedDial) {
         verifyBlfs(speedDial);
-        if (speedDial.isNew()) {
-            super.persistEntity(speedDial);
-        } else {
-            super.mergeEntity(speedDial);
-        }
+        super.saveEntity(speedDial);
         super.flush();
         User user = m_coreContext.loadUser(speedDial.getUser().getId());
         getDaoEventPublisher().publishSave(user);
@@ -237,11 +233,7 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
     @Override
     public void saveSpeedDialGroup(SpeedDialGroup speedDialGroup) {
         verifyBlfs(speedDialGroup);
-        if (speedDialGroup.isNew()) {
-            super.persistEntity(speedDialGroup);
-        } else {
-            super.mergeEntity(speedDialGroup);
-        }
+        super.saveEntity(speedDialGroup);
         getDaoEventPublisher().publishSave(speedDialGroup.getUserGroup());
     }
 

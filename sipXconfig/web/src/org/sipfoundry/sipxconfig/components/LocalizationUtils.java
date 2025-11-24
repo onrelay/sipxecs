@@ -10,6 +10,7 @@
 package org.sipfoundry.sipxconfig.components;
 
 import java.util.Locale;
+import java.text.MessageFormat;
 
 import org.apache.hivemind.Messages;
 import org.apache.tapestry.IComponent;
@@ -127,18 +128,21 @@ public final class LocalizationUtils {
         UserException e = (UserException) t;
         String msg = e.getRawMessage();
         if (msg == null) {
-            return e.getMessage();
+            return e.getLocalizedMessage();
         }
+
         String localizedMsg = localizeString(messages, msg);
-        Object[] localizedParams = LocalizationUtils.localizeArray(messages, e.getRawParams());
-        return e.format(localizedMsg, localizedParams);
+
+        String[] localizedParams = LocalizationUtils.localizeArray(messages, e.getRawParams());
+
+        return ((UserException)e).getLocalizedMessage( localizedMsg, localizedParams );
     }
 
-    static Object[] localizeArray(Messages messages, Object... params) {
+    static String[] localizeArray(Messages messages, String... params) {
         if (params == null) {
             return null;
         }
-        Object[] localizedParams = new Object[params.length];
+        String[] localizedParams = new String[params.length];
         for (int i = 0; i < params.length; i++) {
             localizedParams[i] = localizeString(messages, params[i]);
         }

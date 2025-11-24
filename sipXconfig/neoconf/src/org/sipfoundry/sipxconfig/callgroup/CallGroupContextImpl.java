@@ -19,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.Session;
 
-import org.springframework.transaction.annotation.Transactional;
 
 import org.sipfoundry.sipxconfig.alias.AliasManager;
 import org.sipfoundry.sipxconfig.common.BeanId;
@@ -68,7 +67,6 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport<CallGroup> imp
     }
     
     @Override
-    @Transactional
     public int getCallGroupId(String extension) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -108,11 +106,7 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport<CallGroup> imp
         if (StringUtils.isNotBlank(did) && did.equals(extension)) {
             throw new DidInUseException(huntGroupTypeName, did);
         }
-        if (callGroup.isNew()) {
-            super.persistEntity(callGroup);
-        } else {
-            super.mergeEntity(callGroup);
-        }
+        super.saveEntity(callGroup);
         // activate call groups every time the call group is saved
         m_replicationContext.generate(callGroup);
     }
@@ -187,7 +181,7 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport<CallGroup> imp
             if (delete) {
                 callGroup.removeRing(ring);
             }
-            super.persistEntity(callGroup);
+            super.saveEntity(callGroup);
             super.flush();
             m_replicationContext.generate(callGroup);
         }

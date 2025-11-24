@@ -18,7 +18,6 @@ import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.sipfoundry.sipxconfig.job.JobContext;
-import org.springframework.transaction.annotation.Transactional;
 
 public abstract class RowInserter<T> extends SipxHibernateDaoSupport<T> implements Closure {
     private static final Log LOG = LogFactory.getLog(RowInserter.class);
@@ -61,7 +60,6 @@ public abstract class RowInserter<T> extends SipxHibernateDaoSupport<T> implemen
     /**
      * Transactional method runs inside a Spring-managed transaction.
      */
-    @Transactional
     protected void executeInTransaction(Serializable jobId, T row) {
         m_jobContext.start(jobId);
         RowResult result = checkRowData(row);

@@ -18,7 +18,7 @@ import org.sipfoundry.sipxconfig.common.UserException;
 
 @SuppressWarnings("serial")
 public class ValidateException extends UserException {
-    public ValidateException(String msg, Object...params) {
+    public ValidateException(String msg, String... params) {
         super(msg, params);
     }
 }

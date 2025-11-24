@@ -42,7 +42,7 @@ public class FeatureChangeValidator {
         if (m_request.hasChanged(subject)) {
             Collection<Location> on = getLocationsForEnabledFeature(subject);
             if (on.size() > 1) {
-                InvalidChangeException err = new InvalidChangeException("&error.singleLocationOnly.{0}", subject);
+                InvalidChangeException err = new InvalidChangeException("&error.singleLocationOnly.{0}", subject + "");
                 InvalidChange singleLocation = new InvalidChange(subject, err);
                 m_invalid.add(singleLocation);
             }
@@ -53,7 +53,7 @@ public class FeatureChangeValidator {
         if (m_request.hasChanged(subject)) {
             Collection<Location> on = getLocationsForEnabledFeature(subject);
             if (on.size() > 1 || !isInstalledOnPrimary(on)) {
-                InvalidChangeException err = new InvalidChangeException("&error.primaryLocationOnly.{0}", subject);
+                InvalidChangeException err = new InvalidChangeException("&error.primaryLocationOnly.{0}", subject + "");
                 InvalidChange primaryLocation = new InvalidChange(subject, err);
                 m_invalid.add(primaryLocation);
             }

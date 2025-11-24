@@ -740,7 +740,7 @@ public class CoreContextImplTestIntegration extends IntegrationTestCase {
         user.setImDisplayName("displayName  ");
         user.addAlias(" Alias1");
         user.addAlias("Alias2 ");
-        assertTrue(m_coreContext.saveUser(user));
+        m_coreContext.saveUser(user);
         user = m_coreContext.loadUserByUserName("username");
         assertEquals("First", user.getFirstName());
         assertEquals("Last", user.getLastName());

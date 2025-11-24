@@ -25,7 +25,6 @@ import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Transactional;
 
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.DaoUtils;
@@ -73,11 +72,7 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
         if (branch.isNew() || (!branch.isNew() && isNameChanged(branch))) {
             checkForDuplicateName(branch);
         }
-        if (!branch.isNew()) {
-            super.mergeEntity(branch);
-        } else {
-            super.persistEntity(branch);
-        }
+        super.saveEntity(branch);
     }
 
     private boolean isNameChanged(Branch branch) {
@@ -147,7 +142,6 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
         return branches;
     }
 
-    @Transactional
     private Branch loadBranchByUniqueProperty(String propName, String propValue) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -176,7 +170,6 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
     }
 
     @Override
-    @Transactional
     public List<?> getFeatureNames(Integer branchId, String sqlQuery, Class<?> c) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
@@ -190,7 +183,6 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
     }
 
     @Override
-    @Transactional
     public List<?> getFeatureNames(String sqlQuery, Class<?> c) {
         
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {

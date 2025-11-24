@@ -50,7 +50,7 @@ public interface CoreContext extends DataObjectSource<User>, AliasOwner, Replica
      * @return true if username has changed, false if it's an update to existing user without
      *         username change
      */
-    boolean saveUser(User user);
+    void saveUser(User user);
 
     String getOriginalUserName(User user);
 

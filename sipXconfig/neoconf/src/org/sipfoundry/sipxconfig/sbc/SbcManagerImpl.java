@@ -24,7 +24,6 @@ import org.sipfoundry.sipxconfig.domain.DomainManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 public class SbcManagerImpl extends SipxHibernateDaoSupport<Sbc> implements SbcManager, BeanFactoryAware {
     private DomainManager m_domainManager;
@@ -56,18 +55,13 @@ public class SbcManagerImpl extends SipxHibernateDaoSupport<Sbc> implements SbcM
     }
 
     public void saveSbc(Sbc sbc) {
-        if (sbc.isNew()) {
-            super.persistEntity(sbc);
-        } else {
-            super.mergeEntity(sbc);
-        }
+        super.saveEntity(sbc);
     }
 
     public AuxSbc loadSbc(Integer sbcId) {
         return (AuxSbc) super.loadEntity(AuxSbc.class, sbcId);
     }
 
-    @Transactional
     public void removeSbcs(Collection<Integer> selectedRows) {
 
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
