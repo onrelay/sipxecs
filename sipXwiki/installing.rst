@@ -7,7 +7,7 @@ Installing
 ===================
 
 .. note::
-If you are still using CentOS7, which is now End Of Life, please follow the :ref:`_installing-centos7` instructions to install sipXcom.
+If you are still using CentOS7, which is now End Of Life, please follow the :ref:`Installing CentOS7 <installing-centos7>` instructions to install sipXcom.
 
 Setup sipXcom repo
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
