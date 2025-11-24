@@ -6,6 +6,8 @@
 Installing 
 ===================
 
+Before following the below instructions, setup your environment as described :ref:`here <environment>`.
+
 .. note::
 If you are still using CentOS7, which is now End Of Life, please follow the :ref:`Installing CentOS7 <installing-centos7>` instructions to install sipXcom.
 
