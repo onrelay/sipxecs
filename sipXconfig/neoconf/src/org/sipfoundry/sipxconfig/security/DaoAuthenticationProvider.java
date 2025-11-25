@@ -71,15 +71,14 @@ public class DaoAuthenticationProvider extends AbstractUserDetailsAuthentication
 
         if (authentication.getCredentials() == null) {
             throw new BadCredentialsException(messages.getMessage(
-                    "AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials") );
+                    "AbstractUserDetailsAuthenticationProvider.badCredentials", "Missing credentials") );
         }
 
-        String presentedPassword = authentication.getCredentials() == null ? "" : authentication.getCredentials()
-                .toString();
+        String presentedPassword = authentication.getCredentials().toString();
 
         if (!passwordEncoder.matches(presentedPassword, userDetails.getPassword() )) {
             throw new BadCredentialsException(messages.getMessage(
-                    "AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials" ) );
+                    "AbstractUserDetailsAuthenticationProvider.badCredentials", "Invalid credentials" ) );
         }
     }
 

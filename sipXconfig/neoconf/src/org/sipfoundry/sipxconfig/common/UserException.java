@@ -67,7 +67,7 @@ public class UserException extends RuntimeException {
 
         if (localizedMessage != null && getCause() != null ) {
 
-            String result = MessageFormat.format(localizedMessage, (Object[]){getCause().getLocalizedMessage()});
+            String result = MessageFormat.format(localizedMessage, getCause().getLocalizedMessage());
             // Comment below out when done with development
             result += "\n" + ExceptionUtils.getStackTrace( getCause() );
             return result;
