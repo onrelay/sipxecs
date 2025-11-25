@@ -68,13 +68,11 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
 
     public static final String ELASTICSEARCH = "elasticsearch";
     public static final LocationFeature FEATURE = new LocationFeature(ELASTICSEARCH);
-    public static final AddressType ES_UDP = new AddressType("esUdp", Protocol.udp);
     public static final AddressType ES_TCP = new AddressType("esTcp", Protocol.tcp);
-    private static final Collection<AddressType> ADDRESS_TYPES = Arrays.asList(ES_UDP, ES_TCP);
-
+    private static final Collection<AddressType> ADDRESS_TYPES = Arrays.asList(ES_TCP);
     private static final Log LOG = LogFactory.getLog(ElasticsearchServiceImpl.class);
     private static final String FILTERING_ERROR_MESSAGE = "Filtering is supported only by QueryBuilder objects.";
-    private static final String NO_NODE_AVAILABLE_ERROR_MESSAGE = "No available nodes in ElasticSearch.";
+    private static final String NO_CONNECTION_AVAILABLE_ERROR_MESSAGE = "Not able to reach Elasticsearch at: ";
     private static final String ELASTICSEARCH_REGEXP = ".*\\java -Xms256m -Xmx1g -Djava.awt.headless=true\\s.*";
 
     private ElasticsearchClient m_client;
@@ -107,7 +105,6 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
         if (m_client == null) {
             try {
                 String fqdn = m_locationsManager.getPrimaryLocation().getFqdn();
-                // Use org.apache.http.HttpHost (from httpclient 4.x)
                 RestClient restClient = RestClient.builder(new HttpHost(fqdn, m_port, "http")).build();
                 m_client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper()));
             } catch (Exception e) {
@@ -126,7 +123,8 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
                 .document(source)
             );
         } catch (IOException e) {
-            LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
+            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE + 
+                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
         }
     }
 
@@ -145,7 +143,8 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
 
             getClient().bulk(b -> b.index(index).operations(ops));
         } catch (IOException e) {
-            LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
+            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE + 
+                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
         }
     }
 
@@ -180,7 +179,8 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
                 .map(hit -> hit.source())
                 .collect(Collectors.toList());
         } catch (IOException e) {
-            LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
+            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE + 
+                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
             return new ArrayList<T>();
         }
     }
@@ -194,7 +194,8 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
             GetResponse<T> response = getClient().get(g -> g.index(indexName).id(id), clazz);
             return response.found() ? response.source() : null;
         } catch (IOException e) {
-            LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
+            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE +  
+                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
             return null;
         }
     }
@@ -208,12 +209,7 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
         Collection<Address> addresses = new ArrayList<>(locations.size());
 
         for (Location location : locations) {
-            Address address = null;
-            if (type.equals(ES_UDP)) {
-                address = new Address(ES_UDP, location.getAddress(), 9300);
-            } else if (type.equals(ES_TCP)) {
-                address = new Address(ES_TCP, location.getAddress(), 9300);
-            }
+            Address address = new Address(ES_TCP, location.getAddress(), m_port);
             addresses.add(address);
         }
 
@@ -275,7 +271,8 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
             CountResponse response = getClient().count(countBuilder.build());
             return (int) response.count();
         } catch (IOException e) {
-            LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
+            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE + 
+                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
             return 0;
         }
     }
@@ -285,7 +282,8 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
             BooleanResponse exists = getClient().indices().exists(e -> e.index(indexName));
             return exists.value();
         } catch (IOException e) {
-            LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
+            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE +  
+                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
             return false;
         }
     }
@@ -306,7 +304,8 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
             }
             getClient().deleteByQuery(deleteBuilder.build());
         } catch (IOException e) {
-            LOG.error(NO_NODE_AVAILABLE_ERROR_MESSAGE, e);
+            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE +  
+                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
         }
     }
 }

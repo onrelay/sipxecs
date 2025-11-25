@@ -5,9 +5,7 @@ include config/project.am
 	LICENSE \
 	installer/README.html \
 	installer/LICENSES \
-	installer/icons/logo.gif \
 	installer/icons/logo.png \
-	installer/icons/logo-sipfoundry.jpg \
 	installer/icons/sipxconfig-logo.png \
 	installer/startup/sipviewer \
 	installer/startup/start-sipviewer.bat \

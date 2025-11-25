@@ -33,6 +33,7 @@ sipxconfig_neoconf_PKGS = \
 	jakarta.mail \
 	jakarta.activation-api \
 	jakarta.annotation-api \
+	jakarta.json-api \
 	jakarta.persistence-api \
 	jakarta.transaction-api \
 	jakarta.servlet-api \
@@ -41,6 +42,7 @@ sipxconfig_neoconf_PKGS = \
 	jakarta.ws.rs-api \
 	jakarta.xml.bind-api \
 	jakarta.xml.ws-api \
+	yasson \
 	jaxen \
 	jaxrpc \
 	jettison \
@@ -54,6 +56,8 @@ sipxconfig_neoconf_PKGS = \
 	lucene-backward-codecs \
 	mime-dir-j-vcard4j-jakarta \
 	mysql-connector-java \
+	opentelemetry-api \
+	opentelemetry-context \
 	org.restlet \
 	org.restlet.ext.json \
 	org.restlet.ext.spring \
@@ -139,8 +143,10 @@ sipxconfig_neoconf_PKGS = \
 	elasticsearch-java \
 	elasticsearch-rest-client \
 	elasticsearch-x-content \
+	httpasyncclient \
 	httpclient \
 	httpcore \
+	httpcore-nio \
 	httpclient5 \
 	httpcore5 \
 	gson \

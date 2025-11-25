@@ -296,11 +296,8 @@ function c2ccallcb(obj)
 
 function initializeGadget()
 {
-    //document.body.background = "http://www.sipfoundry.org/templates/ja_zibal/images/logo-sipfoundry.jpg";
    	initializeContactList();
-	//initializeContactInfo();
 	fetchData(1);
-	
 }
 
 
