@@ -18,17 +18,17 @@
   <bean id="sipxFilterChainProxy" class="org.sipfoundry.sipxconfig.security.SipxFilterChainProxy">
     <constructor-arg name="filterChains">
       <util:list>
-        <security:filter-chain pattern="/initial-config/.*"
+        <security:filter-chain pattern="/initial-config/**"
             filters="lazySecurityContextPersistenceFilter,basicAuthenticationFilter,basicExceptionTranslationFilter,filterInvocationInterceptor" />
-        <security:filter-chain pattern="/rest/private/[^/]{32}/.*"
+        <security:filter-chain pattern="/rest/private/[^/]{32}/**"
             filters="lazySecurityContextPersistenceFilter,privateUserKeyProcessingFilter,digestExceptionTranslationFilter,filterInvocationInterceptor" />
-        <security:filter-chain pattern="/rest/avatar/.*"
+        <security:filter-chain pattern="/rest/avatar/**"
             filters="lazySecurityContextPersistenceFilter,basicAuthenticationFilter,digestAuthenticationFilter,digestExceptionTranslationFilter,anonymousProcessingFilter,filterInvocationInterceptor" />
-        <security:filter-chain pattern="/(services|rest|api)/.*"
+        <security:filter-chain pattern="/(services|rest|api)/**"
             filters="lazySecurityContextPersistenceFilter,optionsAuthFilter,basicAuthenticationFilter,digestAuthenticationFilter,digestExceptionTranslationFilter,filterInvocationInterceptor" />
         <security:filter-chain pattern="/(TestPage|FirstUser).html"
             filters="securityContextPersistenceFilter" />
-        <security:filter-chain pattern="/.*"
+        <security:filter-chain pattern="/**"
             filters="securityContextPersistenceFilter,authenticationProcessingFilter,loginExceptionTranslationFilter,filterInvocationInterceptor" />
       </util:list>
     </constructor-arg>
@@ -57,7 +57,7 @@
     <property name="userDetailsService" ref="standardUserDetailsService" />
     <property name="userCache" ref="userCache" />
     <property name="passwordEncoder" ref="passwordEncoder" />
-     <property name="systemAuthPolicyCollector" ref="systemAuthPolicyCollector"/>    
+    <property name="systemAuthPolicyCollector" ref="systemAuthPolicyCollector"/>    
   </bean>
 
   <bean id="sharedSecretUserAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
@@ -173,6 +173,7 @@
     <property name="authenticationFailureHandler" ref="authenticationFailureHandler"/>
     <property name="authenticationSuccessHandler" ref="authenticationSuccessHandler"/>
     <property name="authenticationDetailsSource" ref="authenticationDetailsSource" />
+    <property name="filterProcessesUrl" value="/j_spring_security_check"/>
   </bean>
 
   <bean id="authenticationSuccessHandler"
