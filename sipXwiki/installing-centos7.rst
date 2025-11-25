@@ -1,4 +1,4 @@
-.. index:: installing
+.. index:: installing-centos7
 
 .. _installing-centos7:
 

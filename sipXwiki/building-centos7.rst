@@ -10,7 +10,7 @@ Building CentOS 7 (EOL)
 Use Build Server
 -----------------
 
-To build the sipXcom source for execution or RPM generation on a physical server or cloud image, follow the instructions from installing_ to setup and configure a server.
+To build the sipXcom source for execution or RPM generation on a physical server or cloud image, follow the instructions from :ref:`Installing CentOS7 <installing-centos7>` to setup and configure a server.
 
 Use Docker Container
 -----------------
