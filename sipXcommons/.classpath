@@ -179,6 +179,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/org.restlet.ext.spring-2.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/oro-2.0.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/p6spy-1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/parsson-1.1.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-3.5-FINAL-20090928.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/pop3-2.0.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/postgresql-42.7.5.jar"/>
@@ -244,7 +245,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/whack-3.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/woodstox-core-asl-4.3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ws-commons-util-1.0.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/yasson-3.0.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-jakarta-2.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-client-5.0.0.jar"/>

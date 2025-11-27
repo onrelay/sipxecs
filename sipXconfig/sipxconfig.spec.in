@@ -203,7 +203,7 @@ ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jakarta.transaction-ap
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jakarta.websocket-api-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jakarta.websocket-client-api-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jakarta.mail-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
-ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/yasson-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/parsson-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/hazelcast-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/jboss-logging-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/classmate-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
