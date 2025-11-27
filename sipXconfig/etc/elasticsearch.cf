@@ -1,4 +1,4 @@
-# Copyright (c) 2015 eZuce, Inc. All rights reserved.
+# Copyright (c) 2015 eZuce, Inc.
 # Contributed to SIPfoundry under a Contributor Agreement
 
 # This software is free software; you can redistribute it and/or modify it under
@@ -14,6 +14,7 @@
 #
 # Elasticsearch configuration for working with sipxecs
 #
+
 bundle agent elasticsearch {
 
   methods:
@@ -75,9 +76,14 @@ bundle edit_line elasticsearch_config_file {
       "cluster.initial_master_nodes.*";
       "network.host.*";
       "transport.host.*";
+      "transport.bind_host.*";
+      "transport.publish_host.*";
+      "transport.port.*";
+      "network.bind_host.*";
+      "network.publish_host.*";
       "http.port.*";
 
-      # Remove unwanted/unneeded X-Pack auto-settings
+      # Remove unused/unneeded X-Pack auto-settings
       "xpack.ml.enabled.*";
       "xpack.monitoring.enabled.*";
       "xpack.security.enabled.*";
@@ -86,12 +92,25 @@ bundle edit_line elasticsearch_config_file {
 
   insert_lines:
     any::
-      "path.repo: [\"$(tmpDir)\", \"$(tmpDir)/elasticsearch_backup\"]";
-      "cluster.initial_master_nodes: [\"$(sipx.host)$(sipx.net_domain)\"]";
 
-      # Local-only, no external access
+      # Repo locations
+      "path.repo: [\"$(tmpDir)\", \"$(tmpDir)/elasticsearch_backup\"]";
+
+      # Local single-node cluster, required for ES 8 when not running a real cluster
+      "discovery.type: single-node";
+
+      # Force IPv4-only and local-only (prevents [::1] binding errors)
       "network.host: 127.0.0.1";
+      "network.bind_host: 127.0.0.1";
+      "network.publish_host: 127.0.0.1";
+
+      # Transport client compatibility
       "transport.host: 127.0.0.1";
+      "transport.bind_host: 127.0.0.1";
+      "transport.publish_host: 127.0.0.1";
+      "transport.port: 9300";
+
+      # HTTP REST API
       "http.port: 9200";
 
       # Disable unused X-Pack features
@@ -99,16 +118,18 @@ bundle edit_line elasticsearch_config_file {
       "xpack.ml.enabled: false";
 }
 
-# --- JVM heap size control ---
+# --- JVM options ---
 bundle edit_line elasticsearch_jvm_options {
 
   delete_lines:
       "^-Xms.*";
       "^-Xmx.*";
+      "^-Djava.net.preferIPv4Stack.*";
 
   insert_lines:
       "-Xms256m";
       "-Xmx512m";
+      "-Djava.net.preferIPv4Stack=true";
 }
 
 # --- apply index replica policies ---
@@ -133,7 +154,8 @@ bundle agent elasticsearch_systemctl_running {
 
   classes:
     any::
-      "elasticsearch_running" expression => returnszero("$(sipx.systemctl) is-active $(service)","noshell");
+      "elasticsearch_running"
+        expression => returnszero("$(sipx.systemctl) is-active $(service)","noshell");
 
   commands:
     (!elasticsearch|stop_sipxecs).elasticsearch_running::

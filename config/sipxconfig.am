@@ -42,7 +42,7 @@ sipxconfig_neoconf_PKGS = \
 	jakarta.ws.rs-api \
 	jakarta.xml.bind-api \
 	jakarta.xml.ws-api \
-	yasson \
+	parsson \
 	jaxen \
 	jaxrpc \
 	jettison \

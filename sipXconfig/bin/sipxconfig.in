@@ -200,8 +200,13 @@ buildCommand() {
     -XX:+UseStringDeduplication \
     ${SIPXCONFIG_OPTS} \
     ${TrustStoreOpts} \
+    --add-modules java.se \
     --add-opens java.base/java.lang=ALL-UNNAMED \
+    --add-opens java.base/sun.nio.ch=ALL-UNNAMED \
+    --add-opens java.management/sun.management=ALL-UNNAMED \
+    --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED \
     --add-exports java.base/sun.security.action=ALL-UNNAMED \
+    --add-exports java.base/jdk.internal.ref=ALL-UNNAMED \
     -Djava.io.tmpdir=${TmpDir} \
     -Djavax.cache.spi.CachingProvider=${CachingProvider} \
     -Dorg.apache.lucene.lockdir=${IndexDir} \

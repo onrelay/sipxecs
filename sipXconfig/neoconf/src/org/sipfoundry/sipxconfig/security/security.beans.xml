@@ -174,6 +174,8 @@
     <property name="authenticationSuccessHandler" ref="authenticationSuccessHandler"/>
     <property name="authenticationDetailsSource" ref="authenticationDetailsSource" />
     <property name="filterProcessesUrl" value="/j_spring_security_check"/>
+    <property name="usernameParameter" value="j_username"/>
+    <property name="passwordParameter" value="j_password"/>
   </bean>
 
   <bean id="authenticationSuccessHandler"

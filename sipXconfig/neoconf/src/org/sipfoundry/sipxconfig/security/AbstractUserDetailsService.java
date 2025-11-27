@@ -35,7 +35,9 @@ public abstract class AbstractUserDetailsService implements UserDetailsService {
     private AdditionalAuthoritiesLoader m_authLoader;
 
     public final UserDetails loadUserByUsername(String userNameOrAliasOrImIdOrAuthAccnameOrEmail) {
+
         User user = m_coreContext.loadUserByUserNameOrAlias(userNameOrAliasOrImIdOrAuthAccnameOrEmail);
+        
         if (user == null) {
             // 2nd attempt - try to login as an imID
             user = getUserForImId(userNameOrAliasOrImIdOrAuthAccnameOrEmail);
@@ -76,25 +78,25 @@ public abstract class AbstractUserDetailsService implements UserDetailsService {
     }
 
     public UserDetails createUserDetails(String userNameOrAliasOrImIdOrAuthAccnameOrEmail, User user) {
-        List<GrantedAuthority> gas = new ArrayList<GrantedAuthority>(5);
-        gas.add(User.toAuth());
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>(5);
+        grantedAuthorities.add(User.toAuth());
 
         if (user.isAdmin()) {
-            gas.add(Admin.toAuth());
+            grantedAuthorities.add(Admin.toAuth());
         }
         
         if (user.isRest()) {
-        	gas.add(Rest.toAuth());
+        	grantedAuthorities.add(Rest.toAuth());
         }
 
         if (user.hasPermission(RECORD_SYSTEM_PROMPTS)) {
-            gas.add(AttendantAdmin.toAuth());
+            grantedAuthorities.add(AttendantAdmin.toAuth());
         }
         if (m_authLoader != null) {
             m_authLoader.addUserAuthorities(user, gas);
         }
 
-        return createUserDetails(userNameOrAliasOrImIdOrAuthAccnameOrEmail, user, gas);
+        return createUserDetails(userNameOrAliasOrImIdOrAuthAccnameOrEmail, user, grantedAuthorities);
     }
 
     private User getUserForImId(String imId) {
