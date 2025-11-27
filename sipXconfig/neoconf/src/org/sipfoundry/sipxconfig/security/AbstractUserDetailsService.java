@@ -93,7 +93,7 @@ public abstract class AbstractUserDetailsService implements UserDetailsService {
             grantedAuthorities.add(AttendantAdmin.toAuth());
         }
         if (m_authLoader != null) {
-            m_authLoader.addUserAuthorities(user, gas);
+            m_authLoader.addUserAuthorities(user, grantedAuthorities);
         }
 
         return createUserDetails(userNameOrAliasOrImIdOrAuthAccnameOrEmail, user, grantedAuthorities);
