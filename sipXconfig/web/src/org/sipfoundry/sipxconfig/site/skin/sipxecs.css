@@ -1510,12 +1510,12 @@ li.active a:visited
 #logo, #login-logo {
     background-image: url(/sipxconfig/skin/logo.png);
     background-repeat: no-repeat;
-    background-position: center; /* Centers the image horizontally and vertically */
     background-size: contain; /* Scales the image proportionally to fit inside the div */
 }
 
 #login-logo {
     height: 120px;
+    background-position: center; /* Centers the image horizontally and vertically */
 }
 
 #contentContainer {

@@ -32,7 +32,7 @@ $master_dat= "#{$cfdatadir}/defaults/master"
 $location_dat = "#{$cfdatadir}/defaults/location_id"
 $mongo_client_ini = "#{$cfdatadir}/1/mongo-client.ini"
 $log = "#{$logdir}/sipxagent.log"
-$verbose = true
+$verbose = false
 $advanced = false
 $exit_status = 0
 $prompt = {:primary => true}

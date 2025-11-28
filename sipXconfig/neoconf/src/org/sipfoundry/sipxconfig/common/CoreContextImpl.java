@@ -724,6 +724,8 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
             // currently superadmin cannot invite to a conference without a valid sip password
             admin.setSipPassword(RandomStringUtils.randomAlphanumeric(SIP_PASSWORD_LEN));
+            persistEntity(admin);
+
         } else {
             // if superadmin user already exists make sure it has superadmin permission
             admin.setPermission(PermissionName.SUPERADMIN, true);
@@ -734,7 +736,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
         // enable IM for superadmin
         ImAccount imAccount = new ImAccount(admin);
         imAccount.setEnabled(true);
-        persistEntity(admin);
+        mergeEntity(admin);
         getDaoEventPublisher().publishSave(admin);
     }
 
