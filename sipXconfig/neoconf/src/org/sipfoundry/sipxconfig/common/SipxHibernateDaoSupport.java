@@ -103,8 +103,15 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         @Override
         public void close() {
             try {
-                if (m_transaction != null && m_transaction.isActive() && !m_transaction.getRollbackOnly()) {
-                    m_transaction.commit();
+                if (m_transaction != null && m_transaction.isActive()) {
+                    if (!m_transaction.getRollbackOnly()) {
+                        if (m_session != null && m_session.isOpen()) {
+                            m_session.flush();
+                        }
+                        m_transaction.commit();
+                    } else {
+                        m_transaction.rollback();
+                    }
                 }
             } catch (RuntimeException e) {
                 if (m_transaction != null && m_transaction.isActive()) {
