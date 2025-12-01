@@ -170,27 +170,28 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
     @Override
     public void storePhone(Phone phone) {
 
+        boolean isNew;
+        String serialNumber = phone.getSerialNumber();
+        if (!phone.getModel().isSerialNumberValid(serialNumber)) {
+            throw new InvalidSerialNumberException(serialNumber, phone.getModel().getSerialNumberPattern());
+        }
+
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
 
             Session session = sessionTransaction.getSession();
 
-            boolean isNew;
-            String serialNumber = phone.getSerialNumber();
-            if (!phone.getModel().isSerialNumberValid(serialNumber)) {
-                throw new InvalidSerialNumberException(serialNumber, phone.getModel().getSerialNumberPattern());
-            }
             DaoUtils.checkDuplicatesByNamedQuery(session, phone, QUERY_PHONE_ID_BY_SERIAL_NUMBER, serialNumber,
                     new DuplicateSerialNumberException(serialNumber));
-
-            phone.setValueStorage(clearUnsavedValueStorage(phone.getValueStorage()));
-            isNew = phone.isNew();
-            if (isNew) {
-                LOG.error(String.format(ALARM_PHONE_ADDED, phone.getSerialNumber()));
-            } 
-            super.saveEntity(phone);
-            super.flush();
-            getDaoEventPublisher().publishSave(phone);
         }
+
+        phone.setValueStorage(clearUnsavedValueStorage(phone.getValueStorage()));
+        isNew = phone.isNew();
+        if (isNew) {
+            LOG.error(String.format(ALARM_PHONE_ADDED, phone.getSerialNumber()));
+        } 
+        super.saveEntity(phone);
+        super.flush();
+        getDaoEventPublisher().publishSave(phone); 
     }
 
     @Override

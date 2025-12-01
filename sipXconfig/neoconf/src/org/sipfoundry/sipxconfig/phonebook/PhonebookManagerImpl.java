@@ -170,11 +170,12 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
             Session session = sessionTransaction.getSession();
 
             DaoUtils.checkDuplicates(session, Phonebook.class, phonebook, NAME, new DuplicatePhonebookName());
-
-            super.saveEntity(phonebook);
-
-            getDaoEventPublisher().publishSave(phonebook);
         }
+
+        super.saveEntity(phonebook);
+
+        getDaoEventPublisher().publishSave(phonebook);
+        
     }
 
     @Override
@@ -993,7 +994,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
 
             try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
 
-            Session session = sessionTransaction.getSession();
+                Session session = sessionTransaction.getSession();
 
                 String query = "select phonebook_id, members_csv_filename, members_vcard_filename from phonebook";
 

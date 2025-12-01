@@ -445,19 +445,27 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
      * @param queryName name of the query to be executed (define in *.hbm.xml file)
      */
     public BeanWithId duplicateBean(BeanWithId bean, String queryName) {
+        
         BeanWithId copy = bean.duplicate();
 
         if (bean instanceof NamedObject) {
+
             NamedObject namedCopy = (NamedObject) copy;
+
             namedCopy.setName(((NamedObject) bean).getName());
-          
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
-    
-                do {
-                    namedCopy.setName("CopyOf" + namedCopy.getName());
-                } while (DaoUtils.checkDuplicatesByNamedQuery(session, copy, queryName, namedCopy.getName(), null));
+
+            while( true ) {
+
+                namedCopy.setName("CopyOf" + namedCopy.getName());
+
+                try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+                
+                    Session session = sessionTransaction.getSession();
+
+                    if( !DaoUtils.checkDuplicatesByNamedQuery(session, copy, queryName, namedCopy.getName(), null) ) {
+                        break;
+                    }
+                }
             }
         }
 
@@ -585,6 +593,8 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     protected void removeAll(Class<?> klass) {
         
+        List<?> entities;
+
         try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
             
             Session session = sessionTransaction.getSession();    
@@ -593,19 +603,28 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             CriteriaQuery<?> cq = cb.createQuery(klass);
             cq.from(klass);
 
-            List<?> entities = session.createQuery(cq).getResultList();
+            entities = session.createQuery(cq).getResultList();
+        }
 
-            for (Object entity : entities) {
-                m_daoEventPublisher.publishDelete(entity);
+        for (Object entity : entities) {
+
+            m_daoEventPublisher.publishDelete(entity);
+
+            try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+                Session session = sessionTransaction.getSession();    
+
                 session.remove(entity);
             }
-
-            session.flush(); // Optional: ensure deletions are flushed immediately
-       
-        } catch( IllegalStateException e ) {
-            // server not ready
         }
-        
+
+        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+            
+            Session session = sessionTransaction.getSession();    
+
+            session.flush(); 
+        }
+       
     }
 
     protected Storage clearUnsavedValueStorage(Storage storage) {

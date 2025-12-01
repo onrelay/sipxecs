@@ -94,7 +94,7 @@ password=${value#$prefix}
 
 # Incase system failed suddenly, clear previous locks
 clearIndexLocks() {
-  rm ${IndexDir}/*.lock  >> ${LogFile} 2>&1
+  rm ${IndexDir}/*.lock  > /dev/null 2>&1
 }
 
 # Incase system failed suddenly, clear previous locks
@@ -275,7 +275,7 @@ start() {
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningInstanceTimeout @SIPXPBXUSER@ $regex >> ${LogFile} 2>&1
+      checkRunningInstanceTimeout @SIPXPBXUSER@ $regex > /dev/null 2>&1
       Status=$?
       pid=$(pgrep -u @SIPXPBXUSER@ -f "$regex")
       [ $Status -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
@@ -353,7 +353,7 @@ EOF
 stop() {
   echo -n $"Stopping $prog: "
   killAnyOrphans @SIPXPBXUSER@ $regex
-  checkRunningInstance @SIPXPBXUSER@ $regex  >> ${LogFile} 2>&1
+  checkRunningInstance @SIPXPBXUSER@ $regex  > /dev/null 2>&1
   Status=$?
   [ $Status -eq 0 ] && { echo_failure; echo; exit $ERUNNING; }
   [ $Status -eq 0 ] || { echo_success; echo; }
@@ -394,7 +394,7 @@ case "$1" in
     asyncrestart
     ;;
   condrestart)
-    checkRunningInstance @SIPXPBXUSER@ $regex  >> ${LogFile} 2>&1
+    checkRunningInstance @SIPXPBXUSER@ $regex  > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] && restart || :
     ;;

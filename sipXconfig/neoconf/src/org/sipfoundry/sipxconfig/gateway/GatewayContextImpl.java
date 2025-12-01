@@ -89,27 +89,33 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport<Object> implemen
             DaoUtils.checkDuplicates(session, Gateway.class, gateway, "name",
                     new DuplicateNameException(gateway.getName()));
 
+        }
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
+
             DaoUtils.checkDuplicates(session, Gateway.class, gateway, "serialNumber",
                     new DuplicateSerialNumberException(gateway.getSerialNumber()));
+        }
         
-            // Find if we are about to save a new gateway
-            boolean isNew = gateway.isNew();
-            // Store the updated gateway
-            super.saveEntity(gateway);
+        // Find if we are about to save a new gateway
+        boolean isNew = gateway.isNew();
+        // Store the updated gateway
+        super.saveEntity(gateway);
 
-            super.flush();
+        super.flush();
 
-            if (isNew) {
-                m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.ADDED, AUDIT_LOG_CONFIG_TYPE, gateway.getName());
-            } else {
-                m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.MODIFIED, AUDIT_LOG_CONFIG_TYPE, gateway.getName());
-            }
+        if (isNew) {
+            m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.ADDED, AUDIT_LOG_CONFIG_TYPE, gateway.getName());
+        } else {
+            m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.MODIFIED, AUDIT_LOG_CONFIG_TYPE, gateway.getName());
+        }
 
-            SbcDevice sbc = gateway.getSbcDevice();
-            if (sbc != null) {
-                sbc.generateProfiles(sbc.getProfileLocation());
-                sbc.restart();
-            }
+        SbcDevice sbc = gateway.getSbcDevice();
+        if (sbc != null) {
+            sbc.generateProfiles(sbc.getProfileLocation());
+            sbc.restart();
         }
     }
 

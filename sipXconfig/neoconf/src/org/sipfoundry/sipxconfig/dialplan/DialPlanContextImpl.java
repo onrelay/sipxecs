@@ -125,14 +125,16 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
             DaoUtils.checkDuplicatesByNamedQuery(session, rule, DIALING_RULE_IDS_WITH_NAME_QUERY, name,
                     new NameInUseException(DIALING_RULE, name));
 
-            // For internal rules, check for alias collisions. Note: this method throws
-            // an exception if it finds a duplicate.
-            if (rule instanceof InternalRule) {
-                checkAliasCollisionsForInternalRule((InternalRule) rule);
-            }
-            if (rule instanceof AttendantRule) {
-                checkAliasCollisionsForAttendantRule((AttendantRule) rule);
-            }
+        }
+
+        // For internal rules, check for alias collisions. Note: this method throws
+        // an exception if it finds a duplicate.
+        if (rule instanceof InternalRule) {
+            checkAliasCollisionsForInternalRule((InternalRule) rule);
+        }
+
+        if (rule instanceof AttendantRule) {
+            checkAliasCollisionsForAttendantRule((AttendantRule) rule);
         }
     }
 

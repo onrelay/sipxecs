@@ -584,7 +584,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
             try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
 
-            Session session = sessionTransaction.getSession();
+                Session session = sessionTransaction.getSession();
                 UserLoader loader = new UserLoader(session);
                 Integer count = (Integer) loader.countUsers(searchString, groupId);
                 numUsers = count.intValue();
@@ -626,6 +626,11 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
                 query.setMaxResults(pageSize);
                 return query.list();
             }
+        }
+
+        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+
+            Session session = sessionTransaction.getSession();
 
             UserLoader loader = new UserLoader(session);
             List<User> users = (List<User>)loader.loadUsersByPage(
@@ -712,10 +717,10 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             adminGroup.setName(ADMIN_GROUP_NAME);
             adminGroup.setResource(User.GROUP_RESOURCE_ID);
             adminGroup.setDescription("Users with superadmin privileges");
-            persistEntity(adminGroup);
         }
         PermissionName.SUPERADMIN.setEnabled(adminGroup, true);
         PermissionName.TUI_CHANGE_PIN.setEnabled(adminGroup, false);
+        mergeEntity(adminGroup);
 
         User admin = loadUserByUserName(User.SUPERADMIN);
         if (admin == null) {
@@ -724,7 +729,6 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
             // currently superadmin cannot invite to a conference without a valid sip password
             admin.setSipPassword(RandomStringUtils.randomAlphanumeric(SIP_PASSWORD_LEN));
-            persistEntity(admin);
 
         } else {
             // if superadmin user already exists make sure it has superadmin permission
@@ -909,10 +913,10 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             if (SipxCollectionUtils.safeSize(userIds) > 0) {
                 return true;
             }
-
-            // Fallback check in user profile DB
-            return getUserProfileService().isImIdInUse(alias);
         }
+
+        // Fallback check in user profile DB
+        return getUserProfileService().isImIdInUse(alias);
     }
     
     @Override
@@ -931,10 +935,9 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             if (SipxCollectionUtils.safeSize(userIds) > 0) {
                 return true;
             }
-
-            // Fallback check in user profile DB
-            return getUserProfileService().isImIdInUse(alias);
         }
+        // Fallback check in user profile DB
+        return getUserProfileService().isImIdInUse(alias);
     }
 
     @Override
@@ -963,6 +966,8 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     @Override
     public Collection<BeanId> getBeanIdsOfObjectsWithAlias(String alias) {
 
+        List<Integer> ids;
+
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
 
             Session session = sessionTransaction.getSession();
@@ -971,36 +976,38 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
                 .createNativeQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS, Integer.class);
             query.setParameter(ALIAS, alias);
 
-            List<Integer> ids = query.getResultList();
-
-            String username = getUserProfileService().getUsernameByImId(alias);
-            if (username != null) {
-                User user = loadUserByUserName(username);
-                Integer userId = user.getId();
-                if (!ids.contains(userId)) {
-                    ids.add(userId);
-                }
-            }
-
-            return BeanId.createBeanIdCollection(ids, User.class);
+            ids = query.getResultList();
         }
+
+        String username = getUserProfileService().getUsernameByImId(alias);
+        if (username != null) {
+            User user = loadUserByUserName(username);
+            Integer userId = user.getId();
+            if (!ids.contains(userId)) {
+                ids.add(userId);
+            }
+        }
+
+        return BeanId.createBeanIdCollection(ids, User.class);
+        
     }
 
     @Override
     public void addToGroup(Integer groupId, Collection<Integer> ids) {
 
+        Group group = super.loadEntity(Group.class, groupId);
+        for (Integer id : ids) {
+            User user = loadUser(id);
+            if (!user.isGroupAvailable(group)) {
+                throw new UserException("&branch.validity.error", user.getUserName(), user.getSite().getName(),
+                        group.getBranch().getName());
+            }
+        }
+        
         try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
 
             Session session = sessionTransaction.getSession();
 
-            Group group = super.loadEntity(Group.class, groupId);
-            for (Integer id : ids) {
-                User user = loadUser(id);
-                if (!user.isGroupAvailable(group)) {
-                    throw new UserException("&branch.validity.error", user.getUserName(), user.getSite().getName(),
-                            group.getBranch().getName());
-                }
-            }
             DaoUtils.addToGroup(session, getDaoEventPublisher(), groupId, User.class, ids);
         }
     }

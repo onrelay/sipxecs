@@ -340,7 +340,6 @@ public class SpeedDialManagerImpl extends SipxHibernateDaoSupport<SpeedDial> imp
         if (entity instanceof User
                 || (entity instanceof Group && ((Group) entity).getResource().equals(User.GROUP_RESOURCE_ID))) {
             LOG.debug("rebuilding ~~id~xmpprlsclient entity..." + entity.getClass());
-            super.flush();
             SpecialUser su = m_coreContext.getSpecialUserAsSpecialUser(SpecialUserType.XMPP_SERVER);
             if (su != null) {
                 m_sipxReplicationContext.generate(m_coreContext

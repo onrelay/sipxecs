@@ -198,10 +198,7 @@
   <!--
     - H I B E R N A T E   S E S S I O N
   -->
-  <bean id="hibernateInterceptor" class="org.sipfoundry.sipxconfig.common.SipxOpenSessionInterceptor">
-    <property name="sessionFactory" ref="sessionFactory"/>
-  </bean>
-  
+
   <!-- springInstantiator will force hibernate to create new objects through Spring -->
   <bean id="springInstantiator" class="org.sipfoundry.sipxconfig.search.IndexingInterceptor" >
     <property name="sessionFactory" ref="sessionFactory" />
@@ -215,15 +212,9 @@
     <property name="daoEventPublisher" ref="daoEventPublisher"/>    
   </bean>
 
-  
-  <!--
-    - Use this instead of 'hibernateInterceptor' when you want to
-    - load spring beans from hibernate mappings.  See common/common.beans.xml for example
-  -->
   <bean id="abstractDao" abstract="true">
     <property name="interceptorNames">
       <list>
-        <value>hibernateInterceptor</value>
         <value>onDeleteAdvisor</value>
         <value>onSaveAdvisor</value>
       </list>
@@ -250,11 +241,6 @@
   </bean>
 
   <bean id="cdr.dao" abstract="true">
-    <property name="interceptorNames">
-      <list>
-        <value>cdr.hibernateInterceptor</value>
-      </list>
-    </property>
   </bean>
 
   <bean id="daoEventPublisher" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
@@ -262,11 +248,6 @@
       <value>org.sipfoundry.sipxconfig.common.event.DaoEventPublisher</value>
     </property>
     <property name="target" ref="daoEventPublisherImpl" />
-    <property name="interceptorNames">
-      <list>
-        <value>hibernateInterceptor</value>
-      </list>
-    </property>
   </bean>
   
   <bean id="daoEventPublisherImpl" class="org.sipfoundry.sipxconfig.common.event.DaoEventPublisherImpl">  

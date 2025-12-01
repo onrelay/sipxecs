@@ -30,7 +30,7 @@ public abstract class PersonalAttendantManager extends SipxHibernateDaoSupport<P
         if (pa == null) {
             pa = new PersonalAttendant();
             pa.setUser(user);
-            super.mergeEntity(pa);
+            super.persistEntity(pa);
         }
         return pa;
     }

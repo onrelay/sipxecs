@@ -47,11 +47,6 @@
   </bean>
 
   <bean id="sipxReplicationContextDao" class="org.springframework.aop.framework.ProxyFactoryBean">
-    <property name="interceptorNames">
-      <list>
-        <value>hibernateInterceptor</value>
-      </list>
-    </property>
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.commserver.SipxReplicationContext"/>
     <property name="target" ref="sipxReplicationContextImpl"/>
   </bean>

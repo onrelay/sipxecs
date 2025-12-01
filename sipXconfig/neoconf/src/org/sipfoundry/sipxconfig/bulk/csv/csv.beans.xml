@@ -33,7 +33,6 @@
     <property name="interceptorNames">
       <list>
         <value>backgroundTaskInterceptor</value>
-        <value>hibernateInterceptor</value>
       </list>
     </property>
   </bean>

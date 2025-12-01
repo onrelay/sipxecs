@@ -56,12 +56,14 @@ public class BeanWithSettingsDaoImpl<T extends BeanWithSettings> extends SipxHib
             Session session = tx.getSession();
 
             session.merge( object.getInitializeValueStorage() );  
+        } 
+
+        try (SessionTransaction tx = getSessionTransaction()) {
+
+            Session session = tx.getSession();
 
             session.flush();
-
-        } catch (IllegalStateException e) {
-            // server not ready
-        }
+        } 
     }
 
     @Override
