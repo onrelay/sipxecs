@@ -143,6 +143,13 @@ bundle edit_line add_crontab_line(regex,value) {
 }
 
 bundle agent sipx_module {
+  
+  files:
+    any::
+      "@SIPX_CFDATA@/$(sipx.location_id)/." 
+        create => "true",
+        perms  => mog("0755","$(sipx.SIPXPBXUSER)","$(sipx.SIPXPBXGROUP)");
+
   commands:
     any::
       "@SIPX_CFMODULES@/sipx"
