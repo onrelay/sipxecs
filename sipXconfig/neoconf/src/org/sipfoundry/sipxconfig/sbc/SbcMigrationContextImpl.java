@@ -74,10 +74,7 @@ public class SbcMigrationContextImpl extends SipxHibernateDaoSupport<Sbc> implem
 
     private void cleanSchema() {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
-
+        super.getSessionFactory().inTransaction( session -> {
             session.doWork(connection -> {
                 try (Statement statement = connection.createStatement()) {
                     statement.addBatch(SQL);
@@ -86,7 +83,7 @@ public class SbcMigrationContextImpl extends SipxHibernateDaoSupport<Sbc> implem
                     LOG.warn("cleaning schema", e);
                 }
             });
-        }
+        });
     }
 
     public void setSbcDeviceManager(SbcDeviceManager sbcDeviceManager) {

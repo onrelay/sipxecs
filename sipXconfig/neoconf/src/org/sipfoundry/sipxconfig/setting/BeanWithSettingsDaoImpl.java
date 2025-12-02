@@ -51,19 +51,15 @@ public class BeanWithSettingsDaoImpl<T extends BeanWithSettings> extends SipxHib
     @Override
     public void upsert(T object) {
 
-        try (SessionTransaction tx = getSessionTransaction()) {
-
-            Session session = tx.getSession();
-
+        super.getSessionFactory().inTransaction( session -> {
+            
             session.merge( object.getInitializeValueStorage() );  
-        } 
+        });
 
-        try (SessionTransaction tx = getSessionTransaction()) {
-
-            Session session = tx.getSession();
+        super.getSessionFactory().inTransaction( session -> {
 
             session.flush();
-        } 
+        }); 
     }
 
     @Override

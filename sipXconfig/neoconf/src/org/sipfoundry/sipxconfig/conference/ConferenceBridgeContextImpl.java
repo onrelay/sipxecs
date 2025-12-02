@@ -230,31 +230,29 @@ public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Confere
         return conferences;
     }
 
+    private Query<Conference> filterConferencesCriteria(final Integer bridgeId, final Integer ownerGroupId, Session session) {
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Conference> cq = cb.createQuery(Conference.class);
+        Root<Conference> root = cq.from(Conference.class);
 
+        // Join bridge
+        Join<Object, Object> bridgeJoin = root.join("bridge");
+        Predicate bridgePredicate = cb.equal(bridgeJoin.get("id"), bridgeId);
 
-private Query<Conference> filterConferencesCriteria(final Integer bridgeId, final Integer ownerGroupId, Session session) {
-    CriteriaBuilder cb = session.getCriteriaBuilder();
-    CriteriaQuery<Conference> cq = cb.createQuery(Conference.class);
-    Root<Conference> root = cq.from(Conference.class);
+        Predicate finalPredicate = bridgePredicate;
 
-    // Join bridge
-    Join<Object, Object> bridgeJoin = root.join("bridge");
-    Predicate bridgePredicate = cb.equal(bridgeJoin.get("id"), bridgeId);
+        if (ownerGroupId != null) {
+            // Join owner -> groups
+            Join<Object, Object> ownerJoin = root.join("owner"); // assuming OWNER is "owner"
+            Join<Object, Object> groupJoin = ownerJoin.join("groups");
+            Predicate groupPredicate = cb.equal(groupJoin.get("id"), ownerGroupId);
+            finalPredicate = cb.and(finalPredicate, groupPredicate);
+        }
 
-    Predicate finalPredicate = bridgePredicate;
+        cq.select(root).where(finalPredicate).distinct(true);
 
-    if (ownerGroupId != null) {
-        // Join owner -> groups
-        Join<Object, Object> ownerJoin = root.join("owner"); // assuming OWNER is "owner"
-        Join<Object, Object> groupJoin = ownerJoin.join("groups");
-        Predicate groupPredicate = cb.equal(groupJoin.get("id"), ownerGroupId);
-        finalPredicate = cb.and(finalPredicate, groupPredicate);
+        return session.createQuery(cq);
     }
-
-    cq.select(root).where(finalPredicate).distinct(true);
-
-    return session.createQuery(cq);
-}
 
     public List<Conference> getAllConferences() {
         return super.loadAllEntities(Conference.class);
@@ -262,13 +260,11 @@ private Query<Conference> filterConferencesCriteria(final Integer bridgeId, fina
 
     public List<Conference> filterConferences(final Integer bridgeId, final Integer ownerGroupId) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             Query<Conference> query = filterConferencesCriteria(bridgeId, ownerGroupId, session);
             return query.getResultList();
-        }
+        });
     }
 
     public List<Conference> searchConferences(final String searchTerm) {
@@ -294,9 +290,7 @@ private Query<Conference> filterConferencesCriteria(final Integer bridgeId, fina
 
     public int countFilterConferences(final Integer bridgeId, final Integer ownerGroupId) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Long> cq = cb.createQuery(Long.class);
@@ -320,16 +314,14 @@ private Query<Conference> filterConferencesCriteria(final Integer bridgeId, fina
             Long count = session.createQuery(cq).getSingleResult();
         
             List<Long> list = List.of(count);;
-            return (list != null && !list.isEmpty()) ? list.get(0).intValue() : 0;
-        }
+            return (list != null && !list.isEmpty()) ? list.get(0) : 0;
+        }).intValue();
     }
 
     public List<Conference> filterConferencesByPage(final Integer bridgeId, final Integer ownerGroupId,
             final int firstRow, final int pageSize, final String[] orderBy, final boolean orderAscending) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Conference> cq = cb.createQuery(Conference.class);
@@ -362,7 +354,7 @@ private Query<Conference> filterConferencesCriteria(final Integer bridgeId, fina
             query.setMaxResults(pageSize);
 
             return query.getResultList();
-        }
+        });
     }
 
     public String getAddressSpec(Conference conference) {

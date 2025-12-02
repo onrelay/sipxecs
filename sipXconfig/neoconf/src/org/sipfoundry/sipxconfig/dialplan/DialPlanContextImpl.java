@@ -117,15 +117,13 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
      */
     private void validateRule(DialingRule rule) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        super.getSessionFactory().inTransaction( session -> {
 
             String name = rule.getName();
             DaoUtils.checkDuplicatesByNamedQuery(session, rule, DIALING_RULE_IDS_WITH_NAME_QUERY, name,
                     new NameInUseException(DIALING_RULE, name));
 
-        }
+        });
 
         // For internal rules, check for alias collisions. Note: this method throws
         // an exception if it finds a duplicate.

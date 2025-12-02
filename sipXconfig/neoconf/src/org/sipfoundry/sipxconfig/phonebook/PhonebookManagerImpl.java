@@ -165,12 +165,10 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     @Override
     public void savePhonebook(Phonebook phonebook) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        super.getSessionFactory().inTransaction( session -> {
 
             DaoUtils.checkDuplicates(session, Phonebook.class, phonebook, NAME, new DuplicatePhonebookName());
-        }
+        });
 
         super.saveEntity(phonebook);
 
@@ -988,14 +986,11 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     @Override
     public Map<Integer, String[]> getPhonebookFilesName() {
 
-        Map<Integer, String[]> names = new TreeMap<>();
+        return super.getSessionFactory().fromTransaction( session -> {
 
-        try {
+            Map<Integer, String[]> names = new TreeMap<>();
 
-            try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-                Session session = sessionTransaction.getSession();
-
+            try {
                 String query = "select phonebook_id, members_csv_filename, members_vcard_filename from phonebook";
 
                 NativeQuery<Object[]> nativeQuery = session.createNativeQuery(query, Object[].class);
@@ -1009,14 +1004,13 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
                     };
                     names.put((Integer) entry[0], files);
                 }
+            
+                LOG.info("Extracted file names from " + names.size() + " phonebooks.");
+            } catch (HibernateException e) {
+                LOG.warn("Failed to load phonebook file names", e);
             }
-
-            LOG.info("Extracted file names from " + names.size() + " phonebooks.");
-        } catch (HibernateException e) {
-            LOG.warn("Failed to load phonebook file names", e);
-        }
-
-        return names;
+            return names;
+        });
     }
 
     /**

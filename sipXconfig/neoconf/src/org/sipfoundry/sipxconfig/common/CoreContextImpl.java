@@ -327,9 +327,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     private User loadUserByUniqueProperty(String propName, String propValue) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<User> cq = cb.createQuery(User.class);
@@ -341,7 +339,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             List<User> users = session.createQuery(cq).getResultList();
 
             return DaoUtils.requireOneOrZero(users, predicate.toString());
-        }
+        });
     }
 
     @Override
@@ -547,13 +545,11 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     @Override
     public List<User> loadUserByTemplateUser(final User userTemplate) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             UserLoader loader = new UserLoader(session);
             return loader.loadUsers(userTemplate);
-        }
+        });
     }
 
     @Override
@@ -582,13 +578,12 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
         int numUsers = 0;
         if (!StringUtils.isEmpty(searchString)) {
 
-            try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+            numUsers = super.getSessionFactory().fromTransaction( session -> {
 
-                Session session = sessionTransaction.getSession();
                 UserLoader loader = new UserLoader(session);
                 Integer count = (Integer) loader.countUsers(searchString, groupId);
-                numUsers = count.intValue();
-            }
+                return count;
+            });
         } 
         else {
             numUsers = getUsersInGroupCount(groupId);
@@ -616,27 +611,24 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             return loadUsersByUserProfileAndPage(search, firstRow, pageSize);
         }
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
+        if (StringUtils.equals(search, PHANTOM)) {
 
-            Session session = sessionTransaction.getSession();
+            return super.getSessionFactory().fromTransaction( session -> {
 
-            if (StringUtils.equals(search, PHANTOM)) {
                 Query query = session.createQuery(PHANTOM_USERS_QUERY);
                 query.setFirstResult(firstRow);
                 query.setMaxResults(pageSize);
                 return query.list();
-            }
+            });
         }
-
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        
+        return super.getSessionFactory().fromTransaction( session -> {
 
             UserLoader loader = new UserLoader(session);
             List<User> users = (List<User>)loader.loadUsersByPage(
                 search, groupId, branchId, firstRow, pageSize, orderBy, orderAscending);;
             return users;
-        }
+        });
     }
 
     private List<User> loadUsersByUserProfileAndPage(String search, int firstRow, int pageSize) {
@@ -652,9 +644,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     @Override
     public List<User> loadUsersByPage(int first, int pageSize) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             Query<User> q = session.createNativeQuery(
                 "select * from users where user_type='C' order by user_id limit :" + PAGE_SIZE + " offset :" + FIRST,
@@ -662,15 +652,13 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             q.setParameter(FIRST, first);
             q.setParameter(PAGE_SIZE, pageSize);
             return q.getResultList();
-        }
+        });
     }
 
     @Override
     public List<Integer> loadUserIdsByPage(int first, int pageSize) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             Query<Integer> q = session.createNativeQuery(
                 "select " + USER_ID + " from users where user_type='C' order by user_id limit :" + PAGE_SIZE + " offset :" + FIRST,
@@ -678,7 +666,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             q.setParameter(FIRST, first);
             q.setParameter(PAGE_SIZE, pageSize);
             return q.getResultList();
-        }
+        });
     }
 
     @Override
@@ -717,6 +705,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             adminGroup.setName(ADMIN_GROUP_NAME);
             adminGroup.setResource(User.GROUP_RESOURCE_ID);
             adminGroup.setDescription("Users with superadmin privileges");
+            persistEntity(adminGroup);
         }
         PermissionName.SUPERADMIN.setEnabled(adminGroup, true);
         PermissionName.TUI_CHANGE_PIN.setEnabled(adminGroup, false);
@@ -726,9 +715,9 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
         if (admin == null) {
             admin = newUser();
             admin.setUserName(User.SUPERADMIN);
-
             // currently superadmin cannot invite to a conference without a valid sip password
             admin.setSipPassword(RandomStringUtils.randomAlphanumeric(SIP_PASSWORD_LEN));
+            persistEntity(admin);
 
         } else {
             // if superadmin user already exists make sure it has superadmin permission
@@ -874,9 +863,7 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     @Override
     public Collection<Integer> getBranchMembersByPage(int bid, int first, int pageSize) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             String sql = """
                 select users.user_id
@@ -894,15 +881,13 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             query.setParameter(PAGE_SIZE, pageSize);
 
             return query.getResultList();
-        }
+        });
     }
 
-    @Override
+    @Override 
     public boolean isAliasInUse(String alias) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        boolean inUse = super.getSessionFactory().fromTransaction( session -> {
 
             NativeQuery<Integer> query = session
                 .createNativeQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS, Integer.class);
@@ -910,21 +895,17 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
             List<Integer> userIds = query.getResultList();
 
-            if (SipxCollectionUtils.safeSize(userIds) > 0) {
-                return true;
-            }
-        }
+            return SipxCollectionUtils.safeSize(userIds) > 0;
+        });
 
         // Fallback check in user profile DB
-        return getUserProfileService().isImIdInUse(alias);
+        return inUse || getUserProfileService().isImIdInUse(alias);
     }
     
     @Override
     public boolean isAliasInUseExceptDid(String alias) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        boolean inUse = super.getSessionFactory().fromTransaction( session -> {
 
             NativeQuery<Integer> query = session
                 .createNativeQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS_EXCEPT_DID, Integer.class);
@@ -932,20 +913,17 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
             List<Integer> userIds = query.getResultList();
 
-            if (SipxCollectionUtils.safeSize(userIds) > 0) {
-                return true;
-            }
-        }
+            return SipxCollectionUtils.safeSize(userIds) > 0;
+        });
+
         // Fallback check in user profile DB
-        return getUserProfileService().isImIdInUse(alias);
+        return inUse || getUserProfileService().isImIdInUse(alias);
     }
 
     @Override
     public boolean isAliasInUseForOthers(String alias, String username) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        boolean inUse = super.getSessionFactory().fromTransaction( session -> {
 
             NativeQuery<Integer> query = session
                 .createNativeQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS_EXCEPT_THIS, Integer.class);
@@ -954,30 +932,24 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
             List<Integer> userIds = query.getResultList();
 
-            if (SipxCollectionUtils.safeSize(userIds) > 0) {
-                return true;
-            }
-        }
+            return SipxCollectionUtils.safeSize(userIds) > 0;
+        });
 
         // Fallback check in user profile DB
-        return getUserProfileService().isAliasInUse(alias, username);
+        return inUse || getUserProfileService().isAliasInUse(alias, username);
     }
 
     @Override
     public Collection<BeanId> getBeanIdsOfObjectsWithAlias(String alias) {
 
-        List<Integer> ids;
-
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        List<Integer> ids = super.getSessionFactory().fromTransaction( session -> {
 
             NativeQuery<Integer> query = session
                 .createNativeQuery(SQL_QUERY_USER_IDS_BY_NAME_OR_ALIAS, Integer.class);
             query.setParameter(ALIAS, alias);
 
-            ids = query.getResultList();
-        }
+            return query.getResultList();
+        });
 
         String username = getUserProfileService().getUsernameByImId(alias);
         if (username != null) {
@@ -1004,23 +976,19 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             }
         }
         
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        super.getSessionFactory().inTransaction( session -> {
 
             DaoUtils.addToGroup(session, getDaoEventPublisher(), groupId, User.class, ids);
-        }
+        });
     }
 
     @Override
     public void removeFromGroup(Integer groupId, Collection<Integer> ids) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        super.getSessionFactory().inTransaction( session -> {
 
             DaoUtils.removeFromGroup(session, getDaoEventPublisher(), groupId, User.class, ids);
-        }
+        });
     }
 
     @Override
@@ -1155,24 +1123,24 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     @Override
     public int getPhantomUsersCount() {
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
 
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
+
             NativeQuery<?> query = session.createNativeQuery(SQL_QUERY_PHANTOM_USERS);
             Number result = (Number) query.getSingleResult();
-            return result != null ? result.intValue() : 0;
-        }
+            return result != null ? result : 0;
+        }).intValue();
     }
 
     @Override
     public int getPhantomUsersWithoutSuperadminCount() {
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
 
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
+
             NativeQuery<?> query = session.createNativeQuery(SQL_QUERY_PHANTOM_USERS_WITHOUT_SUPERADMIN);
             Number result = (Number) query.getSingleResult();
-            return result != null ? result.intValue() : 0;
-        }
+            return result != null ? result : 0;
+        }).intValue();
     }
 
     @Override

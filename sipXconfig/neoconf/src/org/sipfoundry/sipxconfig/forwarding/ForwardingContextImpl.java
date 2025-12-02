@@ -118,9 +118,7 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
      */
     private List<CallSequence> loadAllCallSequences() {
         
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             List<CallSequence> callSequences = new ArrayList<>();
 
@@ -135,7 +133,7 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
             }
 
             return callSequences;
-        }
+        });
     }
 
     public void setCoreContext(CoreContext coreContext) {

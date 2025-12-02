@@ -474,9 +474,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
             "LEFT JOIN call_queue_tier t ON q.freeswitch_ext_id = t.freeswitch_ext_id " +
             "WHERE t.call_queue_agent_id = :" + QUERY_PARAM_AGENT_ID + ")";
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             List<CallQueue> result = session
                 .createNativeQuery(sql, CallQueue.class)
@@ -484,7 +482,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
                 .getResultList();
 
             return result;
-        }
+        });
     }
 
     @Override
@@ -493,9 +491,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
             return Collections.emptyList();
         }
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             NativeQuery<Integer> query = session.createNativeQuery(
                     "SELECT DISTINCT t.call_queue_agent_id FROM call_queue_tier t WHERE t.freeswitch_ext_id = :" + QUERY_PARAM_QUEUE_ID,
@@ -505,7 +501,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
             query.setParameter(QUERY_PARAM_QUEUE_ID, callqueueid.intValue());
 
             return query.getResultList();
-        }
+        });
     }
 
     private List<Integer> getCallQueueIds(Integer callqueueAgentId) {
@@ -513,9 +509,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
             return Collections.emptyList();
         }
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             NativeQuery<Integer> query = session.createNativeQuery(
                     "SELECT q.freeswitch_ext_id FROM freeswitch_extension q " +
@@ -527,7 +521,7 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
             query.setParameter(QUERY_PARAM_AGENT_ID, callqueueAgentId);
 
             return query.getResultList();
-        }
+        });
     }
 
     @Override

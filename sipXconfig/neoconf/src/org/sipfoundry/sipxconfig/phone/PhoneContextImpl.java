@@ -176,13 +176,11 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
             throw new InvalidSerialNumberException(serialNumber, phone.getModel().getSerialNumberPattern());
         }
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        super.getSessionFactory().inTransaction( session -> {
 
             DaoUtils.checkDuplicatesByNamedQuery(session, phone, QUERY_PHONE_ID_BY_SERIAL_NUMBER, serialNumber,
                     new DuplicateSerialNumberException(serialNumber));
-        }
+        });
 
         phone.setValueStorage(clearUnsavedValueStorage(phone.getValueStorage()));
         isNew = phone.isNew();
@@ -519,23 +517,19 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
     @Override
     public void addToGroup(Integer groupId, Collection<Integer> ids) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        super.getSessionFactory().inTransaction( session -> {
 
             DaoUtils.addToGroup(session, getDaoEventPublisher(), groupId, Phone.class, ids);
-        }
+        });
     }
 
     @Override
     public void removeFromGroup(Integer groupId, Collection<Integer> ids) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        super.getSessionFactory().inTransaction( session -> {
 
             DaoUtils.removeFromGroup(session, getDaoEventPublisher(), groupId, Phone.class, ids);
-        }
+        });
     }
 
     @Override
@@ -622,9 +616,7 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
     @Override
     public List<Phone> loadPhonesWithNoLinesByPage(int firstRow, int pageSize, String[] orderBy, boolean orderAscending) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Phone> cq = cb.createQuery(Phone.class);
@@ -656,14 +648,12 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
             query.setMaxResults(pageSize);
 
             return query.getResultList();
-        }
+        });
     }
 
     public int getPhonesWithNoLinesCount() {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Long> cq = cb.createQuery(Long.class);
@@ -681,15 +671,13 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
             cq.select(cb.count(root)).where(noLinesPredicate);
 
             Long count = session.createQuery(cq).getSingleResult();
-            return count.intValue();
-        }
+            return count;
+        }).intValue();
     }
 
     public List<Phone> getPhonesWithLinesLike(String value) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             CriteriaBuilder cb = session.getCriteriaBuilder();
 
@@ -729,7 +717,7 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
             // Combine and return
             internalPhones.addAll(filteredExternalPhones);
             return internalPhones;
-        }
+        });
 
     }
 
@@ -772,27 +760,23 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
 
     private int getPhoneGroupWeight(int phoneId) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             org.hibernate.query.NativeQuery<?> q = session.createNativeQuery(SQL_PHONE_GROUP_WEIGHT);
             q.setParameter("phoneId", phoneId);
             Number result = (Number) q.uniqueResult();
-            return result != null ? result.intValue() : 0;
-        }
+            return result != null ? result : 0;
+        }).intValue();
     }
 
     private int getGroupWeight(int groupId) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             org.hibernate.query.NativeQuery<?> q = session.createNativeQuery(SQL_GROUP_WEIGHT);
             q.setParameter("groupId", groupId);
             Number result = (Number) q.uniqueResult();
-            return result != null ? result.intValue() : 0;
-        }
+            return result != null ? result : 0;
+        }).intValue();
     }
 }

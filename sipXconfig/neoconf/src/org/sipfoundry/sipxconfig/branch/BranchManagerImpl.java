@@ -144,9 +144,7 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
 
     private Branch loadBranchByUniqueProperty(String propName, String propValue) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Branch> cq = cb.createQuery(Branch.class);
@@ -160,7 +158,7 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
 
             List<Branch> branches = query.getResultList();
             return DaoUtils.requireOneOrZero(branches, predicate.toString());
-        }
+        });
     }
 
     @Override
@@ -172,26 +170,22 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
     @Override
     public List<?> getFeatureNames(Integer branchId, String sqlQuery, Class<?> c) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             Query<?> q = session.createNativeQuery(sqlQuery, c);
             q.setParameter("branchId", branchId);
             return q.getResultList();
-        }
+        });
     }
 
     @Override
     public List<?> getFeatureNames(String sqlQuery, Class<?> c) {
         
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             Query<?> q = session.createNativeQuery(sqlQuery, c);
             return q.getResultList();
-        }
+        });
     }
 
     @Override

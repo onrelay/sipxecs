@@ -17,7 +17,6 @@ import java.util.List;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.lang.AutoCloseable;
 import java.lang.UnsupportedOperationException;
 import java.lang.IllegalStateException;
 import java.lang.IllegalAccessException;
@@ -57,74 +56,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     private DaoEventPublisher m_daoEventPublisher;
 
-    public static class SessionTransaction implements AutoCloseable {
-
-        private Session m_session = null;
-        private Transaction m_transaction = null;
-        private boolean m_openedSession = false;
-
-        public SessionTransaction(SessionFactory sessionFactory) {
-
-            try {
-                // Try the configured current session
-                m_session = sessionFactory.getCurrentSession();
-            } catch (org.hibernate.HibernateException e) {
-                // No current session, open a new one
-                m_session = sessionFactory.openSession();
-                m_openedSession = true;
-            }
-
-            try {
-                m_transaction = m_session.beginTransaction();
-
-            } catch( UnsupportedOperationException e ) {
-                
-                if( "The application must supply JDBC connections".equals( e.getMessage() ) ) {
-                    throw new IllegalStateException( "JDBC interface not ready");
-                }
-                else {
-                    throw e;
-                }
-            }
-        }
-
-        public Session getSession() {
-            return m_session;
-        }
-
-        public Transaction getTransaction() {
-            return m_transaction;
-        }
-
-        public boolean getOpenedSession() {
-            return m_openedSession;
-        }
-
-        @Override
-        public void close() {
-            try {
-                if (m_transaction != null && m_transaction.isActive()) {
-                    if (!m_transaction.getRollbackOnly()) {
-                        if (m_session != null && m_session.isOpen()) {
-                            m_session.flush();
-                        }
-                        m_transaction.commit();
-                    } else {
-                        m_transaction.rollback();
-                    }
-                }
-            } catch (RuntimeException e) {
-                if (m_transaction != null && m_transaction.isActive()) {
-                    m_transaction.rollback();
-                }
-                throw e;
-            } finally {
-                if (m_openedSession && m_session != null && m_session.isOpen()) {
-                    m_session.close();
-                }
-            }
-        }
-    }
 
     public SipxHibernateDaoSupport() {
     }
@@ -143,10 +74,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
       }
     }
 
-    protected final SessionTransaction getSessionTransaction()  {
-       return new SessionTransaction( getSessionFactory() );
-    }
-
     public SessionFactory getSessionFactory() {
         return m_sessionFactory;
     }
@@ -161,24 +88,21 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     public <S extends Object> S loadEntity(Class<S> klass, Serializable id) {
    
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+        return getSessionFactory().fromTransaction( session -> {
             
-            Session session = sessionTransaction.getSession();
-    
             return session.byId(klass).load(id);
-        }
+        });
     }
 
     public <S extends Object> List<S> loadAllEntities(Class<S> klass) {
 
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
-    
-            CriteriaBuilder cb = session.getCriteriaBuilder();
-            CriteriaQuery<S> cq = cb.createQuery(klass);
-            cq.from(klass);
-            return session.createQuery(cq).getResultList();
+        try {
+            return getSessionFactory().fromTransaction( session -> {
+                CriteriaBuilder cb = session.getCriteriaBuilder();
+                CriteriaQuery<S> cq = cb.createQuery(klass);
+                cq.from(klass);
+                return session.createQuery(cq).getResultList();
+            });
         } catch( IllegalStateException e ) {
             // server not ready
             return new ArrayList<S>();
@@ -187,15 +111,15 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     public <S extends Object> S findEntity(Class<S> klass, Serializable id) {
 
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
-    
-            return (S) session.find(klass,id);
-        } catch( IllegalStateException e ) {
-            // server not ready
-            return null;
-        }
+        return getSessionFactory().fromTransaction( session -> {
+
+            try {
+                return (S) session.find(klass,id);
+            } catch( IllegalStateException e ) {
+                // server not ready
+                return null;
+            }
+        });
     }
 
     public <S extends Object> void saveEntity(S entity) {
@@ -220,14 +144,14 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             updateBeanValueStorage( (BeanWithSettings)entity);
         }
 
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+        getSessionFactory().inTransaction( session -> {
             
-            Session session = sessionTransaction.getSession();
-    
-            session.persist(entity);
-        } catch( IllegalStateException e ) {
-            // server not ready
-        }
+            try{ 
+                session.persist(entity);
+
+            } catch( IllegalStateException e ) {
+            }
+        });
     }
 
     public <S extends Object> void mergeEntity(S entity) {
@@ -236,16 +160,16 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             updateBeanValueStorage( (BeanWithSettings)entity);
         }
 
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+        getSessionFactory().inTransaction( session -> {
             
-            Session session = sessionTransaction.getSession();
+            try {
+                S mergedEntity = session.merge(entity);
+        
+                BeanUtils.copyProperties(mergedEntity, entity);
 
-            S mergedEntity = session.merge(entity);
-    
-            BeanUtils.copyProperties(mergedEntity, entity);
-
-        } catch( IllegalStateException | IllegalAccessException | InvocationTargetException e ) {
-        }
+            } catch( IllegalStateException | IllegalAccessException | InvocationTargetException e ) {
+            }
+        });
     }
 
     public <S extends Object> void refreshEntity(S entity) {
@@ -254,14 +178,14 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             updateBeanValueStorage( (BeanWithSettings)entity);
         }
 
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+        getSessionFactory().inTransaction( session -> {
             
-            Session session = sessionTransaction.getSession();
-
-            session.refresh(entity);
-        } catch( IllegalStateException e ) {
-            // server not ready
-        }
+            try {
+                session.refresh(entity);
+            } catch( IllegalStateException e ) {
+                // server not ready
+            }
+        });
     }
 
     public <S extends Object> void removeEntity(S entity) {
@@ -270,14 +194,14 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             updateBeanValueStorage( (BeanWithSettings)entity);
         }
 
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+        getSessionFactory().inTransaction( session -> {
             
-            Session session = sessionTransaction.getSession();
-
-            session.remove(entity);
-        } catch( IllegalStateException e ) {
-            // server not ready
-        }
+            try {
+                session.remove(entity);
+            } catch( IllegalStateException e ) {
+                // server not ready
+            }
+        });
     }
 
     public <S extends Object> void removeAllEntities(Collection<S> entities) {
@@ -288,15 +212,15 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
                 updateBeanValueStorage( (BeanWithSettings)entity);
             }
 
-            try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-        
-                Session session = sessionTransaction.getSession();
-
-                session.remove(entity);
-                            
-            } catch( IllegalStateException e ) {
-                // server not ready
-            }
+            getSessionFactory().inTransaction( session -> {
+                
+                try {
+                    session.remove(entity);
+                                
+                } catch( IllegalStateException e ) {
+                    // server not ready
+                }
+            });
         }
     }
 
@@ -306,14 +230,14 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             updateBeanValueStorage( (BeanWithSettings)entity);
         }
 
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
-    
-            session.evict(entity);
-        } catch( IllegalStateException e ) {
-            // server not ready
-        }
+        getSessionFactory().inTransaction( session -> {
+                
+            try {
+                session.evict(entity);
+            } catch( IllegalStateException e ) {
+                // server not ready
+            }
+        });
     }
 
     private void updateBeanValueStorage(BeanWithSettings bean) {
@@ -324,26 +248,26 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     public void flush() {
         
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
-    
-            session.flush();
-        } catch( IllegalStateException e ) {
-            // server not ready
-        }
+        getSessionFactory().inTransaction( session -> {
+                
+            try {
+                session.flush();
+            } catch( IllegalStateException e ) {
+                // server not ready
+            }
+        });
     }
 
     public void clear() {
         
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
-
-            session.clear();
-        } catch( IllegalStateException e ) {
-            // server not ready
-        }
+        getSessionFactory().inTransaction( session -> {
+                
+            try {
+                session.clear();
+            } catch( IllegalStateException e ) {
+                // server not ready
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -353,20 +277,20 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             throw new RuntimeException("queryNames and values must have same size");
         }
         
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
+        return getSessionFactory().fromTransaction( session -> {
+                
+            try {
+                Query<S> query = session.createQuery(queryText, resultClass);
+                for( int i = 0; i < paramNames.length; i++ ) {
 
-            Query<S> query = session.createQuery(queryText, resultClass);
-            for( int i = 0; i < paramNames.length; i++ ) {
-
-                query = query.setParameter(paramNames[i], values[i]);
+                    query = query.setParameter(paramNames[i], values[i]);
+                }
+                return query.getResultList();
+            } catch( IllegalStateException e ) {
+                // server not ready
+                return new ArrayList<S>();
             }
-            return query.getResultList();
-        } catch( IllegalStateException e ) {
-            // server not ready
-            return new ArrayList<S>();
-        }
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -388,20 +312,20 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             throw new RuntimeException("queryNames and values must have same size");
         }
         
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
+        return getSessionFactory().fromTransaction( session -> {
 
-            Query<S> query = session.createNamedQuery(queryName, resultClass);
-            for( int i = 0; i < paramNames.length; i++ ) {
+            try {
+                Query<S> query = session.createNamedQuery(queryName, resultClass);
+                for( int i = 0; i < paramNames.length; i++ ) {
 
-                query = query.setParameter(paramNames[i], values[i]);
+                    query = query.setParameter(paramNames[i], values[i]);
+                }
+                return query.getResultList();
+            } catch( IllegalStateException e ) {
+                // server not ready
+                return new ArrayList<S>();
             }
-            return query.getResultList();
-        } catch( IllegalStateException e ) {
-            // server not ready
-            return new ArrayList<S>();
-        }
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -414,20 +338,21 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
     @SuppressWarnings("unchecked")
     public <S> List<S> findByNamedQuery(String queryName, Object[] values, Class<S> resultClass) {
 
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
-    
-            Query<S> query = session.createNamedQuery(queryName, resultClass);
-            for( int i = 0; i < values.length; i++ ) {
+        return getSessionFactory().fromTransaction( session -> {
 
-                query = query.setParameter(i + 1, values[i]);
+            try {
+
+                Query<S> query = session.createNamedQuery(queryName, resultClass);
+                for( int i = 0; i < values.length; i++ ) {
+
+                    query = query.setParameter(i + 1, values[i]);
+                }
+                return query.getResultList();
+            } catch( IllegalStateException e ) {
+                // server not ready
+                return new ArrayList<S>();
             }
-            return query.getResultList();
-        } catch( IllegalStateException e ) {
-            // server not ready
-            return new ArrayList<S>();
-        }
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -461,18 +386,16 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
             namedCopy.setName(((NamedObject) bean).getName());
 
-            while( true ) {
+            boolean duplicates = true;
+
+            while( duplicates ) {
 
                 namedCopy.setName("CopyOf" + namedCopy.getName());
 
-                try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-                
-                    Session session = sessionTransaction.getSession();
+                duplicates = getSessionFactory().fromTransaction( session -> {
 
-                    if( !DaoUtils.checkDuplicatesByNamedQuery(session, copy, queryName, namedCopy.getName(), null) ) {
-                        break;
-                    }
-                }
+                    return DaoUtils.checkDuplicatesByNamedQuery(session, copy, queryName, namedCopy.getName(), null);
+                });
             }
         }
 
@@ -488,48 +411,47 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
     public List<T> loadBeansByPage(Class<T> beanClass, Integer groupId, Integer branchId, int firstRow, int pageSize,
                                 String[] orderBy, boolean orderAscending) {
         
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();
+        return getSessionFactory().fromTransaction( session -> {
+            try {
+                CriteriaBuilder cb = session.getCriteriaBuilder();
+                CriteriaQuery<T> cq = cb.createQuery(beanClass);
+                Root<T> root = cq.from(beanClass);
 
-            CriteriaBuilder cb = session.getCriteriaBuilder();
-            CriteriaQuery<T> cq = cb.createQuery(beanClass);
-            Root<T> root = cq.from(beanClass);
-
-            List<Predicate> predicates = new ArrayList<>();
-            
-            Predicate groupPredicate = addByGroupCriteria(cb, root, groupId);
-            if (groupPredicate != null) {
-                predicates.add(groupPredicate);
-            }
-            
-            Predicate branchPredicate = addByBranchCriteria(cb, root, branchId);
-            if (branchPredicate != null) {
-                predicates.add(branchPredicate);
-            }
-
-            if (!predicates.isEmpty()) {
-                cq.where(cb.and(predicates.toArray(new Predicate[0])));
-            }
-
-            if (orderBy != null) {
-                List<Order> orders = new ArrayList<>();
-                for (String o : orderBy) {
-                    orders.add(orderAscending ? cb.asc(root.get(o)) : cb.desc(root.get(o)));
+                List<Predicate> predicates = new ArrayList<>();
+                
+                Predicate groupPredicate = addByGroupCriteria(cb, root, groupId);
+                if (groupPredicate != null) {
+                    predicates.add(groupPredicate);
                 }
-                cq.orderBy(orders);
+                
+                Predicate branchPredicate = addByBranchCriteria(cb, root, branchId);
+                if (branchPredicate != null) {
+                    predicates.add(branchPredicate);
+                }
+
+                if (!predicates.isEmpty()) {
+                    cq.where(cb.and(predicates.toArray(new Predicate[0])));
+                }
+
+                if (orderBy != null) {
+                    List<Order> orders = new ArrayList<>();
+                    for (String o : orderBy) {
+                        orders.add(orderAscending ? cb.asc(root.get(o)) : cb.desc(root.get(o)));
+                    }
+                    cq.orderBy(orders);
+                }
+
+                TypedQuery<T> query = session.createQuery(cq);
+                query.setFirstResult(firstRow);
+                query.setMaxResults(pageSize);
+
+                return query.getResultList();
+
+            } catch( IllegalStateException e ) {
+                // server not ready
+                return new ArrayList<T>();
             }
-
-            TypedQuery<T> query = session.createQuery(cq);
-            query.setFirstResult(firstRow);
-            query.setMaxResults(pageSize);
-
-            return query.getResultList();
-
-        } catch( IllegalStateException e ) {
-            // server not ready
-            return new ArrayList<T>();
-        }
+        });
     }
 
     @SuppressWarnings("rawtypes")
@@ -546,91 +468,82 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
      */
     public <T> int getBeansInGroupCount(Class<T> beanClass, Integer groupId) {
         
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+        return getSessionFactory().fromTransaction( session -> {
             
-            Session session = sessionTransaction.getSession();
+            try {
+                CriteriaBuilder cb = session.getCriteriaBuilder();
+                CriteriaQuery<Long> cq = cb.createQuery(Long.class);
+                Root<T> root = cq.from(beanClass);
 
-            CriteriaBuilder cb = session.getCriteriaBuilder();
-            CriteriaQuery<Long> cq = cb.createQuery(Long.class);
-            Root<T> root = cq.from(beanClass);
+                Predicate groupPredicate = addByGroupCriteria(cb, root, groupId);
+                if (groupPredicate != null) {
+                    cq.where(groupPredicate);
+                }
 
-            Predicate groupPredicate = addByGroupCriteria(cb, root, groupId);
-            if (groupPredicate != null) {
-                cq.where(groupPredicate);
+                cq.select(cb.count(root));
+
+                Long count = session.createQuery(cq).getSingleResult();
+
+                return count;
+
+            } catch( IllegalStateException e ) {
+                // server not ready
+                return 0;
             }
-
-            cq.select(cb.count(root));
-
-            Long count = session.createQuery(cq).getSingleResult();
-
-            return count.intValue();
-
-        } catch( IllegalStateException e ) {
-            // server not ready
-            return 0;
-        }
+        }).intValue();
     }
 
     protected void removeAll(Class<?> klass, Collection<Integer> ids) {
         
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+        getSessionFactory().inTransaction( session -> {
             
-            Session session = sessionTransaction.getSession();
-    
-            Collection<Object> entities = new ArrayList<>(ids.size());
+            try {
+                Collection<Object> entities = new ArrayList<>(ids.size());
 
-            for (Integer id : ids) {
-                Object entity = session.find(klass, id); 
-                if (entity != null) {
-                    entities.add(entity);
-                    m_daoEventPublisher.publishDelete(entity);
+                for (Integer id : ids) {
+                    Object entity = session.find(klass, id); 
+                    if (entity != null) {
+                        entities.add(entity);
+                        m_daoEventPublisher.publishDelete(entity);
+                    }
                 }
+
+                for (Object entity : entities) {
+                    session.remove(entity);
+                }
+
+                session.flush();
+
+            } catch( IllegalStateException e ) {
+                // server not ready
             }
-
-            for (Object entity : entities) {
-                session.remove(entity);
-            }
-
-            session.flush();
-
-        } catch( IllegalStateException e ) {
-            // server not ready
-        }
+        });
     }
 
     protected void removeAll(Class<?> klass) {
         
-        List<?> entities;
-
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
+        List<?> entities = getSessionFactory().fromTransaction( session -> {
             
-            Session session = sessionTransaction.getSession();    
-
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<?> cq = cb.createQuery(klass);
             cq.from(klass);
 
-            entities = session.createQuery(cq).getResultList();
-        }
+            return session.createQuery(cq).getResultList();
+        });
 
         for (Object entity : entities) {
 
             m_daoEventPublisher.publishDelete(entity);
 
-            try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-                Session session = sessionTransaction.getSession();    
-
+            getSessionFactory().inTransaction( session -> {
                 session.remove(entity);
-            }
+            });
         }
 
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();    
+        getSessionFactory().inTransaction( session -> {
 
             session.flush(); 
-        }
+        });
        
     }
 
@@ -648,15 +561,15 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
      */
     protected Object getOriginalValue(PrimaryKeySource obj, String propertyName) {
         
-        try( SessionTransaction sessionTransaction = getSessionTransaction() ) {
-            
-            Session session = sessionTransaction.getSession();    
-         
-            return new GetOriginalValueCallback(obj, propertyName).doInSession(session);
-        } catch( IllegalStateException e ) {
-            // server not ready
-            return null;
-        }
+        return getSessionFactory().fromTransaction( session -> {
+
+            try {            
+                return new GetOriginalValueCallback(obj, propertyName).doInSession(session);
+            } catch( IllegalStateException e ) {
+                // server not ready
+                return null;
+            }
+        });
     }
 
     /**

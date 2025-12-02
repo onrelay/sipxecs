@@ -64,14 +64,10 @@ public class SbcManagerImpl extends SipxHibernateDaoSupport<Sbc> implements SbcM
 
     public void removeSbcs(Collection<Integer> selectedRows) {
 
-        Collection<Object> sbcs;
+        Collection<Object> sbcs = super.getSessionFactory().fromTransaction( session -> {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
-
-            sbcs = DaoUtils.loadBeanByIds(session, AuxSbc.class, selectedRows);
-        }
+            return DaoUtils.loadBeanByIds(session, AuxSbc.class, selectedRows);
+        });
 
         getDaoEventPublisher().publishDeleteCollection(sbcs);
         super.removeAllEntities(sbcs);

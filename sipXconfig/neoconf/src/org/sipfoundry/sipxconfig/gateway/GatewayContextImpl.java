@@ -82,22 +82,18 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport<Object> implemen
     public void saveGateway(Gateway gateway) {
         // Before storing the gateway, make sure that it has a unique name.
         // Throw an exception if it doesn't.
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        super.getSessionFactory().inTransaction( session -> {
 
             DaoUtils.checkDuplicates(session, Gateway.class, gateway, "name",
-                    new DuplicateNameException(gateway.getName()));
+                new DuplicateNameException(gateway.getName()));
 
-        }
+        });
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        super.getSessionFactory().inTransaction( session -> {
 
             DaoUtils.checkDuplicates(session, Gateway.class, gateway, "serialNumber",
                     new DuplicateSerialNumberException(gateway.getSerialNumber()));
-        }
+        });
         
         // Find if we are about to save a new gateway
         boolean isNew = gateway.isNew();
@@ -170,16 +166,14 @@ public class GatewayContextImpl extends SipxHibernateDaoSupport<Object> implemen
 
     public <T> List<T> getGatewayByType(final Class<T> type) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<T> cq = cb.createQuery(type);
             Root<T> root = cq.from(type);
             cq.select(root);
             return session.createQuery(cq).getResultList();
-        }
+        });
     }
 
     /**

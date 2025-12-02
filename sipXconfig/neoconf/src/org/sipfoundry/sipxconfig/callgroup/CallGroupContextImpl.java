@@ -69,15 +69,13 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport<CallGroup> imp
     @Override
     public int getCallGroupId(String extension) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
 
             NativeQuery<?> q = session.createNativeQuery(SQL_CALL_GROUP_EXTENSION);
             q.setParameter("extension", extension);
             Number result = (Number) q.uniqueResult();
-            return result != null ? result.intValue() : 0; // handle null safely
-        }
+            return result != null ? result : 0; // handle null safely
+        }).intValue();
     }
     
     @Override

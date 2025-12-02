@@ -93,9 +93,7 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
 
     private Location loadLocationByUniqueProperty(String propName, Object propValue) {
 
-        try( SessionTransaction sessionTransaction = super.getSessionTransaction() ) {
-
-            Session session = sessionTransaction.getSession();
+        return super.getSessionFactory().fromTransaction( session -> {
         
             CriteriaBuilder cb = session.getCriteriaBuilder();
             CriteriaQuery<Location> cq = cb.createQuery(Location.class);
@@ -108,7 +106,7 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
             List<Location> locations = query.getResultList();
 
             return singleResult(locations);
-        }
+        });
     }
 
     /**
