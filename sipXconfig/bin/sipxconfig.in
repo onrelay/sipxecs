@@ -265,7 +265,7 @@ start() {
     runuser -m -s @BASH@ @SIPXPBXUSER@ -c "${Command}" >> ${LogFile} 2>&1
     Status=$?
   else
-    checkRunningInstance @SIPXPBXUSER@ $regex  >> ${LogFile} 2>&1
+    checkRunningInstance @SIPXPBXUSER@ $regex  > ${LogFile} 2>&1
     Status=$?
     [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
 
@@ -399,7 +399,7 @@ case "$1" in
     [ $Status -eq 0 ] && restart || :
     ;;
   status)
-    checkRunningInstance @SIPXPBXUSER@ $regex $prog
+    checkRunningInstance @SIPXPBXUSER@ $regex $prog > /dev/null 2>&1
     Status=$?
     ;;
   configtest)
