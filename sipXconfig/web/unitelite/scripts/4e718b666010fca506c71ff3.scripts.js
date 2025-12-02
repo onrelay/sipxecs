@@ -3463,7 +3463,7 @@ uw.service('restService', [
            },
            {
              icon: 'follow_me',
-             name: 'Call Forwarding',
+             name: 'Forwarding',
              displayName: 'SETTINGS.CALL_FORWARDING',
              enable: 'true'
            },
@@ -5898,7 +5898,7 @@ uw.controller('settingsController', [
       },
       {
         icon: 'follow_me',
-        name: 'Call Forwarding'
+        name: 'Forwarding'
       },
       {
         icon: 'dialpad',
@@ -5973,7 +5973,7 @@ uw.controller('settingsController', [
           $scope.userSettings.speed.init();
           break;
 
-        case 'Call Forwarding':
+        case 'Forwarding':
           $scope.userSettings.fwd.setup.init();
           break;
 
