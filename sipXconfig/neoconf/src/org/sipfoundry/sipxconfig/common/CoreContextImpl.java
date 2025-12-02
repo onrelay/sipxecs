@@ -709,7 +709,6 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
         }
         PermissionName.SUPERADMIN.setEnabled(adminGroup, true);
         PermissionName.TUI_CHANGE_PIN.setEnabled(adminGroup, false);
-        mergeEntity(adminGroup);
 
         User admin = loadUserByUserName(User.SUPERADMIN);
         if (admin == null) {
