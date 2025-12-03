@@ -88,21 +88,37 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     public <S extends Object> S loadEntity(Class<S> klass, Serializable id) {
    
-        return getSessionFactory().fromTransaction( session -> {
-            
+        S entity = getSessionFactory().fromTransaction( session -> {
+
             return session.byId(klass).load(id);
+
         });
+
+        if( entity instanceof BeanWithSettings ) {
+            updateBeanValueStorage( (BeanWithSettings)entity);
+        }
+        return entity;
     }
 
     public <S extends Object> List<S> loadAllEntities(Class<S> klass) {
 
         try {
-            return getSessionFactory().fromTransaction( session -> {
+            List<S> allEntities = getSessionFactory().fromTransaction( session -> {
                 CriteriaBuilder cb = session.getCriteriaBuilder();
                 CriteriaQuery<S> cq = cb.createQuery(klass);
                 cq.from(klass);
                 return session.createQuery(cq).getResultList();
             });
+
+            if( allEntities != null ) {
+                for( S entity : allEntities ) {
+                    if( entity instanceof BeanWithSettings ) {
+                        updateBeanValueStorage( (BeanWithSettings)entity);
+                    }                
+                }
+            }
+            return allEntities;
+
         } catch( IllegalStateException e ) {
             // server not ready
             return new ArrayList<S>();
@@ -111,7 +127,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     public <S extends Object> S findEntity(Class<S> klass, Serializable id) {
 
-        return getSessionFactory().fromTransaction( session -> {
+        S entity = getSessionFactory().fromTransaction( session -> {
 
             try {
                 return (S) session.find(klass,id);
@@ -120,6 +136,11 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
                 return null;
             }
         });
+
+        if( entity instanceof BeanWithSettings ) {
+            updateBeanValueStorage( (BeanWithSettings)entity);
+        }
+        return entity;
     }
 
     public <S extends Object> void saveEntity(S entity) {
@@ -240,12 +261,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         });
     }
 
-    private void updateBeanValueStorage(BeanWithSettings bean) {
-        Storage origStorage = bean.getValueStorage();
-        Storage cleanStorage = clearUnsavedValueStorage(origStorage);
-        bean.setValueStorage(cleanStorage);
-    }
-
     public void flush() {
         
         getSessionFactory().inTransaction( session -> {
@@ -277,7 +292,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             throw new RuntimeException("queryNames and values must have same size");
         }
         
-        return getSessionFactory().fromTransaction( session -> {
+        List<S> entities = getSessionFactory().fromTransaction( session -> {
                 
             try {
                 Query<S> query = session.createQuery(queryText, resultClass);
@@ -291,6 +306,16 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
                 return new ArrayList<S>();
             }
         });
+
+        if( entities != null ) {
+            for( S entity : entities ) {
+                if( entity instanceof BeanWithSettings ) {
+                    updateBeanValueStorage( (BeanWithSettings)entity);
+                }                
+            }
+        }
+
+        return entities;
     }
 
     @SuppressWarnings("unchecked")
@@ -312,7 +337,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             throw new RuntimeException("queryNames and values must have same size");
         }
         
-        return getSessionFactory().fromTransaction( session -> {
+        List<S> entities = getSessionFactory().fromTransaction( session -> {
 
             try {
                 Query<S> query = session.createNamedQuery(queryName, resultClass);
@@ -326,6 +351,16 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
                 return new ArrayList<S>();
             }
         });
+
+        if( entities != null ) {
+            for( S entity : entities ) {
+                if( entity instanceof BeanWithSettings ) {
+                    updateBeanValueStorage( (BeanWithSettings)entity);
+                }                
+            }
+        }
+
+        return entities;
     }
 
     @SuppressWarnings("unchecked")
@@ -338,7 +373,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
     @SuppressWarnings("unchecked")
     public <S> List<S> findByNamedQuery(String queryName, Object[] values, Class<S> resultClass) {
 
-        return getSessionFactory().fromTransaction( session -> {
+        List<S> entities = getSessionFactory().fromTransaction( session -> {
 
             try {
 
@@ -353,6 +388,15 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
                 return new ArrayList<S>();
             }
         });
+
+        if( entities != null ) {
+            for( S entity : entities ) {
+                if( entity instanceof BeanWithSettings ) {
+                    updateBeanValueStorage( (BeanWithSettings)entity);
+                }                
+            }
+        }
+        return entities;
     }
 
     @SuppressWarnings("unchecked")
@@ -411,7 +455,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
     public List<T> loadBeansByPage(Class<T> beanClass, Integer groupId, Integer branchId, int firstRow, int pageSize,
                                 String[] orderBy, boolean orderAscending) {
         
-        return getSessionFactory().fromTransaction( session -> {
+        List<T> beans = getSessionFactory().fromTransaction( session -> {
             try {
                 CriteriaBuilder cb = session.getCriteriaBuilder();
                 CriteriaQuery<T> cq = cb.createQuery(beanClass);
@@ -452,6 +496,16 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
                 return new ArrayList<T>();
             }
         });
+
+        if( beans != null ) {
+            for( T bean : beans ) {
+                if( bean instanceof BeanWithSettings ) {
+                    updateBeanValueStorage( (BeanWithSettings)bean);
+                }                
+            }
+        }
+
+        return beans;
     }
 
     @SuppressWarnings("rawtypes")
@@ -545,6 +599,12 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             session.flush(); 
         });
        
+    }
+
+    protected void updateBeanValueStorage(BeanWithSettings bean) {
+        Storage origStorage = bean.getInitializeValueStorage();
+        Storage cleanStorage = clearUnsavedValueStorage(origStorage);
+        bean.setValueStorage(cleanStorage);
     }
 
     protected Storage clearUnsavedValueStorage(Storage storage) {
