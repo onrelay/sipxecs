@@ -424,7 +424,7 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
          * when an user is part of a Group, it's MoH settings should be those of the Group;
          * if the user has GROUP_MUSIC_ON_HOLD permission then it can have personalized settings for MoH
          */
-        setSettingModel2(new BeanWithGroupsModel(this) {
+        setSettingModel(new BeanWithGroupsModel(this) {
             @Override
             public SettingValue getSettingValue(Setting setting) {
                 String parentSettings = setting.getParent().getName();
@@ -457,7 +457,7 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
      */
     public boolean hasPermission(PermissionName permissionName) {
         Setting setting = retrieveSettingForPermission(permissionName);
-        return setting != null && Permission.isEnabled(setting.getValue());
+        return Permission.isEnabled(setting.getValue());
     }
 
     /**
@@ -465,7 +465,7 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
      */
     public boolean hasPermission(Permission permission) {
         Setting setting = retrieveSettingForPermission(permission);
-        return setting != null && Permission.isEnabled(setting.getValue());
+        return Permission.isEnabled(setting.getValue());
     }
 
     /**
@@ -476,9 +476,7 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
      */
     public void setPermission(PermissionName permissionName, boolean enabled) {
         Setting setting = retrieveSettingForPermission(permissionName);
-        if( setting != null ) {
-            setting.setTypedValue(enabled);
-        }
+        setting.setTypedValue(enabled);
     }
 
     /**
@@ -489,9 +487,7 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
      */
     public void setPermission(Permission permission, boolean enabled) {
         Setting setting = retrieveSettingForPermission(permission);
-        if( setting != null ) {
-            setting.setTypedValue(enabled);
-        }
+        setting.setTypedValue(enabled);
     }
 
     public boolean isAdmin() {
@@ -511,9 +507,6 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
     }
 
     private Setting retrieveSettingForSettingPath(String path, String name) {
-        if( getSettings() == null ) {
-            return null;
-        }
         Setting setting = getSettings().getSetting(path);
         if (setting == null) {
             throw new IllegalArgumentException("Setting " + name + " does not exist in user setting model");

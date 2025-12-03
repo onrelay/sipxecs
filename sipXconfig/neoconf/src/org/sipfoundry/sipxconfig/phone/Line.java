@@ -186,7 +186,7 @@ public class Line extends BeanWithGroups implements NamedObject, SystemAuditable
             m_phone.initializeLine(this);
             m_initialized = true;
 
-            BeanWithGroupsModel model = (BeanWithGroupsModel) getSettingModel2();
+            BeanWithGroupsModel model = (BeanWithGroupsModel) getSettingModel();
             // passed collection is not copied
             model.setGroups(m_phone.getGroups());
         }

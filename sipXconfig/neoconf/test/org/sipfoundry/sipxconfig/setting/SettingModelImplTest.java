@@ -33,7 +33,7 @@ public class SettingModelImplTest extends TestCase {
         handlerCtrl.replay();
 
         BeanWithSettings bean = new BirdWithSettings();
-        BeanWithSettingsModel model = bean.getSettingModel2();
+        BeanWithSettingsModel model = bean.getSettingModel();
         bean.setSettings(birds);
 
         bean.addDefaultSettingHandler(handler);

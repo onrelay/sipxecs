@@ -31,7 +31,7 @@ public abstract class BeanWithGroups extends BeanWithSettings {
 
     @Override
     protected void initializeSettingModel() {
-        setSettingModel2(new BeanWithGroupsModel(this));
+        setSettingModel(new BeanWithGroupsModel(this));
     }
 
     public synchronized Set<Group> getGroups() {
@@ -45,7 +45,7 @@ public abstract class BeanWithGroups extends BeanWithSettings {
     public void setGroups(Set<Group> settingSets) {
         m_groups = settingSets;
 
-        BeanWithGroupsModel model = (BeanWithGroupsModel) getSettingModel2();
+        BeanWithGroupsModel model = (BeanWithGroupsModel) getSettingModel();
         // passed collection is not copied
         model.setGroups(m_groups);
     }

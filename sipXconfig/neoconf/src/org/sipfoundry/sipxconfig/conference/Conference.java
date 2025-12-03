@@ -117,7 +117,7 @@ public class Conference extends BeanWithSettings implements Replicable, DeployCo
     @Override
     public void initialize() {
         addDefaultBeanSettingHandler(this);
-        getSettingModel2().setDefaultProfileNameHandler(new ConferenceProfileName(this));
+        getSettingModel().setDefaultProfileNameHandler(new ConferenceProfileName(this));
     }
 
     @Override

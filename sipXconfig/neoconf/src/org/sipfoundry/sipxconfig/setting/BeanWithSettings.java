@@ -17,7 +17,7 @@ public abstract class BeanWithSettings extends BeanWithId {
 
     private ModelFilesContext m_modelFilesContext;
     private Setting m_settings;
-    private BeanWithSettingsModel m_model2;
+    private BeanWithSettingsModel m_model;
 
     /**
      * While settings are getting decorated, this represents the settings that should be decorated
@@ -29,7 +29,7 @@ public abstract class BeanWithSettings extends BeanWithId {
     }
 
     protected void initializeSettingModel() {
-        setSettingModel2(new BeanWithSettingsModel(this));
+        setSettingModel(new BeanWithSettingsModel(this));
     }
 
     /**
@@ -39,16 +39,16 @@ public abstract class BeanWithSettings extends BeanWithId {
         // default implementation empty
     }
 
-    protected void setSettingModel2(BeanWithSettingsModel model) {
-        m_model2 = model;
+    protected void setSettingModel(BeanWithSettingsModel model) {
+        m_model = model;
     }
 
-    protected BeanWithSettingsModel getSettingModel2() {
-        return m_model2;
+    protected BeanWithSettingsModel getSettingModel() {
+        return m_model;
     }
 
     public void addDefaultSettingHandler(SettingValueHandler handler) {
-        m_model2.addDefaultsHandler(handler);
+        m_model.addDefaultsHandler(handler);
     }
 
     public void addDefaultBeanSettingHandler(Object bean) {
@@ -71,7 +71,7 @@ public abstract class BeanWithSettings extends BeanWithId {
 
     public void setSettings(Setting settings) {
         m_settings = settings;
-        m_model2.setSettings(m_settings);
+        m_model.setSettings(m_settings);
     }
 
     public void setValueStorage(Storage valueStorage) {
