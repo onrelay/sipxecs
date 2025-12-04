@@ -29,4 +29,7 @@
   <bean id="domainSettings" class="org.sipfoundry.sipxconfig.domain.DomainSettings" parent="settingsBean">
   </bean>
 
+  <bean id="domain" class="org.sipfoundry.sipxconfig.domain.Domain">
+  </bean>
+
 </beans>

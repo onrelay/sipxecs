@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<!DOCTYPE model PUBLIC "-//SIPFoundry//sipXconfig//Model specification 2.0//EN"
-  "http://www.sipfoundry.org/sipXconfig/dtd/setting_2_0.dtd" [
+<!DOCTYPE model PUBLIC "-//sipXconfig//Model specification 2.0//EN"
+  "/etc/sipxpbx/setting.dtd" [
   <!ENTITY types SYSTEM "types.xml">
   <!ENTITY phone4_5 SYSTEM "phone-4_5.xml">
   ]>
