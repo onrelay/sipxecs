@@ -411,10 +411,10 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
 
     @Override
     protected Setting loadSettings() {
-        if( m_permissionManager == null ) {
-            throw new RuntimeException( "No permission manager injected");
+        if (m_permissionManager != null) {
+            return m_permissionManager.getPermissionModel();
         }
-        return m_permissionManager.getPermissionModel();
+        return null;
     }
 
     @Override
