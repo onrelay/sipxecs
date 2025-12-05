@@ -13,7 +13,6 @@ SUBDIRS = \
   ruby-module
 
 PUB_PACKAGES = \
-	packages/browser \
 	packages/sipxconfig/sipxconfig.dart
 
 pub-get $(PUB_PACKAGES) :
