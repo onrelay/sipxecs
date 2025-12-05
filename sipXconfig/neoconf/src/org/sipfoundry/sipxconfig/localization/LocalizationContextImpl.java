@@ -17,19 +17,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.dao.support.DataAccessUtils;
 
-public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localization> implements LocalizationContext,
-        ApplicationContextAware {
+public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localization> implements LocalizationContext {
 
     public static final String PROMPTS_PREFIX = "stdprompts_";
     private static final Log LOG = LogFactory.getLog(LocalizationContextImpl.class);
     private String m_promptsDir;
     private String m_defaultRegion;
     private String m_defaultLanguage;
-    private ApplicationContext m_applicationContext;
 
     public void setPromptsDir(String promptsDir) {
         m_promptsDir = promptsDir;
@@ -115,7 +111,7 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
         }
 
         localization.setRegion(regionBeanId);
-        m_applicationContext.publishEvent(new RegionUpdatedEvent(this, regionBeanId));
+        getApplicationContext().publishEvent(new RegionUpdatedEvent(this, regionBeanId));
         super.saveEntity(localization);
         super.flush();
         getDaoEventPublisher().publishSave(localization);
@@ -147,7 +143,7 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
         // Copy default AutoAttendant prompts in the currently applied language
         // to AutoAttendant prompts directory.
         LOG.debug("Language updated, sending LanguageUpdatedEvent...");
-        m_applicationContext.publishEvent(new LanguageUpdatedEvent(this, m_promptsDir, getCurrentLanguageDir()));
+        getApplicationContext().publishEvent(new LanguageUpdatedEvent(this, m_promptsDir, getCurrentLanguageDir()));
         return 1;
     }
     
@@ -168,19 +164,14 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
         super.flush();
         getDaoEventPublisher().publishSave(actualLocalization);
         if (updateRegion) {
-            m_applicationContext.publishEvent(new RegionUpdatedEvent(this, region));            
+            getApplicationContext().publishEvent(new RegionUpdatedEvent(this, region));            
         }        
         if (updateLanguage) {
             // Copy default AutoAttendant prompts in the currently applied language
             // to AutoAttendant prompts directory.
             LOG.debug("Language updated, sending LanguageUpdatedEvent...");
-            m_applicationContext.publishEvent(new LanguageUpdatedEvent(this, m_promptsDir, getCurrentLanguageDir()));
+            getApplicationContext().publishEvent(new LanguageUpdatedEvent(this, m_promptsDir, getCurrentLanguageDir()));
         }        
         return actualLocalization;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        m_applicationContext = applicationContext;
     }
 }

@@ -27,6 +27,10 @@ import org.apache.commons.beanutils.BeanUtils;
 
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.dao.support.DaoSupport;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -50,12 +54,13 @@ import org.sipfoundry.sipxconfig.setting.Storage;
 import org.sipfoundry.sipxconfig.setting.ValueStorage;
 
 
-public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObjectSource<T> {
+public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObjectSource<T>, ApplicationContextAware {
     
     private SessionFactory m_sessionFactory;
 
     private DaoEventPublisher m_daoEventPublisher;
 
+    private ApplicationContext m_applicationContext;
 
     public SipxHibernateDaoSupport() {
     }
@@ -82,6 +87,14 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         m_sessionFactory = sessionFactory;
     }
 
+    public ApplicationContext getApplicationContext() {
+        return m_applicationContext;
+    }
+
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        m_applicationContext = applicationContext;
+    }
+
     public T load(Class<T> klass, Serializable id) {
         return loadEntity( klass, id );
     }
@@ -91,12 +104,10 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         S entity = getSessionFactory().fromTransaction( session -> {
 
             return session.byId(klass).load(id);
-
         });
 
-        if( entity instanceof BeanWithSettings ) {
-            updateBeanValueStorage( (BeanWithSettings)entity);
-        }
+        injectSpringDependencies( entity, klass );    
+
         return entity;
     }
 
@@ -110,13 +121,10 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
                 return session.createQuery(cq).getResultList();
             });
 
-            if( allEntities != null ) {
-                for( S entity : allEntities ) {
-                    if( entity instanceof BeanWithSettings ) {
-                        updateBeanValueStorage( (BeanWithSettings)entity);
-                    }                
-                }
+            for( S entity : allEntities ) {
+                injectSpringDependencies( entity, klass );    
             }
+            
             return allEntities;
 
         } catch( IllegalStateException e ) {
@@ -137,9 +145,8 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             }
         });
 
-        if( entity instanceof BeanWithSettings ) {
-            updateBeanValueStorage( (BeanWithSettings)entity);
-        }
+        injectSpringDependencies( entity, klass );    
+
         return entity;
     }
 
@@ -161,9 +168,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     public <S extends Object> void persistEntity(S entity) {
 
-        if( entity instanceof BeanWithSettings ) {
-            updateBeanValueStorage( (BeanWithSettings)entity);
-        }
+        updateBeanValueStorage(entity);
 
         getSessionFactory().inTransaction( session -> {
             
@@ -177,9 +182,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     public <S extends Object> void mergeEntity(S entity) {
 
-        if( entity instanceof BeanWithSettings ) {
-            updateBeanValueStorage( (BeanWithSettings)entity);
-        }
+        updateBeanValueStorage(entity);
 
         getSessionFactory().inTransaction( session -> {
             
@@ -195,9 +198,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     public <S extends Object> void refreshEntity(S entity) {
 
-        if( entity instanceof BeanWithSettings ) {
-            updateBeanValueStorage( (BeanWithSettings)entity);
-        }
+        updateBeanValueStorage(entity);
 
         getSessionFactory().inTransaction( session -> {
             
@@ -211,9 +212,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     public <S extends Object> void removeEntity(S entity) {
 
-        if( entity instanceof BeanWithSettings ) {
-            updateBeanValueStorage( (BeanWithSettings)entity);
-        }
+        updateBeanValueStorage(entity);
 
         getSessionFactory().inTransaction( session -> {
             
@@ -228,10 +227,8 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
     public <S extends Object> void removeAllEntities(Collection<S> entities) {
 
         for (S entity : entities) {
-
-            if( entity instanceof BeanWithSettings ) {
-                updateBeanValueStorage( (BeanWithSettings)entity);
-            }
+            
+            updateBeanValueStorage(entity);
 
             getSessionFactory().inTransaction( session -> {
                 
@@ -247,9 +244,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     public <S extends Object> void evictEntity(S entity) {
 
-        if( entity instanceof BeanWithSettings ) {
-            updateBeanValueStorage( (BeanWithSettings)entity);
-        }
+        updateBeanValueStorage(entity);
 
         getSessionFactory().inTransaction( session -> {
                 
@@ -309,9 +304,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
         if( entities != null ) {
             for( S entity : entities ) {
-                if( entity instanceof BeanWithSettings ) {
-                    updateBeanValueStorage( (BeanWithSettings)entity);
-                }                
+                injectSpringDependencies( entity, resultClass );                 
             }
         }
 
@@ -354,9 +347,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
         if( entities != null ) {
             for( S entity : entities ) {
-                if( entity instanceof BeanWithSettings ) {
-                    updateBeanValueStorage( (BeanWithSettings)entity);
-                }                
+                injectSpringDependencies( entity, resultClass );                               
             }
         }
 
@@ -391,9 +382,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
         if( entities != null ) {
             for( S entity : entities ) {
-                if( entity instanceof BeanWithSettings ) {
-                    updateBeanValueStorage( (BeanWithSettings)entity);
-                }                
+                injectSpringDependencies( entity, resultClass );                                
             }
         }
         return entities;
@@ -499,9 +488,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
         if( beans != null ) {
             for( T bean : beans ) {
-                if( bean instanceof BeanWithSettings ) {
-                    updateBeanValueStorage( (BeanWithSettings)bean);
-                }                
+                injectSpringDependencies( bean, beanClass );                               
             }
         }
 
@@ -601,10 +588,57 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
        
     }
 
-    protected void updateBeanValueStorage(BeanWithSettings bean) {
-        Storage origStorage = bean.getInitializeValueStorage();
-        Storage cleanStorage = clearUnsavedValueStorage(origStorage);
-        bean.setValueStorage(cleanStorage);
+    protected <S extends Object> void updateBeanValueStorage( S entity ) {
+
+        if( entity instanceof BeanWithSettings )  {
+
+            BeanWithSettings bean = (BeanWithSettings)entity;
+            Storage origStorage = bean.getInitializeValueStorage();
+            Storage cleanStorage = clearUnsavedValueStorage(origStorage);
+            bean.setValueStorage(cleanStorage);
+
+        }
+    }
+
+    protected <S> void injectSpringDependencies(S entity, Class<S> klass) {
+
+        // Only Spring-inject objects that are defined as BeanWithId
+        if (!BeanWithId.class.isAssignableFrom(klass)) {
+            return;
+        }
+
+        String beanName = null;
+
+        // Try exact bean name match by type
+        String[] beanNames = m_applicationContext.getBeanNamesForType(klass);
+
+        if (beanNames.length == 1) {
+            beanName = beanNames[0];
+        } 
+        else {
+
+            // Try simpleName decapitalized (standard Spring convention)
+            String conventionalName = Introspector.decapitalize(klass.getSimpleName());
+
+            if (m_applicationContext.containsBean(conventionalName)) {
+                beanName = conventionalName;
+            } 
+            else {
+                // Try fully qualified class name 
+                String fqcnName = klass.getName(); 
+
+                if (m_applicationContext.containsBean(fqcnName)) {
+                    beanName = fqcnName;
+
+                } 
+                else {
+                    // No spring bean found
+                    return;
+                }
+            }
+        }
+
+        m_applicationContext.getAutowireCapableBeanFactory().configureBean(entity, beanName);
     }
 
     protected Storage clearUnsavedValueStorage(Storage storage) {

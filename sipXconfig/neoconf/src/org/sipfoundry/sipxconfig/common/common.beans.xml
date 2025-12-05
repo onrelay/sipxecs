@@ -115,6 +115,8 @@
   <bean id="org.sipfoundry.sipxconfig.common.InternalUser" class="org.sipfoundry.sipxconfig.common.InternalUser"
     scope="prototype" parent="org.sipfoundry.sipxconfig.common.User" />
 
+  <bean id="org.sipfoundry.sipxconfig.common.SpecialUser" class="org.sipfoundry.sipxconfig.common.SpecialUser" />
+
   <!-- DST change monitoring -->
   <bean id="checkDST" class="org.sipfoundry.sipxconfig.common.CheckDST"/>
 

@@ -205,12 +205,12 @@
   </bean>
 
   
-  <bean id="abstractDaoImpl" abstract="true">
+  <bean id="abstractDaoImpl" abstract="true" class="org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport">
     <property name="sessionFactory" ref="sessionFactory"/>
     <property name="daoEventPublisher" ref="daoEventPublisher"/>    
   </bean>
 
-  <bean id="abstractDao" abstract="true">
+  <bean id="abstractDao" abstract="true" class="org.springframework.dao.support.DaoSupport">
     <property name="interceptorNames">
       <list>
         <value>onDeleteAdvisor</value>

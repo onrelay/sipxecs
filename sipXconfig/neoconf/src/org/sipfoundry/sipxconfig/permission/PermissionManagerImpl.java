@@ -236,7 +236,11 @@ public class PermissionManagerImpl extends SipxHibernateDaoSupport<Permission> i
     }
 
     private Setting loadSettings() {
-        return m_modelFilesContext.loadModelFile("commserver/user-settings.xml");
+        Setting setting = m_modelFilesContext.loadModelFile("commserver/user-settings.xml");
+        if( setting == null ) {
+            throw new RuntimeException( "Unable to load user-settings.xml");
+        }
+        return setting;
     }
 
     public void setModelFilesContext(ModelFilesContext modelFilesContext) {

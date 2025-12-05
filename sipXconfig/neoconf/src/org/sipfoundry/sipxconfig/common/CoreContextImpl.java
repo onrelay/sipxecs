@@ -52,14 +52,12 @@ import org.sipfoundry.sipxconfig.setting.SettingDao;
 import org.sipfoundry.sipxconfig.setup.SetupListener;
 import org.sipfoundry.sipxconfig.setup.SetupManager;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 
 
-public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> implements CoreContext,
-       ApplicationContextAware, SetupListener {
+public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> implements CoreContext, SetupListener {
 
     public static final String ADMIN_GROUP_NAME = "administrators";
     public static final String CONTEXT_BEAN_NAME = "coreContextImpl";
@@ -117,7 +115,6 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
     private DomainManager m_domainManager;
     private SettingDao m_settingDao;
     private AliasManager m_aliasManager;
-    private ApplicationContext m_applicationContext;
     private JdbcTemplate m_jdbcTemplate;
     private boolean m_debug;
     private boolean m_setup;
@@ -169,11 +166,6 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
 
     public void setAliasManager(AliasManager aliasManager) {
         m_aliasManager = aliasManager;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        m_applicationContext = applicationContext;
     }
 
     @Override

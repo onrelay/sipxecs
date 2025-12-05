@@ -31,6 +31,10 @@
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao" />
   </bean>
 
+  <bean id="valueStorage" class="org.sipfoundry.sipxconfig.setting.ValueStorage" abstract="true" />
+
+  <bean id="group" class="org.sipfoundry.sipxconfig.setting.Group" parent="valueStorage" />
+
   <bean id="modelBuilderImpl" class="org.sipfoundry.sipxconfig.setting.XmlModelBuilder">
     <constructor-arg index="0" value="${sysdir.etc}" />
   </bean>

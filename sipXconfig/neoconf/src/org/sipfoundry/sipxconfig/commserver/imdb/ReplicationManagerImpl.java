@@ -59,7 +59,6 @@ import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import org.bson.Document;
@@ -78,8 +77,7 @@ import org.bson.conversions.Bson;
  * all the work load needed to replicate {@link Replicable}s in Mongo and
  * {@link ConfigurationFile}s on different locations.
  */
-public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> implements ReplicationManager, BeanFactoryAware,
-         ApplicationContextAware {
+public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> implements ReplicationManager, BeanFactoryAware {
     private static final Log LOG = LogFactory.getLog(ReplicationManagerImpl.class);
     private static final String REPLICATION_FAILED = "Replication: insert/update failed - ";
     private static final String REPLICATION_FAILED_REMOVE = "Replication: delete failed - ";
@@ -113,7 +111,6 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> impl
     private int m_nThreads = 2;
     private boolean m_useDynamicPageSize;
     private DataSet m_dataSet;
-    private ApplicationContext m_applicationContext;
     private PhoneContext m_phoneContext;
 
     private final Closure<User> m_userClosure = new Closure<User>() {
@@ -318,7 +315,7 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> impl
             replicateEntity(extalias);
             m_auditLogContext.logReplicationMongo(DATABASE_REGENERATION, primary);
         } finally {
-            m_applicationContext.publishEvent(new MongoGenerationFinishedEvent(this));
+            getApplicationContext().publishEvent(new MongoGenerationFinishedEvent(this));
         }
 
     }
@@ -831,11 +828,6 @@ public class ReplicationManagerImpl extends SipxHibernateDaoSupport<Object> impl
 
     public void setImdb(MongoTemplate imdb) {
         m_imdb = imdb;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        m_applicationContext = applicationContext;
     }
 
     public void setPhoneContext(PhoneContext phoneContext) {

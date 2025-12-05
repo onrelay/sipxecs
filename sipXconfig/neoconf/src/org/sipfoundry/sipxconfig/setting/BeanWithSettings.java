@@ -29,7 +29,7 @@ public abstract class BeanWithSettings extends BeanWithId {
     }
 
     protected void initializeSettingModel() {
-        setSettingModel(new BeanWithSettingsModel(this));
+        m_model = new BeanWithSettingsModel(this);
     }
 
     /**
@@ -39,15 +39,15 @@ public abstract class BeanWithSettings extends BeanWithId {
         // default implementation empty
     }
 
-    protected void setSettingModel(BeanWithSettingsModel model) {
+    protected synchronized void setSettingModel(BeanWithSettingsModel model) {
         m_model = model;
     }
 
-    protected BeanWithSettingsModel getSettingModel() {
+    protected synchronized BeanWithSettingsModel getSettingModel() {
         return m_model;
     }
 
-    public void addDefaultSettingHandler(SettingValueHandler handler) {
+    public synchronized void addDefaultSettingHandler(SettingValueHandler handler) {
         m_model.addDefaultsHandler(handler);
     }
 
@@ -58,36 +58,37 @@ public abstract class BeanWithSettings extends BeanWithId {
     /**
      * @return decorated model - use this to modify phone settings
      */
-    public Setting getSettings() {
+    public synchronized Setting getSettings() {
         if (m_settings != null) {
             return m_settings;
         }
-        setSettings(loadSettings());
+        m_settings = loadSettings();
+        m_model.setSettings(m_settings);
         initialize();
         return m_settings;
     }
 
     protected abstract Setting loadSettings();
 
-    public void setSettings(Setting settings) {
+    public synchronized void setSettings(Setting settings) {
         m_settings = settings;
         m_model.setSettings(m_settings);
     }
 
-    public void setValueStorage(Storage valueStorage) {
+    public synchronized void setValueStorage(Storage valueStorage) {
         m_valueStorage = valueStorage;
     }
 
-    public Storage getValueStorage() {
+    public synchronized Storage getValueStorage() {
         return m_valueStorage;
     }
 
-    protected synchronized Storage getInitializeValueStorage() {
+    public synchronized Storage getInitializeValueStorage() {
         if (m_valueStorage == null) {
-            setValueStorage(new ValueStorage());
+            m_valueStorage = new ValueStorage();
         }
 
-        return getValueStorage();
+        return m_valueStorage;
     }
 
     public String getSettingValue(String path) {
@@ -130,11 +131,11 @@ public abstract class BeanWithSettings extends BeanWithId {
         setting.setTypedValue(value);
     }
 
-    public void setModelFilesContext(ModelFilesContext modelFilesContext) {
+    public synchronized void setModelFilesContext(ModelFilesContext modelFilesContext) {
         m_modelFilesContext = modelFilesContext;
     }
 
-    public ModelFilesContext getModelFilesContext() {
+    public synchronized ModelFilesContext getModelFilesContext() {
         return m_modelFilesContext;
     }
 }
