@@ -26,7 +26,6 @@ import org.apache.tapestry.asset.AssetFactory;
  * Link that allows for downloading files from web server
  */
 public abstract class DartCode extends BaseComponent {
-    private static final String DART_JS = "packages/browser/dart.js";
 
     @Parameter(required = false, defaultValue = "literal:text/javascript")
     public abstract String getType();
@@ -40,19 +39,13 @@ public abstract class DartCode extends BaseComponent {
     public abstract TapestryContext getTapestryContext();
 
     public String getLink() {
-        IAsset asset;
-        // might have to exapnd this if we add dart libraries.
-        if (getSrc().endsWith(DART_JS)) {
-            setActualType(getType());
-            asset = getAssetFactory().createAbsoluteAsset(DART_JS, null, null);
-        } else {
-            setActualType("text/javascript");
-            String js = getSrc().replaceAll("\\.dart$", ".js");
-            String url = getPage().getLocation().getResource().getRelativeResource(js).getPath();
-            String jsPath = url.replaceFirst("/WEB-INF/", "");
-            asset = getAssetFactory().createAbsoluteAsset(jsPath, null, null);
-        }
 
+        setActualType("text/javascript");
+        String js = getSrc().replaceAll("\\.dart$", ".js");
+        String url = getPage().getLocation().getResource().getRelativeResource(js).getPath();
+        String jsPath = url.replaceFirst("/WEB-INF/", "");
+        IAsset asset = getAssetFactory().createAbsoluteAsset(jsPath, null, null);
+        
         // keep suffix ".dart" and dart java script will look for ".js"
         return asset.buildURL();
     }
