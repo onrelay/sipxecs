@@ -69,7 +69,7 @@ Change active java version to 1.8:
 
     alternatives --config java
     
-    => Select java-17-openjdk.x86_64 
+    => Select java-1.8.0-openjdk.x86_64 
 
 Reboot your system:
 
