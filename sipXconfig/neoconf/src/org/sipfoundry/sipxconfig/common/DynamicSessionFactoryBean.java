@@ -93,64 +93,62 @@ public class DynamicSessionFactoryBean extends HibernateConfigurationPlugin
 
 
     @Override
-public void afterPropertiesSet() {
+    public void afterPropertiesSet() {
 
-    try {
-        // Wrap datasource for Spring transaction awareness
-        TransactionAwareDataSourceProxy dsProxy = new TransactionAwareDataSourceProxy(m_dataSource);
-        m_hibernateProperties.put("hibernate.connection.datasource", dsProxy);
+        try {
+            // Wrap datasource for Spring transaction awareness
+            TransactionAwareDataSourceProxy dsProxy = new TransactionAwareDataSourceProxy(m_dataSource);
+            m_hibernateProperties.put("hibernate.connection.datasource", dsProxy);
 
-        StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
-                .applySettings(m_hibernateProperties)
-                .build();
+            StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+                    .applySettings(m_hibernateProperties)
+                    .build();
 
-       List<String> baseClassMappings = Arrays.asList(super.getMappingResources());
+            List<String> baseClassMappings = Arrays.asList(super.getMappingResources());
 
-        MetadataSources sources = new MetadataSources(registry);
-        for (String mapping : baseClassMappings ) {
-            sources.addResource(mapping);
-        }
+            MetadataSources sources = new MetadataSources(registry);
+            for (String mapping : baseClassMappings ) {
+                sources.addResource(mapping);
+            }
 
-        Map<String, HibernateConfigurationPlugin> plugins = m_beanFactory.getBeansOfType(HibernateConfigurationPlugin.class);
+            Map<String, HibernateConfigurationPlugin> plugins = m_beanFactory.getBeansOfType(HibernateConfigurationPlugin.class);
 
-        for (HibernateConfigurationPlugin plugin : plugins.values()) {
+            for (HibernateConfigurationPlugin plugin : plugins.values()) {
 
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-            for (String resource : plugin.getMappingResources()) {
+                for (String resource : plugin.getMappingResources()) {
 
-                if (!baseClassMappings.contains(resource)) { 
+                    if (!baseClassMappings.contains(resource)) { 
 
-                    try (InputStream is = new ClassPathResource(resource, cl).getInputStream()) {
-                        sources.addInputStream(is);
+                        try (InputStream is = new ClassPathResource(resource, cl).getInputStream()) {
+                            sources.addInputStream(is);
+                        }
                     }
                 }
             }
-        }
 
-        // Bind dynamic subclasses BEFORE building Metadata
-        for (String baseId : m_baseClassBeanIds) {
-            bindSubclasses(sources, baseId);
-        }
+            // Bind dynamic subclasses BEFORE building Metadata
+            for (String baseId : m_baseClassBeanIds) {
+                bindSubclasses(sources, baseId);
+            }
 
-        // Build metadata
-        Metadata metadata = sources.getMetadataBuilder().build();
+            // Build metadata
+            Metadata metadata = sources.getMetadataBuilder().build();
 
-        // Build SessionFactory with Spring-instantiator interceptor if present
-        SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-        try {
-            Interceptor interceptor = m_beanFactory.getBean("springInstantiator", Interceptor.class);
+            // Build SessionFactory with Spring-instantiator interceptor if present
+            SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
+            
+            Interceptor interceptor = m_beanFactory.getBean("indexingInterceptor", Interceptor.class);
+                
             sfb.applyInterceptor(interceptor);
-        } catch (Exception ignored) {
-            // allow missing interceptor
-        }
 
-        m_sessionFactory = sfb.build();
+            m_sessionFactory = sfb.build();
 
-    } catch (Exception ex) {
-        throw new RuntimeException(ex);
-    } 
-}
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        } 
+    }
     
 
 

@@ -23,10 +23,10 @@ import org.sipfoundry.sipxconfig.test.IntegrationTestCase;
 import org.springframework.context.ApplicationContext;
 import org.sipfoundry.sipxconfig.test.TestHelper;
 
-public class SpringHibernateInstantiatorTestIntegration
+public class SpringHibernateInterceptorTestIntegration
     extends IntegrationTestCase {
 
-    private SpringHibernateInstantiator m_instantiator;
+    private SpringHibernateInterceptor m_instantiator;
 
     /* This method is named init as the superclass has defined the
      * setUp method to be final.  Therefore, each test must explicitly
@@ -34,12 +34,13 @@ public class SpringHibernateInstantiatorTestIntegration
      */
     protected void init() throws Exception {
         ApplicationContext m_applicationContext = TestHelper.getApplicationContext();
-        m_instantiator = new SpringHibernateInstantiator();
+        m_instantiator = new SpringHibernateInterceptor();
         m_instantiator.setBeanFactory(m_applicationContext);
         // to make sure that test are valid
         assertTrue(m_applicationContext.getBeanNamesForType(Gateway.class).length > 1);
     }
 
+/* No longer supported by Hibernate
     public void testInstantiate() throws Exception {
         init();
         Integer id = Integer.valueOf(5);
@@ -62,9 +63,10 @@ public class SpringHibernateInstantiatorTestIntegration
         init();
         Integer id = Integer.valueOf(5);
         // there is a good chance we will not have StringUtils in beanFactory
-        Object bean = m_instantiator.instantiate(StringUtils.class, id);
+        Object bean = m_instantiator.onLoad(new String(), id);
         assertNull(bean);
-        Object bean2 = m_instantiator.instantiate(StringUtils.class, id);
+        Object bean2 = m_instantiator.onLoad(new String(), id);
         assertNull(bean2);
     }
+    */
 }

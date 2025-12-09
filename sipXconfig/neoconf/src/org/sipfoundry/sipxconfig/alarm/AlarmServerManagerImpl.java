@@ -83,7 +83,7 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
     }
 
     @Override
-    public AlarmGroup loadAlarmGroup(Serializable id) {
+    public AlarmGroup loadAlarmGroup(Object id) {
         return super.loadEntity(AlarmGroup.class, id);
     }
 

@@ -16,8 +16,6 @@
  */
 package org.sipfoundry.sipxconfig.common.profile;
 
-import java.io.Serializable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sipfoundry.commons.userdb.profile.UserProfile;
@@ -29,7 +27,7 @@ public class UserDecorator implements EntityDecorator {
     private static final Log LOG = LogFactory.getLog(UserDecorator.class);
     private UserProfileService m_userProfileService;
 
-    public void decorateEntity(Object entity, Serializable id) {
+    public void onLoad(Object entity, Object id) {
         if (entity instanceof User) {
             try {
                 User user = (User) entity;
@@ -48,10 +46,10 @@ public class UserDecorator implements EntityDecorator {
     }
 
     @Override
-    public void onSave(Object entity, Serializable id) {
+    public void onSave(Object entity, Object id) {
     }
 
     @Override
-    public void onDelete(Object entity, Serializable id) {
+    public void onDelete(Object entity, Object id) {
     }
 }

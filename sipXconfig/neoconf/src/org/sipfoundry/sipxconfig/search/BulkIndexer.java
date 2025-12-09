@@ -28,7 +28,7 @@ public class BulkIndexer implements Indexer {
 
     private IndexWriter m_writer;
 
-    public void indexBean(Object bean, Serializable id, Object[] state, String[] fieldNames,
+    public void indexBean(Object bean, Object id, Object[] state, String[] fieldNames,
             Type[] types, boolean newInstance_) {
         try {
             Document document = new Document();
@@ -42,7 +42,7 @@ public class BulkIndexer implements Indexer {
         }
     }
 
-    public void removeBean(Object bean_, Serializable id_) {
+    public void removeBean(Object bean_, Object id_) {
         throw new UnsupportedOperationException("only used to add new beans");
     }
 

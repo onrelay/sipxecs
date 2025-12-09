@@ -130,7 +130,7 @@ public class DefaultBeanAdaptor implements BeanAdaptor, BeanFactoryAware {
         m_indexedClasses = indexedClasses;
     }
 
-    public boolean documentFromBean(Document document, Object bean, Serializable id, Object[] state,
+    public boolean documentFromBean(Document document, Object bean, Object id, Object[] state,
             String[] fieldNames, Type[] types) {
         if (!indexClass(document, bean.getClass())) {
             return false;
@@ -212,7 +212,7 @@ public class DefaultBeanAdaptor implements BeanAdaptor, BeanFactoryAware {
         return false;
     }
 
-    private String getKeyword(Object bean, Serializable id) {
+    private String getKeyword(Object bean, Object id) {
         StringBuffer buffer = new StringBuffer();
         buffer.append(bean.getClass().getName());
         buffer.append(':');
@@ -220,7 +220,7 @@ public class DefaultBeanAdaptor implements BeanAdaptor, BeanFactoryAware {
         return buffer.toString();
     }
 
-    public Term getIdentityTerm(Object bean, Serializable id) {
+    public Term getIdentityTerm(Object bean, Object id) {
         return new Term(BeanWithId.ID_PROPERTY, getKeyword(bean, id));
     }
 

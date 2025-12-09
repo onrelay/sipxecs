@@ -150,8 +150,8 @@ public abstract class ActiveConferenceControl extends BaseComponent implements P
 
     public IPrimaryKeyConverter getConverter() {
         DataObjectSource< ? > source = new DataObjectSource<ActiveConferenceMember>() {
-            public ActiveConferenceMember load(Class<ActiveConferenceMember> c, Serializable serializable) {
-                return getMemberById((Integer) serializable);
+            public ActiveConferenceMember load(Class<ActiveConferenceMember> c, Object id) {
+                return getMemberById((Integer) id);
             }
         };
         ObjectSourceDataSqueezer squeezer = new ObjectSourceDataSqueezer();

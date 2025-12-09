@@ -41,13 +41,13 @@ public interface ConferenceBridgeContext extends AliasOwner {
 
     void removeConferences(Collection<Integer> conferencesIds);
 
-    Bridge loadBridge(Serializable serverId);
+    Bridge loadBridge(Object serverId);
 
     Bridge getBridgeByServer(String hostname);
 
     List<Conference> getAllConferences();
 
-    Conference loadConference(Serializable id);
+    Conference loadConference(Object id);
 
     Conference findConferenceByName(String name);
 

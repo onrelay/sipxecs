@@ -16,14 +16,12 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
-import java.io.Serializable;
-
 public interface EntityDecorator {
 
-    void decorateEntity(Object entity, Serializable id);
+    void onLoad(Object entity, Object id);
 
-    void onSave(Object entity, Serializable id);
+    void onSave(Object entity, Object id);
 
-    void onDelete(Object entity, Serializable id);
+    void onDelete(Object entity, Object id);
 
 }

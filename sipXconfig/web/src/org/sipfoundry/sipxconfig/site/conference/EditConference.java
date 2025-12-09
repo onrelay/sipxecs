@@ -68,7 +68,7 @@ public abstract class EditConference extends PageWithCallback implements PageBeg
 
     public abstract Serializable getConferenceId();
 
-    public abstract void setConferenceId(Serializable id);
+    public abstract void setConferenceId(Object id);
 
     @Persist("session")
     public abstract Conference getTransientConference();

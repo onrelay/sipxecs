@@ -16,20 +16,19 @@
  */
 package org.sipfoundry.sipxconfig.site.vm;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
 import org.sipfoundry.sipxconfig.vm.Voicemail;
 
 public class VoicemailSource {
-    private Map<Serializable, Voicemail> m_voicemails;
+    private Map<Object, Voicemail> m_voicemails;
 
-    public VoicemailSource(Map<Serializable, Voicemail> voicemails) {
+    public VoicemailSource(Map<Object, Voicemail> voicemails) {
         m_voicemails = voicemails;
     }
 
-    public Voicemail getVoicemail(Serializable voicemailId) {
+    public Voicemail getVoicemail(Object voicemailId) {
         return m_voicemails.get(voicemailId);
     }
 
@@ -37,7 +36,7 @@ public class VoicemailSource {
         return m_voicemails.values();
     }
 
-    public static Serializable getVoicemailId(Voicemail vm) {
+    public static Object getVoicemailId(Voicemail vm) {
         if (vm != null) {
             return vm.getUserId() + '/' + vm.getFolderId() + '/' + vm.getMessageId();
         }

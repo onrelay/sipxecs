@@ -9,7 +9,6 @@
  */
 package org.sipfoundry.sipxconfig.search;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,12 +17,12 @@ import org.hibernate.type.Type;
 
 public class BeanIndexProperties {
     private Object m_entity;
-    private Serializable m_id;
+    private Object m_id;
     private List<Object> m_state;
     private List<String> m_propertyNames;
     private List<Type> m_types;
 
-    BeanIndexProperties(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
+    BeanIndexProperties(Object entity, Object id, Object[] state, String[] propertyNames, Type[] types) {
         m_entity = entity;
         m_id = id;
         m_state = new ArrayList<Object>(Arrays.asList(state));
@@ -71,7 +70,7 @@ public class BeanIndexProperties {
         return m_entity;
     }
 
-    public Serializable getId() {
+    public Object getId() {
         return m_id;
     }
 }

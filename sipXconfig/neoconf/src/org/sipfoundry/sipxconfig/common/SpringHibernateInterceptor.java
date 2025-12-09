@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.beans.Introspector;
+
 
 import org.apache.commons.collections4.Transformer;
 import org.apache.commons.collections4.map.LazyMap;
@@ -25,17 +27,15 @@ import org.apache.commons.logging.LogFactory;
 
 import org.hibernate.CallbackException;
 import org.hibernate.Interceptor;
-import org.hibernate.SessionFactory;
 import org.hibernate.type.Type;
-import org.hibernate.metamodel.mapping.EntityMappingType;
-import org.hibernate.persister.entity.EntityPersister;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.metamodel.spi.MappingMetamodelImplementor;
 
-
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationContext;
 
 import org.sipfoundry.sipxconfig.common.event.HibernateEntityChangeProvider;
 import org.sipfoundry.sipxconfig.systemaudit.ConfigChangeAction;
@@ -47,10 +47,10 @@ import org.sipfoundry.sipxconfig.systemaudit.ConfigChangeAction;
  * Note: it inherits from IndexingInterceptor: only one interceptor can be registered with
  * hibernate session.
  */
-public class SpringHibernateInstantiator implements Interceptor, BeanFactoryAware {
-    private static final Log LOG = LogFactory.getLog(SpringHibernateInstantiator.class);
+public class SpringHibernateInterceptor implements Interceptor, BeanFactoryAware, ApplicationContextAware {
+    private static final Log LOG = LogFactory.getLog(SpringHibernateInterceptor.class);
     private ListableBeanFactory m_beanFactory;
-    private SessionFactory m_sessionFactory;
+    private ApplicationContext m_applicationContext;
     private Map<Class<?>,String> m_beanNamesCache;
     private Map<String, EntityDecorator> m_decorators;
     private Collection<HibernateEntityChangeProvider> m_hbEntityProviders;
@@ -59,33 +59,6 @@ public class SpringHibernateInstantiator implements Interceptor, BeanFactoryAwar
     private CopyOnWriteArraySet<HbEntity> m_updates = new CopyOnWriteArraySet<HbEntity>();
     private CopyOnWriteArraySet<HbEntity> m_deletes = new CopyOnWriteArraySet<HbEntity>();
 
-    /**
-     * This implementation only supports BeanWithId objects with integer ids
-     */
-    public Object instantiate(String entityName, Serializable id) {
-        SessionFactoryImplementor sfi = (SessionFactoryImplementor) m_sessionFactory;
-        MappingMetamodelImplementor metamodel = sfi.getMappingMetamodel();
-        EntityMappingType entityMapping = metamodel.getEntityDescriptor(entityName);
-        Class<?> clazz = entityMapping.getJavaType().getJavaTypeClass();
-        return instantiate(clazz, id);
-    }
-
-    Object instantiate(Class<?> clazz, Serializable id) {
-        String beanName = (String) m_beanNamesCache.get(clazz);
-        if (beanName == null) {
-            return null;
-        }
-
-        BeanWithId bean = m_beanFactory.getBean(beanName, BeanWithId.class);
-        bean.setId((Integer) id);
-
-        EntityDecorator decorator = getDecorator(clazz);
-        if (decorator != null) {
-            decorator.decorateEntity(bean, id);
-        }
-
-        return bean;
-    }
 
     private static class ClassToBeanName implements Transformer {
         private ListableBeanFactory m_beanFactory;
@@ -111,7 +84,34 @@ public class SpringHibernateInstantiator implements Interceptor, BeanFactoryAwar
         }
     }
 
-    public boolean onSave(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
+    @Override
+    public boolean onLoad(Object entity, Object id, Object[] state, String[] propertyNames, Type[] types) {
+
+        // Only Spring-inject objects that are defined as BeanWithId
+        if ( !(entity instanceof BeanWithId) ) {
+            return false;
+        }
+
+        if( !injectSpringDependencies( entity ) ) {
+            return false;
+        }
+
+        EntityDecorator decorator = getDecorator(entity);
+        if (decorator != null) {
+            decorator.onLoad(entity, id);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onSave(Object entity, Object id, Object[] state, String[] propertyNames, Type[] types) {
+        
+        // Only Spring-inject objects that are defined as BeanWithId
+        if ( !(entity instanceof BeanWithId) ) {
+            return false;
+        }
+        
         EntityDecorator decorator = getDecorator(entity);
         if (decorator != null) {
             decorator.onSave(entity, id);
@@ -120,7 +120,14 @@ public class SpringHibernateInstantiator implements Interceptor, BeanFactoryAwar
         return true;
     }
 
-    public void onDelete(Object entity, Serializable id, Object[] state, String[] propertyNames, Type[] types) {
+    @Override
+    public void onDelete(Object entity, Object id, Object[] state, String[] propertyNames, Type[] types) {
+       
+        // Only Spring-inject objects that are defined as BeanWithId
+        if ( !(entity instanceof BeanWithId) ) {
+            return;
+        }
+
         EntityDecorator decorator = getDecorator(entity);
         if (decorator != null) {
             decorator.onDelete(entity, id);
@@ -128,6 +135,7 @@ public class SpringHibernateInstantiator implements Interceptor, BeanFactoryAwar
         m_deletes.add(new HbEntity(entity, id, null, null, propertyNames, types, state));
 
     }
+
 
     private EntityDecorator getDecorator(Object entity) {
         return getDecorator(entity.getClass());
@@ -162,12 +170,15 @@ public class SpringHibernateInstantiator implements Interceptor, BeanFactoryAwar
         return m_beanFactory;
     }
 
-
-    public void setSessionFactory(SessionFactory sessionFactory) {
-        m_sessionFactory = sessionFactory;
+    public ApplicationContext getApplicationContext() {
+        return m_applicationContext;
     }
 
-    public boolean onFlushDirty(Object obj, Serializable id, Object[] newValues, Object[] oldValues,
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        m_applicationContext = applicationContext;
+    }
+
+    public boolean onFlushDirty(Object obj, Object id, Object[] newValues, Object[] oldValues,
             String[] properties, Type[] types) throws CallbackException {
         m_updates.add(new HbEntity(obj, id, newValues, oldValues, properties, types, null));
         return true;
@@ -221,4 +232,44 @@ public class SpringHibernateInstantiator implements Interceptor, BeanFactoryAwar
         }
         return m_hbEntityProviders;
     }
+
+    private <S> boolean injectSpringDependencies(S entity ) {
+                Class<?> klass = entity.getClass();
+
+        String beanName = null;
+
+        // Try exact bean name match by type
+        String[] beanNames = m_applicationContext.getBeanNamesForType(klass);
+
+        if (beanNames.length == 1) {
+            beanName = beanNames[0];
+        } 
+        else {
+
+            // Try simpleName decapitalized (standard Spring convention)
+            String conventionalName = Introspector.decapitalize(klass.getSimpleName());
+
+            if (m_applicationContext.containsBean(conventionalName)) {
+                beanName = conventionalName;
+            } 
+            else {
+                // Try fully qualified class name 
+                String fqcnName = klass.getName(); 
+
+                if (m_applicationContext.containsBean(fqcnName)) {
+                    beanName = fqcnName;
+
+                } 
+                else {
+                    // No spring bean found
+                    return false;
+                }
+            }
+        }
+
+        m_applicationContext.getAutowireCapableBeanFactory().configureBean(entity, beanName);
+
+        return true;
+    }
+
 }

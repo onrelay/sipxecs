@@ -33,7 +33,7 @@ public class MoveVoicemailAction extends BulkGroupAction {
     }
 
     public void actionTriggered(IComponent arg0, IRequestCycle arg1) {
-        for (Serializable id : (Collection<Serializable>) getIds()) {
+        for (Object id : (Collection<Object>) getIds()) {
             Voicemail vm = m_source.getVoicemail(id);
             m_mgr.move(vm.getUserId(), vm, m_folderId);
         }

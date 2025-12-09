@@ -20,14 +20,14 @@ import org.hibernate.type.Type;
 
 public class HbEntity {
     private Object m_entity;
-    private Serializable m_id;
+    private Object m_id;
     private Object[] m_newValues;
     private Object[] m_oldValues;
     private String[] m_properties;
     private Type[] m_types;
     private Object[] m_state;
 
-    public HbEntity(Object entity, Serializable id, Object[] newValues, Object[] oldValues, String[] properties,
+    public HbEntity(Object entity, Object id, Object[] newValues, Object[] oldValues, String[] properties,
         Type[] types, Object[] state) {
         m_entity = entity;
         m_id = id;
@@ -40,7 +40,7 @@ public class HbEntity {
     public Object getEntity() {
         return m_entity;
     }
-    public Serializable getId() {
+    public Object getId() {
         return m_id;
     }
     public Object[] getNewValues() {

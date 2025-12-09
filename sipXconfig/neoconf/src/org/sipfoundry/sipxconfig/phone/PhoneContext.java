@@ -68,7 +68,7 @@ public interface PhoneContext extends DataObjectSource<Phone> {
 
     @SuppressWarnings("rawtypes")
     @Override
-    Phone load(Class c, Serializable id);
+    Phone load(Class c, Object id);
 
     void storePhone(Phone phone);
 

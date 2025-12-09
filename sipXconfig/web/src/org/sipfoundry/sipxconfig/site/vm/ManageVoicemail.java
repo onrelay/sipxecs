@@ -201,8 +201,8 @@ public abstract class ManageVoicemail extends UserBasePage implements IExternalP
     }
 
     public void delete() {
-        Collection<Serializable> allSelected = getSelections().getAllSelected();
-        for (Serializable id : allSelected) {
+        Collection<Object> allSelected = getSelections().getAllSelected();
+        for (Object id : allSelected) {
             Voicemail vm = getVoicemailSource().getVoicemail(id);
             getMailboxManager().delete(getLoadedUser().getUserName(), vm);
         }
@@ -279,7 +279,7 @@ public abstract class ManageVoicemail extends UserBasePage implements IExternalP
 
         VoicemailSource source = null;
         List<Voicemail> voicemails = Collections.emptyList();
-        Map<Serializable, Voicemail> voicemailMap = new LinkedHashMap<Serializable, Voicemail>();
+        Map<Object, Voicemail> voicemailMap = new LinkedHashMap<Object, Voicemail>();
         try {
             voicemails = mgr.getVoicemail(userId, getFolderId());
             for (Voicemail voicemail : voicemails) {

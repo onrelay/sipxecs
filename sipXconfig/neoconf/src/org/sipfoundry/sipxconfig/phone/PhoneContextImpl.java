@@ -263,7 +263,7 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
     }
 
     @Override
-    public Phone load(Class c, Serializable id) {
+    public Phone load(Class c, Object id) {
         return loadPhone( (Integer)id );
     }
 

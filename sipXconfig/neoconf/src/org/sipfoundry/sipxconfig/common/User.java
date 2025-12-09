@@ -264,7 +264,8 @@ public class User extends AbstractUser implements Replicable, IndexedBean {
     }
 
     public boolean isPhantom() {
-        return (Boolean) getSettingTypedValue(PHANTOM_USER);
+        Boolean isPhantom = (Boolean) getSettingTypedValue(PHANTOM_USER);
+        return isPhantom != null && isPhantom;
     }
 
     public void setPhantom(boolean phantom) {

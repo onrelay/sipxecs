@@ -18,7 +18,7 @@
     </property>  
   </bean>
 
-  <bean id="recording" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="recording" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="target" ref="recordingImpl"/>
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.recording.Recording"/>
   </bean>

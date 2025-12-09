@@ -36,7 +36,7 @@ public abstract class EditBridge extends PageWithCallback implements PageBeginRe
     public abstract Serializable getBridgeId();
 
     @Persist
-    public abstract void setBridgeId(Serializable id);
+    public abstract void setBridgeId(Object id);
 
     public abstract Bridge getBridge();
 

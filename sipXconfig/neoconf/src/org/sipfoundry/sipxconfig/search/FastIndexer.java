@@ -25,7 +25,7 @@ public class FastIndexer implements Indexer {
 
     private BeanAdaptor m_beanAdaptor;
 
-    public void indexBean(Object bean, Serializable id, Object[] state, String[] fieldNames,
+    public void indexBean(Object bean, Object id, Object[] state, String[] fieldNames,
             Type[] types, boolean newInstance) {
         Document document = new Document();
         if (!m_beanAdaptor.documentFromBean(document, bean, id, state, fieldNames, types)) {
@@ -37,7 +37,7 @@ public class FastIndexer implements Indexer {
         addBean(document);
     }
 
-    public void removeBean(Object bean, Serializable id) {
+    public void removeBean(Object bean, Object id) {
         // only remove beans that are index-able
         if (m_beanAdaptor.indexClass(new Document(), bean.getClass())) {
             internalRemoveBean(bean, id);
@@ -56,7 +56,7 @@ public class FastIndexer implements Indexer {
         }
     }
 
-    private synchronized void internalRemoveBean(Object bean, Serializable id) {
+    private synchronized void internalRemoveBean(Object bean, Object id) {
         IndexWriter writer = null;
         try {
             writer = m_indexSource.getWriter(false);

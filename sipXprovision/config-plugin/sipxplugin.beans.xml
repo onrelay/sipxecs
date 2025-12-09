@@ -7,7 +7,7 @@
     <property name="coreContext" ref="coreContext" />
   </bean>
 
-  <bean id="provision" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="provision" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="target" ref="provisionImpl"/>
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.provision.Provision"/>
   </bean>

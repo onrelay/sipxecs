@@ -127,7 +127,7 @@ public class PermissionManagerImpl extends SipxHibernateDaoSupport<Permission> i
         return null;
     }
 
-    public Permission load(Class<Permission> c, Serializable id) {
+    public Permission load(Class<Permission> c, Object id) {
         if (id instanceof String) {
             Map<String, Permission> builtInPermissions = getBuiltInCallPermissions();
             return builtInPermissions.get(id);

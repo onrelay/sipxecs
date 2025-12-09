@@ -29,9 +29,6 @@ import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.dao.support.DaoSupport;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationContext;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -59,7 +56,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
     private SessionFactory m_sessionFactory;
 
     private DaoEventPublisher m_daoEventPublisher;
-
+    
     private ApplicationContext m_applicationContext;
 
     public SipxHibernateDaoSupport() {
@@ -84,6 +81,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
     }
 
     public void setSessionFactory( SessionFactory sessionFactory ) {
+
         m_sessionFactory = sessionFactory;
     }
 
@@ -94,19 +92,17 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
     public void setApplicationContext(ApplicationContext applicationContext) {
         m_applicationContext = applicationContext;
     }
-
-    public T load(Class<T> klass, Serializable id) {
+    
+    public T load(Class<T> klass, Object id) {
         return loadEntity( klass, id );
     }
 
-    public <S extends Object> S loadEntity(Class<S> klass, Serializable id) {
+    public <S extends Object> S loadEntity(Class<S> klass, Object id) {
    
         S entity = getSessionFactory().fromTransaction( session -> {
 
             return session.byId(klass).load(id);
         });
-
-        injectSpringDependencies( entity, klass );    
 
         return entity;
     }
@@ -120,10 +116,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
                 cq.from(klass);
                 return session.createQuery(cq).getResultList();
             });
-
-            for( S entity : allEntities ) {
-                injectSpringDependencies( entity, klass );    
-            }
             
             return allEntities;
 
@@ -133,7 +125,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         }
     }
 
-    public <S extends Object> S findEntity(Class<S> klass, Serializable id) {
+    public <S extends Object> S findEntity(Class<S> klass, Object id) {
 
         S entity = getSessionFactory().fromTransaction( session -> {
 
@@ -144,8 +136,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
                 return null;
             }
         });
-
-        injectSpringDependencies( entity, klass );    
 
         return entity;
     }
@@ -302,12 +292,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             }
         });
 
-        if( entities != null ) {
-            for( S entity : entities ) {
-                injectSpringDependencies( entity, resultClass );                 
-            }
-        }
-
         return entities;
     }
 
@@ -345,12 +329,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             }
         });
 
-        if( entities != null ) {
-            for( S entity : entities ) {
-                injectSpringDependencies( entity, resultClass );                               
-            }
-        }
-
         return entities;
     }
 
@@ -380,11 +358,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             }
         });
 
-        if( entities != null ) {
-            for( S entity : entities ) {
-                injectSpringDependencies( entity, resultClass );                                
-            }
-        }
         return entities;
     }
 
@@ -485,12 +458,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
                 return new ArrayList<T>();
             }
         });
-
-        if( beans != null ) {
-            for( T bean : beans ) {
-                injectSpringDependencies( bean, beanClass );                               
-            }
-        }
 
         return beans;
     }
@@ -600,46 +567,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         }
     }
 
-    protected <S> void injectSpringDependencies(S entity, Class<S> klass) {
-
-        // Only Spring-inject objects that are defined as BeanWithId
-        if (!BeanWithId.class.isAssignableFrom(klass)) {
-            return;
-        }
-
-        String beanName = null;
-
-        // Try exact bean name match by type
-        String[] beanNames = m_applicationContext.getBeanNamesForType(klass);
-
-        if (beanNames.length == 1) {
-            beanName = beanNames[0];
-        } 
-        else {
-
-            // Try simpleName decapitalized (standard Spring convention)
-            String conventionalName = Introspector.decapitalize(klass.getSimpleName());
-
-            if (m_applicationContext.containsBean(conventionalName)) {
-                beanName = conventionalName;
-            } 
-            else {
-                // Try fully qualified class name 
-                String fqcnName = klass.getName(); 
-
-                if (m_applicationContext.containsBean(fqcnName)) {
-                    beanName = fqcnName;
-
-                } 
-                else {
-                    // No spring bean found
-                    return;
-                }
-            }
-        }
-
-        m_applicationContext.getAutowireCapableBeanFactory().configureBean(entity, beanName);
-    }
 
     protected Storage clearUnsavedValueStorage(Storage storage) {
         // requirement, otherwise you wouldn't be calling this function
@@ -702,7 +629,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
         public Object doInSession(Session session) {
             Class<?> entityClass = m_object.getClass();
-            Serializable id = (Serializable) m_object.getPrimaryKey();
+            Object id = (Serializable) m_object.getPrimaryKey();
 
             Object dbObject = session.byId(entityClass).load(id);
             if (dbObject == null) {

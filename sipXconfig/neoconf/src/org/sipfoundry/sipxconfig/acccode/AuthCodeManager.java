@@ -34,5 +34,5 @@ public interface AuthCodeManager extends DataObjectSource<AuthCode>, AliasOwner 
 
     AuthCode newAuthCode();
 
-    AuthCode load(Class<AuthCode> c, Serializable id);
+    AuthCode load(Class<AuthCode> c, Object id);
 }

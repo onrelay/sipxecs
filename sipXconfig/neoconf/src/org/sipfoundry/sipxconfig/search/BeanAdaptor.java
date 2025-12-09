@@ -9,8 +9,6 @@
  */
 package org.sipfoundry.sipxconfig.search;
 
-import java.io.Serializable;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
 import org.hibernate.type.Type;
@@ -20,10 +18,10 @@ public interface BeanAdaptor {
     /**
      * @return true if the document should be added to index
      */
-    boolean documentFromBean(Document document, Object bean, Serializable id, Object[] state,
+    boolean documentFromBean(Document document, Object bean, Object id, Object[] state,
             String[] fieldNames, Type[] types);
 
-    Term getIdentityTerm(Object bean, Serializable id);
+    Term getIdentityTerm(Object bean, Object id);
 
     Identity getBeanIdentity(Document document);
 
@@ -38,16 +36,16 @@ public interface BeanAdaptor {
 
     public static class Identity<T> {
         private Class<T> m_klass;
-        private Serializable m_id;
+        private Object m_id;
         private String m_name;
         private String m_description;
 
-        public Identity(Class<T> klass, Serializable id) {
+        public Identity(Class<T> klass, Object id) {
             m_klass = klass;
             m_id = id;
         }
 
-        public Serializable getBeanId() {
+        public Object getBeanId() {
             return m_id;
         }
 

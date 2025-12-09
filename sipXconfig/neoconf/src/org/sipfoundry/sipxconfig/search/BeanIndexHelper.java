@@ -9,36 +9,28 @@
  */
 package org.sipfoundry.sipxconfig.search;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.sipfoundry.sipxconfig.phone.Phone;
-import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 
 
-public class BeanIndexHelper extends SipxHibernateDaoSupport<Object> {
+public class BeanIndexHelper  {
     private static final String BEAN_ID = "beanId";
 
-    public void setupIndexProperties(BeanIndexProperties beanIndexProperties, boolean loadObjectFromSession) {
+    public void setupIndexProperties(BeanIndexProperties beanIndexProperties) {
         Object entity = beanIndexProperties.getEntity();
-        Serializable id = beanIndexProperties.getId();
+        Object id = beanIndexProperties.getId();
         List<String> propertyNames = beanIndexProperties.getPropertyNamesList();
         List<Object> state = beanIndexProperties.getStateList();
 
-        modifyPhoneBeans(entity, id, propertyNames, state, loadObjectFromSession);
+        modifyPhoneBeans(entity, id, propertyNames, state);
     }
 
     // Replace the beanId in Phone class with the phone's model label that's
     // shown in the UI
-    private void modifyPhoneBeans(Object entity, Serializable id, List<String> propertyNames, List<Object> state,
-            boolean loadFromSession) {
+    private void modifyPhoneBeans(Object entity, Object id, List<String> propertyNames, List<Object> state ) {
         if (null != entity && entity instanceof Phone) {
-            Phone phone = null;
-            if (loadFromSession) {
-                phone = (Phone) super.findEntity(Phone.class, id);
-            } else {
-                phone = (Phone) entity;
-            }
+            Phone phone = (Phone) entity;
             if (propertyNames.contains(BEAN_ID)) {
                 int propertyIndex = propertyNames.indexOf(BEAN_ID);
                 state.set(propertyIndex, phone.getModelLabel());

@@ -49,7 +49,7 @@ public interface AlarmServerManager {
 
     boolean removeAlarmGroups(Collection<Integer> groupsIds, List<Alarm> alarms);
 
-    AlarmGroup loadAlarmGroup(Serializable id);
+    AlarmGroup loadAlarmGroup(Object id);
 
     AlarmGroup getAlarmGroupById(Integer alarmGroupId);
 

@@ -62,7 +62,7 @@ public abstract class EditFirewallServerGroups extends BaseComponent implements 
 
     public void delete() {
         Collection<Serializable> allSelected = getSelections().getAllSelected();
-        for (Serializable id : allSelected) {
+        for (Object id : allSelected) {
             ServerGroup group = getFirewallManager().getServerGroup((Integer) id);
             getFirewallManager().deleteServerGroup(group);
         }

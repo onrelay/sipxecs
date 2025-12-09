@@ -26,7 +26,7 @@ public class VoicemailSqueezer implements IPrimaryKeyConverter {
     }
 
     public Object getValue(Object arg0) {
-        Voicemail vm = m_source.getVoicemail((Serializable) arg0);
+        Voicemail vm = m_source.getVoicemail( arg0);
         return vm;
     }
 }

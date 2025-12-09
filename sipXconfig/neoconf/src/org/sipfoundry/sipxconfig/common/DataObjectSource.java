@@ -9,13 +9,11 @@
  */
 package org.sipfoundry.sipxconfig.common;
 
-import java.io.Serializable;
-
 /**
  * Support common data object marshalling
  */
 public interface DataObjectSource<T> {
 
     /** Read object from data source by class and object id */
-    public T load(Class<T> c, Serializable serializable);
+    public T load(Class<T> c, Object id);
 }

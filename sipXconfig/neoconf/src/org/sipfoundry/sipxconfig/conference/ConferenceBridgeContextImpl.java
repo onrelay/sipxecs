@@ -131,7 +131,7 @@ public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Confere
     public void removeConferences(Collection<Integer> conferencesIds) {
         Set<Bridge> bridges = new HashSet<Bridge>();
         for (Iterator<Integer> i = conferencesIds.iterator(); i.hasNext();) {
-            Serializable id = i.next();
+            Object id = i.next();
             Conference conference = loadConference(id);
             getDaoEventPublisher().publishDelete(conference);
             Bridge bridge = conference.getBridge();
@@ -144,7 +144,7 @@ public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Confere
         super.flush();
     }
 
-    public Bridge loadBridge(Serializable id) {
+    public Bridge loadBridge(Object id) {
         return super.loadEntity(Bridge.class, id);
     }
 
@@ -171,7 +171,7 @@ public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Confere
         return bridgeForServer;
     }
 
-    public Conference loadConference(Serializable id) {
+    public Conference loadConference(Object id) {
         return super.loadEntity(Conference.class, id);
     }
 
