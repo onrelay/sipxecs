@@ -198,7 +198,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/smack-tcp-4.4.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smartgwt-jakarta-14.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smartgwt-skins-14.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/snmp4j-2.0.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/snmp4j-3.9.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smtp-2.0.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-aop-6.2.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-beans-6.2.6.jar"/>
