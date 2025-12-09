@@ -5,7 +5,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
                       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
-  <bean id="firewallManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="firewallManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.firewall.FirewallManager</value>
     </property>
@@ -14,7 +14,7 @@
     </property>
   </bean>
 
-  <bean id="firewallManagerImpl" class="org.sipfoundry.sipxconfig.firewall.FirewallManagerImpl" parent="abstractDaoImpl">
+  <bean id="firewallManagerImpl" class="org.sipfoundry.sipxconfig.firewall.FirewallManagerImpl" parent="daoSupport">
     <property name="settingsDao">
       <bean parent="beanWithSettingsDao">
         <property name="target">
@@ -38,7 +38,7 @@
     <property name="callRateManager" ref="callRateManager"/>
   </bean>
 
-  <bean id="callRateManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="callRateManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.firewall.CallRateManager</value>
     </property>
@@ -47,7 +47,7 @@
     </property>
   </bean>
 
-  <bean id="callRateManagerImpl" class="org.sipfoundry.sipxconfig.firewall.CallRateManagerImpl" parent="abstractDaoImpl">
+  <bean id="callRateManagerImpl" class="org.sipfoundry.sipxconfig.firewall.CallRateManagerImpl" parent="daoSupport">
     <property name="jdbc" ref="configJdbcTemplate"/>
   </bean>
   

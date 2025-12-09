@@ -5,14 +5,14 @@
     - F O R W A R D I N G  C O N T E X T
   -->
 
-  <bean id="forwardingContextImpl" class="org.sipfoundry.sipxconfig.forwarding.ForwardingContextImpl" parent="abstractDaoImpl">
+  <bean id="forwardingContextImpl" class="org.sipfoundry.sipxconfig.forwarding.ForwardingContextImpl" parent="daoSupport">
     <property name="coreContext" ref="coreContext" />
     <property name="configJdbcTemplate" ref="configJdbcTemplate" />
     <property name="sipxReplicationContext" ref="sipxReplicationContextImpl" />
     <property name="configManager" ref="configManager" />
   </bean>
 
-  <bean id="forwardingContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="forwardingContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.forwarding.ForwardingContext" />
     <property name="target">
       <ref bean="forwardingContextImpl" />

@@ -27,7 +27,7 @@
     </property>
   </bean>
 
-  <bean id="cdrManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="cdrManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="target" ref="cdrManagerImpl"/>
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.cdr.CdrManager"/>
   </bean>

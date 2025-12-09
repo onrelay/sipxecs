@@ -16,7 +16,7 @@
     <property name="modelSource" ref="phoneModelSource" />
   </bean>
 
-  <bean id="phoneContextImpl" class="org.sipfoundry.sipxconfig.phone.PhoneContextImpl" parent="abstractDaoImpl">
+  <bean id="phoneContextImpl" class="org.sipfoundry.sipxconfig.phone.PhoneContextImpl" parent="daoSupport">
     <property name="settingDao" ref="settingDaoImpl" />
     <property name="coreContext" ref="coreContext" />
     <property name="systemDirectory" value="${sysdir.etc}" />
@@ -28,7 +28,7 @@
     <property name="configJdbcTemplate" ref="configJdbcTemplate" />
   </bean>
 
-  <bean id="phoneContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao" depends-on="phoneContextImpl">
+  <bean id="phoneContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport" depends-on="phoneContextImpl">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.phone.PhoneContext"/>
     <property name="target" ref="phoneContextImpl"/>
   </bean>
@@ -37,7 +37,7 @@
     <property name="phoneContext" ref="phoneContext" />
   </bean>
 
-  <bean id="phoneRestartManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="phoneRestartManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.device.RestartManager" />
     <property name="target" ref="phoneRestartManagerImpl" />
   </bean>
@@ -51,7 +51,7 @@
     <property name="executorService" ref="restartExecutorService" />
   </bean>
 
-  <bean id="eagerPhoneProfileManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="eagerPhoneProfileManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.device.ProfileManager" />
     <property name="target" ref="eagerPhoneProfileManagerImpl" />
   </bean>
@@ -67,7 +67,7 @@
     <property name="systemAuditManager" ref="systemAuditManager" />
   </bean>
 
-  <bean id="phoneProfileManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="phoneProfileManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.device.ProfileManager" />
     <property name="target" ref="phoneProfileManagerImpl" />
   </bean>

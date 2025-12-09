@@ -2,12 +2,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   
-  <bean id="abstractMailboxManager" abstract="true">
+  <bean id="abstractMailboxManager" class="org.sipfoundry.sipxconfig.vm.AbstractMailboxManager" abstract="true" parent="daoSupport">
     <property name="coreContext" ref="coreContext" />
     <property name="addressManager" ref="addressManager" />
     <property name="featureManager" ref="featureManager" />
     <property name="locationsManager" ref="locationsManager"/>
-    <property name="sessionFactory" ref="sessionFactory" />
   </bean>
 
   <bean id="xpathTemplate" class="org.springframework.xml.xpath.Jaxp13XPathTemplate"/>
@@ -19,7 +18,7 @@
     <property name="coreContext" ref="coreContext"/>
   </bean>
 
-  <bean id="mailboxManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="mailboxManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.vm.MailboxManager</value>
     </property>

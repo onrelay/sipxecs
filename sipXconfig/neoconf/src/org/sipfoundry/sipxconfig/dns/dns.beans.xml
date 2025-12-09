@@ -8,7 +8,7 @@
     <property name="sbcManager" ref="sbcManager"/>
   </bean>
   
-  <bean id="dnsManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="dnsManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.dns.DnsManager" />
     <property name="target" ref="dnsManagerImpl"/>
   </bean>
@@ -50,7 +50,7 @@
     <property name="domainManager" ref="domainManager"/>
   </bean>
 
-  <bean id="dnsTestContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="dnsTestContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.dns.DnsTestContext" />
     <property name="target" ref="dnsTestContextImpl" />
   </bean>

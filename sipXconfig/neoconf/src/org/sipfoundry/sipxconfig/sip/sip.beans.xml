@@ -38,7 +38,7 @@
     <property name="coreContext" ref="coreContext" />
   </bean>
 
-  <bean id="sip" class="org.springframework.aop.framework.ProxyFactoryBean">
+  <bean id="sip" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.sip.SipService" />
     <property name="target" ref="sipImpl" />
     <property name="interceptorNames">

@@ -11,20 +11,20 @@
     <property name="modelFilesContext" ref="modelFilesContext"/>
   </bean>
 
-  <bean id="pagingFeatureContextImpl" class="org.sipfoundry.sipxconfig.paging.PagingFeatureContextImpl" parent="abstractDaoImpl">
+  <bean id="pagingFeatureContextImpl" class="org.sipfoundry.sipxconfig.paging.PagingFeatureContextImpl" parent="daoSupport">
     <property name="configManager" ref="configManager" />
     <property name="pagingContext" ref="pagingContext" />
     <property name="jdbc" ref="configJdbcTemplate"/> 
   </bean>
 
-  <bean id="pagingFeatureContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="pagingFeatureContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.paging.PagingFeatureContext" />
     <property name="target">
       <ref bean="pagingFeatureContextImpl" />
     </property>
   </bean>
 
-  <bean id="pagingContextImpl" class="org.sipfoundry.sipxconfig.paging.PagingContextImpl" parent="abstractDaoImpl">
+  <bean id="pagingContextImpl" class="org.sipfoundry.sipxconfig.paging.PagingContextImpl" parent="daoSupport">
     <property name="featureManager" ref="featureManager" />
     <property name="aliasManager" ref="aliasManager" />
     <property name="domainManager" ref="domainManager" />
@@ -40,7 +40,7 @@
     <property name="jdbc" ref="configJdbcTemplate"/> 
   </bean>
 
-  <bean id="pagingContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="pagingContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.paging.PagingContext" />
     <property name="target">
       <ref bean="pagingContextImpl" />

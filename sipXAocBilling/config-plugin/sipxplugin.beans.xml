@@ -2,7 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="iantAocBilling" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="iantAocBilling" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="target" ref="iantAocBillingImpl"/>
     <property name="proxyInterfaces" value="de.iant.iab.IantAocBilling"/>
   </bean>

@@ -3,7 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="ftpManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="ftpManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.ftp.FtpManager</value>
     </property>
@@ -12,7 +12,7 @@
     </property>
   </bean>
 
-  <bean id="ftpManagerImpl" class="org.sipfoundry.sipxconfig.ftp.FtpManagerImpl" parent="abstractDaoImpl">
+  <bean id="ftpManagerImpl" class="org.sipfoundry.sipxconfig.ftp.FtpManagerImpl" parent="daoSupport">
     <property name="settingsDao">
       <bean parent="beanWithSettingsDao">
         <property name="target">

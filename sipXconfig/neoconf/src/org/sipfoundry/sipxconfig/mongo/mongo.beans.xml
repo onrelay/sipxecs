@@ -7,7 +7,7 @@
     <property name="configFile" value="${sysdir.etc}/mongo-client.ini" />
   </bean>
   
-  <bean id="mongoManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="mongoManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="target" ref="mongoManagerImpl"/>
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.mongo.MongoManager"/>
   </bean>

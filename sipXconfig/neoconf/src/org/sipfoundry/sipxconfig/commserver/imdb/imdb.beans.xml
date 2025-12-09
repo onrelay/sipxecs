@@ -66,12 +66,12 @@
     <property name="musicOnHoldManager" ref="musicOnHoldManager" />
   </bean>
 
-  <bean id="replicationManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="replicationManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.commserver.imdb.ReplicationManager"/>
     <property name="target" ref="replicationManagerImpl"/>
   </bean>
 
-  <bean id="replicationManagerImpl" class="org.sipfoundry.sipxconfig.commserver.imdb.ReplicationManagerImpl" parent="abstractDaoImpl">
+  <bean id="replicationManagerImpl" class="org.sipfoundry.sipxconfig.commserver.imdb.ReplicationManagerImpl" parent="daoSupport">
     <property name="locationsManager" ref="locationsManager" />
     <property name="auditLogContext" ref="auditLogContext" />
     <property name="coreContext" ref="coreContext" />
@@ -81,9 +81,8 @@
     <property name="imdb" ref="imdb"/>
   </bean>
 
-  <bean id="replicationTrigger" class="org.sipfoundry.sipxconfig.commserver.imdb.ReplicationTrigger">
+  <bean id="replicationTrigger" class="org.sipfoundry.sipxconfig.commserver.imdb.ReplicationTrigger" parent="daoSupport">
     <property name="replicationManager" ref="replicationManagerImpl" />
-    <property name="sessionFactory" ref="sessionFactory" />
     <property name="configManager" ref="configManager" />
     <property name="featureManager" ref="featureManager" />
   </bean>

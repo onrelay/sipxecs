@@ -121,12 +121,12 @@
   <!--
     - D I A L P L A N  C O N T E X T
   -->
-  <bean id="dialPlanContextImpl" class="org.sipfoundry.sipxconfig.dialplan.DialPlanContextImpl" parent="abstractDaoImpl">
+  <bean id="dialPlanContextImpl" class="org.sipfoundry.sipxconfig.dialplan.DialPlanContextImpl" parent="daoSupport">
     <property name="aliasManager" ref="aliasManager" />
     <property name="auditLogContext" ref="auditLogContext" />
   </bean>
 
-  <bean id="dialPlanContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="dialPlanContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.dialplan.DialPlanContext" />
     <property name="target">
       <ref bean="dialPlanContextImpl" />
@@ -158,7 +158,7 @@
   <bean id="aaSettings" class="org.sipfoundry.sipxconfig.dialplan.attendant.AutoAttendantSettings" parent="settingsBean">
   </bean>
 
-  <bean id="autoAttendantManagerImpl" class="org.sipfoundry.sipxconfig.dialplan.AutoAttendantManagerImpl" parent="abstractDaoImpl">
+  <bean id="autoAttendantManagerImpl" class="org.sipfoundry.sipxconfig.dialplan.AutoAttendantManagerImpl" parent="daoSupport">
     <property name="aliasManager" ref="aliasManager" />
     <property name="settingDao" ref="settingDao" />
     <property name="mediaServer" ref="freeswitchMediaServer" />
@@ -174,7 +174,7 @@
     </property>
   </bean>
 
-  <bean id="autoAttendantManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="autoAttendantManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.dialplan.AutoAttendantManager" />
     <property name="target" ref="autoAttendantManagerImpl" />
   </bean>

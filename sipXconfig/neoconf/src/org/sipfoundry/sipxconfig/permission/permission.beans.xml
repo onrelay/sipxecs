@@ -3,14 +3,13 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="permissionManagerImpl" class="org.sipfoundry.sipxconfig.permission.PermissionManagerImpl"
-    parent="abstractDaoImpl">
+    parent="daoSupport">
     <property name="modelFilesContext" ref="modelFilesContext" />
     <property name="replicationManager" ref="replicationManagerImpl" />
     <property name="sipxReplicationContext" ref="sipxReplicationContextImpl" />
-    <property name="sessionFactory" ref="sessionFactory" />
   </bean>
 
-  <bean id="permissionManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="permissionManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>
         org.sipfoundry.sipxconfig.permission.PermissionManager

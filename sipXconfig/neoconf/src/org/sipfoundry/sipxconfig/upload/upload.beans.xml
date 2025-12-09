@@ -12,13 +12,13 @@
     <property name="modelSource" ref="nakedUploadSpecificationSource" />
   </bean>
 
-  <bean id="uploadManagerImpl" class="org.sipfoundry.sipxconfig.upload.UploadManagerImpl" parent="abstractDaoImpl">
+  <bean id="uploadManagerImpl" class="org.sipfoundry.sipxconfig.upload.UploadManagerImpl" parent="daoSupport">
     <property name="specificationSource" ref="nakedUploadSpecificationSource"/>
   </bean>
 
   <bean id="uploadManager"
     class="org.springframework.aop.framework.ProxyFactoryBean"
-    parent="abstractDao">
+    parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.upload.UploadManager</value>
     </property>

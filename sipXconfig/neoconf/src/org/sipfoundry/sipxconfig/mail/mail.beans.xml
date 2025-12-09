@@ -29,7 +29,7 @@
     </property>
   </bean>
 
-  <bean id="mailManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="mailManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.mail.MailManager"/>
     <property name="target" ref="mailManagerImpl" />
   </bean>

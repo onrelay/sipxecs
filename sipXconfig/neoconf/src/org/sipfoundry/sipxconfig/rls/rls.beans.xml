@@ -10,7 +10,7 @@
     <property name="validUsers" ref="validUsers" />
   </bean>
 
-  <bean id="rls" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="rls" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="target" ref="rlsImpl"/>
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.rls.Rls"/>
   </bean>

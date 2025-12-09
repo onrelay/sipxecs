@@ -2,11 +2,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   
-  <bean id="sbcManagerImpl" class="org.sipfoundry.sipxconfig.sbc.SbcManagerImpl" parent="abstractDaoImpl">
+  <bean id="sbcManagerImpl" class="org.sipfoundry.sipxconfig.sbc.SbcManagerImpl" parent="daoSupport">
     <property name="domainManager" ref="domainManager" />
   </bean>
 
-  <bean id="sbcManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="sbcManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.sbc.SbcManager" />
     <property name="target">
       <ref bean="sbcManagerImpl" />
@@ -33,12 +33,12 @@
     </property>
   </bean>
 
-  <bean id="sbcDeviceManagerImpl" class="org.sipfoundry.sipxconfig.sbc.SbcDeviceManagerImpl" parent="abstractDaoImpl">
+  <bean id="sbcDeviceManagerImpl" class="org.sipfoundry.sipxconfig.sbc.SbcDeviceManagerImpl" parent="daoSupport">
     <property name="sipXbridgeSbcModel" ref="sipXbridgeSbcModel" />
     <property name="auditLogContext" ref="auditLogContext" />
   </bean>
 
-  <bean id="sbcDeviceManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="sbcDeviceManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.sbc.SbcDeviceManager" />
     <property name="target" ref="sbcDeviceManagerImpl"/>
   </bean>
@@ -106,13 +106,12 @@
     <property name="sleepInterval" value="5000" />
   </bean>
 
-  <bean id="sbcMigrationContextImpl" class="org.sipfoundry.sipxconfig.sbc.SbcMigrationContextImpl">
-    <property name="sessionFactory" ref="sessionFactory" />
+  <bean id="sbcMigrationContextImpl" class="org.sipfoundry.sipxconfig.sbc.SbcMigrationContextImpl" parent="daoSupport">
     <property name="sbcDeviceManager" ref="sbcDeviceManager" />
     <property name="sbcModelSource" ref="nakedSbcModelSource" />
   </bean>
 
-  <bean id="sbcMigrationContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="sbcMigrationContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.sbc.SbcMigrationContext</value>
     </property>

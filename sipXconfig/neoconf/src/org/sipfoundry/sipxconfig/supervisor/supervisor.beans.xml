@@ -3,7 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="supervisor" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="supervisor" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.supervisor.Supervisor" />
     <property name="target" ref="supervisorImpl" />
   </bean>

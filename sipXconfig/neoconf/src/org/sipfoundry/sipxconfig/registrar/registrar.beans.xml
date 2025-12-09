@@ -11,7 +11,7 @@
     <property name="aliasManager" ref="aliasManager"/>
   </bean>
 
-  <bean id="registrar" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="registrar" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="target" ref="registrarImpl"/>
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.registrar.Registrar"/>
   </bean>

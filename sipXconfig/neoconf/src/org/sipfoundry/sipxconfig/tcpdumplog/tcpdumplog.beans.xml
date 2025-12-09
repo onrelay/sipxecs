@@ -4,7 +4,7 @@
 
   <bean id="tcpdumpLogSettings" class="org.sipfoundry.sipxconfig.tcpdumplog.TcpdumpLogSettings" parent="settingsBean"/>
 
-  <bean id="tcpdumpLog" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="tcpdumpLog" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="target" ref="tcpdumpLogImpl"/>
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.tcpdumplog.TcpdumpLog"/>
   </bean>

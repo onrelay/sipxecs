@@ -4,14 +4,14 @@
   <!--
     - I N T E R C O M   M A N A G E R   I M P L
   -->
-  <bean id="intercomManagerImpl" class="org.sipfoundry.sipxconfig.intercom.IntercomManagerImpl" parent="abstractDaoImpl">
+  <bean id="intercomManagerImpl" class="org.sipfoundry.sipxconfig.intercom.IntercomManagerImpl" parent="daoSupport">
     <property name="configManager" ref="configManager" />
   </bean>
 
   <!--
     - I N T E R C O M   M A N A G E R
   -->
-  <bean id="intercomManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="intercomManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.intercom.IntercomManager</value>
     </property>

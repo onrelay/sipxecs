@@ -5,7 +5,7 @@
   <bean id="proxySettings" class="org.sipfoundry.sipxconfig.proxy.ProxySettings" parent="settingsBean">
   </bean>
 
-  <bean id="proxyManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="proxyManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="target" ref="proxyManagerImpl"/>
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.proxy.ProxyManager"/>
   </bean>

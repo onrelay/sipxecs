@@ -2,10 +2,7 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   
-  <bean id="rowInserter" abstract="true">
+  <bean id="rowInserter" class="org.sipfoundry.sipxconfig.bulk.RowInserter" abstract="true" parent="daoSupport">
     <property name="jobContext" ref="jobContext" />
-    <property name="sessionFactory">
-      <ref bean="sessionFactory"/>
-    </property>
   </bean>
 </beans>

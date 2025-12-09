@@ -3,14 +3,14 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="apacheManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="apacheManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.apache.ApacheManager</value>
     </property>
     <property name="target" ref="apacheManagerImpl" />
   </bean>
 
-  <bean id="apacheManagerImpl" class="org.sipfoundry.sipxconfig.apache.ApacheManagerImpl" parent="abstractDaoImpl">
+  <bean id="apacheManagerImpl" class="org.sipfoundry.sipxconfig.apache.ApacheManagerImpl" parent="daoSupport">
     <property name="locationsManager" ref="locationsManager"/>
   </bean>
   

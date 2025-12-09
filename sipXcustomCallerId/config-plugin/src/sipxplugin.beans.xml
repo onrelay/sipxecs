@@ -4,7 +4,7 @@
   
   <bean id="customCallerIdHook" class="org.sipfoundry.sipxconfig.web.plugin.CustomCallerIdHook"/>
 
-  <bean id="customCallerIdManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="customCallerIdManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="target" ref="customCallerIdManagerImpl"/>
     <property name="proxyInterfaces" value="nl.telecats.customcid.CustomCallerIdManager"/>
   </bean>

@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="speedDialManager" class="org.springframework.aop.framework.ProxyFactoryBean"
-    parent="abstractDao">
+    parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.speeddial.SpeedDialManager</value>
     </property>
@@ -13,7 +13,7 @@
     </property>
   </bean>
 
-  <bean id="speedDialManagerImpl" class="org.sipfoundry.sipxconfig.speeddial.SpeedDialManagerImpl" parent="abstractDaoImpl">
+  <bean id="speedDialManagerImpl" class="org.sipfoundry.sipxconfig.speeddial.SpeedDialManagerImpl" parent="daoSupport">
     <property name="coreContext" ref="coreContext" />
     <property name="featureManager" ref="featureManager" />
     <property name="configManager" ref="configManager" />

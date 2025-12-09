@@ -4,7 +4,7 @@
   <!--
   - C O R E  C O N T E X T   I M P L
   -->
-  <bean id="coreContextImpl" class="org.sipfoundry.sipxconfig.common.CoreContextImpl" parent="abstractDaoImpl">
+  <bean id="coreContextImpl" class="org.sipfoundry.sipxconfig.common.CoreContextImpl" parent="daoSupport">
     <lookup-method name="newUser" bean="org.sipfoundry.sipxconfig.common.User"/>
     <lookup-method name="newInternalUser" bean="org.sipfoundry.sipxconfig.common.InternalUser"/>
     <lookup-method name="getUserProfileService" bean="userProfileService"/>
@@ -18,7 +18,7 @@
   <!--
   - C O R E  C O N T E X T
   -->
-  <bean id="coreContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="coreContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.common.CoreContext</value>
     </property>
@@ -41,13 +41,13 @@
   <!--
   - E X T E N S I O N  P O O L  C O N T E X T   I M P L
   -->
-  <bean id="extensionPoolContextImpl" class="org.sipfoundry.sipxconfig.common.ExtensionPoolContextImpl" parent="abstractDaoImpl">
+  <bean id="extensionPoolContextImpl" class="org.sipfoundry.sipxconfig.common.ExtensionPoolContextImpl" parent="daoSupport">
     <property name="coreContext" ref="coreContext"/>
   </bean>
   <!--
   - E X T E N S I O N  P O O L  C O N T E X T
   -->
-  <bean id="extensionPoolContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="extensionPoolContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.common.ExtensionPoolContext</value>
     </property>
@@ -77,7 +77,7 @@
     <property name="didService" ref="didService"/>
   </bean>
   
-  <bean id="didPoolContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="didPoolContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.common.DidPoolContext" />
     <property name="target" ref="didPoolContextImpl" />
   </bean>
@@ -100,7 +100,7 @@
     <property name="profiles" ref="profilesDb"/>
   </bean>
 
-  <bean id="org.sipfoundry.sipxconfig.common.User" class="org.sipfoundry.sipxconfig.common.User"
+  <bean id="org.sipfoundry.sipxconfig.common.AbstractUser" class="org.sipfoundry.sipxconfig.common.AbstractUser"
     scope="prototype" parent="beanWithSettings">
     <property name="modelFilesContext" ref="modelFilesContext"/>
     <property name="permissionManager" ref="permissionManager"/>
@@ -112,10 +112,14 @@
     <property name="timeManager" ref="ntpManager" />
   </bean>
 
-  <bean id="org.sipfoundry.sipxconfig.common.InternalUser" class="org.sipfoundry.sipxconfig.common.InternalUser"
-    scope="prototype" parent="org.sipfoundry.sipxconfig.common.User" />
+  <bean id="org.sipfoundry.sipxconfig.common.User" class="org.sipfoundry.sipxconfig.common.User"
+    scope="prototype" parent="org.sipfoundry.sipxconfig.common.AbstractUser" />
 
-  <bean id="org.sipfoundry.sipxconfig.common.SpecialUser" class="org.sipfoundry.sipxconfig.common.SpecialUser" />
+  <bean id="org.sipfoundry.sipxconfig.common.InternalUser" class="org.sipfoundry.sipxconfig.common.InternalUser"
+    scope="prototype" parent="org.sipfoundry.sipxconfig.common.AbstractUser" />
+
+  <bean id="org.sipfoundry.sipxconfig.common.SpecialUser" class="org.sipfoundry.sipxconfig.common.SpecialUser" 
+    scope="prototype" />
 
   <!-- DST change monitoring -->
   <bean id="checkDST" class="org.sipfoundry.sipxconfig.common.CheckDST"/>

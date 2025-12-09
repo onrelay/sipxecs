@@ -5,7 +5,7 @@
   <bean id="restServerSettings" class="org.sipfoundry.sipxconfig.restserver.RestServerSettings" parent="settingsBean">
   </bean>
 
-  <bean id="restServer" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="restServer" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="target" ref="restServerImpl"/>
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.restserver.RestServer"/>
   </bean>

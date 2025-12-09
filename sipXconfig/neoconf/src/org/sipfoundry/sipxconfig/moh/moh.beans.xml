@@ -9,14 +9,14 @@
     <property name="mohUser" value="~~mh~" />
   </bean>
 
-  <bean id="musicOnHoldManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="musicOnHoldManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.moh.MusicOnHoldManager" />
     <property name="target">
       <ref bean="musicOnHoldManagerImpl" />
     </property>
   </bean>
 
-  <bean id="groupMusicOnHoldManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="groupMusicOnHoldManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.moh.MusicOnHoldManager" />
     <property name="target">
       <ref bean="groupMusicOnHoldManagerImpl" />

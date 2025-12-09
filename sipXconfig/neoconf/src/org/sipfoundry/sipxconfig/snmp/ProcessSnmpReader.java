@@ -29,6 +29,7 @@ import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.Target;
+import org.snmp4j.mp.MessageProcessingModel;
 import org.snmp4j.TransportMapping;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.mp.SnmpConstants;
@@ -99,6 +100,10 @@ public class ProcessSnmpReader {
         snmp.listen();
 
         TableUtils tableUtils = new TableUtils(snmp, new PDUFactory() {
+            @Override
+            public PDU createPDU(MessageProcessingModel model) {
+                return new PDU();
+            }
             @Override
             public PDU createPDU(Target target) {
                 return new PDU();

@@ -16,7 +16,7 @@
     <property name="logDirectory" value="${sysdir.var}/upload/snmptrapd"/>
   </bean>
 
-  <bean id="alarmServerManagerImpl" class="org.sipfoundry.sipxconfig.alarm.AlarmServerManagerImpl" parent="abstractDaoImpl">
+  <bean id="alarmServerManagerImpl" class="org.sipfoundry.sipxconfig.alarm.AlarmServerManagerImpl" parent="daoSupport">
     <property name="locationsManager" ref="locationsManager" />    
     <property name="featureManager" ref="featureManager" />    
     <property name="sipxUser" value="${sysdir.user}" />
@@ -31,7 +31,7 @@
     </property>
   </bean>
 
-  <bean id="alarmServerManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="alarmServerManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.alarm.AlarmServerManager" />
     <property name="target" ref="alarmServerManagerImpl" />
   </bean>

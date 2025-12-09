@@ -10,12 +10,12 @@
     <property name="registrar" ref="registrar"/>
   </bean>
 
-  <bean id="parkOrbitContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="parkOrbitContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.parkorbit.ParkOrbitContext" />
     <property name="target" ref="parkOrbitContextImpl"/>
   </bean>
 
-  <bean id="parkOrbitContextImpl" class="org.sipfoundry.sipxconfig.parkorbit.ParkOrbitContextImpl" parent="abstractDaoImpl">
+  <bean id="parkOrbitContextImpl" class="org.sipfoundry.sipxconfig.parkorbit.ParkOrbitContextImpl" parent="daoSupport">
     <property name="aliasManager" ref="aliasManager" />
     <property name="settingDao" ref="settingDao"/>
     <property name="featureManager" ref="featureManager"/>

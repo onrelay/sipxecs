@@ -28,21 +28,25 @@
     <property name="beanAdaptor" ref="beanAdaptor"/>
   </bean>
 
+  <bean id="indexingInterceptor" class="org.sipfoundry.sipxconfig.search.IndexingInterceptor" >
+    <property name="indexer" ref="fastIndexer" />
+    <property name="beanIndexHelper" ref="beanIndexHelper"/>
+  </bean>
+
+
   <bean id="loadIndexingInterceptor" class="org.sipfoundry.sipxconfig.search.LoadIndexingInterceptor">
-    <property name="sessionFactory" ref="sessionFactory"/>
     <property name="indexer" ref="bulkIndexer"/>
     <property name="beanIndexHelper" ref="beanIndexHelper"/>
   </bean>
 
 
-  <bean id="indexManagerImpl" class="org.sipfoundry.sipxconfig.search.IndexManagerImpl">
-    <property name="sessionFactory" ref="sessionFactory"/>
+  <bean id="indexManagerImpl" class="org.sipfoundry.sipxconfig.search.IndexManagerImpl" parent="daoSupport">
     <property name="indexer" ref="bulkIndexer"/>
     <property name="beanAdaptor" ref="bulkBeanAdaptor"/>
   </bean>
 
   <bean id="indexManager" class="org.springframework.aop.framework.ProxyFactoryBean"
-    parent="abstractDao">
+    parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.search.IndexManager</value>
     </property>
@@ -62,8 +66,7 @@
     </property>
   </bean>
 
-  <bean id="beanIndexHelper" class="org.sipfoundry.sipxconfig.search.BeanIndexHelper">
-    <property name="sessionFactory" ref="sessionFactory"/>
+  <bean id="beanIndexHelper" class="org.sipfoundry.sipxconfig.search.BeanIndexHelper" >
   </bean>
 
   <bean id="searchableService" class="org.springframework.aop.framework.ProxyFactoryBean">

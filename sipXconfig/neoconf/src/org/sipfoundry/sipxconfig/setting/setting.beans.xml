@@ -7,11 +7,11 @@
     <property name="modelFilesContext" ref="modelFilesContext"/>    
   </bean>
 
-  <bean id="settingDaoImpl" class="org.sipfoundry.sipxconfig.setting.SettingDaoImpl" parent="abstractDaoImpl">
+  <bean id="settingDaoImpl" class="org.sipfoundry.sipxconfig.setting.SettingDaoImpl" parent="daoSupport">
     <property name="configJdbcTemplate" ref="configJdbcTemplate" />
   </bean>
 
-  <bean id="settingDao" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="settingDao" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.setting.SettingDao" />
     <property name="target" ref="settingDaoImpl"/>
   </bean>
@@ -24,10 +24,10 @@
     </property>
   </bean>
 
-  <bean id="beanWithSettingsDaoImpl" class="org.sipfoundry.sipxconfig.setting.BeanWithSettingsDaoImpl" abstract="true" parent="abstractDaoImpl">
+  <bean id="beanWithSettingsDaoImpl" class="org.sipfoundry.sipxconfig.setting.BeanWithSettingsDaoImpl" abstract="true" parent="daoSupport">
   </bean>
 
-  <bean id="beanWithSettingsDao" class="org.springframework.aop.framework.ProxyFactoryBean" abstract="true" parent="abstractDao">
+  <bean id="beanWithSettingsDao" class="org.springframework.aop.framework.ProxyFactoryBean" abstract="true" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.setting.BeanWithSettingsDao" />
   </bean>
 
@@ -39,7 +39,7 @@
     <constructor-arg index="0" value="${sysdir.etc}" />
   </bean>
 
-  <bean id="modelBuilder" class="org.springframework.aop.framework.ProxyFactoryBean">
+  <bean id="modelBuilder" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.setting.ModelBuilder" />
     <property name="target" ref="modelBuilderImpl" />
     <property name="interceptorNames">

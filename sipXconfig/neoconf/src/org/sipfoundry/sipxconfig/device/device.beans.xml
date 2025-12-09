@@ -41,7 +41,7 @@
   <bean id="restartExecutorService" class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean">
   </bean>
 
-  <bean id="timeZoneManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="timeZoneManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.device.TimeZoneManager</value>
     </property>
@@ -50,7 +50,7 @@
     </property>
   </bean>
 
-  <bean id="timeZoneManagerImpl" class="org.sipfoundry.sipxconfig.device.TimeZoneManagerImpl" parent="abstractDaoImpl">
+  <bean id="timeZoneManagerImpl" class="org.sipfoundry.sipxconfig.device.TimeZoneManagerImpl" parent="daoSupport">
   </bean>
 
   <bean id="timeZoneInit" class="org.sipfoundry.sipxconfig.device.TimeZoneInit">

@@ -4,7 +4,7 @@
   <bean id="ntpSettings" class="org.sipfoundry.sipxconfig.time.NtpSettings" scope="prototype" parent="settingsBean">
   </bean>
 
- <bean id="ntpManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+ <bean id="ntpManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.time.NtpManager" />
     <property name="target" ref="ntpManagerImpl"/>
   </bean>

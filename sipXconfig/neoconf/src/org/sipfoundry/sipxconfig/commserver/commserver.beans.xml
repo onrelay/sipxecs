@@ -7,13 +7,13 @@
 	<property name="fqdn" value="localhost"/>
   </bean>
 
-  <bean id="locationsManagerImpl" class="org.sipfoundry.sipxconfig.commserver.LocationsManagerImpl" parent="abstractDaoImpl">
+  <bean id="locationsManagerImpl" class="org.sipfoundry.sipxconfig.commserver.LocationsManagerImpl" parent="daoSupport">
     <property name="auditLogContext" ref="auditLogContext" />
     <property name="jdbc" ref="configJdbcTemplate"/>
     <property name="domainManager" ref="domainManager"/>
   </bean>
 
-  <bean id="locationsManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="locationsManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.commserver.LocationsManager</value>
     </property>
@@ -22,10 +22,10 @@
     </property>
   </bean>
   
-  <bean id="settingsWithLocationDaoImpl" class="org.sipfoundry.sipxconfig.commserver.SettingsWithLocationDaoImpl" abstract="true" parent="abstractDaoImpl">
+  <bean id="settingsWithLocationDaoImpl" class="org.sipfoundry.sipxconfig.commserver.SettingsWithLocationDaoImpl" abstract="true" parent="daoSupport">
   </bean>
   
-  <bean id="settingsWithLocationDao" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao" abstract="true">
+  <bean id="settingsWithLocationDao" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport" abstract="true">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.commserver.SettingsWithLocationDao"/>
   </bean>
   

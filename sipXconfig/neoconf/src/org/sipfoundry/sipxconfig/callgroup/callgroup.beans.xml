@@ -2,13 +2,13 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="callGroupContextImpl" class="org.sipfoundry.sipxconfig.callgroup.CallGroupContextImpl" parent="abstractDaoImpl">
+  <bean id="callGroupContextImpl" class="org.sipfoundry.sipxconfig.callgroup.CallGroupContextImpl" parent="daoSupport">
     <property name="coreContext" ref="coreContextImpl" />
     <property name="replicationContext" ref="sipxReplicationContextImpl" />
     <property name="aliasManager" ref="aliasManager" />
   </bean>
 
-  <bean id="callGroupContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="callGroupContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.callgroup.CallGroupContext" />
     <property name="target">
       <ref bean="callGroupContextImpl" />

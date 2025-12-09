@@ -5,11 +5,11 @@
   <!--
     - TLS Peer
   -->
-  <bean id="tlsPeerManagerImpl" class="org.sipfoundry.sipxconfig.tls.TlsPeerManagerImpl" parent="abstractDaoImpl">
+  <bean id="tlsPeerManagerImpl" class="org.sipfoundry.sipxconfig.tls.TlsPeerManagerImpl" parent="daoSupport">
     <property name="coreContext" ref="coreContext" />
   </bean>
 
-  <bean id="tlsPeerManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="tlsPeerManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.tls.TlsPeerManager" />
     <property name="target" ref="tlsPeerManagerImpl" />
   </bean>

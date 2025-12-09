@@ -8,7 +8,7 @@
     </property>
   </bean>
 
-  <bean id="backupManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="backupManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.backup.BackupManager"/>
     <property name="target" ref="backupManagerImpl" />
   </bean>
@@ -24,8 +24,7 @@
   <bean id="backupDbSettings" class="org.sipfoundry.sipxconfig.backup.BackupDbSettings" parent="settingsBean">    
   </bean>  
 
-  <bean id="backupManagerImpl" class="org.sipfoundry.sipxconfig.backup.BackupManagerImpl">
-    <property name="sessionFactory" ref="sessionFactory"/>
+  <bean id="backupManagerImpl" class="org.sipfoundry.sipxconfig.backup.BackupManagerImpl" parent="daoSupport">
     <property name="settingsDao">
       <bean parent="beanWithSettingsDao">
         <property name="target">

@@ -32,7 +32,7 @@
     </property>
   </bean>
 
-  <bean id="conferenceBridgeContextImpl" class="org.sipfoundry.sipxconfig.conference.ConferenceBridgeContextImpl" parent="abstractDaoImpl">
+  <bean id="conferenceBridgeContextImpl" class="org.sipfoundry.sipxconfig.conference.ConferenceBridgeContextImpl" parent="daoSupport">
     <property name="aliasManager" ref="aliasManager" />
     <property name="domainManager" ref="domainManager" />
   </bean>
@@ -41,7 +41,7 @@
     <property name="conferenceBridgeContext" ref="conferenceBridgeContext"/>
   </bean>
 
-  <bean id="conferenceBridgeContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="conferenceBridgeContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.conference.ConferenceBridgeContext" />
     <property name="target" ref="conferenceBridgeContextImpl" />
   </bean>
@@ -53,7 +53,7 @@
     </property>
   </bean>
 
-  <bean id="conferenceReplicationProvider" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="conferenceReplicationProvider" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.conference.ConferenceReplicationProvider" />
     <property name="target" ref="conferenceReplicationProviderImpl" />
   </bean>
@@ -71,8 +71,7 @@
     <property name="portAudioUrl" value="portaudio_stream://" />
   </bean>
 
-  <bean id="identity" class="org.sipfoundry.sipxconfig.conference.BridgeConferenceIdentityImpl">
-    <property name="sessionFactory" ref="sessionFactory" />
+  <bean id="identity" class="org.sipfoundry.sipxconfig.conference.BridgeConferenceIdentityImpl" parent="daoSupport">
   </bean>
 
 </beans>

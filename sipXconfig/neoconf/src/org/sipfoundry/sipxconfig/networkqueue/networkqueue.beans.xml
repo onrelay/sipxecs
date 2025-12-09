@@ -3,7 +3,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="networkQueueManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="networkQueueManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.networkqueue.NetworkQueueManager</value>
     </property>
@@ -12,7 +12,7 @@
     </property>
   </bean>
 
-  <bean id="networkQueueManagerImpl" class="org.sipfoundry.sipxconfig.networkqueue.NetworkQueueManagerImpl" parent="abstractDaoImpl">
+  <bean id="networkQueueManagerImpl" class="org.sipfoundry.sipxconfig.networkqueue.NetworkQueueManagerImpl" parent="daoSupport">
     <property name="settingsDao">
       <bean parent="beanWithSettingsDao">
         <property name="target">

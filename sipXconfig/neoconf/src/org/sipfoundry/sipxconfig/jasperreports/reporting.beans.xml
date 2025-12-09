@@ -2,13 +2,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
   
-  <bean id="jasperReportContextImpl" class="org.sipfoundry.sipxconfig.jasperreports.JasperReportContextImpl">
+  <bean id="jasperReportContextImpl" class="org.sipfoundry.sipxconfig.jasperreports.JasperReportContextImpl" parent="daoSupport">
     <property name="tmpDirectory" value="${sysdir.tmp}" />
-    <property name="sessionFactory" ref="sessionFactory" />
     <property name="reportsDirectory" value="${sysdir.var}/reports"/>
   </bean>
 
-  <bean id="jasperReportContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="jasperReportContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.jasperreports.JasperReportContext" />
     <property name="target">
       <ref bean="jasperReportContextImpl" />

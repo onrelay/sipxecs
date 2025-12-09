@@ -9,7 +9,7 @@
   <bean id="restletSpringBeanRouter" class="org.sipfoundry.sipxconfig.rest.SipxSpringBeanRouter" />
 
   <bean id="jsonMediaType" class="org.restlet.data.MediaType">
-	<constructor-arg type="java.lang.String" value="application/json"/>
+	  <constructor-arg type="java.lang.String" value="application/json"/>
   </bean>
 
   <bean id="jsonFormat" class="org.restlet.representation.Variant">
@@ -57,7 +57,7 @@
 
   <bean id="userPhonebookEntry" class="org.sipfoundry.sipxconfig.rest.UserPhonebookEntryResource" scope="prototype">
     <property name="coreContext" ref="coreContext" />
-	<property name="phonebookManager" ref="phonebookManager" />
+	  <property name="phonebookManager" ref="phonebookManager" />
     <property name="readable" value="true" />
     <property name="modifiable" value="true" />
   </bean>
@@ -72,7 +72,7 @@
 
   <bean id="showContactsOnPhone" class="org.sipfoundry.sipxconfig.rest.ShowContactsOnPhoneResource" scope="prototype">
     <property name="coreContext" ref="coreContext" />
-	<property name="phonebookManager" ref="phonebookManager" />
+	  <property name="phonebookManager" ref="phonebookManager" />
     <property name="available" value="false" />
     <property name="readable" value="false" />
   </bean>
@@ -271,10 +271,10 @@
   <alias name="contactInformationResource" alias="/my/contact-information" />
 
   <bean id="avatarResource" class="org.sipfoundry.sipxconfig.rest.UserAvatarResource" scope="prototype">
-	<property name="available" value="true" />
-	<property name="modifiable" value="false" />
-	<property name="readable" value="true" />
-	<property name="userAvatarService" ref="userProfileService" />
+    <property name="available" value="true" />
+    <property name="modifiable" value="false" />
+    <property name="readable" value="true" />
+    <property name="userAvatarService" ref="userProfileService" />
   </bean>
   <alias name="avatarResource" alias="/avatar/{user}" />
 

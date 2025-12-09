@@ -2,12 +2,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="featureManagerImpl" class="org.sipfoundry.sipxconfig.feature.FeatureManagerImpl" parent="abstractDaoImpl">
+  <bean id="featureManagerImpl" class="org.sipfoundry.sipxconfig.feature.FeatureManagerImpl" parent="daoSupport">
     <property name="jdbcTemplate" ref="configJdbcTemplate"/>
     <property name="locationsManager" ref="locationsManager"/>
   </bean>
 
-  <bean id="featureManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="featureManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.feature.FeatureManager"/>
     <property name="target" ref="featureManagerImpl"/>
   </bean>

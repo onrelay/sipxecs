@@ -5,7 +5,7 @@
   <bean id="aliasConflicterImpl" class="org.sipfoundry.sipxconfig.conference.DummyAliasConflicter">
   </bean>
 
-  <bean id="aliasConflicter" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="aliasConflicter" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.alias.AliasOwner</value>
     </property>

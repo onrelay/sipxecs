@@ -6,10 +6,10 @@
   - A L I A S  M A N A G E R
   -->
 
-  <bean id="aliasManagerImpl" class="org.sipfoundry.sipxconfig.alias.AliasManagerImpl" parent="abstractDaoImpl">
+  <bean id="aliasManagerImpl" class="org.sipfoundry.sipxconfig.alias.AliasManagerImpl" parent="daoSupport">
   </bean>
 
-  <bean id="aliasManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="aliasManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.alias.AliasManager</value>
     </property>

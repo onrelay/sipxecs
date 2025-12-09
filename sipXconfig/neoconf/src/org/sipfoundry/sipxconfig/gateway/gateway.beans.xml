@@ -46,12 +46,12 @@
   </bean>
 
   <!-- gateway context -->
-  <bean id="gatewayContextImpl" class="org.sipfoundry.sipxconfig.gateway.GatewayContextImpl" parent="abstractDaoImpl">
+  <bean id="gatewayContextImpl" class="org.sipfoundry.sipxconfig.gateway.GatewayContextImpl" parent="daoSupport">
     <property name="dialPlanContext" ref="dialPlanContext" />
     <property name="auditLogContext" ref="auditLogContext" />
   </bean>
 
-  <bean id="gatewayContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="gatewayContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.gateway.GatewayContext"/>
     <property name="target" ref="gatewayContextImpl" />
   </bean>
@@ -60,7 +60,7 @@
     <property name="gatewayContext" ref="gatewayContext" />
   </bean>
 
-  <bean id="gatewayRestartManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="gatewayRestartManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.device.RestartManager" />
     <property name="target" ref="gatewayRestartManagerImpl" />
   </bean>
@@ -72,7 +72,7 @@
     <property name="executorService" ref="restartExecutorService" />
   </bean>
 
-  <bean id="eagerGatewayProfileManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="eagerGatewayProfileManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.device.ProfileManager" />
     <property name="target" ref="eagerGatewayProfileManagerImpl" />
   </bean>
@@ -84,7 +84,7 @@
     <property name="systemAuditManager" ref="systemAuditManager" />
   </bean>
 
-  <bean id="gatewayProfileManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="gatewayProfileManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.device.ProfileManager" />
     <property name="target" ref="gatewayProfileManagerImpl" />
   </bean>
@@ -94,14 +94,13 @@
     <property name="sleepInterval" value="5000" />
   </bean>
 
-  <bean id="sipTrunkMigrationContextImpl" class="org.sipfoundry.sipxconfig.gateway.SipTrunkMigrationContextImpl">
+  <bean id="sipTrunkMigrationContextImpl" class="org.sipfoundry.sipxconfig.gateway.SipTrunkMigrationContextImpl" parent="daoSupport">
     <property name="gatewayContext" ref="gatewayContext" />
-    <property name="sessionFactory" ref="sessionFactory" />
     <property name="sbcDeviceManager" ref="sbcDeviceManager" />
     <property name="sbcModelSource" ref="nakedSbcModelSource" />
   </bean>
 
-  <bean id="sipTrunkMigrationContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="sipTrunkMigrationContext" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.gateway.SipTrunkMigrationContext</value>
     </property>

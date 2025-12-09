@@ -19,13 +19,12 @@
     <property name="mailboxManager" ref="mailboxManager" />
   </bean>
 
-  <bean id="bulkManagerImpl" class="org.sipfoundry.sipxconfig.bulk.csv.BulkManagerImpl">
-    <property name="sessionFactory" ref="sessionFactory" />
+  <bean id="bulkManagerImpl" class="org.sipfoundry.sipxconfig.bulk.csv.BulkManagerImpl" parent="daoSupport">
     <property name="csvParser" ref="csvParser" />
     <property name="rowInserter" ref="csvRowInserter" />
   </bean>
 
-  <bean id="bulkManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+  <bean id="bulkManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.bulk.csv.BulkManager</value>
     </property>
@@ -38,7 +37,7 @@
   </bean>
 
   <!-- used in tests only -->
-  <bean id="bulkManagerDao" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="bulkManagerDao" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.bulk.csv.BulkManager</value>
     </property>

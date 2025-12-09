@@ -8,7 +8,7 @@
          http://www.springframework.org/schema/task
          https://www.springframework.org/schema/task/spring-task.xsd">
 
-  <bean id="certificateManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="abstractDao">
+  <bean id="certificateManager" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
     <property name="proxyInterfaces">
       <value>org.sipfoundry.sipxconfig.cert.CertificateManager</value>
     </property>
