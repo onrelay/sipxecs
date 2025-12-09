@@ -121,7 +121,7 @@ public class CallbackExecutor {
         Thread.sleep(CallbackTimer.THREAD_WAIT_TIME);
 
         // bridge B and A legs
-        Set set = new Set(m_fsCmdSocket, calleeUUID, "ringback", "${us-ring}");
+        Set set = new Set(m_fsCmdSocket, calleeUUID, "ringback", "${us_ring}");
         set.start();
         BridgeCommand bridge = new BridgeCommand(m_fsCmdSocket, calleeUUID, m_callerUID, sipxchangeDomainName);
         bridge.start();

@@ -14,13 +14,13 @@
   </extension>
   <extension name="transferBridged">
     <condition field="destination_number" expression="^transferBridged(.*)$">
-      <action application="set" data="ringback=${us-ring}"/>
+      <action application="set" data="ringback=${us_ring}"/>
       <action application="bridge" data="{ignore_early_media=true}sofia/$${domain}/$1@$${domain}"/>
     </condition>
   </extension>
   <extension name="going-in">
     <condition>
-      <action application="set" data="ringback=${us-ring}"/>
+      <action application="set" data="ringback=${us_ring}"/>
       <action application="bridge" data="{api_on_answer='uuid_simplify ${uuid}'}sofia/ezuce.ro/${destination_number}@ezuce.ro"/>
     </condition>
   </extension>
