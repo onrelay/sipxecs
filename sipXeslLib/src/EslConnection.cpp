@@ -361,7 +361,7 @@ EslEvent::Ptr EslConnection::bridgeToUriWithRingback(
   arg << "sofia/" << sipProfile << "/" << uri;
 
   execute("set", "hangup_after_bridge=true");
-  execute("set", "ringback=${us-ring}");
+  execute("set", "ringback=${us_ring}");
 
   return execute("bridge", arg.str().c_str(), 0);
 }
