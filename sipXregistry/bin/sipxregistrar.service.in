@@ -1,6 +1,6 @@
 [Unit]
 Description=sipxregistrar
-Documentation=http://sipxcom.org
+Documentation=https://github.com/onrelay/sipxecs
 After=network.target syslog.target
 
 [Service]
