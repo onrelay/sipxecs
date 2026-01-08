@@ -90,9 +90,9 @@ public:
 
 	ConnectionInfo(const ConnectionInfo& rhs);
 
-  ConnectionInfo(const std::string& connectionString);
+  ConnectionInfo(const std::string& connectionUrl);
 
-  ConnectionInfo(const mongocxx::uri& connectionUri);
+  ConnectionInfo(const mongocxx::uri& connectionUrl);
 
 	ConnectionInfo(std::ifstream& configFile);
 
@@ -102,23 +102,14 @@ public:
 
   ConnectionInfo& operator=(const ConnectionInfo& conn);
 
-	/**
-	 * Read just the connection string from a file.
-	 *
-	 *
-	 * Example file contents:
-	 * ======================
-	 * sipxecs/localhost:27017,localhost:27018
-	 * ======================
-	 */
 	static ConnectionInfo globalInfo();
 	static ConnectionInfo localInfo();
 
-	static bool	testConnection(const mongocxx::uri& connectionUri, std::string& errmsg);
+	static bool	testConnection(const mongocxx::uri& connectionUrl, std::string& errmsg);
 
   const mongocxx::uri& getConnectionUri() const
 	{
-    return _connectionUri;
+    return _connectionUrl;
 	}
 	
 
@@ -140,7 +131,7 @@ public:
 
 	const bool isEmpty() const
 	{
-		return _connectionUri.to_string().empty();
+		return _connectionUrl.to_string().empty();
 	}
 
   const std::string& getClusterId() const
@@ -172,13 +163,12 @@ public:
 
 private:
 
-  mongocxx::uri _connectionUri; 
+  mongocxx::uri _connectionUrl; 
   std::int32_t _shard;
   bool _useReadTags;
   std::string _clusterId;
   std::int64_t _readQueryTimeoutMs;
   std::int64_t _writeQueryTimeoutMs;
-  std::string _rawConnectionString;
 };
 
 class MongoConnection {
@@ -186,9 +176,9 @@ class MongoConnection {
     // Constructor to initialize the client with connection info
     MongoConnection(const ConnectionInfo& connectionInfo);
 
-    MongoConnection(const std::string& connectionString);
+    MongoConnection(const std::string& connectionUrl);
 
-    MongoConnection(const mongocxx::uri& connectionUri);
+    MongoConnection(const mongocxx::uri& connectionUrl);
 
     // Getter for the raw mongocxx::client object
     mongocxx::client& client();

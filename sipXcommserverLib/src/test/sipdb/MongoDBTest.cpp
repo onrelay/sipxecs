@@ -5,51 +5,9 @@
 
 using namespace std;
 
-#define LOCALHOST_ADDR "127.0.0.1"
+#define LOCALHOST_ADDR "mongodb://127.0.0.1"
 #define DATABASE_NAME "test.BaseDBTest"
 #define FIELD_NAME "a"
-
-
-//class MongoDBTest: public CppUnit::TestCase
-//{
-//	CPPUNIT_TEST_SUITE(MongoDBTest);
-//	CPPUNIT_TEST(testReadHAConfig);
-//    CPPUNIT_TEST(testReadSingleConfig);
-//	CPPUNIT_TEST_SUITE_END();
-//
-//public:
-//
-//    void testReadSingleConfig()
-//    {
-//        try {
-//            mongo::ConnectionString s = MongoDB::ConnectionInfo::connectionStringFromFile(TEST_DATA_DIR "/sipxmongo-single-config");
-//            CPPUNIT_ASSERT_EQUAL(string("sipxecs"), s.getSetName());
-//            std::vector<mongo::HostAndPort> servers = s.getServers();
-//            CPPUNIT_ASSERT_EQUAL(1, (int) servers.size());
-//            mongo::HostAndPort first = servers.front();
-//            CPPUNIT_ASSERT_EQUAL(string("localhost"), first.host());
-//            CPPUNIT_ASSERT_EQUAL(27017, first.port());
-//        } catch (exception& e) {
-//            cout << e.what() << endl;
-//        }
-//    }
-//
-//	void testReadHAConfig()
-//	{
-//		mongo::ConnectionString s = MongoDB::ConnectionInfo::connectionStringFromFile(TEST_DATA_DIR "/sipxmongo-ha-config");
-//		CPPUNIT_ASSERT_EQUAL(string("sipxecs"), s.getSetName());
-//		std::vector<mongo::HostAndPort> servers = s.getServers();
-//		CPPUNIT_ASSERT_EQUAL(2, (int) servers.size());
-//		mongo::HostAndPort first = servers.front();
-//		CPPUNIT_ASSERT_EQUAL(string("localhost"), first.host());
-//		CPPUNIT_ASSERT_EQUAL(27017, first.port());
-//		mongo::HostAndPort second = servers.back();
-//		CPPUNIT_ASSERT_EQUAL(string("localhost"), second.host());
-//		CPPUNIT_ASSERT_EQUAL(27018, second.port());
-//	}
-//};
-//CPPUNIT_TEST_SUITE_REGISTRATION(MongoDBTest);
-
 
 class BaseDBTest: public CppUnit::TestCase
 {

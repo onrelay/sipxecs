@@ -29,11 +29,11 @@ MongoConnection::MongoConnection(const ConnectionInfo& connectionInfo) :
     MongoConnection( connectionInfo.getConnectionUri() ) {
 }
 
-MongoConnection::MongoConnection(const std::string& connectionString) :
-    MongoConnection(mongocxx::uri("mongodb://" + connectionString )) {
+MongoConnection::MongoConnection(const std::string& connectionUrl) :
+    MongoConnection(mongocxx::uri(connectionUrl )) {
 }
 
-MongoConnection::MongoConnection(const mongocxx::uri& connectionUri) {
+MongoConnection::MongoConnection(const mongocxx::uri& connectionUrl) {
 
     try {
         mongocxx::options::client clientOptions;
@@ -43,7 +43,7 @@ MongoConnection::MongoConnection(const mongocxx::uri& connectionUri) {
         clientOptions.server_api_opts(serverApi);
 
         // Initialize client
-        _ptr = std::make_unique<mongocxx::client>(connectionUri, clientOptions);
+        _ptr = std::make_unique<mongocxx::client>(connectionUrl, clientOptions);
     }
     catch (const mongocxx::exception& e) {
         throw MongoException(std::string("Failed to connect to MongoDB: ") + e.what());
@@ -122,14 +122,14 @@ mongocxx::collection MongoConnection::collection(const std::string& ns ) {
   {
   }
 
-bool ConnectionInfo::testConnection(const mongocxx::uri& connectionUri, std::string& errmsg)
+bool ConnectionInfo::testConnection(const mongocxx::uri& connectionUrl, std::string& errmsg)
 {
     bool ret = false;
 
     try
     {
         // Using MongoConnection to test the connection
-        MongoDB::MongoConnection connection(connectionUri);
+        MongoDB::MongoConnection connection(connectionUrl);
 
         ret = connection.ok();
     }  
@@ -173,8 +173,7 @@ bool ConnectionInfo::testConnection(const mongocxx::uri& connectionUri, std::str
 
   ConnectionInfo::ConnectionInfo(const ConnectionInfo& rhs)
 	{
-    _rawConnectionString = rhs._rawConnectionString;
-    _connectionUri = mongocxx::uri("mongodb://" + _rawConnectionString);
+    _connectionUrl = mongocxx::uri(rhs._connectionUrl.to_string());
     _shard = rhs._shard;
     _useReadTags = rhs._useReadTags;
     _clusterId = rhs._clusterId;
@@ -185,8 +184,7 @@ bool ConnectionInfo::testConnection(const mongocxx::uri& connectionUri, std::str
   ConnectionInfo& ConnectionInfo::operator=(const ConnectionInfo& rhs)
   {
     string errmsg;
-    _rawConnectionString = rhs._rawConnectionString;
-    _connectionUri = mongocxx::uri("mongodb://" + _rawConnectionString);
+    _connectionUrl = mongocxx::uri(rhs._connectionUrl.to_string());
     _shard = rhs._shard;
     _useReadTags = rhs._useReadTags;
     _clusterId = rhs._clusterId;
@@ -195,8 +193,8 @@ bool ConnectionInfo::testConnection(const mongocxx::uri& connectionUri, std::str
     return *this;
   }
 
-  ConnectionInfo::ConnectionInfo(const std::string& connectionString) :
-                 _connectionUri(mongocxx::uri("mongodb://" + connectionString)),
+  ConnectionInfo::ConnectionInfo(const std::string& connectionUrl) :
+                 _connectionUrl(mongocxx::uri(connectionUrl)),
                  _shard(0),
                  _useReadTags(false),
                  _readQueryTimeoutMs(0),
@@ -204,8 +202,8 @@ bool ConnectionInfo::testConnection(const mongocxx::uri& connectionUri, std::str
 	{
 	}
 
-  ConnectionInfo::ConnectionInfo(const mongocxx::uri& connectionUri) :
-                 _connectionUri(mongocxx::uri(connectionUri.to_string())),
+  ConnectionInfo::ConnectionInfo(const mongocxx::uri& connectionUrl) :
+                 _connectionUrl(mongocxx::uri(connectionUrl.to_string())),
                  _shard(0),
                  _useReadTags(false),
                  _readQueryTimeoutMs(0),
@@ -226,28 +224,21 @@ bool ConnectionInfo::testConnection(const mongocxx::uri& connectionUri, std::str
     try {
         boost::property_tree::ini_parser::read_ini(file, pt);
 
-        _rawConnectionString = pt.get<std::string>("connectionString", "");
+        _connectionUrl = mongocxx::uri(pt.get<std::string>("connectionUrl", ""));
         _shard = pt.get<int>("shardId", 0);
         _clusterId = pt.get<std::string>("clusterId", "");
         _useReadTags = pt.get<std::string>("useReadTags", "false") == "true";
         _readQueryTimeoutMs = pt.get<int>("read-query-timeout-ms", 0);
         _writeQueryTimeoutMs = pt.get<int>("write-query-timeout-ms", 0);
     }
+    catch (const mongocxx::exception& e) {
+        BOOST_THROW_EXCEPTION(ConfigError() << errmsg_info(e.what()));
+    }
     catch (const std::exception& e) {
         BOOST_THROW_EXCEPTION(ConfigError() << errmsg_info(std::string("Failed to parse config file: ") + e.what()));
     }
 
-    if (_rawConnectionString.empty()) {
-        BOOST_THROW_EXCEPTION(ConfigError() << errmsg_info("Missing 'connectionString' in file."));
-    }
-
-    try {
-        _connectionUri = mongocxx::uri("mongodb://" + _rawConnectionString);
-    } catch (const mongocxx::exception& e) {
-        BOOST_THROW_EXCEPTION(ConfigError() << errmsg_info(e.what()));
-    }
-
-    Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "Loaded DB connection info for %s", _rawConnectionString.c_str());
+    Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "Loaded DB connection info for %s", _connectionUrl.to_string().c_str());
   }
 
   void BaseDB::setReadPreference(bsoncxx::builder::basic::document& builder, 

@@ -338,7 +338,7 @@ int main(int argc, char* argv[])
 
    // Create the SipPersistentSubscriptionMgr.
 
-   MongoDB::ConnectionInfo c(MongoDB::ConnectionInfo::connectionStringFromFile(), SubscribeDB::NS);
+   MongoDB::ConnectionInfo c(MongoDB::ConnectionInfo::connectionUrlFromFile(), SubscribeDB::NS);
    SubscribeDB db(c);
    SipPersistentSubscriptionMgr subscriptionMgr(SUBSCRIPTION_COMPONENT_PRESENCE,
                                                 domainName,

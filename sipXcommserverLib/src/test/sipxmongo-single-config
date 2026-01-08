@@ -1,1 +1,1 @@
-connectionString = sipxecs/localhost:27017
+connectionUrl = mongodb://localhost:27017

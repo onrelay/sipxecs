@@ -45,7 +45,7 @@ extern "C" AuthPlugin* getAuthPlugin(const UtlString& pluginName)
   {
     assert(!gpEmergency);
     assert(!gpEmergencyRules);
-    MongoDB::ConnectionInfo info(MongoDB::ConnectionInfo::connectionStringFromFile(), EntityDB::NS);
+    MongoDB::ConnectionInfo info(MongoDB::ConnectionInfo::connectionUrlFromFile(), EntityDB::NS);
     gpEmergency = new EmergencyDB();
     return new EmergencyLineIdentifier(pluginName);
   }

@@ -48,12 +48,6 @@ public class MongoConfigTest {
     }
 
     @Test
-    public void getConnectionString() {
-        assertEquals("sipxecs/one:1", m_config.getConnectionString(m_single, "sipxecs", 1));
-        assertEquals("sipxecs/one:1,two:1", m_config.getConnectionString(m_multi, "sipxecs", 1));
-    }
-
-    @Test
     public void getConnectionUrl() {
         assertEquals("mongodb://one:1/?readPreference=nearest&readPreferenceTags=clusterId:1;readPreferenceTags=shardId:99;readPreferenceTags=", m_config.getConnectionUrl(m_single, 1, 99, 1));
     }

@@ -416,7 +416,6 @@ bundle edit_line mongo_client_config {
     # should only be for very first run
     !has_config::
        "connectionUrl=mongodb://$(sipx.host).$(sipx.net_domain):27017/?readPreference=nearest";
-       "connectionString=sipxecs/$(sipx.host).$(sipx.net_domain):27017";
 
   delete_lines:
     ".*";

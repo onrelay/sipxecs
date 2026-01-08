@@ -34,8 +34,6 @@ SHARD=`awk -F = '/shardId=/ {print $2}' @SIPX_CONFDIR@/mongo-local.ini`
 
 # format for modern drivers
 DEST_URL=`awk -F = '/connectionUrl=/ {print substr($0,15)}' @SIPX_CONFDIR@/mongo-client.ini`
-# legacy format for c++ driver and some mongo tools like mongooplog
-DEST_STR=`sed -n 's|^connectionString=sipxecs/\(.*\)$|\1|p' @SIPX_CONFDIR@/mongo-client.ini`
 
 LOG=@SIPX_LOGDIR@/mongodb-sync.log
 DB=node

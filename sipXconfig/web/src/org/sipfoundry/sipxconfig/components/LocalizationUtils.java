@@ -81,10 +81,15 @@ public final class LocalizationUtils {
      */
     public static String getModelMessage(IComponent component, MessageSource modelMessages, String key,
             String defaultMessage) {
-        if (modelMessages != null) {
-            Locale locale = component.getPage().getLocale();
-            return modelMessages.getMessage(key, null, defaultMessage, locale);
-        }
+
+        try{ 
+            if (modelMessages != null) {
+                Locale locale = component.getPage().getLocale();
+                if( locale != null ) {
+                    return modelMessages.getMessage(key, null, defaultMessage, locale);
+                }
+            }
+        } catch( Exception e ) {}
         return defaultMessage;
     }
 

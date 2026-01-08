@@ -93,10 +93,9 @@ public class MongoConfig implements ConfigProvider {
             Integer regionId = location.getRegionId();
             int shardId = (regionId != null ? regionId : 0);
             int clusterId = location.getId();
-            String connStr = getConnectionString(dbs, GLOBAL_REPLSET, settings.getPort());
             String connUrl = getConnectionUrl(dbs, clusterId, shardId, settings.getPort());
             try {
-                writeClientConfig(client, connStr, connUrl, clusterId, shardId, settings);
+                writeClientConfig(client, connUrl, clusterId, shardId, settings);
             } finally {
                 IOUtils.closeQuietly(client);
             }
@@ -296,12 +295,11 @@ public class MongoConfig implements ConfigProvider {
      * @param settings - mongo settings, if null is passed, no mongo settings are written
      * @throws IOException
      */
-    void writeClientConfig(Writer w, String connStr, String connUrl, int clusterId, int shardId,
+    void writeClientConfig(Writer w, String connUrl, int clusterId, int shardId,
             MongoSettings settings) throws IOException {
 
         KeyValueConfiguration config = KeyValueConfiguration.equalsSeparated(w);
         config.write("connectionUrl", connUrl);
-        config.write("connectionString", connStr);
         config.write(CLUSTER_ID, clusterId);
         config.write(SHARD_ID, shardId);
         config.write("useReadTags", true);
@@ -318,22 +316,8 @@ public class MongoConfig implements ConfigProvider {
     void writeLocalClientConfig(Writer w, List<Location> servers, int clusterId, int shardId,
         int port, MongoSettings settings) throws IOException {
 
-        String lconnStr = getConnectionString(servers, LOCAL_REPLSET, port);
         String lconnUrl = getConnectionUrl(servers, clusterId, shardId, port);
-        writeClientConfig(w, lconnStr, lconnUrl, clusterId, shardId, settings);
-    }
-
-    // C++ driver/projects use connection string format
-    String getConnectionString(List<Location> servers, String replSet, int port) {
-        StringBuilder r = new StringBuilder(replSet).append('/');
-        for (int i = 0; i < servers.size(); i++) {
-            Location server = servers.get(i);
-            if (i > 0) {
-                r.append(',');
-            }
-            r.append(server.getFqdn() + ':' + port);
-        }
-        return r.toString();
+        writeClientConfig(w, lconnUrl, clusterId, shardId, settings);
     }
 
     // java driver/projects use URL format
