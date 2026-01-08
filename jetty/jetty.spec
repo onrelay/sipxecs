@@ -1,6 +1,6 @@
 
 Name:           jetty
-Version:        12.0.22
+Version:        12.1.4
 Release:        1%{?dist}
 Summary:        Jetty Home directory with module support for Jetty 12
 Group:          Development/Tools

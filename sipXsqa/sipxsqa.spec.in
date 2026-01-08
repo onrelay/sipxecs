@@ -91,6 +91,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_libdir}/libsipXsqa.so*
 %{_datadir}/sipxecs/cfinputs/plugin.d/sipxsqaclient.cf
 %{_datadir}/java/sipXecs/sipXcommons/sipxsqaclient.jar
+%attr(755,sipx,sipx) %{_datadir}/java/sipXecs/sipXcommons/sipxsqaclient.jar
 %{_libdir}/libsqaclient.so*
 
 %files server

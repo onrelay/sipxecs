@@ -1,4 +1,4 @@
-jetty_VER = 12.0.22
+jetty_VER = 12.1.4
 jetty_REL = 1
 jetty_SRPM = jetty-$(jetty_VER)-$(jetty_REL)$(RPM_DIST).src.rpm
 jetty_SPEC = $(SRC)/jetty/jetty.spec

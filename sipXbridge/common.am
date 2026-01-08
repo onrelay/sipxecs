@@ -7,12 +7,20 @@ bridge_PKGS = \
 	commons-codec \
 	dnsjava \
 	jain-sip-sdp \
-	jakarta.servlet \
+	jakarta.servlet-api \
+	jetty-server \
+	jetty-ee10-servlet \
+	jetty-http \
+	jetty-io \
+	jetty-security \
+	jetty-session \
+	jetty-util \
 	log4j \
-	sipxcommons \
 	ws-commons-util \
 	xmlrpc-client \
 	xmlrpc-server \
 	slf4j-api \
-	slf4j-reload4j
+	slf4j-reload4j \
+	sipxcommons 
+
 	
