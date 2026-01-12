@@ -258,9 +258,16 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
     }
 
     public void setOperator(AutoAttendant attendant) {
+
+        boolean newDialPlan = isDialPlanEmpty();
         DialPlan dialPlan = getDialPlan();
         dialPlan.setOperator(attendant);
-        super.saveEntity(dialPlan);
+        if( newDialPlan ) {
+            super.persistEntity(dialPlan);
+        }
+        else {
+            super.mergeEntity(dialPlan);
+        }
     }
 
     /**

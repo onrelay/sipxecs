@@ -701,14 +701,16 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
         }
 
         User admin = loadUserByUserName(User.SUPERADMIN);
-        if (admin == null) {
+
+        boolean newUser = (admin == null);
+
+        if (newUser) {
             admin = newUser();
             admin.setUserName(User.SUPERADMIN);
             // currently superadmin cannot invite to a conference without a valid sip password
             admin.setSipPassword(RandomStringUtils.randomAlphanumeric(SIP_PASSWORD_LEN));
             admin.setPermission(PermissionName.SUPERADMIN, true);
             admin.setPin(StringUtils.defaultString(pin));
-            persistEntity(admin);
         }
 
         PermissionName.SUPERADMIN.setEnabled(adminGroup, true);
@@ -717,7 +719,12 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
         // enable IM for superadmin
         ImAccount imAccount = new ImAccount(admin);
         imAccount.setEnabled(true);
-        mergeEntity(admin);
+        if( newUser ) {
+            persistEntity(admin);
+        }
+        else {
+            mergeEntity(admin);
+        }
         getDaoEventPublisher().publishSave(admin);
     }
 
