@@ -62,7 +62,7 @@
     </setting>
     <setting name="SIPX_PROXY_LOG_LEVEL">
       <type refid="loglevel" />
-      <value>NOTICE</value>
+      <value>DEBUG</value>
     </setting>
     <setting name="SIPX_PROXY_TCP_PORT" hidden="yes">
       <type>
