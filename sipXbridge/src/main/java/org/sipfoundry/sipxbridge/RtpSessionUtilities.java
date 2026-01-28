@@ -328,10 +328,10 @@ public class RtpSessionUtilities {
 	 * 
 	 */
 	 static RtpSessionOperation reAssignRtpSessionParameters(	
-			ServerTransaction serverTransaction) 
-	    throws SdpParseException, ParseException, SipException {
-		 
-	
+				ServerTransaction serverTransaction) 
+		    throws SdpParseException, ParseException, SipException {
+			 
+		
 		Dialog dialog = serverTransaction.getDialog();
 		
 		Dialog peerDialog  = DialogContext.getPeerDialog(dialog);
@@ -348,49 +348,70 @@ public class RtpSessionUtilities {
 					+ DialogContext.get(peerDialog).getLastResponse());
 		}
 		
-		if ( logger.isDebugEnabled() ) logger.debug("rtpSession.getTransmitter().sessionDescription = " + rtpSession.getTransmitter().getSessionDescription());
+		final SessionDescription existingSessionDescription = rtpSession.getTransmitter().getSessionDescription();
 
-		final SessionDescription sessionDescription = SipUtilities.getSessionDescription(request);
+		if ( logger.isDebugEnabled() ) logger.debug("existingSessionDescription = " + existingSessionDescription);
+
+		final SessionDescription updatedSessionDescription = SipUtilities.getSessionDescription(request);
+
+		if ( logger.isDebugEnabled() ) logger.debug("updatedSessionDescription = " + updatedSessionDescription);
 
 		int newport = SipUtilities
-				.getSessionDescriptionMediaPort(sessionDescription);
+				.getSessionDescriptionMediaPort(updatedSessionDescription);
 		String newIpAddress = SipUtilities
-				.getSessionDescriptionMediaIpAddress(sessionDescription);
+				.getSessionDescriptionMediaIpAddress(updatedSessionDescription);
 
 		/*
 		 * Get the a media attribute -- CAUTION - this only takes care of the
 		 * one media attribute. Question - what to do when only one media stream is put
 		 * on hold?
 		 */
+		
+		String existingMediaAttribute = SipUtilities
+				.getSessionDescriptionMediaAttributeDuplexity(existingSessionDescription);
 
-		String mediaAttribute = SipUtilities
-				.getSessionDescriptionMediaAttributeDuplexity(sessionDescription);
-
-		String sessionAttribute = SipUtilities
-				.getSessionDescriptionAttribute(sessionDescription);
+		String existingSessionAttribute = SipUtilities
+				.getSessionDescriptionAttribute(existingSessionDescription);
 
 		if (logger.isDebugEnabled()) {
-		    logger.debug("mediaAttribute = " + mediaAttribute
-					+ " sessionAttribute = " + sessionAttribute);
+		    logger.debug("existingSessionDescription = " + existingSessionDescription
+					+ " existingSessionDescription = " + existingSessionDescription);
 		}
 
-		String attribute = sessionAttribute != null ? sessionAttribute
-				: mediaAttribute;
+		String existingAttribute = existingSessionAttribute != null ? existingSessionAttribute
+				: existingMediaAttribute;
 
-		if (rtpSession.isHoldRequest(sessionDescription)) {
+		String updatedMediaAttribute = SipUtilities
+				.getSessionDescriptionMediaAttributeDuplexity(updatedSessionDescription);
+
+		String updatedSessionAttribute = SipUtilities
+				.getSessionDescriptionAttribute(updatedSessionDescription);
+
+		if (logger.isDebugEnabled()) {
+		    logger.debug("updatedMediaAttribute = " + updatedMediaAttribute
+					+ " updatedSessionAttribute = " + updatedSessionAttribute);
+		}
+
+		String updatedAttribute = updatedSessionAttribute != null ? updatedSessionAttribute
+				: updatedMediaAttribute;
+
+		if (rtpSession.isHoldRequest(updatedSessionDescription) && 
+			!rtpSession.isHoldRequest(existingSessionDescription)) {
 			
 			putOnHold(rtpSession);
 			return RtpSessionOperation.PLACE_HOLD;
 
-		} else if (rtpSession.getTransmitter().isOnHold() && 
-				(attribute == null || attribute.equals("sendrecv"))) {
+		} 
+		else if (rtpSession.getTransmitter().isOnHold() && 
+				(updatedAttribute == null || updatedAttribute.equals("sendrecv"))) {
 			/*
 			 * Somebody is trying to remove the hold.
 			 */
-			rtpSession.getTransmitter().setSessionDescription(sessionDescription, true);
+			rtpSession.getTransmitter().setSessionDescription(updatedSessionDescription, true);
 			removeHold(rtpSession, serverTransaction, dialog);
 			return RtpSessionOperation.REMOVE_HOLD;
-		} else if (rtpSession.getTransmitter().getIpAddress().equals( newIpAddress) &&
+		} 
+		else if (rtpSession.getTransmitter().getIpAddress().equals( newIpAddress) &&
 					rtpSession.getTransmitter().getPort() != newport) {
 			/*
 			 * This is just a re-invite where he has changed his port. simply
@@ -398,28 +419,37 @@ public class RtpSessionUtilities {
 			 * data.
 			 */
 			
-			rtpSession.getTransmitter().setSessionDescription(sessionDescription, true);
+			rtpSession.getTransmitter().setSessionDescription(updatedSessionDescription, true);
 			
-            // OR: The PORT_REMAP handling is not working correctly, and in some cases incorrectly change port, root cause unknown
-			//return RtpSessionOperation.PORT_REMAP;
-			return RtpSessionOperation.NO_OP;
-
-		} else if (SipUtilities
-				.getSessionDescriptionVersion(sessionDescription) == SipUtilities
-				.getSessionDescriptionVersion(rtpSession.getTransmitter()
-						.getSessionDescription())) {
+			return RtpSessionOperation.PORT_REMAP;
+		} 
+		else if (SipUtilities.getSessionDescriptionVersion(updatedSessionDescription) == 
+				   SipUtilities.getSessionDescriptionVersion(existingSessionDescription)) {
 			/*
 			 * Must be a session keepalive. Mark it as a NO-OP.
 			 */
 			return RtpSessionOperation.NO_OP;
-		} else {
+		} 
+		else if (updatedSessionDescription.toString().equals( existingSessionDescription.toString() ) ) {
+			/*
+			 * Identical SDPs. Mark it as a NO-OP.
+			 */
+			return RtpSessionOperation.NO_OP;
+		} 
+		else if( !SipUtilities.isCodecDifferent( existingSessionDescription, updatedSessionDescription ) &&
+				"sendonly".equals( existingAttribute ) && 
+				"sendrecv".equals( updatedAttribute ) ) {
+			
+			// This is a NO OP since we map sendonly to sendrecv elsewhere
+			return RtpSessionOperation.NO_OP;
+		}
+		else {
 			/*
 			 * Must be the other side trying to renegotiate codec.
 			 */
-			rtpSession.getTransmitter().setSessionDescription(sessionDescription, true);
+			rtpSession.getTransmitter().setSessionDescription(updatedSessionDescription, true);
 
 			return RtpSessionOperation.CODEC_RENEGOTIATION;
 		}
-
-	}
+	 }
 }

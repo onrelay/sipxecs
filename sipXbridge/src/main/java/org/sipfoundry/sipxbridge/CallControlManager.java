@@ -263,130 +263,147 @@ class CallControlManager implements SymmitronResetHandler {
          * INVITE has no session description.
          */
 
-        if (SipUtilities.isSdpOfferSolicitation(request)) {
-            /*
-             * This case occurs if MOH is turned OFF on sipxbridge and is turned ON on the phone.
-             * In this case the phone will solicit the ITSP for an offer See Issue 1739
-             */
-            Request newRequest = peerDialog.createRequest(Request.INVITE);
+        if (SipUtilities.isSdpOfferSolicitation(request)  ) {
+        	
+        	if( provider != Gateway.getLanProvider() ) {
+        	       		
+                if ( logger.isDebugEnabled() ) logger.debug("Responding OK to ITSP SDP solicitation");
 
-			/*
-			 * By default the UAC always refreshes the session.
-			 */
-            
-            ItspAccountInfo itspAccount = dialogContext.getItspInfo();
-            int sessionTimerInterval;
-            if( itspAccount != null ) {
-            	sessionTimerInterval = itspAccount.getSessionTimerInterval();
-            }
-            else {
-            	sessionTimerInterval = Gateway.DEFAULT_SESSION_TIMER_INTERVAL;
-            }
-            
-			SessionExpires sessionExpires = (SessionExpires) ((HeaderFactoryExt) ProtocolObjects.headerFactory)
-					.createSessionExpiresHeader( sessionTimerInterval );
-			sessionExpires.setParameter("refresher", "uac");
-			sessionExpires.setExpires( sessionTimerInterval );
-			newRequest.addHeader(sessionExpires);
-                        
-			newRequest.setHeader(referencesHeader);
+                RtpSession rtpSession = dialogContext.getRtpSession();
 
-            /*
-             * Contact header for the re-INVITE we are about to send.
-             * Use the contact header from the inbound re-invite and extract the user name
-             * from there.
-             */
-            ContactHeader requestContactHeader = (ContactHeader) request.getHeader(ContactHeader.NAME);
-            
-            String contactUser;
-            if (requestContactHeader != null) {
-               SipURI contactURI = (SipURI) requestContactHeader.getAddress().getURI();
-               contactUser = contactURI.getUser();
-            } else {
-               contactUser = Gateway.SIPXBRIDGE_USER;
-            } 
-            
-            ContactHeader contactHeader = SipUtilities.createContactHeader(
-                    contactUser, 
-                    peerDialogProvider,
-                    SipUtilities.getViaTransport(newRequest));
-            
-            newRequest.setHeader(contactHeader);
+                Response response = SipUtilities.createResponse(serverTransaction,
+                        Response.OK);
+                SessionDescription sessionDescription = rtpSession.getReceiver()
+                        .getSessionDescription();
+                SipUtilities.setSessionDescription(response, sessionDescription);
+                
+                if (dialogContext.getItspInfo() == null || dialogContext.getItspInfo().isGlobalAddressingUsed() ) {
+                    SipUtilities.setGlobalAddress(response);
+                }
+                serverTransaction.sendResponse(response);
+        	}
+        	else {
+	            /*
+	             * This case occurs if MOH is turned OFF on sipxbridge and is turned ON on the phone.
+	             * In this case the phone will solicit the ITSP for an offer See Issue 1739
+	             */
+	            Request newRequest = peerDialog.createRequest(Request.INVITE);
+	
+				/*
+				 * By default the UAC always refreshes the session.
+				 */
+	            
+	            ItspAccountInfo itspAccount = dialogContext.getItspInfo();
+	            int sessionTimerInterval;
+	            if( itspAccount != null ) {
+	            	sessionTimerInterval = itspAccount.getSessionTimerInterval();
+	            }
+	            else {
+	            	sessionTimerInterval = Gateway.DEFAULT_SESSION_TIMER_INTERVAL;
+	            }
+	            
+				SessionExpires sessionExpires = (SessionExpires) ((HeaderFactoryExt) ProtocolObjects.headerFactory)
+						.createSessionExpiresHeader( sessionTimerInterval );
+				sessionExpires.setParameter("refresher", "uac");
+				sessionExpires.setExpires( sessionTimerInterval );
+				newRequest.addHeader(sessionExpires);
+	                        
+				newRequest.setHeader(referencesHeader);
+	
+	            /*
+	             * Contact header for the re-INVITE we are about to send.
+	             * Use the contact header from the inbound re-invite and extract the user name
+	             * from there.
+	             */
+	            ContactHeader requestContactHeader = (ContactHeader) request.getHeader(ContactHeader.NAME);
+	            
+	            String contactUser;
+	            if (requestContactHeader != null) {
+	               SipURI contactURI = (SipURI) requestContactHeader.getAddress().getURI();
+	               contactUser = contactURI.getUser();
+	            } else {
+	               contactUser = Gateway.SIPXBRIDGE_USER;
+	            } 
+	            
+	            ContactHeader contactHeader = SipUtilities.createContactHeader(
+	                    contactUser, 
+	                    peerDialogProvider,
+	                    SipUtilities.getViaTransport(newRequest));
+	            
+	            newRequest.setHeader(contactHeader);
+	
+	            if ( request.getHeader(AuthorizationHeader.NAME) != null ) {
+	               AuthorizationHeader authHeader = (AuthorizationHeader)
+	                        request.getHeader(AuthorizationHeader.NAME);
+	                newRequest.setHeader(authHeader);
+	            }
+	
+	            if ( request.getHeader("History-Info") != null ) {
+	                newRequest.setHeader(request.getHeader("History-Info"));
+	            }
+	
+	
+	            /*
+	             * Create a new client transaction with which to forward the request.
+	             */
+	
+	            ClientTransaction ctx = peerDialogProvider.getNewClientTransaction(newRequest);
+	
+	            /*
+	             * Set up the transaction context.
+	             */
+	            TransactionContext tad = TransactionContext.attach(ctx,
+	                    Operation.FORWARD_SDP_SOLICITIATION);
+	
+	            /*
+	             * Associate the client transaction with the inbound server transaction.
+	             */
+	            tad.setServerTransaction(serverTransaction);
+	
+	            /*
+	             * Set up the continuation data so we know what to do when the response arrives.
+	             */
+	            tad.setContinuationData(new ForwardSdpSolicitationContinuationData(requestEvent));
+	            serverTransaction.setApplicationData(tad);
+	
+	            DialogContext peerDialogContext = DialogContext.get(peerDialog);
+	
+	            /*
+	             * Incoming request came in on the LAN side. Check if there is a record for the ITSP on
+	             * the wan side of the association.
+	             */
+	            if (peerDialogContext.getItspInfo() == null || 
+	            		peerDialogContext.getItspInfo().isGlobalAddressingUsed()) {
 
-            if ( request.getHeader(AuthorizationHeader.NAME) != null ) {
-               AuthorizationHeader authHeader = (AuthorizationHeader)
-                        request.getHeader(AuthorizationHeader.NAME);
-                newRequest.setHeader(authHeader);
-            }
+                    String transport = peerDialogContext.getSipProvider().getListeningPoints()[0].getTransport();
 
-            if ( request.getHeader("History-Info") != null ) {
-                newRequest.setHeader(request.getHeader("History-Info"));
-            }
-
-
-            /*
-             * Create a new client transaction with which to forward the request.
-             */
-
-            ClientTransaction ctx = peerDialogProvider.getNewClientTransaction(newRequest);
-
-            /*
-             * Set up the transaction context.
-             */
-            TransactionContext tad = TransactionContext.attach(ctx,
-                    Operation.FORWARD_SDP_SOLICITIATION);
-
-            /*
-             * Associate the client transaction with the inbound server transaction.
-             */
-            tad.setServerTransaction(serverTransaction);
-
-            /*
-             * Set up the continuation data so we know what to do when the response arrives.
-             */
-            tad.setContinuationData(new ForwardSdpSolicitationContinuationData(requestEvent));
-            serverTransaction.setApplicationData(tad);
-
-            DialogContext peerDialogContext = DialogContext.get(peerDialog);
-
-            /*
-             * Incoming request came in on the LAN side. Check if there is a record for the ITSP on
-             * the wan side of the association.
-             */
-            if (provider == Gateway.getLanProvider()
-                    && (peerDialogContext.getItspInfo() == null || peerDialogContext.getItspInfo()
-                            .isGlobalAddressingUsed())) {
-
-                String transport = peerDialogContext.getSipProvider().getListeningPoints()[0].getTransport();
-
-                SipUtilities.setGlobalAddresses(newRequest, transport);
-            }
-
-            /*
-             * Set the ALLOW header to be the WAN side ALLOW headers.
-             */
-            if (provider == Gateway.getLanProvider()) {
-                SipUtilities.addWanAllowHeaders(newRequest);
-            }
-            /*
-             * Record in the corresponding dialog that that we solicited an offer so we can send
-             * the Ack along with the SDP that is offered.
-             */
-            peerDialogContext.setPendingAction(PendingDialogAction.PENDING_FORWARD_ACK_WITH_SDP_ANSWER);
-            if ( (peerDialogContext.getItspInfo() == null ||
-                    peerDialogContext.getItspInfo().getPassword() == null ) &&
-                   request.getHeader(AuthorizationHeader.NAME) != null ) {
-                /*
-                 * We have no password information for the peer so just
-                 * accept any incoming authorization information from the
-                 * caller.
-                 */
-                AuthorizationHeader authHeader = (AuthorizationHeader)
-                        request.getHeader(AuthorizationHeader.NAME);
-                newRequest.setHeader(authHeader);
-            }
-            peerDialogContext.sendReInvite(ctx);
-
+	                SipUtilities.setGlobalAddresses(newRequest, transport );
+	            }
+	
+	            /*
+	             * Set the ALLOW header to be the WAN side ALLOW headers.
+	             */
+	            SipUtilities.addWanAllowHeaders(newRequest);
+	            
+	            /*
+	             * Record in the corresponding dialog that that we solicited an offer so we can send
+	             * the Ack along with the SDP that is offered.
+	             */
+	            peerDialogContext.setPendingAction(PendingDialogAction.PENDING_FORWARD_ACK_WITH_SDP_ANSWER);
+	            if ( (peerDialogContext.getItspInfo() == null ||
+	                    peerDialogContext.getItspInfo().getPassword() == null ) &&
+	                   request.getHeader(AuthorizationHeader.NAME) != null ) {
+	                /*
+	                 * We have no password information for the peer so just
+	                 * accept any incoming authorization information from the
+	                 * caller.
+	                 */
+	                AuthorizationHeader authHeader = (AuthorizationHeader)
+	                        request.getHeader(AuthorizationHeader.NAME);
+	                newRequest.setHeader(authHeader);
+	            }
+	            peerDialogContext.sendReInvite(ctx);
+        	} 
         } else {
 
             RtpSession rtpSession = dialogContext.getRtpSession();
@@ -395,8 +412,9 @@ class CallControlManager implements SymmitronResetHandler {
              * Associate the inbound session description with the TRANSMITTER side of the
              * rtpSession.
              */
-            RtpSessionOperation operation = RtpSessionUtilities
-                    .reAssignRtpSessionParameters(serverTransaction);
+            RtpSessionOperation operation = SipUtilities.isSdpOfferSolicitation(request) ? 
+            		RtpSessionOperation.NO_OP :
+            		RtpSessionUtilities.reAssignRtpSessionParameters(serverTransaction);
 
             if ( logger.isDebugEnabled() ) logger.debug("Rtp Operation " + operation);
 
@@ -478,7 +496,6 @@ class CallControlManager implements SymmitronResetHandler {
                 serverTransaction.sendResponse(response);
 
             }
-
         }
     }
 
@@ -1414,7 +1431,7 @@ class CallControlManager implements SymmitronResetHandler {
                  * This is a redirect response we want to get rid of this record
                  * right now so we can retry with a new relay. Otherwise we
                  * find the same record cached and wind up with two relays and
-                 * extraneous media which scares phones. TODO - clean up this code
+                 * extraneous media which scares phones. 
                  * by moving it into the block below.
                  */
                 if ( response.getStatusCode() /100 == 3 ) {
