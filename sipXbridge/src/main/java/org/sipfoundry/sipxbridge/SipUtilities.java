@@ -1465,7 +1465,8 @@ class SipUtilities {
 	}
 
 	private static Response createResponse(SipProvider provider,
-			Request request, int statusCode) throws ParseException {
+			Request request, 
+			int statusCode) throws ParseException {
 		Response response = ProtocolObjects.messageFactory.createResponse(
 				statusCode, request);
 		ContactHeader contactHeader = createContactHeader(
@@ -1478,9 +1479,13 @@ class SipUtilities {
 			response.addHeader(ProtocolObjects.headerFactory
 					.createSupportedHeader("100rel"));
 		} else {
-			SupportedHeader sh = ProtocolObjects.headerFactory
-					.createSupportedHeader("replaces");
-			response.setHeader(sh);
+			SupportedHeader supportedHeader = ProtocolObjects.headerFactory
+					.createSupportedHeader("timer");
+			response.setHeader(supportedHeader);
+			response.addHeader(ProtocolObjects.headerFactory
+					.createSupportedHeader("100rel"));			
+			response.addHeader(ProtocolObjects.headerFactory
+							.createSupportedHeader("replaces"));
 		}
 		return response;
 	}
@@ -1842,9 +1847,15 @@ class SipUtilities {
 						.createAllowHeader(method);
 				message.addHeader(allow);
 			}
-			SupportedHeader sh = ProtocolObjects.headerFactory
+			SupportedHeader supportedHeader = ProtocolObjects.headerFactory
 					.createSupportedHeader("timer");
-			message.setHeader(sh);
+			message.setHeader(supportedHeader);
+			supportedHeader = ProtocolObjects.headerFactory
+					.createSupportedHeader("100rel");
+			message.addHeader(supportedHeader);
+			supportedHeader = ProtocolObjects.headerFactory
+					.createSupportedHeader("replaces");
+			message.addHeader(supportedHeader); 
 			/*
 			 * 100rel not supported from the WAN side. DO NOT add 100rel support
 			 * when signaling the WAN ( not needed -- leads to needless
