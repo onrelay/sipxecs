@@ -431,71 +431,56 @@ class CallControlManager implements SymmitronResetHandler {
                     SendInviteToMohServerContinuationData cdata = new SendInviteToMohServerContinuationData(
                             requestEvent);
                     dialogContext.solicitSdpOfferFromPeerDialog(cdata,requestEvent.getRequest());
-                } else {
-                	
-                    // OR Change: ACK would otherwise sometimes get discarded by JAIN SIP, 
-                    // causing its ack semaphore to not get released, causing dialog to close,
-                    // causing some ITSPs to drop call due to timeout
-                    RtpSessionUtilities.forwardReInvite(rtpSession, serverTransaction, dialog, true);
-
-                	/*
-                    // No MOH support on bridge so send OK right away.
-                    Response response = SipUtilities.createResponse(serverTransaction,
-                            Response.OK);
-                    SessionDescription sessionDescription = rtpSession.getReceiver()
-                            .getSessionDescription();
-                    SipUtilities.setSessionDescription(response, sessionDescription);
-                    
-                     // Send an OK to the other side with a SD that indicates that the HOLD
-                     // operation is successful. The hold operation is handled locally.
-
-                    if (dialogContext.getItspInfo() == null || dialogContext.getItspInfo().isGlobalAddressingUsed() ) {
-                        SipUtilities.setGlobalAddress(response);
-                    }
-                    serverTransaction.sendResponse(response);
-                    */
-                }
+                    return;
+                } 
             } 
-            else if (operation == RtpSessionOperation.REMOVE_HOLD
-                    || operation == RtpSessionOperation.CODEC_RENEGOTIATION
-                    || operation == RtpSessionOperation.PORT_REMAP ) {
+
+            if (operation == RtpSessionOperation.REMOVE_HOLD ) {
+
+                if (Gateway.getMusicOnHoldUri() != null) {
+
+                    RtpSessionUtilities.forwardReInvite(rtpSession, serverTransaction, dialog, true);
+                    return;
+                }
+            }
+            
+            if( operation == RtpSessionOperation.CODEC_RENEGOTIATION
+                || operation == RtpSessionOperation.PORT_REMAP ) {
                 /*
-                 * Remove hold and codec renegotiation require forwarding of re-INVITE.
+                 * Port remap and codec renegotiation require forwarding of re-INVITE.
                  */
                 RtpSessionUtilities.forwardReInvite(rtpSession, serverTransaction, dialog, true);
+                return;
             } 
-            else {
-                /*
-                 * This is a request that can be handled locally. Grab the previous session
-                 * description from the receiver side.
-                 */
-                if ( logger.isDebugEnabled() ) logger.debug("session Timer INVITE -- sending old response ");
-                
-                SessionDescription newDescription = rtpSession.getReceiver()
-                        .getSessionDescription();
-                
-                Response response = SipUtilities.createResponse(serverTransaction, Response.OK);
 
-                if (newDescription != null) {
-                    response.setContent(newDescription, ProtocolObjects.headerFactory
-                            .createContentTypeHeader("application", "sdp"));
-                }
+            /*
+            * This is a request that can be handled locally. Grab the previous session
+            * description from the receiver side.
+            */
+            if ( logger.isDebugEnabled() ) logger.debug("session Timer INVITE -- sending old response ");
+            
+            SessionDescription newDescription = rtpSession.getReceiver()
+                    .getSessionDescription();
+            
+            Response response = SipUtilities.createResponse(serverTransaction, Response.OK);
 
-                
-                // Use the incoming request as contact address
-    			Address address = 
-    					ProtocolObjects.addressFactory.createAddress((SipURI)request.getRequestURI());
-    			
-    			ContactHeader contactHeader = ProtocolObjects.headerFactory.createContactHeader(address);
-                
-                response.setHeader(contactHeader);
-                
-
-                dialogContext.setSessionTimerResponseSent();
-
-                serverTransaction.sendResponse(response);
-
+            if (newDescription != null) {
+                response.setContent(newDescription, ProtocolObjects.headerFactory
+                        .createContentTypeHeader("application", "sdp"));
             }
+
+            // Use the incoming request as contact address
+            Address address = 
+                    ProtocolObjects.addressFactory.createAddress((SipURI)request.getRequestURI());
+            
+            ContactHeader contactHeader = ProtocolObjects.headerFactory.createContactHeader(address);
+            
+            response.setHeader(contactHeader);            
+
+            dialogContext.setSessionTimerResponseSent();
+
+            serverTransaction.sendResponse(response);
+
         }
     }
 
