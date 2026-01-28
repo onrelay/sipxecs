@@ -17,8 +17,7 @@ prog=$(basename $exec)
 progName="cf-serverd"
 # used to tell which config is in use.
 configid=/run/sipxsupervisor-configid
-
-pidfolder="/run/sipxpbx/sipxsupervisor"
+pidfile="@SIPX_RUNDIR@/sipxsupervisor/sipxsupervisor.pid"
 
 [ -e /etc/sysconfig/sipxsupervisor ] && . /etc/sysconfig/sipxsupervisor
 
@@ -28,7 +27,7 @@ sipxagentlockfile="@SIPX_RUNDIR@/sipxsupervisor/sipxagent.lock"
 start() {
   [ -x $exec ] || { echo -n "$execError"; echo_failure; echo; exit $ENOEXEC; }
   [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; echo; exit $ENOENT; }
-  checkRunningInstance "root" $exec > /dev/null
+  checkRunningProcess ${pidfile} > /dev/null
   Status=$?
   [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
 
@@ -37,15 +36,16 @@ start() {
   "$exec" -f "$config" &
   Status=$?
   [ $Status -eq 0 ] && touch $lockfile
+  echo $! > ${pidfile}
 
   if [ $# -gt 0 ]; then
-    checkRunningInstanceTimeout "root" $exec $maxTimeout
+    checkRunningProcessTimeout ${pidfile}
     Status=$?
     [ $Status -eq $ESRCH ] && { echo_failure; echo; exit $ESRCH; }
 
     #sipxagent running
     if [ -f @sipxagentlockfile ]; then
-      checkIfListening $progName
+      checkIfProcessIsListening ${pidfile}
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; echo; return $Status; }
@@ -57,7 +57,7 @@ start() {
   #while the secondary is down. sipxagent has to be run as root because we don't want to go through
   #supervisor again
   if [ ! -f $sipxagentlockfile ]; then
-    runuser - root -s @SIPX_BINDIR@/sipxagent
+    sudo @SIPX_BINDIR@/sipxagent
 
     if [ $# -gt 0 ]; then
       checkIfListening $prog
@@ -119,11 +119,11 @@ case "$1" in
     force_reload
     ;;
   status)
-    checkRunningInstance "root" $exec $prog
+    checkRunningProcessIsListening ${pidfile}
     ;;
   # condrestart - only restarts if service *is* running
   condrestart)
-    checkRunningInstance "root" $exec > /dev/null
+    checkRunningProcessIsListening ${pidfile} > /dev/null
     Status=$?
     [ $Status -eq 0 ] || restart
     ;;

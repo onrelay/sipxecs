@@ -78,7 +78,7 @@ public class NatTraversalImpl implements NatTraversal, FeatureProvider, ProcessP
         boolean relayEnabled = manager.getFeatureManager().isFeatureEnabled(FEATURE);
         boolean proxyEnabled = manager.getFeatureManager().isFeatureEnabled(ProxyManager.FEATURE, location);
         return (relayEnabled && proxyEnabled ? Collections.singleton(ProcessDefinition.sipxByRegex("sipxrelay",
-                ".*\\s-Dprocname=sipxrelay\\s.*")) : null);
+                "-Dprocname=sipxrelay")) : null);
     }
 
     @Override

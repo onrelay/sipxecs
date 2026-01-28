@@ -564,3 +564,127 @@ killAnyOrphans () {
   Status=$?
   [ $Status -eq 0 ] && { echo_failure; echo; } 
 }
+
+
+getRunningProcessID() {
+    pidfile="$1"
+
+    [ -f "$pidfile" ] || return $ESRCH
+
+    pid=$(cat "$pidfile" 2>/dev/null)
+
+    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+        echo "$pid"
+        return 0
+    fi
+
+    return $ESRCH
+}
+
+checkRunningProcess() {
+    pidfile="$1"
+
+    programName=$(basename "$pidfile")
+    programName=${programName%.pid}
+
+    pid=$(getRunningProcessID "$pidfile")
+    rc=$?
+
+    if [ $rc -ne 0 ]; then
+        echo "$programName is stopped"
+        return $ESRCH
+    fi
+
+    echo "$programName ( pid $pid ) is running"
+    return 0
+}
+
+checkRunningProcessIsListening() {
+    pidfile="$1"
+
+    programName=$(basename "$pidfile")
+    programName=${programName%.pid}
+
+    pid=$(getRunningProcessID "$pidfile")
+    rc=$?
+
+    if [ $rc -ne 0 ]; then
+        echo "$programName is stopped"
+        return $ESRCH
+    fi
+
+    # Check if PID is listening on any port
+    if ss -lptn 2>/dev/null | grep -q "pid=$pid,"; then
+        echo "$programName ( pid $pid ) is running and listening on port"
+    else
+        echo "$programName ( pid $pid ) is running but not listening on port"
+    fi
+
+    return 0
+}
+
+checkRunningProcessTimeout() {
+    pidfile="$1"
+    [ -z "$pidfile" ] && return $ESRCH
+
+    timeout=${2:-$maxTimeout}
+
+    for ((i=0; i<$timeout; i++)); do
+        pid=$(getRunningProcessID "$pidfile")
+        [ $? -eq 0 ] && return 0
+        sleep $sleepTime
+    done
+
+    return $ESRCH
+}
+
+checkIfProcessIsListening() {
+    pidfile="$1"
+    [ -z "$pidfile" ] && return $ENOSCKT
+
+    timeout=${2:-$maxListenTimeout}
+    pid=$(getRunningProcessID "$pidfile") || return $ENOSCKT
+
+    for ((i=0; i<$timeout; i++)); do
+        if ss -lptn 2>/dev/null | grep -q "pid=$pid,"; then
+            return 0
+        fi
+        sleep $sleepTime
+    done
+
+    return $ENOSCKT
+}
+
+killAnyProcessOrphans() {
+    pidfile="$1"
+    [ -z "$pidfile" ] && return
+
+    timeout=${2:-$maxTimeout}
+
+    pid=$(getRunningProcessID "$pidfile")
+    [ $? -ne 0 ] && return 0  # Nothing to kill
+
+    # First attempt graceful TERM
+    kill -TERM "$pid" 2>/dev/null || true
+
+    # Wait for process to exit
+    for ((i=0; i<$timeout; i++)); do
+        getRunningProcessID "$pidfile" >/dev/null 2>&1
+        [ $? -ne 0 ] && break
+        sleep $sleepTime
+    done
+
+    # Force KILL if still running
+    getRunningProcessID "$pidfile" >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        pid=$(getRunningProcessID "$pidfile")
+        kill -KILL "$pid" 2>/dev/null || true
+    fi
+
+    # Final check
+    getRunningProcessID "$pidfile" >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo_failure
+        echo "Process could not be killed: $pid"
+    fi
+}

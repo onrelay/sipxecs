@@ -117,7 +117,7 @@ mongo_killproc()
 
   checkpid $pid # returns 0 only if the process exists
   local RC=$?
-  [ "$RC" -eq 0 ] && failure "${procname} shutdown" || rm -f "${pidfile}"; success "${procname} shutdown"
+  [ "$RC" -eq 0 ] && failure "${procname} shutdown" || rm -f ${pidfile}; success "${procname} shutdown"
   RC=$((! $RC)) # invert return code so we return 0 when process is dead.
   return $RC
 }

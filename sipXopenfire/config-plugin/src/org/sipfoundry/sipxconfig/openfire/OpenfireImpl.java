@@ -158,7 +158,7 @@ public class OpenfireImpl implements ImManager, FeatureProvider, AddressProvider
             return null;
         }
         return Collections.singleton(ProcessDefinition.sysvByRegex("openfire",
-                ".*\\s-Dprovider.properties.className=org.jivesoftware.util.FilePropertiesProvider\\s.*"));
+                "-Dprovider.properties.className=org.jivesoftware.util.FilePropertiesProvider"));
     }
 
     @Override

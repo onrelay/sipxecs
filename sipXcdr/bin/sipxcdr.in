@@ -429,15 +429,17 @@ start() {
   fi
   if [ -n "${NoFork}" ] ; then
     killAnyOrphans @SIPXPBXUSER@ $regex
-    runuser -s /bin/bash @SIPXPBXUSER@ -c "${RubyCmd} ${CallResolverMain} ${resolverArgs}"
+    sudo -u @SIPXPBXUSER@ "${RubyCmd} ${CallResolverMain} ${resolverArgs}"
   else
     checkRunningInstance @SIPXPBXUSER@ $regex > /dev/null
     Status=$?
     [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
 
     echo -n $"Starting ${prog}: "
-    runuser -s /bin/bash @SIPXPBXUSER@ -c "${RubyCmd} ${CallResolverMain} ${resolverArgs}" >/dev/null 2>&1 &
-    echo $! > ${PidFile}
+    su @SIPXPBXUSER@
+      "${RubyCmd} ${CallResolverMain} ${resolverArgs}" >/dev/null 2>&1 & 
+      echo $! > ${PidFile}
+    exit
 
     if [ $# -gt 0 ]; then
       #check if process was spawned

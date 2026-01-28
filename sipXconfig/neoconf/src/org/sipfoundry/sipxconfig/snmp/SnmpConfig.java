@@ -118,13 +118,17 @@ public class SnmpConfig implements ConfigProvider, FeatureListener, SetupListene
     void writeProcesses(Writer w, List<ProcessDefinition> defs) throws IOException {
         String eol = SystemUtils.LINE_SEPARATOR;
         for (ProcessDefinition def : defs) {
-            w.write("proc ");
-            w.write(def.getProcess());
             String regexp = def.getRegexp();
             if (StringUtils.isNotBlank(regexp)) {
+                w.write("procmatch ");
+                w.write(def.getProcess());
                 // max min (max of 0 means unlimited)
                 w.write(" 0 1 ");
                 w.write(regexp);
+            }
+            else {
+                w.write("proc ");
+                w.write(def.getProcess());
             }
             w.write(eol);
             if (StringUtils.isNotBlank(def.getRestartCommand())) {

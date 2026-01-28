@@ -4,11 +4,12 @@ Documentation=https://github.com/onrelay/sipxecs
 After=network.target syslog.target named.service sipxproxy.service 
 
 [Service]
-Type=oneshot
+Type=forking
 ExecStart=@SIPX_SERVICEDIR@/sipxbridge start
 RemainAfterExit=true
 ExecStop=@SIPX_SERVICEDIR@/sipxbridge stop
 StandardOutput=journal
+PIDFile=/run/sipxpbx/sipxbridge/sipxbridge.pid
 
 [Install]
 WantedBy=multi-user.target

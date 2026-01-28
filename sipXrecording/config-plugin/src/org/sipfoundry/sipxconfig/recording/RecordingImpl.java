@@ -74,7 +74,7 @@ public class RecordingImpl implements FeatureProvider, Recording, ProcessProvide
             return null;
         }
         return Collections.singleton(ProcessDefinition.sipxByRegex("sipxrecording",
-                ".*\\s-Dprocname=sipxrecording\\s.*"));
+                "-Dprocname=sipxrecording"));
     }
 
     @Override

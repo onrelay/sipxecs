@@ -18,18 +18,9 @@ pidfile="@SIPX_RUNDIR@/sipximbot/sipximbot.pid"
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 
-checkRunningInstance() {
-  if [ -f "${pidfile}" ]; then
-    pid=`cat ${pidfile}`
-    if checkpid $pid 2>&1; then
-      echo "Process $prog is already running with pid $pid"
-      exit 1
-    fi
-  fi
-}
 
 start() {
-    checkRunningInstance
+    checkRunningProcessIsListening ${pidfile} > /dev/null
 
     JavaCmd=`@SIPX_BINDIR@/sipx-config --java`
     Dependencies=`@SIPX_BINDIR@/java-dep -d @SIPX_JAVADIR@/sipXcommons @imbot_PKGS@`
@@ -49,11 +40,13 @@ start() {
          org.sipfoundry.sipximbot.SipXimbot \
 	 $Args"
     if [ -n "${NoFork}" ] ; then
-      runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command}"
+      sudo -u @SIPXPBXUSER@ ${Command}
     else
       echo -n $"Starting sipximbot: "
-      runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command}" >/dev/null 2>&1 &
-      echo $! > ${pidfile}
+      su @SIPXPBXUSER@
+        ${Command} >> ${LogFile} 2>&1 &
+        echo $! > ${pidfile}
+      exit
       echo_success
     fi
 }
@@ -63,7 +56,7 @@ stop() {
   pkill -f "-Dprocname=$prog"
   Status=$?
   echo
-  [ $Status -eq 0 ] && rm -f "${pidfile}"
+  [ $Status -eq 0 ] && rm -f ${pidfile}
 }
 
 restart() {
@@ -102,7 +95,7 @@ case "$1" in
     [ -f ${pidfile} ] && restart || :
     ;;
   status)
-    status -p ${pidfile} sipximbot
+    checkRunningProcessIsListening ${pidfile}
     ;;
   configtest)
     configtest

@@ -73,7 +73,7 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
     private static final Log LOG = LogFactory.getLog(ElasticsearchServiceImpl.class);
     private static final String FILTERING_ERROR_MESSAGE = "Filtering is supported only by QueryBuilder objects.";
     private static final String NO_CONNECTION_AVAILABLE_ERROR_MESSAGE = "Not able to reach Elasticsearch at: ";
-    private static final String ELASTICSEARCH_REGEXP = ".*\\java -Xms256m -Xmx1g -Djava.awt.headless=true\\s.*";
+    private static final String ELASTICSEARCH_REGEXP = "-Des.path.home=/usr/share/elasticsearch";
 
     private ElasticsearchClient m_client;
     private String m_hostName;

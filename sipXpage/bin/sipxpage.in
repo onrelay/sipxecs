@@ -13,7 +13,6 @@
 
 prog=sipxpage
 pidfile="@SIPX_RUNDIR@/sipxpage/sipxpage.pid"
-regex="Dprocname=sipxpage"
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 
@@ -31,24 +30,25 @@ start() {
     org.sipfoundry.sipxpage.SipXpage \
     $Args"
   if [ -n "${NoFork}" ] ; then
-    killAnyOrphans @SIPXPBXUSER@ $regex
-    runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command}"
+    killAnyProcessOrphans ${pidfile}
+    sudo -u @SIPXPBXUSER@ ${Command}
   else
-    checkRunningInstance @SIPXPBXUSER@ $regex > /dev/null
+    checkRunningProcessIsListening ${pidfile} > /dev/null
     Status=$?
     [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
 
     echo -n $"Starting $prog: "
-    runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command}" >/dev/null 2>&1 &
-    echo $! > ${pidfile}
+    su @SIPXPBXUSER@
+      ${Command} >> ${LogFile} 2>&1 &
+      echo $! > ${pidfile}
+    exit
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningInstanceTimeout @SIPXPBXUSER@ $regex
+      checkRunningProcessTimeout ${pidfile}
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; echo; exit $ESRCH;}
-      pid=`ps -u @SIPXPBXUSER@ -o pid,args | grep $regex | grep -v "grep" | awk '{print $1 }'`
-      checkIfListening $pid
+      checkIfProcessIsListening ${pidfile}
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; echo; }
@@ -60,8 +60,8 @@ start() {
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyOrphans @SIPXPBXUSER@ $regex
-  checkRunningInstance @SIPXPBXUSER@ $regex > /dev/null
+  killAnyProcessOrphans ${pidfile}
+  checkRunningProcessIsListening ${pidfile} > /dev/null
   Status=$?
   [ $Status -eq 0 ] && { echo_failure; echo; exit $ERUNNING; }
   [ $Status -eq 0 ] || { echo_success; echo; }
@@ -112,12 +112,12 @@ case "$1" in
     asyncrestart
     ;;
   condrestart)
-    checkRunningInstance @SIPXPBXUSER@ $regex > /dev/null
+    checkRunningProcessIsListening ${pidfile} > /dev/null
     Status=$?
     [ $Status -eq 0 ] && restart || :
     ;;
   status)
-    checkRunningInstance @SIPXPBXUSER@ $regex $prog
+    checkRunningProcessIsListening ${pidfile}
     Status=$?
     ;;
   configtest)

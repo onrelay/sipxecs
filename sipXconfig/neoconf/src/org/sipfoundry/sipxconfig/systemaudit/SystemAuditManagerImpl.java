@@ -249,7 +249,7 @@ public class SystemAuditManagerImpl implements SystemAuditManager, FeatureListen
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE, location);
         return (enabled ? Collections.singleton(ProcessDefinition.sipxByRegex("systemaudit",
-                ".*-Dprocname=sipxconfig.*", true)) : null);
+                "-Dprocname=sipxconfig", true)) : null);
     }
 
     @Override

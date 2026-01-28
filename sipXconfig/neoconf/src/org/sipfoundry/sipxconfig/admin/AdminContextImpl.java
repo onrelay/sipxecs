@@ -88,7 +88,7 @@ public class AdminContextImpl extends SipxHibernateDaoSupport<Object> implements
     @Override
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         return (location.isPrimary() ? Collections.singleton(ProcessDefinition.sipxByRegex("sipxconfig",
-                ".*-Dprocname=sipxconfig.*")) : null);
+                "-Dprocname=sipxconfig")) : null);
     }
 
     @Override

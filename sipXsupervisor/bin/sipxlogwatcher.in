@@ -18,19 +18,20 @@ rc=@SIPX_CONFDIR@/sipxlogwatcher-rc
 
 start() {
   [ -x $exec ] || { echo -n "$execError"; echo_failure; echo; exit $ENOEXEC; }
-  checkRunningInstance "root" $exec > /dev/null 
+  checkRunningProcess ${PidFile} > /dev/null 
   Status=$?
   [ $Status -eq 0 ] && { echo -n "$progName $runningError"; echo_failure; echo; exit $ERUNNING; }
 
   for n in `seq 0 $((${#SEC_ARGS[*]} - 1))`; do
     echo -n $"Starting $progName instance "$(($n + 1))": "
-    daemon $exec ${SEC_ARGS[$n]}
-    RETVAL=$?
+    $exec ${SEC_ARGS[$n]} &
+    Status=$?
+    echo $! > ${PidFile}
     echo
-    [ $RETVAL -ne 0 ] && return $RETVAL
+    [ $Status -ne 0 ] && return $Status
   done
   touch $lockfile
-  return $RETVAL
+  return $Status
 }
 
 stop() {
@@ -40,7 +41,7 @@ stop() {
   echo
   [ $RETVAL -eq 0 ] && rm -f $lockfile
   return $RETVAL
-  killAnyOrphans "root" $prog
+  killAnyProcessOrphans ${PidFile}
 }
 
 
@@ -62,7 +63,7 @@ force_reload() {
 }
 
 rh_status() {
-  status $prog
+  checkRunningProcess ${PidFile}
 }
 
 rh_status_q() {

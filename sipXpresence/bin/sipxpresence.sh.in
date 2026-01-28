@@ -29,7 +29,7 @@ done
 
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || exit 1
 
-pidfile=@SIPX_RUNDIR@/sipxpresence.pid
+pidfile=@SIPX_RUNDIR@/sipxpresence/sipxpresence.pid
 
 case ${Action} in
    RUN)

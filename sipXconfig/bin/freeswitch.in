@@ -80,7 +80,7 @@ do_audio_setup() {
 base=${0##*/}
 
 do_start() {
-  checkRunningInstance $FS_USER $DAEMON $NAME > /dev/null
+  checkRunningProcessIsListening $PIDFILE > /dev/null
   RETVAL=$?
   [ $RETVAL -eq 0 ] && { echo -n "$NAME $runningError"; echo_failure; echo; exit $ERUNNING; }
   do_setlimits
@@ -91,10 +91,10 @@ do_start() {
 
   if [ $# -gt 0 ]; then
     #check if process spawned
-    checkRunningInstanceTimeout $FS_USER $DAEMON
+    checkRunningProcessTimeout $PIDFILE
     RETVAL=$?
     [ $RETVAL -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
-    checkIfListening $NAME
+    checkIfProcessIsListening $PIDFILE
     RETVAL=$?
     [ $RETVAL -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
     [ $RETVAL -eq 0 ] && { echo_success; echo; }
@@ -139,7 +139,7 @@ do_stop() {
   fi
   rm -f $LOCKFILE
   echo
-  killAnyOrphans $FS_USER $DAEMON
+  killAnyProcessOrphans $PIDFILE
   return $RETVAL
 }
 
@@ -179,7 +179,7 @@ case "$1" in
     do_asyncrestart
     ;;
   status)
-    checkRunningInstance $FS_USER $DAEMON $NAME
+    checkRunningProcessIsListening $PIDFILE
     ;;
   *)
     echo $"Usage: $0 {start|stop|status}"

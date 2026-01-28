@@ -73,7 +73,6 @@ TrustStore=@SIPX_CONFDIR@/ssl/authorities.jks
 CachingProvider=org.ehcache.jsr107.EhcacheCachingProvider
 Logger=org.apache.commons.logging.impl.Log4JLogger
 prog=sipxconfig
-regex="Dprocname=sipxconfig"
 waitForListenPortTime=900
 
 . /etc/rc.d/init.d/functions || exit 1
@@ -136,7 +135,7 @@ databaseCommand() {
       -f @SIPX_CONFDIR@/database/database.xml \
       $@"
 
-  CmdOut=`runuser -s @BASH@ @SIPXPBXUSER@ -c "${Command}"`
+  CmdOut=`sudo -u  @SIPXPBXUSER@ "${Command}"`
 
   if [ $? != "0" ]; then
      echo "$CmdOut" | grep -v '^Unable to locate tools.jar' >&2
@@ -239,7 +238,7 @@ runTask() {
   databaseVersionCheck    
   buildCommand task-$taskId
   Command="$Command org.sipfoundry.sipxconfig.common.SystemTaskRunner $*"
-  runuser -m -s @BASH@ @SIPXPBXUSER@ -c "${Command}"
+  sudo -u @SIPXPBXUSER@ "${Command}"
   Status=$?
 }
 
@@ -261,25 +260,25 @@ start() {
   touch ${LogFile}
   chown @SIPXPBXUSER@:@SIPXPBXUSER@ ${LogFile}
   if [ -n "${NoFork}" ] ; then
-    killAnyOrphans @SIPXPBXUSER@ $regex
-    runuser -m -s @BASH@ @SIPXPBXUSER@ -c "${Command}" >> ${LogFile} 2>&1
+    killAnyProcessOrphans ${PidFile}
+    sudo -u @SIPXPBXUSER@ "${Command}" >> ${LogFile} 2>&1
     Status=$?
   else
-    checkRunningInstance @SIPXPBXUSER@ $regex  > ${LogFile} 2>&1
+    checkRunningProcessIsListening ${PidFile} > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
 
     echo -n $"Starting $prog: "
-    runuser -s @BASH@ @SIPXPBXUSER@ -c "${Command}"  >> ${LogFile} 2>&1 &
-    echo $! > ${PidFile}
+    su @SIPXPBXUSER@
+      ${Command} >> ${LogFile} 2>&1 &
+      echo $! > ${PidFile}
+    exit
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningInstanceTimeout @SIPXPBXUSER@ $regex > /dev/null 2>&1
+      checkRunningProcessTimeout ${PidFile} > /dev/null 2>&1
       Status=$?
-      pid=$(pgrep -u @SIPXPBXUSER@ -f "$regex")
-      [ $Status -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
-      checkIfListening $pid $waitForListenPortTime
+      checkIfProcessIsListening ${PidFile} $waitForListenPortTime
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; echo; }
@@ -352,8 +351,8 @@ EOF
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyOrphans @SIPXPBXUSER@ $regex
-  checkRunningInstance @SIPXPBXUSER@ $regex  > /dev/null 2>&1
+  killAnyProcessOrphans ${PidFile}
+  checkRunningProcessIsListening ${PidFile}  > /dev/null 2>&1
   Status=$?
   [ $Status -eq 0 ] && { echo_failure; echo; exit $ERUNNING; }
   [ $Status -eq 0 ] || { echo_success; echo; }
@@ -394,12 +393,12 @@ case "$1" in
     asyncrestart
     ;;
   condrestart)
-    checkRunningInstance @SIPXPBXUSER@ $regex  > /dev/null 2>&1
+    checkRunningProcessIsListening ${PidFile}  > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] && restart || :
     ;;
   status)
-    checkRunningInstance @SIPXPBXUSER@ $regex $prog > /dev/null 2>&1
+    checkRunningProcessIsListening ${PidFile}
     Status=$?
     ;;
   configtest)

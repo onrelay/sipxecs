@@ -160,7 +160,7 @@ public class AuthCodesImpl implements DialingRuleProvider, FeatureProvider, Auth
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE, location);
         return (enabled ? Collections.singleton(ProcessDefinition.sipxByRegex("sipxacccode",
-                ".*\\s-Dprocname=sipxacccode\\s.*")) : null);
+                "-Dprocname=sipxacccode")) : null);
     }
 
     @Override

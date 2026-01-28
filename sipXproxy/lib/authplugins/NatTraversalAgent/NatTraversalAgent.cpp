@@ -969,11 +969,11 @@ bool NatTraversalAgent::addNatMappingInfoToResponseContacts( SipMessage& respons
 
    // Only necessary to check this if it is a response to ourselves from the SIP extension
 
-   if( address == mNatTraversalRules.getProxyTransportInfo().getAddress() &&
-        port == mNatTraversalRules.getProxyTransportInfo().getPort()  
+   if( (address == mNatTraversalRules.getProxyTransportInfo().getAddress() &&
+        port == mNatTraversalRules.getProxyTransportInfo().getPort() ) 
         ||
-        address == mNatTraversalRules.getSecureProxyTransportInfo().getAddress() &&
-        port == mNatTraversalRules.getSecureProxyTransportInfo().getPort() )
+        (address == mNatTraversalRules.getSecureProxyTransportInfo().getAddress() &&
+        port == mNatTraversalRules.getSecureProxyTransportInfo().getPort() ) )
    {
       rc = mpSipRouter->addNatMappingInfoToResponseContacts( response );
    }

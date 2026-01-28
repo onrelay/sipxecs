@@ -167,15 +167,15 @@ public class MongoManagerImpl implements AddressProvider, FeatureProvider, Mongo
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         Collection<ProcessDefinition> procs = new ArrayList<ProcessDefinition>(2);
         if (manager.getFeatureManager().isFeatureEnabled(FEATURE_ID, location) || location.isPrimary()) {
-            procs.add(ProcessDefinition.sysvByRegex("mongod", ".*/mongod.*-f.*/mongodb{0,1}.conf", true));
+            procs.add(ProcessDefinition.sysv("mongod", true));
         }
 
         addProcess(manager, location, procs, ARBITER_FEATURE, "mongod-arbiter",
-                ".*/mongod.*-f.*/mongod-arbiter.conf", "restart_mongo_arbiter");
-        addProcess(manager, location, procs, LOCAL_FEATURE, "mongo-local", ".*/mongod.*-f.*/mongo-local.conf",
+                "-f.*/mongod-arbiter.conf", "restart_mongo_arbiter");
+        addProcess(manager, location, procs, LOCAL_FEATURE, "mongo-local", "-f.*/mongo-local.conf",
                 "restart_mongo_local");
         addProcess(manager, location, procs, LOCAL_ARBITER_FEATURE, "mongo-local-arbiter",
-                ".*/mongod.*-f.*/mongo-local-arbiter.conf", "restart_mongo_local_arbiter");
+                "-f.*/mongo-local-arbiter.conf", "restart_mongo_local_arbiter");
 
         return procs;
     }

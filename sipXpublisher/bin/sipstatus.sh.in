@@ -29,7 +29,7 @@ done
 
 . @SIPX_LIBEXECDIR@/sipx-utils.sh
 
-pidfile=@SIPX_RUNDIR@/sipstatus.pid
+pidfile=@SIPX_RUNDIR@/sipstatus/sipstatus.pid
 
 case ${Action} in
    RUN)

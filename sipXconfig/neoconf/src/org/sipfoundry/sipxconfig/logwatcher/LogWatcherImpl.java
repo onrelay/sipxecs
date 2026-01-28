@@ -50,7 +50,7 @@ public class LogWatcherImpl implements LogWatcher, SetupListener, ProcessProvide
     @Override
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE);
-        ProcessDefinition def = ProcessDefinition.sipxByRegex(PROCESS, "/usr/bin/perl\\s+-w\\s+/usr/bin/sec.*",
+        ProcessDefinition def = ProcessDefinition.sipxByRegex(PROCESS, "--pid=/var/run/sipxpbx/sipxlogwatcher/sipxlogwatcher.pid",
                 PROCESS);
         return (enabled ? Collections.singleton(def) : null);
     }
