@@ -314,85 +314,6 @@ public class Gateway {
      * @throws SipXbridgeException
      */
 
-     /* 
-    static void discoverAddress() throws SipXbridgeException {
-
-        try {
-
-            BridgeConfiguration bridgeConfiguration = accountManager.getBridgeConfiguration();
-
-            StunStack stunStack = new StunStack();
-            String stunServerAddress = bridgeConfiguration.getStunServerAddress();
-            int stunServerPort = bridgeConfiguration.getStunServerPort();
-
-            String oldPublicAddress = Gateway.getGlobalAddress();
-
-            if (stunServerAddress != null) {
-                // Todo -- deal with the situation when this port may be taken.
-                if (addressDiscovery == null) {
-                    int localStunPort = stunServerPort + 2;
-
-                    TransportAddress localStunAddress = new TransportAddress(Gateway.getLocalAddress(), localStunPort, STUN_TRANSPORT );
-
-                    TransportAddress serverStunAddress = new TransportAddress(stunServerAddress, stunServerPort, STUN_TRANSPORT );
-
-                    addressDiscovery = new NetworkConfigurationDiscoveryProcess( stunStack, localStunAddress, serverStunAddress);
-
-                    addressDiscovery.start();
-                }
-                StunDiscoveryReport report = addressDiscovery.determineAddress();
-                if (report == null || report.getPublicAddress() == null) {
-                    logger.warn("STUN Error : Global address could not be found");
-                    try {
-                        if (addressDiscovery != null) {
-                            addressDiscovery.shutDown();
-                        }
-                    } catch (Exception e) {
-                        logger.error("Error shutting down address discovery ", e);
-                    } finally {
-                        addressDiscovery = null;
-                    }
-                    return;
-                }
-
-                globalAddress = report.getPublicAddress().getAddress().getHostAddress();
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Stun report = " + report);
-                }
-
-                if (oldPublicAddress != null && !oldPublicAddress.equals(globalAddress)
-                        || (oldStunPort != -1 && oldStunPort != report.getPublicAddress().getPort())) {
-                    Gateway.raiseAlarm(Gateway.STUN_PUBLIC_ADDRESS_CHANGED_ALARM_ID, globalAddress);
-                }
-                oldStunPort = report.getPublicAddress().getPort();
-
-                if (report.getPublicAddress().getPort() != stunServerPort + 2) {
-                    logger.warn("WARNING External port != internal port your NAT may not be symmetric.");
-                }
-
-            }
-        } catch (Exception ex) {
-
-            logger.error("Error discovering  address", ex);
-            try {
-                if (addressDiscovery != null) {
-                    addressDiscovery.shutDown();
-                }
-            } catch (Exception e) {
-                logger.error("Error shutting down address discovery ", e);
-            } finally {
-                addressDiscovery = null;
-            }
-            return;
-        } finally {
-            if (logger.isDebugEnabled()) {
-                logger.debug("global address = " + globalAddress);
-            }
-        }
-    }
-
-    */
 
     static void discoverAddress() throws SipXbridgeException {
 
@@ -895,18 +816,40 @@ public class Gateway {
 
     }
 
-    static void startAddressDiscovery() {
+    static void startAddressDiscovery() throws SipXbridgeException {
 
-        if (Gateway.getGlobalAddress() == null
-                && Gateway.accountManager.getBridgeConfiguration().getStunServerAddress() == null) {
-            throw new SipXbridgeException("Gateway address or stun server required. ");
+        BridgeConfiguration configuration = Gateway.accountManager.getBridgeConfiguration();
+
+        if (configuration.getGlobalAddress() == null && configuration.getStunServerAddress() == null) {
+
+            throw new SipXbridgeException("Global address or stun server required. ");
         }
 
-        if (Gateway.getGlobalAddress() == null) {
+        if (configuration.getExternalAddress() == null) {
+            throw new SipXbridgeException("Missing configuration parameter <external-address>");
+        }
+
+        if (configuration.getLocalAddress() == null) {
+            throw new SipXbridgeException("Missing configuration parameter <local-address>");
+        }
+
+        if (configuration.getExternalAddress().equals(configuration.getLocalAddress())
+                && configuration.getExternalPort() ==  configuration.getLocalPort()) {
+
+            throw new SipXbridgeException("Configuration error: external address == internal address && external port == internal port");
+        }
+
+        if (configuration.getStunServerAddress() != null && 
+            (configuration.getGlobalAddress() == null || configuration.getGlobalAddress().equals(configuration.getLocalAddress() ) ) ) {
+
             startRediscoveryTimer();
-        } else {
-            Gateway.accountManager.getBridgeConfiguration().setStunServerAddress(null);
-            Gateway.accountManager.getBridgeConfiguration().setStunServerPort(0);
+
+            if (globalAddress == null) {
+                throw new SipXbridgeException( "Could not discover public address. Check your STUN server settings or specify public address");
+            }
+        }
+        else {
+            globalAddress = configuration.getGlobalAddress();
         }
     }
 
@@ -1159,8 +1102,7 @@ public class Gateway {
      */
     static String getGlobalAddress() {
 
-        return Gateway.accountManager.getBridgeConfiguration().getGlobalAddress() == null ? globalAddress
-                : Gateway.accountManager.getBridgeConfiguration().getGlobalAddress();
+        return globalAddress;
     }
 
     /**
