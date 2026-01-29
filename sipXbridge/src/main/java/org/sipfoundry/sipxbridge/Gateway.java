@@ -839,8 +839,8 @@ public class Gateway {
             throw new SipXbridgeException("Configuration error: external address == internal address && external port == internal port");
         }
 
-        if (configuration.getStunServerAddress() != null
-                && configuration.getGlobalAddress() == null) {
+        if (configuration.getStunServerAddress() != null && 
+            (configuration.getGlobalAddress() == null || configuration.getGlobalAddress().equals(configuration.getLocalAddress() ) ) ) {
 
             startRediscoveryTimer();
 
