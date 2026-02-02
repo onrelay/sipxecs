@@ -227,7 +227,7 @@ public class BridgeSbc extends SbcDevice implements DeployConfigOnEdit {
         }
 
         @SettingEntry(path = "bridge-configuration/use-stun")
-        public String getUseStun() {
+        public boolean getUseStun() {
             return m_location.getUseStun();
         }
 
