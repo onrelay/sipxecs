@@ -6,10 +6,8 @@
   <include-script resource-path="/org/sipfoundry/sipxconfig/site/search/search-panel.js" />
   <input-symbol key="placeholder" required="yes" />
   <input-symbol key="queryField" required="yes" />
-  <let key="searchBox">
-    dojo.byId('${queryField.clientId}')
-  </let>
   <initialization>
-    searchPanel.register(${searchBox}, '${placeholder}');
+    var searchBox = dojo.byId('${queryField.clientId}');
+    searchPanel.register(searchBox, '${placeholder}');
   </initialization>
 </script>

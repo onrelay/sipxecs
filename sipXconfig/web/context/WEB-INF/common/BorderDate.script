@@ -8,18 +8,24 @@
 
 <body>
 <![CDATA[
-dojo.require("dojo.date.format");
-
 var currentDate = new Date("${date}");
-var interval=10000;
+var interval = 10000;
 
-function updateDate(){
-	targetNode = dojo.byId("dateComponent");
-	targetNode.innerHTML = dojo.date.format(currentDate, {datePattern: "EEE, dd MMM yyyy ", timePattern: "h:mm aa"});
-	currentDate.setMilliseconds(currentDate.getMilliseconds()+interval);
-	setTimeout('updateDate()', interval);
+function updateDate() {
+    var targetNode = dojo.byId("dateComponent");
+    if (!targetNode) return;
+
+    targetNode.innerHTML = dojo.date.format(currentDate, {
+        datePattern: "EEE, dd MMM yyyy",
+        timePattern: "h:mm aa"
+    });
+
+    currentDate.setMilliseconds(currentDate.getMilliseconds() + interval);
+    setTimeout(updateDate, interval);
 }
 
+// Run when DOM is ready
+dojo.addOnLoad(updateDate);
 ]]>
 </body>
 <initialization>
