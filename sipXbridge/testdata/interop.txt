@@ -274,6 +274,7 @@ Eutelia.it
     <local-address>sipxpbx.example.com</local-address>
     <local-port>5090</local-port>
     <sipx-proxy-domain>example.com</sipx-proxy-domain>
+    <use-stun>true</use-stun>
     <stun-server-address>freestun.net</stun-server-address>
     <stun-server-port>3478</stun-server-port>
     <sip-keepalive-seconds>20</sip-keepalive-seconds>

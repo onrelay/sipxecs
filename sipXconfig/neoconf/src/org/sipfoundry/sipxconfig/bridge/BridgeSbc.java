@@ -225,6 +225,11 @@ public class BridgeSbc extends SbcDevice implements DeployConfigOnEdit {
             return m_defaults.getLogDirectory() + "/";
         }
 
+        @SettingEntry(path = "bridge-configuration/use-stun")
+        public boolean getUseStun() {
+            return m_location.getUseStun();
+        }
+
         @SettingEntry(path = "bridge-configuration/stun-server-address")
         public String getStunServerAddress() {
             return m_location.getStunAddress();

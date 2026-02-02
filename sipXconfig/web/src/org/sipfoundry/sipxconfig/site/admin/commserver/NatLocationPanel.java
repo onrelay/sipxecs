@@ -61,7 +61,7 @@ public abstract class NatLocationPanel extends BaseComponent {
     }
 
     private String calculateBlock() {
-        return getLocationBean().isUseStun() ? "stun" : "public";
+        return getLocationBean().getUseStun() ? "stun" : "public";
     }
 
     @Override

@@ -321,6 +321,11 @@ public class Gateway {
 
             BridgeConfiguration bridgeConfiguration = accountManager.getBridgeConfiguration();
 
+            if( !bridgeConfiguration.getUseStun() ) {
+                logger.warn("STUN Error : STUN not enabled in NAT traversal settings" );
+                return;
+            }
+
             String stunServerAddress = bridgeConfiguration.getStunServerAddress();
 
             int stunServerPort = bridgeConfiguration.getStunServerPort();
@@ -415,9 +420,7 @@ public class Gateway {
             }
             
             FindSipServer serverFinder = new FindSipServer(logger);
-            
-            // OR: Note this only works with upgraded JAVA DNS
-        	
+                    	
             Collection<Hop> hops = serverFinder.findSipServers(proxyUri);
 
             PriorityQueue<Hop> proxyAddressTable = new PriorityQueue<Hop>();          
@@ -820,9 +823,9 @@ public class Gateway {
 
         BridgeConfiguration configuration = Gateway.accountManager.getBridgeConfiguration();
 
-        if (configuration.getGlobalAddress() == null && configuration.getStunServerAddress() == null) {
+        if (configuration.getGlobalAddress() == null && !configuration.getUseStun() ) {
 
-            throw new SipXbridgeException("Global address or stun server required. ");
+            throw new SipXbridgeException("Global address must be set or stun must be enabled. ");
         }
 
         if (configuration.getExternalAddress() == null) {
@@ -839,8 +842,7 @@ public class Gateway {
             throw new SipXbridgeException("Configuration error: external address == internal address && external port == internal port");
         }
 
-        if (configuration.getStunServerAddress() != null && 
-            (configuration.getGlobalAddress() == null || configuration.getGlobalAddress().equals(configuration.getLocalAddress() ) ) ) {
+        if (configuration.getUseStun() ) {
 
             startRediscoveryTimer();
 

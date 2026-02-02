@@ -225,6 +225,14 @@
 				</xs:simpleType>
 			</xs:element>
 
+			<xs:element name="use-stun"
+				type="xs:boolean" default="true" maxOccurs="1" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						Whether or not stun is enabled.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 
 			<xs:element name="stun-server-address" type="xs:string"
 				maxOccurs="1" minOccurs="0" >

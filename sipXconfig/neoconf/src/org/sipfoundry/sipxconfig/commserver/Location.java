@@ -139,7 +139,7 @@ public class Location extends BeanWithId implements KeepsOriginalCopy<Location>,
         m_useStun = useStun;
     }
 
-    public boolean isUseStun() {
+    public boolean getUseStun() {
         return m_useStun;
     }
 
