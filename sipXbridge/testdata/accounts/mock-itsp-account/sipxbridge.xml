@@ -7,6 +7,7 @@
     <local-address>127.0.0.1</local-address>
     <local-port>5090</local-port>
     <sipx-proxy-domain>127.0.0.1</sipx-proxy-domain>
+    <use-stun>true</use-stun>
     <stun-server-address>freestun.net</stun-server-address>
     <stun-server-port>3478</stun-server-port>
     <sip-keepalive-seconds>20</sip-keepalive-seconds>

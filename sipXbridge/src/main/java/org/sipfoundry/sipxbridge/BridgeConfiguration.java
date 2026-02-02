@@ -30,6 +30,7 @@ public class BridgeConfiguration {
     private int localPort = 5090;
     private int sipxProxyPort = -1;
     private String sipxProxyDomain;
+    private boolean useStun = false;
     private String stunServerAddress = null;
     private int stunServerPort = -1;
     private String musicOnHoldName = "~~mh~";
@@ -165,6 +166,21 @@ public class BridgeConfiguration {
      */
     public String getSipxProxyTransport() {
         return this.sipxProxyTransport;
+    }
+
+    /**
+     * @param useStun whether to use STUN
+     */
+    public void setUseStun(boolean useStun) {
+
+        this.useStun = useStun;
+    }
+
+    /**
+     * @return useStun 
+     */
+    public boolean getUseStun() {
+        return useStun;
     }
 
     /**

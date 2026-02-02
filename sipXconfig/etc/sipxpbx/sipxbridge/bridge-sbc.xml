@@ -96,6 +96,9 @@
       </type>
       <value>8092</value>
     </setting>
+    <setting name="use-stun" hidden="yes">
+      <!-- set from NAT location data -->
+    </setting>
     <setting name="stun-server-address" hidden="yes">
       <!-- set from NAT location data -->
     </setting>
