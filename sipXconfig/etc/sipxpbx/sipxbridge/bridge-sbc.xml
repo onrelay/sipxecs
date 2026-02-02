@@ -98,6 +98,17 @@
     </setting>
     <setting name="use-stun" hidden="yes">
       <!-- set from NAT location data -->
+      <type>
+        <boolean>
+          <true>
+            <value>true</value>
+          </true>
+          <false>
+            <value>false</value>
+          </false>
+        </boolean>
+      </type>
+      <value>false</value>
     </setting>
     <setting name="stun-server-address" hidden="yes">
       <!-- set from NAT location data -->
