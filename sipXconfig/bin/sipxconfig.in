@@ -306,7 +306,7 @@ databaseVersionCheck() {
            ${Database} @POSTGRESQL_USER@`
     if [ $? -ne 0 ] || [ -z "$dbver" ]
     then
-        echo "Error: could not get the database version.  Exiting now."
+        echo "Error: could not get the database version. Exiting now."
         exit 1
     fi
     if [ "$dbver" -ne $RequiredDatabaseVersion ]
