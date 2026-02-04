@@ -1266,6 +1266,22 @@ class SipUtilities {
 							if ( logger.isDebugEnabled() ) logger.debug("removing ICE candidate attribute: " + attr.getValue() );
 							it1.remove();
 						}
+						
+						// OR: Filtering QoS parameters not supported by sipX
+						if (attr.getName().equalsIgnoreCase("curr")) {
+							if ( logger.isDebugEnabled() ) logger.debug("removing QoS curr attribute: " + attr.getValue() );
+							it1.remove();
+						}
+						
+						if (attr.getName().equalsIgnoreCase("des")) {
+							if ( logger.isDebugEnabled() ) logger.debug("removing QoS des attribute: " + attr.getValue() );
+							it1.remove();
+						}
+						
+						if (attr.getName().equalsIgnoreCase("conf")) {
+							if ( logger.isDebugEnabled() ) logger.debug("removing QoS conf attribute: " + attr.getValue() );
+							it1.remove();
+						}
 					}
 					
 					// OR: Needed since some endpoints are not DTLS compatible, we require SDES
