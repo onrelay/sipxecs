@@ -40,7 +40,7 @@ start() {
          org.sipfoundry.sipxacccode.SipXacccode \
 	 $Args"
     if [ -n "${NoFork}" ] ; then
-      sudo -u @SIPXPBXUSER@ ${Command}
+      runuser -s @BASH@ @SIPXPBXUSER@ -c ${Command}
     else
       echo -n $"Starting sipxacccode: "
       su @SIPXPBXUSER@

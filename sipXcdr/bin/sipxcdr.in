@@ -429,7 +429,7 @@ start() {
   fi
   if [ -n "${NoFork}" ] ; then
     killAnyOrphans @SIPXPBXUSER@ $regex
-    sudo -u @SIPXPBXUSER@ "${RubyCmd} ${CallResolverMain} ${resolverArgs}"
+    runuser -s @BASH@ @SIPXPBXUSER@ -c "${RubyCmd} ${CallResolverMain} ${resolverArgs}"
   else
     checkRunningInstance @SIPXPBXUSER@ $regex > /dev/null
     Status=$?

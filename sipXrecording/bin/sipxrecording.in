@@ -48,7 +48,7 @@ start() {
     org.sipfoundry.sipxrecording.SipXrecording \
     $Args"
   if [ -n "${NoFork}" ] ; then
-    sudo -u @SIPXPBXUSER@ ${Command}
+    runuser -s @BASH@ @SIPXPBXUSER@ -c ${Command}
   else
     echo -n $"Starting $prog: "
     su @SIPXPBXUSER@

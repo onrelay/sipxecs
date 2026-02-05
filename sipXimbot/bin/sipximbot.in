@@ -40,7 +40,7 @@ start() {
          org.sipfoundry.sipximbot.SipXimbot \
 	 $Args"
     if [ -n "${NoFork}" ] ; then
-      sudo -u @SIPXPBXUSER@ ${Command}
+      runuser -s @BASH@ @SIPXPBXUSER@ -c ${Command}
     else
       echo -n $"Starting sipximbot: "
       su @SIPXPBXUSER@

@@ -135,7 +135,7 @@ databaseCommand() {
       -f @SIPX_CONFDIR@/database/database.xml \
       $@"
 
-  CmdOut=`sudo -u  @SIPXPBXUSER@ "${Command}"`
+  CmdOut=`runuser -s @BASH@ @SIPXPBXUSER@ -c "${Command}"`
 
   if [ $? != "0" ]; then
      echo "$CmdOut" | grep -v '^Unable to locate tools.jar' >&2
@@ -238,7 +238,7 @@ runTask() {
   databaseVersionCheck    
   buildCommand task-$taskId
   Command="$Command org.sipfoundry.sipxconfig.common.SystemTaskRunner $*"
-  sudo -u @SIPXPBXUSER@ "${Command}"
+  runuser -s @BASH@ @SIPXPBXUSER@ -c "${Command}"
   Status=$?
 }
 
@@ -261,7 +261,7 @@ start() {
   chown @SIPXPBXUSER@:@SIPXPBXUSER@ ${LogFile}
   if [ -n "${NoFork}" ] ; then
     killAnyProcessOrphans ${PidFile}
-    sudo -u @SIPXPBXUSER@ "${Command}" >> ${LogFile} 2>&1
+    runuser -s @BASH@ @SIPXPBXUSER@ -c "${Command}" >> ${LogFile} 2>&1
     Status=$?
   else
     checkRunningProcessIsListening ${PidFile} > /dev/null 2>&1

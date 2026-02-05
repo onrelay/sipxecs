@@ -23,7 +23,7 @@ start() {
   [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; echo; exit $ENOENT; }
   if [ -n "${NoFork}" ] ; then
     killAnyProcessOrphans ${pidfile}
-    sudo -u @SIPXPBXUSER@ $exec
+    runuser -s @BASH@ @SIPXPBXUSER@ -c $exec
   else
     checkRunningProcessIsListening ${pidfile} > /dev/null
     Status=$?

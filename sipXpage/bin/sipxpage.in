@@ -31,7 +31,7 @@ start() {
     $Args"
   if [ -n "${NoFork}" ] ; then
     killAnyProcessOrphans ${pidfile}
-    sudo -u @SIPXPBXUSER@ ${Command}
+    runuser -s @BASH@ @SIPXPBXUSER@ -c ${Command}
   else
     checkRunningProcessIsListening ${pidfile} > /dev/null
     Status=$?
