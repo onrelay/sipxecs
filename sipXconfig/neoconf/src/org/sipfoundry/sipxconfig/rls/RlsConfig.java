@@ -59,7 +59,7 @@ public class RlsConfig implements ConfigProvider, DaoEventListener, BeanFactoryA
         RlsSettings settings = m_rls.getSettings();
         boolean xmppPresenceEnabled = false;
         if (manager.getFeatureManager().isFeatureEnabled(ImManager.FEATURE)) {
-            ImManager imManager = m_factory.getBean(ImManager.class);
+            ImManager imManager = m_factory.getBean("imManager", ImManager.class);
             xmppPresenceEnabled = imManager.isPresenceEnabled();
         }
         for (Location location : locations) {
