@@ -22,34 +22,34 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.sipfoundry.sipxconfig.dialplan.attendant.Attendant;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.AfterHoursAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 
-@XmlRootElement(name = "workingTimeAttendant")
-public class WorkingTimeAttendantBean extends AttendantBean {
+@XmlRootElement(name = "afterHoursAttendant")
+public class AfterHoursAttendantBean extends AttendantBean {
 
-    public static WorkingTimeAttendantBean convertWorkingTimeAttendantBean(WorkingTimeAttendant workingTimeAttendant) {
+    public static AfterHoursAttendantBean convertAfterHoursAttendantBean(AfterHoursAttendant afterHoursAttendant) {
 
         AttendantBean attendantBean = 
-            AttendantBean.convertAttendantBean( workingTimeAttendant );
+            AttendantBean.convertAttendantBean( afterHoursAttendant );
 
-        WorkingTimeAttendantBean workingTimeAttendantBean = new WorkingTimeAttendantBean();
+        AfterHoursAttendantBean afterHoursAttendantBean = new AfterHoursAttendantBean();
 
-        workingTimeAttendantBean.setWorkingHours( attendantBean.getWorkingHours() );
+        afterHoursAttendantBean.setWorkingHours( attendantBean.getWorkingHours() );
 
-        return workingTimeAttendantBean;
+        return afterHoursAttendantBean;
     }
 
-    public static WorkingTimeAttendant convertToWorkingTimeAttendant(WorkingTimeAttendantBean workingTimeAttendantBean ) {
+    public static AfterHoursAttendant convertToAfterHoursAttendant(AfterHoursAttendantBean afterHoursAttendantBean ) {
 
         Attendant attendant = 
-            AttendantBean.convertToAttendant( workingTimeAttendantBean );
+            AttendantBean.convertToAttendant( afterHoursAttendantBean );
 
-        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        AfterHoursAttendant afterHoursAttendant = new AfterHoursAttendant();
 
-        workingTimeAttendant.setWorkingHours( attendant.getWorkingHours() );
+        afterHoursAttendant.setWorkingHours( attendant.getWorkingHours() );
 
-        return workingTimeAttendant;
+        return afterHoursAttendant;
     }
 
     public void setWorkingHours(List<WorkingHoursBean> workingHours) {

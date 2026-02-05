@@ -154,11 +154,11 @@ public class AutoAttendantsConfigTest extends XMLTestCase {
         attendantRule.setAfterHoursAttendant(sa);
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
-        Holiday holiday = new Holiday();
-        holiday.addPeriod(getNewHolidayPeriod(format.parse("2010-05-03 00:00"), format.parse("2010-05-03 23:59")));
-        holiday.addPeriod(getNewHolidayPeriod(format.parse("2010-07-04 00:00"), format.parse("2010-07-04 23:59")));
-        holiday.setAttendant(operator);
-        attendantRule.setHolidayAttendant(holiday);
+        HolidayAttendant holidayAttendant = new HolidayAttendant();
+        holidayAttendant.addPeriod(getNewHolidayPeriod(format.parse("2010-05-03 00:00"), format.parse("2010-05-03 23:59")));
+        holidayAttendant.addPeriod(getNewHolidayPeriod(format.parse("2010-07-04 00:00"), format.parse("2010-07-04 23:59")));
+        holidayAttendant.setAttendant(operator);
+        attendantRule.setHolidayAttendant(holidayAttendant);
 
         WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
         workingTimeAttendant.setAttendant(operator);

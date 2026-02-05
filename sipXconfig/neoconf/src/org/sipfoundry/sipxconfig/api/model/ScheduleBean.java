@@ -27,10 +27,10 @@ import org.sipfoundry.sipxconfig.forwarding.UserSchedule;
 
 @XmlRootElement(name = "Schedule")
 @XmlType(propOrder = {
-        "id", "name", "description", "userId", "groupId", "type", "workingTimeAttendant"
+        "id", "name", "description", "userId", "groupId", "type", "scheduledAttendant"
         })
 @JsonPropertyOrder({
-        "id", "name", "description", "userId", "groupId", "type", "workingTimeAttendant"
+        "id", "name", "description", "userId", "groupId", "type", "scheduledAttendant"
     })
 public class ScheduleBean {
     private int m_id;
@@ -39,7 +39,7 @@ public class ScheduleBean {
     private Integer m_userId = -1;
     private Integer m_groupId = -1;
     private ScheduleType m_type;
-    private WorkingTimeAttendantBean m_workingTimeAttendant;
+    private ScheduledAttendantBean m_scheduledAttendant;
 
     @XmlType(name = "scheduleType")
     @XmlEnum
@@ -69,9 +69,9 @@ public class ScheduleBean {
             scheduleBean.setType(ScheduleType.U);
             scheduleBean.setGroupId(schedule.getUserGroup().getId());
         }
-        scheduleBean.setWorkingTimeAttendant(
-            WorkingTimeAttendantBean.convertWorkingTimeAttendantBean(
-                schedule.getWorkingTimeAttendant()));
+        scheduleBean.setScheduledAttendant(
+            ScheduledAttendantBean.convertScheduledAttendantBean(
+                schedule.getScheduledAttendant()));
         return scheduleBean;
     }
 
@@ -123,11 +123,11 @@ public class ScheduleBean {
         m_type = type;
     }
 
-    public WorkingTimeAttendantBean getWorkingTimeAttendant() {
-        return m_workingTimeAttendant;
+    public ScheduledAttendantBean getScheduledAttendant() {
+        return m_scheduledAttendant;
     }
 
-    public void setWorkingTimeAttendant(WorkingTimeAttendantBean workingTimeAttendant) {
-        m_workingTimeAttendant = workingTimeAttendant;
+    public void setScheduledAttendant(ScheduledAttendantBean scheduledAttendant) {
+        m_scheduledAttendant = scheduledAttendant;
     }
 }

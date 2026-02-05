@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.common.UserException;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 import org.sipfoundry.sipxconfig.setting.Group;
 import org.sipfoundry.sipxconfig.systemaudit.SystemAuditable;
@@ -26,7 +26,7 @@ public abstract class Schedule extends BeanWithId implements SystemAuditable {
     private User m_user;
     private String m_name;
     private String m_description;
-    private WorkingTimeAttendant m_workingTimeAttendant;
+    private ScheduledAttendant m_scheduledAttendant;
     private Group m_userGroup;
 
     public User getUser() {
@@ -53,12 +53,12 @@ public abstract class Schedule extends BeanWithId implements SystemAuditable {
         this.m_description = description;
     }
 
-    public WorkingTimeAttendant getWorkingTimeAttendant() {
-        return m_workingTimeAttendant;
+    public ScheduledAttendant getScheduledAttendant() {
+        return m_scheduledAttendant;
     }
 
-    public void setWorkingTimeAttendant(WorkingTimeAttendant workingTimeAttendant) {
-        this.m_workingTimeAttendant = workingTimeAttendant;
+    public void setScheduledAttendant(ScheduledAttendant scheduledAttendant) {
+        this.m_scheduledAttendant = scheduledAttendant;
     }
 
     public Group getUserGroup() {
@@ -70,9 +70,9 @@ public abstract class Schedule extends BeanWithId implements SystemAuditable {
     }
 
     public String calculateValidTime() {
-        WorkingTimeAttendant workingTimeAttendant = getWorkingTimeAttendant();
+        ScheduledAttendant scheduledAttendant = getScheduledAttendant();
         TimeZone timeZone = (m_user != null) ? m_user.getTimezone() : TimeZone.getDefault();
-        List<WorkingHours.Interval> intervals = workingTimeAttendant.calculateValidTime(timeZone);
+        List<WorkingHours.Interval> intervals = scheduledAttendant.calculateValidTime(timeZone);
         List<String> validTimeStr = new ArrayList<String>(intervals.size());
         for (WorkingHours.Interval time : intervals) {
             validTimeStr.add(Integer.toHexString(time.getStart()));
@@ -82,12 +82,12 @@ public abstract class Schedule extends BeanWithId implements SystemAuditable {
     }
 
     public void checkForValidSchedule() {
-        WorkingTimeAttendant workingTimeAttendant = getWorkingTimeAttendant();
-        List<WorkingHours> workingHours = workingTimeAttendant.getWorkingHours();
+        ScheduledAttendant scheduledAttendant = getScheduledAttendant();
+        List<WorkingHours> workingHours = scheduledAttendant.getWorkingHours();
         if (workingHours == null || workingHours.size() == 0) {
             throw new ScheduleException();
         }
-        workingTimeAttendant.checkValid();
+        scheduledAttendant.checkValid();
     }
 
     @SuppressWarnings("serial")

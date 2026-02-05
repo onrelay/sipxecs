@@ -9,5 +9,6 @@
  */
 package org.sipfoundry.sipxconfig.dialplan.attendant;
 
-public class ScheduledAttendant extends Attendant {
+public class AfterHoursAttendant extends ScheduledAttendant {
+
 }

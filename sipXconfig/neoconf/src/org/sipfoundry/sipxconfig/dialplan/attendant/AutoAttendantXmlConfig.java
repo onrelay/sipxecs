@@ -73,7 +73,7 @@ public class AutoAttendantXmlConfig {
     private void generateSchedule(Element schedulesEl, AttendantRule attendantRule) {
         Element scheduleEl = schedulesEl.addElement("schedule");
         scheduleEl.addAttribute(ID, attendantRule.getSystemName());
-        Holiday holidayAttendant = attendantRule.getHolidayAttendant();
+        HolidayAttendant holidayAttendant = attendantRule.getHolidayAttendant();
         Element holidayEl = scheduleEl.addElement("holiday");
         if (holidayAttendant.isEnabled()) {
             addId(holidayEl, holidayAttendant.getAttendant());

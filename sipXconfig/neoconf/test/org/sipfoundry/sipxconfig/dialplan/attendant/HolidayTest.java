@@ -31,24 +31,24 @@ public class HolidayTest extends TestCase {
     }
 
     public void testaddPeriod() {
-        Holiday holiday = new Holiday();
-        assertTrue(holiday.getPeriods().isEmpty());
-        holiday.addPeriod(m_now);
-        holiday.addPeriod(m_then);
-        holiday.addPeriod(m_now);
-        assertEquals(3, holiday.getPeriods().size());
-        assertTrue(holiday.getPeriods().contains(m_now));
-        assertTrue(holiday.getPeriods().contains(m_then));
+        HolidayAttendant holidayAttendant = new HolidayAttendant();
+        assertTrue(holidayAttendant.getPeriods().isEmpty());
+        holidayAttendant.addPeriod(m_now);
+        holidayAttendant.addPeriod(m_then);
+        holidayAttendant.addPeriod(m_now);
+        assertEquals(3, holidayAttendant.getPeriods().size());
+        assertTrue(holidayAttendant.getPeriods().contains(m_now));
+        assertTrue(holidayAttendant.getPeriods().contains(m_then));
     }
 
     public void testRemovePeriod() {
-        Holiday holiday = new Holiday();
-        holiday.addPeriod(m_now);
-        assertEquals(1, holiday.getPeriods().size());
-        holiday.removePeriod(m_then);
-        assertEquals(1, holiday.getPeriods().size());
-        holiday.removePeriod(m_now);
-        assertTrue(holiday.getPeriods().isEmpty());
+        HolidayAttendant holidayAttendant = new HolidayAttendant();
+        holidayAttendant.addPeriod(m_now);
+        assertEquals(1, holidayAttendant.getPeriods().size());
+        holidayAttendant.removePeriod(m_then);
+        assertEquals(1, holidayAttendant.getPeriods().size());
+        holidayAttendant.removePeriod(m_now);
+        assertTrue(holidayAttendant.getPeriods().isEmpty());
     }
 
     public void testNotNullPeriod() {
@@ -107,11 +107,11 @@ public class HolidayTest extends TestCase {
     }
 
     public void testGetDay() {
-        Holiday holiday = new Holiday();
-        assertTrue(holiday.getPeriods().isEmpty());
+        HolidayAttendant holidayAttendant = new HolidayAttendant();
+        assertTrue(holidayAttendant.getPeriods().isEmpty());
         for (int i = 0; i < 3; i++) {
-            assertNotNull(holiday.getPeriod(i));
-            assertEquals(i + 1, holiday.getPeriods().size());
+            assertNotNull(holidayAttendant.getPeriod(i));
+            assertEquals(i + 1, holidayAttendant.getPeriods().size());
         }
     }
 
@@ -119,40 +119,40 @@ public class HolidayTest extends TestCase {
         HolidayPeriod[] holidayPeriods = {
             m_now, m_then, getNewHolidayPeriod(), getNewHolidayPeriod(), getNewHolidayPeriod()
         };
-        Holiday holiday = new Holiday();
-        assertTrue(holiday.getPeriods().isEmpty());
+        HolidayAttendant holidayAttendant = new HolidayAttendant();
+        assertTrue(holidayAttendant.getPeriods().isEmpty());
         for (int i = 0; i < holidayPeriods.length; i++) {
-            holiday.addPeriod(holidayPeriods[i]);
+            holidayAttendant.addPeriod(holidayPeriods[i]);
         }
-        assertEquals(5, holiday.getPeriods().size());
-        holiday.chop(2);
-        assertEquals(3, holiday.getPeriods().size());
-        List days = holiday.getPeriods();
+        assertEquals(5, holidayAttendant.getPeriods().size());
+        holidayAttendant.chop(2);
+        assertEquals(3, holidayAttendant.getPeriods().size());
+        List days = holidayAttendant.getPeriods();
         for(int i = 0; i < days.size(); i++) {
             assertSame(holidayPeriods[i], days.get(i));
         }
     }
 
     public void testChopLast() {
-        Holiday holiday = new Holiday();
-        assertTrue(holiday.getPeriods().isEmpty());
+        HolidayAttendant holidayAttendant = new HolidayAttendant();
+        assertTrue(holidayAttendant.getPeriods().isEmpty());
         for (int i = 0; i < 3; i++) {
-            holiday.addPeriod(getNewHolidayPeriod());
+            holidayAttendant.addPeriod(getNewHolidayPeriod());
         }
-        assertEquals(3, holiday.getPeriods().size());
-        holiday.chop(2);
-        assertEquals(3, holiday.getPeriods().size());
+        assertEquals(3, holidayAttendant.getPeriods().size());
+        holidayAttendant.chop(2);
+        assertEquals(3, holidayAttendant.getPeriods().size());
     }
 
     public void testChopOutOfRange() {
-        Holiday holiday = new Holiday();
-        assertTrue(holiday.getPeriods().isEmpty());
+        HolidayAttendant holidayAttendant = new HolidayAttendant();
+        assertTrue(holidayAttendant.getPeriods().isEmpty());
         for (int i = 0; i < 3; i++) {
-            holiday.addPeriod(getNewHolidayPeriod());
+            holidayAttendant.addPeriod(getNewHolidayPeriod());
         }
-        assertEquals(3, holiday.getPeriods().size());
-        holiday.chop(4);
-        assertEquals(3, holiday.getPeriods().size());
+        assertEquals(3, holidayAttendant.getPeriods().size());
+        holidayAttendant.chop(4);
+        assertEquals(3, holidayAttendant.getPeriods().size());
     }
 
     private HolidayPeriod getNewHolidayPeriod() {

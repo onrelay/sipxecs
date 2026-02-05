@@ -22,29 +22,31 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.sipfoundry.commons.util.HolidayPeriod;
-import org.sipfoundry.sipxconfig.dialplan.attendant.Holiday;
+import org.sipfoundry.sipxconfig.dialplan.attendant.HolidayAttendant;
 
 @XmlRootElement(name = "holidayPeriods")
-public class HolidayBean {
+public class HolidayAttendantBean {
     private List<HolidayPeriodBean> m_holidayPeriods;
 
-    public static HolidayBean convertHolidayBean(Holiday holiday) {
+    public static HolidayAttendantBean convertHolidayAttendantBean(HolidayAttendant holidayAttendant) {
         List<HolidayPeriodBean> holidayPeriodList = new ArrayList<HolidayPeriodBean>();
-        for (HolidayPeriod hPeriod : holiday.getPeriods()) {
+        for (HolidayPeriod hPeriod : holidayAttendant.getPeriods()) {
             holidayPeriodList.add(HolidayPeriodBean.convertHolidayPeriod(hPeriod));
         }
-        HolidayBean holidayBean = new HolidayBean();
-        holidayBean.setHolidayPeriods(holidayPeriodList);
-        return holidayBean;
+        HolidayAttendantBean holidayAttendantBean = new HolidayAttendantBean();
+        holidayAttendantBean.setHolidayPeriods(holidayPeriodList);
+        return holidayAttendantBean;
     }
 
-    public static void convertToHoliday(HolidayBean holidayBean, Holiday holiday) {
-        holiday.getPeriods().clear();
-        if (holidayBean == null) {
+    public static void convertToHolidayAttendant(HolidayAttendantBean holidayAttendantBean, HolidayAttendant holidayAttendant) {
+        
+        holidayAttendant.getPeriods().clear();
+
+        if (holidayAttendantBean == null) {
             return;
         }
-        for (HolidayPeriodBean bean : holidayBean.getHoliday()) {
-            holiday.addPeriod(HolidayPeriodBean.convertToHolidayPeriod(bean));
+        for (HolidayPeriodBean bean : holidayAttendantBean.getHolidayPeriods()) {
+            holidayAttendant.addPeriod(HolidayPeriodBean.convertToHolidayPeriod(bean));
         }
     }
 
@@ -54,7 +56,7 @@ public class HolidayBean {
 
     @XmlElement(name = "holidayPeriods")
     @JsonProperty(value = "holidayPeriods")
-    public List<HolidayPeriodBean> getHoliday() {
+    public List<HolidayPeriodBean> getHolidayPeriods() {
         if (m_holidayPeriods == null) {
             return new ArrayList<HolidayPeriodBean>();
         }

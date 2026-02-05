@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 import org.sipfoundry.sipxconfig.callgroup.AbstractRing;
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
 import org.sipfoundry.sipxconfig.dialplan.ForkQueueValue;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 
 /**
@@ -51,7 +51,7 @@ public class RingTest extends TestCase {
 
         Schedule schedule = new UserSchedule();
         List<WorkingHours> workingHours = new ArrayList<WorkingHours>();
-        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        ScheduledAttendant scheduledAttendant = new ScheduledAttendant();
         workingHours.add( new WorkingHours() );
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         cal.set(2006, Calendar.DECEMBER, 31, 10, 00);
@@ -64,9 +64,9 @@ public class RingTest extends TestCase {
         Integer stopMinute = Integer.valueOf(cal.get(Calendar.MINUTE));
         workingHours.get(0).setEnabled(true);
         workingHours.get(0).setDay(ScheduledDay.WEDNESDAY);
-        workingTimeAttendant.setWorkingHours(workingHours);
-        workingTimeAttendant.setEnabled(true);
-        schedule.setWorkingTimeAttendant(workingTimeAttendant);
+        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.setEnabled(true);
+        schedule.setScheduledAttendant(scheduledAttendant);
 
         ring.setSchedule(schedule);
 

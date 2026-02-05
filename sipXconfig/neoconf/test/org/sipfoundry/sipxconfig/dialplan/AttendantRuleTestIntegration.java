@@ -164,7 +164,7 @@ public class AttendantRuleTestIntegration extends MongoTestIntegration {
         workingHours.add(workingHoursItem);
         workingTimeAttendant.setWorkingHours(workingHours);
         workingTimeAttendant.setEnabled(true);
-        schedule.setWorkingTimeAttendant(workingTimeAttendant);
+        schedule.setScheduledAttendant(workingTimeAttendant);
         schedule.setName("live attendant schedule");
         m_forwardingContext.saveSchedule(schedule);
         rule.setSchedule(schedule);

@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.sipfoundry.commons.util.HolidayPeriod;
 
-public class Holiday extends ScheduledAttendant {
+public class HolidayAttendant extends Attendant {
     private List<HolidayPeriod> m_periods = new ArrayList<HolidayPeriod>();
 
     public void addPeriod(HolidayPeriod period) {
@@ -42,7 +42,7 @@ public class Holiday extends ScheduledAttendant {
      */
     @Override
     public Object clone() throws CloneNotSupportedException {
-        Holiday clone = (Holiday) super.clone();
+        HolidayAttendant clone = (HolidayAttendant) super.clone();
         clone.setPeriods(new ArrayList(getPeriods()));
         return clone;
     }

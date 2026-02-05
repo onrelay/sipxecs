@@ -389,7 +389,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
                         workingTimeAttendant.setWorkingHours(workingHours);
                         List<WorkingHours.Interval> intervals = workingTimeAttendant.calculateValidTime(utc);
                         int intervalNow = intervals.get(0).getStart();
-                        List<WorkingHours.Interval> scheduleIntervals = schedule.getWorkingTimeAttendant().calculateValidTime(
+                        List<WorkingHours.Interval> scheduleIntervals = schedule.getScheduledAttendant().calculateValidTime(
                                 TimeZone.getDefault());
                         int dif = 0;
                         int firstStartInWeek = 0;

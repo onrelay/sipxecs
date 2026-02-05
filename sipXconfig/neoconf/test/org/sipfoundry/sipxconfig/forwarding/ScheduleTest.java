@@ -23,7 +23,7 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
 import org.sipfoundry.sipxconfig.common.User;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 
 public class ScheduleTest extends TestCase {
@@ -37,7 +37,7 @@ public class ScheduleTest extends TestCase {
         Schedule sch = new UserSchedule();
         sch.setUser(user);
         List<WorkingHours> workingHours = new ArrayList<WorkingHours>();
-        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        ScheduledAttendant scheduledAttendant = new ScheduledAttendant();
 
         workingHours.add( new WorkingHours() );
 
@@ -59,10 +59,10 @@ public class ScheduleTest extends TestCase {
 
         Integer minutesFromSunday = (workingHours.get(0).getDay().getDayOfWeek() - 1) * 24 * 60;
 
-        workingTimeAttendant.setWorkingHours(workingHours);
-        workingTimeAttendant.setEnabled(true);
+        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.setEnabled(true);
 
-        sch.setWorkingTimeAttendant(workingTimeAttendant);
+        sch.setScheduledAttendant(scheduledAttendant);
 
         //int tz_offset = TimeZone.getDefault().getOffset((new Date()).getTime()) / 60000;
         int tz_offset = 0;
@@ -85,7 +85,7 @@ public class ScheduleTest extends TestCase {
         Schedule sch = new UserSchedule();
         sch.setUser(user);
         List<WorkingHours> workingHours = new ArrayList<WorkingHours>();
-        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        ScheduledAttendant scheduledAttendant = new ScheduledAttendant();
 
         workingHours.add( new WorkingHours() );
 
@@ -107,10 +107,10 @@ public class ScheduleTest extends TestCase {
 
         Integer minutesFromSunday = (workingHours.get(0).getDay().getDayOfWeek() - 1) * 24 * 60;
 
-        workingTimeAttendant.setWorkingHours(workingHours);
-        workingTimeAttendant.setEnabled(true);
+        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.setEnabled(true);
 
-        sch.setWorkingTimeAttendant(workingTimeAttendant);
+        sch.setScheduledAttendant(scheduledAttendant);
 
         int tz_offset = DateTimeZone.forTimeZone(TimeZone.getTimeZone("GMT-11")).getOffset(
                 new DateTime(DateTimeZone.forTimeZone(TimeZone.getTimeZone("GMT-11"))).getMillis()) / 1000 / 60;
@@ -134,7 +134,7 @@ public class ScheduleTest extends TestCase {
         Schedule sch = new UserSchedule();
         sch.setUser(user);
         List<WorkingHours> workingHours = new ArrayList<WorkingHours>();
-        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        ScheduledAttendant scheduledAttendant = new ScheduledAttendant();
 
         workingHours.add( new WorkingHours() );
 
@@ -156,10 +156,10 @@ public class ScheduleTest extends TestCase {
 
         Integer minutesFromSunday = (workingHours.get(0).getDay().getDayOfWeek() - 1) * 24 * 60;
 
-        workingTimeAttendant.setWorkingHours(workingHours);
-        workingTimeAttendant.setEnabled(true);
+        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.setEnabled(true);
 
-        sch.setWorkingTimeAttendant(workingTimeAttendant);
+        sch.setScheduledAttendant(scheduledAttendant);
 
         int tz_offset = DateTimeZone.forTimeZone(TimeZone.getTimeZone("GMT+5")).getOffset(
                 new DateTime(DateTimeZone.forTimeZone(TimeZone.getTimeZone("GMT+5"))).getMillis()) / 1000 / 60;

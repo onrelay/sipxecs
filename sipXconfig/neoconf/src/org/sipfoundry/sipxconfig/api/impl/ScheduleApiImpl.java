@@ -24,7 +24,7 @@ import org.sipfoundry.sipxconfig.api.ScheduleApi;
 import org.sipfoundry.sipxconfig.api.model.ScheduleBean;
 import org.sipfoundry.sipxconfig.api.model.ScheduleList;
 import org.sipfoundry.sipxconfig.api.model.WorkingHoursBean;
-import org.sipfoundry.sipxconfig.api.model.WorkingTimeAttendantBean;
+import org.sipfoundry.sipxconfig.api.model.ScheduledAttendantBean;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.common.User;
 import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
@@ -136,9 +136,9 @@ public class ScheduleApiImpl implements ScheduleApi {
         Schedule schedule = m_forwardingContext.getScheduleById(scheduleId);
         if (schedule != null) {
             WorkingHours wHours = WorkingHoursBean.convertToWorkingHours(whBean);
-            List<WorkingHours> newWorkingHours = schedule.getWorkingTimeAttendant().getWorkingHours();
+            List<WorkingHours> newWorkingHours = schedule.getScheduledAttendant().getWorkingHours();
             newWorkingHours.add( wHours );
-            schedule.getWorkingTimeAttendant().setWorkingHours(newWorkingHours);
+            schedule.getScheduledAttendant().setWorkingHours(newWorkingHours);
             m_forwardingContext.saveSchedule(schedule);
             return Response.ok().build();
         }
@@ -149,11 +149,11 @@ public class ScheduleApiImpl implements ScheduleApi {
     @Override
     public Response deletePeriod(Integer scheduleId, Integer index) {
         Schedule schedule = m_forwardingContext.getScheduleById(scheduleId);
-        List<WorkingHours> newWorkingHours = schedule.getWorkingTimeAttendant().getWorkingHours();
+        List<WorkingHours> newWorkingHours = schedule.getScheduledAttendant().getWorkingHours();
         if (schedule != null && index > 0 && index < newWorkingHours.size() ) {
 
             newWorkingHours.remove( index.intValue() );
-            schedule.getWorkingTimeAttendant().setWorkingHours(newWorkingHours);
+            schedule.getScheduledAttendant().setWorkingHours(newWorkingHours);
             m_forwardingContext.saveSchedule(schedule);
             return Response.ok().build();
         }
@@ -168,9 +168,9 @@ public class ScheduleApiImpl implements ScheduleApi {
         } else if (schedule instanceof UserGroupSchedule) {
             schedule.setUserGroup(m_coreContext.getGroupById(scheduleBean.getGroupId()));
         }
-        schedule.setWorkingTimeAttendant(
-            WorkingTimeAttendantBean.convertToWorkingTimeAttendant(
-                scheduleBean.getWorkingTimeAttendant()));
+        schedule.setScheduledAttendant(
+            ScheduledAttendantBean.convertToScheduledAttendant(
+                scheduleBean.getScheduledAttendant()));
     }
 
     

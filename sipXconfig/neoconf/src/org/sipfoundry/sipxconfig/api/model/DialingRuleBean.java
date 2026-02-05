@@ -81,7 +81,7 @@ public class DialingRuleBean {
     private boolean m_afterHoursAttendantEnabled;
     private String m_workingTimeAttendant;
     private String m_holidayAttendant;
-    private HolidayBean m_holidayAttendantPeriods;
+    private HolidayAttendantBean m_holidayAttendantPeriods;
     private WorkingTimeAttendantBean m_workingTimeAttendantPeriods;
     private boolean m_enableLiveAttendant;
 
@@ -157,7 +157,7 @@ public class DialingRuleBean {
             attendant = ((AttendantRule) rule).getWorkingTimeAttendant().getAttendant();
             dialingRuleBean.setWorkingTimeAttendant(attendant != null ? attendant.getName() : null);
             attendant = ((AttendantRule) rule).getHolidayAttendant().getAttendant();
-            dialingRuleBean.setHolidayAttendantPeriods(HolidayBean.convertHolidayBean(
+            dialingRuleBean.setHolidayAttendantPeriods(HolidayAttendantBean.convertHolidayAttendantBean(
                 ((AttendantRule) rule).getHolidayAttendant()));
             dialingRuleBean.setWorkingTimeAttendantPeriods(WorkingTimeAttendantBean.convertWorkingTimeAttendantBean(
                 ((AttendantRule) rule).getWorkingTimeAttendant()));
@@ -369,11 +369,11 @@ public class DialingRuleBean {
         m_afterHoursAttendantEnabled = afterHoursAttendantEnabled;
     }
 
-    public HolidayBean getHolidayAttendantPeriods() {
+    public HolidayAttendantBean getHolidayAttendantPeriods() {
         return m_holidayAttendantPeriods;
     }
 
-    public void setHolidayAttendantPeriods(HolidayBean holidayAttendantPeriods) {
+    public void setHolidayAttendantPeriods(HolidayAttendantBean holidayAttendantPeriods) {
         m_holidayAttendantPeriods = holidayAttendantPeriods;
     }
 

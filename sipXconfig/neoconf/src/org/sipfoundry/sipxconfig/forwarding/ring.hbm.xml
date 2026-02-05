@@ -49,16 +49,13 @@
     <discriminator column="schedule_type" type="character" />
     <property name="name" />
     <property name="description" />
-    <component name="workingTimeAttendant" class="org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant">
-      <many-to-one name="attendant" column="working_time_attendant_id" class="org.sipfoundry.sipxconfig.dialplan.AutoAttendant"
-          cascade="none" foreign-key="fk_attendant_working_hours_attendant_dialing_rule" />
-      <property name="enabled" column="working_time_attendant_enabled" />
+    <component name="scheduledAttendant" class="org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant">
       <list name="workingHours"
-            table="attendant_working_hours"
+            table="schedule_hours"
             batch-size="7">
-        <key column="attendant_dialing_rule_id"
-            foreign-key="fk_attendant_working_hours_attendant_dialing_rule" />
-        <index column="index" />
+        <key column="schedule_id"
+            foreign-key="fk_schedule_hours_schedule" />
+        <index column="schedule_hours_id" />
         <composite-element class="org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours">
           <property name="start" type="org.sipfoundry.sipxconfig.common.UtcTimestampType" />
           <property name="stop"  type="org.sipfoundry.sipxconfig.common.UtcTimestampType" />

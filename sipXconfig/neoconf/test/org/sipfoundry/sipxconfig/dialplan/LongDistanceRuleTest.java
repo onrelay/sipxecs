@@ -18,7 +18,7 @@ import java.util.TimeZone;
 import junit.framework.TestCase;
 
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
-import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 import org.sipfoundry.sipxconfig.dialplan.config.FullTransform;
 import org.sipfoundry.sipxconfig.dialplan.config.Transform;
@@ -42,7 +42,7 @@ public class LongDistanceRuleTest extends TestCase {
         m_schedule = new GeneralSchedule();
         m_schedule.setName("Custom schedule");
         List<WorkingHours> workingHours = new ArrayList<WorkingHours>();
-        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        ScheduledAttendant scheduledAttendant = new ScheduledAttendant();
         WorkingHours workingHoursItem = new WorkingHours();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         cal.set(2006, Calendar.DECEMBER, 31, 10, 12);
@@ -52,9 +52,9 @@ public class LongDistanceRuleTest extends TestCase {
         workingHoursItem.setEnabled(true);
         workingHoursItem.setDay(ScheduledDay.WEDNESDAY);
         workingHours.add(workingHoursItem);
-        workingTimeAttendant.setWorkingHours(workingHours);
-        workingTimeAttendant.setEnabled(true);
-        m_schedule.setWorkingTimeAttendant(workingTimeAttendant);
+        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.setEnabled(true);
+        m_schedule.setScheduledAttendant(scheduledAttendant);
 
         m_rule = new LongDistanceRule();
         m_rule.setEnabled(true);

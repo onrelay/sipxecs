@@ -32,7 +32,7 @@ import org.sipfoundry.sipxconfig.common.Replicable;
 import org.sipfoundry.sipxconfig.common.SipUri;
 import org.sipfoundry.sipxconfig.commserver.imdb.AliasMapping;
 import org.sipfoundry.sipxconfig.commserver.imdb.DataSet;
-import org.sipfoundry.sipxconfig.dialplan.attendant.Holiday;
+import org.sipfoundry.sipxconfig.dialplan.attendant.HolidayAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
 import org.sipfoundry.sipxconfig.dialplan.config.Transform;
@@ -52,7 +52,7 @@ public class AttendantRule extends DialingRule implements Replicable {
     private FeatureManager m_featureManager;
     private MediaServer m_mediaServer;
     private ScheduledAttendant m_afterHoursAttendant = new ScheduledAttendant();
-    private Holiday m_holidayAttendant = new Holiday();
+    private HolidayAttendant m_holidayAttendant = new HolidayAttendant();
     private WorkingTimeAttendant m_workingTimeAttendant = new WorkingTimeAttendant();
     private String m_attendantAliases;
     private String m_extension;
@@ -93,7 +93,7 @@ public class AttendantRule extends DialingRule implements Replicable {
         AttendantRule ar = (AttendantRule) super.clone();
         ar.m_afterHoursAttendant = (ScheduledAttendant) m_afterHoursAttendant.clone();
         ar.m_workingTimeAttendant = (WorkingTimeAttendant) m_workingTimeAttendant.clone();
-        ar.m_holidayAttendant = (Holiday) m_holidayAttendant.clone();
+        ar.m_holidayAttendant = (HolidayAttendant) m_holidayAttendant.clone();
         ar.m_locations = new HashSet<Branch>(m_locations);
         return ar;
     }
@@ -137,11 +137,11 @@ public class AttendantRule extends DialingRule implements Replicable {
         m_afterHoursAttendant = afterHoursAttendant;
     }
 
-    public Holiday getHolidayAttendant() {
+    public HolidayAttendant getHolidayAttendant() {
         return m_holidayAttendant;
     }
 
-    public void setHolidayAttendant(Holiday holidayAttendant) {
+    public void setHolidayAttendant(HolidayAttendant holidayAttendant) {
         m_holidayAttendant = holidayAttendant;
     }
 

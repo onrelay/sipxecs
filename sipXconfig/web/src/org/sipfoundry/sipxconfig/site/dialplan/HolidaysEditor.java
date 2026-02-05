@@ -20,10 +20,10 @@ import org.apache.tapestry.IMarkupWriter;
 import org.apache.tapestry.IRequestCycle;
 import org.apache.tapestry.form.ListEditMap;
 import org.sipfoundry.commons.util.HolidayPeriod;
-import org.sipfoundry.sipxconfig.dialplan.attendant.Holiday;
+import org.sipfoundry.sipxconfig.dialplan.attendant.HolidayAttendant;
 
 public abstract class HolidaysEditor extends BaseComponent {
-    public abstract Holiday getHoliday();
+    public abstract HolidayAttendant getHolidayAttendant();
 
     public abstract int getDayIndex();
 
@@ -42,12 +42,12 @@ public abstract class HolidaysEditor extends BaseComponent {
     public abstract void setListEditMap(ListEditMap map);
 
     public Date getHolidayStartDay() {
-        return getHoliday().getPeriod(getDayIndex()).getStartDate();
+        return getHolidayAttendant().getPeriod(getDayIndex()).getStartDate();
     }
 
     public void setHolidayStartDay(Date day) {
         synchronizeDateTime(getHolidayStartDay(), day);
-        getHoliday().getPeriod(getDayIndex()).setStartDate(day);
+        getHolidayAttendant().getPeriod(getDayIndex()).setStartDate(day);
     }
 
     public Date getHolidayStartTime() {
@@ -60,12 +60,12 @@ public abstract class HolidaysEditor extends BaseComponent {
     }
 
     public Date getHolidayEndDay() {
-        return getHoliday().getPeriod(getDayIndex()).getEndDate();
+        return getHolidayAttendant().getPeriod(getDayIndex()).getEndDate();
     }
 
     public void setHolidayEndDay(Date day) {
         synchronizeDateTime(getHolidayEndDay(), day);
-        getHoliday().getPeriod(getDayIndex()).setEndDate(day);
+        getHolidayAttendant().getPeriod(getDayIndex()).setEndDate(day);
     }
 
     public Date getHolidayEndTime() {
@@ -113,32 +113,32 @@ public abstract class HolidaysEditor extends BaseComponent {
     }
 
     private void adjustPeriods() {
-        Holiday holiday = getHoliday();
-        holiday.chop(getMaxDayIndex());
+        HolidayAttendant holidayAttendant = getHolidayAttendant();
+        holidayAttendant.chop(getMaxDayIndex());
     }
 
     private void removePeriod() {
-        Holiday holiday = getHoliday();
+        HolidayAttendant holidayAttendant = getHolidayAttendant();
         ListEditMap map = getListEditMap();
         List deletedKeys = map.getDeletedKeys();
         Collections.sort(deletedKeys);
         for (int i = deletedKeys.size() - 1; i >= 0; i--) {
             Integer index = (Integer) deletedKeys.get(i);
-            holiday.removeDay(index.intValue());
+            holidayAttendant.removeDay(index.intValue());
         }
     }
 
     private void addPeriod() {
-        Holiday holiday = getHoliday();
+        HolidayAttendant holidayAttendant = getHolidayAttendant();
         HolidayPeriod holidayPeriod = getNewPeriod();
         if (holidayPeriod != null) {
-            holiday.addPeriod(holidayPeriod);
+            holidayAttendant.addPeriod(holidayPeriod);
         }
     }
 
     private void initListEditMap() {
         ListEditMap map = new ListEditMap();
-        List<HolidayPeriod> dates = getHoliday().getPeriods();
+        List<HolidayPeriod> dates = getHolidayAttendant().getPeriods();
         for (int i = 0; i < dates.size(); i++) {
             map.add(Integer.valueOf(i), dates.get(i));
         }

@@ -28,7 +28,7 @@ import org.sipfoundry.sipxconfig.api.model.DialPatternList;
 import org.sipfoundry.sipxconfig.api.model.DialingRuleBean;
 import org.sipfoundry.sipxconfig.api.model.DialingRuleBean.RuleType;
 import org.sipfoundry.sipxconfig.api.model.DialingRuleList;
-import org.sipfoundry.sipxconfig.api.model.HolidayBean;
+import org.sipfoundry.sipxconfig.api.model.HolidayAttendantBean;
 import org.sipfoundry.sipxconfig.api.model.NameList;
 import org.sipfoundry.sipxconfig.api.model.WorkingTimeAttendantBean;
 import org.sipfoundry.sipxconfig.dialplan.AttendantRule;
@@ -181,7 +181,7 @@ public class DialPlanApiImpl implements DialPlanApi {
             } else {
                 ((AttendantRule) rule).setAfterHoursAttendant(new ScheduledAttendant());
             }
-            HolidayBean.convertToHoliday(ruleBean.getHolidayAttendantPeriods(),
+            HolidayAttendantBean.convertToHolidayAttendant(ruleBean.getHolidayAttendantPeriods(),
                 ((AttendantRule) rule).getHolidayAttendant());
             ((AttendantRule) rule).setWorkingTimeAttendant(
                 WorkingTimeAttendantBean.convertToWorkingTimeAttendant(ruleBean.getWorkingTimeAttendantPeriods()));

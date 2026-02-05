@@ -33,7 +33,7 @@ import org.sipfoundry.commons.util.HolidayPeriod;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
 import org.sipfoundry.sipxconfig.common.UserException;
-import org.sipfoundry.sipxconfig.dialplan.attendant.Holiday;
+import org.sipfoundry.sipxconfig.dialplan.attendant.HolidayAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
@@ -74,7 +74,7 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
         Schedule schedule = new GeneralSchedule();
         schedule.setName("R1 Schedule");
         ArrayList<WorkingHours> workingHours = new ArrayList<WorkingHours>();
-        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        ScheduledAttendant scheduledAttendant = new ScheduledAttendant();
         WorkingHours workingHoursItem = new WorkingHours();
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         cal.set(2006, Calendar.DECEMBER, 31, 10, 00);
@@ -84,9 +84,9 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
         workingHoursItem.setEnabled(true);
         workingHoursItem.setDay(ScheduledDay.WEDNESDAY);
         workingHours.add(workingHoursItem);
-        workingTimeAttendant.setWorkingHours(workingHours);
-        workingTimeAttendant.setEnabled(true);
-        schedule.setWorkingTimeAttendant(workingTimeAttendant);
+        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.setEnabled(true);
+        schedule.setScheduledAttendant(scheduledAttendant);
         m_forwardingContext.saveSchedule(schedule);
         r1.setSchedule(schedule);
 
@@ -245,11 +245,11 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
 
         DateFormat format = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
 
-        Holiday holiday = new Holiday();
-        holiday.setAttendant(autoAttendant);
-        holiday.addPeriod(getNewHolidayPeriod(format.parse("01-JAN-2005 00:00"), format.parse("01-JAN-2005 23:59")));
-        holiday.addPeriod(getNewHolidayPeriod(format.parse("06-JUN-2005 00:00"), format.parse("06-JUN-2005 23:59")));
-        holiday.addPeriod(getNewHolidayPeriod(format.parse("24-DEC-2005 00:00"), format.parse("24-DEC-2005 23:59")));
+        HolidayAttendant holidayAttendant = new HolidayAttendant();
+        holidayAttendant.setAttendant(autoAttendant);
+        holidayAttendant.addPeriod(getNewHolidayPeriod(format.parse("01-JAN-2005 00:00"), format.parse("01-JAN-2005 23:59")));
+        holidayAttendant.addPeriod(getNewHolidayPeriod(format.parse("06-JUN-2005 00:00"), format.parse("06-JUN-2005 23:59")));
+        holidayAttendant.addPeriod(getNewHolidayPeriod(format.parse("24-DEC-2005 00:00"), format.parse("24-DEC-2005 23:59")));
 
         WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
         workingTimeAttendant.setAttendant(autoAttendant);
@@ -263,7 +263,7 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
         AttendantRule rule = new AttendantRule();
         rule.setName("myattendantschedule");
         rule.setAfterHoursAttendant(sa);
-        rule.setHolidayAttendant(holiday);
+        rule.setHolidayAttendant(holidayAttendant);
         rule.setWorkingTimeAttendant(workingTimeAttendant);
 
         m_dialPlanContext.storeRule(rule);
