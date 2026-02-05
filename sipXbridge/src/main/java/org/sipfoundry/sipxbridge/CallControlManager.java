@@ -273,8 +273,13 @@ class CallControlManager implements SymmitronResetHandler {
 
                 Response response = SipUtilities.createResponse(serverTransaction,
                         Response.OK);
+
                 SessionDescription sessionDescription = rtpSession.getReceiver()
                         .getSessionDescription();
+
+                // Some mobile carriers require updated SDP versions
+                SipUtilities.incrementSessionVersion(sessionDescription);
+                
                 SipUtilities.setSessionDescription(response, sessionDescription);
                 
                 if (dialogContext.getItspInfo() == null || dialogContext.getItspInfo().isGlobalAddressingUsed() ) {
