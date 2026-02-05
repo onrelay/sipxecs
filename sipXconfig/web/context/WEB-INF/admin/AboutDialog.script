@@ -5,7 +5,6 @@
 <script>
 <body>
 <![CDATA[
-dojo.require("dijit.Dialog");
 ]]>
 </body>
 <initialization>

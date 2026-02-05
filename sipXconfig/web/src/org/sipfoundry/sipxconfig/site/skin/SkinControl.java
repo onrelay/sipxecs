@@ -103,7 +103,9 @@ public class SkinControl implements BeanFactoryAware {
     }
 
     private AssetFactory getAssetFactory() {
-        return m_tapestryContext.getHivemindContext().getClasspathAssetFactory();
+
+        return m_tapestryContext.getHivemindContext() == null ? null :
+            m_tapestryContext.getHivemindContext().getClasspathAssetFactory();
     }
 
     public Map<String, String> getAssets() {
@@ -117,6 +119,9 @@ public class SkinControl implements BeanFactoryAware {
     public IAsset getAsset(String path) {
         String resourcePath = m_assets.get(path);
         if (resourcePath == null) {
+            return null;
+        }
+        if( getAssetFactory() == null ) {
             return null;
         }
 

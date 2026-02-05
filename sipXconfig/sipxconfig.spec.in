@@ -177,6 +177,7 @@ ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-lang3-*.jar %{
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-logging-jakarta-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-net-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-pool-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/commons-fileupload-jakarta-*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/httpasyncclient*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/httpclient*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/httpcore*.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/

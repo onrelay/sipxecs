@@ -108,7 +108,7 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
                 RestClient restClient = RestClient.builder(new HttpHost(fqdn, m_port, "http")).build();
                 m_client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper()));
             } catch (Exception e) {
-                LOG.error("Cannot create elasticsearch client, probably elasticsearch service is not up yet.", e);
+                LOG.error("Cannot create elasticsearch client, probably elasticsearch service is not up yet: " + e.getMessage());
             }
         }
         return m_client;
@@ -117,6 +117,9 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
     @Override
     public void storeDoc(String index, SearchableBean source) {
         try {
+            if( getClient() == null ) {
+                return;
+            }
             getClient().index(i -> i
                 .index(index)
                 .id(source.getId())
@@ -131,6 +134,9 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
     @Override
     public void storeBulkDocs(String index, List<SearchableBean> source) {
         try {
+            if( getClient() == null ) {
+                return;
+            }
             List<BulkOperation> ops = source.stream()
                 .map(bean -> BulkOperation.of(b -> b
                     .index(idx -> idx
