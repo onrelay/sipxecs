@@ -443,23 +443,23 @@ public class XmlModelBuilder implements ModelBuilder {
         }
 
         public InputSource resolveEntity(String publicId, String systemId) throws IOException {
-            if (publicId != null) {
-                if (publicId.startsWith("-//SIPFoundry//sipXconfig//Model specification ")) {
-                    InputStream dtdStream = null;
-                    if (m_dtd.exists()) {
-                        dtdStream = new FileInputStream(m_dtd);
-                    } else {
-                        LOG.warn("Cannot find " + m_dtd);
-                        // try classpath
-                        dtdStream = getClass().getClassLoader().getResourceAsStream(DTD);
+            if (publicId != null && publicId.startsWith("-//sipXconfig//Model specification ")) {
+                
+                InputStream dtdStream = null;
+                if (m_dtd.exists()) {
+                    dtdStream = new FileInputStream(m_dtd);
+                } else {
+                    LOG.warn("Cannot find " + m_dtd);
+                    // try classpath
+                    dtdStream = getClass().getClassLoader().getResourceAsStream(DTD);
 
-                    }
-                    if (dtdStream != null) {
-                        return new InputSource(dtdStream);
-                    }
-                    // FIXME: this usually requires internet connection
-                    return new InputSource(systemId);
                 }
+                if (dtdStream != null) {
+                    return new InputSource(dtdStream);
+                }
+                // FIXME: this usually requires internet connection
+                return new InputSource(systemId);
+                
             } else if (systemId != null && m_baseSystemId != null) {
                 // LIMITATION: All files loaded as ENTITYies defined as SYSTEM
                 // must live in same directory as XML file
