@@ -48,23 +48,21 @@ start() {
     org.sipfoundry.sipxrecording.SipXrecording \
     $Args"
   if [ -n "${NoFork}" ] ; then
-    runuser -s @BASH@ @SIPXPBXUSER@ -c ${Command}
+    runuser -s /bin/bash @SIPXPBXUSER@ -c ${Command}
   else
     echo -n $"Starting $prog: "
-    su @SIPXPBXUSER@
-      ${Command} >> ${LogFile} 2>&1 &
-      echo $! > ${pidfile}
-    exit
+    runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command} > /dev/null 2>&1 & echo \$!" > ${pidfile}
     echo_success
   fi  
 }
 
 stop() {
   echo -n $"Stopping $prog: "
-  pkill -f "-Dprocname=$prog"
+  killAnyProcessOrphans ${pidfile}
   Status=$?
-  echo
-  [ $Status -eq 0 ] && rm -f ${pidfile}
+  [ $Status -ne 0 ] && { echo_failure; echo; exit "${Status}"; }
+  rm -f ${pidfile}
+  echo_success; echo;
 }
 
 restart() {

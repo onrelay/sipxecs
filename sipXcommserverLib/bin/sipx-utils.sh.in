@@ -17,10 +17,10 @@ if [ -f /etc/redhat-release ]
 then
   # Redhat
   echo_success() { 
-    echo "success"; 
+    echo "OK"; 
   }
   echo_failure() { 
-    echo "failure"; 
+    echo "Fail"; 
   }
 
   HTTP_DAEMON_START="@APACHE2_HTTPD@"
@@ -474,7 +474,7 @@ EOF
 maxTimeout=25
 maxListenTimeout=60
 sleepTime=0.5
-runningError="is already running"
+runningError="is already running: "
 execError="Provided file is not executable"
 invalidFileError="Invalid file"
 noPortError="No listening port found"
@@ -656,35 +656,37 @@ checkIfProcessIsListening() {
 }
 
 killAnyProcessOrphans() {
-    pidfile="$1"
-    [ -z "$pidfile" ] && return
 
-    timeout=${2:-$maxTimeout}
+  pidfile="$1"
 
-    pid=$(getRunningProcessID "$pidfile")
-    [ $? -ne 0 ] && return 0  # Nothing to kill
+  [ -z "$pidfile" ] && return $ESRCH; 
 
-    # First attempt graceful TERM
-    kill -TERM "$pid" 2>/dev/null || true
+  timeout=${2:-$maxTimeout}
 
-    # Wait for process to exit
-    for ((i=0; i<$timeout; i++)); do
-        getRunningProcessID "$pidfile" >/dev/null 2>&1
-        [ $? -ne 0 ] && break
-        sleep $sleepTime
-    done
+  pid=$(getRunningProcessID ${pidfile})
+  [ $? -ne 0 ] && return $ESRCH  
 
-    # Force KILL if still running
-    getRunningProcessID "$pidfile" >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        pid=$(getRunningProcessID "$pidfile")
-        kill -KILL "$pid" 2>/dev/null || true
-    fi
+  # First attempt graceful TERM
+  kill -TERM ${pid} 2>/dev/null
 
-    # Final check
-    getRunningProcessID "$pidfile" >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        echo_failure
-        echo "Process could not be killed: $pid"
-    fi
+  # Wait for process to exit
+  for ((i=0; i<$timeout; i++)); do
+      getRunningProcessID ${pidfile} >/dev/null 2>&1
+      [ $? -ne 0 ] && break
+      sleep $sleepTime
+  done
+
+  getRunningProcessID ${pidfile} >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+      pid=$(getRunningProcessID ${pidfile})
+      kill -KILL "$pid" 2>/dev/null || true
+  fi
+
+  getRunningProcessID ${pidfile} >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+      echo_failure; echo;
+      return $ESRCH
+  fi
+
+  return 0
 }

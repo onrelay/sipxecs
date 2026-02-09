@@ -7,8 +7,6 @@
     <property name="publicHttpPort" value="${ivr.publicHttpPort}" />
     <property name="servletHandler" ref="servletHandler" />
     <property name="userLoginService" ref="userLoginService" />
-    <property name="digestAuthenticator" ref="digestAuthenticator" />
-    <property name="securityHandler" ref="securityHandler" />
   </bean>
 
   <bean id="servletHandler" class="org.sipfoundry.sipxivr.rest.SipxIvrServletHandler">
@@ -18,10 +16,6 @@
     <property name="depositMap" ref="depositMap" />
     <property name="mailboxManager" ref="mailboxManager" />
     <property name="mwiManager" ref="mwiManager" />
-  </bean>
-
-  <bean id="securityHandler" class="org.sipfoundry.commons.jetty.SipXSecurityHandler">
-  	<constructor-arg><value>${ivr.publicHttpPort}</value></constructor-arg>
   </bean>
 
   <bean id="userLoginService" class="org.sipfoundry.sipxivr.rest.SipxIvrUserLoginService">
@@ -60,7 +54,4 @@
     <constructor-arg><value>org.sipfoundry.voicemail.ManagementServlet</value></constructor-arg>
   </bean>
   
-  <bean id="digestAuthenticator" class="org.sipfoundry.sipxivr.rest.SipxIvrDigestAuthenticator">
-  </bean>
-
 </beans>

@@ -168,11 +168,8 @@ public class IvrConfig implements ConfigProvider, AlarmProvider {
 
     private int getPortalType() {
         Boolean oldPortal = (Boolean) m_adminContext.getSettings().getSettingTypedValue("user-portal/old-portal");
-        Boolean imPortal = (Boolean) m_adminContext.getSettings().getSettingTypedValue("user-portal/im-portal");
         if (oldPortal) {
             return 0;
-        } else if (imPortal != null && imPortal) {
-            return 2;
         } else {
             return 1;
         }

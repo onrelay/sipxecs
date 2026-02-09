@@ -30,7 +30,6 @@ public class WebServer implements BeanFactoryAware {
     private int m_publicHttpPort;
     private BeanFactory m_beanFactory;
     private SipxIvrUserLoginService m_userLoginService;
-    private DigestAuthenticator m_digestAuthenticator;
 
     public void init() {
         Map<String, RestApiBean> beans = ((ListableBeanFactory) m_beanFactory).getBeansOfType(RestApiBean.class);
@@ -72,7 +71,6 @@ public class WebServer implements BeanFactoryAware {
 
             // Security handler
             ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-            securityHandler.setAuthenticator(m_digestAuthenticator);
             securityHandler.setRealmName(m_userLoginService.getName());
             securityHandler.setLoginService(m_userLoginService);
             securityHandler.addConstraintMapping(mapping);
@@ -110,10 +108,6 @@ public class WebServer implements BeanFactoryAware {
 
     public void setBeanFactory(BeanFactory factory) {
         m_beanFactory = factory;
-    }
-
-    public void setDigestAuthenticator(DigestAuthenticator digestAuthenticator) {
-        m_digestAuthenticator = digestAuthenticator;
     }
 }
 

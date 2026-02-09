@@ -11,7 +11,7 @@
       <xmlvalidate description="validate setting description files">
         <fileset dir="${plugin.models.dir}" includes="**/*.xml" excludes="**/phone.xml">
         </fileset>
-        <dtd publicid="-//SIPFoundry//sipXconfig//Model specification 2.0//EN" location="etc/setting.dtd" />
+        <dtd publicid="-//sipXconfig//Model specification 2.0//EN" location="etc/setting.dtd" />
       </xmlvalidate>
   </target>
 

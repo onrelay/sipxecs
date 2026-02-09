@@ -7,7 +7,15 @@ relay_PKGS = \
 	dnsjava \
 	jain-sip-sdp \
 	jakarta.servlet \
-	log4j \
+	jetty-server \
+	jetty-ee10-servlet \
+	jetty-http \
+	jetty-io \
+	jetty-security \
+	jetty-session \
+	jetty-util \
+	slf4j-api \
+	slf4j-reload4j \
 	sipxcommons \
 	ws-commons-util \
 	xmlrpc-client \

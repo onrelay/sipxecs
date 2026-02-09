@@ -55,6 +55,20 @@ do_permission_check() {
     chown -R $FS_USER:$FS_GROUP $FS_DBDIR
     chmod -R u+rwX,ga+rX $FS_DBDIR
   fi
+  FS_RUNDIR=@SIPX_FSRUNDIR@
+  if test ! -e $FS_RUNDIR
+  then
+    mkdir $FS_RUNDIR
+    chown -R $FS_USER:$FS_GROUP $FS_RUNDIR
+    chmod -R u+rwX,ga+rX $FS_RUNDIR
+  fi
+  FS_LOGDIR=@SIPX_FSLOGDIR@
+  if test ! -e $FS_LOGDIR
+  then
+    mkdir $FS_LOGDIR
+    chown -R $FS_USER:$FS_GROUP $FS_LOGDIR
+    chmod -R u+rwX,ga+rX $FS_LOGDIR
+  fi
 }
 
 do_audio_setup() {

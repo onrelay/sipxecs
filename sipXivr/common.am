@@ -5,6 +5,7 @@ ivr_PKGS = \
 	commons-io \
 	commons-logging-jakarta  \
 	commons-lang \
+	cache-api  \
 	dom4j \
 	iText \
 	jaudiotagger \
@@ -12,6 +13,16 @@ ivr_PKGS = \
 	jakarta.servlet \
 	jakarta.servlet-api \
 	jakarta.activation-api \
+	jetty-server \
+	jetty-ee10-servlet \
+	jetty-http \
+	jetty-io \
+	jetty-security \
+	jetty-session \
+	jetty-util \
+	micrometer-core-jakarta \
+	micrometer-commons \
+	micrometer-observation \
 	jaxen \
 	log4j \
 	mongodb-driver-core \
@@ -43,5 +54,5 @@ ivr_PKGS = \
 	hazelcast \
 	mongodb-driver-core \
 	mongodb-driver-sync \
-	bson
+	bson 
 

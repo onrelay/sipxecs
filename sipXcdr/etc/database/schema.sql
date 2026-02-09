@@ -34,13 +34,15 @@ create table version_history(
  *  - update DbVersion variable in sipcallresolver.sh
  *  - do *not* delete patch file
  *
- * For the initial sipX release with Call Resolver, the database version is 2.
- * Version 3: view_cdrs patch
- * Version 4: index CSE and CDR tables on timestamp
- * Version 5: add reference field in CSE and CDR tables.
- * Version 6: add branch_id and via_count fields in CSE table.
- * Version 7: add cdrremote user and grant it read-only access to cdrs table.
+ * For the initial sipX release with Call Resolver, the database version is 1.
+ * Version 2: view_cdrs patch
+ * Version 3: index CSE and CDR tables on timestamp
+ * Version 4: add reference field in CSE and CDR tables.
+ * Version 5: add branch_id and via_count fields in CSE table.
+ * Version 6: add cdrremote user and grant it read-only access to cdrs table.
+ * Version 7: add gateway.
  */
+
 insert into version_history (version, applied) values (7, now());
 
 create table patch(

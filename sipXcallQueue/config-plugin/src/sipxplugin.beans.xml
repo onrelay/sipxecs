@@ -54,9 +54,8 @@
     </property>
   </bean>
 
-  <bean id="callQueueI18n"
-	class="org.springframework.context.support.ResourceBundleMessageSource">
-	<property name="basename" value="sipxcallqueue" />
+  <bean id="callQueueI18n" class="org.springframework.context.support.ResourceBundleMessageSource">
+	  <property name="basename" value="sipxcallqueue" />
   </bean>
   
   <bean id="freeswitchCallCenterConfig" class="org.sipfoundry.sipxconfig.callqueue.CallCenterConfiguration" parent="freeswitchConfigFile">

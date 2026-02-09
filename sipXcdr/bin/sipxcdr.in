@@ -49,7 +49,7 @@ Args=""
 : ${ConfDir:=@SIPX_CONFDIR@}
 : ${SslDir:=${ConfDir}/ssl}
 : ${AuthoritiesDir:=${SslDir}/authorities}
-: ${PidFile:=@SIPX_RUNDIR@/sipxcdr/sipxcdr.pid}
+: ${pidfile:=@SIPX_RUNDIR@/sipxcdr/sipxcdr.pid}
 : ${LibOdbcDir:=@ODBC_LIBDIR@}
 : ${Psql:=psql}
 if [ `uname -s` = FreeBSD ] ; then
@@ -143,7 +143,7 @@ UpgradePatches6="cdrremote $UpgradePatches7"
 UpgradePatches5="transaction $UpgradePatches6"
 UpgradePatches4="reference contact calldirection transaction $UpgradePatches5"
 UpgradePatches3="index_on_time $UpgradePatches4"
-UpgradePatches2="view_cdrs $UpgradePatches3"
+UpgradePatches2="view_cdrs $UpgradePatches1"
 UpgradePatches1="refer_uri $UpgradePatches2"
 
 # Apply database patches
@@ -156,7 +156,7 @@ databasePatch() {
         for patch in $UpgradePatches; do
             if [ ${patch} = ${VersionPatch} ]; then
                 echo "Upgrading DB schema version to ${DbVersion}" >> ${DbPatchLog}
-            	${PsqlCmd} -c "insert into version_history values ('${DbVersion}', '${Today}')" >>${DbPatchLog} 2>&1
+            	${PsqlCmd} -c "insert into version_history values ('${DbVersion}', '${Today}') on conflict (version) do nothing" >>${DbPatchLog} 2>&1
             elif [ -f ${DbPatchDir}/${patch}.sql ]; then
                 # Apply patch only if not found in the patch list
                 if ! ${PsqlCmd} -c "select name from patch where name = '${patch}'" | grep ${patch} >>${DbPatchLog} 2>&1; then
@@ -422,32 +422,27 @@ onSetup() {
 start() {
   onSetup
   # Check database version - don't run if it's wrong
-  echo $$ > ${PidFile}
   databasePatch
   if ! databaseVersionCheck; then
     exit 1
   fi
   if [ -n "${NoFork}" ] ; then
-    killAnyOrphans @SIPXPBXUSER@ $regex
-    runuser -s @BASH@ @SIPXPBXUSER@ -c "${RubyCmd} ${CallResolverMain} ${resolverArgs}"
+    killAnyProcessOrphans ${pidfile}
+    runuser -s /bin/bash @SIPXPBXUSER@ -c ${Command}
   else
-    checkRunningInstance @SIPXPBXUSER@ $regex > /dev/null
+    checkRunningProcessIsListening ${pidfile} > /dev/null
     Status=$?
     [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
 
     echo -n $"Starting ${prog}: "
-    su @SIPXPBXUSER@
-      "${RubyCmd} ${CallResolverMain} ${resolverArgs}" >/dev/null 2>&1 & 
-      echo $! > ${PidFile}
-    exit
+    runuser -s /bin/bash @SIPXPBXUSER@ -c "${RubyCmd} ${CallResolverMain} ${resolverArgs} >> ${CallResolverLog} 2>&1 & echo \$!" > ${pidfile}
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningInstanceTimeout @SIPXPBXUSER@ $regex
+      checkRunningProcessTimeout ${pidfile} > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
-      pid=`ps -u @SIPXPBXUSER@ -o pid,args | grep $regex | grep -v "grep" | awk '{print $1 }'`
-      checkIfListening $pid
+      checkIfProcessIsListening ${pidfile}
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; echo; }
@@ -459,11 +454,11 @@ start() {
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyOrphans @SIPXPBXUSER@ $regex
-  checkRunningInstance @SIPXPBXUSER@ $regex > /dev/null
+  killAnyProcessOrphans ${pidfile}
   Status=$?
-  [ $Status -eq 0 ] && { echo_failure; echo; exit $ERUNNING; }
-  [ $Status -eq 0 ] || { echo_success; echo; }
+  [ $Status -ne 0 ] && { echo_failure; echo; exit "${Status}"; }
+  rm -f ${pidfile}
+  echo_success; echo;
 }
 
 restart() {

@@ -33,24 +33,22 @@ start() {
   [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; echo; exit $ENOENT; }
   if [ -n "${NoFork}" ] ; then
     killAnyProcessOrphans ${pidfile}
-    runuser -s @BASH@ @SIPXPBXUSER@ -c $exec
+    runuser -s /bin/bash @SIPXPBXUSER@ -c $exec
   else
     checkRunningProcessIsListening ${pidfile} > /dev/null
     Status=$?
     [ $Status -eq 0 ] && { echo -n "$progName $runningError"; echo_failure; echo; exit $ERUNNING; }
 
     echo -n $"Starting $progName: "
-    su @SIPXPBXUSER@
-      $exec --pid-file $pidfile &
-      echo $! > ${pidfile}
-    exit
+    runuser -s /bin/bash @SIPXPBXUSER@ -c "$exec --pid-file $pidfile & echo \$!" > ${pidfile}
+
 
     if [ $# -gt 0 ]; then
       #check if process spawned
       checkRunningProcessTimeout ${pidfile}
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
-      checkIProcessIsListening ${pidfile}
+      checkIfProcessIsListening ${pidfile}
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; echo; }
@@ -63,12 +61,12 @@ start() {
 
 
 stop() {
-  echo -n $"Stopping $progName: "
-  pkill -f "$exec"
-  Status=$?
-  echo
-  [ $Status -eq 0 ] && rm -f ${pidfile}
+  echo -n $"Stopping $prog: "
   killAnyProcessOrphans ${pidfile}
+  Status=$?
+  [ $Status -ne 0 ] && { echo_failure; echo; exit "${Status}"; }
+  rm -f ${pidfile}
+  echo_success; echo;
 }
 
 

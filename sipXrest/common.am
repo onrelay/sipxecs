@@ -9,6 +9,13 @@ rest_PKGS = \
 	dnsjava \
 	jain-sip-sdp \
 	jakarta.servlet \
+	jetty-server \
+	jetty-ee10-servlet \
+	jetty-http \
+	jetty-io \
+	jetty-security \
+	jetty-session \
+	jetty-util \
 	log4j \
 	mongodb-driver-core \
 	mongodb-driver-sync \

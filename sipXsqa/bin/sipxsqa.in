@@ -25,7 +25,7 @@ start() {
   [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; echo; exit $ENOENT; }
   if [ -n "${NoFork}" ] ; then
     killAnyProcessOrphans ${pidfile}
-    runuser -s @BASH@ @SIPXPBXUSER@ -c "$exec  \
+    runuser -s /bin/bash @SIPXPBXUSER@ -c "$exec  \
       --config-file $config \
       --pid-file $pidfile \
       --log-file $logfile"
@@ -35,13 +35,11 @@ start() {
     [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
 
     echo -n $"Starting $prog: "
-    su @SIPXPBXUSER@
-      $exec \
+
+    runuser -s /bin/bash @SIPXPBXUSER@ -c "$exec \
         --config-file $config \
         --pid-file $pidfile \
-        --log-file $logfile &
-      echo $! > ${pidfile}
-    exit
+        --log-file $logfile & echo \$!" > ${pidfile}
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
@@ -61,11 +59,11 @@ start() {
 
 stop() {
   echo -n $"Stopping $prog: "
-  pkill -f "$exec"
-  Status=$?
-  echo
-  [ $Status -eq 0 ] && rm -f ${pidfile}
   killAnyProcessOrphans ${pidfile}
+  Status=$?
+  [ $Status -ne 0 ] && { echo_failure; echo; exit "${Status}"; }
+  rm -f ${pidfile}
+  echo_success; echo;
 }
 
 

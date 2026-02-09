@@ -58,14 +58,15 @@ USAGE
 Daemon=true
 Status=0
 JavaCmd=`@bindir@/sipx-config --java`
-PidFile=@SIPX_RUNDIR@/sipxconfig/sipxconfig.pid
+pidfile=@SIPX_RUNDIR@/sipxconfig/sipxconfig.pid
 LibDir=@SIPX_JAVADIR@/sipXconfig
 PluginDir=@SIPX_JAVADIR@/sipXconfig/plugins
 CommonsLibDir=@SIPX_JAVADIR@/sipXcommons
 LogDir=@SIPX_LOGDIR@
 LogFile=${LogDir}/sipxconfig.log
 TmpDir=@SIPX_TMPDIR@
-HomeDir=/home/@SIPXPBXUSER@
+UserName=@SIPXPBXUSER@
+HomeDir=/home/${UserName}
 JettyHomeDir=@SIPX_JETTY_HOME@
 JettyBaseDir=@SIPX_CONFDIR@/jetty
 KeyStore=@SIPX_CONFDIR@/ssl/ssl-web.keystore
@@ -128,6 +129,7 @@ databaseCommand() {
       -Dlib.dir=${LibDir} \
       -Dlog.dir=${LogDir} \
       -Dtmp.dir=${TmpDir} \
+      -Duser.name=${UserName} \
       -Duser.home=${HomeDir} \
       -Dsipxconfig.db.user=@POSTGRESQL_USER@ \
       -Dpostgres-pwd.password='${password}' \
@@ -135,7 +137,7 @@ databaseCommand() {
       -f @SIPX_CONFDIR@/database/database.xml \
       $@"
 
-  CmdOut=`runuser -s @BASH@ @SIPXPBXUSER@ -c "${Command}"`
+  CmdOut=`runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command}"`
 
   if [ $? != "0" ]; then
      echo "$CmdOut" | grep -v '^Unable to locate tools.jar' >&2
@@ -219,6 +221,7 @@ buildCommand() {
     -Djetty.base=${JettyBaseDir} \
     -Dtmp.dir=${TmpDir} \
     -Duser.home=${HomeDir} \
+    -Duser.name=${UserName} \
     -Dsipxconfig.db.user=@POSTGRESQL_USER@ \
     -Dpostgres-pwd.password='${password}' \
     -Djava.net.preferIPv4Stack=true \
@@ -238,7 +241,7 @@ runTask() {
   databaseVersionCheck    
   buildCommand task-$taskId
   Command="$Command org.sipfoundry.sipxconfig.common.SystemTaskRunner $*"
-  runuser -s @BASH@ @SIPXPBXUSER@ -c "${Command}"
+  runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command}"
   Status=$?
 }
 
@@ -260,25 +263,23 @@ start() {
   touch ${LogFile}
   chown @SIPXPBXUSER@:@SIPXPBXUSER@ ${LogFile}
   if [ -n "${NoFork}" ] ; then
-    killAnyProcessOrphans ${PidFile}
-    runuser -s @BASH@ @SIPXPBXUSER@ -c "${Command}" >> ${LogFile} 2>&1
+    killAnyProcessOrphans ${pidfile}
+    runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command}" > /dev/null 2>&1
     Status=$?
   else
-    checkRunningProcessIsListening ${PidFile} > /dev/null 2>&1
+    checkRunningProcessIsListening ${pidfile} > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
 
     echo -n $"Starting $prog: "
-    su @SIPXPBXUSER@
-      ${Command} >> ${LogFile} 2>&1 &
-      echo $! > ${PidFile}
-    exit
+    runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command} >> ${LogFile} 2>&1 & echo \$!" > ${pidfile}
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningProcessTimeout ${PidFile} > /dev/null 2>&1
+      checkRunningProcessTimeout ${pidfile} > /dev/null 2>&1
       Status=$?
-      checkIfProcessIsListening ${PidFile} $waitForListenPortTime
+      [ $Status -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
+      checkIfProcessIsListening ${pidfile} $waitForListenPortTime
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; echo; }
@@ -351,11 +352,11 @@ EOF
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans ${PidFile}
-  checkRunningProcessIsListening ${PidFile}  > /dev/null 2>&1
+  killAnyProcessOrphans ${pidfile}
   Status=$?
-  [ $Status -eq 0 ] && { echo_failure; echo; exit $ERUNNING; }
-  [ $Status -eq 0 ] || { echo_success; echo; }
+  [ $Status -ne 0 ] && { echo_failure; echo; exit "${Status}"; }
+  rm -f ${pidfile}
+  echo_success; echo;
 }
 
 restart() {
@@ -393,12 +394,12 @@ case "$1" in
     asyncrestart
     ;;
   condrestart)
-    checkRunningProcessIsListening ${PidFile}  > /dev/null 2>&1
+    checkRunningProcessIsListening ${pidfile}  > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] && restart || :
     ;;
   status)
-    checkRunningProcessIsListening ${PidFile}
+    checkRunningProcessIsListening ${pidfile}
     Status=$?
     ;;
   configtest)
