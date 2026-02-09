@@ -12,7 +12,7 @@ require 'soap/rpc/driver'
 $:.unshift(File.join(File.dirname(__FILE__), '..', '..', 'lib'))
 
 require 'cdr'
-require 'soap/server'
+require 'soap/rpc/standaloneServer'
 
 class SoapServerTest < Test::Unit::TestCase
 

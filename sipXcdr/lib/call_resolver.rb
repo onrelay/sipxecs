@@ -6,11 +6,9 @@
 ##############################################################################
 
 require 'logger'
-require 'thwait'
 
 require 'db/cse_reader'
 require 'db/cdr_writer'
-require 'soap/server'
 require 'utils/cleaner'
 require 'utils/configure'
 require 'state'
