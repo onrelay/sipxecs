@@ -32,25 +32,9 @@ EOT
   exit 1
 end
 
-# ruby-postgress RPM installs postgres.so in /usr/lib/site_ruby/1.8/i386-linux
-# however on CentOS ruby 'sitearchdir' is /usr/lib/site_ruby/1.8/i386-linux-gnu
-# this function tries to load postgres from both places
-# On Suse 'postgres' is installed as ruby gem: loading rubygems explictely enables
-# us to find it.
+
 def load_postgres_driver()
-  require 'pg_ext'
-rescue LoadError
-  require 'postgres'
-rescue LoadError
-  require 'rubygems'
-  require 'rbconfig'
-  sad = Config::CONFIG['sitearchdir']
-  postgres_dir = sad.chomp('-gnu')
-  $:.unshift(postgres_dir)
-  require 'postgres'
-rescue LoadError
-  # On SUSE, FreeBSD the driver is called ruby-postgres and is a gem
-  require 'ruby-postgres'
+  require 'pg'
 end
 
 def main()

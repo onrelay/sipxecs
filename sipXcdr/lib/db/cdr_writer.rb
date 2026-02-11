@@ -52,8 +52,7 @@ class CdrWriter < Dao
   def purge_now(conn, start_time_cdr)
     @log.debug("cdr_writer.rb:: Purging CDRs older than #{start_time_cdr}") if @log
     sql = CdrWriter.delete_sql
-    conn.prepare('delete_cdr', sql) unless conn.prepared_statements.key?('delete_cdr')
-    conn.exec_prepared('delete_cdr', [start_time_cdr])
+    conn.exec_params(sql, [start_time_cdr])
   end
 
   class << self

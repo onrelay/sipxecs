@@ -82,6 +82,8 @@ gem install soap4r-ng
 gem install dbd-pg
 gem install webrick
 gem install rexml
+gem install logger-application
+gem install thwait
 
 if [ -f %{_sysconfdir}/cron.daily/callresolver_run ]; then
   rm -f %{_sysconfdir}/cron.daily/callresolver_run

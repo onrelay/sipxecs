@@ -13,6 +13,8 @@ require 'utils/cleaner'
 require 'utils/configure'
 require 'state'
 require 'rest/active_cdrs'
+require 'soap/server'
+require 'thwait'
 
 
 # The CallResolver analyzes call state events (CSEs) and computes call detail
