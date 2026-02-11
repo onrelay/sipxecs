@@ -43,7 +43,7 @@ import org.sipfoundry.sipxconfig.dialplan.EmergencyRule;
 import org.sipfoundry.sipxconfig.dialplan.InternalRule;
 import org.sipfoundry.sipxconfig.dialplan.LongDistanceRule;
 import org.sipfoundry.sipxconfig.dialplan.SiteToSiteDialingRule;
-import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.AfterHoursAttendant;
 import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
 import org.sipfoundry.sipxconfig.forwarding.Schedule;
 
@@ -173,13 +173,13 @@ public class DialPlanApiImpl implements DialPlanApi {
             AutoAttendant autoAttendant = retrieveAutoAttendant(ruleBean.getAfterHoursAttendant());
 
             if (autoAttendant != null) {
-                ScheduledAttendant schAttendant = ((AttendantRule) rule).getAfterHoursAttendant();
-                schAttendant = (schAttendant == null ? new ScheduledAttendant() : schAttendant);
-                schAttendant.setAttendant(autoAttendant);
-                schAttendant.setEnabled(ruleBean.isAfterHoursAttendantEnabled());
-                ((AttendantRule) rule).setAfterHoursAttendant(schAttendant);
+                AfterHoursAttendant afterHoursAttendant = ((AttendantRule) rule).getAfterHoursAttendant();
+                afterHoursAttendant = (afterHoursAttendant == null ? new AfterHoursAttendant() : afterHoursAttendant);
+                afterHoursAttendant.setAttendant(autoAttendant);
+                afterHoursAttendant.setEnabled(ruleBean.isAfterHoursAttendantEnabled());
+                ((AttendantRule) rule).setAfterHoursAttendant(afterHoursAttendant);
             } else {
-                ((AttendantRule) rule).setAfterHoursAttendant(new ScheduledAttendant());
+                ((AttendantRule) rule).setAfterHoursAttendant(new AfterHoursAttendant());
             }
             HolidayAttendantBean.convertToHolidayAttendant(ruleBean.getHolidayAttendantPeriods(),
                 ((AttendantRule) rule).getHolidayAttendant());

@@ -149,9 +149,9 @@ public class AutoAttendantsConfigTest extends XMLTestCase {
         operator.setPrompt("operator.wav");
 
         AttendantRule attendantRule = new AttendantRule();
-        ScheduledAttendant sa = new ScheduledAttendant();
-        sa.setAttendant(operator);
-        attendantRule.setAfterHoursAttendant(sa);
+        AfterHoursAttendant afterHoursAttendant = new AfterHoursAttendant();
+        afterHoursAttendant.setAttendant(operator);
+        attendantRule.setAfterHoursAttendant(afterHoursAttendant);
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US);
         HolidayAttendant holidayAttendant = new HolidayAttendant();

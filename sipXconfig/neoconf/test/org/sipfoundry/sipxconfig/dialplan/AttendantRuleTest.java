@@ -26,7 +26,7 @@ import org.apache.commons.io.IOUtils;
 import org.sipfoundry.sipxconfig.address.Address;
 import org.sipfoundry.sipxconfig.address.AddressManager;
 import org.sipfoundry.sipxconfig.dialplan.attendant.HolidayAttendant;
-import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.AfterHoursAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
 import org.sipfoundry.sipxconfig.dialplan.config.MappingRules;
 import org.sipfoundry.sipxconfig.dialplan.config.RulesXmlFile;
@@ -191,13 +191,13 @@ public class AttendantRuleTest extends TestCase {
         HolidayAttendant holidayAttendant = new HolidayAttendant();
         holidayAttendant.setAttendant(attendant);
 
-        ScheduledAttendant sa = new ScheduledAttendant();
-        sa.setAttendant(attendant);
+        AfterHoursAttendant afterHoursAttendant = new AfterHoursAttendant();
+        afterHoursAttendant.setAttendant(attendant);
 
         AttendantRule r1 = new AttendantRule();
         assertFalse(r1.checkAttendant(attendant));
 
-        r1.setAfterHoursAttendant(sa);
+        r1.setAfterHoursAttendant(afterHoursAttendant);
         assertTrue(r1.checkAttendant(attendant));
 
         AttendantRule r2 = new AttendantRule();

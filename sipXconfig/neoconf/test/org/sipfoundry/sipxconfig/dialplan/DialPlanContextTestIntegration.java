@@ -33,8 +33,9 @@ import org.sipfoundry.commons.util.HolidayPeriod;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.common.ScheduledDay;
 import org.sipfoundry.sipxconfig.common.UserException;
-import org.sipfoundry.sipxconfig.dialplan.attendant.HolidayAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.HolidayAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.AfterHoursAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
@@ -240,8 +241,8 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
 
         m_dialPlanSetup.setupDefaultRegion();
 
-        ScheduledAttendant sa = new ScheduledAttendant();
-        sa.setAttendant(autoAttendant);
+        AfterHoursAttendant afterHoursAttendant = new AfterHoursAttendant();
+        afterHoursAttendant.setAttendant(autoAttendant);
 
         DateFormat format = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
 
@@ -262,7 +263,7 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
 
         AttendantRule rule = new AttendantRule();
         rule.setName("myattendantschedule");
-        rule.setAfterHoursAttendant(sa);
+        rule.setAfterHoursAttendant(afterHoursAttendant);
         rule.setHolidayAttendant(holidayAttendant);
         rule.setWorkingTimeAttendant(workingTimeAttendant);
 

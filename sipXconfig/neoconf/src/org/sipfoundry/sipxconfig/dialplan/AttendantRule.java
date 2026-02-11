@@ -33,7 +33,7 @@ import org.sipfoundry.sipxconfig.common.SipUri;
 import org.sipfoundry.sipxconfig.commserver.imdb.AliasMapping;
 import org.sipfoundry.sipxconfig.commserver.imdb.DataSet;
 import org.sipfoundry.sipxconfig.dialplan.attendant.HolidayAttendant;
-import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.AfterHoursAttendant;
 import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingTimeAttendant;
 import org.sipfoundry.sipxconfig.dialplan.config.Transform;
 import org.sipfoundry.sipxconfig.feature.Feature;
@@ -51,7 +51,7 @@ public class AttendantRule extends DialingRule implements Replicable {
 
     private FeatureManager m_featureManager;
     private MediaServer m_mediaServer;
-    private ScheduledAttendant m_afterHoursAttendant = new ScheduledAttendant();
+    private AfterHoursAttendant m_afterHoursAttendant = new AfterHoursAttendant();
     private HolidayAttendant m_holidayAttendant = new HolidayAttendant();
     private WorkingTimeAttendant m_workingTimeAttendant = new WorkingTimeAttendant();
     private String m_attendantAliases;
@@ -91,7 +91,7 @@ public class AttendantRule extends DialingRule implements Replicable {
     @Override
     protected Object clone() throws CloneNotSupportedException {
         AttendantRule ar = (AttendantRule) super.clone();
-        ar.m_afterHoursAttendant = (ScheduledAttendant) m_afterHoursAttendant.clone();
+        ar.m_afterHoursAttendant = (AfterHoursAttendant) m_afterHoursAttendant.clone();
         ar.m_workingTimeAttendant = (WorkingTimeAttendant) m_workingTimeAttendant.clone();
         ar.m_holidayAttendant = (HolidayAttendant) m_holidayAttendant.clone();
         ar.m_locations = new HashSet<Branch>(m_locations);
@@ -129,11 +129,11 @@ public class AttendantRule extends DialingRule implements Replicable {
         return false;
     }
 
-    public ScheduledAttendant getAfterHoursAttendant() {
+    public AfterHoursAttendant getAfterHoursAttendant() {
         return m_afterHoursAttendant;
     }
 
-    public void setAfterHoursAttendant(ScheduledAttendant afterHoursAttendant) {
+    public void setAfterHoursAttendant(AfterHoursAttendant afterHoursAttendant) {
         m_afterHoursAttendant = afterHoursAttendant;
     }
 

@@ -16,7 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.sipfoundry.sipxconfig.dialplan.attendant.ScheduledAttendant;
+import org.sipfoundry.sipxconfig.dialplan.attendant.AfterHoursAttendant;
 import org.sipfoundry.sipxconfig.cfgmgt.DeployConfigOnEdit;
 import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.common.DataCollectionUtil;
@@ -113,10 +113,10 @@ public class DialPlan extends BeanWithId implements DeployConfigOnEdit {
      */
     public void setOperator(AutoAttendant operator) {
         List<AttendantRule> rules = getDialingRuleByType(m_rules, AttendantRule.class);
-        for (AttendantRule ar : rules) {
-            ScheduledAttendant sa = new ScheduledAttendant();
-            sa.setAttendant(operator);
-            ar.setAfterHoursAttendant(sa);
+        for (AttendantRule rule : rules) {
+            AfterHoursAttendant afterHoursAttendant = new AfterHoursAttendant();
+            afterHoursAttendant.setAttendant(operator);
+            rule.setAfterHoursAttendant(afterHoursAttendant);
         }
     }
 
