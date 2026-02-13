@@ -1,63 +1,199 @@
-body
-{
-color: black;
-background: white;
-margin-left: +10%;
-margin-right: +10%;
+* {
+  box-sizing: border-box;
 }
 
-h1
-{
-margin-left: -7%;
-text-decoration: underline;
-font-size: +2;
-font-weight: bold;
-}
-h2
-{
-margin-left: -7%;
-font-size: +2;
-font-weight: bold;
-}
-h3
-{
-margin-left: -3%;
-font-size: +1;
-font-weight: bold;
-}
-a:visited
-{
-color: blue;
-}
-a:active, a:link
-{
-color: blue;
-text-decoration: underline;
+html {
+  font-size: 16px;
 }
 
-div.note, div.warning, div.caution
-{
-border-style: solid hidden solid hidden;
-border-color: black;
-border-width: thin none thin none;
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+               Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: #f5f7fa;
+  color: #1f2933;
+  line-height: 1.5;
 }
 
-.programlisting
-{
-font-family: Courier,monospace;
-white-space: pre;
+/* ===== Layout Container ===== */
+
+#bodyContentContainer {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 30px;
 }
 
-div.programlisting
-{
-border-style: solid;
-border-color: black;
-border-width: 1px;
-padding:      5px;
+/* ===== Banner ===== */
+
+#banner {
+  background: #1e293b;
+  color: white;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.parameter
-{
-font-style: italic;
+#banner a {
+  color: #cbd5e1;
+  text-decoration: none;
+  margin-left: 16px;
 }
 
+#banner a:hover {
+  color: white;
+}
+
+/* ===== Navigation ===== */
+
+#navigation {
+  margin-top: 20px;
+}
+
+#nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 20px;
+}
+
+#nav > li {
+  position: relative;
+}
+
+.navigationMenuItemTop > a.heading {
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 12px;
+  display: inline-block;
+  border-radius: 6px;
+}
+
+.navigationMenuItemTop > a.heading:hover {
+  background: #e2e8f0;
+}
+
+/* Dropdown menus */
+
+#nav ul {
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+  position: absolute;
+  background: white;
+  min-width: 220px;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  display: none;
+  z-index: 1000;
+}
+
+#nav li:hover > ul,
+.dropdown:hover > .dropdown-content,
+.dropdown2:hover > .dropdown-content2 {
+  display: block;
+}
+
+#nav ul li {
+  padding: 0;
+}
+
+#nav ul li a {
+  display: block;
+  padding: 8px 16px;
+  text-decoration: none;
+  color: #334155;
+}
+
+#nav ul li a:hover {
+  background: #f1f5f9;
+}
+
+/* ===== Content Card Styling ===== */
+
+.content,
+.panel,
+fieldset {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+/* ===== Headings ===== */
+
+h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-top: 0;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+h2 {
+  font-size: 1.4rem;
+  margin-top: 24px;
+}
+
+h3 {
+  font-size: 1.1rem;
+}
+
+/* ===== Buttons ===== */
+
+input[type="submit"],
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+input[type="submit"]:hover,
+button:hover {
+  background: #1d4ed8;
+}
+
+/* ===== Forms ===== */
+
+input[type="text"],
+select,
+textarea {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  width: 100%;
+}
+
+input[type="text"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+/* ===== Tables ===== */
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+  text-align: left;
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+tr:hover {
+  background: #f1f5f9;
+}

@@ -10,13 +10,12 @@
 
 package org.sipfoundry.sipxconfig.rest;
 
-import static org.springframework.beans.factory.BeanFactoryUtils.beanNamesForTypeIncludingAncestors;
-
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.ext.spring.SpringBeanRouter;
 import org.restlet.resource.Finder;
 import org.restlet.resource.Resource;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.beans.factory.BeanFactoryUtils;
 
 /**
  * This router behaves similarly to standard Spring bean router, but it adds additional routes.
@@ -31,7 +30,7 @@ public class SipxSpringBeanRouter extends SpringBeanRouter {
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory factory) {
-        String[] names = isFindingInAncestors() ? beanNamesForTypeIncludingAncestors(factory, Resource.class, true,
+        String[] names = isFindingInAncestors() ? BeanFactoryUtils.beanNamesForTypeIncludingAncestors(factory, Resource.class, true,
                 true) : factory.getBeanNamesForType(Resource.class, true, true);
 
         for (String name : names) {
