@@ -95,8 +95,7 @@ public class ProvisionImpl implements FeatureProvider, AddressProvider, Provisio
     @Override
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE, location);
-        return (enabled ? Collections.singleton(ProcessDefinition.sipxByRegex("sipxprovision",
-                "-Dprocname=sipxprovision")) : null);
+        return (enabled ? Collections.singleton(ProcessDefinition.sipxJava("sipxprovision")) : null);
     }
 
     @Override

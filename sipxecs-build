@@ -692,11 +692,11 @@ function main()
 
     checkSELinux
 
+    init
+
+    addRepos
+
     if [ ! -z "${CONFIGURE}" ]; then
-
-        init
-
-        addRepos
 
         case $PLATFORM in
 
