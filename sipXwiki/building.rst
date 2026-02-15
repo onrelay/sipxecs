@@ -83,7 +83,7 @@ To build all the sipX* RPMs from source, just add the --rpm option to the sipxec
 
   .. code-block:: bash
 
-    sudo ./sipxecs-build --rpm
+    sudo ./sipxecs-build --configure --build --rpm
 
 The resulting RPMs are e.g. found in the build/repo/CentOS_7/x86_64 folder for CentOS 7.
 
@@ -91,7 +91,7 @@ To also install the RPMs locally, add the '--install' option:
 
   .. code-block:: bash
 
-    sudo ./sipxecs-build --rpm --install
+    sudo ./sipxecs-build --configure --build --rpm --install
 
 Build Executables
 ~~~~~~~~~~~~~~~~~~
@@ -100,7 +100,7 @@ To just build the sipX* executables from source, simply run:
 
   .. code-block:: bash
 
-    sudo ./sipxecs-build
+    sudo ./sipxecs-build --configure --build
 
 Additional Build Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -111,7 +111,11 @@ The sipxecs-build script has the following additional options:
 
     sudo ./sipxecs-build [options]
 
-        **-p | --platform**: OS platform of sipxcom RPM to build, e.g. rocky-7=9 (default), centos-7
+        **-c | --configure**: Include this option to configure make system (must be included for first time build)
+
+        **-b | --build**: Include this option to compile and build from source
+
+        **-p | --platform**: OS platform of sipxcom RPM to configure/build/install, e.g. rocky-7=9 (default), centos-7
 
         **-a | --architecture**: Hardware architecture of sipxcom RPM to build, e.g. x86_64 (default)
 

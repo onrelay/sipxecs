@@ -95,10 +95,20 @@ function checkInput()
             INSTALL_OPTIONS="${o#*=}"
             shift
             ;;
+            -b|--build)
+            BUILD="build"
+            shift
+            ;;
+            -c|--configure)
+            CONFIGURE="configure"
+            shift
+            ;;
             -h|--help)
                 echo "
 
             Usage:
+                -c|--configure: run configure 
+                -b|--build: run build 
                 -p|--platform: platform of sipxcom RPM to build, e.g. ${DEFAULT_PLATFORM} (default), rocky-9
                 -a|--architecture: architecture of sipxcom RPM to build, e.g. ${DEFAULT_ARCHITECTURE} (default)
                 -s|--subproject: subproject to build or sipx for building all RPMs, e.g. ${DEFAULT_SUBPROJECT} (default) sipXconfig
@@ -109,7 +119,7 @@ function checkInput()
 
             Sample:
                 sudo sipxecs-build --platform=centos-7 --subproject=sipXconfig --version=25.01 --rpm --install
-                sudo sipxecs-build -p=rocky-9 -a=x86_64 -s=sipXconfig -v=24.07
+                sudo sipxecs-build --configure -p=rocky-9 -a=x86_64 -s=sipXconfig -v=24.07
                 "
                 exit
             shift
@@ -682,39 +692,44 @@ function main()
 
     checkSELinux
 
-    init
+    if [ ! -z "${CONFIGURE}" ]; then
 
-    addRepos
+        init
 
-    case $PLATFORM in
+        addRepos
 
-        "centos-7")
-            setupCentOS7
-            configureCentOS7
-            ;;
+        case $PLATFORM in
 
-        "centos-9")
-            setupCentOS9
-            configureCentOS9
-            ;;
+            "centos-7")
+                setupCentOS7
+                configureCentOS7
+                ;;
 
-        "rocky-9")
-            setupRocky9
-            configureRocky9
-            ;;
+            "centos-9")
+                setupCentOS9
+                configureCentOS9
+                ;;
 
-        *)
-            echo "Error: Unknown platform ${PLATFORM}"
-            exit 1
-            ;;
-    esac
+            "rocky-9")
+                setupRocky9
+                configureRocky9
+                ;;
+
+            *)
+                echo "Error: Unknown platform ${PLATFORM}"
+                exit 1
+                ;;
+        esac
+    fi
     
-    build
+    if [ ! -z "${BUILD}" ]; then
+
+        build
+    fi
 
     if [ ! -z "${INSTALL}" ]; then
 
         install
-
     fi
 
     echo "Finished ${THIS_MASTER_BUILD_SCRIPT}"
