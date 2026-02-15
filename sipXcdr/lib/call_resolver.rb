@@ -133,20 +133,43 @@ class CallResolver
     log.info("call_resolver.rb:: resolve: Done. Analysis took #{Time.now - start_run} seconds.")
   end
 
-  # install handler for INT (2) and TERM (9) signals to cleanly terminate readers threads
+  # Install signal handlers to terminate reader threads safely in Ruby 3
   def install_signal_handler(readers)
-    %w( TERM INT ).each do | s |
-      Signal.trap(s) do
-        log.info("call_resolver.rb:: #{s} intercepted. Terminating reader threads.")
-        readers.each { |r| r.stop() }
+    # Shared shutdown flag
+    @shutdown_requested = false
+
+    # Handle TERM (15) and INT (2) signals
+    %w(TERM INT).each do |sig|
+      Signal.trap(sig) do
+        # Just set the shutdown flag — no thread operations in trap
+        log.info("call_resolver.rb:: #{sig} intercepted. Shutdown requested.")
+        @shutdown_requested = true
       end
     end
-    Signal.trap("USR1") do
-      log.debug("call_resolver.rb:: " + @state.to_s)
-    end
-    Signal.trap("ABRT") do
-      # A signal abort has been received.  Handle it by simply exiting.
-      exit 0
+
+    # Return a lambda or proc that main loop can call to handle shutdown
+    lambda do
+      if @shutdown_requested
+        log.info("call_resolver.rb:: Performing graceful shutdown of reader threads.")
+        readers.each do |r|
+          begin
+            r.stop
+          rescue => e
+            log.error("call_resolver.rb:: Error stopping reader thread #{r}: #{e.message}") if log
+          end
+        end
+        # If using ThreadsWait for reader threads:
+        if defined?(ThreadsWait)
+          begin
+            ThreadsWait.all_waits(readers.map(&:thread)) # assuming each reader has a `thread` method
+          rescue ThreadsWait::ErrNoFinishedThread
+            log.warn("call_resolver.rb:: No finished threads during shutdown.")
+          end
+        end
+        true  # Indicate shutdown was performed
+      else
+        false # No shutdown needed
+      end
     end
   end
 end
