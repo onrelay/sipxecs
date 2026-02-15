@@ -90,8 +90,8 @@ bundle agent sipxsqa_running {
         args => "restart";
     
     sipxopenfire.sipxsqa.restart_sipxsqa::
-      "/etc/init.d/openfire"
-        comment => "restart openfire",
+      "/etc/init.d/sipxopenfire"
+        comment => "restart sipxopenfire",
         args => "restart";
         
     (homer_capture|homer_web).sipxsqa.restart_sipxsqa::  

@@ -1,0 +1,15 @@
+[Unit]
+Description=sipX Openfire XMPP Server
+After=network.target syslog.target
+
+[Service]
+Type=forking
+RemainAfterExit=true
+EnvironmentFile=-/etc/sysconfig/openfire
+ExecStart=/etc/init.d/sipxopenfire start
+ExecStop=/etc/init.d/sipxopenfire stop
+ExecReload=/etc/init.d/sipxopenfire restart
+PIDFile=/var/run/openfire.pid
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,142 @@
+#!/bin/sh
+#
+# openfire	Stops and starts the Openfire XMPP service.
+#
+# chkconfig: 2345 99 1
+# description: Openfire is an XMPP server, which is a server that facilitates \
+#              XML based communication, such as chat.
+# config: /opt/openfire/conf/openfire.xml
+# config: /etc/sysconfig/openfire
+# pidfile: /var/run/openfire.pid
+# 
+
+. /etc/rc.d/init.d/functions ||  exit $ENOENT
+. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }
+
+. /etc/sysconfig/openfire || exit $ENOENT
+
+# If openfire user is not set in sysconfig, set to daemon.
+[ -z "$OPENFIRE_USER" ] && OPENFIRE_USER="daemon"
+
+# If pid file path is not set in sysconfig, set to /var/run/openfire.pid.
+[ -z "$OPENFIRE_PIDFILE" ] && OPENFIRE_PIDFILE="/var/run/openfire.pid"
+
+# If a openfire home variable has not been specified, try to determine it.
+if [ -z "$OPENFIRE_HOME" -o ! -d "$OPENFIRE_HOME" ]; then
+    echo "Please specify the Openfire installation location as variable OPENFIRE_HOME"
+    exit 1
+fi
+
+# If log path is not set in sysconfig, set to $OPENFIRE_HOME/logs.
+[ -z "$OPENFIRE_LOGDIR" ] && OPENFIRE_LOGDIR="${OPENFIRE_HOME}/logs"
+
+JAVACMD=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
+
+# Prepare location of openfire libraries
+OPENFIRE_LIB="${OPENFIRE_HOME}/lib"
+
+# Prepare openfire command line
+OPENFIRE_OPTS="${OPENFIRE_OPTS} -DopenfireHome=${OPENFIRE_HOME} -Dopenfire.lib.dir=${OPENFIRE_LIB}"
+
+# Prepare local java class path
+if [ -z "$LOCALCLASSPATH" ]; then
+	LOCALCLASSPATH="${OPENFIRE_LIB}/startup.jar"
+else
+	LOCALCLASSPATH="${OPENFIRE_LIB}/startup.jar:${LOCALCLASSPATH}"
+fi
+
+prog=openfire
+pidfile="${OPENFIRE_PIDFILE}"
+regex="java-$prog"
+
+start() {
+  Command="${JAVACMD} -Dlog4j.configurationFile=${OPENFIRE_LIB}/log4j2.xml -Dlog4j2.formatMsgNoLookups=true"
+
+  if [ -n "${NoFork}" ] ; then
+    killAnyProcessOrphans "${pidfile}" "${regex}"
+    runuser -s /bin/bash ${OPENFIRE_USER} -c ${Command}
+  else
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
+    Status=$?
+    [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
+
+    echo -n $"Starting $prog: "
+    runuser -s /bin/bash ${OPENFIRE_USER} -c "${Command} > /dev/null 2>&1 & echo \$!" > ${pidfile}
+    Status=$?
+
+    if [ $# -gt 0 ]; then
+      #check if process was spawned
+      checkRunningProcessTimeout "${pidfile}" "${regex}" 
+      Status=$?
+      [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
+      checkIfProcessIsListening "${pidfile}" "${regex}"
+      Status=$?
+      [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
+      [ $Status -eq 0 ] && { echo_success; }
+    else
+      [ $Status -eq 0 ] || { echo_failure; }
+      [ $Status -eq 0 ] && { echo_success; }
+    fi
+  fi
+}
+
+stop() {
+  echo -n $"Stopping $prog: "
+  killAnyProcessOrphans "${pidfile}" "${regex}"
+  Status=$?
+  [ $Status -eq 0 ] || { echo_failure; }
+  [ $Status -eq 0 ] && { echo_success; }
+}
+
+restart() {
+  stop
+  start $withCheck
+}
+
+asyncrestart() {
+  stop
+  start
+}
+
+case "$1" in
+  nofork)
+    NoFork=1
+    start
+    ;;
+  start)
+    start $withCheck
+    ;;
+  stop)
+    stop
+    ;;
+  restart|reload|force-reload)
+    restart
+    ;;
+  asyncrestart)
+    asyncrestart
+    ;;
+  condrestart)
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
+    Status=$?
+    [ $Status -eq 0 ] && restart || :
+    ;;
+  status)
+    checkRunningProcessIsListening "${pidfile}" "${regex}"
+    Status=$?
+    ;;
+  configtest)
+    configtest
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|status|restart|asyncrestart|reload|force-reload|condrestart|nofork}"
+    Status=$EINCORRECTUSAGE
+esac
+
+exit $Status
+
+
+
+
+
+
+

@@ -78,6 +78,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/java/sipXecs/sipXconfig/plugins/openfire-cfg-service.jar
 %dir %attr(755,sipx,sipx) %{_localstatedir}/sipxdata/cfdata
 %{_localstatedir}/sipxdata/cfdata/defaults/sipxopenfire.cfdat
+%attr(755,root,root) %{_sysconfdir}/init.d/sipxopenfire
+%attr(644,root,root) /usr/lib/systemd/system/sipxopenfire.service
 
 %post
 alternatives --set java java-17-openjdk.x86_64
+if [ -f /etc/init.d/openfire ]; then
+    chmod -x /etc/init.d/openfire
+fi

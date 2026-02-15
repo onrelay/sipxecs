@@ -20,7 +20,7 @@ bundle agent sipxopenfire {
     sipxopenfire::
       "any" usebundle => sipxopenfire_config;  
     any::
-      "any" usebundle => openfire_running;
+      "any" usebundle => sipxopenfire_running;
   files:	
     !sipxopenfire::
       "$(sipx.OPENFIRE_HOME)/conf/openfire.xml"
@@ -185,25 +185,25 @@ bundle edit_line sipxopenfire_sipx_properties {
     "openfire.home=$(sipx.OPENFIRE_HOME)";
 }
 
-bundle agent openfire_running {
+bundle agent sipxopenfire_running {
   methods:
     !src.sipxopenfire::
-      "any" usebundle => rh_systemctl_status("enable openfire");
+      "any" usebundle => rh_systemctl_status("enable sipxopenfire");
     !src.!sipxopenfire::
-      "any" usebundle => rh_systemctl_status("disable openfire");
+      "any" usebundle => rh_systemctl_status("disable sipxopenfire");
 
   commands:
-    (!sipxopenfire|stop_sipxecs).openfire_running::
+    (!sipxopenfire|stop_sipxecs).sipxopenfire_running::
       "/bin/systemctl"
-        args => "stop openfire";
+        args => "stop sipxopenfire";
 
-    sipxopenfire.!openfire_running.!stop_sipxecs::
+    sipxopenfire.!sipxopenfire_running.!stop_sipxecs::
       "/bin/systemctl"
-        args => "start openfire";
+        args => "start sipxopenfire";
 
-    sipxopenfire.openfire_running.(restart_sipxecs|restart_openfire)::
+    sipxopenfire.sipxopenfire_running.(restart_sipxecs|restart_openfire)::
       "/bin/systemctl"
-        args => "restart openfire";
+        args => "restart sipxopenfire";
 }
 
 bundle edit_line sipxopenfire_log4j_properties_contents {
