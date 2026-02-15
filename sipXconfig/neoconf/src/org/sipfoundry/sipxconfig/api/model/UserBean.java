@@ -158,7 +158,7 @@ public class UserBean {
     public static UserBean convertUser(User user) {
         UserBean bean = new UserBean();
         bean.setId(user.getId());
-        bean.setAliases(user.getAliases());
+        bean.setAliases(new LinkedHashSet(user.getAliases()));
         Branch branch = user.getBranch();
         if (branch != null) {
             bean.setBranchName(user.getBranch().getName());
