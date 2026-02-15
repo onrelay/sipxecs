@@ -14,7 +14,7 @@
 # Licensed to the User under the LGPL license.
 
 . /etc/rc.d/init.d/functions || exit $ENOENT
-. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; echo; exit $ENOENT; }
+. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }
 
 prog=sipregistrar
 exec="@SIPX_BINDIR@/${prog}"
@@ -24,42 +24,42 @@ pidfile="@SIPX_RUNDIR@/sipxregistrar/sipxregistrar.pid"
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 
 start() {
-  [ -x $exec ] || { echo -n "$execError"; echo_failure; echo; exit $NOEXEC; }
-  [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; echo; exit $ENOENT; }
+  [ -x $exec ] || { echo -n "$execError"; echo_failure; exit $NOEXEC; }
+  [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; exit $ENOENT; }
   if [ -n "${NoFork}" ] ; then
-    killAnyProcessOrphans ${pidfile}
+    killAnyProcessOrphans "${pidfile}" "${exec}"
     runuser -s /bin/bash @SIPXPBXUSER@ -c $exec
   else
-    checkRunningProcessIsListening ${pidfile} > /dev/null
+    checkRunningProcessIsListening "${pidfile}" "${exec}" > /dev/null
     Status=$?
-    [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
+    [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
 
     echo -n $"Starting $prog: "
-    runuser -s /bin/bash @SIPXPBXUSER@ -c "$exec --pid-file $pidfile & echo \$!" > ${pidfile}
+    runuser -s /bin/bash @SIPXPBXUSER@ -c "$exec --pid-file $pidfile > /dev/null 2>&1 & echo \$!" > ${pidfile}
+    Status=$?
 
     if [ $# -gt 0 ]; then
       #check if process spawned
-      checkRunningProcessTimeout ${pidfile}
+      checkRunningProcessTimeout "${pidfile}" "${exec}"
       Status=$?
-      [ $Status -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
-       checkIfProcessIsListening ${pidfile}
+      [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
+       checkIfProcessIsListening "${pidfile}" "${exec}"
       Status=$?
-      [ $Status -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
-      [ $Status -eq 0 ] && { echo_success; echo; }
+      [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
+      [ $Status -eq 0 ] && { echo_success; }
     else
-      [ $Status -eq 0 ] && { echo_success; echo; }
-      [ $Status -eq 0 ] || { echo_failure; echo; }
+      [ $Status -eq 0 ] || { echo_failure; }
+      [ $Status -eq 0 ] && { echo_success; }
     fi
   fi
 }
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans ${pidfile}
+  killAnyProcessOrphans "${pidfile}" "${exec}"
   Status=$?
-  [ $Status -ne 0 ] && { echo_failure; echo; exit "${Status}"; }
-  rm -f ${pidfile}
-  echo_success; echo;
+  [ $Status -eq 0 ] || { echo_failure; }
+  [ $Status -eq 0 ] && { echo_success; }
 }
 
 
@@ -150,12 +150,12 @@ case "$1" in
     asyncrestart
     ;;
   condrestart)
-    checkRunningProcessIsListening ${pidfile} > /dev/null
+    checkRunningProcessIsListening "${pidfile}" "${exec}" > /dev/null
     Status=$?
     [ $Status -eq 0 ] && restart || :
     ;;
   status)
-    checkRunningProcessIsListening ${pidfile}
+    checkRunningProcessIsListening "${pidfile}" "${exec}"
     Status=$?
     ;;
   configtest)

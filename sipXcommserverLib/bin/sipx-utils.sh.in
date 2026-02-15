@@ -341,51 +341,51 @@ proc_alive() # pid
 
 sipx_stop() {
    proc_name=$1; shift
-   pidFile=$1; shift
+   pidfile=$1; shift
 
    STATUS=0
 
    echo -n "  Confirm Stop: $proc_name "
 
-   if [ -r ${pidFile} ]
+   if [ -r ${pidfile} ]
    then
-       PID=`cat ${pidFile} 2> /dev/null`
-       if proc_alive "$PID"
+       pid=`cat ${pidfile} 2> /dev/null`
+       if proc_alive "$pid"
        then
-          kill $PID 2> /dev/null
+          kill $pid 2> /dev/null
           for ticks in `seq 19 -1 0`
           do
              sleep 1
-             proc_alive "$PID" && echo -n "." || break
+             proc_alive "$pid" && echo -n "." || break
           done
-          if proc_alive "$PID"
+          if proc_alive "$pid"
           then
               # It didn't die!  Try to get a core dump
               echo ""
               echo    "    $proc_name did not Stop."
               echo -n "    Trying to abort $proc_name "
-              kill -ABRT $PID 2> /dev/null
+              kill -ABRT $pid 2> /dev/null
               for ticks in `seq 55 -5 0`
               do
                  sleep 5
-                 proc_alive "$PID" && echo -n " $ticks" || break
+                 proc_alive "$pid" && echo -n " $ticks" || break
               done
-              if proc_alive "$PID"
+              if proc_alive "$pid"
               then
                   echo ""
                   echo    "    $proc_name did not abort."
                   echo -n "    Trying to kill $proc_name "
-                  kill -KILL $PID 2> /dev/null
+                  kill -KILL $pid 2> /dev/null
                   for ticks in `seq 55 -5 0`
                   do
                      sleep 5
-                     proc_alive "$PID" && echo -n " $ticks" || break
+                     proc_alive "$pid" && echo -n " $ticks" || break
                   done
               fi
           fi
        fi
 
-       if proc_alive "$PID"
+       if proc_alive "$pid"
        then
            # Holy fluff!  It didn't die!  The end is nigh!
            echo ""
@@ -398,7 +398,7 @@ sipx_stop() {
        else
            echo_success
            echo ""
-           rm -f ${pidFile}
+           rm -f ${pidfile}
        fi
 
    else
@@ -431,7 +431,7 @@ setJavaSslOpts() {
     -Djavax.net.ssl.keyStore=@SIPX_CONFDIR@/ssl/ssl.keystore \
     -Djavax.net.ssl.keyStorePassword=$StorePassword"
 
-  local JavaCmd=`@SIPX_BINDIR@/sipx-config --java`
+  local JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
   X509Algorithm=`$JavaCmd \
        org.sipfoundry.commons.x509selector.X509Selector`
   JettySslOpts="\
@@ -471,8 +471,8 @@ EOF
 ##
 ## functions for process management
 ##
-maxTimeout=25
-maxListenTimeout=60
+maxTimeout=5
+maxListenTimeout=20
 sleepTime=0.5
 runningError="is already running: "
 execError="Provided file is not executable"
@@ -481,7 +481,7 @@ noPortError="No listening port found"
 withCheck=1
 
 #check if process is in the process table and if is listening on a port
-checkRunningInstance () {
+checkRunningUserProcess () {
   user=$1
   regex=$2
   [ $3 ] && programName=$3
@@ -507,14 +507,14 @@ checkRunningInstance () {
 }
 
 #check if process is in the process table for a maximum amount of time
-checkRunningInstanceTimeout () {
+checkRunningUserProcessTimeout () {
   user=$1
   regex=$2
   [ $3 ] && timeout=$3
   [ $3 ] || timeout=$maxTimeout
 
   for((i=0; i<$timeout; i++ )); do
-    checkRunningInstance $user $regex > /dev/null
+    checkRunningUserProcess $user $regex > /dev/null
     Status=$?
     [ $Status -eq 0 ] && return 0
     sleep $sleepTime
@@ -524,58 +524,82 @@ checkRunningInstanceTimeout () {
 }
 
 #check if process is listening on a port for a maximum amount of time
-checkIfListening() {
-  regex=$1
-  [ $2 ] && timeout=$2
-  [ $2 ] || timeout=$maxListenTimeout
-  for((i=0; i<$timeout; i++)); do
-    result=`netstat -tulpn | awk '$6 == "LISTEN"' | grep $regex | awk '{ print $4 }'` 
-    [ "${result}" ] && return 0; 
-    sleep $sleepTime
-  done
-  return $ENOSCKT
+checkIfUserProcessIsListening() {
+    user=$1
+    regex=$2
+    [ $3 ] && timeout=$3
+    [ $3 ] || timeout=$maxListenTimeout
+    for((i=0; i<$timeout; i++)); do
+        result=`netstat -tulpn | awk '$6 == "LISTEN"' | grep $regex | awk '{ print $4 }'` 
+        [ "${result}" ] && return 0; 
+        sleep $sleepTime
+    done
+    return $ENOSCKT
 }
 
 #kill any process that belongs to a specified user and related to a regex
-killAnyOrphans () {
-  user=$1
-  regex=$2
-  Status=0
-  [ $3 ] && timeout=$3
-  [ $3 ] || timeout=$maxTimeout
-  
-  #TERM first, then KILL if not dead
-  procs=`ps -u $1 -o pid,args | grep $regex | grep -v "grep" | awk '{print $1 }'`
-  for pid in $procs; do kill -TERM $pid; done
-  for((i=0; i<$timeout; i++)); do
-    checkRunningInstance $user $regex > /dev/null
+killAnyUserProcessOrphans () {
+    user=$1
+    regex=$2
+    Status=0
+    [ $3 ] && timeout=$3
+    [ $3 ] || timeout=$maxTimeout
+    
+    #TERM first, then KILL if not dead
+    procs=`ps -u $1 -o pid,args | grep $regex | grep -v "grep" | awk '{print $1 }'`
+    for pid in $procs; do kill -TERM $pid; done
+    for((i=0; i<$timeout; i++)); do
+        checkRunningUserProcess $user $regex > /dev/null
+        Status=$?
+        [ $Status -eq $ESRCH ] && break;
+        sleep $sleepTime
+    done
+    
+    checkRunningUserProcess $user $regex > /dev/null
     Status=$?
-    [ $Status -eq $ESRCH ] && break;
-    sleep $sleepTime
-  done
-  
-  checkRunningInstance $user $regex > /dev/null
-  Status=$?
-  [ $Status -eq 0 ] && { procs=`ps -u $1 -o pid,args | grep $regex | grep -v "grep" | awk '{print $1 }'`; \
-                         for pid in $procs; do kill -KILL $pid; done ; \
-                        }
+    [ $Status -eq 0 ] && { procs=`ps -u $1 -o pid,args | grep $regex | grep -v "grep" | awk '{print $1 }'`; \
+                            for pid in $procs; do kill -KILL $pid; done ; \
+                            }
 
-  checkRunningInstance $user $regex > /dev/null
-  Status=$?
-  [ $Status -eq 0 ] && { echo_failure; echo; } 
+    checkRunningUserProcess $user $regex > /dev/null
+    Status=$?
+    [ $Status -eq 0 ] && { echo_failure; } 
 }
 
 
 getRunningProcessID() {
     pidfile="$1"
+    regex="$2"
 
-    [ -f "$pidfile" ] || return $ESRCH
+    if [ -f "$pidfile" ]; then
 
-    pid=$(cat "$pidfile" 2>/dev/null)
+        pid=$(cat "$pidfile" 2>/dev/null)
 
-    if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
-        echo "$pid"
-        return 0
+        if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+            echo "$pid"
+            return 0
+        else
+            rm -f "$pidfile" >/dev/null
+        fi
+    fi
+
+    if [[ -n "$regex" ]]; then
+
+        count=$(pgrep -c -f "$regex")
+
+        if [[ "$count" -eq 1 ]]; then
+                
+            pid=$(pgrep -f "$regex")
+
+            if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+
+                if [[ -n "$pidfile" ]]; then
+                    echo "$pid" > "$pidfile"
+                fi
+                echo "$pid"
+                return 0
+            fi
+        fi
     fi
 
     return $ESRCH
@@ -583,11 +607,12 @@ getRunningProcessID() {
 
 checkRunningProcess() {
     pidfile="$1"
+    regex="$2"
 
     programName=$(basename "$pidfile")
     programName=${programName%.pid}
 
-    pid=$(getRunningProcessID "$pidfile")
+    pid=$(getRunningProcessID "$pidfile" "$regex")
     rc=$?
 
     if [ $rc -ne 0 ]; then
@@ -601,11 +626,12 @@ checkRunningProcess() {
 
 checkRunningProcessIsListening() {
     pidfile="$1"
+    regex="$2"
 
     programName=$(basename "$pidfile")
     programName=${programName%.pid}
 
-    pid=$(getRunningProcessID "$pidfile")
+    pid=$(getRunningProcessID "$pidfile" "$regex")
     rc=$?
 
     if [ $rc -ne 0 ]; then
@@ -613,7 +639,7 @@ checkRunningProcessIsListening() {
         return $ESRCH
     fi
 
-    # Check if PID is listening on any port
+    # Check if pid is listening on any port
     if ss -lptn 2>/dev/null | grep -q "pid=$pid,"; then
         echo "$programName ( pid $pid ) is running and listening on port"
     else
@@ -625,12 +651,12 @@ checkRunningProcessIsListening() {
 
 checkRunningProcessTimeout() {
     pidfile="$1"
-    [ -z "$pidfile" ] && return $ESRCH
+    regex="$2"
 
-    timeout=${2:-$maxTimeout}
+    timeout=${3:-$maxTimeout}
 
     for ((i=0; i<$timeout; i++)); do
-        pid=$(getRunningProcessID "$pidfile")
+        pid=$(getRunningProcessID "$pidfile" "$regex")
         [ $? -eq 0 ] && return 0
         sleep $sleepTime
     done
@@ -640,10 +666,10 @@ checkRunningProcessTimeout() {
 
 checkIfProcessIsListening() {
     pidfile="$1"
-    [ -z "$pidfile" ] && return $ENOSCKT
+    regex="$2"
 
-    timeout=${2:-$maxListenTimeout}
-    pid=$(getRunningProcessID "$pidfile") || return $ENOSCKT
+    timeout=${3:-$maxListenTimeout}
+    pid=$(getRunningProcessID "$pidfile" "$regex") || return $ENOSCKT
 
     for ((i=0; i<$timeout; i++)); do
         if ss -lptn 2>/dev/null | grep -q "pid=$pid,"; then
@@ -657,36 +683,39 @@ checkIfProcessIsListening() {
 
 killAnyProcessOrphans() {
 
-  pidfile="$1"
+    pidfile="$1"
+    regex="$2"
 
-  [ -z "$pidfile" ] && return $ESRCH; 
+    timeout=${3:-$maxTimeout}
 
-  timeout=${2:-$maxTimeout}
+    pid=$(getRunningProcessID "$pidfile" "$regex")
+    [ $? -ne 0 ] && return $ESRCH  
 
-  pid=$(getRunningProcessID ${pidfile})
-  [ $? -ne 0 ] && return $ESRCH  
+    # First attempt graceful TERM
+    kill -TERM ${pid} 2>/dev/null
 
-  # First attempt graceful TERM
-  kill -TERM ${pid} 2>/dev/null
+    # Wait for process to exit
+    for ((i=0; i<$timeout; i++)); do
+        getRunningProcessID ${pidfile} >/dev/null 2>&1
+        [ $? -ne 0 ] && break
+        sleep $sleepTime
+    done
 
-  # Wait for process to exit
-  for ((i=0; i<$timeout; i++)); do
-      getRunningProcessID ${pidfile} >/dev/null 2>&1
-      [ $? -ne 0 ] && break
-      sleep $sleepTime
-  done
+    getRunningProcessID "$pidfile" "$regex" >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        pid=$(getRunningProcessID "$pidfile" "$regex")
+        kill -KILL "$pid" 2>/dev/null || true
+    fi
 
-  getRunningProcessID ${pidfile} >/dev/null 2>&1
-  if [ $? -eq 0 ]; then
-      pid=$(getRunningProcessID ${pidfile})
-      kill -KILL "$pid" 2>/dev/null || true
-  fi
+    getRunningProcessID "$pidfile" "$regex" >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo_failure;
+        return $ESRCH
+    fi
 
-  getRunningProcessID ${pidfile} >/dev/null 2>&1
-  if [ $? -eq 0 ]; then
-      echo_failure; echo;
-      return $ESRCH
-  fi
+    if [ -f "$pidfile" ]; then
+        rm -f "$pidfile"  > /dev/null
+    fi
 
-  return 0
+    return 0
 }

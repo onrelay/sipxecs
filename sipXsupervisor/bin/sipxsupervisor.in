@@ -9,12 +9,12 @@
 # config: /var/cfengine/masterfiles
 
 # Source function library.
-. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; echo; exit $ENOENT; }
+. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }
 
 config="@SIPX_CFINPUTS@/sipxsupervisord.cf"
 exec="/usr/local/sbin/cf-serverd"
 prog=$(basename $exec)
-progName="cf-serverd"
+progname="sipxsupervisor"
 # used to tell which config is in use.
 configid=/run/sipxsupervisor-configid
 
@@ -26,29 +26,29 @@ lockfile=/var/lock/subsys/$prog
 sipxagentlockfile="@SIPX_RUNDIR@/sipxsupervisor/sipxagent.lock"
 
 start() {
-  [ -x $exec ] || { echo -n "$execError"; echo_failure; echo; exit $ENOEXEC; }
-  [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; echo; exit $ENOENT; }
-  checkRunningInstance "root" $exec > /dev/null
+  [ -x $exec ] || { echo -n "$execError"; echo_failure; exit $ENOEXEC; }
+  [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; exit $ENOENT; }
+  checkRunningUserProcess "root" $exec > /dev/null
   Status=$?
-  [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
+  [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
 
   echo -n $config > $configid
-  echo -n $"Starting $progName: "
+  echo -n $"Starting $prog: "
   "$exec" -f "$config" &
   Status=$?
   [ $Status -eq 0 ] && touch $lockfile
 
   if [ $# -gt 0 ]; then
-    checkRunningInstanceTimeout "root" $exec $maxTimeout
+    checkRunningUserProcessTimeout "root" $exec $maxTimeout
     Status=$?
-    [ $Status -eq $ESRCH ] && { echo_failure; echo; exit $ESRCH; }
+    [ $Status -eq $ESRCH ] && { echo_failure; exit $ESRCH; }
 
     #sipxagent running
     if [ -f @sipxagentlockfile ]; then
-      checkIfListening $progName
+      checkIfUserProcessIsListening "root" $prog
       Status=$?
-      [ $Status -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
-      [ $Status -eq 0 ] && { echo_success; echo; return $Status; }
+      [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
+      [ $Status -eq 0 ] && { echo_success; return $Status; }
     fi
   fi
 
@@ -60,27 +60,27 @@ start() {
     runuser - root -s @SIPX_BINDIR@/sipxagent
 
     if [ $# -gt 0 ]; then
-      checkIfListening $prog
+      checkIfUserProcessIsListening "root" $prog
       Status=$?
-      [ $Status -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
-      [ $Status -eq 0 ] && { echo_success; echo; return 0; }
+      [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
+      [ $Status -eq 0 ] && { echo_success; return 0; }
     fi
   fi
 
 }
 
 nofork() {
-  killAnyOrphans "root" $exec
+  killAnyUserProcessOrphans "root" $exec
   $exec -v -f $config
 }
 
 stop() {
-  echo -n $"Stopping $progName: "
+  echo -n $"Stopping $progname: "
   pkill -f "$exec"
   RETVAL=$?
   echo
   [ $RETVAL -eq 0 ] && rm -f $lockfile
-  killAnyOrphans "root" $exec
+  killAnyUserProcessOrphans "root" $exec
   return $RETVAL
 }
 
@@ -119,11 +119,11 @@ case "$1" in
     force_reload
     ;;
   status)
-    checkRunningInstance "root" $exec $prog
+    checkRunningUserProcess "root" $exec $progname
     ;;
   # condrestart - only restarts if service *is* running
   condrestart)
-    checkRunningInstance "root" $exec > /dev/null
+    checkRunningUserProcess "root" $exec > /dev/null
     Status=$?
     [ $Status -eq 0 ] || restart
     ;;

@@ -15,14 +15,15 @@
 
 prog=sipximbot
 pidfile="@SIPX_RUNDIR@/sipximbot/sipximbot.pid"
+regex="java-$prog"
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 
 
 start() {
-    checkRunningProcessIsListening ${pidfile} > /dev/null
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
 
-    JavaCmd=`@SIPX_BINDIR@/sipx-config --java`
+    JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
     Dependencies=`@SIPX_BINDIR@/java-dep -d @SIPX_JAVADIR@/sipXcommons @imbot_PKGS@`
     export CLASSPATH=`echo @SIPX_CONFDIR@/sipximbot @SIPX_JAVADIR@/sipXimbot/*.jar ${Dependencies} | sed -e 's/ /:/g'`
 
@@ -30,7 +31,6 @@ start() {
 
     # procname is there so cfengine can find it
     Command="$JavaCmd \
-      -Dprocname="$prog" \
       -Dconf.dir=@SIPX_CONFDIR@ \
       -Dlog.dir=@SIPX_LOGDIR@ \
       -Dvar.dir=@SIPX_VARDIR@ \
@@ -44,17 +44,30 @@ start() {
     else
       echo -n $"Starting sipximbot: "
       runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command} > /dev/null 2>&1 & echo \$!" > ${pidfile}
-      echo_success
+      Status=$?
+
+      if [ $# -gt 0 ]; then
+        #check if process was spawned
+        checkRunningProcessTimeout "${pidfile}" "${regex}" 
+        Status=$?
+        [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
+        checkIfProcessIsListening "${pidfile}" "${regex}"
+        Status=$?
+        [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
+        [ $Status -eq 0 ] && { echo_success; }
+      else
+      [ $Status -eq 0 ] || { echo_failure; }
+      [ $Status -eq 0 ] && { echo_success; }
+      fi
     fi
 }
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans ${pidfile}
+  killAnyProcessOrphans "${pidfile}" "${regex}" 
   Status=$?
-  [ $Status -ne 0 ] && { echo_failure; echo; exit "${Status}"; }
-  rm -f ${pidfile}
-  echo_success; echo;
+  [ $Status -eq 0 ] || { echo_failure; }
+  [ $Status -eq 0 ] && { echo_success; }
 }
 
 restart() {
@@ -93,7 +106,7 @@ case "$1" in
     [ -f ${pidfile} ] && restart || :
     ;;
   status)
-    checkRunningProcessIsListening ${pidfile}
+    checkRunningProcessIsListening "${pidfile}" "${regex}"
     ;;
   configtest)
     configtest

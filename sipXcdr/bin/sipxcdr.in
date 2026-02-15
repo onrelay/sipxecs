@@ -11,7 +11,7 @@
 # Licensed to the User under the LGPL license.
 
 . /etc/rc.d/init.d/functions || exit $ENOENT
-. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; echo; exit $ENOENT; }
+. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }
 
 usage() {
 cat <<USAGE
@@ -65,8 +65,8 @@ fi
 : ${PgUser:=@POSTGRESQL_USER@}
 : ${PgSchema:=${ConfDir}/cdr/schema.sql}
 : ${RemoteUserSql:=${ConfDir}/cdr/cdrremote.sql}
-: ${RubyCmd:=@RUBY@}
 : ${DbVersion:=7}
+: ${Ruby:=@RUBY@}
 : ${DbPatchDir:=${ConfDir}/cdr}
 : ${DbPatchLog:=${LogDir}/sipcdrpatch.log}
 : ${CallResolverLog:=${LogDir}/sipcallresolver.log}
@@ -420,6 +420,7 @@ onSetup() {
 
 # Start CDR call resolver
 start() {
+  RubyCmd=`@SIPX_BINDIR@/sipx-config --"${Ruby}" --pidfile "${pidfile}"`
   onSetup
   # Check database version - don't run if it's wrong
   databasePatch
@@ -427,38 +428,39 @@ start() {
     exit 1
   fi
   if [ -n "${NoFork}" ] ; then
-    killAnyProcessOrphans ${pidfile}
-    runuser -s /bin/bash @SIPXPBXUSER@ -c ${Command}
+    killAnyProcessOrphans "${pidfile}" "${regex}"
+    runuser -s /bin/bash @SIPXPBXUSER@ -c "${RubyCmd} ${CallResolverMain} ${resolverArgs}
   else
-    checkRunningProcessIsListening ${pidfile} > /dev/null
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
     Status=$?
-    [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
+    [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
 
     echo -n $"Starting ${prog}: "
     runuser -s /bin/bash @SIPXPBXUSER@ -c "${RubyCmd} ${CallResolverMain} ${resolverArgs} >> ${CallResolverLog} 2>&1 & echo \$!" > ${pidfile}
+    Status=$?
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningProcessTimeout ${pidfile} > /dev/null 2>&1
+      checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
-      [ $Status -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
-      checkIfProcessIsListening ${pidfile}
+      [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
+      checkIfProcessIsListening "${pidfile}" "${regex}"
       Status=$?
-      [ $Status -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
-      [ $Status -eq 0 ] && { echo_success; echo; }
+      [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
+      [ $Status -eq 0 ] && { echo_success; }
     else
-      echo_success; echo;
+      [ $Status -eq 0 ] || { echo_failure; }
+      [ $Status -eq 0 ] && { echo_success; }      
     fi
   fi
 }
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans ${pidfile}
+  killAnyProcessOrphans "${pidfile}" "${regex}"
   Status=$?
-  [ $Status -ne 0 ] && { echo_failure; echo; exit "${Status}"; }
-  rm -f ${pidfile}
-  echo_success; echo;
+  [ $Status -eq 0 ] || { echo_failure; }
+  [ $Status -eq 0 ] && { echo_success; }
 }
 
 restart() {
@@ -495,12 +497,12 @@ case "$1" in
     asyncrestart
     ;;
   condrestart)
-    checkRunningInstance @SIPXPBXUSER@ $regex > /dev/null
+    checkRunningProcess "${pidfile}" "${regex}" > /dev/null
     Status=$?
     [ $Status -eq 0 ] && restart || :
     ;;
   status)
-    checkRunningInstance @SIPXPBXUSER@ $regex $prog
+    checkRunningProcess "${pidfile}" "${regex}"
     Status=$?
     ;;
   configtest)

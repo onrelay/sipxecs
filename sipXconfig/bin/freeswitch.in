@@ -8,7 +8,7 @@
 # Author: gled
 
 . /etc/sysconfig/network
-. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; echo; exit $ENOENT; }
+. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }
 
 PATH=/sbin:/usr/sbin:/bin:/usr/bin:@FREESWITCH_PREFIX@/bin
 DESC="FreeSwitch Voice Switching System"
@@ -96,7 +96,7 @@ base=${0##*/}
 do_start() {
   checkRunningProcessIsListening $PIDFILE > /dev/null
   RETVAL=$?
-  [ $RETVAL -eq 0 ] && { echo -n "$NAME $runningError"; echo_failure; echo; exit $ERUNNING; }
+  [ $RETVAL -eq 0 ] && { echo -n "$NAME $runningError"; echo_failure; exit $ERUNNING; }
   do_setlimits
   do_permission_check
   do_audio_setup
@@ -107,14 +107,14 @@ do_start() {
     #check if process spawned
     checkRunningProcessTimeout $PIDFILE
     RETVAL=$?
-    [ $RETVAL -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
+    [ $RETVAL -eq 0 ] || { echo_failure; exit $ESRCH; }
     checkIfProcessIsListening $PIDFILE
     RETVAL=$?
-    [ $RETVAL -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
-    [ $RETVAL -eq 0 ] && { echo_success; echo; }
+    [ $RETVAL -eq 0 ] || { echo_failure; exit $ENOSCKT; }
+    [ $RETVAL -eq 0 ] && { echo_success; }
   else
-    [ $RETVAL -eq 0 ] && { echo_success; echo; }
-    [ $RETVAL -eq 0 ] || { echo_failure; echo; }
+    [ $RETVAL -eq 0 ] && { echo_success; }
+    [ $RETVAL -eq 0 ] || { echo_failure; }
     return $RETVAL
   fi
 }

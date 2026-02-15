@@ -13,19 +13,19 @@
 
 prog=sipxrest
 pidfile="@SIPX_RUNDIR@/sipxrest/sipxrest.pid"
+regex="java-$prog"
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 
 # Start sipxrest
 start() {
-  checkRunningProcess ${pidfile} > /dev/null
+  checkRunningProcess "${pidfile}" "${regex}" > /dev/null
   Args=""
-  JavaCmd=`@SIPX_BINDIR@/sipx-config --java`
+  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
   Dependencies=`@SIPX_BINDIR@/java-dep -d @SIPX_JAVADIR@/sipXcommons @rest_PKGS@`
   export CLASSPATH=`echo @SIPX_CONFDIR@/sipxrest @SIPX_JAVADIR@/sipXrest/*.jar @SIPX_JAVADIR@/sipXrest/plugins/*.jar ${Dependencies} | sed -e 's/ /:/g'`    
   
   Command="$JavaCmd \
-      -Dprocname="$prog" \
       -Dconf.dir=@SIPX_CONFDIR@	\
       -Dplugin.dir=@SIPX_JAVADIR@/sipXrest/plugins \
 	    -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger \
@@ -34,38 +34,39 @@ start() {
 	 $Args"
 
   if [ -n "${NoFork}" ] ; then
-    killAnyProcessOrphans ${pidfile}
+    killAnyProcessOrphans "${pidfile}" "${regex}"
     runuser -s /bin/bash @SIPXPBXUSER@ -c ${Command}
   else
-    checkRunningProcess ${pidfile} > /dev/null
+    checkRunningProcess "${pidfile}" "${regex}" > /dev/null
     Status=$?
-    [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
+    [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
 
     echo -n $"Starting $prog: "
     runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command} > /dev/null 2>&1 & echo \$!" > ${pidfile}
+    Status=$?
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningProcessTimeout ${pidfile}
+      checkRunningProcessTimeout "${pidfile}" "${regex}"
       Status=$?
-      [ $Status -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
-      checkRunningProcess ${pidfile} > /dev/null
+      [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
+      checkRunningProcess "${pidfile}" "${regex}" > /dev/null
       Status=$?
-      [ $Status -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
-      [ $Status -eq 0 ] && { echo_success; echo; }
+      [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
+      [ $Status -eq 0 ] && { echo_success; }
     else
-      echo_success; echo;
+      [ $Status -eq 0 ] || { echo_failure; }
+      [ $Status -eq 0 ] && { echo_success; }
     fi
   fi
 }
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans ${pidfile}
+  killAnyProcessOrphans "${pidfile}" "${regex}"
   Status=$?
-  [ $Status -ne 0 ] && { echo_failure; echo; exit "${Status}"; }
-  rm -f ${pidfile}
-  echo_success; echo;
+  [ $Status -eq 0 ] || { echo_failure; }
+  [ $Status -eq 0 ] && { echo_success; }
 }
 
 restart() {
@@ -91,10 +92,12 @@ case "$1" in
     restart
     ;;
   condrestart)
-    [ -f ${pidfile} ] && restart || :
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
+    Status=$?
+    [ $Status -eq 0 ] && restart || :
     ;;
   status)
-    checkRunningProcessIsListening ${pidfile}
+    checkRunningProcessIsListening "${pidfile}" "${regex}"
     ;;
   configtest)
     configtest

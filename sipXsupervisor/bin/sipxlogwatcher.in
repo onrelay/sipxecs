@@ -5,30 +5,30 @@
 # description:  Simple Event Correlator script to filter log file entries
 
 . /etc/rc.d/init.d/functions
-. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; echo; exit $ENOENT; }
+. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }
 
-progName="sipxlogwatcher"
-exec="/usr/bin/sec"
-prog=$(basename $exec)
+prog="sipxlogwatcher"
 lockfile="/var/lock/subsys/sec"
 pidfile=@SIPX_RUNDIR@/sipxlogwatcher/sipxlogwatcher.pid
 rc=@SIPX_CONFDIR@/sipxlogwatcher-rc
+regex="perl-$prog"
+exec=`@SIPX_BINDIR@/sipx-config --perl --pidfile "${pidfile}"` 
+exec="${exec} -w /usr/bin/sec"
 
 [ -e $rc ] && . $rc
 
 start() {
-  [ -x $exec ] || { echo -n "$execError"; echo_failure; echo; exit $ENOEXEC; }
-  checkRunningProcess ${pidfile} > /dev/null 
+  checkRunningProcess "${pidfile}" "${regex}" > /dev/null 
   Status=$?
-  [ $Status -eq 0 ] && { echo -n "$progName $runningError"; echo_failure; echo; exit $ERUNNING; }
+  [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
 
   for n in `seq 0 $((${#SEC_ARGS[*]} - 1))`; do
-    echo -n $"Starting $progName instance "$(($n + 1))": "
+    echo -n $"Starting $prog instance "$(($n + 1))": "
     $exec ${SEC_ARGS[$n]} &
     Status=$?
     echo $! > ${pidfile}
-    echo
     [ $Status -ne 0 ] && return $Status
+    echo_success
   done
   touch $lockfile
   return $Status
@@ -36,11 +36,10 @@ start() {
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans ${pidfile}
+  killAnyProcessOrphans "${pidfile}" "${regex}"
   Status=$?
-  [ $Status -ne 0 ] && { echo_failure; echo; exit "${Status}"; }
-  rm -f ${pidfile}
-  echo_success; echo;
+  [ $Status -eq 0 ] || { echo_failure; }
+  [ $Status -eq 0 ] && { echo_success; }
 }
 
 restart() {
@@ -61,7 +60,7 @@ force_reload() {
 }
 
 rh_status() {
-  checkRunningProcess ${pidfile}
+  checkRunningProcess "${pidfile}" "${regex}"
 }
 
 rh_status_q() {

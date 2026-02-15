@@ -9,15 +9,16 @@
 # Licensed to the User under the LGPL license.
 
 . /etc/rc.d/init.d/functions || exit $ENOENT
-. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; echo; exit $ENOENT; }
+. @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }
 
 prog=sipxivr
 pidfile="@SIPX_RUNDIR@/sipxivr/sipxivr.pid"
+regex="java-$prog"
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 
 start() {
-  JavaCmd=`@SIPX_BINDIR@/sipx-config --java`
+  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
   Dependencies=`@SIPX_BINDIR@/java-dep -d @SIPX_JAVADIR@/sipXcommons @ivr_PKGS@`
   export CLASSPATH=`echo @SIPX_CONFDIR@/sipxivr @SIPX_JAVADIR@/{sipXivr,sipXopenfire/plugins}/*.jar ${Dependencies} | sed -e 's/ /:/g'`
 
@@ -25,7 +26,6 @@ start() {
 
   # procname is there so cfengine can find it
   Command="$JavaCmd \
-    -Dprocname=sipxivr \
     -Dconf.dir=@SIPX_CONFDIR@ \
     -Dvar.dir=@SIPX_VARDIR@ \
     -Dhazelcast.config=@SIPX_CONFDIR@/hz-config.xml \
@@ -43,7 +43,7 @@ start() {
       echo "Exiting sipxivr script with no change"
       exit 0;
     fi
-    checkRunningProcessIsListening ${pidfile} > /dev/null
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
     Status=$?
     if [ $Status -eq 0 ]; then    
       echo -e $"sipXivr is running and voicemail migration parameter is passed - we need to stop sipxivr first: "
@@ -52,38 +52,39 @@ start() {
   fi
   
   if [ -n "${NoFork}" ] ; then
-    killAnyProcessOrphans ${pidfile}
+    killAnyProcessOrphans "${pidfile}" "${regex}"
     runuser -s /bin/bash @SIPXPBXUSER@ -c ${Command}
   else
-    checkRunningProcessIsListening ${pidfile} > /dev/null
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
     Status=$?
-    [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; echo; exit $ERUNNING; }
+    [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
 
     echo -n $"Starting $prog: "
     runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command} > /dev/null 2>&1 & echo \$!" > ${pidfile}
+    Status=$?
 
     if [ $# -gt 1 ]; then
       #check if process was spawned
-      checkRunningProcessTimeout ${pidfile}
+      checkRunningProcessTimeout "${pidfile}" "${regex}"
       Status=$?
-      [ $Status -eq 0 ] || { echo_failure; echo; exit $ESRCH; }
-      checkIfProcessIsListening ${pidfile}
+      [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
+      checkIfProcessIsListening "${pidfile}" "${regex}"
       Status=$?
-      [ $Status -eq 0 ] || { echo_failure; echo; exit $ENOSCKT; }
-      [ $Status -eq 0 ] && { echo_success; echo; }
+      [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
+      [ $Status -eq 0 ] && { echo_success; }
     else
-      echo_success; echo;
+      [ $Status -eq 0 ] || { echo_failure; }
+      [ $Status -eq 0 ] && { echo_success; }
     fi
   fi
 }
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans ${pidfile}
+  killAnyProcessOrphans "${pidfile}" "${regex}"
   Status=$?
-  [ $Status -ne 0 ] && { echo_failure; echo; exit "${Status}"; }
-  rm -f ${pidfile}
-  echo_success; echo;
+  [ $Status -eq 0 ] || { echo_failure; }
+  [ $Status -eq 0 ] && { echo_success; }
 }
 
 restart() {
@@ -131,12 +132,12 @@ case "$1" in
     asyncrestart
     ;;
   condrestart)
-    checkRunningProcessIsListening ${pidfile} > /dev/null
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
     Status=$?
     [ $Status -eq 0 ] && restart || :
     ;;
   status)
-    checkRunningProcessIsListening ${pidfile}
+    checkRunningProcessIsListening "${pidfile}" "${regex}"
     Status=$?
     ;;
   configtest)
