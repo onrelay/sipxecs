@@ -19,9 +19,33 @@ bundle agent elasticsearch {
 
   methods:
     primary::
+      "any" usebundle => elasticsearch_snmp_symlink;
       "any" usebundle => elasticsearch_config;
       "any" usebundle => elasticsearch_index_settings;
       "any" usebundle => elasticsearch_systemctl_running;
+}
+
+# --- Create named symlink in the PID folder ---
+bundle agent elasticsearch_snmp_symlink {
+  files:
+    any::
+      # 1. Ensure the directory structure ES expects exists
+      "/run/elasticsearch/bin/."
+        comment => "Ensure bin subfolder exists for JAVA_HOME structure",
+        create => "true",
+        perms => mog("755", "elasticsearch", "elasticsearch");
+
+      # 2. The 'java' link for Elasticsearch to actually run
+      "/run/elasticsearch/bin/java"
+        comment => "Standard java link so ES finds its binary",
+        link_from => ln_s("/usr/share/elasticsearch/jdk/bin/java"),
+        move_obstructions => "true";
+
+      # 3. The 'named' link for SNMP to track the process
+      "/run/elasticsearch/java-elasticsearch"
+        comment => "Named link for SNMP visibility",
+        link_from => ln_s("/run/elasticsearch/bin/java"),
+        move_obstructions => "true";
 }
 
 # --- Manage configuration files ---
@@ -49,6 +73,23 @@ bundle agent elasticsearch_config {
         perms => mog("644","root","root"),
         edit_line => elasticsearch_jvm_options,
         classes => if_repaired("restart_elasticsearch");
+
+      # Systemd override to point to the new symlink name
+      "/etc/systemd/system/elasticsearch.service.d/snmp-override.conf"
+        comment => "Point ES to the named java symlink for SNMP tracking",
+        create => "true",
+        perms => mog("644", "root", "root"),
+        edit_line => elasticsearch_systemd_override,
+        classes => if_repaired("restart_elasticsearch");
+}
+
+# --- systemd override content ---
+bundle edit_line elasticsearch_systemd_override {
+  insert_lines:
+    "[Service]
+# We point ES_JAVA_HOME to the folder containing our symlink
+Environment=ES_JAVA_HOME=/run/elasticsearch
+";
 }
 
 # --- nofile limits ---
