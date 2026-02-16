@@ -7,9 +7,8 @@
  */
 
 html {
-  font-family: sans-serif; /* 1 */
-  -ms-text-size-adjust: 100%; /* 2 */
-  -webkit-text-size-adjust: 100%; /* 2 */
+  font-family: sans-serif;
+  -webkit-text-size-adjust: 100%;
 }
 
 /**
@@ -43,16 +42,15 @@ summary {
 }
 
 /**
- * 1. Correct `inline-block` display not defined in IE 8/9.
- * 2. Normalize vertical alignment of `progress` in Chrome, Firefox, and Opera.
+ * Normalize vertical alignment of media elements.
  */
 
 audio,
 canvas,
 progress,
 video {
-  display: inline-block; /* 1 */
-  vertical-align: baseline; /* 2 */
+  display: inline-block;
+  vertical-align: baseline;
 }
 
 /**
@@ -66,8 +64,7 @@ audio:not([controls]) {
 }
 
 /**
- * Address `[hidden]` styling not present in IE 8/9.
- * Hide the `template` element in IE, Safari, and Firefox < 22.
+ * Hide hidden and template elements.
  */
 
 [hidden],
@@ -79,15 +76,7 @@ template {
    ========================================================================== */
 
 /**
- * Remove the gray background color from active links in IE 10.
- */
-
-a {
-  background: transparent;
-}
-
-/**
- * Improve readability when focused and also mouse hovered in all browsers.
+ * Improve readability when focused and hovered.
  */
 
 a:active,
@@ -96,129 +85,6 @@ a:hover {
 }
 
 
-
-/* Text-level semantics
-   ========================================================================== */
-
-/**
- * Address styling not present in IE 8/9, Safari 5, and Chrome.
- */
-
-abbr[title] {
-  border-bottom: 1px dotted;
-}
-
-/**
- * Address style set to `bolder` in Firefox 4+, Safari 5, and Chrome.
- */
-
-b,
-strong {
-  font-weight: bold;
-}
-
-/**
- * Address styling not present in Safari 5 and Chrome.
- */
-
-dfn {
-  font-style: italic;
-}
-
-/**
- * Address variable `h1` font-size and margin within `section` and `article`
- * contexts in Firefox 4+, Safari 5, and Chrome.
- */
-
-h1 {
-  font-size: 2em;
-  margin: 0.67em 0;
-}
-
-/**
- * Address styling not present in IE 8/9.
- */
-
-mark {
-  background: #ff0;
-  color: #000;
-}
-
-/**
- * Address inconsistent and variable font size in all browsers.
- */
-
-small {
-  font-size: 80%;
-}
-
-/**
- * Prevent `sub` and `sup` affecting `line-height` in all browsers.
- */
-
-sub,
-sup {
-  font-size: 75%;
-  line-height: 0;
-  position: relative;
-  vertical-align: baseline;
-}
-
-sup {
-  top: -0.5em;
-}
-
-sub {
-  bottom: -0.25em;
-}
-
-/* Embedded content
-   ========================================================================== */
-
-/**
- * Remove border when inside `a` element in IE 8/9.
- */
-
-img {
-  border: 0;
-}
-
-/**
- * Correct overflow displayed oddly in IE 9.
- */
-
-svg:not(:root) {
-  overflow: hidden;
-}
-
-/* Grouping content
-   ========================================================================== */
-
-/**
- * Address margin not present in IE 8/9 and Safari 5.
- */
-
-figure {
-  margin: 1em 40px;
-}
-
-/**
- * Address differences between Firefox and other browsers.
- */
-
-hr {
-  -moz-box-sizing: content-box;
-  box-sizing: content-box;
-  height: 0;
-}
-
-/**
- * Contain overflow in all browsers.
- */
-
-pre {
-  overflow: auto;
-}
 
 /**
  * Address odd `em`-unit font size rendering in all browsers.
@@ -232,65 +98,38 @@ samp {
   font-size: 1em;
 }
 
-/* Forms
-   ========================================================================== */
-
-/**
- * Known limitation: by default, Chrome and Safari on OS X allow very limited
- * styling of `select`, unless a `border` property is set.
- */
-
-/**
- * 1. Correct color not being inherited.
- *    Known issue: affects color of disabled elements.
- * 2. Correct font properties not being inherited.
- * 3. Address margins set differently in Firefox 4+, Safari 5, and Chrome.
- */
 
 button,
-input,
-optgroup,
-select,
-textarea {
-  color: black; /* 1 */
-  font: inherit; /* 2 */
-  margin: 0; /* 3 */
-}
-
-/**
- * Address `overflow` set to `hidden` in IE 8/9/10.
- */
-
-button {
-  overflow: visible;
-}
-
-/**
- * Address inconsistent `text-transform` inheritance for `button` and `select`.
- * All other form control elements do not inherit `text-transform` values.
- * Correct `button` style inheritance in Firefox, IE 8+, and Opera
- * Correct `select` style inheritance in Firefox.
- */
-
-button,
-select {
-  text-transform: none;
-}
-
-/**
- * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
- *    and `video` controls.
- * 2. Correct inability to style clickable `input` types in iOS.
- * 3. Improve usability and consistency of cursor style between image-type
- *    `input` and others.
- */
-
-button,
-html input[type="button"], /* 1 */
+html input[type="button"],
 input[type="reset"],
 input[type="submit"] {
-  -webkit-appearance: button; /* 2 */
-  cursor: pointer; /* 3 */
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #55829b;
+  border: 1px solid #4a7085;
+  color: white;
+  font-weight: 600;
+  padding: 8px 16px;
+  height: auto;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+button:hover,
+html input[type="button"]:hover,
+input[type="reset"]:hover,
+input[type="submit"]:hover {
+  background-color: #4a7085;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+button:active,
+html input[type="button"]:active,
+input[type="reset"]:active,
+input[type="submit"]:active {
+  background-color: #3a6075;
 }
 
 /**
@@ -304,31 +143,154 @@ html input[disabled] {
 }
 
 /**
- * Remove inner padding and border in Firefox 4+.
+ * Style select dropdowns to match other form controls.
  */
 
-button::-moz-focus-inner,
-input::-moz-focus-inner {
-  border: 0;
-  padding: 0;
+select {
+  appearance: none;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  color: #333333;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+  padding-right: 36px;
+}
+
+select:hover {
+  border-color: #55829b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+select:focus {
+  outline: none;
+  border-color: #55829b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(85, 130, 155, 0.1);
+}
+
+select[disabled] {
+  background-color: #f5f5f5;
+  color: #999999;
+  cursor: not-allowed;
+}
+
+/* Style select dropdown options */
+select option {
+  padding: 12px;
+  background-color: #ffffff;
+  color: #333333;
+  font-size: 14px;
+}
+
+select option:hover {
+  background-color: #55829b;
+  color: #ffffff;
+}
+
+select option:checked {
+  background-color: #55829b;
+  background-image: linear-gradient(#55829b, #55829b);
+  color: #ffffff;
 }
 
 /**
- * Address Firefox 4+ setting `line-height` on `input` using `!important` in
- * the UA stylesheet.
+ * Style text inputs and related form fields.
  */
 
-input {
-  line-height: normal;
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+textarea {
+  appearance: none;
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  color: #333333;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/**
- * It's recommended that you don't attempt to style these elements.
- * Firefox's implementation doesn't respect box-sizing, padding, or width.
- *
- * 1. Address box sizing set to `content-box` in IE 8/9/10.
- * 2. Remove excess padding in IE 8/9/10.
- */
+textarea {
+  height: auto;
+  min-height: 100px;
+  resize: vertical;
+  padding: 10px 12px;
+}
+
+input[type="text"]:hover,
+input[type="password"]:hover,
+input[type="email"]:hover,
+input[type="url"]:hover,
+input[type="tel"]:hover,
+input[type="number"]:hover,
+input[type="search"]:hover,
+textarea:hover {
+  border-color: #55829b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="tel"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: #55829b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(85, 130, 155, 0.1);
+}
+
+input[type="text"]:disabled,
+input[type="password"]:disabled,
+input[type="email"]:disabled,
+input[type="url"]:disabled,
+input[type="tel"]:disabled,
+input[type="number"]:disabled,
+input[type="search"]:disabled,
+textarea:disabled {
+  background-color: #f5f5f5;
+  color: #999999;
+  cursor: not-allowed;
+}
+
+.password-toggle {
+  padding: 6px 8px;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:hover {
+  background-color: #e0e0e0;
+}
+
+.password-toggle.password-visible {
+  background-color: #e8f4f8;
+}
+
+.password-icon {
+  color: #555;
+}
 
 input[type="checkbox"],
 input[type="radio"] {
@@ -371,42 +333,9 @@ input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
 }
 
-/**
- * Define consistent border, margin, and padding.
- */
 
-fieldset {
-  border: 1px solid #c0c0c0;
-  margin: 0 2px;
-  padding: 0.35em 0.625em 0.75em;
-}
 
-/**
- * 1. Correct `color` not being inherited in IE 8/9.
- * 2. Remove padding so people aren't caught out if they zero out fieldsets.
- */
 
-legend {
-  border: 0; /* 1 */
-  padding: 0; /* 2 */
-}
-
-/**
- * Remove default vertical scrollbar in IE 8/9.
- */
-
-textarea {
-  overflow: auto;
-}
-
-/**
- * Don't inherit the `font-weight` (applied by a rule above).
- * NOTE: the default cannot safely be changed in Chrome and Safari on OS X.
- */
-
-optgroup {
-  font-weight: bold;
-}
 
 /* Tables
    ========================================================================== */
@@ -419,16 +348,32 @@ table {
   border-spacing: 0;
 }
 
+
 td,
 th {
   padding: 0;
+}
+
+fieldset td
+{
+	padding:6px;
+}
+
+table.cloud thead 
+{
+	text-align: left;
+}
+
+table.cloud tbody tr td
+{
+  padding: 0.5em 0;
 }
 
 body
 {
 	background:#EBEBEB;
 	font-family:Arial, Verdana, Helvetica, sans-serif;
-	font-size:12px;
+	font-size:14px;
 	margin:0;
 	padding:0;
 	min-width:850px;
@@ -554,12 +499,11 @@ li div.tabLink
     height: 1.5em;
     width: 500px;
     margin-top: 50px;
-    margin-left: 5px;
 }
 
 #login-form {
-  padding-left: 20px;
-  padding-top: 7px;
+  padding-left: 40px;
+  padding-top: 10px;
 }
 
 #login-title {
@@ -568,40 +512,56 @@ li div.tabLink
   margin-top:10px;
 }
 
-#login-form input[type="text"], input[type="password"] {
-    width:240px;
-    height:20px;
+#login-form input[type="text"],
+#login-form input[type="password"] {
+    width: 100%;
+    max-width: 240px;
+    padding: 12px 12px;
+    font-size: 15px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#login-form input[type="text"]:focus,
+#login-form input[type="password"]:focus {
+    outline: none;
+    border-color: #55829b;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(85, 130, 155, 0.1);
 }
 #login-form input[type="submit"] {
-    background-color: #262626;
-    border-radius: 5px 5px 5px 5px;
-    border-width: 1px;
-    border-color:#d6d6d6;
-    border-bottom-color:#bcbcbc;
-    color: #5c5c5c;
-    font-size: 13pt;
-    height: 40px;
-    margin-left: 10px;
-    width: 170px;
-    background-image: -webkit-gradient(
-	linear,
-	left top,
-	left bottom,
-	color-stop(0, #FFFFFF),
-	color-stop(1, #EFEFEF)
-);
-background-image: -o-linear-gradient(bottom, #FFFFFF 0%, #EFEFEF 100%);
-background-image: -moz-linear-gradient(bottom, #FFFFFF 0%, #EFEFEF 100%);
-background-image: -webkit-linear-gradient(bottom, #FFFFFF 0%, #EFEFEF 100%);
-background-image: -ms-linear-gradient(bottom, #FFFFFF 0%, #EFEFEF 100%);
-background-image: linear-gradient(to bottom, #FFFFFF 0%, #EFEFEF 100%);
+    background-color: #55829b;
+    border-radius: 6px;
+    border: 1px solid #4a7085;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    height: 44px;
+    margin-top: 8px;
+    width: 185px;
+    padding: 0;
+    cursor: pointer;
+    background-image: linear-gradient(to bottom, #6a98b5 0%, #55829b 100%);
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+#login-form input[type="submit"]:hover {
+    background-color: #4a7085;
+    background-image: linear-gradient(to bottom, #5a88a5 0%, #4a7085 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+#login-form input[type="submit"]:active {
+    background-image: linear-gradient(to bottom, #4a7085 0%, #3a6075 100%);
 }
 #login-form label {
-    font-size: 12px;
-    font-weight: bold;
-    margin-bottom:5px;
-    margin-top:10px;
-    display:inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 14px;
+    display: block;
+    color: #333333;
 }
 
 fieldset#loginForm legend {
@@ -616,8 +576,8 @@ fieldset#loginForm legend {
 }
 
 #loginFormSectionBox {
-	width:310px;
-	height:420px;	
+	width:350px;
+	height:520px;	
 	margin-top: 92px;
 	margin-left:auto;
 	margin-right:auto;
@@ -639,12 +599,6 @@ fieldset#loginForm legend {
     width: 300px;
 }
 
-#logo {
-    height: 84px;
-    width:265px;
-    float:left;
-    margin-left:20px;
-}
 
 #banner
 {
@@ -658,6 +612,8 @@ fieldset#loginForm legend {
 {
 	text-align: right;
 	float:right;
+  padding-top:2px;
+  padding-right:4px;
 }
 
 #banner-links a
@@ -682,8 +638,6 @@ fieldset#loginForm legend {
 #navigation
 {
  background-color:white;
- padding-bottom:2px;
- height:30px;
 }
 
 #navigation ul,
@@ -695,12 +649,20 @@ fieldset#loginForm legend {
 }
 
 .navigationMenuItemTop{
-  background-color:#55829b;
-  border-radius:10px 10px 0px 0;
+  background-color: #55829b;
+  border-radius: 8px 8px 0px 0;
   text-transform: uppercase;
   color: white;
-  font-size: 10pt;
-  height:30px;
+  font-size: 12px;
+  font-weight: 600;
+  height: 40px;
+  padding: 0;
+  line-height: 40px;
+  transition: background-color 0.2s;
+}
+
+.navigationMenuItemTop:hover {
+  background-color: #4a7085;
 }
 
 .navigationMenuItemTop ul a:hover { 
@@ -715,12 +677,19 @@ fieldset#loginForm legend {
 .dropdown-content {
     display: none;
     position: absolute;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     left: 100px;
     top: 0px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    padding: 4px 4px 4px 4px;
+    padding: 6px 0;
     z-index: 1;
+    min-width: 140px;
+    border-radius: 4px;
+}
+
+.dropdown a {
+    white-space: nowrap;
+    text-align: left;
+    padding-left: 12px;
 }
 
 .dropdown a:hover { 
@@ -739,12 +708,19 @@ fieldset#loginForm legend {
 .dropdown-content2 {
     display: none;
     position: absolute;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     left: 100px;
     top: 0px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    padding: 4px 4px 4px 4px;
+    padding: 6px 0;
     z-index: 1;
+    min-width: 140px;
+    border-radius: 4px;
+}
+
+.dropdown2 a {
+    white-space: nowrap;
+    text-align: left;
+    padding-left: 12px;
 }
 
 .dropdown2 a:hover { 
@@ -765,10 +741,11 @@ fieldset#loginForm legend {
 
 #navigation li {
 	float: left;
-	min-width:115px;
-	width:120px;
-	text-align:center;
+	min-width: 130px;
+	width: 140px;
+	text-align: center;
 	margin: 0;
+	transition: background-color 0.2s;
 }
 
 .userPortal ul#nav li {
@@ -776,34 +753,34 @@ fieldset#loginForm legend {
 }
 
 #navigation li li {
-    	min-width:113px;
-    	padding-right:0px;
-    	width:100%;
-	text-transform:none;
-   	background: #ffffff;
-    	border-left:1px solid #bebebe;
-    	border-right:1px solid #bebebe;
-	border-top:1px solid #bebebe;
-	width:118px;
+    min-width: 113px;
+    padding-right: 0px;
+    width: 100%;
+    text-transform: none;
+    background: #ffffff;
+    border-top: none;
+    width: 118px;
 }
 
 #navigation li ul {
 	display: none;
-	border-bottom:1px solid #bebebe;
-	margin-right:0px;
-	width:120px;
-	position:relative
+	margin-right: 0px;
+	width: 120px;
+	position: relative;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 #navigation li:hover ul,
 #navigation li.over ul { 
 	display: inline-block; 
-    	z-index: 500;
+  z-index: 500;
 }
 
 #navigation li li a {
-    border-bottom-color: #666666;
-    font-weight: normal;
+  font-weight: normal;
+  text-align: left;
+  padding-left: 12px;
+  white-space: nowrap;
 }
 
 #navigation a
@@ -811,7 +788,7 @@ fieldset#loginForm legend {
 	font-weight: bold;
 	display: block;
 	text-decoration: none;
-	padding: 2px 0;
+	font-size: 14px;
 }
 
 #navigation a:hover,
@@ -824,8 +801,7 @@ fieldset#loginForm legend {
 #navigation a.heading {
   color:#ffffff;
   height:14px;
-  padding-top:8px;
-  padding-bottom:8px;
+  padding-top:2px;
 }
 #navigation a.heading:hover,
 #navigation a.heading.over,
@@ -844,7 +820,8 @@ fieldset#loginForm legend {
   width: 375px;
   margin-left: -185px;
   background-color: #fff;
-  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 #contentContainer {
@@ -852,32 +829,36 @@ fieldset#loginForm legend {
 }    
 
 #contentContainer #leftNav {
-    border: 1px solid #BBBBBB;
-    border-radius: 3px;
+    background-color: #fafafa;
+    border-radius: 8px;
     float: left;
     margin-left: 10px;
     min-width: 166px;
     word-wrap: break-word;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    padding: 12px 0px;
 }
 
 #contentWithoutLeftNav
 {	
-    width:65%;
-    border:1px solid #bbbbbb;
-    border-radius:3px;
-    margin-left:auto;
-    margin-right:auto;
-    padding:5px;
+    width: 65%;
+    border-radius: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 12px;
+    background-color: #fafafa;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 #contentWithLeftNav
 {	
-    width:65%;
-    border:1px solid #bbbbbb;
-    border-radius:3px;
-    margin-left:10px;
-    float:left;
-    padding:5px;
+    width: 65%;
+    border-radius: 8px;
+    margin-left: 10px;
+    float: left;
+    padding: 12px;
+    background-color: #fafafa;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .tableDiv
@@ -910,8 +891,10 @@ fieldset#loginForm legend {
 
 .highlight
 {
-	border-style: dashed;
-	border-width: 1px;
+	background-color: #f0f8ff;
+	padding: 12px;
+	border-left: 4px solid #55829b;
+	border-radius: 4px;
 }
 
 #footer
@@ -973,9 +956,7 @@ ul.component-links li form
 ul.component-submit
 {
 	list-style-type:none;
-	margin:0px;
 	padding:0;
-	margin-bottom:0px;
 }
 
 ul.component-submit li
@@ -987,29 +968,30 @@ ul.component-submit li
 
 table.component
 {
-	border-style: solid;
-	border-width: 1px;
-    	width: 100%;
-    	border-spacing:1px;
+	width: 100%;
+    	border-spacing: 8px;
+    	background-color: #fafafa;
+    	border-radius: 6px;
+    	overflow: hidden;
 }
 
 table.component thead tr th,
 table.component tbody tr th
 {
-	white-space:nowrap;
-	padding:3px 5px;
+	white-space: nowrap;
+	padding: 10px 12px;
+	font-weight: 600;
+	background-color: #f5f5f5;
+	color: #333333;
 }
 
-table.component th a
-{
-    text-decoration:none;
+table.component tbody tr {
+	border-bottom: 1px solid #e8e8e8;
 }
 
-table.component tbody tr td
-{
-	white-space:nowrap;
-	border-collapse:collapse;
-	padding:3px 5px;
+table.component tbody tr:last-child {
+	border-bottom: none;
+}
 }
 
 table.component tbody tr.even td, table.component tbody tr.odd td
@@ -1021,7 +1003,7 @@ table.component tfoot tr td
 {
 	text-align:center;
 	white-space:nowrap;
-	padding:3px;
+	padding: 6px;
 }
 
 table.component .descriptionColumnValue,
@@ -1171,10 +1153,6 @@ form.with-sections fieldset
 	border-style:solid !important;
 }
 
-fieldset td
-{
-	padding:3px;
-}
 
 .page-label
 {
@@ -1227,15 +1205,6 @@ ul.form-actions li
 	margin-right: 1em;
 }
 
-table.cloud thead 
-{
-	text-align: left;
-}
-
-table.cloud tbody tr td
-{
-  padding: 0.5em 0;
-}
 
 div.col
 {
@@ -1280,12 +1249,16 @@ html, body {
 
 .testDescription {
     position: absolute;
-    width: 400px;
-    border-style: solid;
-    border-width: 1px;
+    width: 320px;
+    background: #ffffff;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     top: 0;
     left: 0;
     text-align: left;
+    z-index: 1000;
+    overflow: hidden;
 }
 
 .hidden {
@@ -1297,7 +1270,9 @@ html, body {
 }
 
 .testDescription .tooltipBody {
-    padding: 2px;
+    padding: 12px;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
 .status-Success {
@@ -1396,11 +1371,12 @@ div.dialog
 }
 
 div.sectionTitle {
-	font-size: 12pt;
+  margin-top: 1px;
+	font-size: 16px;
 	font-weight: bold;
-	padding-bottom: 7px;
+	padding-bottom: 10px;
 	padding-left: 10px;
-	padding-top: 7px;
+	padding-top: 10px;
 	text-transform: uppercase;
 	background: #6199b5;
 	color: white;
@@ -1465,12 +1441,12 @@ li.tab a
 
 li.tab:hover
 {
-	background-color: #FDE6A1;
+	background-color: #E7EEF8;
 }
 
 li.active, li.active:hover
 {
-	background-color: #fde6a1;
+	background-color: #E7EEF8;
 }
 
 li.active a,
@@ -1507,20 +1483,28 @@ li.active a:visited
     background:url('/sipxconfig/images/folder.png') left no-repeat;	
 }
 
+
+#logo {
+    height: 84px;
+    width:265px;
+    float:left;
+    margin-left:12px;
+    margin-left:20px;
+}
+
+#login-logo {
+    height: 120px;
+    background-position: center; 
+    margin-right: 30px;
+    margin-bottom: 20px;
+}
+
 #logo, #login-logo {
     background-image: url(/sipxconfig/skin/logo.png);
     background-repeat: no-repeat;
     background-size: contain; /* Scales the image proportionally to fit inside the div */
 }
 
-#login-logo {
-    height: 120px;
-    background-position: center; /* Centers the image horizontally and vertically */
-}
-
-#contentContainer {
-    
-}
 
 .highlight
 {
@@ -1535,47 +1519,6 @@ p.message
 .settingDescription
 {
 
-}
-
-table.component
-{
-	border-color: #c0c0c2;
-	background: #fff;
-}
-
-table.component thead,
-table.component tbody tr th
-{
-	color: #595a5b;
-    background-image: -webkit-gradient(
-	linear,
-	left top,
-	left bottom,
-	color-stop(0, #FFFFFF),
-	color-stop(1, #EFEFEF)
-);
-background-image: -o-linear-gradient(bottom, #FFFFFF 0%, #EFEFEF 100%);
-background-image: -moz-linear-gradient(bottom, #FFFFFF 0%, #EFEFEF 100%);
-background-image: -webkit-linear-gradient(bottom, #FFFFFF 0%, #EFEFEF 100%);
-background-image: -ms-linear-gradient(bottom, #FFFFFF 0%, #EFEFEF 100%);
-background-image: linear-gradient(to bottom, #FFFFFF 0%, #EFEFEF 100%);
-}
-
-table.component thead tr th,
-table.component tbody tr th
-{
-	border-color: #1B2B31;
-}
-
-table.component th a
-{
-	color: #595A5B;
-}
-
-table.component tfoot tr td
-{
-	background: #FFFFFF;
-	border-color: #C0C0C2;
 }
 
 tr.toolbar
@@ -1737,18 +1680,21 @@ div.autocomplete ul strong.highlight {
 }
 
 .testDescription {
-    border-color: #000000;
+    border-color: #d0d0d0;
 }
 
 .testDescription .tooltipTitle {
-	background: #8B5E4B;
-	color: #FFFFFF;
+	background: #55829b;
+	color: #ffffff;
 	font-weight: bold;
+	padding: 10px 12px;
+	margin: 0;
+	font-size: 13px;
 }
 
 .testDescription .tooltipBody {
-    background: #E0D2C8;
-    color: #000000;
+    background: #ffffff;
+    color: #333333;
 }
 
 .service-disabled {
@@ -1763,9 +1709,10 @@ div.autocomplete ul strong.highlight {
 
 #updateBox {
 	width: 500px;
-    border: 1px solid #243942;
-    background: #EFF3F6;
-    padding: 10px;
+    background: #f0f8ff;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 #updateBox h3 {
@@ -1786,31 +1733,21 @@ div.autocomplete ul strong.highlight {
 	border: 5px solid  #F0F0F0;
 }
 
+img.chart-image {
+	display: block;
+	margin-bottom: 20px;
+	max-width: 100%;
+	height: auto;
+}
+
 
 
 /**
- * For modern browsers
- * 1. The space content is one way to avoid an Opera bug when the
- *    contenteditable attribute is included anywhere else in the document.
- *    Otherwise it causes space to appear at the top and bottom of elements
- *    that are clearfixed.
- * 2. The use of `table` rather than `block` is only necessary if using
- *    `:before` to contain the top-margins of child elements.
+ * Modern clearfix using clear float.
+ * Consider using flexbox containers instead where possible.
  */
-.cf:before,
-.cf:after {
-    content: " "; /* 1 */
-    display: table; /* 2 */
-}
-
-.cf:after {
+.cf::after {
+    content: "";
+    display: table;
     clear: both;
-}
-
-/**
- * For IE 6/7 only
- * Include this rule to trigger hasLayout and contain floats.
- */
-.cf {
-    *zoom: 1;
 }
