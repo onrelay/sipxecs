@@ -19,20 +19,21 @@ package org.sipfoundry.sipxconfig.snmp;
 import static java.lang.String.format;
 
 public final class ProcessDefinition {
+
+    public static final String JAVA_PROCESS_PREFIX = "java-";
+    public static final String RUBY_PROCESS_PREFIX = "ruby-";
+    public static final String PERL_PROCESS_PREFIX = "perl-";
+
+    public static final int MAX_SNMP_MATCH_LENGTH = 15;
+
     private String m_process;
-    private String m_mask;
+    private String m_service;
     private String m_restartCommand;
-    private String m_regexp;
     private String m_restartClass;
     private boolean m_hideFromGlobalServiceScript;
 
     private ProcessDefinition(String process) {
         m_process = process;
-    }
-
-    private ProcessDefinition(String process, String regexp) {
-        this(process);
-        m_regexp = regexp;
     }
 
     public static ProcessDefinition sipx(String process) {
@@ -47,27 +48,56 @@ public final class ProcessDefinition {
         return pd;
     }
 
-    public static ProcessDefinition sipx(String process, String service, String mask) {
-        ProcessDefinition pd = new ProcessDefinition(process);
-        pd.setSipxServiceName(service);
-        pd.setProcessMask(mask);
-        return pd;
-    }
-
-    public static ProcessDefinition sipxByRegex(String process, String regexp) {
-        ProcessDefinition pd = new ProcessDefinition(process, regexp);
+    public static ProcessDefinition sipxJava(String process) {
+        ProcessDefinition pd = new ProcessDefinition(JAVA_PROCESS_PREFIX + process);
         pd.setSipxServiceName(process);
         return pd;
     }
 
-    public static ProcessDefinition sipxByRegex(String process, String regexp, boolean hideFromGlobalServiceScript) {
-        ProcessDefinition pd = sipxByRegex(process, regexp);
+    public static ProcessDefinition sipxJava(String process, boolean hideFromGlobalServiceScript) {
+        ProcessDefinition pd = sipxJava(process);
         pd.setHideFromGlobalServiceScript(hideFromGlobalServiceScript);
         return pd;
     }
 
-    public static ProcessDefinition sipxByRegex(String process, String regexp, String service) {
-        ProcessDefinition pd = new ProcessDefinition(process, regexp);
+    public static ProcessDefinition sipxJava(String process, String service) {
+        ProcessDefinition pd = sipxJava(process);
+        pd.setSipxServiceName(service);
+        return pd;
+    }
+
+    public static ProcessDefinition sipxRuby(String process) {
+        ProcessDefinition pd = new ProcessDefinition(RUBY_PROCESS_PREFIX + process);
+        pd.setSipxServiceName(process);
+        return pd;
+    }
+
+    public static ProcessDefinition sipxRuby(String process, boolean hideFromGlobalServiceScript) {
+        ProcessDefinition pd = sipxRuby(process);
+        pd.setHideFromGlobalServiceScript(hideFromGlobalServiceScript);
+        return pd;
+    }
+
+    public static ProcessDefinition sipxRuby(String process, String service) {
+        ProcessDefinition pd = sipxRuby(process);
+        pd.setSipxServiceName(service);
+        return pd;
+    }
+
+    public static ProcessDefinition sipxPerl(String process) {
+        ProcessDefinition pd = new ProcessDefinition(PERL_PROCESS_PREFIX + process);
+        pd.setSipxServiceName(process);
+        return pd;
+    }
+
+    public static ProcessDefinition sipxPerl(String process, boolean hideFromGlobalServiceScript) {
+        ProcessDefinition pd = sipxPerl(process);
+        pd.setHideFromGlobalServiceScript(hideFromGlobalServiceScript);
+        return pd;
+    }
+
+    public static ProcessDefinition sipxPerl(String process, String service) {
+        ProcessDefinition pd = sipxPerl(process);
         pd.setSipxServiceName(service);
         return pd;
     }
@@ -91,42 +121,30 @@ public final class ProcessDefinition {
         return pd;
     }
 
-    public static ProcessDefinition sysvByRegex(String process, String regexp) {
-        ProcessDefinition pd = new ProcessDefinition(process, regexp);
-        pd.setSysVServiceName(process);
-        return pd;
-    }
-
-    public static ProcessDefinition sysvByRegex(String process, String regexp, boolean hideFromGlobalServiceScript) {
-        ProcessDefinition pd = new ProcessDefinition(process, regexp);
-        pd.setSysVServiceName(process);
-        pd.setHideFromGlobalServiceScript(true);
-        return pd;
-    }
-
-    public static ProcessDefinition sysvByRegex(String process, String regexp, String service) {
-        ProcessDefinition pd = new ProcessDefinition(process, regexp);
-        pd.setSysVServiceName(service);
-        return pd;
-    }
-
     public String getProcess() {
         return m_process;
     }
 
-    public String getRegexp() {
-        return m_regexp;
+    public String getSnmpProcess() {
+
+        if( m_process.length() > MAX_SNMP_MATCH_LENGTH ) {
+            return m_process.substring( 0, MAX_SNMP_MATCH_LENGTH );
+        }
+
+        return m_process;
+    }
+
+    public String getService() {
+        return m_service;
     }
 
     public void setSipxServiceName(String service) {
+        m_service = service;
         setServiceStartCommand(format("$(sipx.SIPX_SERVICEDIR)/%s start", service), service);
     }
 
-    public void setProcessMask(String mask) {
-        m_mask = mask;
-    }
-
     public void setSysVServiceName(String service) {
+        m_service = service;
         setServiceStartCommand(format("/etc/init.d/%s start", service), service);
     }
 
@@ -145,13 +163,6 @@ public final class ProcessDefinition {
 
     public String getRestartClass() {
         return m_restartClass;
-    }
-
-    public String getProcessMask() {
-        if (m_mask != null) {
-            return m_mask;
-        }
-        return m_process;
     }
 
     public void setRestartClass(String restartClass) {

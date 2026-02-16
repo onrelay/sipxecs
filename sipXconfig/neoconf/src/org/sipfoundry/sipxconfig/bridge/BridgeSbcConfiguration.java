@@ -97,7 +97,7 @@ public class BridgeSbcConfiguration implements ConfigProvider, ProcessProvider, 
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(BridgeSbcContext.FEATURE, location);
         return (enabled ? Collections
-                .singleton(ProcessDefinition.sipxByRegex(SIPXBRIDGE, "-Dprocname=sipxbridge")) : null);
+                .singleton(ProcessDefinition.sipxJava(SIPXBRIDGE)) : null);
     }
 
     @Override
@@ -126,14 +126,12 @@ public class BridgeSbcConfiguration implements ConfigProvider, ProcessProvider, 
 
     @Override
     public Collection<GlobalFeature> getAvailableGlobalFeatures(FeatureManager featureManager) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Collection<LocationFeature> getAvailableLocationFeatures(FeatureManager featureManager, Location l) {
-        // TODO Auto-generated method stub
-        return null;
+        return Collections.singleton(BridgeSbcContext.FEATURE);
     }
 
     @Override

@@ -101,8 +101,7 @@ public class CallbackOnBusyImpl implements FeatureProvider, CallbackOnBusy,
     @Override
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE, location);
-        return (enabled ? Collections.singleton(ProcessDefinition.sipxByRegex("sipxcallback",
-                "-Dprocname=sipxcallback")) : null);
+        return (enabled ? Collections.singleton(ProcessDefinition.sipxJava("sipxcallback")) : null);
     }
 
     @Override

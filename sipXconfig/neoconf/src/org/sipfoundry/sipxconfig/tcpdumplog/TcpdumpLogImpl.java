@@ -128,7 +128,7 @@ public class TcpdumpLogImpl implements FeatureProvider, ProcessProvider, Tcpdump
     @Override
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE, location);
-        return (enabled ? Collections.singleton(ProcessDefinition.sipx("tcpdump", PROCESS, PROCESS)) : null);
+        return (enabled ? Collections.singleton(ProcessDefinition.sipx("tcpdump", PROCESS)) : null);
     }
 
     public void setConfigManager(ConfigManager configManager) {

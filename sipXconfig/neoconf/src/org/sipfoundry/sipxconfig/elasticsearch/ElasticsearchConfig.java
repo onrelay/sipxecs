@@ -21,6 +21,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.apache.commons.io.IOUtils;
 import org.sipfoundry.sipxconfig.backup.BackupManager;
@@ -32,8 +34,12 @@ import org.sipfoundry.sipxconfig.cfgmgt.ConfigUtils;
 import org.sipfoundry.sipxconfig.cfgmgt.LoggerKeyValueConfiguration;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
+import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
+import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
+import org.sipfoundry.sipxconfig.snmp.SnmpManager;
 
-public class ElasticsearchConfig implements ConfigProvider {
+
+public class ElasticsearchConfig implements ConfigProvider, ProcessProvider {
 
     private BackupManager m_backupManager;
 
@@ -47,7 +53,7 @@ public class ElasticsearchConfig implements ConfigProvider {
         for (Location location : locations) {
             File dir = manager.getLocationDataDirectory(location);
             boolean enabled = featureManager.isFeatureEnabled(ElasticsearchServiceImpl.FEATURE, location);
-            ConfigUtils.enableCfengineClass(dir, "elasticsearch.cfdat", enabled, "elasticsearch");
+            ConfigUtils.enableCfengineClass(dir, "elasticsearch.cfdat", enabled, ElasticsearchServiceImpl.ELASTICSEARCH);
 
             BackupSettings backupSettings = m_backupManager.getSettings();
             File f = new File(dir, "elasticsearch.yml.part");
@@ -68,6 +74,12 @@ public class ElasticsearchConfig implements ConfigProvider {
     
     public void setBackupManager(BackupManager backupManager) {
         m_backupManager = backupManager;
+    }
+
+    @Override
+    public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
+        boolean enabled = manager.getFeatureManager().isFeatureEnabled(ElasticsearchServiceImpl.FEATURE, location);
+        return (enabled ? Collections.singleton(ProcessDefinition.sipxJava(ElasticsearchServiceImpl.ELASTICSEARCH, true)) : null);
     }
 
 }

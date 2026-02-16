@@ -100,8 +100,7 @@ public class RestServerImpl implements FeatureProvider, AddressProvider, RestSer
     @Override
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE, location);
-        return (enabled ? Collections.singleton(ProcessDefinition.sipxByRegex("sipxrest",
-                "-Dprocname=sipxrest")) : null);
+        return (enabled ? Collections.singleton(ProcessDefinition.sipxJava("sipxrest")) : null);
     }
 
     @Override

@@ -230,8 +230,7 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
     @Override
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE, location);
-        return (enabled ? Collections.singleton(ProcessDefinition.sysvByRegex(
-                ELASTICSEARCH, ELASTICSEARCH_REGEXP, true)) : null);
+        return (enabled ? Collections.singleton(ProcessDefinition.sipxJava(ELASTICSEARCH, true)) : null);
     }
 
     @Override

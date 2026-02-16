@@ -14,12 +14,14 @@ import static org.sipfoundry.sipxconfig.components.LocalizationUtils.getMessage;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tapestry.BaseComponent;
@@ -105,7 +107,25 @@ public abstract class ServicesTable extends BaseComponent {
 
     public String getServiceLabel() {
         String serviceBeanId = getCurrentRow().getServiceBeanId();
-        String key = LABEL + serviceBeanId;
+        return getServiceLabel( serviceBeanId );
+    }
+
+    public String getServiceLabel( String serviceBeanId ) {
+
+        List<ProcessDefinition> processDefinitionMatches = 
+            getSnmpManager().getProcessDefinitions( getServiceLocation(), Collections.singleton( serviceBeanId ) );
+
+        String key = LABEL;
+        if( processDefinitionMatches != null && 
+            processDefinitionMatches.size() == 1 &&
+            StringUtils.isNotBlank( processDefinitionMatches.get(0).getService() ) ) {
+                
+            key += processDefinitionMatches.get(0).getService();
+        }
+        else {
+            key += serviceBeanId;
+        }
+
         return getMessage(getMessages(), key, serviceBeanId);
     }
 
@@ -118,7 +138,8 @@ public abstract class ServicesTable extends BaseComponent {
 
         Map<String, Object> sortedMap = new TreeMap<String, Object>();
         for (Object obj : serviceStatus) {
-            String label = getMessages().getMessage(LABEL + ((ServiceStatus) obj).getServiceBeanId());
+            String serviceBeanId = ((ServiceStatus)obj).getServiceBeanId();
+            String label = getServiceLabel( serviceBeanId );
             sortedMap.put(label.toLowerCase(), obj);
         }
 

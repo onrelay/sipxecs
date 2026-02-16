@@ -170,20 +170,17 @@ public class MongoManagerImpl implements AddressProvider, FeatureProvider, Mongo
             procs.add(ProcessDefinition.sysv("mongod", true));
         }
 
-        addProcess(manager, location, procs, ARBITER_FEATURE, "mongod-arbiter",
-                "-f.*/mongod-arbiter.conf", "restart_mongo_arbiter");
-        addProcess(manager, location, procs, LOCAL_FEATURE, "mongo-local", "-f.*/mongo-local.conf",
-                "restart_mongo_local");
-        addProcess(manager, location, procs, LOCAL_ARBITER_FEATURE, "mongo-local-arbiter",
-                "-f.*/mongo-local-arbiter.conf", "restart_mongo_local_arbiter");
+        addProcess(manager, location, procs, ARBITER_FEATURE, "mongod-arbiter", "restart_mongo_arbiter");
+        addProcess(manager, location, procs, LOCAL_FEATURE, "mongo-local", "restart_mongo_local");
+        addProcess(manager, location, procs, LOCAL_ARBITER_FEATURE, "mongo-local-arbiter", "restart_mongo_local_arbiter");
 
         return procs;
     }
 
     void addProcess(SnmpManager manager, Location location, Collection<ProcessDefinition> procs, LocationFeature f,
-            String process, String regex, String restart) {
+            String process, String restart) {
         if (manager.getFeatureManager().isFeatureEnabled(f, location)) {
-            ProcessDefinition def = ProcessDefinition.sipxByRegex(process, regex);
+            ProcessDefinition def = ProcessDefinition.sipx(process);
             def.setRestartClass(restart);
             procs.add(def);
         }

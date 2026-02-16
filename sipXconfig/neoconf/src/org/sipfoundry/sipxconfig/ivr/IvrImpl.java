@@ -226,8 +226,7 @@ public class IvrImpl implements FeatureProvider, AddressProvider, Ivr, ProcessPr
     @Override
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE, location);
-        return (enabled ? Collections.singleton(ProcessDefinition.sysvByRegex("sipxivr",
-                ".*\\s-Dprocname=sipxivr\\s.*")) : null);
+        return (enabled ? Collections.singleton(ProcessDefinition.sipxJava("sipxivr")) : null);
     }
 
     @Override

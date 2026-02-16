@@ -32,7 +32,7 @@ public class SnmpConfigTest {
     @Test
     public void config() throws IOException {
         SnmpConfig config = new SnmpConfig();
-        List<ProcessDefinition> defs = Arrays.asList(ProcessDefinition.sipx("jay"), ProcessDefinition.sysvByRegex("robin", ".*whatever.*"));
+        List<ProcessDefinition> defs = Arrays.asList(ProcessDefinition.sipx("jay"), ProcessDefinition.sipxJava("robin"));
         StringWriter actual = new StringWriter();
         config.writeProcesses(actual, defs);
         String expected = IOUtils.toString(getClass().getResourceAsStream("expected-config"));
@@ -40,12 +40,12 @@ public class SnmpConfigTest {
     }
 
     @Test
-    public void configWithRestart() throws IOException {
+    public void configWithJava() throws IOException {
         SnmpConfig config = new SnmpConfig();
-        List<ProcessDefinition> defs = Arrays.asList(ProcessDefinition.sipxByRegex("robin", ".*whatever.*", "restart"));
+        List<ProcessDefinition> defs = Arrays.asList(ProcessDefinition.sipxJava("robin"));
         StringWriter actual = new StringWriter();
         config.writeProcesses(actual, defs);
-        String expected = IOUtils.toString(getClass().getResourceAsStream("expected-config-restart"));
+        String expected = IOUtils.toString(getClass().getResourceAsStream("java-robin"));
         assertEquals(expected, actual.toString());
     }
 }

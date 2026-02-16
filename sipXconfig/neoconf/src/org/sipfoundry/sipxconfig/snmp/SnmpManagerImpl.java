@@ -53,6 +53,8 @@ import org.sipfoundry.sipxconfig.systemaudit.SystemAuditManager;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
+import org.springframework.beans.factory.BeanFactoryUtils;
+
 
 public class SnmpManagerImpl implements BeanFactoryAware, SnmpManager, FeatureProvider, ProcessProvider,
         FirewallProvider, AddressProvider {
@@ -61,7 +63,6 @@ public class SnmpManagerImpl implements BeanFactoryAware, SnmpManager, FeaturePr
     });
     private ListableBeanFactory m_beanFactory;
     private FeatureManager m_featureManager;
-    private Collection<ProcessProvider> m_processProviders;
     private BeanWithSettingsDao<SnmpSettings> m_settingsDao;
     private ConfigManager m_configManager;
     private LocationsManager m_locationsManager;
@@ -80,11 +81,7 @@ public class SnmpManagerImpl implements BeanFactoryAware, SnmpManager, FeaturePr
     }
 
     Collection<ProcessProvider> getProcessProviders() {
-        if (m_processProviders == null) {
-            Map<String, ProcessProvider> beansOfType = m_beanFactory.getBeansOfType(ProcessProvider.class);
-            m_processProviders = beansOfType.values();
-        }
-        return m_processProviders;
+        return m_beanFactory.getBeansOfType(ProcessProvider.class).values();
     }
 
     @Override
@@ -175,13 +172,13 @@ public class SnmpManagerImpl implements BeanFactoryAware, SnmpManager, FeaturePr
 
     @Override
     public List<ProcessDefinition> getProcessDefinitions(Location location, Collection<String> processIds) {
-        List<ProcessDefinition> defs = getProcessDefinitions(location);
+        List<ProcessDefinition> processDefinitions = getProcessDefinitions(location);
         List<ProcessDefinition> selected = new ArrayList<ProcessDefinition>(processIds.size());
         Set<String> ids = new HashSet<String>(processIds);
-        for (ProcessDefinition def : defs) {
-            if (ids.contains(def.getProcess())) {
-                ids.remove(def.getProcess());
-                selected.add(def);
+        for (ProcessDefinition processDefinition : processDefinitions) {
+            if (ids.contains(processDefinition.getProcess()) || ids.contains(processDefinition.getSnmpProcess())) {
+                ids.remove(processDefinition.getProcess());
+                selected.add(processDefinition);
             }
         }
         if (ids.size() > 0) {

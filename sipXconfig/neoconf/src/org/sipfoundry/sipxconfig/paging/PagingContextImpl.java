@@ -256,8 +256,7 @@ public class PagingContextImpl extends SipxHibernateDaoSupport<PagingGroup> impl
     @Override
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE, location);
-        return (enabled ? Collections.singleton(ProcessDefinition.sipxByRegex("sipxpage",
-                "-Dprocname=sipxpage")) : null);
+        return (enabled ? Collections.singleton(ProcessDefinition.sipxJava("sipxpage")) : null);
     }
 
 	@Override

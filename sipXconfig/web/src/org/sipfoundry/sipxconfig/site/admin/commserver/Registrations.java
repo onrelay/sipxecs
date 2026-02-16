@@ -136,7 +136,7 @@ public abstract class Registrations extends SipxBasePage implements PageBeginRen
 
      private JFreeChart createChart( final XYDataset dataset ) {
         JFreeChart chart = ChartFactory.createTimeSeriesChart(             
-           "Time Registration chart", 
+           "Time Registration Chart", 
            "Date",              
            "Value",              
            dataset,             
