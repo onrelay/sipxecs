@@ -140,8 +140,7 @@ public class FreeswitchFeature implements FeatureProvider, AddressProvider, Proc
         if (!manager.getFeatureManager().isFeatureEnabled(FEATURE, location)) {
             return null;
         }
-        ProcessDefinition def = ProcessDefinition.sipx("freeswitch", PROCESS);
-        def.setRestartClass("restart_mediaservice");
+        ProcessDefinition def = ProcessDefinition.sipx(PROCESS);
         return Collections.singleton(def);
     }
 

@@ -420,7 +420,7 @@ onSetup() {
 
 # Start CDR call resolver
 start() {
-  RubyCmd=`@SIPX_BINDIR@/sipx-config --"${Ruby}" --pidfile "${pidfile}"`
+  RubyCmd=`@SIPX_BINDIR@/sipx-config --tool "${Ruby}" --pidfile "${pidfile}"`
   onSetup
   # Check database version - don't run if it's wrong
   databasePatch
@@ -429,7 +429,7 @@ start() {
   fi
   if [ -n "${NoFork}" ] ; then
     killAnyProcessOrphans "${pidfile}" "${regex}"
-    runuser -s /bin/bash @SIPXPBXUSER@ -c "${RubyCmd} ${CallResolverMain} ${resolverArgs}
+    runuser -s /bin/bash @SIPXPBXUSER@ -c "${RubyCmd} ${CallResolverMain} ${resolverArgs}"
   else
     checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
     Status=$?

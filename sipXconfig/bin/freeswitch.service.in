@@ -1,0 +1,16 @@
+[Unit]
+Description=freeswitch
+Documentation=https://github.com/onrelay/sipxecs
+After=network.target syslog.target
+
+[Service]
+# see man systemd.service
+Type=forking
+ExecStart=@SIPX_SERVICEDIR@/freeswitch start
+RemainAfterExit=true
+ExecStop=@SIPX_SERVICEDIR@/freeswitch stop
+StandardOutput=journal
+PIDFile=@SIPX_FSRUNDIR@/freeswitch.pid
+
+[Install]
+WantedBy=multi-user.target

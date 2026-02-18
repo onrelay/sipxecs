@@ -69,7 +69,7 @@ public class RegistrarImpl implements FeatureProvider, AddressProvider, BeanFact
     private static final Collection<AddressType> ADDRESSES = Arrays.asList(new AddressType[] {
         TCP_ADDRESS, UDP_ADDRESS, PRESENCE_MONITOR_ADDRESS, EVENT_ADDRESS
     });
-    private static final String PROCESS = "sipxregistrar";
+    private static final String SERVICE = "sipxregistrar";
     private BeanWithSettingsDao<RegistrarSettings> m_settingsDao;
     private ListableBeanFactory m_beanFactory;
     private ConfigManager m_configManager;
@@ -182,7 +182,7 @@ public class RegistrarImpl implements FeatureProvider, AddressProvider, BeanFact
         if (!manager.getFeatureManager().isFeatureEnabled(FEATURE, location)) {
             return null;
         }
-        ProcessDefinition def = ProcessDefinition.sipx("sipregistrar", PROCESS);
+        ProcessDefinition def = ProcessDefinition.sipx("sipregistrar", SERVICE);
         return Collections.singleton(def);
     }
 

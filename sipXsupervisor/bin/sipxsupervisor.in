@@ -5,7 +5,6 @@
 # description: sipxsupervisor is responsible from giving out configuration files to
 #              those cfengine clients, who wish to update their configs.
 #              For more information, visit http://www.cfengine.org
-# processname: cf-serverd
 # config: /var/cfengine/masterfiles
 
 # Source function library.
@@ -17,71 +16,64 @@ prog=$(basename $exec)
 progname="sipxsupervisor"
 # used to tell which config is in use.
 configid=/run/sipxsupervisor-configid
-
 pidfolder="/run/sipxpbx/sipxsupervisor"
+pidfile="$pidfolder/sipxsupervisor.pid"
 
 [ -e /etc/sysconfig/sipxsupervisor ] && . /etc/sysconfig/sipxsupervisor
-
-lockfile=/var/lock/subsys/$prog
-sipxagentlockfile="@SIPX_RUNDIR@/sipxsupervisor/sipxagent.lock"
 
 start() {
   [ -x $exec ] || { echo -n "$execError"; echo_failure; exit $ENOEXEC; }
   [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; exit $ENOENT; }
-  checkRunningUserProcess "root" $exec > /dev/null
+  checkRunningProcess "${pidfile}" "${exec}" > /dev/null
   Status=$?
   [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
 
   echo -n $config > $configid
   echo -n $"Starting $prog: "
-  "$exec" -f "$config" &
+  "$exec" -f "$config" > /dev/null 2>&1 & echo \$! > ${pidfile}
   Status=$?
-  [ $Status -eq 0 ] && touch $lockfile
 
   if [ $# -gt 0 ]; then
-    checkRunningUserProcessTimeout "root" $exec $maxTimeout
+    checkRunningProcessTimeout "${pidfile}" "${exec}" $maxTimeout
     Status=$?
     [ $Status -eq $ESRCH ] && { echo_failure; exit $ESRCH; }
 
     #sipxagent running
-    if [ -f @sipxagentlockfile ]; then
-      checkIfUserProcessIsListening "root" $prog
-      Status=$?
-      [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
-      [ $Status -eq 0 ] && { echo_success; return $Status; }
-    fi
+    checkIfProcessIsListening "${pidfile}" "${exec}"
+    Status=$?
+    [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
+    [ $Status -eq 0 ] && { echo_success; return $Status; }
   fi
+  
 
   #if sipxagent is not running make sure the host is pulling the last configuration on startup.
   #this applies in cases when secondary host starts after master, and master changed configuration
   #while the secondary is down. sipxagent has to be run as root because we don't want to go through
   #supervisor again
-  if [ ! -f $sipxagentlockfile ]; then
+  if [ ! -f "${pidfile}" ]; then
     runuser - root -s @SIPX_BINDIR@/sipxagent
+    Status=$?
 
     if [ $# -gt 0 ]; then
-      checkIfUserProcessIsListening "root" $prog
+      checkIfProcessIsListening "${pidfile}" "${exec}"
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; return 0; }
     fi
   fi
-
 }
 
 nofork() {
-  killAnyUserProcessOrphans "root" $exec
+  killAnyProcessOrphans "${pidfile}" "${exec}"
   $exec -v -f $config
 }
 
 stop() {
-  echo -n $"Stopping $progname: "
-  pkill -f "$exec"
-  RETVAL=$?
-  echo
-  [ $RETVAL -eq 0 ] && rm -f $lockfile
-  killAnyUserProcessOrphans "root" $exec
-  return $RETVAL
+  echo -n $"Stopping $prog: "
+  killAnyProcessOrphans "${pidfile}" "${exec}"
+  Status=$?
+  [ $Status -eq 0 ] || { echo_failure; }
+  [ $Status -eq 0 ] && { echo_success; }
 }
 
 
@@ -119,11 +111,11 @@ case "$1" in
     force_reload
     ;;
   status)
-    checkRunningUserProcess "root" $exec $progname
+    checkRunningProcess "${pidfile}" "${exec}"
     ;;
   # condrestart - only restarts if service *is* running
   condrestart)
-    checkRunningUserProcess "root" $exec > /dev/null
+    checkRunningProcess "${pidfile}" "${exec}" > /dev/null
     Status=$?
     [ $Status -eq 0 ] || restart
     ;;

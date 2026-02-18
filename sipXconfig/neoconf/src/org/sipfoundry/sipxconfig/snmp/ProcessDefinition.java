@@ -48,6 +48,24 @@ public final class ProcessDefinition {
         return pd;
     }
 
+    public static ProcessDefinition javaSystemctl(String process) {
+        ProcessDefinition pd = new ProcessDefinition(JAVA_PROCESS_PREFIX + process);
+        pd.setSystemctlServiceName(process);
+        return pd;
+    }
+
+    public static ProcessDefinition javaSystemctl(String process, boolean hideFromGlobalServiceScript) {
+        ProcessDefinition pd = javaSystemctl(process);
+        pd.setHideFromGlobalServiceScript(hideFromGlobalServiceScript);
+        return pd;
+    }
+
+    public static ProcessDefinition javaSystemctl(String process, String service) {
+        ProcessDefinition pd = new ProcessDefinition(JAVA_PROCESS_PREFIX + process);
+        pd.setSystemctlServiceName(service);
+        return pd;
+    }
+
     public static ProcessDefinition sipxJava(String process) {
         ProcessDefinition pd = new ProcessDefinition(JAVA_PROCESS_PREFIX + process);
         pd.setSipxServiceName(process);
@@ -102,22 +120,34 @@ public final class ProcessDefinition {
         return pd;
     }
 
-    public static ProcessDefinition sysv(String process) {
+    public static ProcessDefinition java(String process) {
+        return systemctl( JAVA_PROCESS_PREFIX + process );
+    }
+
+    public static ProcessDefinition java(String process, boolean hideFromGlobalServiceScript) {
+        return systemctl( JAVA_PROCESS_PREFIX + process, hideFromGlobalServiceScript );
+    }
+
+    public static ProcessDefinition java(String process, String service) {
+        return systemctl( JAVA_PROCESS_PREFIX + process, service );
+    }
+
+    public static ProcessDefinition systemctl(String process) {
         ProcessDefinition pd = new ProcessDefinition(process);
-        pd.setSysVServiceName(process);
+        pd.setSystemctlServiceName(process);
         return pd;
     }
 
-    public static ProcessDefinition sysv(String process, boolean hideFromGlobalServiceScript) {
+    public static ProcessDefinition systemctl(String process, boolean hideFromGlobalServiceScript) {
         ProcessDefinition pd = new ProcessDefinition(process);
-        pd.setSysVServiceName(process);
+        pd.setSystemctlServiceName(process);
         pd.setHideFromGlobalServiceScript(true);
         return pd;
     }
 
-    public static ProcessDefinition sysv(String process, String service) {
+    public static ProcessDefinition systemctl(String process, String service) {
         ProcessDefinition pd = new ProcessDefinition(process);
-        pd.setSysVServiceName(service);
+        pd.setSystemctlServiceName(service);
         return pd;
     }
 
@@ -143,9 +173,9 @@ public final class ProcessDefinition {
         setServiceStartCommand(format("$(sipx.SIPX_SERVICEDIR)/%s start", service), service);
     }
 
-    public void setSysVServiceName(String service) {
+    public void setSystemctlServiceName(String service) {
         m_service = service;
-        setServiceStartCommand(format("/etc/init.d/%s start", service), service);
+        setServiceStartCommand(format("systemctl start %s", service), service);
     }
 
     private void setServiceStartCommand(String restartCommand, String service) {

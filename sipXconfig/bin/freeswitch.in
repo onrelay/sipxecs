@@ -69,6 +69,13 @@ do_permission_check() {
     chown -R $FS_USER:$FS_GROUP $FS_LOGDIR
     chmod -R u+rwX,ga+rX $FS_LOGDIR
   fi
+  FS_CONFDIR=@SIPX_FSCONFDIR@
+  if test ! -e $FS_CONFDIR
+  then
+    mkdir $FS_CONFDIR
+    chown -R $FS_USER:$FS_GROUP $FS_CONFDIR
+    chmod -R u+rwX,ga+rX $FS_CONFDIR
+  fi
 }
 
 do_audio_setup() {
@@ -153,7 +160,6 @@ do_stop() {
   fi
   rm -f $LOCKFILE
   echo
-  killAnyProcessOrphans $PIDFILE
   return $RETVAL
 }
 

@@ -109,7 +109,6 @@ do
         --python) Action=RUN; ToolName="python3" ;;
         --ruby)   Action=RUN; ToolName="ruby" ;;
         --node)   Action=RUN; ToolName="node" ;;
-        --sec)   Action=RUN; ToolName="sec" ;;
         --tool)   # New flag for custom paths
             Action=RUN
             ToolName="${2}"
@@ -147,7 +146,6 @@ Usage:
     ./sipx-config --python [--pidfile /path/to/proc.pid]
     ./sipx-config --ruby   [--pidfile /path/to/proc.pid]
     ./sipx-config --node   [--pidfile /path/to/proc.pid]
-    ./sipx-config --sec    [--pidfile /path/to/proc.pid]
     ./sipx-config --tool /path/to/tool [--pidfile /path/to/proc.pid]
 
 Options:

@@ -54,7 +54,7 @@ import org.sipfoundry.sipxconfig.snmp.SnmpManager;
 public class MwiImpl implements AddressProvider, FeatureProvider, Mwi, DnsProvider, ProcessProvider,
         FirewallProvider {
     private static final Collection<AddressType> ADDRESSES = Arrays.asList(SIP_UDP, SIP_TCP, HTTP_API);
-    private static final String PROCESS = "sipxpublisher";
+    private static final String SERVICE = "sipxpublisher";
     private BeanWithSettingsDao<MwiSettings> m_settingsDao;
     private ConfigManager m_configManager;
     private FeatureManager m_featureManager;
@@ -154,7 +154,7 @@ public class MwiImpl implements AddressProvider, FeatureProvider, Mwi, DnsProvid
     @Override
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE, location);
-        ProcessDefinition def = ProcessDefinition.sipx("sipstatus", PROCESS);
+        ProcessDefinition def = ProcessDefinition.sipx("sipstatus", SERVICE);
         return (enabled ? Collections.singleton(def) : null);
     }
 

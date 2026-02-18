@@ -34,12 +34,8 @@ import org.sipfoundry.sipxconfig.cfgmgt.ConfigUtils;
 import org.sipfoundry.sipxconfig.cfgmgt.LoggerKeyValueConfiguration;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.feature.FeatureManager;
-import org.sipfoundry.sipxconfig.snmp.ProcessDefinition;
-import org.sipfoundry.sipxconfig.snmp.ProcessProvider;
-import org.sipfoundry.sipxconfig.snmp.SnmpManager;
 
-
-public class ElasticsearchConfig implements ConfigProvider, ProcessProvider {
+public class ElasticsearchConfig implements ConfigProvider {
 
     private BackupManager m_backupManager;
 
@@ -74,12 +70,6 @@ public class ElasticsearchConfig implements ConfigProvider, ProcessProvider {
     
     public void setBackupManager(BackupManager backupManager) {
         m_backupManager = backupManager;
-    }
-
-    @Override
-    public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
-        boolean enabled = manager.getFeatureManager().isFeatureEnabled(ElasticsearchServiceImpl.FEATURE, location);
-        return (enabled ? Collections.singleton(ProcessDefinition.sipxJava(ElasticsearchServiceImpl.ELASTICSEARCH, true)) : null);
     }
 
 }

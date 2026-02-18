@@ -104,7 +104,7 @@ public class DhcpManagerImpl extends SipxHibernateDaoSupport<DhcpSettings> imple
     @Override
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE, location);
-        return (enabled ? Collections.singleton(ProcessDefinition.sysv("dhcpd", true)) : null);
+        return (enabled ? Collections.singleton(ProcessDefinition.systemctl("dhcpd", true)) : null);
     }
 
     public void setSettingsDao(BeanWithSettingsDao<DhcpSettings> settingsDao) {

@@ -62,7 +62,7 @@ public class ProxyManagerImpl implements ProxyManager, FeatureProvider, AddressP
     private static final Collection<AddressType> ADDRESS_TYPES = Arrays.asList(new AddressType[] {
         TCP_ADDRESS, UDP_ADDRESS, TLS_ADDRESS
     });
-    private static final String PROCESS = "sipxproxy";
+    private static final String SERVICE = "sipxproxy";
     private FeatureManager m_featureManager;
     private BeanWithSettingsDao<ProxySettings> m_settingsDao;
     private ConfigManager m_configManager;
@@ -131,7 +131,7 @@ public class ProxyManagerImpl implements ProxyManager, FeatureProvider, AddressP
         if (!m_featureManager.isFeatureEnabled(FEATURE, location)) {
             return null;
         }
-        ProcessDefinition def = ProcessDefinition.sipx("sipXproxy", PROCESS);
+        ProcessDefinition def = ProcessDefinition.sipx("sipXproxy", SERVICE);
         return Collections.singleton(def);
     }
 

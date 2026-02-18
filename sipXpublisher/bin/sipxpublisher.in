@@ -45,10 +45,10 @@ start() {
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningProcessTimeout "${pidfile}" "${exec}" "${regex}" 
+      checkRunningProcessTimeout "${pidfile}" "${exec}"  
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-      checkIfProcessIsListening "${pidfile}" "${exec}" "${regex}"
+      checkIfProcessIsListening "${pidfile}" "${exec}" 
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; }

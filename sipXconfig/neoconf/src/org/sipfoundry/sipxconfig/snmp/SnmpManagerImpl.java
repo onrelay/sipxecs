@@ -138,7 +138,7 @@ public class SnmpManagerImpl implements BeanFactoryAware, SnmpManager, FeaturePr
     @Override
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE);
-        return (enabled ? Collections.singleton(ProcessDefinition.sysv("snmpd", true)) : null);
+        return (enabled ? Collections.singleton(ProcessDefinition.systemctl("snmpd", true)) : null);
     }
 
     @Override
@@ -176,8 +176,13 @@ public class SnmpManagerImpl implements BeanFactoryAware, SnmpManager, FeaturePr
         List<ProcessDefinition> selected = new ArrayList<ProcessDefinition>(processIds.size());
         Set<String> ids = new HashSet<String>(processIds);
         for (ProcessDefinition processDefinition : processDefinitions) {
-            if (ids.contains(processDefinition.getProcess()) || ids.contains(processDefinition.getSnmpProcess())) {
-                ids.remove(processDefinition.getProcess());
+            if( ids.remove(processDefinition.getProcess() ) ) {
+                selected.add(processDefinition);
+            }
+            else if( ids.remove(processDefinition.getSnmpProcess() ) ) {
+                selected.add(processDefinition);
+            }
+            else if( ids.remove(processDefinition.getService() ) ) {
                 selected.add(processDefinition);
             }
         }

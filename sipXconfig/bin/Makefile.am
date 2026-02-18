@@ -22,6 +22,7 @@ initd_SCRIPTS = \
 systemddir = /usr/lib/systemd/system
 systemd_SCRIPTS = \
 	sipxconfig.service \
+	freeswitch.service \
 	mongod-arbiter.service \
 	mongo-local.service \
 	mongo-local-arbiter.service \

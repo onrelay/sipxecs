@@ -73,7 +73,6 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
     private static final Log LOG = LogFactory.getLog(ElasticsearchServiceImpl.class);
     private static final String FILTERING_ERROR_MESSAGE = "Filtering is supported only by QueryBuilder objects.";
     private static final String NO_CONNECTION_AVAILABLE_ERROR_MESSAGE = "Not able to reach Elasticsearch at: ";
-    private static final String ELASTICSEARCH_REGEXP = "-Des.path.home=/usr/share/elasticsearch";
 
     private ElasticsearchClient m_client;
     private String m_hostName;
@@ -230,7 +229,7 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
     @Override
     public Collection<ProcessDefinition> getProcessDefinitions(SnmpManager manager, Location location) {
         boolean enabled = manager.getFeatureManager().isFeatureEnabled(FEATURE, location);
-        return (enabled ? Collections.singleton(ProcessDefinition.sipxJava(ELASTICSEARCH, true)) : null);
+        return (enabled ? Collections.singleton(ProcessDefinition.javaSystemctl(ELASTICSEARCH, true)) : null);
     }
 
     @Override

@@ -66,7 +66,7 @@ public class MySqlImpl implements MySql, ConfigProvider, ProcessProvider, Firewa
             return null;
         }
 
-        ProcessDefinition def = ProcessDefinition.sysv("mysqld", true);
+        ProcessDefinition def = ProcessDefinition.systemctl("mysqld", true);
         return Collections.singleton(def);
     }
 
