@@ -212,6 +212,7 @@ input[type="tel"],
 input[type="number"],
 input[type="search"],
 textarea {
+  min-width: 240px;
   appearance: none;
   background-color: #ffffff;
   border: 1px solid #d0d0d0;
@@ -269,27 +270,43 @@ textarea:disabled {
   cursor: not-allowed;
 }
 
+
+.password-wrapper {
+  position: relative;
+  display: inline-block;   
+}
+
 .password-toggle {
-  padding: 6px 8px;
+  position: absolute;
+  top: 50%;
+  right: 6px;          
+  transform: translateY(-50%);
+  border: none;
+  background: none;
   cursor: pointer;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
 }
 
 .password-toggle:hover {
-  background-color: #e0e0e0;
-}
-
-.password-toggle.password-visible {
-  background-color: #e8f4f8;
+  background: rgba(0,0,0,0.05);
+  border-radius: 4px;
 }
 
 .password-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
   color: #555;
+}
+
+.password-toggle.password-visible .eye-closed,
+.password-toggle.password-hidden .eye-open {
+  display: none;
 }
 
 input[type="checkbox"],
@@ -316,7 +333,7 @@ input[type="number"]::-webkit-outer-spin-button {
  */
 
 input[type="search"] {
-  -webkit-appearance: textfield; /* 1 */
+  appearance: textfield; /* 1 */
   -moz-box-sizing: content-box;
   -webkit-box-sizing: content-box; /* 2 */
   box-sizing: content-box;
@@ -335,8 +352,6 @@ input[type="search"]::-webkit-search-decoration {
 
 
 
-
-
 /* Tables
    ========================================================================== */
 
@@ -345,13 +360,13 @@ input[type="search"]::-webkit-search-decoration {
  */
 
 table {
-  border-spacing: 0;
+    border-collapse: collapse; 
 }
 
 
 td,
 th {
-  padding: 0;
+  padding: 2px;
 }
 
 fieldset td
@@ -449,6 +464,7 @@ textarea[readonly=readonly]
 a:link
 {
 	color: #55829B;
+  text-decoration: none;
 }
 a:visited
 {
@@ -514,8 +530,6 @@ li div.tabLink
 
 #login-form input[type="text"],
 #login-form input[type="password"] {
-    width: 100%;
-    max-width: 240px;
     padding: 12px 12px;
     font-size: 15px;
     border: 1px solid #d0d0d0;
@@ -668,67 +682,61 @@ fieldset#loginForm legend {
 .navigationMenuItemTop ul a:hover { 
     background-color: #EBEBEB;
 }
-
+/* Top-level dropdown */
 .dropdown {
-    position: relative;
-    display: inline-block;
+  position: relative;
+  display: inline-block;
+  min-width: 160px;
 }
 
 .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #ffffff;
-    left: 100px;
-    top: 0px;
-    padding: 6px 0;
-    z-index: 1;
-    min-width: 140px;
-    border-radius: 4px;
+  display: none;
+  position: absolute;
+  top: 100%;          /* directly below the parent */
+  left: 0;            /* align left edge with parent */
+  background-color: #fff;
+  min-width: 160px;
+  padding: 6px 0;
+  border-radius: 4px;
+  z-index: 1;
 }
 
-.dropdown a {
-    white-space: nowrap;
-    text-align: left;
-    padding-left: 12px;
+.dropdown:hover > .dropdown-content {
+  display: block;
 }
 
-.dropdown a:hover { 
-    background-color: #EBEBEB;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
+/* Second-level dropdown inside dropdown-content */
 .dropdown2 {
-    position: relative;
-    display: inline-block;
+  position: relative;  /* relative to parent .dropdown-content li */
 }
 
 .dropdown-content2 {
-    display: none;
-    position: absolute;
-    background-color: #ffffff;
-    left: 100px;
-    top: 0px;
-    padding: 6px 0;
-    z-index: 1;
-    min-width: 140px;
-    border-radius: 4px;
+  display: none;
+  position: absolute;
+  top: 0;              /* align top of second menu with parent li */
+  left: 100%;          /* directly to the right of parent li */
+  background-color: #fff;
+  min-width: 160px;
+  padding: 6px 0;
+  border-radius: 4px;
+  z-index: 2;
 }
 
+.dropdown2:hover > .dropdown-content2 {
+  display: block;
+}
+
+/* Links inside any dropdown */
+.dropdown a,
 .dropdown2 a {
-    white-space: nowrap;
-    text-align: left;
-    padding-left: 12px;
+  white-space: nowrap;
+  padding: 6px 12px;
+  display: block;
 }
 
-.dropdown2 a:hover { 
-    background-color: #EBEBEB;
-}
-
-.dropdown2:hover .dropdown-content2 {
-    display: block;
+.dropdown a:hover,
+.dropdown2 a:hover {
+  background-color: #EBEBEB;
 }
 
 .adminPortal ul#nav li:nth-child(n+1):nth-child(-n+5) {
@@ -741,8 +749,8 @@ fieldset#loginForm legend {
 
 #navigation li {
 	float: left;
-	min-width: 130px;
-	width: 140px;
+	min-width: 160px;
+	width: 180px;
 	text-align: center;
 	margin: 0;
 	transition: background-color 0.2s;
@@ -753,7 +761,7 @@ fieldset#loginForm legend {
 }
 
 #navigation li li {
-    min-width: 113px;
+    min-width: 160px;
     padding-right: 0px;
     width: 100%;
     text-transform: none;
@@ -783,6 +791,12 @@ fieldset#loginForm legend {
   white-space: nowrap;
 }
 
+#navigation li ul,
+.dropdown-content,
+.dropdown-content2 {
+    box-shadow: none !important;
+}
+
 #navigation a
 {
 	font-weight: bold;
@@ -805,7 +819,7 @@ fieldset#loginForm legend {
 }
 #navigation a.heading:hover,
 #navigation a.heading.over,
-#navigation a.heading.visited,
+#navigation a.heading.visited
 {
 	background:none;
 	cursor:pointer;
@@ -833,7 +847,7 @@ fieldset#loginForm legend {
     border-radius: 8px;
     float: left;
     margin-left: 10px;
-    min-width: 166px;
+    min-width: 180px;
     word-wrap: break-word;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     padding: 12px 0px;
@@ -944,6 +958,9 @@ ul.component-links
 	list-style-type:none;
 	text-align:right;
 	margin:0px;
+  padding-top:6px;
+  padding-bottom:8px;
+  
 }
 
 ul.component-links li,
@@ -969,20 +986,25 @@ ul.component-submit li
 table.component
 {
 	width: 100%;
-    	border-spacing: 8px;
-    	background-color: #fafafa;
-    	border-radius: 6px;
-    	overflow: hidden;
+  background-color: #fafafa;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+table.component th, 
+table.component td 
+{
+  padding: 8px 12px;
 }
 
 table.component thead tr th,
 table.component tbody tr th
 {
 	white-space: nowrap;
-	padding: 10px 12px;
 	font-weight: 600;
 	background-color: #f5f5f5;
-	color: #333333;
+	color: #666666;
+  text-decoration: none;
 }
 
 table.component tbody tr {
@@ -992,7 +1014,7 @@ table.component tbody tr {
 table.component tbody tr:last-child {
 	border-bottom: none;
 }
-}
+
 
 table.component tbody tr.even td, table.component tbody tr.odd td
 {
@@ -1161,6 +1183,23 @@ form.with-sections fieldset
 	padding:2px;
 }
 
+.setting-label
+{
+  font-size:100%;
+}
+
+.small-setting-label
+{
+  font-size:100%;
+}
+
+.small-input {
+  min-width: 120px;
+  padding: 8px;
+  font-size: 12px;
+}
+
+
 ul.form-actions
 {
 	list-style-type:none;
@@ -1306,7 +1345,7 @@ html, body {
 }
 
 #servicesTable .statusColumnValue {
-    width: 70%;
+    width: 50%;
     white-space:normal;
 }
 
@@ -1488,7 +1527,7 @@ li.active a:visited
     height: 84px;
     width:265px;
     float:left;
-    margin-left:12px;
+    margin-top:12px;
     margin-left:20px;
 }
 
@@ -1516,10 +1555,6 @@ p.message
 	color: red;
 }
 
-.settingDescription
-{
-
-}
 
 tr.toolbar
 {
@@ -1542,9 +1577,6 @@ form.with-sections legend
 	background: #F0E68C;
 }
 
-.cloud
-{
-}
 
 .hilite-user-error
 {

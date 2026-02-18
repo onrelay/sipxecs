@@ -537,7 +537,7 @@ class SettingEditor {
   <tbody>
     <tr>
       <td width="25%">
-        <label class="settingLabel" for="${path}">${setting['label']}</label>
+        <label class="setting-label" for="${path}">${setting['label']}</label>
       </td>
       <td>
           ${html}

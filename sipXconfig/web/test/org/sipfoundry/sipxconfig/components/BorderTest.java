@@ -332,6 +332,12 @@ public class BorderTest extends TestCase {
         }
 
         @Override
+        public IAsset getPasswordToggleScript() {
+            return null;
+        }
+
+
+        @Override
         public Messages getMessages() {
             return new FullMessages();
         }
@@ -390,6 +396,7 @@ public class BorderTest extends TestCase {
             // TODO Auto-generated method stub
             return null;
         }
+
     }
 
     private static class FullMessages extends AbstractMessages {

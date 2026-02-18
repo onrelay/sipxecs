@@ -13,10 +13,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.tapestry.PageRedirectException;
 import org.apache.tapestry.annotations.Bean;
 import org.apache.tapestry.annotations.InjectObject;
+import org.apache.tapestry.annotations.Asset;
 import org.apache.tapestry.event.PageBeginRenderListener;
 import org.apache.tapestry.event.PageEvent;
 import org.apache.tapestry.valid.ValidatorException;
 import org.apache.tapestry.web.WebSession;
+import org.apache.tapestry.IAsset;
 import org.sipfoundry.sipxconfig.common.CoreContext;
 import org.sipfoundry.sipxconfig.components.PageWithCallback;
 import org.sipfoundry.sipxconfig.components.SipxValidationDelegate;
@@ -36,6 +38,9 @@ public abstract class LoginPage extends PageWithCallback implements PageBeginRen
 
     @Bean
     public abstract SipxValidationDelegate getValidator();
+
+    @Asset("context:/WEB-INF/common/PasswordToggle.script")
+    public abstract IAsset getPasswordToggleScript();
 
     @Override
     public void pageBeginRender(PageEvent event) {

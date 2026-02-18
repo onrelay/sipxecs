@@ -80,6 +80,9 @@ public abstract class Border extends BaseComponent implements PageValidateListen
     @Asset("context:/WEB-INF/common/BorderDate.script")
     public abstract IAsset getBorderDateScript();
 
+    @Asset("context:/WEB-INF/common/PasswordToggle.script")
+    public abstract IAsset getPasswordToggleScript();
+
     /**
      * When true - page does not require login
      */

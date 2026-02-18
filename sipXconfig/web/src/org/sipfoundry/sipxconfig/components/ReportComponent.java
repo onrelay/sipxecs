@@ -87,6 +87,8 @@ public abstract class ReportComponent extends BaseComponent {
 
     private static final String PIECHART_SECTIONLABEL_FORMAT = "{0} = {1} ({2})";    
 
+    private static final String BACKGROUND_COLOR = "#EBEBEB";
+
     @InjectObject(value = "service:tapestry.globals.RequestGlobals")
     public abstract RequestGlobals getRequestGlobals();
 
@@ -432,7 +434,7 @@ public abstract class ReportComponent extends BaseComponent {
         // Create a chart with the dataset
         JFreeChart barChart = ChartFactory.createBarChart3D(EMPTY_TITLE, xAxisLabel, yAxisLabel,
                 data, PlotOrientation.VERTICAL, true, true, true);
-        barChart.setBackgroundPaint(Color.lightGray);
+        barChart.setBackgroundPaint(Color.decode(BACKGROUND_COLOR));
         barChart.getTitle().setPaint(Color.BLACK);
         CategoryPlot p = barChart.getCategoryPlot();
         p.setRangeGridlinePaint(Color.red);

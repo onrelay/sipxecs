@@ -14,7 +14,9 @@
 <span jwcid="InternalPluginsSystemBottom@Block">
 </span>
 <span jwcid="InternalPluginsDiagnosticsTop@Block">
-    <li><span jwcid="@admin/AboutDialog" id="menu.about" linkTitle="message:menu.about"/></li>
+    <div class="dropdown">
+      <li><span jwcid="@admin/AboutDialog" id="menu.about" linkTitle="message:menu.about"/></li>
+    </div>
     <span jwcid="@common/AdminNavigationMenu" pagePath="admin/AlarmsPage" label="ognl:messages.getMessage('menu.alarms')" />
     <span jwcid="@If" condition="ognl:isOn('fail2ban')">
       <span jwcid="@common/AdminNavigationMenu" pagePath="admin/BannedHosts" label="ognl:messages.getMessage('menu.bannedHosts')" />

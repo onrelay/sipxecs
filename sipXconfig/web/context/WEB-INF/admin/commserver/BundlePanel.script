@@ -40,7 +40,6 @@ this.tooltip = function(){
     ]]>
   </body>
   <initialization>
-    dojo.require("tapestry.form");
     tapestry.form.registerForm("configureBundler");
     jQuery(document).ready(function() {
     	tooltip();

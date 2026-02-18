@@ -20,11 +20,13 @@
 						<fieldset id="loginForm">
 							<span key="login.prompt">Please login</span><br/><br/>
 
-							<label class="settingLabel" for="j_username"><span key="label.userName">User ID</span></label><br/>
+							<label class="setting-label" for="j_username"><span key="label.userName">User ID</span></label><br/>
 							<input type="text" name="j_username" value="" id="j_username" /><br/>
 
-							<label class="settingLabel" for="j_password"><span key="label.password">PIN</span></label><br/>
-							<input type="password" name="j_password" value="" id="j_password" />
+							<label class="setting-label" for="j_password"><span key="label.password">PIN</span></label><br/>
+							<div class="password-wrapper">
+								<input type="password" name="j_password" value="" id="j_password" />
+							</div>
 						</fieldset>
 						<ul class="form-actions">
 							<li><input jwcid="@Any" type="submit" value="message:button.submit" id="login:submit" /></li>
@@ -36,6 +38,6 @@
      		</div>
 		</div>
   </div>
-
+  <span jwcid="@Script" scriptAsset="asset:passwordToggleScript"/>
 </body>
 </html>
