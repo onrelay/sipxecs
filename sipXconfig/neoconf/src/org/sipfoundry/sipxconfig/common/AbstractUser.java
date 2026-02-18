@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -140,7 +140,7 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
 
     private String m_userName;
 
-    private Set<String> m_aliases = new LinkedHashSet<String>(0);
+    private Set<String> m_aliases;
 
     private Set<Group> m_supervisorForGroups;
 
@@ -265,11 +265,14 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
     }
 
     public Set<String> getAliases() {
+        if( m_aliases == null ) {
+            m_aliases = new LinkedHashSet<String>();
+        }
         return m_aliases;
     }
 
     public void setAliases(Set<String> aliases) {
-        m_aliases = aliases;
+        copyAliases(aliases);
     }
 
     public String getDomain() {
@@ -293,13 +296,13 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
     }
 
     private List<String> getNumericAliases() {
-        Set<String> aliases = getAliases();
-        List<String> numeric = new ArrayList<String>(aliases.size());
-        for (String alias : aliases) {
+        List<String> numeric = new ArrayList<String>();
+        for (String alias : getAliases()) {
             if (isNumeric(alias)) {
                 numeric.add(alias);
             }
         }
+        
         return numeric;
     }
 
@@ -354,8 +357,13 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
      * user's Set, since it is a separate object.
      */
     public void copyAliases(Collection<String> aliases) {
+            
         getAliases().clear();
-        getAliases().addAll(aliases);
+        if( aliases != null ) {
+            for (String alias : aliases) {
+                addAlias(alias);
+            }
+        }
     }
 
     /**
@@ -374,14 +382,17 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
 
     /** Return the aliases as a space-delimited string */
     public String getAliasesString() {
-        List<String> aliases = new ArrayList<String>(getAliases());
+        List<String> aliases = new ArrayList<String>();
+        for (String alias : getAliases()) {
+            aliases.add( alias );
+        }
         Collections.sort(aliases);
+        
         return join(aliases.iterator(), " ");
     }
 
     /** Set the aliases from a space-delimited string */
     public void setAliasesString(String aliasesString) {
-        getAliases().clear();
         if (aliasesString != null) {
             String[] aliases = split(aliasesString);
             addAliases(aliases);
@@ -658,7 +669,14 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
     }
 
     public void setSupervisorForGroups(Set<Group> supervisorForGroups) {
-        m_supervisorForGroups = supervisorForGroups;
+        if (m_supervisorForGroups == null) {
+            m_supervisorForGroups = new TreeSet<Group>();
+        }
+        if( supervisorForGroups != null ) {
+            for( Group supervisorForGroup : supervisorForGroups ) {
+                m_supervisorForGroups.add( supervisorForGroup );
+            }
+        }
     }
 
     public void clearSupervisorForGroups() {
@@ -680,7 +698,7 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
             throw new RuntimeException("Group needs to be saved before it can be added to the set.");
         }
         if (m_supervisorForGroups == null) {
-            m_supervisorForGroups = new HashSet<Group>();
+            m_supervisorForGroups = new TreeSet<Group>();
         }
         m_supervisorForGroups.add(group);
     }

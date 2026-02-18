@@ -49,7 +49,7 @@ public abstract class DialingRule extends BeanWithId implements NamedObject,
     private boolean m_enabled;
     private String m_name;
     private String m_description;
-    private List<Gateway> m_gateways = new ArrayList<Gateway>();
+    private List<Gateway> m_gateways;
     private transient PermissionManager m_permissionManager;
     private Schedule m_schedule;
     private Location m_location;
@@ -63,7 +63,7 @@ public abstract class DialingRule extends BeanWithId implements NamedObject,
     @Override
     protected Object clone() throws CloneNotSupportedException {
         DialingRule clone = (DialingRule) super.clone();
-        clone.m_gateways = new ArrayList<Gateway>(m_gateways);
+        clone.m_gateways = new ArrayList<Gateway>(getGateways());
         return clone;
     }
 
@@ -96,6 +96,9 @@ public abstract class DialingRule extends BeanWithId implements NamedObject,
     }
 
     public List<Gateway> getGateways() {
+        if( m_gateways == null ) {
+            m_gateways = new ArrayList<Gateway>();
+        }
         return m_gateways;
     }
 
@@ -111,8 +114,8 @@ public abstract class DialingRule extends BeanWithId implements NamedObject,
      * Returns a sublist of enabled gateways for this dialing rule.
      */
     public List<Gateway> getEnabledGateways() {
-        ArrayList<Gateway> enabled = new ArrayList<Gateway>(m_gateways.size());
-        for (Gateway gateway : m_gateways) {
+        ArrayList<Gateway> enabled = new ArrayList<Gateway>(getGateways().size());
+        for (Gateway gateway : getGateways()) {
             if (gateway.isEnabled()) {
                 enabled.add(gateway);
             }
@@ -121,7 +124,10 @@ public abstract class DialingRule extends BeanWithId implements NamedObject,
     }
 
     public void setGateways(List<Gateway> gateways) {
-        m_gateways = gateways;
+        getGateways().clear();
+        if( gateways != null ) {
+            getGateways().addAll( gateways );
+        }
     }
 
     public Schedule getSchedule() {
@@ -184,20 +190,23 @@ public abstract class DialingRule extends BeanWithId implements NamedObject,
     }
 
     public boolean addGateway(Gateway gateway) {
-        int index = m_gateways.lastIndexOf(gateway);
-        boolean existed = !m_gateways.remove(gateway);
+        int index = getGateways().lastIndexOf(gateway);
+        boolean existed = !getGateways().remove(gateway);
         if (index != -1) {
-            m_gateways.add(index, gateway);
+            getGateways().add(index, gateway);
         } else {
-            m_gateways.add(gateway);
+            getGateways().add(gateway);
         }
         return existed;
     }
 
     public void removeGateways(Collection<Integer> selectedGateways) {
-        for (Iterator<Integer> i = selectedGateways.iterator(); i.hasNext();) {
-            Integer id = i.next();
-            m_gateways.remove(new BeanWithId(id));
+        
+        if( selectedGateways != null ) {
+            for (Iterator<Integer> i = selectedGateways.iterator(); i.hasNext();) {
+                Integer id = i.next();
+                getGateways().remove(new BeanWithId(id));
+            }
         }
 
         if (!isEnablable()) {
@@ -233,7 +242,9 @@ public abstract class DialingRule extends BeanWithId implements NamedObject,
     }
 
     public void moveGateways(Collection<Integer> ids, int step) {
-        DataCollectionUtil.moveByPrimaryKey(m_gateways, ids.toArray(), step);
+        if( ids != null ) {
+            DataCollectionUtil.moveByPrimaryKey(getGateways(), ids.toArray(), step);
+        }
     }
 
     @Override
@@ -296,7 +307,7 @@ public abstract class DialingRule extends BeanWithId implements NamedObject,
      * Only internal rules or rules with gateways can be enabled
      */
     public boolean isEnablable() {
-        return isInternal() || m_gateways.size() > 0;
+        return isInternal() || getGateways().size() > 0;
     }
 
     @Override

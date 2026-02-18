@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -128,11 +129,17 @@ public class Location extends BeanWithId implements KeepsOriginalCopy<Location>,
 
 
     public Set<String> getFailedReplications() {
+        if( m_failedReplications == null ) {
+            m_failedReplications = new TreeSet<String>();
+        }
         return m_failedReplications;
     }
 
     public void setFailedReplications(Set<String> failedReplications) {
-        m_failedReplications = failedReplications;
+        getFailedReplications().clear();
+        if( failedReplications != null ) {
+            getFailedReplications().addAll( failedReplications );
+        }
     }
 
     public void setUseStun(boolean useStun) {
