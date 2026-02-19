@@ -11,22 +11,34 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 public class BranchRoutes {
-    private List<String> m_domains = new ArrayList<String>();
-    private List<String> m_subnets = new ArrayList<String>();
+    private List<String> m_domains;
+    private List<String> m_subnets;
 
     public void setDomains(List<String> domains) {
-        m_domains = domains;
+        getDomains().clear();
+        if( domains != null ) {
+            getDomains().addAll( domains );
+        }
     }
 
     public List<String> getDomains() {
+        if( m_domains == null ) {
+            m_domains = new ArrayList<String>();
+        }
         return m_domains;
     }
 
     public void setSubnets(List<String> subnets) {
-        m_subnets = subnets;
+        getSubnets().clear();
+        if( subnets != null ) {
+            getSubnets().addAll( subnets );
+        }
     }
 
     public List<String> getSubnets() {
+        if( m_subnets == null ) {
+            m_subnets = new ArrayList<String>();
+        }
         return m_subnets;
     }
 

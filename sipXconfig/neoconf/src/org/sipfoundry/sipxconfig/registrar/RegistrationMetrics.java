@@ -48,12 +48,17 @@ public class RegistrationMetrics {
         LoadDistribution metric = new LoadDistribution();
         // decided to count expired registrations, shouldn't matter and more history
         // gives a more accurate value.
-        CollectionUtils.forAllDo(m_uniqueRegistrations, metric);
+        if( m_uniqueRegistrations != null ) {
+            CollectionUtils.forAllDo(m_uniqueRegistrations, metric);
+        }
         double loadBalance = metric.getLoadBalance();
         return loadBalance;
     }
 
     public int getActiveRegistrationCount() {
+        if( m_uniqueRegistrations == null ) {
+            return 0;
+        }
         int count = CollectionUtils.countMatches(m_uniqueRegistrations, new ActiveRegistrations(
                 m_startTime));
         return count;
@@ -104,7 +109,7 @@ public class RegistrationMetrics {
 
         public boolean evaluate(Object input) {
             RegistrationItem reg = (RegistrationItem) input;
-            if (reg.timeToExpireAsSeconds(m_startTime) > 0) {
+            if (reg != null && reg.timeToExpireAsSeconds(m_startTime) > 0) {
                 return true;
             }
             return false;
