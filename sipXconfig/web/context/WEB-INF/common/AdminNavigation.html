@@ -1,62 +1,52 @@
 <div class="adminPortal">
 	<span jwcid="ieHackScript@Script" script="AdminNavigation.script" />
 	<ul id="nav">
-		<li>
-			<div class="navigationMenuItemTop">
-				<a class="heading"><span key="menu.section.user">Users</span></a>
-				<ul>
-					<span jwcid="@common/Plugin" blockId="UserTop"/>
-					<span jwcid="@common/AdminNavigationMenu" pagePath="user/ManageUsers" label="ognl:messages.getMessage('menu.users')" />
-					<span jwcid="@common/AdminNavigationMenu" pagePath="user/UserGroups" label="ognl:messages.getMessage('menu.userGroups')" />				    
-					<span jwcid="@common/Plugin" blockId="UserBottom"/>
-				</ul>
-			</div>
+		<li class="navigationMenuItemTop">
+			<a class="heading"><span key="menu.section.user">Users</span></a>
+			<ul>
+				<span jwcid="@common/Plugin" blockId="UserTop"/>
+				<span jwcid="@common/AdminNavigationMenu" pagePath="user/ManageUsers" label="ognl:messages.getMessage('menu.users')" />
+				<span jwcid="@common/AdminNavigationMenu" pagePath="user/UserGroups" label="ognl:messages.getMessage('menu.userGroups')" />				    
+				<span jwcid="@common/Plugin" blockId="UserBottom"/>
+			</ul>
 		</li>
-		<li>
-			<div class="navigationMenuItemTop">
-				<a class="heading"><span key="menu.section.devices">Devices</span></a>
-				<ul>
-					<span jwcid="@common/Plugin" blockId="DevicesTop"/>
-					<span jwcid="@common/AdminNavigationMenu" pagePath="gateway/ListGateways" label="ognl:messages.getMessage('menu.gateways')" />
-					<span jwcid="@common/AdminNavigationMenu" pagePath="phone/ManagePhones" label="ognl:messages.getMessage('menu.devices')" />
-					<span jwcid="@common/AdminNavigationMenu" pagePath="phone/PhoneGroups" label="ognl:messages.getMessage('menu.deviceGroups')" />
-					<span jwcid="@common/Plugin" blockId="DevicesBottom"/>
-				</ul>
-			</div>
+		<li class="navigationMenuItemTop">
+			<a class="heading"><span key="menu.section.devices">Devices</span></a>
+			<ul>
+				<span jwcid="@common/Plugin" blockId="DevicesTop"/>
+				<span jwcid="@common/AdminNavigationMenu" pagePath="gateway/ListGateways" label="ognl:messages.getMessage('menu.gateways')" />
+				<span jwcid="@common/AdminNavigationMenu" pagePath="phone/ManagePhones" label="ognl:messages.getMessage('menu.devices')" />
+				<span jwcid="@common/AdminNavigationMenu" pagePath="phone/PhoneGroups" label="ognl:messages.getMessage('menu.deviceGroups')" />
+				<span jwcid="@common/Plugin" blockId="DevicesBottom"/>
+			</ul>
 		</li>
-		<li>
-			<div class="navigationMenuItemTop">
-				<a class="heading"><span key="menu.section.admin">Features</span></a>
-				<ul>
-					<span jwcid="@common/Plugin" blockId="FeaturesTop"/>
-					<span jwcid="@common/Plugin" blockId="FeaturesBottom"/>
-				</ul>
-			</div>
+		<li class="navigationMenuItemTop">
+			<a class="heading"><span key="menu.section.admin">Features</span></a>
+			<ul>
+				<span jwcid="@common/Plugin" blockId="FeaturesTop"/>
+				<span jwcid="@common/Plugin" blockId="FeaturesBottom"/>
+			</ul>
 		</li>
-		<li>
-			<div class="navigationMenuItemTop">
-				<a class="heading"><span key="menu.section.system">System</span></a>
-				<ul>
-					<span jwcid="@common/Plugin" blockId="SystemTop"/>
-					<span jwcid="@common/DatabaseNavigation"  pagePath="#" label="ognl:messages.getMessage('menu.database.navigation')" />
-					<span jwcid="@common/DialingNavigation"  pagePath="#" label="ognl:messages.getMessage('menu.dialing.navigation')" />
-					<span jwcid="@common/MaintenanceNavigation"  pagePath="#" label="ognl:messages.getMessage('menu.maintenance.navigation')" />
-					<span jwcid="@common/SecurityNavigation"  pagePath="#" label="ognl:messages.getMessage('menu.security.navigation')" />
-					<span jwcid="@common/AdminNavigationMenu" pagePath="admin/commserver/LocationsPage" label="ognl:messages.getMessage('menu.locations')" />
-                    <span jwcid="@common/ServicesNavigation"  pagePath="#" label="ognl:messages.getMessage('menu.services.navigation')" />
-                    <span jwcid="@common/SettingsNavigation"  pagePath="#" label="ognl:messages.getMessage('menu.settings.navigation')" />									
-					<span jwcid="@common/Plugin" blockId="SystemBottom"/>
-				</ul>
-			</div>
+		<li class="navigationMenuItemTop">
+			<a class="heading"><span key="menu.section.system">System</span></a>
+			<ul>
+				<span jwcid="@common/Plugin" blockId="SystemTop"/>
+				<span jwcid="@common/DatabaseNavigation"  pagePath="#" label="ognl:messages.getMessage('menu.database.navigation')" />
+				<span jwcid="@common/DialingNavigation"  pagePath="#" label="ognl:messages.getMessage('menu.dialing.navigation')" />
+				<span jwcid="@common/MaintenanceNavigation"  pagePath="#" label="ognl:messages.getMessage('menu.maintenance.navigation')" />
+				<span jwcid="@common/SecurityNavigation"  pagePath="#" label="ognl:messages.getMessage('menu.security.navigation')" />
+				<span jwcid="@common/AdminNavigationMenu" pagePath="admin/commserver/LocationsPage" label="ognl:messages.getMessage('menu.locations')" />
+				<span jwcid="@common/ServicesNavigation"  pagePath="#" label="ognl:messages.getMessage('menu.services.navigation')" />
+				<span jwcid="@common/SettingsNavigation"  pagePath="#" label="ognl:messages.getMessage('menu.settings.navigation')" />									
+				<span jwcid="@common/Plugin" blockId="SystemBottom"/>
+			</ul>
 		</li>
-		<li>
-			<div class="navigationMenuItemTop">
-				<a class="heading"><span key="menu.section.diag">Diagnostics</span></a>
-				<ul>				    
-					<span jwcid="@common/Plugin" blockId="DiagnosticsTop"/>
-					<span jwcid="@common/Plugin" blockId="DiagnosticsBottom"/>
-				</ul>
-			</div>
+		<li class="navigationMenuItemTop">
+			<a class="heading"><span key="menu.section.diag">Diagnostics</span></a>
+			<ul>				    
+				<span jwcid="@common/Plugin" blockId="DiagnosticsTop"/>
+				<span jwcid="@common/Plugin" blockId="DiagnosticsBottom"/>
+			</ul>
 		</li>
     	<span jwcid="@common/Plugin" blockId="MainMenu"/>
 	</ul>

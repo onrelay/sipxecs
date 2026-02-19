@@ -72,19 +72,6 @@ template {
   display: none;
 }
 
-/* Links
-   ========================================================================== */
-
-/**
- * Improve readability when focused and hovered.
- */
-
-a:active,
-a:hover {
-  outline: 0;
-}
-
-
 
 /**
  * Address odd `em`-unit font size rendering in all browsers.
@@ -102,7 +89,8 @@ samp {
 button,
 html input[type="button"],
 input[type="reset"],
-input[type="submit"] {
+input[type="submit"] 
+{
   -webkit-appearance: none;
   appearance: none;
   background-color: #55829b;
@@ -117,10 +105,21 @@ input[type="submit"] {
   transition: background-color 0.2s, box-shadow 0.2s;
 }
 
+button.small-button ,
+html input[type="button"].small-button ,
+input[type="reset"].small-button,
+input[type="submit"].small-button 
+{
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
 button:hover,
 html input[type="button"]:hover,
 input[type="reset"]:hover,
-input[type="submit"]:hover {
+input[type="submit"]:hover 
+{
   background-color: #4a7085;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
@@ -128,7 +127,8 @@ input[type="submit"]:hover {
 button:active,
 html input[type="button"]:active,
 input[type="reset"]:active,
-input[type="submit"]:active {
+input[type="submit"]:active 
+{
   background-color: #3a6075;
 }
 
@@ -137,7 +137,8 @@ input[type="submit"]:active {
  */
 
 button[disabled],
-html input[disabled] {
+html input[disabled] 
+{
   cursor: default;
   color:#837e84;
 }
@@ -164,37 +165,44 @@ select {
   padding-right: 36px;
 }
 
-select:hover {
+
+select:hover 
+{
   border-color: #55829b;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-select:focus {
+select:focus 
+{
   outline: none;
   border-color: #55829b;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(85, 130, 155, 0.1);
 }
 
-select[disabled] {
+select[disabled] 
+{
   background-color: #f5f5f5;
   color: #999999;
   cursor: not-allowed;
 }
 
 /* Style select dropdown options */
-select option {
+select option 
+{
   padding: 12px;
   background-color: #ffffff;
   color: #333333;
   font-size: 14px;
 }
 
-select option:hover {
+select option:hover 
+{
   background-color: #55829b;
   color: #ffffff;
 }
 
-select option:checked {
+select option:checked 
+{
   background-color: #55829b;
   background-image: linear-gradient(#55829b, #55829b);
   color: #ffffff;
@@ -211,7 +219,8 @@ input[type="url"],
 input[type="tel"],
 input[type="number"],
 input[type="search"],
-textarea {
+textarea 
+{
   min-width: 240px;
   appearance: none;
   background-color: #ffffff;
@@ -225,7 +234,8 @@ textarea {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-textarea {
+textarea 
+{
   height: auto;
   min-height: 100px;
   resize: vertical;
@@ -239,7 +249,8 @@ input[type="url"]:hover,
 input[type="tel"]:hover,
 input[type="number"]:hover,
 input[type="search"]:hover,
-textarea:hover {
+textarea:hover 
+{
   border-color: #55829b;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
@@ -251,7 +262,8 @@ input[type="url"]:focus,
 input[type="tel"]:focus,
 input[type="number"]:focus,
 input[type="search"]:focus,
-textarea:focus {
+textarea:focus 
+{
   outline: none;
   border-color: #55829b;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(85, 130, 155, 0.1);
@@ -264,19 +276,37 @@ input[type="url"]:disabled,
 input[type="tel"]:disabled,
 input[type="number"]:disabled,
 input[type="search"]:disabled,
-textarea:disabled {
+textarea:disabled 
+{
   background-color: #f5f5f5;
   color: #999999;
   cursor: not-allowed;
 }
 
+input[type="text"].small-input,
+input[type="password"].small-input,
+input[type="email"].small-input,
+input[type="url"].small-input,
+input[type="tel"].small-input,
+input[type="number"].small-input,
+input[type="search"].small-input,
+textarea.small-input,
+select.small-input
+{
+  min-width: 120px;
+  padding: 8px;
+  font-size: 12px;
+}
 
-.password-wrapper {
+
+.password-wrapper 
+{
   position: relative;
   display: inline-block;   
 }
 
-.password-toggle {
+.password-toggle 
+{
   position: absolute;
   top: 50%;
   right: 6px;          
@@ -305,12 +335,14 @@ textarea:disabled {
 }
 
 .password-toggle.password-visible .eye-closed,
-.password-toggle.password-hidden .eye-open {
+.password-toggle.password-hidden .eye-open 
+{
   display: none;
 }
 
 input[type="checkbox"],
-input[type="radio"] {
+input[type="radio"] 
+{
   box-sizing: border-box; /* 1 */
   padding: 0; /* 2 */
 }
@@ -322,7 +354,8 @@ input[type="radio"] {
  */
 
 input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+input[type="number"]::-webkit-outer-spin-button 
+{
   height: auto;
 }
 
@@ -332,7 +365,8 @@ input[type="number"]::-webkit-outer-spin-button {
  *    (include `-moz` to future-proof).
  */
 
-input[type="search"] {
+input[type="search"] 
+{
   appearance: textfield; /* 1 */
   -moz-box-sizing: content-box;
   -webkit-box-sizing: content-box; /* 2 */
@@ -346,7 +380,8 @@ input[type="search"] {
  */
 
 input[type="search"]::-webkit-search-cancel-button,
-input[type="search"]::-webkit-search-decoration {
+input[type="search"]::-webkit-search-decoration 
+{
   -webkit-appearance: none;
 }
 
@@ -359,13 +394,15 @@ input[type="search"]::-webkit-search-decoration {
  * Remove most spacing between table cells.
  */
 
-table {
+table 
+{
     border-collapse: collapse; 
 }
 
 
 td,
-th {
+th 
+{
   padding: 2px;
 }
 
@@ -466,10 +503,12 @@ a:link
 	color: #55829B;
   text-decoration: none;
 }
+
 a:visited
 {
 	color: #55829B;
 }
+
 ul.htabs, ul.vtabs
 {
 	list-style:none;
@@ -489,10 +528,10 @@ li.tab a:link,
 li.tab a:hover,
 li.tab a:visited
 {
-        text-decoration: none;
-    	padding:5px 0px 5px 10px;
-    	display: block;
-    	height:15px;
+  text-decoration: none;
+  padding:5px 0px 5px 10px;
+  display: block;
+  height:15px;
 }
 
 li div.tabLink
@@ -500,16 +539,19 @@ li div.tabLink
 	margin: .2em 0;
 }
 
-#voicemailFolders li.tab {
+#voicemailFolders li.tab 
+{
 	text-indent:10px;
 }
 
-#login-content {
+#login-content 
+{
  height: 100%;
 }
 
 
-#login-errors .user-error {
+#login-errors .user-error 
+{
     background: url('/sipxconfig/images/error.png') top left no-repeat; 
     padding-left: 20px;
     height: 1.5em;
@@ -517,19 +559,22 @@ li div.tabLink
     margin-top: 50px;
 }
 
-#login-form {
+#login-form 
+{
   padding-left: 40px;
   padding-top: 10px;
 }
 
-#login-title {
+#login-title 
+{
   font-weight: bold;
   color:#55829b;
   margin-top:10px;
 }
 
 #login-form input[type="text"],
-#login-form input[type="password"] {
+#login-form input[type="password"]
+{
     padding: 12px 12px;
     font-size: 15px;
     border: 1px solid #d0d0d0;
@@ -540,12 +585,15 @@ li div.tabLink
 }
 
 #login-form input[type="text"]:focus,
-#login-form input[type="password"]:focus {
+#login-form input[type="password"]:focus 
+{
     outline: none;
     border-color: #55829b;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(85, 130, 155, 0.1);
 }
-#login-form input[type="submit"] {
+
+#login-form input[type="submit"] 
+{
     background-color: #55829b;
     border-radius: 6px;
     border: 1px solid #4a7085;
@@ -561,16 +609,20 @@ li div.tabLink
     transition: background-color 0.2s, box-shadow 0.2s;
 }
 
-#login-form input[type="submit"]:hover {
+#login-form input[type="submit"]:hover 
+{
     background-color: #4a7085;
     background-image: linear-gradient(to bottom, #5a88a5 0%, #4a7085 100%);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-#login-form input[type="submit"]:active {
+#login-form input[type="submit"]:active 
+{
     background-image: linear-gradient(to bottom, #4a7085 0%, #3a6075 100%);
 }
-#login-form label {
+
+#login-form label 
+{
     font-size: 14px;
     font-weight: 600;
     margin-top: 14px;
@@ -578,18 +630,21 @@ li div.tabLink
     color: #333333;
 }
 
-fieldset#loginForm legend {
+fieldset#loginForm legend 
+{
   font-size: 24px;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bolder;
 }
 
-#login-form form {
+#login-form form 
+{
   margin-top:10px;
   margin-bottom:15px;
 }
 
-#loginFormSectionBox {
+#loginFormSectionBox 
+{
 	width:350px;
 	height:520px;	
 	margin-top: 92px;
@@ -662,7 +717,8 @@ fieldset#loginForm legend {
 	display:inline-block;
 }
 
-.navigationMenuItemTop{
+.navigationMenuItemTop
+{
   background-color: #55829b;
   border-radius: 8px 8px 0px 0;
   text-transform: uppercase;
@@ -670,72 +726,63 @@ fieldset#loginForm legend {
   font-size: 12px;
   font-weight: 600;
   height: 40px;
+  min-width: 160px;
   padding: 0;
   line-height: 40px;
   transition: background-color 0.2s;
-}
+  position: relative;   /* important */
 
+}
 .navigationMenuItemTop:hover {
   background-color: #4a7085;
 }
 
-.navigationMenuItemTop ul a:hover { 
+.navigationMenuItemTop > ul a:hover { 
     background-color: #EBEBEB;
 }
-/* Top-level dropdown */
-.dropdown {
-  position: relative;
-  display: inline-block;
-  min-width: 160px;
+
+.navigationMenuItemTop > ul {
+    position: absolute;
+    top: 100%;            /* sit directly below */
+    left: 0;              /* align left edge */
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: none;        /* hide by default */
+    min-width: 200px;     /* optional */
+    z-index: 1000;
 }
 
-.dropdown-content {
-  display: none;
-  position: absolute;
-  top: 100%;          /* directly below the parent */
-  left: 0;            /* align left edge with parent */
-  background-color: #fff;
-  min-width: 160px;
-  padding: 6px 0;
-  border-radius: 4px;
-  z-index: 1;
+.navigationMenuItemTop:hover > ul {
+    display: block;
 }
 
-.dropdown:hover > .dropdown-content {
+li.dropdown {
+    position: relative; 
+    display: block;
+    background: #ffffff;
+    min-width: 160px;
+}
+
+ul.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;        
+    width: 100%;
+    background: #fff;
+    z-index: 999;
+}
+
+li.dropdown:hover > ul.dropdown-content {
+    display: block;
+}
+
+ul.dropdown-content > a {
   display: block;
 }
 
-/* Second-level dropdown inside dropdown-content */
-.dropdown2 {
-  position: relative;  /* relative to parent .dropdown-content li */
-}
-
-.dropdown-content2 {
-  display: none;
-  position: absolute;
-  top: 0;              /* align top of second menu with parent li */
-  left: 100%;          /* directly to the right of parent li */
-  background-color: #fff;
-  min-width: 160px;
-  padding: 6px 0;
-  border-radius: 4px;
-  z-index: 2;
-}
-
-.dropdown2:hover > .dropdown-content2 {
-  display: block;
-}
-
-/* Links inside any dropdown */
-.dropdown a,
-.dropdown2 a {
-  white-space: nowrap;
-  padding: 6px 12px;
-  display: block;
-}
-
-.dropdown a:hover,
-.dropdown2 a:hover {
+ul.dropdown-content > a:hover {
   background-color: #EBEBEB;
 }
 
@@ -749,8 +796,6 @@ fieldset#loginForm legend {
 
 #navigation li {
 	float: left;
-	min-width: 160px;
-	width: 180px;
 	text-align: center;
 	margin: 0;
 	transition: background-color 0.2s;
@@ -761,30 +806,26 @@ fieldset#loginForm legend {
 }
 
 #navigation li li {
-    min-width: 160px;
-    padding-right: 0px;
-    width: 100%;
-    text-transform: none;
-    background: #ffffff;
-    border-top: none;
-    width: 118px;
+  padding-right: 0px;
+  text-transform: none;
+  border-top: none;
 }
 
 #navigation li ul {
 	display: none;
 	margin-right: 0px;
 	width: 120px;
-	position: relative;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0);
 }
 
-#navigation li:hover ul,
-#navigation li.over ul { 
+#navigation li:hover > ul,
+#navigation li.over > ul { 
 	display: inline-block; 
   z-index: 500;
 }
 
-#navigation li li a {
+#navigation li ul a 
+{
   font-weight: normal;
   text-align: left;
   padding-left: 12px;
@@ -792,8 +833,8 @@ fieldset#loginForm legend {
 }
 
 #navigation li ul,
-.dropdown-content,
-.dropdown-content2 {
+.dropdown-content 
+{
     box-shadow: none !important;
 }
 
@@ -807,16 +848,18 @@ fieldset#loginForm legend {
 
 #navigation a:hover,
 #navigation a.over,
-#navigation a.visited,
+#navigation a.visited
 {
 	color: #003333;
-	background: #E7EEF8;
+	background:#E7EEF8;
 }
+
 #navigation a.heading {
   color:#ffffff;
   height:14px;
   padding-top:2px;
 }
+
 #navigation a.heading:hover,
 #navigation a.heading.over,
 #navigation a.heading.visited
@@ -905,8 +948,6 @@ fieldset#loginForm legend {
 
 .highlight
 {
-	background-color: #f0f8ff;
-	padding: 12px;
 	border-left: 4px solid #55829b;
 	border-radius: 4px;
 }
@@ -1193,11 +1234,6 @@ form.with-sections fieldset
   font-size:100%;
 }
 
-.small-input {
-  min-width: 120px;
-  padding: 8px;
-  font-size: 12px;
-}
 
 
 ul.form-actions
@@ -1453,14 +1489,19 @@ button.subtle:hover
   background-color: #ccc;
 }
 
+a,
+a:active,
 a:visited
 {
 	color: #660099;
+  font-weight: 600;
+	text-decoration: none;
 }
 
-a:hover,a:active,a:visited
+a:hover
 {
-	color: #006699;
+	color: #000;
+  outline: 0;
 }
 
 legend
@@ -1483,7 +1524,8 @@ li.tab:hover
 	background-color: #E7EEF8;
 }
 
-li.active, li.active:hover
+li.active, 
+li.active:hover
 {
 	background-color: #E7EEF8;
 }
@@ -1492,8 +1534,6 @@ li.active a,
 li.active a:hover,
 li.active a:visited
 {
-	color: #000;
-	font-weight: 700;
 	text-decoration: none;
 }
 
@@ -1688,25 +1728,29 @@ div.autocomplete ul strong.highlight {
 }
 
 .linkHome:hover,
-.linkHome:active {
+.linkHome:active 
+{
     background: url(/sipxconfig/skin/home-hover.png) no-repeat left;
     font-weight: bold;
 }
 
 .linkHelp:hover,
-.linkHelp:active {
+.linkHelp:active 
+{
     background: url(/sipxconfig/skin/help-hover.png) no-repeat left;
     font-weight: bold;
 }
 
 .linkLiveHelp:hover,
-.linkLiveHelp:active {
+.linkLiveHelp:active 
+{
     background: url(/sipxconfig/skin/live-help-hover.png) no-repeat left;
     font-weight: bold;
 }
 
 .linkLogout:hover,
-.linkLogout:hover {
+.linkLogout:hover 
+{
     background: url(/sipxconfig/skin/logout-hover.png) no-repeat left;
     font-weight: bold;
 }

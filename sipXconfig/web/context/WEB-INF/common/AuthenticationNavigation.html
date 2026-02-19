@@ -1,10 +1,6 @@
-<div class="dropdown">
-  <li jwcid="@If" condition="ognl:isAllowed"><a jwcid="@PageLink" page="ognl:pagePath"><span jwcid="@Insert" value="ognl:label"/></a>
-    <div class="dropdown-content">
-      <ul>
-        <span jwcid="@common/AdminNavigationMenu" pagePath="admin/ldap/LdapPage" label="ognl:messages.getMessage('menu.ldap')" />
-        <span jwcid="@common/Plugin" blockId="AuthenticationSettingsBottom"/>
-      </ul>
-    </div>
-  </li>
-</div>
+<li class="dropdown" jwcid="@If" condition="ognl:isAllowed"><a jwcid="@PageLink" page="ognl:pagePath"><span jwcid="@Insert" value="ognl:label"/></a>
+  <ul class="dropdown-content">
+    <span jwcid="@common/AdminNavigationMenu" pagePath="admin/ldap/LdapPage" label="ognl:messages.getMessage('menu.ldap')" />
+    <span jwcid="@common/Plugin" blockId="AuthenticationSettingsBottom"/>
+  </ul>
+</li>

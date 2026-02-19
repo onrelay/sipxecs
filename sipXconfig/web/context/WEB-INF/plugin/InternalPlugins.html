@@ -14,16 +14,16 @@
 <span jwcid="InternalPluginsSystemBottom@Block">
 </span>
 <span jwcid="InternalPluginsDiagnosticsTop@Block">
-    <div class="dropdown">
-      <li><span jwcid="@admin/AboutDialog" id="menu.about" linkTitle="message:menu.about"/></li>
-    </div>
-    <span jwcid="@common/AdminNavigationMenu" pagePath="admin/AlarmsPage" label="ognl:messages.getMessage('menu.alarms')" />
-    <span jwcid="@If" condition="ognl:isOn('fail2ban')">
-      <span jwcid="@common/AdminNavigationMenu" pagePath="admin/BannedHosts" label="ognl:messages.getMessage('menu.bannedHosts')" />
-    </span>
-    <span jwcid="@If" condition="ognl:isOn('sipxcdr')">
-      <span jwcid="@common/AdminNavigationMenu" pagePath="cdr/CdrPage" label="ognl:messages.getMessage('menu.cdr')" />
-    </span>
+  <li class="dropdown">
+    <span jwcid="@admin/AboutDialog" id="menu.about" linkTitle="message:menu.about"/>
+  </li>
+  <span jwcid="@common/AdminNavigationMenu" pagePath="admin/AlarmsPage" label="ognl:messages.getMessage('menu.alarms')" />
+  <span jwcid="@If" condition="ognl:isOn('fail2ban')">
+    <span jwcid="@common/AdminNavigationMenu" pagePath="admin/BannedHosts" label="ognl:messages.getMessage('menu.bannedHosts')" />
+  </span>
+  <span jwcid="@If" condition="ognl:isOn('sipxcdr')">
+    <span jwcid="@common/AdminNavigationMenu" pagePath="cdr/CdrPage" label="ognl:messages.getMessage('menu.cdr')" />
+  </span>
 </span>
 <span jwcid="InternalPluginsDiagnosticsBottom@Block">
     <span jwcid="@common/AdminNavigationMenu" pagePath="admin/JobStatusPage" label="ognl:messages.getMessage('menu.jobs')" />

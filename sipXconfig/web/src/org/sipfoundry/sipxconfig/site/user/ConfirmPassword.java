@@ -32,10 +32,12 @@ public abstract class ConfirmPassword extends BaseComponent {
     protected void renderComponent(IMarkupWriter writer, IRequestCycle cycle) {
         if (!cycle.isRewinding()) {
             // If the password is null, then init both password and confirmPassword to the empty string
+            /*  Using placeholder instead
             if (getPassword() == null) {
                 setPassword(StringUtils.EMPTY);
                 setConfirmPassword(StringUtils.EMPTY);
             }
+            */
 
             // If the confirmPassword is null, then init it to be the same as the password
             setConfirmPassword((String) ObjectUtils.defaultIfNull(getConfirmPassword(), getPassword()));
@@ -49,11 +51,13 @@ public abstract class ConfirmPassword extends BaseComponent {
             // The user typed in the password twice.  Make sure that it was the same both times.
             IValidationDelegate delegate =
                 TapestryUtils.getValidator(cycle.getPage());
-            String password = StringUtils.defaultIfEmpty(getPassword(), StringUtils.EMPTY);
-            String confirmPassword = StringUtils.defaultIfEmpty(getConfirmPassword(), StringUtils.EMPTY);
-            if (!password.equals(confirmPassword)) {
-                delegate.record(getPasswordMismatchMessage(), ValidationConstraint.CONSISTENCY);
-                return;
+            String password = getPassword();
+            String confirmPassword = getConfirmPassword();
+            if (StringUtils.isNotEmpty( password ) || StringUtils.isNotEmpty( confirmPassword ) ) {
+                if( !password.equals(confirmPassword)) {
+                    delegate.record(getPasswordMismatchMessage(), ValidationConstraint.CONSISTENCY);
+                    return;
+                }
             }
         }
     }
