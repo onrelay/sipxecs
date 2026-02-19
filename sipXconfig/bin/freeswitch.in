@@ -49,33 +49,24 @@ do_setlimits() {
 do_permission_check() {
   # Ensure that important FreeSWITCH files are writeable by freeswitch
   FS_DBDIR=@SIPX_FSDBDIR@
-  if test ! -e $FS_DBDIR
-  then
-    mkdir $FS_DBDIR
-    chown -R $FS_USER:$FS_GROUP $FS_DBDIR
-    chmod -R u+rwX,ga+rX $FS_DBDIR
-  fi
+  mkdir -p $FS_DBDIR
+  chown -R $FS_USER:$FS_GROUP $FS_DBDIR
+  chmod -R u+rwX,ga+rX $FS_DBDIR
+  
   FS_RUNDIR=@SIPX_FSRUNDIR@
-  if test ! -e $FS_RUNDIR
-  then
-    mkdir $FS_RUNDIR
-    chown -R $FS_USER:$FS_GROUP $FS_RUNDIR
-    chmod -R u+rwX,ga+rX $FS_RUNDIR
-  fi
+  mkdir -p $FS_RUNDIR
+  chown -R $FS_USER:$FS_GROUP $FS_RUNDIR
+  chmod -R u+rwX,ga+rX $FS_RUNDIR
+
   FS_LOGDIR=@SIPX_FSLOGDIR@
-  if test ! -e $FS_LOGDIR
-  then
-    mkdir $FS_LOGDIR
-    chown -R $FS_USER:$FS_GROUP $FS_LOGDIR
-    chmod -R u+rwX,ga+rX $FS_LOGDIR
-  fi
+  mkdir -p $FS_LOGDIR
+  chown -R $FS_USER:$FS_GROUP $FS_LOGDIR
+  chmod -R u+rwX,ga+rX $FS_LOGDIR
+  
   FS_CONFDIR=@SIPX_FSCONFDIR@
-  if test ! -e $FS_CONFDIR
-  then
-    mkdir $FS_CONFDIR
-    chown -R $FS_USER:$FS_GROUP $FS_CONFDIR
-    chmod -R u+rwX,ga+rX $FS_CONFDIR
-  fi
+  mkdir -p $FS_CONFDIR
+  chown -R $FS_USER:$FS_GROUP $FS_CONFDIR
+  chmod -R u+rwX,ga+rX $FS_CONFDIR
 }
 
 do_audio_setup() {

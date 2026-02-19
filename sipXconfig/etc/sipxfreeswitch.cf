@@ -45,6 +45,12 @@ bundle agent sipxfreeswitch_config {
       };
 
   files:
+
+    any::
+      "$(sipx.SIPX_FSCONFDIR)/sipxpbx/conf/autoload_configs/."
+        create => "true",
+        perms  => mog("755","freeswitch","daemon");
+
     !sipxconference::
       "$(conference_file)"
         comment => "install freeswitch config $(this.promiser)",
@@ -76,6 +82,11 @@ bundle agent sipxfreeswitch_config {
         classes => if_repaired("reload_sipxfreeswitch");
 
     any::
+      "$(sipx.SIPX_FSCONFDIR)/sipxpbx/conf/autoload_configs/."
+        create => "true",
+        perms  => mog("755","freeswitch","daemon");
+
+    any::
       "$(sipx.SIPX_FSCONFDIR)/sipxpbx/conf/autoload_configs/modules.conf.xml"
         comment => "install freeswitch config $(this.promiser)",
         create => "true",
@@ -90,6 +101,16 @@ bundle agent sipxfreeswitch_config {
         copy_from => local_cp("/etc/freeswitch/lang/."),
         depth_search => recurse("inf");   
         
+    any::
+      "$(sipx.SIPX_FSCONFDIR)/sipxpbx/conf/en/."
+        create => "true",
+        perms  => mog("755","freeswitch","daemon");
+
+    any::
+      "$(sipx.SIPX_FSCONFDIR)/sipxpbx/conf/en/dir/."
+        create => "true",
+        perms  => mog("755","freeswitch","daemon");
+
     any::
       "$(sipx.SIPX_FSCONFDIR)/sipxpbx/conf/en/dir/sounds.xml"
         comment => "change sounds.xml",
