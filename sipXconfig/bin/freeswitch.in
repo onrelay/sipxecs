@@ -92,7 +92,7 @@ do_audio_setup() {
 base=${0##*/}
 
 do_start() {
-  checkRunningProcessIsListening $PIDFILE > /dev/null
+  checkRunningProcessIsListening $PIDFILE > /dev/null 2>&1
   RETVAL=$?
   [ $RETVAL -eq 0 ] && { echo -n "$NAME $runningError"; echo_failure; exit $ERUNNING; }
   do_setlimits
@@ -103,10 +103,10 @@ do_start() {
 
   if [ $# -gt 0 ]; then
     #check if process spawned
-    checkRunningProcessTimeout $PIDFILE
+    checkRunningProcessTimeout $PIDFILE > /dev/null 2>&1
     RETVAL=$?
     [ $RETVAL -eq 0 ] || { echo_failure; exit $ESRCH; }
-    checkIfProcessIsListening $PIDFILE
+    checkIfProcessIsListening $PIDFILE > /dev/null 2>&1
     RETVAL=$?
     [ $RETVAL -eq 0 ] || { echo_failure; exit $ENOSCKT; }
     [ $RETVAL -eq 0 ] && { echo_success; }

@@ -30,7 +30,7 @@ start() {
       --pid-file $pidfile \
       --log-file $logfile"
   else
-    checkRunningProcessIsListening "${pidfile}" "${exec}" > /dev/null
+    checkRunningProcessIsListening "${pidfile}" "${exec}" > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
 
@@ -45,10 +45,10 @@ start() {
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningProcessTimeout "${pidfile}" "${exec}"
+      checkRunningProcessTimeout "${pidfile}" "${exec}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-      checkIfProcessIsListening "${pidfile}" "${exec}"
+      checkIfProcessIsListening "${pidfile}" "${exec}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; }
       [ $Status -eq 0 ] && { echo_success; }
@@ -61,7 +61,7 @@ start() {
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans "${pidfile}" "${exec}"
+  killAnyProcessOrphans "${pidfile}" "${exec}" > /dev/null 2>&1
   Status=$?
   [ $Status -eq 0 ] || { echo_failure; }
   [ $Status -eq 0 ] && { echo_success; }

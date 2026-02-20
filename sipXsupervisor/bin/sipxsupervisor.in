@@ -24,7 +24,7 @@ pidfile="$pidfolder/sipxsupervisor.pid"
 start() {
   [ -x $exec ] || { echo -n "$execError"; echo_failure; exit $ENOEXEC; }
   [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; exit $ENOENT; }
-  checkRunningProcess "${pidfile}" "${exec}" > /dev/null
+  checkRunningProcess "${pidfile}" "${exec}" > /dev/null 2>&1
   Status=$?
   [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
 
@@ -34,12 +34,12 @@ start() {
   Status=$?
 
   if [ $# -gt 0 ]; then
-    checkRunningProcessTimeout "${pidfile}" "${exec}" $maxTimeout
+    checkRunningProcessTimeout "${pidfile}" "${exec}" $maxTimeout > /dev/null 2>&1
     Status=$?
     [ $Status -eq $ESRCH ] && { echo_failure; exit $ESRCH; }
 
     #sipxagent running
-    checkIfProcessIsListening "${pidfile}" "${exec}"
+    checkIfProcessIsListening "${pidfile}" "${exec}" > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
     [ $Status -eq 0 ] && { echo_success; return $Status; }
@@ -55,7 +55,7 @@ start() {
     Status=$?
 
     if [ $# -gt 0 ]; then
-      checkIfProcessIsListening "${pidfile}" "${exec}"
+      checkIfProcessIsListening "${pidfile}" "${exec}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; return 0; }
@@ -64,13 +64,13 @@ start() {
 }
 
 nofork() {
-  killAnyProcessOrphans "${pidfile}" "${exec}"
+  killAnyProcessOrphans "${pidfile}" "${exec}" 
   $exec -v -f $config
 }
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans "${pidfile}" "${exec}"
+  killAnyProcessOrphans "${pidfile}" "${exec}" > /dev/null 2>&1
   Status=$?
   [ $Status -eq 0 ] || { echo_failure; }
   [ $Status -eq 0 ] && { echo_success; }

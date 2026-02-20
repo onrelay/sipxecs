@@ -383,8 +383,10 @@ if systemctl list-unit-files | grep -q '^freeswitch\.service'; then
 fi
 
 %postun
-# uninstall lucene index and Jetty scratch dir on every install
+# uninstall lucene index dir on every install 
 rm -rf /var/sipxdata/tmp/index 2> /dev/null
+
+# uninstall Jetty scratch dir on every install
 rm -rf /var/sipxdata/tmp/Jetty__8443__sipxconfig 2> /dev/null
 
 # empty but required to generate RPM

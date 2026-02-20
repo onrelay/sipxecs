@@ -55,7 +55,7 @@ start() {
     killAnyProcessOrphans "${pidfile}" "${regex}"
     runuser -s /bin/bash @SIPXPBXUSER@ -c ${Command}
   else
-    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
+    checkRunningProcessIsListening "${pidfile}" "${regex}"> /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
 
@@ -65,10 +65,10 @@ start() {
 
     if [ $# -gt 1 ]; then
       #check if process was spawned
-      checkRunningProcessTimeout "${pidfile}" "${regex}"
+      checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-      checkIfProcessIsListening "${pidfile}" "${regex}"
+      checkIfProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; }
@@ -132,7 +132,7 @@ case "$1" in
     asyncrestart
     ;;
   condrestart)
-    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] && restart || :
     ;;

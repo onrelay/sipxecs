@@ -33,8 +33,6 @@ configtest() {
 
 # Start sipxrecording
 start() {
-  checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
-  
   [ -f $config_props ] || exit 6
   
   JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
@@ -50,16 +48,20 @@ start() {
   if [ -n "${NoFork}" ] ; then
     runuser -s /bin/bash @SIPXPBXUSER@ -c ${Command}
   else
+    checkRunningProcessIsListening "${pidfile}" "${exec}" > /dev/null 2>&1
+    Status=$?
+    [ $Status -eq 0 ] && { echo -n "$progName $runningError"; echo_failure; exit $ERUNNING; }
+
     echo -n $"Starting $prog: "
     runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command} > /dev/null 2>&1 & echo \$!" > ${pidfile}
     Status=$?
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningProcessTimeout "${pidfile}" "${regex}" 
+      checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-      checkIfProcessIsListening "${pidfile}" "${regex}"
+      checkIfProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; }
@@ -72,7 +74,7 @@ start() {
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans "${pidfile}" "${regex}"
+  killAnyProcessOrphans "${pidfile}" "${regex}" > /dev/null 2>&1
   Status=$?
   [ $Status -eq 0 ] || { echo_failure; }
   [ $Status -eq 0 ] && { echo_success; }
@@ -101,7 +103,7 @@ case "$1" in
     restart
     ;;
   condrestart)
-    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] && restart || :
     ;;

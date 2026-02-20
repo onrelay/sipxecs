@@ -48,10 +48,10 @@ start() {
 
       if [ $# -gt 0 ]; then
         #check if process was spawned
-        checkRunningProcessTimeout "${pidfile}" "${regex}" 
+        checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
         Status=$?
         [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-        checkIfProcessIsListening "${pidfile}" "${regex}"
+        checkIfProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
         Status=$?
         [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
         [ $Status -eq 0 ] && { echo_success; }
@@ -64,7 +64,7 @@ start() {
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans "${pidfile}" "${regex}"
+  killAnyProcessOrphans "${pidfile}" "${regex}" > /dev/null 2>&1
   Status=$?
   [ $Status -eq 0 ] || { echo_failure; }
   [ $Status -eq 0 ] && { echo_success; }
@@ -103,7 +103,9 @@ case "$1" in
     restart
     ;;
   condrestart)
-    [ -f ${pidfile} ] && restart || :
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
+    Status=$?
+    [ $Status -eq 0 ] && restart || :
     ;;
   status)
     status -p ${pidfile} sipxcallback

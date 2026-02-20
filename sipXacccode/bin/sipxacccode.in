@@ -46,10 +46,10 @@ start() {
 
       if [ $# -gt 0 ]; then
         #check if process was spawned
-        checkRunningProcessTimeout "${pidfile}" "${regex}" 
+        checkRunningProcessTimeout "${pidfile}" "${regex}" /dev/null 2>&1
         Status=$?
         [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-        checkIfProcessIsListening "${pidfile}" "${regex}"
+        checkIfProcessIsListening "${pidfile}" "${regex}" /dev/null 2>&1
         Status=$?
         [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
         [ $Status -eq 0 ] && { echo_success; }
@@ -63,7 +63,7 @@ start() {
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans "${pidfile}" "${regex}"
+  killAnyProcessOrphans "${pidfile}" "${regex}" > /dev/null 2>&1
   Status=$?
   [ $Status -ne 0 ] && { echo_failure; exit "${Status}"; }
   rm -f ${pidfile}
