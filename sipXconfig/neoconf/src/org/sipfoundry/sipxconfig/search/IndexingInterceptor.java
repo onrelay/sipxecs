@@ -18,14 +18,20 @@ public class IndexingInterceptor extends SpringHibernateInterceptor {
     private Indexer m_indexer;
     private BeanIndexHelper m_beanIndexHelper;
 
-    public IndexingInterceptor() {}
-
     public void setIndexer(Indexer indexer) {
         m_indexer = indexer;
     }
 
+    public Indexer getIndexer() {
+        return m_indexer;
+    }
+
     public void setBeanIndexHelper(BeanIndexHelper beanIndexHelper) {
         m_beanIndexHelper = beanIndexHelper;
+    }
+
+    public BeanIndexHelper getBeanIndexHelper() {
+        return m_beanIndexHelper;
     }
 
     public boolean onSave(Object entity, Object id, Object[] state, String[] propertyNames,

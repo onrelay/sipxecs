@@ -28,12 +28,6 @@
     <property name="beanAdaptor" ref="beanAdaptor"/>
   </bean>
 
-  <bean id="indexingInterceptor" class="org.sipfoundry.sipxconfig.search.IndexingInterceptor" >
-    <property name="indexer" ref="fastIndexer" />
-    <property name="beanIndexHelper" ref="beanIndexHelper"/>
-  </bean>
-
-
   <bean id="loadIndexingInterceptor" class="org.sipfoundry.sipxconfig.search.LoadIndexingInterceptor">
     <property name="indexer" ref="bulkIndexer"/>
     <property name="beanIndexHelper" ref="beanIndexHelper"/>

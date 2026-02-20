@@ -139,7 +139,7 @@ public class DynamicSessionFactoryBean extends HibernateConfigurationPlugin
             // Build SessionFactory with Spring-instantiator interceptor if present
             SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
             
-            Interceptor interceptor = m_beanFactory.getBean("indexingInterceptor", Interceptor.class);
+            Interceptor interceptor = m_beanFactory.getBean("loadIndexingInterceptor", Interceptor.class);
                 
             sfb.applyInterceptor(interceptor);
 
