@@ -7,7 +7,7 @@
  */
 
 html {
-  font-family: sans-serif;
+  font-family: Arial, Verdana, Helvetica, sans-serif;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -423,7 +423,7 @@ table.cloud tbody tr td
 
 body
 {
-	background:#EBEBEB;
+	background:#fafafa;
 	font-family:Arial, Verdana, Helvetica, sans-serif;
 	font-size:14px;
 	margin:0;
@@ -509,6 +509,11 @@ a:visited
 	color: #55829B;
 }
 
+a:hover
+{
+	color: #3F6B82;
+}
+
 ul.htabs, ul.vtabs
 {
 	list-style:none;
@@ -528,7 +533,6 @@ li.tab a:link,
 li.tab a:hover,
 li.tab a:visited
 {
-  text-decoration: none;
   padding:5px 0px 5px 10px;
   display: block;
   height:15px;
@@ -633,7 +637,6 @@ li div.tabLink
 fieldset#loginForm legend 
 {
   font-size: 24px;
-  font-family: Arial, Helvetica, sans-serif;
   font-weight: bolder;
 }
 
@@ -687,7 +690,6 @@ fieldset#loginForm legend
 
 #banner-links a
 {
-	text-decoration:none;
 	padding:5px 5px 5px 20px;
 	color:#837e84;
 }
@@ -842,7 +844,6 @@ ul.dropdown-content > a:hover {
 {
 	font-weight: bold;
 	display: block;
-	text-decoration: none;
 	font-size: 14px;
 }
 
@@ -1072,11 +1073,7 @@ table.component tfoot tr td
 table.component .descriptionColumnValue,
 table.component .errorColumnValue
 {
-   /* because of CSS's forward compatibility guidelines, user agents pick the last one they support */
-   white-space: normal;        /* wrap (CSS 2) */
-   white-space: -moz-pre-wrap; /* wrap, but preserve newlines (Mozilla) */
-   white-space: -o-pre-wrap;   /* wrap, but preserve newlines (Opera 7) */
-   white-space: pre-wrap;      /* wrap, but preserve newlines (CSS 2.1) */
+   white-space: normal; 
 }
 
 .select-column 
@@ -1103,7 +1100,6 @@ ul.component-selection li
 
 ul.component-selection li a
 {
-	text-decoration:none;
 	font-size:.8em;
 }
 
@@ -1493,14 +1489,14 @@ a,
 a:active,
 a:visited
 {
-	color: #660099;
+	color: #55829B;
   font-weight: 600;
 	text-decoration: none;
 }
 
 a:hover
 {
-	color: #000;
+	color: #3F6B82;
   outline: 0;
 }
 
@@ -1517,6 +1513,7 @@ legend
 li.tab a
 {
 	color: #837e84;
+  font-weight: normal;
 }
 
 li.tab:hover
@@ -1528,13 +1525,6 @@ li.active,
 li.active:hover
 {
 	background-color: #E7EEF8;
-}
-
-li.active a,
-li.active a:hover,
-li.active a:visited
-{
-	text-decoration: none;
 }
 
 .close-popup {
@@ -1652,8 +1642,7 @@ form.with-sections legend
 
 .disabled
 {
-	color: #0011cc;
-	font-style: italic;
+	color: #AAA;
 }
 
 .user-disabled

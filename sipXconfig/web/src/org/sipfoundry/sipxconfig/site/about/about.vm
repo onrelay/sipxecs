@@ -11,7 +11,7 @@ TD.aside {font-size: smaller;}
     <tr>
 	    <td class="aside">
                 ${defaultAbout.text}
-                <textarea id="license" rows="12" cols="45">${defaultAbout.licenseText}</textarea>
+                <a target="_blank" href="https://www.gnu.org/licenses/agpl-3.0.en.html#license-text">${defaultAbout.licenseText}</a>
         </td>
 	</tr>
 </table>

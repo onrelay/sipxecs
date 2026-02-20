@@ -87,8 +87,6 @@ public abstract class ReportComponent extends BaseComponent {
 
     private static final String PIECHART_SECTIONLABEL_FORMAT = "{0} = {1} ({2})";    
 
-    private static final String BACKGROUND_COLOR = "#EBEBEB";
-
     @InjectObject(value = "service:tapestry.globals.RequestGlobals")
     public abstract RequestGlobals getRequestGlobals();
 
@@ -434,7 +432,7 @@ public abstract class ReportComponent extends BaseComponent {
         // Create a chart with the dataset
         JFreeChart barChart = ChartFactory.createBarChart3D(EMPTY_TITLE, xAxisLabel, yAxisLabel,
                 data, PlotOrientation.VERTICAL, true, true, true);
-        barChart.setBackgroundPaint(Color.decode(BACKGROUND_COLOR));
+        barChart.setBackgroundPaint(null);
         barChart.getTitle().setPaint(Color.BLACK);
         CategoryPlot p = barChart.getCategoryPlot();
         p.setRangeGridlinePaint(Color.red);
@@ -457,7 +455,7 @@ public abstract class ReportComponent extends BaseComponent {
         // Create a chart with the dataset
         JFreeChart barChart = ChartFactory.createBarChart3D(EMPTY_TITLE, xAxisLabel, yAxisLabel,
                 data, PlotOrientation.VERTICAL, true, true, true);
-        barChart.setBackgroundPaint(Color.lightGray);
+        barChart.setBackgroundPaint(null);
         barChart.getTitle().setPaint(Color.BLACK);
         CategoryPlot p = barChart.getCategoryPlot();
         p.setRangeGridlinePaint(Color.red);
@@ -477,7 +475,7 @@ public abstract class ReportComponent extends BaseComponent {
 
         // Create a chart with the dataset
         JFreeChart chart = ChartFactory.createPieChart(EMPTY_TITLE, data, true, true, true);
-        chart.setBackgroundPaint(Color.lightGray);
+        chart.setBackgroundPaint(null);
         chart.getTitle().setPaint(Color.BLACK);
 
         PiePlot chartplot = (PiePlot) chart.getPlot();
@@ -499,7 +497,7 @@ public abstract class ReportComponent extends BaseComponent {
 
         // Create a chart with the dataset
         JFreeChart chart = ChartFactory.createPieChart(EMPTY_TITLE, data, true, true, false);
-        chart.setBackgroundPaint(Color.lightGray);
+        chart.setBackgroundPaint(null);
         chart.setTitle("Summary - " + getMessages().getMessage(CdrReports.TITLE_CALLDIRECTION_REPORT_KEY));
         chart.getTitle().setPaint(Color.BLACK);
 
