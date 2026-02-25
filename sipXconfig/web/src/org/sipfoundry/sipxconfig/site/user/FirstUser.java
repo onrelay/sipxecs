@@ -63,6 +63,13 @@ public abstract class FirstUser extends SipxBasePage implements PageBeginRenderL
     @Asset("context:/WEB-INF/common/PasswordToggle.script")
     public abstract IAsset getPasswordToggleScript();
 
+    @Asset("context:/WEB-INF/common/SubmitSpinner.script")
+    public abstract IAsset getSubmitSpinnerScript();
+
+    @Asset("context:/WEB-INF/common/LoadingSpinner.script")
+    public abstract IAsset getLoadingSpinnerScript();
+
+
     public  String getLicense(int i) {
         return getTapestry().getLicense(i);
     }

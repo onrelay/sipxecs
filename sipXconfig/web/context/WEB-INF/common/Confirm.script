@@ -7,17 +7,22 @@
   <input-symbol key="prompt" required="yes" />
   
   <let key="button">
-    dojo.byId('${component.clientId}')
+    document.getElementById('${component.clientId}')
   </let>  
   
   <body>
     <unique>
-function attachOnClick(button, prompt) {
-  button.onclick = function(){ return confirm(prompt); };
-}    
+      function attachOnClick(button, prompt) {
+        if (!button) return;
+        button.addEventListener('click', function(event) {
+          if (!confirm(prompt)) {
+            event.preventDefault();
+          }
+        });
+      }    
     </unique>
   </body>
   <initialization>
-attachOnClick(${button}, '${prompt}');
+    attachOnClick(${button}, '${prompt}');
   </initialization>
 </script>

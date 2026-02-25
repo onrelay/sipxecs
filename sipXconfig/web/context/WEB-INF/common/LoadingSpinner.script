@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!DOCTYPE script PUBLIC
+	"-//Apache Software Foundation//Tapestry Script Specification 3.0//EN"
+	"http://jakarta.apache.org/tapestry/dtd/Script_3_0.dtd">
+<script>
+<body>
+<![CDATA[
+(function() {
+  'use strict';
+
+  function createSpinner() {
+    if (document.getElementById('containerLoadingSpinner')) return;
+
+    var spinner = document.createElement('div');
+    spinner.id = 'containerLoadingSpinner';
+    spinner.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+        <circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
+        <path d="M22 12a10 10 0 0 1-10 10"/>
+      </svg>
+    `;
+
+    document.body.appendChild(spinner);
+  }
+
+  function showSpinner() {
+    var spinner = document.getElementById('containerLoadingSpinner');
+    if (spinner) spinner.classList.add('active');
+  }
+
+  function initSpinner() {
+    createSpinner();
+
+    // Show when navigation begins
+    window.addEventListener('beforeunload', function() {
+      showSpinner();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSpinner);
+  } else {
+    initSpinner();
+  }
+})();
+]]>
+</body>
+<initialization>
+</initialization>
+</script>

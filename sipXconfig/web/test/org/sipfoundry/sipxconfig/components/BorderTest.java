@@ -336,6 +336,21 @@ public class BorderTest extends TestCase {
             return null;
         }
 
+        @Override
+        public IAsset getSubmitSpinnerScript() {
+            return null;
+        }
+
+        @Override
+        public IAsset getLoadingSpinnerScript() {
+            return null;
+        }
+
+        @Override
+        public IAsset getAboutDialogScript() {
+            return null;
+        }
+
 
         @Override
         public Messages getMessages() {

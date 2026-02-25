@@ -11,8 +11,6 @@
 	<bean id="skinProperties" class="org.sipfoundry.sipxconfig.site.skin.SkinProperties">
 		<property name="properties">
 			<props>
-				<prop key="logo.png">sipXcomAdminLogo.png</prop>
-				<prop key="favicon.ico">sipXcomLoginScreen.png</prop>
 			</props>
 		</property>
 	</bean>

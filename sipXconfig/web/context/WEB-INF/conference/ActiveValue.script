@@ -6,7 +6,11 @@
   <input-symbol key="parameters" required="yes"/>
   <input-symbol key="compClientId" required="yes"/>
   <input-symbol key="updateCompClientId" required="yes"/>
+  
   <initialization>
-dojo.byId('${compClientId}').startRendering(${parameters}, '${updateCompClientId}');
+    var compElement = document.getElementById('${compClientId}');
+    if (compElement && typeof compElement.startRendering === 'function') {
+        compElement.startRendering(${parameters}, '${updateCompClientId}');
+    }
   </initialization>
 </script>

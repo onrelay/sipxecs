@@ -10,56 +10,72 @@
     <body>
         <unique>
 	    <![CDATA[
-           dojo.require("dojo.lfx.*");
-        
-           var visible = new Array();
-        
-           function loadDetails(link, rowId) {
-               showLoadingIcon(rowId);
-               showMessageArea(rowId);
-               visible[rowId] = true;
-           }
-        
-           function toggleDetails(link, rowId) {
-               if (visible[rowId]) {
-                   hideMessageArea(rowId);
-                   link.innerHTML = "${showDetailsLabel}";
-                   visible[rowId] = false;
-               } else {
-                   showMessageArea(rowId);
-                   link.innerHTML = "${hideDetailsLabel}";
-                   
-                   visible[rowId] = true;              
-               }
-           }
-        
-            function showLoadingIcon(rowId) {
-                var loadingIcon = dojo.byId("loadingIcon-" + rowId);
-                if (loadingIcon) {
-                   loadingIcon.style.display = "inline";
+            const visible = {};
+
+            function loadDetails(link, rowId) {
+                showLoadingIcon(rowId);
+                showMessageArea(rowId);
+                visible[rowId] = true;
+            }
+
+            function toggleDetails(link, rowId, showLabel = "${showDetailsLabel}", hideLabel = "${hideDetailsLabel}") {
+                if (visible[rowId]) {
+                    hideMessageArea(rowId);
+                    link.innerHTML = showLabel;
+                    visible[rowId] = false;
+                } else {
+                    showMessageArea(rowId);
+                    link.innerHTML = hideLabel;
+                    visible[rowId] = true;
                 }
             }
-                
-            function hideLoadingIcon(rowId) {                            
-                var loadingIcon = dojo.byId("loadingIcon-" + rowId);
-                if (loadingIcon) {                
+
+            function showLoadingIcon(rowId) {
+                const loadingIcon = document.getElementById("loadingIcon-" + rowId);
+                if (loadingIcon) {
+                    loadingIcon.style.display = "inline";
+                }
+            }
+
+            function hideLoadingIcon(rowId) {
+                const loadingIcon = document.getElementById("loadingIcon-" + rowId);
+                if (loadingIcon) {
                     loadingIcon.style.display = "none";
                 }
-            }               
-                
+            }
+
             function showMessageArea(rowId) {
-                var messageArea = dojo.byId("messageDetail-" + rowId);
+                const messageArea = document.getElementById("messageDetail-" + rowId);
                 if (messageArea) {
-                   dojo.lfx.wipeIn(messageArea, 250).play();
+                    messageArea.style.display = "block";
+                    messageArea.style.height = "0px";
+                    const fullHeight = messageArea.scrollHeight + "px";
+                    messageArea.style.transition = "height 0.25s ease";
+                    requestAnimationFrame(() => {
+                        messageArea.style.height = fullHeight;
+                    });
+                    messageArea.addEventListener("transitionend", function handler() {
+                        messageArea.style.height = "auto"; // allow flexible height after animation
+                        messageArea.removeEventListener("transitionend", handler);
+                    });
                 }
-            }    
-            
-            function hideMessageArea(rowId) {   
-                var messageArea = dojo.byId("messageDetail-" + rowId);
+            }
+
+            function hideMessageArea(rowId) {
+                const messageArea = document.getElementById("messageDetail-" + rowId);
                 if (messageArea) {
-                    dojo.lfx.wipeOut(messageArea, 250).play();
-                }                
-            }           
+                    const fullHeight = messageArea.scrollHeight + "px";
+                    messageArea.style.height = fullHeight; // set current height for transition
+                    requestAnimationFrame(() => {
+                        messageArea.style.transition = "height 0.25s ease";
+                        messageArea.style.height = "0px";
+                    });
+                    messageArea.addEventListener("transitionend", function handler() {
+                        messageArea.style.display = "none";
+                        messageArea.removeEventListener("transitionend", handler);
+                    });
+                }
+            }
 	    ]]>
         </unique>
     </body>

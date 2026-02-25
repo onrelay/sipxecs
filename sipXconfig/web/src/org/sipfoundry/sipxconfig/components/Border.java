@@ -83,6 +83,16 @@ public abstract class Border extends BaseComponent implements PageValidateListen
     @Asset("context:/WEB-INF/common/PasswordToggle.script")
     public abstract IAsset getPasswordToggleScript();
 
+    @Asset("context:/WEB-INF/common/SubmitSpinner.script")
+    public abstract IAsset getSubmitSpinnerScript();
+
+    @Asset("context:/WEB-INF/common/LoadingSpinner.script")
+    public abstract IAsset getLoadingSpinnerScript();
+
+    @Asset("context:/WEB-INF/admin/AboutDialog.script")
+    public abstract IAsset getAboutDialogScript();
+
+
     /**
      * When true - page does not require login
      */

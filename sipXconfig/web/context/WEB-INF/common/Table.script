@@ -3,13 +3,14 @@
 	"-//Apache Software Foundation//Tapestry Script Specification 3.0//EN"
 	"http://jakarta.apache.org/tapestry/dtd/Script_3_0.dtd">
 <script>
-  <include-script resource-path="/org/sipfoundry/sipxconfig/components/table-first-last-fix.js" />
   <input-symbol key="compClientId" required="yes" />
-  <!--
-    HACK: for some reason tapestry does not return correct client ID for tables
-    the code below slices off 2 characters (usually '_0') from the client ID.
-   -->
+  
   <initialization>
-    addFirstLast(dojo.byId('${compClientId}'.slice(0, -2)));
+    var tableId = '${compClientId}'.slice(0, -2);
+    var tableElement = document.getElementById(tableId);
+
+    if (tableElement) {
+        addFirstLast(tableElement);
+    }
   </initialization>
 </script>

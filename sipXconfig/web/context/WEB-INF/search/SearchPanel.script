@@ -3,11 +3,48 @@
     "-//Apache Software Foundation//Tapestry Script Specification 3.0//EN"
     "http://jakarta.apache.org/tapestry/dtd/Script_3_0.dtd">
 <script>
-  <include-script resource-path="/org/sipfoundry/sipxconfig/site/search/search-panel.js" />
   <input-symbol key="placeholder" required="yes" />
   <input-symbol key="queryField" required="yes" />
+  
+  <body>
+    <unique>
+      var searchPanel = {
+        placeholder: null,
+
+        register: function(searchBox, placeholder) {
+          this.placeholder = placeholder;
+          searchBox.value = this.placeholder;
+
+          // initial class for styling
+          var container = searchBox.parentNode;
+          if (container) container.classList.add('styled');
+
+          // event handlers
+          searchBox.addEventListener('focus', this.onClick.bind(this));
+          searchBox.addEventListener('blur', this.onBlur.bind(this));
+        },
+
+        onClick: function(evt) {
+          var sb = evt.target;
+          if (sb.value === this.placeholder) {
+            sb.value = "";
+          }
+          sb.className = "active";
+        },
+
+        onBlur: function(evt) {
+          var sb = evt.target;
+          if (sb.value === "") {
+            sb.value = this.placeholder;
+            sb.className = "inactive";
+          }
+        }
+      };
+    </unique>
+  </body>
+
   <initialization>
-    var searchBox = dojo.byId('${queryField.clientId}');
+    var searchBox = document.getElementById('${queryField.clientId}');
     searchPanel.register(searchBox, '${placeholder}');
   </initialization>
 </script>

@@ -5,61 +5,64 @@
 <script>
 <body>
 <![CDATA[
-dojo.require("dojo.io.*");
-dojo.require("dojo.io.ScriptSrcIO");
-
 var waitForServerDown = true;
 var timeToExpire = 0;
+var interval = 5000; // 5 seconds
+var timeoutLimit = 1800000; // 30 minutes
 var targetUrl = location.href;
+
+// Construct base URL
+function getUrlBase() {
+    var host = location.host;
+    var pos = host.indexOf(":");
+    return pos !== -1 ? host.substr(0, pos) : host;
+}
 var base_url = "http://" + getUrlBase() + "/sipxconfig/rest/my/logoutunite";
 
-
-function getUrlBase() {
-      var host = location.host;
-      var pos = host.indexOf(":");
-      if (pos != -1)
-           return host.substr(0, pos);
-       else
-       return host;
-}
-
+// Modern AJAX polling function
 function makeRequest() {
-    dojo.io.bind({
-    	preventCache:true,
-        url: targetUrl,
-        load: onLoad,
-        error:onError,
-        mimetype: "text/plain",
-        timeout: onTimeout,
-        timeoutSeconds: 5
-    });
+    fetch(targetUrl, { cache: "no-store" })
+        .then(response => {
+            if (!response.ok) throw new Error("Server not ready");
+            return response.text();
+        })
+        .then(data => onLoad(data))
+        .catch(error => onError(error));
 }
-function onLoad(type, data, event){
-	if(waitForServerDown){
-		if(timeToExpire>1800000){
-		    alert("Timeout expired. Server is not down.");
-		    window.location=base_url;
-	    }
-	    else{
-			setTimeout('makeRequest()', 5000);
-		    timeToExpire+=5000;
-	    }
-	}else{
-		window.location=base_url;
-	}
+
+// Handle successful response
+function onLoad(data) {
+    if (waitForServerDown) {
+        if (timeToExpire > timeoutLimit) {
+            alert("Timeout expired. Server is not down.");
+            window.location = base_url;
+        } else {
+            timeToExpire += interval;
+            setTimeout(makeRequest, interval);
+        }
+    } else {
+        window.location = base_url;
+    }
 }
-function onError(type,error){
-	waitForServerDown = false;
-	setTimeout('makeRequest()', 5000);
+
+// Handle error response
+function onError(error) {
+    waitForServerDown = false;
+    setTimeout(makeRequest, interval);
 }
-function onTimeout(){
-	waitForServerDown = false;
-	setTimeout('makeRequest()', 5000);
-}
+
+// Placeholder if needed
 function onWaitingListenerResponse() {
+    // no-op
+}
+
+// Optional: trigger any listener you had in original code
+function triggerWaitingListener() {
+    onWaitingListenerResponse();
 }
 ]]>
 </body>
+
 <initialization>
    makeRequest();
    triggerWaitingListener();

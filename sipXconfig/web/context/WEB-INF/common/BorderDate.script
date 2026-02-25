@@ -11,24 +11,32 @@
 var currentDate = new Date("${date}");
 var interval = 10000;
 
+const formatter = new Intl.DateTimeFormat(undefined, {
+    weekday: 'short',   // EEE
+    day: '2-digit',     // dd
+    month: 'short',     // MMM
+    year: 'numeric',    // yyyy
+    hour: 'numeric',    // h
+    minute: '2-digit',  // mm
+    hour12: true        // aa (AM/PM)
+});
+
 function updateDate() {
-    var targetNode = dojo.byId("dateComponent");
+    const targetNode = document.getElementById("dateComponent");
     if (!targetNode) return;
 
-    targetNode.innerHTML = dojo.date.format(currentDate, {
-        datePattern: "EEE, dd MMM yyyy",
-        timePattern: "h:mm aa"
-    });
+    targetNode.textContent = formatter.format(currentDate);
 
-    currentDate.setMilliseconds(currentDate.getMilliseconds() + interval);
+    currentDate = new Date(currentDate.getTime() + interval);
     setTimeout(updateDate, interval);
 }
 
 // Run when DOM is ready
-dojo.addOnLoad(updateDate);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateDate);
+} else {
+    updateDate();
+}
 ]]>
 </body>
-<initialization>
-	updateDate();
-</initialization>
 </script>

@@ -1,35 +1,39 @@
 <!DOCTYPE script PUBLIC
   "-//Apache Software Foundation//Tapestry Script Specification 3.0//EN"
   "http://jakarta.apache.org/tapestry/dtd/Script_3_0.dtd">
-  <script>
+<script>
   <input-symbol key="placeholder" required="yes" />
+
   <body>
     <![CDATA[
-        var placeholder = "(enter number)";
-        
-        function clickNumberField(event) {
-            var sb = event.target;
-            if (sb.value == this.placeholder) {
-                sb.value = "";
-            }
-            sb.className = "active";        
+      var placeholder = "(enter number)";
+
+      function clickNumberField(event) {
+        var sb = event.target;
+        if (sb.value === placeholder) {
+          sb.value = "";
         }
-        
-        function blurNumberField(event) {
-            var sb = event.target;
-            if (sb.value == "") {
-                sb.value = this.placeholder;
-                sb.className = "inactive";
-            }        
+        sb.className = "active";
+      }
+
+      function blurNumberField(event) {
+        var sb = event.target;
+        if (sb.value === "") {
+          sb.value = placeholder;
+          sb.className = "inactive";
         }
+      }
     ]]>
   </body>
+
   <initialization>
     placeholder = '${placeholder}';
     
-    var numberField = dojo.byId("conference:inviteNumber");
-    numberField.value = placeholder;
-    dojo.event.connect(numberField, "onclick", clickNumberField);
-    dojo.event.connect(numberField, "onblur", blurNumberField);
-  </initialization>  
+    var numberField = document.getElementById("conference:inviteNumber");
+    if (numberField) {
+      numberField.value = placeholder;
+      numberField.addEventListener("focus", clickNumberField);
+      numberField.addEventListener("blur", blurNumberField);
+    }
+  </initialization>
 </script>

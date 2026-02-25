@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<!DOCTYPE script PUBLIC
+	"-//Apache Software Foundation//Tapestry Script Specification 3.0//EN"
+	"http://jakarta.apache.org/tapestry/dtd/Script_3_0.dtd">
+<script>
+<body>
+<![CDATA[
+(function() {
+  'use strict';
+
+  let globalSpinner = null;
+
+  function createSpinner() {
+    if (!globalSpinner) {
+      globalSpinner = document.createElement('span');
+      globalSpinner.className = 'submit-spinner';
+      globalSpinner.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+          <circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
+          <path d="M22 12a10 10 0 0 1-10 10"/>
+        </svg>
+      `;
+      document.body.appendChild(globalSpinner);
+    }
+    return globalSpinner;
+  }
+
+  function positionSpinner(input, spinner) {
+    const rect = input.getBoundingClientRect();
+    spinner.style.left = (rect.right - 24 + window.scrollX) + 'px';
+    spinner.style.top = (rect.top + rect.height / 2 - 8 + window.scrollY) + 'px';
+  }
+
+  function initSubmitSpinners() {
+    const submitInputs = document.querySelectorAll('input[type="submit"]');
+
+    submitInputs.forEach(input => {
+      if (input.dataset.spinnerInit === '1') return;
+
+      input.addEventListener('click', function(e) {
+        const form = input.closest('form');
+        if (!form) return;
+
+        // Store which button triggered submission
+        form._clickedSubmit = input;
+      });
+
+      input.dataset.spinnerInit = '1';
+    });
+
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+      if (form.dataset.spinnerFormInit === '1') return;
+
+      form.addEventListener('submit', function(e) {
+        const clickedInput = form._clickedSubmit;
+        if (!clickedInput) return;
+
+        if (clickedInput.disabled) return;
+
+        // Disable all submit buttons in the form
+        const allSubmits = form.querySelectorAll('input[type="submit"]');
+        allSubmits.forEach(btn => btn.disabled = true);
+
+        // Add spinner and loading class only to clicked button
+        clickedInput.classList.add('submit-loading');
+        const spinner = createSpinner();
+        positionSpinner(clickedInput, spinner);
+        spinner.style.display = 'block';
+
+        // Optional: reposition on scroll/resize
+        window.addEventListener('scroll', () => {
+          if (spinner.style.display === 'block') positionSpinner(clickedInput, spinner);
+        });
+        window.addEventListener('resize', () => {
+          if (spinner.style.display === 'block') positionSpinner(clickedInput, spinner);
+        });
+
+        // Clean up _clickedSubmit
+        form._clickedSubmit = null;
+      });
+
+      form.dataset.spinnerFormInit = '1';
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSubmitSpinners);
+  } else {
+    initSubmitSpinners();
+  }
+})();
+]]>
+</body>
+<initialization>
+</initialization>
+</script>

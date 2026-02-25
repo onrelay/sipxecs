@@ -1,40 +1,32 @@
 var searchPanel = {
-    // property: placeholder
-    // label that is displayed inside of the search box when it's not active
-    placeholder:null,
+    placeholder: null,
 
-    /**
-     * Function: register
-     * 
-     * Installs onclick and onblur handlers.
-     * Fixes Safari problem with styled controls.
-     * Initialized display value to placeholder.
-     */
-    register:function(searchBox, placeholder) {
-        this.placeholder = placeholder
+    register: function(searchBox, placeholder) {
+        this.placeholder = placeholder;
         searchBox.value = this.placeholder;
 
-        if (navigator.userAgent.indexOf("Safari") < 0) {
-            dojo.byId('searchContainer').className = "styled";
-        }
+        // Add initial class
+        var container = document.getElementById('searchContainer');
+        if (container) container.className = "styled";
 
-        dojo.event.connect(searchBox, "onclick", this, "onClick");
-        dojo.event.connect(searchBox, "onblur", this, "onBlur");
+        // Event handlers
+        searchBox.addEventListener('focus', this.onClick.bind(this));
+        searchBox.addEventListener('blur', this.onBlur.bind(this));
     },
 
-    onClick:function(evt) {
+    onClick: function(evt) {
         var sb = evt.target;
-        if (sb.value == this.placeholder) {
+        if (sb.value === this.placeholder) {
             sb.value = "";
         }
         sb.className = "active";
     },
 
-    onBlur:function(evt) {
+    onBlur: function(evt) {
         var sb = evt.target;
-        if (sb.value == "") {
+        if (sb.value === "") {
             sb.value = this.placeholder;
             sb.className = "inactive";
         }
     }
-}
+};

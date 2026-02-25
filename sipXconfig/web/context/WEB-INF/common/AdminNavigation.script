@@ -3,8 +3,6 @@
 	"-//Apache Software Foundation//Tapestry Script Specification 3.0//EN"
 	"http://jakarta.apache.org/tapestry/dtd/Script_3_0.dtd">
 <script>
-<include-script resource-path="/org/sipfoundry/sipxconfig/components/ie-fix.js"/>
 <initialization>
-hoverToOverForIE();    
 </initialization>
 </script>

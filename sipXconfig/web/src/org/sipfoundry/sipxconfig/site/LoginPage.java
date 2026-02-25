@@ -42,6 +42,12 @@ public abstract class LoginPage extends PageWithCallback implements PageBeginRen
     @Asset("context:/WEB-INF/common/PasswordToggle.script")
     public abstract IAsset getPasswordToggleScript();
 
+    @Asset("context:/WEB-INF/common/SubmitSpinner.script")
+    public abstract IAsset getSubmitSpinnerScript();
+
+    @Asset("context:/WEB-INF/common/LoadingSpinner.script")
+    public abstract IAsset getLoadingSpinnerScript();
+
     @Override
     public void pageBeginRender(PageEvent event) {
         // If there are no users in the DB, then redirect to the FirstUser page to make one.
