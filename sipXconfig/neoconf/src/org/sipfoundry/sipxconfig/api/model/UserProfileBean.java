@@ -62,8 +62,8 @@ public class UserProfileBean extends UserProfile {
             UserProfileBean bean = new UserProfileBean();
             BeanUtils.copyProperties(bean, userProfile);
             return bean;
-        } catch (Exception ex) {
-            return null;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

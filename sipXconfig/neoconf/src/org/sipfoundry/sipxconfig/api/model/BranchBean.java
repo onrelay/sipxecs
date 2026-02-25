@@ -33,8 +33,9 @@ public class BranchBean extends Branch {
             BranchBean bean = new BranchBean();
             BeanUtils.copyProperties(bean, branch);
             return bean;
-        } catch (Exception ex) {
-            return null;
+        } catch (Exception e) {
+            LOG.error("Cannot copy properties", e );
+            throw new RuntimeException(e);
         }
     }
 
@@ -42,7 +43,8 @@ public class BranchBean extends Branch {
         try {
             BeanUtils.copyProperties(branch, branchBean);
         } catch (Exception e) {
-            LOG.error("Cannot marshal properties");
+            LOG.error("Cannot copy properties", e );
+            throw new RuntimeException(e);
         }
     }
 }

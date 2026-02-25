@@ -79,7 +79,8 @@ public class CallGroupApiImpl implements CallGroupApi {
             	userRing.setType(AbstractRing.Type.getEnum(ring.getTypeStr()));            	
             }
         } catch (Exception e) {
-            LOG.error("Cannot marshal properties");
+            LOG.error("Cannot marshal properties", e);
+			throw new RuntimeException(e);
         }
 	}
 

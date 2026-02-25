@@ -26,27 +26,31 @@ public class CallGroupBean {
     private boolean m_useFwdTimers;    
     private List<RingBean> m_ringBeans = new ArrayList<RingBean>();
     
-    public static CallGroupBean convertCallGroup(CallGroup callGroup) throws Exception{
+    public static CallGroupBean convertCallGroup(CallGroup callGroup) {
         if (callGroup == null) {
             return null;
         }
         
-        CallGroupBean bean = new CallGroupBean();
-        BeanUtils.copyProperties(bean, callGroup);
-        List<AbstractRing> rings = callGroup.getRings();
-        for (AbstractRing ring : rings) {
-            UserRing userRing = (UserRing) ring;
-            RingBean ringBean = new RingBean();
-            ringBean.setEnabled(userRing.isEnabled());
-            ringBean.setExpiration(userRing.getExpiration());
-            if (!userRing.isFirst()) {
-            	ringBean.setTypeStr(userRing.getType() == null ? UserRing.Type.DELAYED.getName() : userRing.getType().getName());
-            }
-            ringBean.setUserName(userRing.getUser().getName());
-            bean.insertRingBean(ringBean);
-        }
-        return bean;
-        
+		try {
+			CallGroupBean bean = new CallGroupBean();
+			BeanUtils.copyProperties(bean, callGroup);
+			List<AbstractRing> rings = callGroup.getRings();
+			for (AbstractRing ring : rings) {
+				UserRing userRing = (UserRing) ring;
+				RingBean ringBean = new RingBean();
+				ringBean.setEnabled(userRing.isEnabled());
+				ringBean.setExpiration(userRing.getExpiration());
+				if (!userRing.isFirst()) {
+					ringBean.setTypeStr(userRing.getType() == null ? UserRing.Type.DELAYED.getName() : userRing.getType().getName());
+				}
+				ringBean.setUserName(userRing.getUser().getName());
+				bean.insertRingBean(ringBean);
+			}
+			return bean;
+		} catch( Exception e ) {
+			throw new RuntimeException( e );
+		}
+     
     }
 
     

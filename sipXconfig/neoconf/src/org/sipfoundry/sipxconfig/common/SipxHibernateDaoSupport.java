@@ -182,6 +182,7 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
                 BeanUtils.copyProperties(mergedEntity, entity);
 
             } catch( IllegalStateException | IllegalAccessException | InvocationTargetException e ) {
+                throw new RuntimeException(e);
             }
         });
     }

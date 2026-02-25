@@ -22,9 +22,9 @@ import org.sipfoundry.sipxconfig.freeswitch.FreeswitchExtensionProvider;
 public interface CallQueueContext extends FreeswitchExtensionProvider, AliasOwner, ReplicableProvider,
         ConfigProvider, PostConfigListener {
 
-    public static final String CALL_FEATURE_ID = CallQueueContext.CALL_QUEUE;
-    public static final LocationFeature FEATURE = new LocationFeature(CALL_FEATURE_ID);
     public static final String CALL_QUEUE = "callqueue";
+    public static final String CALL_FEATURE_ID = CALL_QUEUE;
+    public static final LocationFeature FEATURE = new LocationFeature(CALL_FEATURE_ID);
     public static final String CALL_QUEUE_GROUP_ID = CALL_QUEUE;
     public static final String CALL_QUEUE_AGENT_GROUP_ID = "callqueueagent";
 
