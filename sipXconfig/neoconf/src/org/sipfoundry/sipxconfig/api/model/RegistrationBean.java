@@ -16,7 +16,6 @@ package org.sipfoundry.sipxconfig.api.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import jakarta.xml.bind.annotation.XmlElement;
@@ -46,44 +45,49 @@ public class RegistrationBean extends RegistrationItem {
         m_timeToExpire = expire;
     }
 
-    public static RegistrationBean convertRegistration(RegistrationItem item, long now) throws Exception {
-        RegistrationBean bean = new RegistrationBean();
-        BeanUtils.copyProperties(bean, item);
-        long timeToExpire = item.timeToExpireAsSeconds(now);
-        if (timeToExpire > 0) {
-            bean.setStatus("active");
-            bean.setSecondsToExpire(timeToExpire);
-        } else {
-            bean.setStatus("expired");
+    public static RegistrationBean convertRegistration(RegistrationItem item, long now) {
+
+        try {
+            RegistrationBean bean = new RegistrationBean();
+            BeanUtils.copyProperties(bean, item);
+            long timeToExpire = item.timeToExpireAsSeconds(now);
+            if (timeToExpire > 0) {
+                bean.setStatus("active");
+                bean.setSecondsToExpire(timeToExpire);
+            } else {
+                bean.setStatus("expired");
+            }
+            return bean;
+        } catch( Exception e ) {
+            throw new RuntimeException( e );
         }
-        return bean;
     }
 
     public static List<RegistrationBean> buildRegistrationList(Collection<RegistrationItem> items, long now) {
-        try {
-            List<RegistrationBean> registrations = new LinkedList<RegistrationBean>();
+        
+        List<RegistrationBean> registrations = new ArrayList<RegistrationBean>();
+
+        if( items != null ) {
             for (RegistrationItem item : items) {
                 registrations.add(convertRegistration(item, now));
             }
-            if (registrations.size() > 0) {
-                return registrations;
-            }
-        } catch (Exception ex) {
-            return null;
         }
-        return null;
+
+        return registrations;
     }
 
-    @XmlRootElement(name = "Registrations")
     public static class RegistrationList {
 
         private List<RegistrationBean> m_registrations;
 
-        public void setRegistrations(List<RegistrationBean> regs) {
-            m_registrations = regs;
+        public void setRegistrations(List<RegistrationBean> registrations) {
+            getRegistrations().clear();
+            if( registrations != null ) {
+                getRegistrations().addAll( registrations );
+            }
+            m_registrations = registrations;
         }
 
-        @XmlElement(name = "Registration")
         public List<RegistrationBean> getRegistrations() {
             if (m_registrations == null) {
                 m_registrations = new ArrayList<RegistrationBean>();
