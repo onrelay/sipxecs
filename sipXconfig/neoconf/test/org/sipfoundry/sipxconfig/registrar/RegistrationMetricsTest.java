@@ -19,7 +19,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.sipfoundry.sipxconfig.commserver.imdb.RegistrationItem;
-import org.sipfoundry.sipxconfig.registrar.RegistrationMetrics.UniqueRegistrations;
 
 public class RegistrationMetricsTest extends TestCase {
     private RegistrationMetrics m_metrics;
@@ -28,7 +27,7 @@ public class RegistrationMetricsTest extends TestCase {
         m_metrics = new RegistrationMetrics();
     }
 
-    public void testUniqueRegistrations() {
+    public void testUniqueRegistration() {
         String[][] regData = {
                 {
                     "contact1", "10"
@@ -54,11 +53,11 @@ public class RegistrationMetricsTest extends TestCase {
             }
             
             m_metrics.setRegistrations(regs);
-            List<UniqueRegistrations> cleanRegs = new ArrayList<>(m_metrics.getUniqueRegistrations());
+            List<RegistrationItem> cleanRegs = new ArrayList<>(m_metrics.getTotalRegistrations());
             assertEquals(3, cleanRegs.size());
-            assertTrue(cleanRegs.get(0).getContacts().contains( "contact1"));
-            assertTrue(cleanRegs.get(1).getContacts().contains( "contact2"));
-            assertTrue(cleanRegs.get(2).getContacts().contains( "contact3"));
+            assertTrue(m_metrics.getContacts().contains( "contact1"));
+            assertTrue(m_metrics.getContacts().contains( "contact2"));
+            assertTrue(m_metrics.getContacts().contains( "contact3"));
     }
 
     public void testCalculateMetricsEmpty() {

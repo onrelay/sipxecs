@@ -31,6 +31,8 @@ import org.sipfoundry.sipxconfig.registrar.RegistrationContext;
 public abstract class RegistrationsTable extends BaseComponent {
     public static final Log LOG = LogFactory.getLog(RegistrationsTable.class);
 
+    private static final String COLUMN_NAMES = "uri,contact,expires,server,instrument";
+
     @InjectObject(value = "spring:registrationContext")
     public abstract RegistrationContext getRegistrationContext();
 
@@ -56,24 +58,27 @@ public abstract class RegistrationsTable extends BaseComponent {
     }
 
     public String getColumnNames() {
-        StringBuilder columnNames = new StringBuilder("uri,contact,expires,server,instrument");
-        return columnNames.toString();
+        return COLUMN_NAMES;
     }
 
     public Object getExpires() {
         RegistrationItem item = getCurrentRow();
-        long timeToExpire = item.timeToExpireAsSeconds(getStartTime());
-        if (timeToExpire > 0) {
-            return timeToExpire;
+        if( item != null ) {
+            long timeToExpire = item.timeToExpireAsSeconds(getStartTime());
+            if (timeToExpire > 0) {
+                return timeToExpire;
+            }
         }
         return getMessages().getMessage("status.expired");
     }
     
     public Object getServer() {
         RegistrationItem item = getCurrentRow();
-        String server = item.getPrimary();
-        if (!StringUtils.isEmpty(server)) {
-            return server;
+        if( item != null ) {
+            String server = item.getPrimary();
+            if (!StringUtils.isEmpty(server)) {
+                return server;
+            }
         }
         return getMessages().getMessage("status.server");
     }

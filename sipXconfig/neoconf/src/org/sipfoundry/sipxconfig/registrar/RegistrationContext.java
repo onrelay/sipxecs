@@ -59,8 +59,8 @@ public interface RegistrationContext {
     
     public abstract void saveTimeRegistrationStatistics(TimeRegistrationStatistics trs);
     
-    public abstract long getTimeRegStatCount();
-    
+    public abstract void operateTimeRegistrationStatistics();
+
     public List<TimeRegistrationStatistics> getTimeRegStats();
 
     @Deprecated

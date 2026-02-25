@@ -120,8 +120,8 @@ public abstract class Registrations extends SipxBasePage implements PageBeginRen
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_MONTH, -1);
         Date pastDayDate = calendar.getTime();
-        final TimeSeries s1 = new TimeSeries("Total Registrations", Minute.class);
-        final TimeSeries s2 = new TimeSeries("Active Registrations", Minute.class);
+        final TimeSeries s1 = new TimeSeries("Total", Minute.class);
+        final TimeSeries s2 = new TimeSeries("Active", Minute.class);
         for (TimeRegistrationStatistics trStat : timeRegStatsList) {
             if(trStat.getTime().after(pastDayDate)) {
                 s1.add(new Minute(trStat.getTime()), trStat.getTotal());            
@@ -136,17 +136,18 @@ public abstract class Registrations extends SipxBasePage implements PageBeginRen
 
      private JFreeChart createChart( final XYDataset dataset ) {
         JFreeChart chart = ChartFactory.createTimeSeriesChart(             
-           "Time Registration Chart", 
+           null, // title
            "Date",              
            "Value",              
            dataset,             
            true,              
            false,              
            false);
+        chart.setBackgroundPaint(null);
         final XYPlot plot = chart.getXYPlot();
         XYLineAndShapeRenderer lineRenderer = new XYLineAndShapeRenderer(true, false);
-        lineRenderer.setSeriesPaint(0, Color.blue);
-        lineRenderer.setSeriesPaint(1, Color.red);
+        lineRenderer.setSeriesPaint(0, Color.darkGray);
+        lineRenderer.setSeriesPaint(1, Color.green);
         lineRenderer.setBaseStroke(new BasicStroke(3.0f));
         lineRenderer.setAutoPopulateSeriesStroke(false);
         plot.setRenderer(lineRenderer);

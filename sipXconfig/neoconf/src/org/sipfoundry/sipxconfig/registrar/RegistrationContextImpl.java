@@ -57,7 +57,7 @@ public class RegistrationContextImpl implements RegistrationContext {
      */
     @Override
     public List<RegistrationItem> getRegistrations() {
-        return getItems(getRegistrarCollection().find(getRegistrationsQuery()));
+        return parseRegistrations(getRegistrarCollection().find(getRegistrationsQuery()));
     }
 
     @Override
@@ -67,61 +67,61 @@ public class RegistrationContextImpl implements RegistrationContext {
     
     @Override
     public List<RegistrationItem> getRegistrations(Integer start, Integer count) {
-        return getItems(getRegistrarCollection().find(getRegistrationsQuery())
+        return parseRegistrations(getRegistrarCollection().find(getRegistrationsQuery())
                 .sort(new Document(EXPIRATION_TIME, -1)).skip(start).limit(count));
     }
 
     @Override
     public List<RegistrationItem> getRegistrationsByUser(User user) {
-        return getItems(getRegistrarCollection().find(getUserQuery(user)));
+        return parseRegistrations(getRegistrarCollection().find(getUserQuery(user)));
     }
     
     @Override
     public List<RegistrationItem> getRegistrationsByUsers(Collection<User> users) {
-        return getItems(getRegistrarCollection().find(getUsersQuery(users)));
+        return parseRegistrations(getRegistrarCollection().find(getUsersQuery(users)));
     }
 
     @Override
     public List<RegistrationItem> getRegistrationsByUser(User user, Integer start, Integer count) {
-        return getItems(getRegistrarCollection().find(getUserQuery(user))
+        return parseRegistrations(getRegistrarCollection().find(getUserQuery(user))
                 .sort(new Document(EXPIRATION_TIME, -1)).skip(start).limit(count));
     }
     
     @Override
     public List<RegistrationItem> getRegistrationsByUsers(Collection<User> users, Integer start, Integer count) {
-        return getItems(getRegistrarCollection().find(getUsersQuery(users))
+        return parseRegistrations(getRegistrarCollection().find(getUsersQuery(users))
                 .sort(new Document(EXPIRATION_TIME, -1)).skip(start).limit(count));
     }
 
     @Override
     public List<RegistrationItem> getRegistrationsByLineId(String line) {
-        return getItems(getRegistrarCollection().find(getLineQuery(line)));
+        return parseRegistrations(getRegistrarCollection().find(getLineQuery(line)));
     }
 
     @Override
     public List<RegistrationItem> getRegistrationsByMac(String mac) {
-        return getItems(getRegistrarCollection().find(getMacQuery(mac)));
+        return parseRegistrations(getRegistrarCollection().find(getMacQuery(mac)));
     }
 
     @Override
     public List<RegistrationItem> getRegistrationsByIp(String ip) {
-        return getItems(getRegistrarCollection().find(getIpQuery(ip)));
+        return parseRegistrations(getRegistrarCollection().find(getIpQuery(ip)));
     }
 
     @Override
     public List<RegistrationItem> getRegistrationsByServer(String server) {
-        return getItems(getRegistrarCollection().find(getServerQuery(server)));
+        return parseRegistrations(getRegistrarCollection().find(getServerQuery(server)));
     }
 
     @Override
     public List<RegistrationItem> getRegistrationsByServer(String server, Integer start, Integer limit) {
-        return getItems(getRegistrarCollection().find(getServerQuery(server))
-                .sort(new Document("expirationTime", -1)).skip(start).limit(limit));
+        return parseRegistrations(getRegistrarCollection().find(getServerQuery(server))
+                .sort(new Document(EXPIRATION_TIME, -1)).skip(start).limit(limit));
     }
 
     @Override
     public List<RegistrationItem> getRegistrationsByCallId(String callId) {
-        return getItems(getRegistrarCollection().find(getCallIdQuery(callId)));
+        return parseRegistrations(getRegistrarCollection().find(getCallIdQuery(callId)));
     }
 
     @Override
@@ -166,14 +166,15 @@ public class RegistrationContextImpl implements RegistrationContext {
     
     @Override
     public void saveTimeRegistrationStatistics(TimeRegistrationStatistics trs) {
-        m_nodedb.save(trs);
-    }
-    
-    @Override
-    public long getTimeRegStatCount() {
-        return getTimeRegStatCollection().countDocuments();
 
+        Document document = new Document()
+            .append("m_time", trs.getTime())
+            .append("m_total", trs.getTotal())
+            .append("m_active", trs.getActive());
+
+        getTimeRegStatCollection().insertOne(document);
     }
+
     
     @Override
     public List<TimeRegistrationStatistics> getTimeRegStats() {
@@ -190,7 +191,7 @@ public class RegistrationContextImpl implements RegistrationContext {
         return listStats;
     }
     
-    
+    @Override
     public void operateTimeRegistrationStatistics() {
         LOG.debug("Run registration statistics: ");
         long startRenderingTime = System.currentTimeMillis() / DateUtils.MILLIS_PER_SECOND;
@@ -198,46 +199,49 @@ public class RegistrationContextImpl implements RegistrationContext {
         metrics.setRegistrations(getRegistrations());
         metrics.setStartTime(startRenderingTime);
         int activeRegistrations = metrics.getActiveRegistrationCount();
-        int totalRegistrations = metrics.getUniqueRegistrations().size();
+        int totalRegistrations = metrics.getTotalRegistrationCount();
         TimeRegistrationStatistics trs = new TimeRegistrationStatistics();
         trs.setActive(activeRegistrations);
         trs.setTotal(totalRegistrations);
         trs.setTime(Calendar.getInstance().getTime());
         saveTimeRegistrationStatistics(trs);
-        if (getTimeRegStatCount() > 1440) {
+        if (totalRegistrations > 1440) {
             Document oldest = getTimeRegStatCollection()
                 .find()
-                .sort(Sorts.ascending("_id")) // or use a timestamp field if available
                 .limit(1)
                 .first();
 
             if (oldest != null) {
-                getTimeRegStatCollection().deleteOne(Filters.eq("_id", oldest.getObjectId("_id")));
+                getRegistrarCollection().deleteOne(Filters.eq("_id", oldest.getObjectId("_id")));
             }
         }
         LOG.debug("Finished running registration statistics");
     }
 
-    private static List<RegistrationItem> getItems(FindIterable<Document> cursor ) {
-        List<RegistrationItem> items = new ArrayList<RegistrationItem>();
-        for( Document registration : cursor ) {
-            RegistrationItem item = new RegistrationItem();
-            item.setContact((String) registration.get(REG_CONTACT));
-            item.setPrimary(StringUtils.substringBefore((String) registration.get(LOCAL_ADDRESS), "/"));
-            // handle change from integer type to long in expiration time
-            Object expires = registration.get(EXPIRATION_TIME);
+    private static List<RegistrationItem> parseRegistrations(FindIterable<Document> cursor ) {
+        List<RegistrationItem> regisrationItems = new ArrayList<RegistrationItem>();
+        for( Document document : cursor ) {
+            RegistrationItem registrationItem = new RegistrationItem();
+            registrationItem.setContact((String) document.get(REG_CONTACT));
+            // Handle LOCAL_ADDRESS safely even if null or missing
+            String localAddress = document.getString(LOCAL_ADDRESS);
+            registrationItem.setPrimary(StringUtils.substringBefore(localAddress == null ? "" : localAddress, "/"));
+
+            Object expires = document.get(EXPIRATION_TIME);
             if (expires instanceof Date) {
-                item.setExpires((Date) expires);
+                registrationItem.setExpires((Date) expires);
+            } else if (expires instanceof Number) {
+                registrationItem.setExpires(new Date(((Number) expires).longValue()));
             } else {
-                item.setExpires(new Date());
+                registrationItem.setExpires(new Date()); // Fallback
             }
-            item.setUri((String) registration.get(URI));
-            item.setInstrument((String) registration.get(INSTRUMENT));
-            item.setRegCallId((String) registration.get(CALL_ID));
-            item.setIdentity((String) registration.get(IDENTITY));
-            items.add(item);
+            registrationItem.setUri((String) document.get(URI));
+            registrationItem.setInstrument((String) document.get(INSTRUMENT));
+            registrationItem.setRegCallId((String) document.get(CALL_ID));
+            registrationItem.setIdentity((String) document.get(IDENTITY));
+            regisrationItems.add(registrationItem);
         }
-        return items;
+        return regisrationItems;
     }
 
     private Bson getRegistrationsQuery() {

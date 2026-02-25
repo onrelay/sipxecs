@@ -6,7 +6,7 @@
     <ul>
       <li>
         <span jwcid="@Insert" value="message:registrationCount"/> :
-        <span jwcid="@Insert" value="ognl:metrics.uniqueRegistrations.size()"/> </li>
+        <span jwcid="@Insert" value="ognl:metrics.totalRegistrationCount"/> </li>
       <li>
         <span jwcid="@Insert" value="message:activeRegistrationCount"/> :
         <span jwcid="@Insert" value="ognl:metrics.activeRegistrationCount"/>
@@ -15,6 +15,6 @@
         <span jwcid="@Insert" value="message:registrationBalance"/> :
         <span jwcid="@Insert" value="ognl:metrics.loadBalance" format="bean:twoDigitDecimal"/> </li>
     </ul>
-	<span jwcid="@setting/RegistrationsTable" registrations="ognl:metrics.uniqueRegistrations"/>
+	<span jwcid="@setting/RegistrationsTable" registrations="ognl:metrics.registrations"/>
   </form>
 </div>

@@ -13,21 +13,67 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.LinkedHashSet;
+import java.util.TreeMap;
 
 import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.FactoryUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.map.LazyMap;
-import org.apache.commons.collections4.map.LinkedMap;
 import org.sipfoundry.sipxconfig.commserver.imdb.RegistrationItem;
 
 /**
  * Metrics about registration distributions
  */
 public class RegistrationMetrics {
-    private Collection<UniqueRegistrations> m_uniqueRegistrations;
+
+    private Set<RegistrationItem> m_registrations;
+
+    private Set<RegistrationItem> m_activeRegistrations;
+
+    private Map<String, RegistrationItem> m_uniqueRegistrations;
+
     private long m_startTime;
+
+    public Collection<RegistrationItem> getRegistrations() {
+        if( m_registrations == null ) {
+            m_registrations = new LinkedHashSet<>();
+        }
+        return m_registrations;
+    }
+
+    public Map<String, RegistrationItem> getUniqueRegistrations() {
+        if( m_uniqueRegistrations == null ) {
+            m_uniqueRegistrations = new TreeMap<>();
+        }
+        return m_uniqueRegistrations;
+    }
+
+    public Collection<RegistrationItem> getActiveRegistrations() {
+        if( m_activeRegistrations == null ) {
+            m_activeRegistrations = new LinkedHashSet<>();
+        }
+        return m_activeRegistrations;
+    }
+
+    public int getActiveRegistrationCount() {
+        return getActiveRegistrations().size();
+    }
+
+    public Collection<RegistrationItem> getTotalRegistrations() {
+
+        return getUniqueRegistrations().values();
+    }
+
+    public int getTotalRegistrationCount() {
+        return getTotalRegistrations().size();
+    }
+
+    public Collection<String> getContacts() {
+        return getUniqueRegistrations().keySet();
+    }
 
     /**
      * All registrations from registration.xml which may include redunant
@@ -35,9 +81,31 @@ public class RegistrationMetrics {
      * w/o unregistering last uri.
      */
     public void setRegistrations(List<RegistrationItem> registrations) {
-        UniqueRegistrations unique = new UniqueRegistrations();
-        CollectionUtils.forAllDo(registrations, unique);
-        setUniqueRegistrations(unique.getRegistrations());
+
+        getRegistrations().clear();
+
+        if( registrations != null ) {
+
+            for( RegistrationItem registration : registrations ) {
+
+                if( registration != null ) {
+
+                    String contact = registration.getContact();
+
+                    RegistrationItem oldRegistration = getUniqueRegistrations().get(contact);
+
+                    if( oldRegistration == null || registration.compareTo(oldRegistration) > 0 )  {
+
+                        getUniqueRegistrations().put( contact, registration );
+                    }
+
+                    if( registration.timeToExpireAsSeconds(m_startTime) > 0) {
+                        getActiveRegistrations().add( registration );
+                    }
+                }
+                getRegistrations().add( registration );
+            }
+        }
     }
 
     public void setStartTime(long startTime) {
@@ -46,74 +114,13 @@ public class RegistrationMetrics {
 
     public double getLoadBalance() {
         LoadDistribution metric = new LoadDistribution();
-        // decided to count expired registrations, shouldn't matter and more history
-        // gives a more accurate value.
-        if( m_uniqueRegistrations != null ) {
-            CollectionUtils.forAllDo(m_uniqueRegistrations, metric);
+
+        for( RegistrationItem registrationItem : getTotalRegistrations() ) {
+            metric.execute( registrationItem );
         }
+        
         double loadBalance = metric.getLoadBalance();
         return loadBalance;
-    }
-
-    public int getActiveRegistrationCount() {
-        if( m_uniqueRegistrations == null ) {
-            return 0;
-        }
-        int count = CollectionUtils.countMatches(m_uniqueRegistrations, new ActiveRegistrations(
-                m_startTime));
-        return count;
-    }
-
-    public Collection<UniqueRegistrations> getUniqueRegistrations() {
-        return m_uniqueRegistrations;
-    }
-
-    void setUniqueRegistrations(Collection<UniqueRegistrations> registrations) {
-        m_uniqueRegistrations = registrations;
-    }
-
-    /**
-     * Filter out multiple registrations for a single contact
-     */
-    static class UniqueRegistrations implements Closure {
-        private LinkedMap<String, UniqueRegistrations> m_contact2registration = new LinkedMap<>();
-
-        public Collection<UniqueRegistrations> getRegistrations() {
-            return m_contact2registration.values();
-        }
-
-        public Collection<String> getContacts() {
-            return m_contact2registration.keySet();
-        }
-
-        public void execute(Object input) {
-            RegistrationItem ri = (RegistrationItem) input;
-            String contact = ri.getContact();
-            UniqueRegistrations riOld = m_contact2registration.get(contact);
-            // replace older registrations
-            if (riOld == null || ri.compareTo(riOld) > 0) {
-                m_contact2registration.put(contact, riOld);
-            }
-        }
-    }
-
-    /**
-     * Filter out expired registrations
-     */
-    static class ActiveRegistrations implements Predicate {
-        private long m_startTime;
-
-        ActiveRegistrations(long startTime) {
-            m_startTime = startTime;
-        }
-
-        public boolean evaluate(Object input) {
-            RegistrationItem reg = (RegistrationItem) input;
-            if (reg != null && reg.timeToExpireAsSeconds(m_startTime) > 0) {
-                return true;
-            }
-            return false;
-        }
     }
 
     /**
