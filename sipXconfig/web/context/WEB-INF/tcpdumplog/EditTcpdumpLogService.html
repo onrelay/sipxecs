@@ -1,4 +1,4 @@
-<div jwcid="@common/Border" useDojo="true" borderTitle="ognl:borderTitle">
+<div jwcid="@common/Border" useDojo="ognl:true" borderTitle="ognl:borderTitle">
   <span jwcid="@common/TabNavigation" tabNames="ognl:{'configure', 'reports'}" selectedTab="ognl:tab"/>
   <div id="settings-content">
     <span jwcid="@RenderBlock" block="ognl:components.get(tab + 'Tab')" />
