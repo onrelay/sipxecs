@@ -52,23 +52,21 @@ public abstract class EditSbc extends PageWithCallback implements PageBeginRende
     public abstract boolean getEnforceInternetCallingSupport();
 
     public void pageBeginRender(PageEvent event) {
-        if (getSbc() != null) {
-            return;
-        }
+
+        Sbc sbc = getSbc();
 
         Integer sbcId = getSbcId();
-        Sbc sbc;
-        if (sbcId != null) {
+
+
+        if( sbcId != null && sbc.getId() == null ) {
             sbc = getSbcManager().loadSbc(sbcId);
-        } else {
-            sbc = new AuxSbc();
-            sbc.setRoutes(new SbcRoutes());
-        }
-        setSbc(sbc);
-        SbcDevice sbcDevice = sbc.getSbcDevice();
-        if (sbcDevice != null) {
-            setSelectedSbcDevice(sbcDevice);
-        }
+
+            SbcDevice sbcDevice = sbc.getSbcDevice();
+            if (sbcDevice != null) {
+                setSelectedSbcDevice(sbcDevice);
+            }
+            setSbc(sbc);
+        }   
     }
 
     public void save() {
@@ -84,9 +82,9 @@ public abstract class EditSbc extends PageWithCallback implements PageBeginRende
         }
         sbc.setSbcDevice(getSelectedSbcDevice());
         getSbcManager().saveSbc(sbc);
-        // update IDs of newly saved SBC
         if (getSbcId() == null) {
             setSbcId(sbc.getId());
+            setSbc( sbc );
         }
     }
 }
