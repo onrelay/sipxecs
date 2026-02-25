@@ -270,7 +270,7 @@ stylecmd_PKGS = \
 	checkstyle \
 	google-collection \
 	commons-beanutils-core \
-	commons-cli \	
+	commons-cli \
 	commons-logging-jakarta  \
 	antlr
 
