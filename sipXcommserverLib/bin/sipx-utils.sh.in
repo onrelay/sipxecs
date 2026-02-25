@@ -504,7 +504,7 @@ getRunningProcessID() {
                 
             pid=$(pgrep -f "$regex")
 
-            if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+            if [ -n "$pid" ] && kill -0 "$pid" > /dev/null 2>&1; then
 
                 if [[ -n "$pidfile" ]]; then
                     echo "$pid" > "$pidfile"
@@ -605,7 +605,7 @@ killAnyProcessOrphans() {
     [ $? -ne 0 ] && return $ESRCH  
 
     # First attempt graceful TERM
-    kill -TERM ${pid} 2>/dev/null
+    kill -TERM ${pid} > /dev/null 2>&1
 
     # Wait for process to exit
     for ((i=0; i<$timeout; i++)); do
@@ -627,7 +627,7 @@ killAnyProcessOrphans() {
     fi
 
     if [ -f "$pidfile" ]; then
-        rm -f "$pidfile"  > /dev/null
+        rm -f "$pidfile"  > /dev/null 2>&1
     fi
 
     return 0
