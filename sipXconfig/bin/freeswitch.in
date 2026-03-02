@@ -13,23 +13,24 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin:@FREESWITCH_PREFIX@/bin
 DESC="FreeSwitch Voice Switching System"
 NAME=freeswitch
-DAEMON=$NAME
+EXEC=$NAME
 FS_USER=freeswitch
 FS_GROUP=daemon
 FS_CLI=fs_cli
-DAEMON_ARGS="\
+EXEC_ARGS="\
   -conf @SIPX_FSCONFDIR@/sipxpbx/conf \
   -db @SIPX_FSDBDIR@ \
   -log @SIPX_FSLOGDIR@ \
   -run @SIPX_FSRUNDIR@ \
   -htdocs @SIPX_FSCONFDIR@/sipxpbx/conf/htdoc"
-DAEMON_START_ARGS="-nc -nonat \
+EXEC_START_ARGS="-nc -nonat \
   -u $FS_USER \
   -g $FS_GROUP \
-   $DAEMON_ARGS"
-DAEMON_STOP_ARGS="-stop \
-   $DAEMON_ARGS"
+   $EXEC_ARGS"
+EXEC_STOP_ARGS="-stop \
+   $EXEC_ARGS"
 PIDFILE=@SIPX_FSRUNDIR@/freeswitch.pid
+REGEX="^$EXEC"
 
 do_setlimits() {
         ulimit -c unlimited
@@ -92,21 +93,21 @@ do_audio_setup() {
 base=${0##*/}
 
 do_start() {
-  checkRunningProcessIsListening $PIDFILE > /dev/null 2>&1
+  checkRunningProcessIsListening $PIDFILE $EXEC > /dev/null 2>&1
   RETVAL=$?
   [ $RETVAL -eq 0 ] && { echo -n "$NAME $runningError"; echo_failure; exit $ERUNNING; }
   do_setlimits
   do_permission_check
   do_audio_setup
-  $DAEMON $DAEMON_START_ARGS
+  $EXEC $EXEC_START_ARGS > /dev/null 2>&1 & echo \$! > ${PIDFILE}
   RETVAL=$?
 
   if [ $# -gt 0 ]; then
     #check if process spawned
-    checkRunningProcessTimeout $PIDFILE > /dev/null 2>&1
+    checkRunningProcessTimeout $PIDFILE $EXEC > /dev/null 2>&1
     RETVAL=$?
     [ $RETVAL -eq 0 ] || { echo_failure; exit $ESRCH; }
-    checkIfProcessIsListening $PIDFILE > /dev/null 2>&1
+    checkIfProcessIsListening $PIDFILE $EXEC > /dev/null 2>&1
     RETVAL=$?
     [ $RETVAL -eq 0 ] || { echo_failure; exit $ENOSCKT; }
     [ $RETVAL -eq 0 ] && { echo_success; }
@@ -117,43 +118,13 @@ do_start() {
   fi
 }
 
-do_kill() {
-  if [ -f "$PIDFILE" ]; then
-      pid=$(cat "$PIDFILE")
-      if kill -0 "$pid" 2>/dev/null; then
-          kill -TERM "$pid"
-      fi
-  fi
-}
-
 do_stop() {
-  fspid=$(pgrep -x "$NAME")
-  status=$?
-  $DAEMON $DAEMON_STOP_ARGS
-  RETVAL=$?
-  if [ "$RETVAL" -eq 0 ]; then
-    echo "$base shutdown: success"
-  else
-    echo "$base shutdown: failed"
-  fi
-  echo "Waiting for daemon to exit..."
-  i=0
-  while [[ $status -lt 1 && $i -lt 10 ]]
-    do
-    sleep 1
-      fspid=$(pgrep -x "$NAME")
-  status=$?
-  i=$(expr $i + 1)
-  done
-  if [ $status -lt 1 ]; then
-    echo "Process did not exit cleanly. Aborting..."
-    do_kill
-  fi
-  rm -f $LOCKFILE
-  echo
-  return $RETVAL
+  echo -n $"Stopping $prog: "
+  killAnyProcessOrphans "${PIDFILE}" "${EXEC}" > /dev/null 2>&1
+  Status=$?
+  [ $Status -eq 0 ] || { echo_failure; }
+  [ $Status -eq 0 ] && { echo_success; }
 }
-
 
 do_reload() {
   $FS_CLI -x "reloadXml"
@@ -190,7 +161,7 @@ case "$1" in
     do_asyncrestart
     ;;
   status)
-    checkRunningProcessIsListening $PIDFILE
+    checkRunningProcessIsListening $PIDFILE $EXEC
     ;;
   *)
     echo $"Usage: $0 {start|stop|status}"

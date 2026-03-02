@@ -4,7 +4,6 @@ Documentation=https://github.com/onrelay/sipxecs
 After=network.target syslog.target
 
 [Service]
-# see man systemd.service
 Type=forking
 ExecStart=@SIPX_SERVICEDIR@/freeswitch start
 RemainAfterExit=true
