@@ -759,24 +759,23 @@ when_linking_children => "if_no_such_file"; # "override_file";
 
 body perms m(mode)
 {
-mode   => "$(mode)";
+  mode   => "$(mode)";
+  rxdirs => "true";
 }
-
-##
 
 body perms mo(mode,user)
 {
-owners => { "$(user)" };
-mode   => "$(mode)";
+  owners => { "$(user)" };
+  mode   => "$(mode)";
+  rxdirs => "true";
 }
-
-##
 
 body perms mog(mode,user,group)
 {
-owners => { "$(user)" };
-groups => { "$(group)" };
-mode   => "$(mode)";
+  owners => { "$(user)" };
+  groups => { "$(group)" };
+  mode   => "$(mode)";
+  rxdirs => "true";
 }
 
 ##
