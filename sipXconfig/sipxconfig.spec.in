@@ -253,6 +253,8 @@ ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/xpp3-*.jar %{buildroot
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXcommons/sipxcommons.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXconfig/sipxconfig-neoconf.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
 ln -sfn ../../../../../usr/share/java/sipXecs/sipXconfig/sipxconfig-web.jar %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+ln -sfn ../../../../../usr/share/java/sipXecs/sipXconfig/plugins %{buildroot}%{sipxpbxconf}/jetty/lib/ext/
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -265,7 +267,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %attr(755,root,root) %{sipxpbxconf}/jetty/lib/ext
 %attr(-,root,root) %{sipxpbxconf}/jetty/lib/ext/*
 %attr(755,root,root) %{_sysconfdir}/init.d/*
-%attr(644,root,root) %{_sysconfdir}/systemd/system/*
 %attr(644,root,root) %{_sysconfdir}/tmpfiles.d/*
 %attr(644,root,root) /usr/lib/systemd/system/*
 %{_datadir}/sipxecs/cfinputs/plugin.d/*.cf
