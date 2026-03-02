@@ -5,8 +5,38 @@
 <script>
 <body>
 <![CDATA[
+function initializeAboutDialog() {
+    const dialog = document.getElementById("aboutDialog");
+    const openLink = document.getElementById("aboutLink");
+    const closeButton = document.getElementById("aboutClose");
+
+    if (!dialog || !openLink || !closeButton) return;
+
+    // Open dialog
+    openLink.addEventListener("click", function(e) {
+        e.preventDefault();
+        dialog.hidden = false;
+        // optional: center using CSS absolute + margin
+        const rect = dialog.getBoundingClientRect();
+		dialog.style.marginLeft = "-" + (rect.width / 2) + "px";
+		dialog.style.marginTop  = "-" + (rect.height / 2) + "px";
+    });
+
+    // Close dialog
+    closeButton.addEventListener("click", function() {
+        dialog.hidden = true;
+    });
+
+    // Optional: click outside dialog closes it
+    document.addEventListener("click", function(e) {
+        if (!dialog.contains(e.target) && e.target !== openLink) {
+            dialog.hidden = true;
+        }
+    });
+}
 ]]>
 </body>
 <initialization>
+initializeAboutDialog();
 </initialization>
 </script>

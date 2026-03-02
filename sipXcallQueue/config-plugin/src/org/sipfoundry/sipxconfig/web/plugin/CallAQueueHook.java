@@ -6,10 +6,7 @@
  */
 package org.sipfoundry.sipxconfig.web.plugin;
 
-import org.apache.tapestry.html.BasePage;
+import org.sipfoundry.sipxconfig.site.SimplePluginHook;
 
-/**
- * Tapestry 4 page, for dynamic code behind your menu links, should you need any.
- */
-public abstract class CallAQueueHook extends BasePage {
+public abstract class CallAQueueHook extends SimplePluginHook {
 }

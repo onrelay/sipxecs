@@ -9,7 +9,7 @@
   
   <initialization>
     var compElement = document.getElementById('${compClientId}');
-    if (compElement && typeof compElement.startRendering === 'function') {
+    if (compElement != null && typeof compElement.startRendering === 'function') {
         compElement.startRendering(${parameters}, '${updateCompClientId}');
     }
   </initialization>
