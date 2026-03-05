@@ -32,12 +32,10 @@ public abstract class ConfirmPassword extends BaseComponent {
     protected void renderComponent(IMarkupWriter writer, IRequestCycle cycle) {
         if (!cycle.isRewinding()) {
             // If the password is null, then init both password and confirmPassword to the empty string
-            /*  Using placeholder instead
             if (getPassword() == null) {
                 setPassword(StringUtils.EMPTY);
                 setConfirmPassword(StringUtils.EMPTY);
             }
-            */
 
             // If the confirmPassword is null, then init it to be the same as the password
             setConfirmPassword((String) ObjectUtils.defaultIfNull(getConfirmPassword(), getPassword()));

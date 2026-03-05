@@ -9,7 +9,9 @@
 <body>
 <![CDATA[
 	function setVisibility(id, visibility) {
-		document.getElementById(id).style.display = visibility;
+		if( document.getElementById(id) != null ) {
+			document.getElementById(id).style.display = visibility;
+		}
 	}
 	function setPosVisibility(id, pos) {
 	    var i=0;

@@ -4,6 +4,30 @@
 	"http://jakarta.apache.org/tapestry/dtd/Script_3_0.dtd">
 <script>
   <input-symbol key="compClientId" required="yes" />
+
+  <body>
+    <![CDATA[
+      function addFirstLast(table) {
+          /**
+          * Appends CSS class name (only if not used already)
+          *
+          * @param node that should be affected
+          * @param cssClass css class name
+          */
+          function appendCssClass(el, cssClass) {
+              if (el.className.indexOf(cssClass) < 0) {
+                  el.className += " " + cssClass;
+              }
+          }
+
+          var rows = table.tBodies[0].rows;
+          if (rows.length > 0) {
+              appendCssClass(rows[0], 'first');
+              appendCssClass(rows[rows.length - 1], 'last');
+          }
+      }
+    ]]>
+  </body>
   
   <initialization>
     var tableId = '${compClientId}'.slice(0, -2);

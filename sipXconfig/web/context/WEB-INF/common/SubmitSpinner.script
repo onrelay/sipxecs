@@ -60,7 +60,7 @@
 
         // Disable all submit buttons in the form
         const allSubmits = form.querySelectorAll('input[type="submit"]');
-        allSubmits.forEach(btn => btn.disabled = true);
+        allSubmits.forEach(btn => btn.style.pointerEvents = 'none');
 
         // Add spinner and loading class only to clicked button
         clickedInput.classList.add('submit-loading');
@@ -76,8 +76,6 @@
           if (spinner.style.display === 'block') positionSpinner(clickedInput, spinner);
         });
 
-        // Clean up _clickedSubmit
-        form._clickedSubmit = null;
       });
 
       form.dataset.spinnerFormInit = '1';

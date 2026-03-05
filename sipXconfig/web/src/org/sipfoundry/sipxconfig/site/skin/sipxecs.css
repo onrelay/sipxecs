@@ -89,8 +89,7 @@ samp {
 button,
 html input[type="button"],
 input[type="reset"],
-input[type="submit"],
-input[type="file"] 
+input[type="submit"]
 {
   -webkit-appearance: none;
   appearance: none;
@@ -114,12 +113,52 @@ input[type="submit"]
 button.small-button ,
 html input[type="button"].small-button ,
 input[type="reset"].small-button,
-input[type="submit"].small-button, 
-input[type="file"].small-button
+input[type="submit"].small-button
 {
   padding: 6px 12px;
   border-radius: 4px;
   font-size: 12px;
+}
+
+/* ---- file input control styling ---- */
+input[type="file"] {
+  font-size: 14px;
+  /* allow the native filename text to flow*/
+  display: inline-block;
+}
+
+/* style the browse button portion of the file input */
+input[type="file"]::-webkit-file-upload-button,
+input[type="file"]::file-selector-button {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: #55829b;
+  border: 1px solid #4a7085;
+  color: white;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover,
+input[type="file"]::file-selector-button:hover {
+  background-color: #4a7085;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+input[type="file"]::-webkit-file-upload-button:active,
+input[type="file"]::file-selector-button:active {
+  background-color: #3a6075;
+}
+
+input[type="file"]:disabled::-webkit-file-upload-button,
+input[type="file"]:disabled::file-selector-button {
+  background-color: #f5f5f5;
+  border-color: #d0d0d0;
+  color: #999999;
+  cursor: not-allowed;
 }
 
 input[type="submit"].small-button 
@@ -982,6 +1021,7 @@ ul.dropdown-content > a:hover {
 	clear:both;
     text-align:center;
     padding: 15px;
+    font-size: 10px;
 }
 
 #footer p 
