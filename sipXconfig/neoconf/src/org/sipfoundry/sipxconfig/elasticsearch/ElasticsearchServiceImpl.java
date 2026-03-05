@@ -116,91 +116,108 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
     @Override
     public void storeDoc(String index, SearchableBean source) {
         try {
-            if( getClient() == null ) {
-                return;
-            }
-            getClient().index(i -> i
+            IndexRequest<SearchableBean> request = IndexRequest.of(i -> i
                 .index(index)
                 .id(source.getId())
                 .document(source)
             );
+            getClient().index(request);
         } catch (IOException e) {
-            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE + 
-                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
+            LOG.error("Error indexing document into index " + index, e);
         }
     }
 
     @Override
-    public void storeBulkDocs(String index, List<SearchableBean> source) {
+    public void storeBulkDocs(String index, List<SearchableBean> sourceList) {
+        if (sourceList.isEmpty()) return;
+
         try {
-            if( getClient() == null ) {
-                return;
-            }
-            List<BulkOperation> ops = source.stream()
-                .map(bean -> BulkOperation.of(b -> b
+            BulkRequest.Builder bulkBuilder = new BulkRequest.Builder();
+            for (SearchableBean bean : sourceList) {
+                bulkBuilder.operations(op -> op
                     .index(idx -> idx
                         .index(index)
                         .id(bean.getId())
                         .document(bean)
                     )
-                ))
-                .collect(Collectors.toList());
+                );
+            }
 
-            getClient().bulk(b -> b.index(index).operations(ops));
+            BulkResponse bulkResponse = getClient().bulk(bulkBuilder.build());
+            if (bulkResponse.errors()) {
+                String errors = bulkResponse.items().stream()
+                    .filter(item -> item.error() != null)
+                    .map(BulkResponseItem::error)
+                    .map(err -> err.reason())
+                    .collect(Collectors.joining(", "));
+                LOG.error("Bulk indexing errors: " + errors);
+            }
         } catch (IOException e) {
-            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE + 
-                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
+            LOG.error("Error executing bulk request on index " + index, e);
         }
     }
 
     @Override
-    public <T extends SearchableBean> List<T> searchDocs(String indexName, Object filter,
-            int start, int size, Class<T> clazz, String orderBy, boolean orderAscending) {
-        if (!checkIndexExists(indexName)) {
-            return new ArrayList<T>();
-        }
+    public <T extends SearchableBean> List<T> searchDocs(
+            String indexName, Object filter, int start, int size, Class<T> clazz,
+            String orderBy, boolean orderAscending) {
+
+        if (!checkIndexExists(indexName)) return Collections.emptyList();
+
         try {
-            SearchRequest.Builder searchBuilder = new SearchRequest.Builder()
+            SearchRequest.Builder searchReq = new SearchRequest.Builder()
                 .index(indexName)
                 .from(start)
                 .size(size);
 
             if (orderBy != null) {
-                searchBuilder.sort(s -> s.field(f -> f.field(orderBy).order(orderAscending ? SortOrder.Asc : SortOrder.Desc)));
-            }
-            // Filtering: You must build the query using the new Query DSL
-            // Example: searchBuilder.query(q -> q.matchAll(m -> m));
-            // If you have a QueryBuilder, you'll need to translate it to the new API
-
-            // For now, only support match_all if filter is null
-            if (filter == null) {
-                searchBuilder.query(q -> q.matchAll(m -> m));
-            } else {
-                LOG.error(FILTERING_ERROR_MESSAGE);
+                searchReq.sort(s -> s
+                    .field(f -> f
+                        .field(orderBy)
+                        .order(orderAscending ? SortOrder.Asc : SortOrder.Desc)
+                    )
+                );
             }
 
-            SearchResponse<T> response = getClient().search(searchBuilder.build(), clazz);
+            if (filter != null) {
+                if (!(filter instanceof co.elastic.clients.elasticsearch._types.query_dsl.Query)) {
+                    LOG.error(FILTERING_ERROR_MESSAGE);
+                } else {
+                    searchReq.query((co.elastic.clients.elasticsearch._types.query_dsl.Query) filter);
+                }
+            }
+
+            SearchResponse<T> response = getClient().search(searchReq.build(), clazz);
             return response.hits().hits().stream()
-                .map(hit -> hit.source())
-                .collect(Collectors.toList());
+                    .map(hit -> {
+                        T obj = hit.source();
+                        obj.setId(hit.id());
+                        return obj;
+                    })
+                    .collect(Collectors.toList());
+
         } catch (IOException e) {
-            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE + 
-                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
-            return new ArrayList<T>();
+            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE + m_hostName + ":" + m_port, e);
+            return Collections.emptyList();
         }
     }
 
     @Override
     public <T extends SearchableBean> T searchDocById(String indexName, String id, Class<T> clazz) {
-        if (!checkIndexExists(indexName)) {
-            return null;
-        }
+        if (!checkIndexExists(indexName)) return null;
+
         try {
-            GetResponse<T> response = getClient().get(g -> g.index(indexName).id(id), clazz);
-            return response.found() ? response.source() : null;
+            GetResponse<T> response = getClient().get(g -> g
+                .index(indexName)
+                .id(id), clazz);
+            if (response.found()) {
+                T obj = response.source();
+                obj.setId(response.id());
+                return obj;
+            }
+            return null;
         } catch (IOException e) {
-            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE +  
-                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
+            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE + m_hostName + ":" + m_port, e);
             return null;
         }
     }
@@ -260,56 +277,52 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
 
     @Override
     public int countDocs(String indexName, Object filter) {
-        if (!checkIndexExists(indexName)) {
-            return 0;
-        }
+        if (!checkIndexExists(indexName)) return 0;
+
         try {
-            // Filtering: You must build the query using the new Query DSL
-            // For now, only support match_all if filter is null
-            CountRequest.Builder countBuilder = new CountRequest.Builder().index(indexName);
-            if (filter == null) {
-                countBuilder.query(q -> q.matchAll(m -> m));
-            } else {
+            CountRequest.Builder countReq = new CountRequest.Builder().index(indexName);
+            if (filter instanceof co.elastic.clients.elasticsearch._types.query_dsl.Query) {
+                countReq.query((co.elastic.clients.elasticsearch._types.query_dsl.Query) filter);
+            } else if (filter != null) {
                 LOG.error(FILTERING_ERROR_MESSAGE);
             }
-            CountResponse response = getClient().count(countBuilder.build());
+
+            CountResponse response = getClient().count(countReq.build());
             return (int) response.count();
         } catch (IOException e) {
-            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE + 
-                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
+            LOG.error("Error counting documents on index " + indexName, e);
             return 0;
         }
     }
 
     private boolean checkIndexExists(String indexName) {
         try {
-            BooleanResponse exists = getClient().indices().exists(e -> e.index(indexName));
-            return exists.value();
+            BooleanResponse response = getClient().indices()
+                .exists(ExistsRequest.of(e -> e.index(indexName)));
+            return response.value();
         } catch (IOException e) {
-            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE +  
-                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
+            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE + m_hostName + ":" + m_port, e);
             return false;
         }
     }
 
     @Override
     public void deleteDocs(String indexName, Object filter) {
-        if (!checkIndexExists(indexName)) {
+        if (!checkIndexExists(indexName)) return;
+
+        if (!(filter instanceof co.elastic.clients.elasticsearch._types.query_dsl.Query)) {
+            LOG.error(FILTERING_ERROR_MESSAGE);
             return;
         }
+
         try {
-            // Filtering: You must build the query using the new Query DSL
-            // For now, only support match_all if filter is null
-            DeleteByQueryRequest.Builder deleteBuilder = new DeleteByQueryRequest.Builder().index(indexName);
-            if (filter == null) {
-                deleteBuilder.query(q -> q.matchAll(m -> m));
-            } else {
-                LOG.error(FILTERING_ERROR_MESSAGE);
-            }
-            getClient().deleteByQuery(deleteBuilder.build());
+            DeleteByQueryRequest req = DeleteByQueryRequest.of(d -> d
+                .index(indexName)
+                .query((co.elastic.clients.elasticsearch._types.query_dsl.Query) filter)
+            );
+            getClient().deleteByQuery(req);
         } catch (IOException e) {
-            LOG.error(NO_CONNECTION_AVAILABLE_ERROR_MESSAGE +  
-                m_locationsManager.getPrimaryLocation().getFqdn() + ":" + m_port, e);
+            LOG.error("Error deleting documents from index " + indexName, e);
         }
     }
 }
