@@ -318,7 +318,10 @@ public class ServerBean {
         }
 
         public void setGlobalFeatures(List<String> features) {
-            m_globalFeatures = features;
+            getGlobalFeatures().clear();
+            if( features != null ) {
+                getGlobalFeatures().addAll( features );
+            }
         }
 
         @XmlElementWrapper(name = "GlobalFeatures")
@@ -331,7 +334,10 @@ public class ServerBean {
         }
 
         public void setLocationFeatures(List<String> features) {
-            m_locationFeatures = features;
+            getLocationFeatures().clear();
+            if( features != null ) {
+                getLocationFeatures().addAll( features );
+            }
         }
 
         @XmlElementWrapper(name = "LocationFeatures")
@@ -353,16 +359,20 @@ public class ServerBean {
 
         public static List<String> buildFeatureList(Collection<? extends Feature> features) {
             List<String> featuresList = new LinkedList<String>();
-            for (Feature feature : features) {
-                featuresList.add(feature.getId());
+            if( features != null ) {
+                for (Feature feature : features) {
+                    featuresList.add(feature.getId());
+                }
             }
             return featuresList;
         }
 
         public static List<BundleBean> buildBundleList(List<Bundle> bundles) {
             List<BundleBean> bundleList = new LinkedList<BundleBean>();
-            for (Bundle bundle : bundles) {
-                bundleList.add(convertBundle(bundle));
+            if( bundles != null ) {
+                for (Bundle bundle : bundles) {
+                    bundleList.add(convertBundle(bundle));
+                }
             }
             if (bundleList.size() > 0) {
                 return bundleList;
@@ -449,7 +459,10 @@ public class ServerBean {
         private List<FeatureBean> m_features;
 
         public void setFeatures(List<FeatureBean> features) {
-            m_features = features;
+            getFeatures().clear();
+            if( features != null ) {
+                getFeatures().addAll( features );
+            }
         }
 
         public List<FeatureBean> getFeatures() {
