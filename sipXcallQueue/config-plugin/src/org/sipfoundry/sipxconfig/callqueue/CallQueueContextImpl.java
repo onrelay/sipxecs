@@ -575,11 +575,11 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
         }
 
         Set<Location> locations = request.locations(manager);
-        List<Location> enabledLocations = manager.getFeatureManager().getLocationsForEnabledFeature(FEATURE);
+        List<Location> enabledLocations = manager.getFeatureManager().getLocationsForEnabledFeature(CallQueueContext.FEATURE);
         for (Location location : locations) {
             File dir = manager.getLocationDataDirectory(location);
             boolean enabled = enabledLocations.contains(location);
-            ConfigUtils.enableCfengineClass(dir, "sipxcallqueue.cfdat", enabled, "callqueue");
+            ConfigUtils.enableCfengineClass(dir, "sipxcallqueue.cfdat", enabled, CallQueueContext.CALL_QUEUE);
         }
     }
 

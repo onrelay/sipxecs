@@ -110,8 +110,8 @@
     <property name="modelFilesContext" ref="modelFilesContext"/>
   </bean>
 
-  <bean id="callqueueHook" class="org.sipfoundry.sipxconfig.site.SimplePluginHook">
-    <property name="hookId" value="CallAQueueHook"/>
+  <bean id="callqueueHook" class="org.sipfoundry.sipxconfig.web.plugin.CallAQueueHook">
+    <property name="hookId" value="CallAQueueMenu"/>
     <property name="featureId" value="callqueue"/>
   </bean>
 

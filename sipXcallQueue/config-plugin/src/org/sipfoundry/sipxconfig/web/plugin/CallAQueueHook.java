@@ -1,12 +1,28 @@
-/*
- * Copyright (C) 2011 Your Company Here,
- * Licensed to the User under the AGPL license.
- * $
- *
- */
+
 package org.sipfoundry.sipxconfig.web.plugin;
 
-import org.sipfoundry.sipxconfig.site.SimplePluginHook;
+import org.sipfoundry.sipxconfig.site.PluginHook;
 
-public abstract class CallAQueueHook extends SimplePluginHook {
+public class CallAQueueHook implements PluginHook {
+
+    private String m_hookId;
+    private String m_featureId;
+
+    @Override
+    public String getHookId() {
+        return m_hookId;
+    }
+
+    public void setHookId( String hookId ) {
+        m_hookId = hookId;
+    }
+
+    @Override
+    public String getFeatureId() {
+        return m_featureId;
+    }
+
+    public void setFeatureId( String featureId ) {
+        m_featureId = featureId;
+    }
 }
