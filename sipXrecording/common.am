@@ -3,6 +3,7 @@ cfg_PKGS = \
 	sipxcommons \
 	velocity-engine-core \
 	commons-lang \
+	commons-lang3 \
 	commons-io \
 	dom4j \
 	jakarta.persistence-api \
@@ -21,6 +22,14 @@ recording_PKGS = \
 	log4j \
 	slf4j-api \
 	slf4j-reload4j \
+	jakarta.servlet-api \
+	jetty-server \
+	jetty-ee10-servlet \
+	jetty-http \
+	jetty-io \
+	jetty-security \
+	jetty-session \
+	jetty-util \
 	commons-io \
 	commons-codec \
 	httpclient5 \
@@ -32,10 +41,14 @@ recording_PKGS = \
 	bson \
 	spring-data-mongodb \
 	spring-data-commons \
+	spring-aop \
 	spring-core \
 	spring-beans \
 	spring-context \
 	spring-tx \
 	spring-expression \
 	commons-lang \
-	hazelcast
+	commons-lang3 \
+	hazelcast \
+	aopalliance
+

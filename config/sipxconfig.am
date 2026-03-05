@@ -140,6 +140,7 @@ sipxconfig_neoconf_PKGS = \
 	reflections-jakarta \
 	guava \
 	elasticsearch \
+	elasticsearch-core \
 	elasticsearch-java \
 	elasticsearch-rest-client \
 	elasticsearch-x-content \

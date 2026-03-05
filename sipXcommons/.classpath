@@ -57,6 +57,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/easymock-5.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ehcache-3.10.8-jakarta.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/elasticsearch-8.19.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/elasticsearch-core-8.19.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/elasticsearch-java-8.19.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/elasticsearch-rest-client-8.19.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/elasticsearch-x-content-8.19.4.jar"/>
