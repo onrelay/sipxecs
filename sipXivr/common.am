@@ -5,6 +5,7 @@ ivr_PKGS = \
 	commons-io \
 	commons-logging-jakarta  \
 	commons-lang \
+	commons-lang3 \
 	cache-api  \
 	dom4j \
 	iText \
