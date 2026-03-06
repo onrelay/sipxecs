@@ -789,10 +789,10 @@ public class ValidUsers {
         user.setMoh(getStringValue(obj, MOH));
 
         // highest weight group is always the last in the list
-        List<Document> groups = (List<Document>) obj.get(GROUPS);
-        if (groups != null) {
-            Document lastGroup = groups.get(groups.size() - 1);
-        	user.setHighestWeightGroup(getStringValue(lastGroup, UID));
+        List<String> groups = (List<String>) obj.get(GROUPS);
+        if (groups != null && groups.size() > 0) {
+            String lastGroup = groups.get(groups.size() - 1);
+        	user.setHighestWeightGroup(lastGroup);
         }
 
         user.setVoicemailTui(getStringValue(obj, VOICEMAILTUI));
