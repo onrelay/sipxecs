@@ -13,8 +13,18 @@ class CallStateEvent
   FIELDS = [:id, :observer, :event_seq, :event_time, :event_type, :cseq, :call_id, :from_tag, :to_tag,
     :from_url, :to_url, :contact, :refer_to, :referred_by, :failure_status, :failure_reason, :request_uri, :reference, :caller_internal, :callee_route, :branch_id, :via_count]
   
-  attr_accessor(*FIELDS)
-  
+  attr_accessor(*FIELDS - [:event_time])
+
+  require 'time'
+
+  def event_time
+    @event_time
+  end
+
+  def event_time=(value)
+    @event_time = value.is_a?(String) ? Time.parse(value) : value
+  end 
+    
   # Constants representing event types
   CALL_REQUEST_TYPE =  'R'
   CALL_SETUP_TYPE =    'S'

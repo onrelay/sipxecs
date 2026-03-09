@@ -309,6 +309,7 @@ public class CdrManagerImpl extends JdbcDaoSupport implements CdrManager, Featur
 
     private List<ActiveCallREST> mapActiveCalls(String xml) {
         XStream xstream = new XStream();
+        xstream.allowTypes(new Class[] { ActiveCallREST.class });
         xstream.alias("cdrs", List.class);
         xstream.alias("cdr", ActiveCallREST.class);
         xstream.aliasField("from", ActiveCallREST.class, "m_from");
@@ -316,6 +317,7 @@ public class CdrManagerImpl extends JdbcDaoSupport implements CdrManager, Featur
         xstream.aliasField("recipient", ActiveCallREST.class, "m_recipient");
         xstream.aliasField(START_TIME, ActiveCallREST.class, "m_startTime");
         xstream.aliasField("duration", ActiveCallREST.class, "m_duration");
+
         List<ActiveCallREST> cdrs = (List<ActiveCallREST>) xstream.fromXML(xml);
         return cdrs;
     }
