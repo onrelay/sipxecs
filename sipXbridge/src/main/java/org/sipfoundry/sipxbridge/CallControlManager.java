@@ -379,7 +379,7 @@ class CallControlManager implements SymmitronResetHandler {
 	            if (peerDialogContext.getItspInfo() == null || 
 	            		peerDialogContext.getItspInfo().isGlobalAddressingUsed()) {
 
-                    String transport = peerDialogContext.getSipProvider().getListeningPoints()[0].getTransport();
+                    String transport = peerDialogContext.getTransport();
 
 	                SipUtilities.setGlobalAddresses(newRequest, transport );
 	            }
