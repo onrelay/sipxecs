@@ -26,11 +26,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.beanutils.BeanUtils;
 import org.sipfoundry.sipxconfig.alarm.AlarmDefinition;
 import org.sipfoundry.sipxconfig.alarm.AlarmProvider;
 import org.sipfoundry.sipxconfig.alarm.AlarmServerManager;
@@ -408,20 +410,21 @@ public class CertificateManagerImpl implements CertificateManager, SetupListener
 
     @Override
     public boolean configureLetsEncryptService(CertificateSettings newSettings) {
-        CertificateSettings oldSettings = getSettings();
+        CertificateSettings settings = getSettings();
         CommandExecutionStatus status = getCertbotCommandStatus();
 
-        if (oldSettings.getLetsEncryptEmail() != null && oldSettings.getLetsEncryptEmail().equals(newSettings.getLetsEncryptEmail()) 
-                && oldSettings.getLetsEncryptKeySize().equals(newSettings.getLetsEncryptKeySize())
+        if (settings.getLetsEncryptEmail() != null && settings.getLetsEncryptEmail().equals(newSettings.getLetsEncryptEmail()) 
+                && settings.getLetsEncryptKeySize().equals(newSettings.getLetsEncryptKeySize())
                 && (status.equals(CommandExecutionStatus.IN_PROGRESS) || status.equals(CommandExecutionStatus.SUCCESS))) {
             // nothing was changed or execution in progress
+            LOG.debug("configureLetsEncryptService: no change");
             return false;
         }
 
         String fqdn = m_locationsManager.getPrimaryLocation().getFqdn();
         String params;
 
-        if (getLetsEncryptStatus() && oldSettings.getLetsEncryptKeySize().equals(newSettings.getLetsEncryptKeySize())
+        if (getLetsEncryptStatus() && settings.getLetsEncryptKeySize().equals(newSettings.getLetsEncryptKeySize())
                 && status.equals(CommandExecutionStatus.SUCCESS)) {
             // just update the email address (if previous run was successfull)
             params = String.format(m_letsencryptEmailChangeParams, newSettings.getLetsEncryptEmail());
@@ -460,6 +463,9 @@ public class CertificateManagerImpl implements CertificateManager, SetupListener
         File lockFile = new File(LOCK_FILE);
 
         if (!lockFile.exists()) {
+            return CommandExecutionStatus.IDLE;
+        }
+        else if( lockFile.length() == 0 ) {
             return CommandExecutionStatus.IN_PROGRESS;
         }
 

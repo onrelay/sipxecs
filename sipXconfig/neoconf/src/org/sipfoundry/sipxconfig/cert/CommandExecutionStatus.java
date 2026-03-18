@@ -16,6 +16,7 @@
 package org.sipfoundry.sipxconfig.cert;
 
 public enum CommandExecutionStatus {
+    IDLE,
     IN_PROGRESS,
     SUCCESS,
     FAIL,

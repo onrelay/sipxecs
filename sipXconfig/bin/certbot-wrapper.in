@@ -2,8 +2,11 @@
 
 LOCK_FILE=@SIPX_CFDATA@/letsencrypt.lock
 
+touch $LOCK_FILE
+/usr/bin/chown @SIPXPBXUSER@:@SIPXPBXGROUP@ $LOCK_FILE
+/usr/bin/chmod 644 $LOCK_FILE
+
 /usr/bin/certbot $*
 
 /usr/bin/echo $? > $LOCK_FILE
-/usr/bin/chown @SIPXPBXUSER@:@SIPXPBXGROUP@ $LOCK_FILE
-/usr/bin/chmod 644 $LOCK_FILE
+

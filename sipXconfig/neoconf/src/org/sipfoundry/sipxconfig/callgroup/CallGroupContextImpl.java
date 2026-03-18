@@ -205,7 +205,6 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport<CallGroup> imp
 
             groupDup.setEnabled(false);
             saveCallGroup(groupDup);
-            getDaoEventPublisher().publishSave(groupDup);
         }
     }
     
@@ -221,7 +220,6 @@ public class CallGroupContextImpl extends SipxHibernateDaoSupport<CallGroup> imp
 
         groupDup.setEnabled(false);
         saveCallGroup(groupDup);
-        getDaoEventPublisher().publishSave(groupDup);        
     }
 
     /**
