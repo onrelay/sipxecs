@@ -500,8 +500,8 @@ SipRedirectorPickUp::lookUp(
    {
       // Check if directed call pick-up is active, and this is a
       // request for directed call pick-up.
-      // Because the default directed pick-up feature code is "*78" and
-      // the default global pick-up feature code is "*78*", we can't just
+      // Because the default directed pick-up feature code is "*7" and
+      // the default global pick-up feature code is "*7*", we can't just
       // match all strings with the directed pick-up feature code as a
       // prefix, we also require that the suffix not be "*" or "#".
       Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,

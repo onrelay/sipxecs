@@ -101,11 +101,11 @@ public class AliasManagerTestIntegration extends IntegrationTestCase {
     }
 
     /**
-     * DISABLED : You'd have to enable directed call pick-up that uses *78 for these assertions to
+     * DISABLED : You'd have to enable directed call pick-up that uses *7 for these assertions to
      * be true --Douglas
      */
     public void DISABLED_testFeatureCodes() {
-        String pickUp = "*78";
+        String pickUp = "*7";
         String retrieve = "*4";
         User user = m_coreContext.newUser();
         user.setUserName(pickUp);

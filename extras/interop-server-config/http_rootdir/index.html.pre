@@ -475,7 +475,7 @@ this response construction, see
 <h3><a name='pickup'>10</a>. Call Pick-Up</h3>
 
 <p>
-Any call to <code>*78xxxx</code> will pick up the call ringing on the
+Any call to <code>*7xxxx</code> will pick up the call ringing on the
 UA at <code>xxxx</code>.  To use this feature:
 </p>
 
@@ -483,11 +483,11 @@ UA at <code>xxxx</code>.  To use this feature:
 <li>From one UA, call a second UA via <code>1<span
 class='group'>gg</span>n</code>.</li>
 <li>Leave the call ringing.</li>
-<li>From a third UA, call <code>*781<span
+<li>From a third UA, call <code>*71<span
 class='group'>gg</span>n</code>.</li>
 <li>The third UA should now be talking to the first UA, and the second
 should no longer be ringing.</li>
-<li>If the second UA answers the call before the third UA calls <code>*781<span
+<li>If the second UA answers the call before the third UA calls <code>*71<span
 class='group'>gg</span>n</code>, the third UA should receive a
 <code>404</code> response rather than connecting to the first UA.</li>
 </ol>
@@ -531,16 +531,16 @@ class='group'>gg</span>6</code>.
 
 <p>
 From yet another UA, the <em>executing UA</em>,
-call <code>*781<span class='group'>gg</span>3</code>.
+call <code>*71<span class='group'>gg</span>3</code>.
 It should pick up the first call, ending the ringing on the target UAs
 and establishing a call between the executing UA and the calling UA.
 </p>
 
 <p>
 Hang up and repeat the sequence, changing the second call to
-<code>*781<span class='group'>gg</span>4</code>,
-<code>*781<span class='group'>gg</span>5</code>, and
-<code>*781<span class='group'>gg</span>6</code> on successive trials.
+<code>*71<span class='group'>gg</span>4</code>,
+<code>*71<span class='group'>gg</span>5</code>, and
+<code>*71<span class='group'>gg</span>6</code> on successive trials.
 Each should pick up the forked call.
 </p>
 
@@ -860,7 +860,7 @@ second UA's BLF should indicate that the first UA is ringing.
 
 <p>
 From a fourth UA, pick up this call by calling
-<code>*781<span class='group'>gg</span>n</code>, as appropriate.
+<code>*71<span class='group'>gg</span>n</code>, as appropriate.
 The fourth UA will be talking to the third UA.
 Hang up this call.
 The second UA's BLF should indicate that the first UA is idle.

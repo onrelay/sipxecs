@@ -29,7 +29,7 @@
 <callParkMethod><![CDATA[none]]></callParkMethod>
 <callRtrvPrefix><![CDATA[*4]]></callRtrvPrefix>
 <serverAssistCallPickup><![CDATA[TRUE]]></serverAssistCallPickup>
-<callPickupPrefix><![CDATA[*78]]></callPickupPrefix>
+<callPickupPrefix><![CDATA[*7]]></callPickupPrefix>
 <sipPort><![CDATA[5060]]></sipPort>
 <offhookOnRefer><![CDATA[FALSE]]></offhookOnRefer>
 <usePreloadedRoute><![CDATA[FALSE]]></usePreloadedRoute>

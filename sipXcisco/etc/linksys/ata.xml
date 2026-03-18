@@ -1376,7 +1376,7 @@
     <setting name="DND_Act_Code">
       <label>DND Act Code</label>
       <profileName>Vertical_Service_Activation_Codes</profileName>
-      <value>*78</value>
+      <value>*7</value>
     </setting>
     <setting name="DND_Deact_Code">
       <label>DND Deact Code</label>

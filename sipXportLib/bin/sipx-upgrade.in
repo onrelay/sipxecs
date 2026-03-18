@@ -211,7 +211,7 @@ UpgradeRegistry2_8To3_0() {
     AddConfigLine ${SysConfDir}/sipxpbx/registrar-config.in \
         SIP_REGISTRAR_GLOBAL_CALL_PICKUP_CODE ''
     AddConfigLine ${SysConfDir}/sipxpbx/registrar-config.in \
-        SIP_REGISTRAR_DIRECTED_CALL_PICKUP_CODE '*78'
+        SIP_REGISTRAR_DIRECTED_CALL_PICKUP_CODE '*7'
     AddConfigLine ${SysConfDir}/sipxpbx/registrar-config.in \
         SIP_REGISTRAR_CALL_RETRIEVE_CODE '*4'
     AddConfigLine ${SysConfDir}/sipxpbx/registrar-config.in \

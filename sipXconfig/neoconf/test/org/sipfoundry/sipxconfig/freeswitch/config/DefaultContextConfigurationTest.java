@@ -374,7 +374,7 @@ public class DefaultContextConfigurationTest {
 
         @Override
         public String getCallPickupExtension() {
-            return "\\*78" + getExtension();
+            return "\\*7" + getExtension();
         }
     }
 }

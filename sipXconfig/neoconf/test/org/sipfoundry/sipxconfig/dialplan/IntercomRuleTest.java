@@ -18,13 +18,13 @@ public class IntercomRuleTest extends TestCase {
     private IntercomRule m_rule;
 
     protected void setUp() {
-        m_rule = new IntercomRule(true, "*78", "Ipek", 42);
+        m_rule = new IntercomRule(true, "*7", "Ipek", 42);
     }
 
     public void testGetPatterns() {
         String[] patterns = m_rule.getPatterns();
         assertEquals(1, patterns.length);
-        assertEquals("*78" + ".", patterns[0]);
+        assertEquals("*7" + ".", patterns[0]);
     }
 
     public void testGetTransforms() {

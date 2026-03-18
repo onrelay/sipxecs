@@ -133,7 +133,7 @@
   <group name="call-pick-up">
     <setting name="SIP_REDIRECT.100-PICKUP.DIRECTED_CALL_PICKUP_CODE">
       <type refid="feature-code" />
-      <value>*78</value>
+      <value>*7</value>
     </setting>
     <setting name="SIP_REDIRECT.100-PICKUP.CALL_RETRIEVE_CODE">
       <type refid="feature-code" required="yes" />

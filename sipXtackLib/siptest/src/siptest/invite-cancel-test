@@ -29,7 +29,7 @@ function generate_tag ()
 
 cat /dev/null >temp.W1
 
-TO='*78222@cdhcp139.pingtel.com'
+TO='*7222@cdhcp139.pingtel.com'
 FROM='173@cdhcp139.pingtel.com'
 
 # Generate an INVITE for a call.

@@ -394,7 +394,7 @@ on the phone's behalf.
        |<--------------------|                 |                  |
        |                     |                 |                  |
        |                     |                 |                  |  2a Dials
-       |                     |                 |                  |     *78123
+       |                     |                 |                  |     *7123
        |                     |                 |                  |
        |                     |                 |  3a INVITE       |
        |                     |                 |<-----------------|
@@ -424,7 +424,7 @@ on the phone's behalf.
 
 The major differences in processing are:
 
-3. Because the dialed number starts with the pick-up prefix "*78", the
+3. Because the dialed number starts with the pick-up prefix "*7", the
 call is routed (either by a phone dialplan or an outgoing call proxy)
 to the pick-up agent.
 
@@ -460,7 +460,7 @@ document to be strictly conformant:
        |<--------------------|                 |                  |
        |                     |                 |                  |
        |                     |                 |                  |  2a Dials
-       |                     |                 |                  |     *78123
+       |                     |                 |                  |     *7123
        |                     |                 |                  |
        |                     |                 |  3a INVITE       |
        |                     |                 |<-----------------|
@@ -521,7 +521,7 @@ Caller             Proxy        Target         Pick-up        Executing
   |<-----------------|            |               |               |
   |                  |            |               |               |
   |                  |            |               |               |  2a Dials
-  |                  |            |               |               |     *78123
+  |                  |            |               |               |     *7123
   |                  |            |               |               |
   |                  |            |               | 3a INVITE     |
   |                  |<-------------------------------------------|
@@ -583,12 +583,12 @@ The overall call flow is:
 
 1. Caller sends invite to the target (123).
 
-2. Executing phone (456) dials *78123.
+2. Executing phone (456) dials *7123.
 
 3. By the normal mechanisms, the INVITE is routed to the registrar.
 
 4. In the registrar, the pick-up agent recognizes the dialing prefix
-*78 and puts the transaction aside for a moment.  It initiates a
+*7 and puts the transaction aside for a moment.  It initiates a
 SUBSCRIBE with "Expires:0" (one-time) to 123.
 
 5. The target sends a NOTIFY back to the pick-up agent.

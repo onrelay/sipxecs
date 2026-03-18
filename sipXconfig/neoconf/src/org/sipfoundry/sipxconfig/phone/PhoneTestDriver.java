@@ -223,7 +223,7 @@ public final class PhoneTestDriver {
             // cannot access sipxregistrar.xml from unit tests.
             @Override
             public String getDirectedCallPickupCode() {
-                return "*78";
+                return "*7";
             }
 
             @Override
