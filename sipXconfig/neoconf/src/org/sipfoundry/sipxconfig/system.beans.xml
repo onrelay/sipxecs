@@ -129,7 +129,11 @@
         <prop key="hibernate.query.substitutions">true 't', false 'f'</prop>
         <prop key="hibernate.physical_naming_strategy">org.sipfoundry.sipxconfig.common.ImprovedNamingStrategy</prop>
         <prop key="hibernate.transform_hbm_xml.enabled">false</prop>
-        <!-- prop key="hibernate.show_sql">true</prop -->
+        <!-- DEBUG
+          <prop key="hibernate.show_sql">true</prop>
+          <prop key="hibernate.cfg.HbmBinder">TRACE</prop>
+          <prop key="hibernate.persister.collection">TRACE</prop>
+        -->
       </props>
     </property>
   </bean>

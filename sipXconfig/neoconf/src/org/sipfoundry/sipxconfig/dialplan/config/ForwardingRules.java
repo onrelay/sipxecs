@@ -88,7 +88,7 @@ public class ForwardingRules extends RulesFile implements ApplicationContextAwar
         VelocityContext context = new VelocityContext();
         context.put("routes", m_routes);
 
-        DefaultSbc sbc = m_sbcManager.loadDefaultSbc();
+        DefaultSbc sbc = m_sbcManager.getDefaultSbc();
         context.put("sbc", sbc);
 
         if (sbc != null) {

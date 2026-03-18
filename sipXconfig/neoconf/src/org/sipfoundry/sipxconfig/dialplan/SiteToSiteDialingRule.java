@@ -23,7 +23,7 @@ public class SiteToSiteDialingRule extends CustomDialingRule {
     @Override
     protected Object clone() throws CloneNotSupportedException {
         SiteToSiteDialingRule clone = (SiteToSiteDialingRule) super.clone();
-        clone.setDialPatterns(new ArrayList(getDialPatterns()));
+        clone.replaceDialPatterns(getDialPatterns());
         return clone;
     }
 

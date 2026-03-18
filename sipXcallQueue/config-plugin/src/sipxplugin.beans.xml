@@ -107,7 +107,6 @@
   </bean>
 
   <bean id="callQueueSettings" class="org.sipfoundry.sipxconfig.callqueue.CallQueueSettings" parent="settingsBean">
-    <property name="modelFilesContext" ref="modelFilesContext"/>
   </bean>
 
   <bean id="callqueueHook" class="org.sipfoundry.sipxconfig.web.plugin.CallAQueueHook">

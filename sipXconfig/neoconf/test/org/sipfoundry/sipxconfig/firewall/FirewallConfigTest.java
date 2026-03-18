@@ -116,12 +116,12 @@ public class FirewallConfigTest {
         limit.setInterval("minute");
         List<CallRateLimit> limits = new ArrayList<CallRateLimit>();
         limits.add(limit);
-        rule.setCallRateLimits(limits);
+        rule.replaceCallRateLimits(limits);
         CallRateRule rule1 = new CallRateRule();
         rule1.setName("rule2");
         rule1.setStartIp("192.168.0.2");
         rule1.setEndIp("192.168.0.4");
-        rule1.setCallRateLimits(limits);
+        rule1.replaceCallRateLimits(limits);
         List<CallRateRule> rateRules = new LinkedList<CallRateRule>();
         rateRules.add(rule);
         rateRules.add(rule1);

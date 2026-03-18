@@ -24,7 +24,6 @@
   </bean>
 
   <bean id="mohSettings" class="org.sipfoundry.sipxconfig.moh.MohSettings" parent="settingsBean">
-    <property name="modelFilesContext" ref="modelFilesContext"/>
   </bean>
 
   <bean id="abstractMusicOnHoldManagerImpl" abstract="true" class="org.sipfoundry.sipxconfig.moh.AbstractMusicOnHoldManagerImpl">

@@ -27,31 +27,31 @@ import org.sipfoundry.sipxconfig.common.NamedObject;
 public abstract class BeanWithGroups extends BeanWithSettings {
     public static final String GROUPS_PROP = "groups";
 
-    private Set<Group> m_groups;
+    private Set<Group> m_groups = new TreeSet<Group>();
 
     @Override
     protected void initializeSettingModel() {
         setSettingModel(new BeanWithGroupsModel(this));
     }
 
-    public synchronized Set<Group> getGroups() {
-        // lazy to avoid NPE in unit tests that create mock objects for subclasses
-        if (m_groups == null) {
-            m_groups = new TreeSet<Group>();
-        }
+    public Set<Group> getGroups() {
         return m_groups;
     }
 
-    public void setGroups(Collection<Group> groups) {
+    public void setGroups(Set<Group> groups) {
+        m_groups = groups;
+    }
 
-        getGroups().clear();
+    public void replaceGroups(Set<Group> groups) {
+
+        m_groups.clear();
         if( groups != null ) {
-            getGroups().addAll(groups);
+            m_groups.addAll(groups);
         }
 
         BeanWithGroupsModel model = (BeanWithGroupsModel) getSettingModel();
         // passed collection is not copied
-        model.setGroups(getGroups());
+        model.setGroups(m_groups);
     }
 
     public List<Group> getGroupsAsList() {
@@ -59,7 +59,7 @@ public abstract class BeanWithGroups extends BeanWithSettings {
     }
 
     public void setGroupsAsList(List<Group> groups) {
-        setGroups( groups );
+        replaceGroups( new TreeSet<Group>(groups) );
     }
 
     public Group getFirstGroupDefaultIsSetFor(Setting setting) {

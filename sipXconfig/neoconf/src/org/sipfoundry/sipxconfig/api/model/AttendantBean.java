@@ -22,7 +22,7 @@ import org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours;
 
 public class AttendantBean {
 
-    private List<WorkingHoursBean> m_workingHours;
+    private List<WorkingHoursBean> m_workingHours = new ArrayList<WorkingHoursBean>();
 
     public static AttendantBean convertAttendantBean(Attendant attendant) {
         List<WorkingHoursBean> workingHoursList = new ArrayList<WorkingHoursBean>();
@@ -30,7 +30,7 @@ public class AttendantBean {
             workingHoursList.add(WorkingHoursBean.convertWorkingHours(workingHours));
         }
         AttendantBean attendantBean = new AttendantBean();
-        attendantBean.setWorkingHours(workingHoursList);
+        attendantBean.replaceWorkingHours(workingHoursList);
         return attendantBean;
     }
 
@@ -40,7 +40,7 @@ public class AttendantBean {
         for (WorkingHoursBean workingHoursBean : attendantBean.getWorkingHours()) {
             workingHours.add( WorkingHoursBean.convertToWorkingHours(workingHoursBean) );
         }
-        attendant.setWorkingHours(workingHours);
+        attendant.replaceWorkingHours(workingHours);
         return attendant;
     }
 
@@ -48,10 +48,14 @@ public class AttendantBean {
         m_workingHours = workingHours;
     }
 
-    public List<WorkingHoursBean> getWorkingHours() {
-        if (m_workingHours == null) {
-            m_workingHours = new ArrayList<WorkingHoursBean>();
+    public void replaceWorkingHours(List<WorkingHoursBean> workingHours) {
+        m_workingHours.clear();
+        if( workingHours != null ) {
+            m_workingHours.addAll( workingHours );
         }
+    }
+
+    public List<WorkingHoursBean> getWorkingHours() {
         return m_workingHours;
     }
 }

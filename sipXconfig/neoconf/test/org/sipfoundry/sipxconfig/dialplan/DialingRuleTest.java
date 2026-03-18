@@ -178,7 +178,7 @@ public class DialingRuleTest extends TestCase {
         DialingRule rule = new InternationalRule();
         assertTrue(rule.getEnabledGateways().isEmpty());
 
-        rule.setGateways(Arrays.asList(g1, g2, g3));
+        rule.replaceGateways(Arrays.asList(g1, g2, g3));
         List<Gateway> eg = rule.getEnabledGateways();
         assertEquals(3, eg.size());
         assertTrue(eg.contains(g1));
@@ -228,7 +228,7 @@ public class DialingRuleTest extends TestCase {
         rule.addGateway(lisbon);
         rule.addGateway(montreal2);
         rule.setCallPattern(new CallPattern("444", CallDigits.NO_DIGITS));
-        rule.setDialPatterns(Arrays.asList(new DialPattern("x", DialPattern.VARIABLE_DIGITS)));
+        rule.replaceDialPatterns(Arrays.asList(new DialPattern("x", DialPattern.VARIABLE_DIGITS)));
 
         Map<String, List<Transform>> siteTransforms = rule.getSiteTransforms();
 

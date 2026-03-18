@@ -120,7 +120,7 @@ public class PageGroupBean {
             for (String alias : user.getAliases()) {
                 aliases.add(alias);
             }
-            userBean.setAliases(aliases);
+            userBean.replaceAliases(aliases);
             userBeans.add(userBean);
         }
         if (!userBeans.isEmpty()) {

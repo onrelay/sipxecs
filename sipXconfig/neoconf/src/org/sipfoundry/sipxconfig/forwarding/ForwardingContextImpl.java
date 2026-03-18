@@ -244,13 +244,13 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
     }
 
     private boolean isNameChanged(Schedule schedule) {
-        List<Schedule> count = (List<Schedule>)super.findByNamedQueryAndNamedParam(
+        List<Object> count = (List<Object>)super.findByNamedQueryAndNamedParam(
             "countScheduleWithSameName", new String[] {
             PARAM_SCHEDULE_ID, PARAM_NAME
         }, new Object[] {
             schedule.getId(), schedule.getName()
         },
-        Schedule.class);
+        Object.class);
 
         return DataAccessUtils.intResult(count) == 0;
     }
@@ -373,9 +373,7 @@ public class ForwardingContextImpl extends SipxHibernateDaoSupport<Object> imple
                         if (rule instanceof AttendantRule) {
                             AttendantRule aaRule = (AttendantRule) rule;
                             m_sipxReplicationContext.generate(aaRule);
-                        } else {
-                            getDaoEventPublisher().publishSave(rule);
-                        }
+                        } 
                     }
                 }
             } else if (schedule instanceof UserSchedule || schedule instanceof UserGroupSchedule) {

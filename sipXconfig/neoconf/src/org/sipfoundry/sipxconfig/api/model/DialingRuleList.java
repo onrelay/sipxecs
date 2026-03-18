@@ -24,10 +24,23 @@ import org.sipfoundry.sipxconfig.dialplan.DialingRule;
 
 @XmlRootElement(name = "Rules")
 public class DialingRuleList {
-    private List<DialingRuleBean> m_rules;
+
+    private List<DialingRuleBean> m_rules = new ArrayList<DialingRuleBean>();
 
     public void setRules(List<DialingRuleBean> rules) {
         m_rules = rules;
+    }
+
+    public void replaceRules(List<DialingRuleBean> rules) {
+        m_rules.clear();
+        if( rules != null ) {
+            m_rules.addAll( rules );
+        }
+    }
+
+    @XmlElement(name = "Rule")
+    public List<DialingRuleBean> getRules() {
+        return m_rules;
     }
 
     public static DialingRuleList convertDialingRuleList(List<DialingRule > rules) {
@@ -36,15 +49,7 @@ public class DialingRuleList {
             rulesList.add(DialingRuleBean.convertDialingRule(rule));
         }
         DialingRuleList list = new DialingRuleList();
-        list.setRules(rulesList);
+        list.replaceRules(rulesList);
         return list;
-    }
-
-    @XmlElement(name = "Rule")
-    public List<DialingRuleBean> getRules() {
-        if (m_rules == null) {
-            m_rules = new ArrayList<DialingRuleBean>();
-        }
-        return m_rules;
     }
 }

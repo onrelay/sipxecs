@@ -136,7 +136,7 @@ public class ForwardingRulesTest extends XMLTestCase {
                 Arrays.asList("*.example.org", "*.example.net"), Arrays.asList("10.1.2.3/16"));
         sbc.setAddress("10.1.2.3");
         SbcManager sbcManager = createNiceMock(SbcManager.class);
-        sbcManager.loadDefaultSbc();
+        sbcManager.getDefaultSbc();
         expectLastCall().andReturn(sbc);
 
         replay(rule, sbcManager);
@@ -177,7 +177,7 @@ public class ForwardingRulesTest extends XMLTestCase {
                 Arrays.asList("*.example.org", "*.example.net"), Arrays.asList("10.1.2.3/16"));
         sbc.setAddress("10.1.2.3");
         SbcManager sbcManager = createNiceMock(SbcManager.class);
-        sbcManager.loadDefaultSbc();
+        sbcManager.getDefaultSbc();
         expectLastCall().andReturn(sbc);
 
         replay(rule, sbcManager);
@@ -223,7 +223,7 @@ public class ForwardingRulesTest extends XMLTestCase {
                 new ArrayList<String>());
         sbc.setAddress("10.1.2.3");
         SbcManager sbcManager = createNiceMock(SbcManager.class);
-        sbcManager.loadDefaultSbc();
+        sbcManager.getDefaultSbc();
         expectLastCall().andReturn(sbc);
 
         replay(rule, sbcManager);
@@ -260,7 +260,7 @@ public class ForwardingRulesTest extends XMLTestCase {
                 new ArrayList<String>());
         sbc.setAddress("10.1.2.3");
         SbcManager sbcManager = createNiceMock(SbcManager.class);
-        sbcManager.loadDefaultSbc();
+        sbcManager.getDefaultSbc();
         expectLastCall().andReturn(sbc);
 
         replay(rule, sbcManager);
@@ -298,7 +298,7 @@ public class ForwardingRulesTest extends XMLTestCase {
         aux1.setAddress("10.1.2.4");
         aux2.setAddress("sbc.example.org");
         SbcManager sbcManager = createNiceMock(SbcManager.class);
-        sbcManager.loadDefaultSbc();
+        sbcManager.getDefaultSbc();
         expectLastCall().andReturn(sbc);
         sbcManager.loadAuxSbcs();
         expectLastCall().andReturn(Arrays.asList(aux1, aux2));
@@ -337,7 +337,7 @@ public class ForwardingRulesTest extends XMLTestCase {
         aux2.setAddress("sbc.example.org");
 
         SbcManager sbcManager = createNiceMock(SbcManager.class);
-        sbcManager.loadDefaultSbc();
+        sbcManager.getDefaultSbc();
         expectLastCall().andReturn(sbc);
         sbcManager.loadAuxSbcs();
         expectLastCall().andReturn(Arrays.asList(aux1, aux2));
@@ -396,7 +396,7 @@ public class ForwardingRulesTest extends XMLTestCase {
         sbc.setAddress("10.1.2.3");
 
         SbcManager sbcManager = createNiceMock(SbcManager.class);
-        sbcManager.loadDefaultSbc();
+        sbcManager.getDefaultSbc();
         expectLastCall().andReturn(sbc);
         sbcManager.loadAuxSbcs();
         expectLastCall().andReturn(null);

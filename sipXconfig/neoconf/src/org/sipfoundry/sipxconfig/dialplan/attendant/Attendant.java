@@ -30,7 +30,7 @@ public class Attendant implements Cloneable {
 
     private AutoAttendant m_attendant;
 
-    private List<WorkingHours> m_workingHours;
+    private List<WorkingHours> m_workingHours = new ArrayList<WorkingHours>();
 
     /**
      * Initialization is a bit tricky - days here are numbered from 0 to 6, with - 0 being Monday
@@ -87,6 +87,13 @@ public class Attendant implements Cloneable {
 
     public void setWorkingHours(List<WorkingHours> workingHours) {
         m_workingHours = workingHours;
+    }
+
+    public void replaceWorkingHours(List<WorkingHours> workingHours) {
+        m_workingHours.clear();
+        if( workingHours != null ) {
+            m_workingHours.addAll( workingHours );
+        }
     }
 
     @Override

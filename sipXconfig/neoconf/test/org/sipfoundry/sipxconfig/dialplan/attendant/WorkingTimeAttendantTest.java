@@ -343,7 +343,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         List<WorkingHours> workingHours = new ArrayList<WorkingHours>();
         workingHours.add(new WorkingHours());
         workingHours.add(new WorkingHours());
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         workingHours.get(0).setDay(ScheduledDay.SUNDAY);
         workingHours.get(1).setDay(ScheduledDay.SUNDAY);
@@ -388,7 +388,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         c.set(Calendar.MINUTE, 23);
         workingHours.get(2).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         assertTrue(workingTimeAttendant.overlappingPeriods());
 
@@ -410,7 +410,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         c.set(Calendar.MINUTE, 23);
         workingHours.get(1).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         assertTrue(workingTimeAttendant.overlappingPeriods());
 
@@ -432,7 +432,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         c.set(Calendar.MINUTE, 23);
         workingHours.get(1).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         assertTrue(workingTimeAttendant.overlappingPeriods());
 
@@ -452,7 +452,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         c.set(Calendar.MINUTE, 23);
         workingHours.get(1).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         assertFalse(workingTimeAttendant.overlappingPeriods());
 
@@ -476,7 +476,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         c.set(Calendar.MINUTE, 3);
         workingHours.get(1).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         assertFalse(workingTimeAttendant.overlappingPeriods());
 
@@ -496,7 +496,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         c.set(Calendar.MINUTE, 23);
         workingHours.get(1).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         assertFalse(workingTimeAttendant.overlappingPeriods());
 
@@ -543,7 +543,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         c.set(Calendar.MINUTE, 5);
         workingHours.get(0).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         try {
             workingTimeAttendant.checkValid();
@@ -560,7 +560,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         c.set(Calendar.MINUTE, 5);
         workingHours.get(0).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         try {
             workingTimeAttendant.checkValid();
@@ -622,7 +622,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         c.set(Calendar.MINUTE, 23);
         workingHours.get(1).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         try {
             workingTimeAttendant.checkValid();
@@ -647,7 +647,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         c.set(Calendar.MINUTE, 23);
         workingHours.get(1).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         try {
             workingTimeAttendant.checkValid();
@@ -672,7 +672,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         c.set(Calendar.MINUTE, 23);
         workingHours.get(1).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         try {
             workingTimeAttendant.checkValid();
@@ -697,7 +697,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         c.set(Calendar.MINUTE, 3);
         workingHours.get(1).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         try {
             workingTimeAttendant.checkValid();
@@ -722,7 +722,7 @@ public class WorkingTimeAttendantTest extends TestCase {
         c.set(Calendar.MINUTE, 23);
         workingHours.get(1).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         try {
             workingTimeAttendant.checkValid();

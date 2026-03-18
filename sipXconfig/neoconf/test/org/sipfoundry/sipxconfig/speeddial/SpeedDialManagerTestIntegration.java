@@ -334,7 +334,7 @@ public class SpeedDialManagerTestIntegration extends ImdbTestCase {
 
         Set<Group> groups = new TreeSet<Group>();
         groups.add(group);
-        u1004.setGroups(groups);
+        u1004.replaceGroups(groups);
         m_coreContext.saveUser(u1004);
 
         btns = new ArrayList<Document>();

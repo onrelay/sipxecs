@@ -182,7 +182,7 @@ public class PermissionManagerImplTestIntegration extends IntegrationTestCase {
         //It will throw java.lang.UnsupportedOperationException
         List<String> permNames = new ArrayList<String>();
         permNames.add(permission.getName());
-        rule.setPermissionNames(permNames);
+        rule.replacePermissionNames(permNames);
 
         m_dialPlanContext.storeRule(rule);
         commit();

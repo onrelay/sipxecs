@@ -80,6 +80,13 @@ public class CallRateRule extends BeanWithId implements DeployConfigOnEdit, Seri
         return m_limits;
     }
 
+    public void replaceCallRateLimits(List<CallRateLimit> limits) {
+        getCallRateLimits().clear();
+        if( limits != null ) {
+            getCallRateLimits().addAll( limits );
+        }
+    }
+
     @Override
     public Collection<Feature> getAffectedFeaturesOnChange() {
         return Collections.singleton((Feature) FirewallManager.FEATURE);

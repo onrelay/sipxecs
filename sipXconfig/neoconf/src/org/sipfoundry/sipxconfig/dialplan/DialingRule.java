@@ -49,7 +49,7 @@ public abstract class DialingRule extends BeanWithId implements NamedObject,
     private boolean m_enabled;
     private String m_name;
     private String m_description;
-    private List<Gateway> m_gateways;
+    private List<Gateway> m_gateways = new ArrayList<Gateway>();
     private transient PermissionManager m_permissionManager;
     private Schedule m_schedule;
     private Location m_location;
@@ -96,9 +96,6 @@ public abstract class DialingRule extends BeanWithId implements NamedObject,
     }
 
     public List<Gateway> getGateways() {
-        if( m_gateways == null ) {
-            m_gateways = new ArrayList<Gateway>();
-        }
         return m_gateways;
     }
 
@@ -124,9 +121,13 @@ public abstract class DialingRule extends BeanWithId implements NamedObject,
     }
 
     public void setGateways(List<Gateway> gateways) {
-        getGateways().clear();
+        m_gateways = gateways;
+    }
+    
+    public void replaceGateways(List<Gateway> gateways) {
+        m_gateways.clear();
         if( gateways != null ) {
-            getGateways().addAll( gateways );
+            m_gateways.addAll( gateways );
         }
     }
 

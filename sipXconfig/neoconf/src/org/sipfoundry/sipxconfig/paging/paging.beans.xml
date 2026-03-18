@@ -8,7 +8,6 @@
   </bean>
 
   <bean id="pagingSettings" class="org.sipfoundry.sipxconfig.paging.PagingSettings" parent="settingsBean">
-    <property name="modelFilesContext" ref="modelFilesContext"/>
   </bean>
 
   <bean id="pagingFeatureContextImpl" class="org.sipfoundry.sipxconfig.paging.PagingFeatureContextImpl" parent="daoSupport">

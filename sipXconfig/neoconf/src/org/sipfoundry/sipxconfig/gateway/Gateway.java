@@ -184,6 +184,13 @@ public class Gateway extends Device implements Replicable, DeployConfigOnEdit, S
         m_ports = ports;
     }
 
+    public void replacePorts(List<FxoPort> ports) {
+        getPorts().clear();
+        if( ports != null ) {
+            getPorts().addAll( ports );
+        }
+    }
+
     public void setModel(GatewayModel model) {
         m_model = model;
         setModelId(m_model.getModelId());

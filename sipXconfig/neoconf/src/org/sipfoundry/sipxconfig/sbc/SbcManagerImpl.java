@@ -29,23 +29,22 @@ public class SbcManagerImpl extends SipxHibernateDaoSupport<Sbc> implements SbcM
     private DomainManager m_domainManager;
     private BeanFactory m_beanFactory;
 
-    public DefaultSbc getDefaultSbc() {
+    public DefaultSbc loadDefaultSbc() {
         List<DefaultSbc> sbcs = super.loadAllEntities(DefaultSbc.class);
         DefaultSbc sbc = (DefaultSbc) DataAccessUtils.singleResult(sbcs);
         return sbc;
     }
 
-    public DefaultSbc loadDefaultSbc() {
-        DefaultSbc sbc = getDefaultSbc();
-        if (sbc == null) {
+
+    public DefaultSbc getDefaultSbc() {
+        DefaultSbc sbc = loadDefaultSbc();
+        if (sbc == null ) {
             sbc = new DefaultSbc();
-            sbc.setRoutes(createDefaultSbcRoutes());
+
+            SbcRoutes sbcRoutes = createDefaultSbcRoutes();
+            sbc.replaceRoutes(sbcRoutes);
+
             super.persistEntity(sbc);
-            //Need to flush - since there can be only one Default SBC in the database.
-            //Otherwise, the hibernate session may not be aware of the fact that a default SBC is
-            //already saved, so  you may end up having two default SBCs in the database.
-            super.flush();
-            getDaoEventPublisher().publishSave(sbc);
         }
         return sbc;
     }
@@ -77,7 +76,7 @@ public class SbcManagerImpl extends SipxHibernateDaoSupport<Sbc> implements SbcM
         super.removeEntity(sbc);
     }
 
-    public SbcRoutes getRoutes() {
+    public SbcRoutes getAllRoutes() {
         SbcRoutes routes = new SbcRoutes();
         Set<String> sbcDomains = new HashSet<String>();
         Set<String> sbcSubnets = new HashSet<String>();

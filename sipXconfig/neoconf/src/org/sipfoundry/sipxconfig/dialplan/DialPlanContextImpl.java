@@ -88,7 +88,6 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         DialPlan dialPlan = getDialPlan();
         dialPlan.addRule(position, rule);
         super.saveEntity(dialPlan);
-        getDaoEventPublisher().publishSave(dialPlan);
         m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.ADDED, AUDIT_LOG_CONFIG_TYPE, rule.getName());
     }
 
@@ -102,13 +101,11 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
             dialPlan.addRule(rule);
             super.persistEntity(rule);
             super.mergeEntity(dialPlan);
-            getDaoEventPublisher().publishSave(dialPlan);
             m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.ADDED, AUDIT_LOG_CONFIG_TYPE, rule.getName());
         } else {
             super.mergeEntity(rule);
             m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.MODIFIED, AUDIT_LOG_CONFIG_TYPE, rule.getName());
         }
-        getDaoEventPublisher().publishSave(rule);
     }
     /**
      * Checks for duplicate names. Should be called before saving the rule.
@@ -228,7 +225,6 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         DialPlan dialPlan = getDialPlan();
         dialPlan.removeRules(selectedRows);
         super.saveEntity(dialPlan);
-        getDaoEventPublisher().publishSave(dialPlan);
         for (DialingRule rule : rulesToDelete) {
             m_auditLogContext.logConfigChange(CONFIG_CHANGE_TYPE.DELETED, AUDIT_LOG_CONFIG_TYPE, rule.getName());
         }
@@ -243,7 +239,6 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
             DialingRule ruleDup = (DialingRule) duplicateBean(rule, DIALING_RULE_IDS_WITH_NAME_QUERY);
             rules.add(ruleDup);
         }
-        getDaoEventPublisher().publishSave(dialPlan);
         super.saveEntity(dialPlan);
     }
 
@@ -284,12 +279,6 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
 
         super.persistEntity(newDialPlan);
 
-        getDaoEventPublisher().publishSave(newDialPlan);
-        // Flush the session to cause the delete to take immediate effect.
-        // Otherwise we can get name collisions on dialing rules when we load the
-        // default dial plan, causing a DB integrity exception, even though the
-        // collisions would go away as soon as the session was flushed.
-        super.flush();
         return newDialPlan;
     }
 
@@ -320,7 +309,6 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         DialPlan dialPlan = getDialPlan();
         dialPlan.moveRules(selectedRows, step);
         super.saveEntity(dialPlan);
-        getDaoEventPublisher().publishSave(dialPlan);
     }
 
     /**
@@ -330,7 +318,6 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         DialPlan dialPlan = getDialPlan();
         if (dialPlan.removeEmptyRules()) {
             super.saveEntity(dialPlan);
-            getDaoEventPublisher().publishSave(dialPlan);
         }
     }
 
@@ -379,7 +366,6 @@ public class DialPlanContextImpl extends SipxHibernateDaoSupport<DialingRule> im
         for (DialingRule rule : rules) {
             rule.removeGateways(gatewayIds);
             storeRule(rule);
-            getDaoEventPublisher().publishSave(rule);
         }
     }
 

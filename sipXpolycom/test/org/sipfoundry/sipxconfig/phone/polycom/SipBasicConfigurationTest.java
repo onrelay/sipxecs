@@ -215,7 +215,7 @@ public class SipBasicConfigurationTest extends PolycomXmlTestCase {
         List<Line> lines = new ArrayList<Line>();
 
         PolycomPhone phone = new PolycomPhone();
-        phone.setLines(lines);
+        phone.replaceLines(lines);
         phone.setModelId("polycomVVX500");
         phone.setPhoneModelSource(phoneModelSource);
         phone.setBeanId("polycomVVX500");

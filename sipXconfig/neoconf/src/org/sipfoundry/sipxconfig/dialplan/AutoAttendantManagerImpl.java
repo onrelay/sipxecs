@@ -84,10 +84,8 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         checkRegEx(aa.getDenyDial(), "&error.invalid.denyDialExpression");
         checkRegEx(aa.getAllowDial(), "&error.invalid.allowDialExpression");
 
-        clearUnsavedValueStorage(aa.getValueStorage());
+        clearEmptyValueStorage(aa.getValueStorage());
         super.saveEntity(aa);
-        super.flush();
-        getDaoEventPublisher().publishSave(aa);
     }
 
     private static void checkRegEx(String regEx, String errMessage) {
@@ -164,7 +162,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
             throw new AttendantInUseException();
         }
 
-        attendant.setValueStorage(clearUnsavedValueStorage(attendant.getValueStorage()));
+        attendant.setValueStorage(clearEmptyValueStorage(attendant.getValueStorage()));
         super.refreshEntity(attendant);
 
         Collection<AttendantRule> attendantRules = super.loadAllEntities(AttendantRule.class);
@@ -247,7 +245,6 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         attendant = createSystemAttendant(attendantId);
         attendant.addGroup(getDefaultAutoAttendantGroup());
         super.saveEntity(attendant);
-        getDaoEventPublisher().publishSave(attendant);
         return attendant;
     }
 
@@ -302,7 +299,6 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
 
         specialMode.setAttendant(null);
         super.saveEntity(specialMode);
-        getDaoEventPublisher().publishSave(specialMode);
     }
 
     @Override
@@ -330,7 +326,6 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
             specialMode.setAttendant(aa);
         }          
         super.saveEntity(specialMode);
-        getDaoEventPublisher().publishSave(specialMode);
     }
 
     private AttendantSpecialMode loadAttendantSpecialMode() {
@@ -386,7 +381,7 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
                         workingHoursItem.setStop(cal.getTime());
                         workingHoursItem.setDay(ScheduledDay.getScheduledDay(cal.get(Calendar.DAY_OF_WEEK)));
                         workingHours.add( workingHoursItem );
-                        workingTimeAttendant.setWorkingHours(workingHours);
+                        workingTimeAttendant.replaceWorkingHours(workingHours);
                         List<WorkingHours.Interval> intervals = workingTimeAttendant.calculateValidTime(utc);
                         int intervalNow = intervals.get(0).getStart();
                         List<WorkingHours.Interval> scheduleIntervals = schedule.getScheduledAttendant().calculateValidTime(
@@ -433,7 +428,6 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
                 rule.setLiveAttendantExpire(null);
             }
             super.saveEntity(rule);
-            getDaoEventPublisher().publishSave(rule);
             return true;
         } catch (Exception ex) {
             LOG.error(String.format("Cannot change live attendant for code %s, cause %s ", code, ex.getMessage()));
@@ -454,7 +448,6 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
                 rule.setLiveAttendantEnabled(true);
                 rule.setLiveAttendantExpire(null);
                 super.mergeEntity(rule);
-                getDaoEventPublisher().publishSave(rule);
             }
         }
     }

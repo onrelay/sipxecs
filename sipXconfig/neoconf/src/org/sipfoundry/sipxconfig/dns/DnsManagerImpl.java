@@ -248,7 +248,7 @@ public class DnsManagerImpl implements DnsManager, AddressProvider, FeatureProvi
                 m_plan = new DnsFailoverPlan();
                 m_plan.setUniqueId(id);
                 m_groups = new ArrayList<DnsFailoverGroup>();
-                m_plan.setGroups(m_groups);
+                m_plan.replaceGroups(m_groups);
                 m_plan.setName(rs.getString(NAME));
                 m_plans.add(m_plan);
             }
@@ -390,7 +390,7 @@ public class DnsManagerImpl implements DnsManager, AddressProvider, FeatureProvi
         targetByOtherRegions.setTargets(Collections.singleton(t3));
 
         DnsFailoverPlan plan = new DnsFailoverPlan();
-        plan.setGroups(Arrays.asList(targetByRegion, targetByOtherRegions));
+        plan.replaceGroups(Arrays.asList(targetByRegion, targetByOtherRegions));
         return plan;
     }
 

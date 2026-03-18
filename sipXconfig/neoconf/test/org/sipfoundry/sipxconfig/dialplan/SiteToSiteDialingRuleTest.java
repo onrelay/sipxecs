@@ -80,7 +80,7 @@ public class SiteToSiteDialingRuleTest {
         workingHoursItem.setEnabled(true);
         workingHoursItem.setDay(ScheduledDay.WEDNESDAY);
         workingHours.add(workingHoursItem);
-        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.replaceWorkingHours(workingHours);
         scheduledAttendant.setEnabled(true);
         m_schedule.setScheduledAttendant(scheduledAttendant);
         DialPattern[] dialPatterns = new DialPattern[PATTERN_COUNT];
@@ -93,7 +93,7 @@ public class SiteToSiteDialingRuleTest {
         m_patternsList = Arrays.asList(dialPatterns);
 
         m_rule = new SiteToSiteDialingRule();
-        m_rule.setDialPatterns(m_patternsList);
+        m_rule.replaceDialPatterns(m_patternsList);
 
         for (int i = 0; i < GATEWAYS.length; i++) {
             Gateway gateway = new Gateway();
@@ -162,7 +162,7 @@ public class SiteToSiteDialingRuleTest {
                 return "bongo.example.org";
             }
         };
-        m_rule.setGateways(Collections.singletonList(g));
+        m_rule.replaceGateways(Collections.singletonList(g));
         Transform[] transforms = m_rule.getTransforms();
         assertEquals(1, transforms.length);
         FullTransform full = (FullTransform) transforms[0];
@@ -173,7 +173,7 @@ public class SiteToSiteDialingRuleTest {
     @Test
     public void testNoGateways() {
         SiteToSiteDialingRule rule = new SiteToSiteDialingRule();
-        rule.setDialPatterns(m_patternsList);
+        rule.replaceDialPatterns(m_patternsList);
         rule.setEnabled(true);
         rule.setCallPattern(new CallPattern("999", CallDigits.VARIABLE_DIGITS));
 
@@ -195,7 +195,7 @@ public class SiteToSiteDialingRuleTest {
     @Test
     public void testNoGatewaysWithSchedule() {
         SiteToSiteDialingRule rule = new SiteToSiteDialingRule();
-        rule.setDialPatterns(m_patternsList);
+        rule.replaceDialPatterns(m_patternsList);
         rule.setEnabled(true);
         rule.setCallPattern(new CallPattern("999", CallDigits.VARIABLE_DIGITS));
         rule.setSchedule(m_schedule);
@@ -219,7 +219,7 @@ public class SiteToSiteDialingRuleTest {
     @Test
     public void testGetTransformedPatternsVariable() throws Exception {
         SiteToSiteDialingRule rule = new SiteToSiteDialingRule();
-        rule.setDialPatterns(m_patternsList);
+        rule.replaceDialPatterns(m_patternsList);
         rule.setEnabled(true);
         rule.setCallPattern(new CallPattern("77", CallDigits.VARIABLE_DIGITS));
 
@@ -235,7 +235,7 @@ public class SiteToSiteDialingRuleTest {
     @Test
     public void testGetTransformedPatternsFixed() throws Exception {
         SiteToSiteDialingRule rule = new SiteToSiteDialingRule();
-        rule.setDialPatterns(m_patternsList);
+        rule.replaceDialPatterns(m_patternsList);
         rule.setEnabled(true);
         rule.setCallPattern(new CallPattern("77", CallDigits.FIXED_DIGITS));
 
@@ -251,7 +251,7 @@ public class SiteToSiteDialingRuleTest {
     @Test
     public void testGetTransformedPatternsNoDigits() throws Exception {
         SiteToSiteDialingRule rule = new SiteToSiteDialingRule();
-        rule.setDialPatterns(m_patternsList);
+        rule.replaceDialPatterns(m_patternsList);
         rule.setEnabled(true);
         rule.setCallPattern(new CallPattern("77", CallDigits.NO_DIGITS));
 

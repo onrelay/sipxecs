@@ -58,7 +58,7 @@ public class FxoPortBean {
     @XmlRootElement(name = "Ports")
     public static class FxoPortList {
 
-        private List<FxoPortBean> m_ports;
+        private List<FxoPortBean> m_ports = new ArrayList<FxoPortBean>();
 
         public void setPorts(List<FxoPortBean> ports) {
             m_ports = ports;
@@ -66,10 +66,14 @@ public class FxoPortBean {
 
         @XmlElement(name = "Port")
         public List<FxoPortBean> getPorts() {
-            if (m_ports == null) {
-                m_ports = new ArrayList<FxoPortBean>();
-            }
             return m_ports;
+        }
+
+        public void replacePorts(List<FxoPortBean> ports) {
+            getPorts().clear();
+            if( ports != null ) {
+                getPorts().addAll( ports );
+            }
         }
 
         public static FxoPortList convertPortsList(Collection<FxoPort> ports) {

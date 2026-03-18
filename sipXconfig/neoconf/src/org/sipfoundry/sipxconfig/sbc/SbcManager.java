@@ -15,14 +15,8 @@ import java.util.List;
 public interface SbcManager {
     public static final String CONTEXT_BEAN_NAME = "sbcManager";
 
-    /**
-     * returns default SBC if one if defined, otherwise null
-     */
     DefaultSbc getDefaultSbc();
 
-    /**
-     * Creates default SBC if one is not found
-     */
     DefaultSbc loadDefaultSbc();
 
     List<AuxSbc> loadAuxSbcs();
@@ -35,7 +29,7 @@ public interface SbcManager {
 
     void removeSbcs(Collection<Integer> sbcIds);
 
-    SbcRoutes getRoutes();
+    SbcRoutes getAllRoutes();
 
     void clear();
 }

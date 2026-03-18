@@ -115,7 +115,7 @@ public abstract class EditCallRate extends PageWithCallback implements PageBegin
         }
 
         CallRateRule rule = getRule();
-        rule.setCallRateLimits(getLimits());
+        rule.replaceCallRateLimits(getLimits());
         saveValid(rule);
     }
 
@@ -138,7 +138,7 @@ public abstract class EditCallRate extends PageWithCallback implements PageBegin
         List<CallRateLimit> newLimits = new LinkedList<CallRateLimit>();
         newLimits.addAll(limits);
         newLimits.remove(index);
-        getRule().setCallRateLimits(newLimits);
+        getRule().replaceCallRateLimits(newLimits);
         setLimits(newLimits);
     }
 

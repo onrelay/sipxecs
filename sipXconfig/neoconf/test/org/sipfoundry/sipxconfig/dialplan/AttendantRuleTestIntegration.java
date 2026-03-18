@@ -162,7 +162,7 @@ public class AttendantRuleTestIntegration extends MongoTestIntegration {
         workingHoursItem.setEnabled(true);
         workingHoursItem.setDay(ScheduledDay.FRIDAY);
         workingHours.add(workingHoursItem);
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
         workingTimeAttendant.setEnabled(true);
         schedule.setScheduledAttendant(workingTimeAttendant);
         schedule.setName("live attendant schedule");

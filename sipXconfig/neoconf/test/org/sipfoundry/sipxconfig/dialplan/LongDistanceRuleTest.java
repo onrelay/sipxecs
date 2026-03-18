@@ -52,7 +52,7 @@ public class LongDistanceRuleTest extends TestCase {
         workingHoursItem.setEnabled(true);
         workingHoursItem.setDay(ScheduledDay.WEDNESDAY);
         workingHours.add(workingHoursItem);
-        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.replaceWorkingHours(workingHours);
         scheduledAttendant.setEnabled(true);
         m_schedule.setScheduledAttendant(scheduledAttendant);
 
@@ -66,7 +66,7 @@ public class LongDistanceRuleTest extends TestCase {
 
         Gateway g = new Gateway();
         g.setAddress("longdistance.gateway.com");
-        m_rule.setGateways(Collections.singletonList(g));
+        m_rule.replaceGateways(Collections.singletonList(g));
     }
 
     private DialingRule getGenerationRule(DialingRule rule) {

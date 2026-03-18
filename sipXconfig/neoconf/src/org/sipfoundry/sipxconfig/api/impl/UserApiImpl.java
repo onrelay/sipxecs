@@ -224,7 +224,7 @@ public class UserApiImpl implements UserApi {
 
         Set<String> aliases = userBean.getAliases();
         if (aliases != null) {
-            user.setAliases(userBean.getAliases());
+            user.replaceAliases(userBean.getAliases());
         }
         
         Set<String> permissions = userBean.getPermissions();

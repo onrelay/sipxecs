@@ -101,7 +101,7 @@ public abstract class EditSchedule extends UserBasePage {
             }
             ScheduledAttendant scheduledAttendant = new ScheduledAttendant();
             workingHours = new ArrayList<WorkingHours>();
-            scheduledAttendant.setWorkingHours(workingHours);
+            scheduledAttendant.replaceWorkingHours(workingHours);
             schedule.setScheduledAttendant(scheduledAttendant);
         }
         setSchedule(schedule);
@@ -146,7 +146,7 @@ public abstract class EditSchedule extends UserBasePage {
 
         Schedule schedule = getSchedule();
         ScheduledAttendant scheduledAttendant = schedule.getScheduledAttendant();
-        scheduledAttendant.setWorkingHours(getWorkingHours());
+        scheduledAttendant.replaceWorkingHours(getWorkingHours());
         schedule.checkForValidSchedule();
         getForwardingContext().saveSchedule(schedule);
     }

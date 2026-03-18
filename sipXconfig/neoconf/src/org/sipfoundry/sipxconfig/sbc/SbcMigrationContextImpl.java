@@ -51,7 +51,6 @@ public class SbcMigrationContextImpl extends SipxHibernateDaoSupport<Sbc> implem
                     ((BridgeSbc) sbcDevice).updateBridgeLocationId();
                 }
                 super.persistEntity(sbc);
-                super.flush();
             } catch (UserException e) {
                 LOG.warn("cannot migrate sbcs", e);
             }
@@ -67,8 +66,6 @@ public class SbcMigrationContextImpl extends SipxHibernateDaoSupport<Sbc> implem
         sbcDevice.setName(address + "_" + System.currentTimeMillis());
         sbcDevice.setAddress(address);
         m_sbcDeviceManager.saveSbcDevice(sbcDevice);
-        super.flush();
-
         return sbcDevice.getId();
     }
 

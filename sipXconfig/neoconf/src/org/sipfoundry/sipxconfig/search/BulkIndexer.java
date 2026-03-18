@@ -14,6 +14,7 @@ import java.io.Serializable;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
 import org.hibernate.type.Type;
 
 /**
@@ -42,8 +43,18 @@ public class BulkIndexer implements Indexer {
         }
     }
 
-    public void removeBean(Object bean_, Object id_) {
-        throw new UnsupportedOperationException("only used to add new beans");
+    public void removeBean(Object bean, Object id) {
+        try {
+            open();
+
+            Term identityTerm = m_beanAdaptor.getIdentityTerm(bean, id);
+            
+            m_writer.deleteDocuments(identityTerm);
+
+        } catch (IOException e) {
+            close();
+            throw new RuntimeException(e);
+        }
     }
 
     public void open() {

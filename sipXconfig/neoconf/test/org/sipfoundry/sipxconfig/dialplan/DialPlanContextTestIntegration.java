@@ -85,7 +85,7 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
         workingHoursItem.setEnabled(true);
         workingHoursItem.setDay(ScheduledDay.WEDNESDAY);
         workingHours.add(workingHoursItem);
-        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.replaceWorkingHours(workingHours);
         scheduledAttendant.setEnabled(true);
         schedule.setScheduledAttendant(scheduledAttendant);
         m_forwardingContext.saveSchedule(schedule);
@@ -97,7 +97,7 @@ public class DialPlanContextTestIntegration extends IntegrationTestCase {
         //It will throw java.lang.UnsupportedOperationException
         List<String> permNames = new ArrayList<String>();
         permNames.add(PermissionName.VOICEMAIL.getName());
-        r2.setPermissionNames(permNames);
+        r2.replacePermissionNames(permNames);
 
         m_dialPlanContext.storeRule(r1);
         assertEquals(1 + DEFAULT_DIAL_PLAN_SIZE, m_dialPlanContext.getRules().size());

@@ -59,7 +59,7 @@ public class ScheduleTest extends TestCase {
 
         Integer minutesFromSunday = (workingHours.get(0).getDay().getDayOfWeek() - 1) * 24 * 60;
 
-        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.replaceWorkingHours(workingHours);
         scheduledAttendant.setEnabled(true);
 
         sch.setScheduledAttendant(scheduledAttendant);
@@ -107,7 +107,7 @@ public class ScheduleTest extends TestCase {
 
         Integer minutesFromSunday = (workingHours.get(0).getDay().getDayOfWeek() - 1) * 24 * 60;
 
-        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.replaceWorkingHours(workingHours);
         scheduledAttendant.setEnabled(true);
 
         sch.setScheduledAttendant(scheduledAttendant);
@@ -156,7 +156,7 @@ public class ScheduleTest extends TestCase {
 
         Integer minutesFromSunday = (workingHours.get(0).getDay().getDayOfWeek() - 1) * 24 * 60;
 
-        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.replaceWorkingHours(workingHours);
         scheduledAttendant.setEnabled(true);
 
         sch.setScheduledAttendant(scheduledAttendant);

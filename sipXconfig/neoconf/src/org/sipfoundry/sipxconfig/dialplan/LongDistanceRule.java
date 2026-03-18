@@ -146,15 +146,15 @@ public class LongDistanceRule extends DialingRule {
         rule.setName(getName());
         rule.setDescription(getDescription());
         rule.setEnabled(isEnabled());
-        rule.setGateways(getGateways());
+        rule.replaceGateways(getGateways());
         rule.setCallPattern(calculateCallPattern(areaCode));
-        rule.setDialPatterns(calculateDialPatterns(areaCode));
+        rule.replaceDialPatterns(calculateDialPatterns(areaCode));
         rule.setPermissionManager(getPermissionManager());
         List<String> permNames = new ArrayList<String>(1);
         if (m_permissionName != null) {
             permNames.add(m_permissionName);
         }
-        rule.setPermissionNames(permNames);
+        rule.replacePermissionNames(permNames);
         rule.setSchedule(getSchedule());
         return rule;
     }

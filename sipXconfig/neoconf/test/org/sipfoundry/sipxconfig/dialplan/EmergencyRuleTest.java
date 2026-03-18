@@ -52,7 +52,7 @@ public class EmergencyRuleTest extends TestCase {
         workingHoursItem.setEnabled(true);
         workingHoursItem.setDay(ScheduledDay.WEDNESDAY);
         workingHours.add(workingHoursItem);
-        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.replaceWorkingHours(workingHours);
         scheduledAttendant.setEnabled(true);
         m_schedule.setScheduledAttendant(scheduledAttendant);
 
@@ -74,7 +74,7 @@ public class EmergencyRuleTest extends TestCase {
         SbcDevice sbcDevice = new SbcDevice();
         sbcDevice.setAddress("bridge.example.org");
         g3.setSbcDevice(sbcDevice);
-        m_rule.setGateways(Arrays.asList(g1, g2, g3));
+        m_rule.replaceGateways(Arrays.asList(g1, g2, g3));
     }
 
     public void testGetPatterns() {

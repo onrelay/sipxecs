@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.sipfoundry.sipxconfig.common.BeanWithId;
 import org.sipfoundry.sipxconfig.common.CoreContextImpl;
 import org.sipfoundry.sipxconfig.common.DaoUtils;
 import org.sipfoundry.sipxconfig.common.DataCollectionUtil;
@@ -142,7 +143,6 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport<Object> implements S
             GroupWeight weight = new GroupWeight();
             super.saveEntity(weight);
             group.setWeight(weight.getWeight());
-            super.removeEntity(weight); // delete not strictly nec.
         }
     }
 
@@ -292,7 +292,7 @@ public class SettingDaoImpl extends SipxHibernateDaoSupport<Object> implements S
     /**
      * Internal object, only used to generate group weights in DB neutral way
      */
-    static class GroupWeight {
+    static class GroupWeight extends BeanWithId {
 
         private Integer m_weight = Integer.valueOf(-1);
 

@@ -27,7 +27,10 @@ public class DialPatternList {
     private List<DialPatternBean> m_patterns;
 
     public void setPatterns(List<DialPatternBean> patterns) {
-        m_patterns = patterns;
+        getPatterns().clear();
+        if( patterns != null ) {
+            getPatterns().addAll( patterns );
+        }
     }
 
     public static DialPatternList convertPatternList(List<DialPattern> patterns) {

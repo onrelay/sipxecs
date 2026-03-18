@@ -170,10 +170,7 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
             DaoUtils.checkDuplicates(session, Phonebook.class, phonebook, NAME, new DuplicatePhonebookName());
         });
 
-        super.saveEntity(phonebook);
-
-        getDaoEventPublisher().publishSave(phonebook);
-        
+        super.saveEntity(phonebook);        
     }
 
     @Override
@@ -195,19 +192,16 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     @Override
     public void savePhonebookEntry(PhonebookEntry entry) {
         super.mergeEntity(entry);
-        getDaoEventPublisher().publishSave(entry);
     }
 
     @Override
     public void updatePhonebookEntry(PhonebookEntry entry) {
         super.mergeEntity(entry);
-        getDaoEventPublisher().publishSave(entry);
     }
 
     @Override
     public void deletePhonebookEntry(PhonebookEntry entry) {
         super.removeEntity(entry);
-        getDaoEventPublisher().publishDelete(entry);
     }
 
     class DuplicatePhonebookName extends UserException {
@@ -308,7 +302,6 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
             phonebook.setName("privatePhonebook_" + user.getId());
             phonebook.setUser(user);
             savePhonebook(phonebook);
-            getDaoEventPublisher().publishSave(phonebook);
         }
 
         return phonebook;
@@ -1101,7 +1094,6 @@ public class PhonebookManagerImpl extends SipxHibernateDaoSupport<Phonebook> imp
     @Override
     public void saveGeneralPhonebookSettings(GeneralPhonebookSettings generalPhonebookSettings) {
         m_settingsDao.upsert(generalPhonebookSettings);
-        getDaoEventPublisher().publishSave(generalPhonebookSettings);
     }
 
     @Override

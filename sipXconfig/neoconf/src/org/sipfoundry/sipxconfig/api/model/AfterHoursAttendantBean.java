@@ -35,7 +35,7 @@ public class AfterHoursAttendantBean extends AttendantBean {
 
         AfterHoursAttendantBean afterHoursAttendantBean = new AfterHoursAttendantBean();
 
-        afterHoursAttendantBean.setWorkingHours( attendantBean.getWorkingHours() );
+        afterHoursAttendantBean.replaceWorkingHours( attendantBean.getWorkingHours() );
 
         return afterHoursAttendantBean;
     }
@@ -47,13 +47,9 @@ public class AfterHoursAttendantBean extends AttendantBean {
 
         AfterHoursAttendant afterHoursAttendant = new AfterHoursAttendant();
 
-        afterHoursAttendant.setWorkingHours( attendant.getWorkingHours() );
+        afterHoursAttendant.replaceWorkingHours( attendant.getWorkingHours() );
 
         return afterHoursAttendant;
-    }
-
-    public void setWorkingHours(List<WorkingHoursBean> workingHours) {
-        super.setWorkingHours( workingHours );
     }
 
     @XmlElement(name = "workingHours")

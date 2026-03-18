@@ -19,6 +19,7 @@ import org.sipfoundry.sipxconfig.components.SipxBasePage;
 import org.sipfoundry.sipxconfig.components.SipxValidationDelegate;
 import org.sipfoundry.sipxconfig.components.TapestryUtils;
 import org.sipfoundry.sipxconfig.sbc.Sbc;
+import org.sipfoundry.sipxconfig.sbc.DefaultSbc;
 import org.sipfoundry.sipxconfig.sbc.SbcDevice;
 import org.sipfoundry.sipxconfig.sbc.SbcManager;
 
@@ -28,9 +29,9 @@ public abstract class InternetCalling extends SipxBasePage implements PageBeginR
     @InjectObject(value = "spring:sbcManager")
     public abstract SbcManager getSbcManager();
 
-    public abstract Sbc getSbc();
+    public abstract DefaultSbc getSbc();
 
-    public abstract void setSbc(Sbc sbc);
+    public abstract void setSbc(DefaultSbc sbc);
 
     public abstract void setSelectedSbcDevice(SbcDevice selectedSbcDevice);
 
@@ -43,9 +44,9 @@ public abstract class InternetCalling extends SipxBasePage implements PageBeginR
     public abstract boolean isAdvanced();
 
     public void pageBeginRender(PageEvent event_) {
-        Sbc sbc = getSbc();
+        DefaultSbc sbc = getSbc();
         if (sbc == null) {
-            sbc = getSbcManager().loadDefaultSbc();
+            sbc = getSbcManager().getDefaultSbc();
             setSbc(sbc);
         }
     }
@@ -60,7 +61,7 @@ public abstract class InternetCalling extends SipxBasePage implements PageBeginR
     }
 
     private void saveValid() {
-        Sbc sbc = getSbc();
+        DefaultSbc sbc = getSbc();
         if (sbc.isEnabled() && (sbc.getAddress() == null || sbc.getPort() == 0)) {
             throw new UserException(getMessages().getMessage("error.requiredSbc"));
         }

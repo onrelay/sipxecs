@@ -42,7 +42,6 @@
   </bean>
 
   <bean id="fsRecordingSettings" class="org.sipfoundry.sipxconfig.freeswitch.FreeswitchRecordingSettings" parent="settingsBean">
-    <property name="modelFilesContext" ref="modelFilesContext"/>
   </bean>
 
 </beans>

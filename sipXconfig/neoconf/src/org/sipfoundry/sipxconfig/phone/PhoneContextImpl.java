@@ -182,23 +182,21 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
                     new DuplicateSerialNumberException(serialNumber));
         });
 
-        phone.setValueStorage(clearUnsavedValueStorage(phone.getValueStorage()));
+        phone.setValueStorage(clearEmptyValueStorage(phone.getValueStorage()));
         isNew = phone.isNew();
         if (isNew) {
             LOG.error(String.format(ALARM_PHONE_ADDED, phone.getSerialNumber()));
         } 
         super.saveEntity(phone);
-        super.flush();
-        getDaoEventPublisher().publishSave(phone); 
     }
 
     @Override
     public void deletePhone(Phone phone) {
         ProfileLocation location = phone.getModel().getDefaultProfileLocation();
         phone.removeProfiles(location);
-        phone.setValueStorage(clearUnsavedValueStorage(phone.getValueStorage()));
+        phone.setValueStorage(clearEmptyValueStorage(phone.getValueStorage()));
         for (Line line : phone.getLines()) {
-            line.setValueStorage(clearUnsavedValueStorage(line.getValueStorage()));
+            line.setValueStorage(clearEmptyValueStorage(line.getValueStorage()));
         }
         super.removeEntity(phone);
         LOG.error(String.format(ALARM_PHONE_DELETED, phone.getId(), phone.getSerialNumber()));
@@ -206,16 +204,14 @@ public class PhoneContextImpl extends SipxHibernateDaoSupport<Phone> implements 
 
     @Override
     public void storeLine(Line line) {
-        line.setValueStorage(clearUnsavedValueStorage(line.getValueStorage()));
+        line.setValueStorage(clearEmptyValueStorage(line.getValueStorage()));
         
         super.saveEntity(line);
-
-        getDaoEventPublisher().publishSave(line);
     }
 
     @Override
     public void deleteLine(Line line) {
-        line.setValueStorage(clearUnsavedValueStorage(line.getValueStorage()));
+        line.setValueStorage(clearEmptyValueStorage(line.getValueStorage()));
         super.removeEntity(line);
     }
 

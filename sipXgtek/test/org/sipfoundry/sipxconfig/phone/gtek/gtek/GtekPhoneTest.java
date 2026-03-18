@@ -78,11 +78,11 @@ public class GtekPhoneTest extends TestCase {
 
         Set user2Aliases = new LinkedHashSet(); // use LinkedHashSet for stable ordering
         user2Aliases.add("201");
-        user2.setAliases(user2Aliases);
+        user2.replaceAliases(user2Aliases);
 
         Set user3Aliases = new LinkedHashSet(); // use LinkedHashSet for stable ordering
         user3Aliases.add("202");
-        user3.setAliases(user3Aliases);
+        user3.replaceAliases(user3Aliases);
 
         Button[] buttons = new Button[] {
             new Button("Bill User", "201"), new Button("Bob User", "202")

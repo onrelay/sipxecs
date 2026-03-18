@@ -27,7 +27,6 @@
   </bean>
   
   <bean id="fail2banSettings" class="org.sipfoundry.sipxconfig.fail2ban.Fail2banSettings" parent="settingsBean">
-    <property name="modelFilesContext" ref="modelFilesContext"/>
     <property name="firewallManager" ref="firewallManager"/>
   </bean>
 

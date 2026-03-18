@@ -39,31 +39,29 @@ public class BeanWithSettingsDaoImpl<T extends BeanWithSettings> extends SipxHib
     }
 
     @Override
+    public void setBeanFactory(BeanFactory beanFactory) {
+        m_beanFactory = (ListableBeanFactory) beanFactory;
+    }
+
+    @Override
     public T findOrCreateOne() {
-        return m_beanFactory.getBean(m_class);
+
+        T beanWithSettings = super.getEntity( m_class );
+
+        if( beanWithSettings == null ) {
+            beanWithSettings = m_beanFactory.getBean(m_class);
+        }
+
+        return beanWithSettings;
     }
 
     @Override
     public List<T> findAll() {
-        return List.of(m_beanFactory.getBean(m_class));
+        return super.getEntities( m_class );
     }
 
     @Override
-    public void upsert(T object) {
-
-        super.getSessionFactory().inTransaction( session -> {
-            
-            session.merge( object.getInitializeValueStorage() );  
-        });
-
-        super.getSessionFactory().inTransaction( session -> {
-
-            session.flush();
-        }); 
-    }
-
-    @Override
-    public void setBeanFactory(BeanFactory beanFactory) {
-        m_beanFactory = (ListableBeanFactory) beanFactory;
+    public void upsert(T beanWithSettings ) {
+        super.saveEntity( beanWithSettings );
     }
 }

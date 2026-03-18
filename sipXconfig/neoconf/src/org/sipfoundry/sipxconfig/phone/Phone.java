@@ -63,7 +63,7 @@ public abstract class Phone extends Device implements Replicable, SystemAuditabl
 
     private String m_description;
 
-    private List<Line> m_lines = Collections.emptyList();
+    private List<Line> m_lines = new ArrayList<Line>();
 
     private PhoneContext m_phoneContext;
 
@@ -254,10 +254,15 @@ public abstract class Phone extends Device implements Replicable, SystemAuditabl
         m_lines = lines;
     }
 
-    public void addLine(Line line) {
-        if (m_lines == Collections.EMPTY_LIST) {
-            m_lines = new ArrayList<Line>();
+    public void replaceLines(List<Line> lines) {
+        m_lines.clear();
+        if( lines != null ) {
+            m_lines.addAll( lines );
         }
+    }
+
+
+    public void addLine(Line line) {
         int max = getModel().getMaxLineCount();
         if (m_lines.size() >= max) {
             throw new MaxLinesException(String.valueOf(max));

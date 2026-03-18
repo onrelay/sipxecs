@@ -25,10 +25,17 @@ import org.sipfoundry.sipxconfig.paging.PagingGroup;
 @XmlRootElement(name = "Groups")
 public class PageGroupList {
 
-    private List<PageGroupBean> m_groups;
+    private List<PageGroupBean> m_groups = new ArrayList<PageGroupBean>();
 
     public void setGroups(List<PageGroupBean> groups) {
         m_groups = groups;
+    }
+
+    public void replaceGroups(List<PageGroupBean> groups) {
+        m_groups.clear();
+        if( groups != null ) {
+            m_groups.addAll( groups );
+        }
     }
 
     @XmlElement(name = "Group")
@@ -45,7 +52,7 @@ public class PageGroupList {
             groups.add(PageGroupBean.convertGroup(group));
         }
         PageGroupList list = new PageGroupList();
-        list.setGroups(groups);
+        list.replaceGroups(groups);
         return list;
     }
 }

@@ -249,7 +249,7 @@ public class FallbackRulesTest extends XMLTestCase {
         rule.addGateway(montreal);
         rule.addGateway(lisbon);
         rule.setCallPattern(new CallPattern("444", CallDigits.NO_DIGITS));
-        rule.setDialPatterns(Arrays.asList(new DialPattern("x", DialPattern.VARIABLE_DIGITS)));
+        rule.replaceDialPatterns(Arrays.asList(new DialPattern("x", DialPattern.VARIABLE_DIGITS)));
 
         EmergencyRule emergencyRule = new EmergencyRule();
         emergencyRule.setName("emergency name");

@@ -22,7 +22,7 @@ public abstract class BeanWithSettings extends BeanWithId {
     /**
      * While settings are getting decorated, this represents the settings that should be decorated
      */
-    private Storage m_valueStorage;
+    private ValueStorage m_valueStorage;
 
     public BeanWithSettings() {
         initializeSettingModel();
@@ -75,15 +75,15 @@ public abstract class BeanWithSettings extends BeanWithId {
         m_model.setSettings(m_settings);
     }
 
-    public synchronized void setValueStorage(Storage valueStorage) {
+    public synchronized void setValueStorage(ValueStorage valueStorage) {
         m_valueStorage = valueStorage;
     }
 
-    public synchronized Storage getValueStorage() {
+    public synchronized ValueStorage getValueStorage() {
         return m_valueStorage;
     }
 
-    public synchronized Storage getInitializeValueStorage() {
+    public synchronized ValueStorage getInitializeValueStorage() {
         if (m_valueStorage == null) {
             m_valueStorage = new ValueStorage();
         }

@@ -26,12 +26,12 @@
     <property name="enabled" />
     <list name="smsAddresses" table="alarm_group_smscontacts">
       <key column="alarm_group_id" />
-      <index column="index" />
+      <list-index column="index" />
       <element type="string" column="address" not-null="true" />
     </list>
     <list name="emailAddresses" table="alarm_group_emailcontacts">
       <key column="alarm_group_id" />
-      <index column="index" />
+      <list-index column="index" />
       <element type="string" column="address" not-null="true" />
     </list>
     <set name="users" table="user_alarm_group">

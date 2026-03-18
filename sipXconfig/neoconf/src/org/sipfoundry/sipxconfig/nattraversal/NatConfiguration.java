@@ -55,7 +55,7 @@ public class NatConfiguration implements ConfigProvider {
         Setting natTraversalSetting = settings.getSettings().getSetting("relay-config");
         Address proxyTcp = manager.getAddressManager().getSingleAddress(ProxyManager.TCP_ADDRESS);
         Address proxyTls = manager.getAddressManager().getSingleAddress(ProxyManager.TLS_ADDRESS);
-        SbcRoutes routes = m_sbcManager.getRoutes();
+        SbcRoutes routes = m_sbcManager.getAllRoutes();
         for (Location location : locations) {
             File dir = manager.getLocationDataDirectory(location);
             boolean proxyEnabled = manager.getFeatureManager().isFeatureEnabled(ProxyManager.FEATURE, location);

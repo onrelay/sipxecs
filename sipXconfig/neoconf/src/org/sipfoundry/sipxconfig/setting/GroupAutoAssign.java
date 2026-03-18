@@ -139,7 +139,6 @@ public class GroupAutoAssign {
         ring.setType(AbstractRing.Type.IMMEDIATE);
 
         m_forwardingContext.saveCallSequence(callSequence);
-        //m_forwardingContext.flush();
     }
 
     /**

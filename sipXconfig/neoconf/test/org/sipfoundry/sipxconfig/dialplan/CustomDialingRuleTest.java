@@ -85,7 +85,7 @@ public class CustomDialingRuleTest {
         workingHoursItem.setEnabled(true);
         workingHoursItem.setDay(ScheduledDay.WEDNESDAY);
         workingHours.add(workingHoursItem);
-        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.replaceWorkingHours(workingHours);
         scheduledAttendant.setEnabled(true);
         m_schedule.setScheduledAttendant(scheduledAttendant);
         DialPattern[] dialPatterns = new DialPattern[PATTERN_COUNT];
@@ -98,7 +98,7 @@ public class CustomDialingRuleTest {
         m_patternsList = Arrays.asList(dialPatterns);
 
         m_rule = new CustomDialingRule();
-        m_rule.setDialPatterns(m_patternsList);
+        m_rule.replaceDialPatterns(m_patternsList);
 
         for (int i = 0; i < GATEWAYS.length; i++) {
             Gateway gateway = new Gateway();
@@ -167,7 +167,7 @@ public class CustomDialingRuleTest {
                 return "bongo.example.org";
             }
         };
-        m_rule.setGateways(Collections.singletonList(g));
+        m_rule.replaceGateways(Collections.singletonList(g));
         Transform[] transforms = m_rule.getTransforms();
         assertEquals(1, transforms.length);
         FullTransform full = (FullTransform) transforms[0];
@@ -178,7 +178,7 @@ public class CustomDialingRuleTest {
     @Test
     public void testNoGateways() {
         CustomDialingRule rule = new CustomDialingRule();
-        rule.setDialPatterns(m_patternsList);
+        rule.replaceDialPatterns(m_patternsList);
         rule.setEnabled(true);
         rule.setCallPattern(new CallPattern("999", CallDigits.VARIABLE_DIGITS));
 
@@ -200,7 +200,7 @@ public class CustomDialingRuleTest {
     @Test
     public void testNoGatewaysWithSchedule() {
         CustomDialingRule rule = new CustomDialingRule();
-        rule.setDialPatterns(m_patternsList);
+        rule.replaceDialPatterns(m_patternsList);
         rule.setEnabled(true);
         rule.setCallPattern(new CallPattern("999", CallDigits.VARIABLE_DIGITS));
         rule.setSchedule(m_schedule);
@@ -224,7 +224,7 @@ public class CustomDialingRuleTest {
     @Test
     public void testGetTransformedPatternsVariable() throws Exception {
         CustomDialingRule rule = new CustomDialingRule();
-        rule.setDialPatterns(m_patternsList);
+        rule.replaceDialPatterns(m_patternsList);
         rule.setEnabled(true);
         rule.setCallPattern(new CallPattern("77", CallDigits.VARIABLE_DIGITS));
 
@@ -240,7 +240,7 @@ public class CustomDialingRuleTest {
     @Test
     public void testGetTransformedPatternsFixed() throws Exception {
         CustomDialingRule rule = new CustomDialingRule();
-        rule.setDialPatterns(m_patternsList);
+        rule.replaceDialPatterns(m_patternsList);
         rule.setEnabled(true);
         rule.setCallPattern(new CallPattern("77", CallDigits.FIXED_DIGITS));
 
@@ -256,7 +256,7 @@ public class CustomDialingRuleTest {
     @Test
     public void testGetTransformedPatternsNoDigits() throws Exception {
         CustomDialingRule rule = new CustomDialingRule();
-        rule.setDialPatterns(m_patternsList);
+        rule.replaceDialPatterns(m_patternsList);
         rule.setEnabled(true);
         rule.setCallPattern(new CallPattern("77", CallDigits.NO_DIGITS));
 

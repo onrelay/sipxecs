@@ -284,7 +284,6 @@ public class LdapManagerImpl extends SipxHibernateDaoSupport<Object> implements 
         LdapConnectionParams connectionParams = getConnectionParams(connectionId);
         connectionParams.setSchedule(schedule);
         super.mergeEntity(connectionParams);
-        getDaoEventPublisher().publishSave(connectionParams);
         m_applicationContext.publishEvent(new LdapImportTrigger.ScheduleChangedEvent(schedule, this, connectionId));
     }
 
@@ -328,7 +327,6 @@ public class LdapManagerImpl extends SipxHibernateDaoSupport<Object> implements 
     @Override
     public void setAttrMap(AttrMap attrMap) {
         super.mergeEntity(attrMap);
-        getDaoEventPublisher().publishSave(attrMap);
     }
 
     @Override
@@ -350,7 +348,6 @@ public class LdapManagerImpl extends SipxHibernateDaoSupport<Object> implements 
     @Override
     public void setConnectionParams(LdapConnectionParams params) {
         super.saveEntity( params );
-        getDaoEventPublisher().publishSave(params);
     }
 
     @Override

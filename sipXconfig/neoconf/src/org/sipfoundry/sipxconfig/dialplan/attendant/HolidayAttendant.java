@@ -33,6 +33,13 @@ public class HolidayAttendant extends Attendant {
         m_periods = holidayPeriods;
     }
 
+    public void replacePeriods(List<HolidayPeriod> holidayPeriods) {
+        m_periods.clear();
+        if( holidayPeriods != null ) {
+            m_periods.addAll( holidayPeriods );
+        }
+    }
+
     public void removeDay(int indexToDelete) {
         m_periods.remove(indexToDelete);
     }
@@ -43,7 +50,7 @@ public class HolidayAttendant extends Attendant {
     @Override
     public Object clone() throws CloneNotSupportedException {
         HolidayAttendant clone = (HolidayAttendant) super.clone();
-        clone.setPeriods(new ArrayList(getPeriods()));
+        clone.replacePeriods(getPeriods());
         return clone;
     }
 

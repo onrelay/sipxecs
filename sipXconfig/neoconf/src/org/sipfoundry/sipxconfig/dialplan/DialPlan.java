@@ -24,6 +24,7 @@ import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.feature.Feature;
 
 public class DialPlan extends BeanWithId implements DeployConfigOnEdit {
+
     private List<DialingRule> m_rules = new ArrayList<DialingRule>();
 
     public List<DialingRule> getRules() {
@@ -32,6 +33,13 @@ public class DialPlan extends BeanWithId implements DeployConfigOnEdit {
 
     public void setRules(List<DialingRule> rules) {
         m_rules = rules;
+    }
+
+    public void replaceRules(List<DialingRule> rules) {
+        m_rules.clear();
+        if( rules != null ) {
+            m_rules.addAll( rules );
+        }
     }
 
     public void removeRule(DialingRule rule) {

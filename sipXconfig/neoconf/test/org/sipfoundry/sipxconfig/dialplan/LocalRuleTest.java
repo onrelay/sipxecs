@@ -33,7 +33,7 @@ public class LocalRuleTest extends TestCase {
         Gateway g = new Gateway();
         g.setAddress("local.gateway.com");
         g.setPrefix("4321");
-        m_rule.setGateways(Collections.singletonList(g));
+        m_rule.replaceGateways(Collections.singletonList(g));
     }
 
     public void testGetPatterns() {

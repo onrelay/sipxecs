@@ -173,7 +173,7 @@ public class UserTest extends TestCase {
         aliases.add("mambo");
         aliases.add("tango");
         aliases.add("django");
-        user.setAliases(aliases);
+        user.replaceAliases(aliases);
         assertEquals("django mambo tango", user.getAliasesString());
     }
 
@@ -199,11 +199,11 @@ public class UserTest extends TestCase {
         Set aliases = new LinkedHashSet(); // use LinkedHashSet for stable ordering
         aliases.add("mambo");
         aliases.add("tango");
-        user.setAliases(aliases);
+        user.replaceAliases(aliases);
         assertEquals("mambo tango", user.getAliasesString());
         checkAliases(user);
 
-        user.setAliases(new LinkedHashSet());
+        user.replaceAliases(new LinkedHashSet());
         user.setAliasesString("mambo tango");
         checkAliases(user);
         user.setImId("imId");
@@ -303,11 +303,11 @@ public class UserTest extends TestCase {
         Set aliases = new LinkedHashSet(); // use LinkedHashSet for stable ordering
         aliases.add("mambo");
         aliases.add("tango");
-        user.setAliases(aliases);
+        user.replaceAliases(aliases);
         assertEquals("mambo tango", user.getAliasesString());
         checkAliases(user);
 
-        user.setAliases(new LinkedHashSet());
+        user.replaceAliases(new LinkedHashSet());
         user.setAliasesString("mambo tango");
         checkAliases(user);
         // set im id same as alias

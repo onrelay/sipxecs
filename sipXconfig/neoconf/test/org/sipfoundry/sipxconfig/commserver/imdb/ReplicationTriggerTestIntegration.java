@@ -69,7 +69,7 @@ public class ReplicationTriggerTestIntegration extends ImdbTestCase {
 
         SortedSet<Group> groups = new TreeSet<Group>();
         groups.add(g);
-        user.setGroups(groups);
+        user.replaceGroups(groups);
 
         getCoreContext().saveUser(user);
         assertObjectWithIdPresent(getEntityCollection(), "User1001");

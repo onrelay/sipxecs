@@ -25,17 +25,21 @@ import org.sipfoundry.sipxconfig.gateway.Gateway;
 @XmlRootElement(name = "Gateways")
 public class GatewayList {
 
-    private List<GatewayBean> m_gateways;
+    private List<GatewayBean> m_gateways = new ArrayList<GatewayBean>();
 
     public void setGateways(List<GatewayBean> gateways) {
         m_gateways = gateways;
     }
 
+    public void replaceGateways(List<GatewayBean> gateways) {
+        m_gateways.clear();
+        if( gateways != null ) {
+            m_gateways.addAll( gateways );
+        }
+    }
+
     @XmlElement(name = "Gateway")
     public List<GatewayBean> getGateways() {
-        if (m_gateways == null) {
-            m_gateways = new ArrayList<GatewayBean>();
-        }
         return m_gateways;
     }
 
@@ -45,7 +49,7 @@ public class GatewayList {
             gatewayList.add(GatewayBean.convertGateway(gateway));
         }
         GatewayList list = new GatewayList();
-        list.setGateways(gatewayList);
+        list.replaceGateways(gatewayList);
         return list;
     }
 }

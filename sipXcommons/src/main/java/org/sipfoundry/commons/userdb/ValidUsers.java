@@ -842,7 +842,7 @@ public class ValidUsers {
                     aliases.add(aliasObj.get(ALIAS_ID).toString());
                 }
             }
-            user.setAliases(aliases);
+            user.replaceAliases(aliases);
         }
 
         // contact info related data
@@ -1078,7 +1078,7 @@ public class ValidUsers {
      * @param u
      */
     protected static void buildDialPatterns(User u) {
-        u.setDialPatterns(new Vector<String>());
+        u.replaceDialPatterns(new Vector<String>());
 
         if (u.getDisplayName() == null) {
             return;

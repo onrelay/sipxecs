@@ -35,7 +35,7 @@ public class DnsFailoverPlan extends BeanWithId implements NamedObject, DeployCo
      */
     public static final Integer FALLBACK = 0;
     private String m_name;
-    private Collection<DnsFailoverGroup> m_groups;
+    private List<DnsFailoverGroup> m_groups = new ArrayList<DnsFailoverGroup>();
 
     public DnsFailoverPlan() {
     }
@@ -54,12 +54,19 @@ public class DnsFailoverPlan extends BeanWithId implements NamedObject, DeployCo
         m_name = name;
     }
 
-    public Collection<DnsFailoverGroup> getGroups() {
+    public List<DnsFailoverGroup> getGroups() {
         return m_groups;
     }
 
-    public void setGroups(Collection<DnsFailoverGroup> groups) {
+    public void setGroups(List<DnsFailoverGroup> groups) {
         m_groups = groups;
+    }
+
+    public void replaceGroups(List<DnsFailoverGroup> groups) {
+        m_groups.clear();
+        if( groups != null ) {
+            m_groups.addAll( groups );
+        }
     }
 
     DnsRecordNumerics getRecordNumerics(DnsView view, Integer regionId, String address) {

@@ -320,13 +320,13 @@ public class AlarmServerManagerImpl extends SipxHibernateDaoSupport<AlarmGroup> 
     }
 
     private boolean isNameChanged(AlarmGroup group) {
-        List<AlarmGroup> count = (List<AlarmGroup>)super.findByNamedQueryAndNamedParam("countAlarmGroupWithSameName",
+        List<Object> count = (List<Object>)super.findByNamedQueryAndNamedParam("countAlarmGroupWithSameName",
                 new String[] {
                     PARAM_ALARM_GROUP_ID, PARAM_ALARM_GROUP_NAME
                 }, new Object[] {
                     group.getId(), group.getName()
                 },
-                AlarmGroup.class);
+                Object.class);
 
         return DataAccessUtils.intResult(count) == 0;
     }

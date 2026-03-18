@@ -16,14 +16,14 @@
     <property name="port" />
     <many-to-one name="sbcDevice" class="SbcDevice" column="sbc_device_id" unique="true"/>
     <component name="routes" class="SbcRoutes">
-      <list name="domains" table="sbc_route_domain">
+      <list name="domains" table="sbc_route_domain" >
         <key column="sbc_id" foreign-key="fk_sbc_route_domain_sbc" />
-        <index column="index" />
+        <list-index column="index" />
         <element type="string" column="domain" not-null="true" />
       </list>
-      <list name="subnets" table="sbc_route_subnet">
+      <list name="subnets" table="sbc_route_subnet" >
         <key column="sbc_id" foreign-key="fk_sbc_route_subnet_sbc" />
-        <index column="index" />
+        <list-index column="index" />
         <element type="string" column="subnet" not-null="true" />
       </list>
     </component>

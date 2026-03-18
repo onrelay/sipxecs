@@ -64,7 +64,7 @@ public class DnsManagerTestIntegration extends IntegrationTestCase {
         DnsTarget g3t1 = new DnsTarget(BasicType.LOCAL_REGION);
         DnsTarget g3t2 = new DnsTarget(BasicType.ALL_OTHER_REGIONS);
         g3.setTargets(Arrays.asList(g3t1, g3t2));                
-        plan.setGroups(groups);
+        plan.replaceGroups(groups);
         m_dnsManager.savePlan(plan);
     }
     

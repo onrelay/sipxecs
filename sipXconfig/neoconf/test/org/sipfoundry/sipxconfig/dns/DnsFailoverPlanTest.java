@@ -154,7 +154,7 @@ public class DnsFailoverPlanTest {
         targetByOtherRegions.setTargets(Collections.singleton(t3));
 
         DnsFailoverPlan plan = new DnsFailoverPlan();
-        plan.setGroups(Arrays.asList(targetByServer, targetByRegion, targetByOtherRegions));
+        plan.replaceGroups(Arrays.asList(targetByServer, targetByRegion, targetByOtherRegions));
         return plan;
     }
     

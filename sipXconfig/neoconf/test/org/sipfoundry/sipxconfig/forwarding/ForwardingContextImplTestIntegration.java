@@ -233,7 +233,7 @@ public class ForwardingContextImplTestIntegration extends ImdbTestCase {
         c.set(Calendar.MINUTE, 0);
         workingHours.get(0).setStop(c.getTime());
 
-        workingTimeAttendant.setWorkingHours(workingHours);
+        workingTimeAttendant.replaceWorkingHours(workingHours);
 
         Schedule schedule = new UserSchedule();
         schedule.setUser(user);

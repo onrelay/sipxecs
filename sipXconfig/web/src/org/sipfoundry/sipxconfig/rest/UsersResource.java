@@ -476,9 +476,9 @@ public class UsersResource extends ServerResource {
         // user may not have any groups
         List<UserGroupRestInfo> userGroupsRestInfo = userRestInfo.getGroups();
         if (userGroupsRestInfo != null) {
-            user.setGroups(createUserGroups(userRestInfo));
+            user.replaceGroups(createUserGroups(userRestInfo));
         } else {
-            user.setGroups(null);
+            user.replaceGroups(null);
         }
 
         // user may not have a branch
@@ -491,9 +491,9 @@ public class UsersResource extends ServerResource {
 
         // user may not have any aliases
         if (userRestInfo.getAliases() != null) {
-            user.setAliases(createAliases(userRestInfo));
+            user.replaceAliases(createAliases(userRestInfo));
         } else {
-            user.setAliases(null);
+            user.replaceAliases(null);
         }
     }
 

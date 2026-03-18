@@ -151,7 +151,7 @@ public class LdapRowInserterTest extends TestCase {
             groups.add(ldapGroup);
             groups.add(noLdapGroup);
 
-            joe.setGroups(groups);
+            joe.replaceGroups(groups);
             joe.setLdapManaged(ldapManaged);
         }
 

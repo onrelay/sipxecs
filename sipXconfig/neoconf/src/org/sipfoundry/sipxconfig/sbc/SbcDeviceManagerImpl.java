@@ -154,8 +154,6 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
         // Please note that sbc_device table is not related with location table
         bridgeSbc.setSettingTypedValue("bridge-configuration/location-id", location.getId());
         saveSbcDevice(bridgeSbc);
-        getDaoEventPublisher().publishSave(bridgeSbc);
-        super.flush();
         return bridgeSbc;
     }
 
@@ -214,12 +212,12 @@ public class SbcDeviceManagerImpl extends SipxHibernateDaoSupport<SbcDevice> imp
     }
 
     private boolean isNameChanged(SbcDevice sbc) {
-        List<SbcDevice> count = (List<SbcDevice>)super.findByNamedQueryAndNamedParam("countSbcWithSameName", new String[] {
+        List<Object> count = (List<Object>)super.findByNamedQueryAndNamedParam("countSbcWithSameName", new String[] {
             SBC_ID, SBC_NAME
         }, new Object[] {
             sbc.getId(), sbc.getName()
         },
-        SbcDevice.class);
+        Object.class);
 
         return DataAccessUtils.intResult(count) == 0;
     }

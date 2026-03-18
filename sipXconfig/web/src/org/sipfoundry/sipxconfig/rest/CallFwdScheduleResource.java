@@ -156,7 +156,7 @@ public class CallFwdScheduleResource extends UserResource {
         bean.setScheduleId(schedule.getId());
         bean.setName(schedule.getName());
         bean.setDescription(schedule.getDescription());
-        bean.setPeriods(toPeriodBeanList(schedule.getScheduledAttendant()));
+        bean.replacePeriods(toPeriodBeanList(schedule.getScheduledAttendant()));
         return bean;
     }
 
@@ -164,7 +164,7 @@ public class CallFwdScheduleResource extends UserResource {
         sch.setName(bean.getName());
         sch.setDescription(bean.getDescription());
         ScheduledAttendant wTime = new ScheduledAttendant();
-        wTime.setWorkingHours(fromPeriodBeanList(bean.getPeriods()));
+        wTime.replaceWorkingHours(fromPeriodBeanList(bean.getPeriods()));
         sch.setScheduledAttendant(wTime);
 
         try {
@@ -234,7 +234,7 @@ public class CallFwdScheduleResource extends UserResource {
         private Integer m_scheduleId;
         private String m_name;
         private String m_description;
-        private List<PeriodBean> m_periods;
+        private List<PeriodBean> m_periods = new ArrayList<PeriodBean>();
 
         @SuppressWarnings("unused")
         public Integer getScheduleId() {
@@ -267,6 +267,13 @@ public class CallFwdScheduleResource extends UserResource {
 
         public void setPeriods(List<PeriodBean> periods) {
             m_periods = periods;
+        }
+
+        public void replacePeriods(List<PeriodBean> periods) {
+            m_periods.clear();
+            if( periods != null ) {
+                m_periods.addAll( periods );
+            }
         }
 
         @Override

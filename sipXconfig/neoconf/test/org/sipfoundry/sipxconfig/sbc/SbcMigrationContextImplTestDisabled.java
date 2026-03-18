@@ -31,7 +31,7 @@ public class SbcMigrationContextImplTestDisabled extends IntegrationTestCase {
         TestHelper.cleanInsertFlat("sbc/pre_migration_sbc_address.db.xml");
         assertEquals(0, getConnection().getRowCount("sbc_device"));
         assertEquals(3, getConnection().getRowCount("sbc"));
-        Sbc sbc = m_sbcManager.loadDefaultSbc();
+        Sbc sbc = m_sbcManager.getDefaultSbc();
         assertNull(sbc.getSbcDevice());
         AuxSbc auxSbc = m_sbcManager.loadSbc(1001);
         assertNull(auxSbc.getSbcDevice());
@@ -40,7 +40,7 @@ public class SbcMigrationContextImplTestDisabled extends IntegrationTestCase {
 
         assertEquals(3, getConnection().getRowCount("sbc_device"));
         assertEquals(3, getConnection().getRowCount("sbc"));
-        sbc = m_sbcManager.loadDefaultSbc();
+        sbc = m_sbcManager.getDefaultSbc();
         assertNotNull(sbc.getSbcDevice());
         assertEquals("10.1.2.3", sbc.getSbcDevice().getAddress());
         auxSbc = m_sbcManager.loadSbc(1001);

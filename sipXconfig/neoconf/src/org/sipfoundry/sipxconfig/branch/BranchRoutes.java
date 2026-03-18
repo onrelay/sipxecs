@@ -11,35 +11,16 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 
 public class BranchRoutes {
-    private List<String> m_domains;
-    private List<String> m_subnets;
+    
+    private List<String> m_domains = new ArrayList<String>();
+    private List<String> m_subnets = new ArrayList<String>();
 
     public void setDomains(List<String> domains) {
-        getDomains().clear();
-        if( domains != null ) {
-            getDomains().addAll( domains );
-        }
+        m_domains = domains;
     }
 
     public List<String> getDomains() {
-        if( m_domains == null ) {
-            m_domains = new ArrayList<String>();
-        }
         return m_domains;
-    }
-
-    public void setSubnets(List<String> subnets) {
-        getSubnets().clear();
-        if( subnets != null ) {
-            getSubnets().addAll( subnets );
-        }
-    }
-
-    public List<String> getSubnets() {
-        if( m_subnets == null ) {
-            m_subnets = new ArrayList<String>();
-        }
-        return m_subnets;
     }
 
     public boolean addDomain() {
@@ -48,6 +29,28 @@ public class BranchRoutes {
 
     public String removeDomain(int index) {
         return getDomains().remove(index);
+    }
+
+    public void replaceDomains(List<String> domains) {
+        getDomains().clear();
+        if( domains != null ) {
+            getDomains().addAll( domains );
+        }
+    }
+
+    public void setSubnets(List<String> subnets) {
+        m_subnets = subnets;
+    }
+
+    public List<String> getSubnets() {
+        return m_subnets;
+    }
+
+    public void replaceSubnets(List<String> subnets) {
+        getSubnets().clear();
+        if( subnets != null ) {
+            getSubnets().addAll( subnets );
+        }
     }
 
     public boolean addSubnet() {

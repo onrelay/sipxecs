@@ -65,7 +65,7 @@ public class DialPlanTest extends TestCase {
         DialingRule[] rules = new DialingRule[] {
             new AttendantRule(), new CustomDialingRule(), new AttendantRule()
         };
-        plan.setRules(Arrays.asList(rules));
+        plan.replaceRules(Arrays.asList(rules));
         assertEquals(2, plan.getAttendantRules().size());
     }
 
@@ -85,7 +85,7 @@ public class DialPlanTest extends TestCase {
         DialingRule c = new AttendantRule();
         DialingRule d = new AttendantRule();
 
-        out.setRules(new ArrayList<DialingRule>(Arrays.asList(a, b, null, c, null, d)));
+        out.replaceRules(new ArrayList<DialingRule>(Arrays.asList(a, b, null, c, null, d)));
         assertEquals(6, out.getRules().size());
 
         out.removeEmptyRules();

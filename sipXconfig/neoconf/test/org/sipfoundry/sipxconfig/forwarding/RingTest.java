@@ -64,7 +64,7 @@ public class RingTest extends TestCase {
         Integer stopMinute = Integer.valueOf(cal.get(Calendar.MINUTE));
         workingHours.get(0).setEnabled(true);
         workingHours.get(0).setDay(ScheduledDay.WEDNESDAY);
-        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.replaceWorkingHours(workingHours);
         scheduledAttendant.setEnabled(true);
         schedule.setScheduledAttendant(scheduledAttendant);
 

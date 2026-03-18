@@ -103,7 +103,7 @@ public class UserMapper implements NameClassPairMapper {
 
     public void setAliasesSet(Set<String> aliases, User user) {
         if (aliases != null) {
-            user.copyAliases(deleteWhitespace(aliases));
+            user.replaceAliases(deleteWhitespace(aliases));
         }
     }
 

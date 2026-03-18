@@ -140,9 +140,9 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
 
     private String m_userName;
 
-    private Set<String> m_aliases;
+    private Set<String> m_aliases = new LinkedHashSet<String>();
 
-    private Set<Group> m_supervisorForGroups;
+    private Set<Group> m_supervisorForGroups = new TreeSet<Group>();
 
     private UserProfile m_userProfile = new UserProfile();
 
@@ -265,14 +265,11 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
     }
 
     public Set<String> getAliases() {
-        if( m_aliases == null ) {
-            m_aliases = new LinkedHashSet<String>();
-        }
         return m_aliases;
     }
 
     public void setAliases(Set<String> aliases) {
-        copyAliases(aliases);
+        m_aliases = aliases;
     }
 
     public String getDomain() {
@@ -350,19 +347,10 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
         return getShortestNumericAlias();
     }
 
-    /**
-     * Copy the input aliases to become the aliases of this user, without replacing the Set
-     * object. For a user read from the DB, Hibernate creates the Set and we don't want to mess
-     * with it. Also, by copying the aliases, subsequent changes to the input Set won't affect the
-     * user's Set, since it is a separate object.
-     */
-    public void copyAliases(Collection<String> aliases) {
-            
+    public void replaceAliases(Collection<String> aliases) {   
         getAliases().clear();
         if( aliases != null ) {
-            for (String alias : aliases) {
-                addAlias(alias);
-            }
+            getAliases().addAll( aliases );
         }
     }
 
@@ -669,13 +657,14 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
     }
 
     public void setSupervisorForGroups(Set<Group> supervisorForGroups) {
-        if (m_supervisorForGroups == null) {
-            m_supervisorForGroups = new TreeSet<Group>();
-        }
+        m_supervisorForGroups = supervisorForGroups;
+    }
+
+    public void replaceSupervisorForGroups(Set<Group> supervisorForGroups) {
+
+        m_supervisorForGroups.clear();
         if( supervisorForGroups != null ) {
-            for( Group supervisorForGroup : supervisorForGroups ) {
-                m_supervisorForGroups.add( supervisorForGroup );
-            }
+            m_supervisorForGroups.addAll( supervisorForGroups );
         }
     }
 
@@ -694,12 +683,6 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
     }
 
     public void addSupervisorForGroup(Group group) {
-        if (group.isNew()) {
-            throw new RuntimeException("Group needs to be saved before it can be added to the set.");
-        }
-        if (m_supervisorForGroups == null) {
-            m_supervisorForGroups = new TreeSet<Group>();
-        }
         m_supervisorForGroups.add(group);
     }
 

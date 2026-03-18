@@ -63,14 +63,24 @@ public class BeanWithId implements PrimaryKeySource, Cloneable {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof BeanWithId)) {
-            return false;
-        }
+        if (this == o) return true; // Identity first!
+        if (!(o instanceof BeanWithId)) return false;
         BeanWithId other = (BeanWithId) o;
+
+        // If both are new (-1), they are NOT the same object 
+        // unless they are the same instance (checked above).
+        if (this.isNew() || other.isNew()) return false; 
+
         return getId().equals(other.getId());
     }
 
     public int hashCode() {
+        // If the entity is NOT saved yet, use the JVM's default identity hash.
+        // This ensures two different "New" objects have different hashCodes.
+        if (isNew()) {
+            return System.identityHashCode(this);
+        }
+        // Once saved, the ID is the stable identity.
         return m_id.hashCode();
     }
 

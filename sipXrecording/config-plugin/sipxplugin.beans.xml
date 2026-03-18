@@ -3,7 +3,6 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="recordingSettings" class="org.sipfoundry.sipxconfig.recording.RecordingSettings" parent="settingsBean">
-    <property name="modelFilesContext" ref="modelFilesContext"/>
   </bean>
 
   <bean id="recordingImpl" class="org.sipfoundry.sipxconfig.recording.RecordingImpl">

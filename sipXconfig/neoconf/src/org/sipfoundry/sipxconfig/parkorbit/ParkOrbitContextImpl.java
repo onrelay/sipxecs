@@ -70,7 +70,6 @@ public class ParkOrbitContextImpl extends SipxHibernateDaoSupport<ParkOrbit> imp
         }
 
         super.saveEntity(parkOrbit);
-        getDaoEventPublisher().publishSave(parkOrbit);
     }
 
     public void removeParkOrbits(Collection ids) {

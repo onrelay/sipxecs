@@ -209,8 +209,8 @@ public class ConferenceBridgeContextImpl extends SipxHibernateDaoSupport<Confere
     }
 
     public boolean isAliasInUse(String alias) {
-        List<Integer> confIds = (List<Integer>)super.findByNamedQueryAndNamedParam(
-            CONFERENCE_IDS_WITH_ALIAS, VALUE, alias, Integer.class );
+        List<Object> confIds = (List<Object>)super.findByNamedQueryAndNamedParam(
+            CONFERENCE_IDS_WITH_ALIAS, VALUE, alias, Object.class );
         return !confIds.isEmpty();
     }
 

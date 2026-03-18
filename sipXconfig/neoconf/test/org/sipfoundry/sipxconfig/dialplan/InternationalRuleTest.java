@@ -39,7 +39,7 @@ public class InternationalRuleTest extends TestCase {
         g2.setAddressTransport(Gateway.AddressTransport.TCP);
         g2.setPrefix("4321");
         list.add(g2);
-        m_rule.setGateways(list);
+        m_rule.replaceGateways(list);
     }
 
     public void testGetPatterns() {

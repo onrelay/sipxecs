@@ -65,7 +65,7 @@ public abstract class LetsEncrypt extends BaseComponent implements PageBeginRend
         }
 
         if (getCertificateManager().configureLetsEncryptService(settings)) {
-            setSettings(getCertificateManager().getSettings());
+            setSettings(settings);
         }
     }
 
@@ -78,12 +78,14 @@ public abstract class LetsEncrypt extends BaseComponent implements PageBeginRend
         String msg;
 
         switch (status) {
-        case IN_PROGRESS:
-            msg = getMessages().getMessage("label.inProgress"); break;
-        case SUCCESS:
-            msg = getMessages().getMessage("label.success"); break;
-        default:
-            msg = getMessages().getMessage("label.failed"); break;
+            case IDLE:
+                msg = ""; break;
+            case IN_PROGRESS:
+                msg = getMessages().getMessage("label.inProgress"); break;
+            case SUCCESS:
+                msg = getMessages().getMessage("label.success"); break;
+            default:
+                msg = getMessages().getMessage("label.failed"); break;
         }
 
         return msg;

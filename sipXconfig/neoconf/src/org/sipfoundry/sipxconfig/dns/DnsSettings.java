@@ -73,7 +73,7 @@ public class DnsSettings extends PersistableSettings implements DeployConfigOnEd
             for (Location location : locations) {
                 ips.add(location.getAddress());
             }
-            SbcRoutes sbcRoutes = m_sbcManager.getRoutes();
+            SbcRoutes sbcRoutes = m_sbcManager.getAllRoutes();
             for (String subnet : sbcRoutes.getSubnets()) {
                 ips.add(subnet);
             }

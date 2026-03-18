@@ -19,7 +19,6 @@ public class TimeZoneManagerImpl extends SipxHibernateDaoSupport<DeviceTimeZone>
 
     public void setDeviceTimeZone(DeviceTimeZone dtz) {
         super.saveEntity(dtz);
-        getDaoEventPublisher().publishSave(dtz);
     }
 
     public DeviceTimeZone getDeviceTimeZone() {

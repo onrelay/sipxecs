@@ -153,7 +153,7 @@ public class DialPlanApiImpl implements DialPlanApi {
             ((InternalRule) rule).setMediaServerHostname(ruleBean.getMediaServerHostname());
             ((InternalRule) rule).setMediaServerType(ruleBean.getMediaServerType());
         } else if (ruleBean.getType() == RuleType.Custom) {
-            ((CustomDialingRule) rule).setDialPatterns(DialPatternList.convertToPatternList(
+            ((CustomDialingRule) rule).replaceDialPatterns(DialPatternList.convertToPatternList(
                 ruleBean.getDialPatterns()));
             ((CustomDialingRule) rule).setCallPattern(CallPatternBean.convertToCallPattern(
                 ruleBean.getCallPattern()));
@@ -195,7 +195,7 @@ public class DialPlanApiImpl implements DialPlanApi {
             ((AttendantRule) rule).setDid(ruleBean.getDid());
             ((AttendantRule) rule).setLiveAttendantEnabled(ruleBean.isEnableLiveAttendant());
         } else if (ruleBean.getType() == RuleType.Site_To_Site) {
-            ((SiteToSiteDialingRule) rule).setDialPatterns(
+            ((SiteToSiteDialingRule) rule).replaceDialPatterns(
                 DialPatternList.convertToPatternList(ruleBean.getDialPatterns()));
             ((SiteToSiteDialingRule) rule).setCallPattern(
                 CallPatternBean.convertToCallPattern(ruleBean.getCallPattern()));

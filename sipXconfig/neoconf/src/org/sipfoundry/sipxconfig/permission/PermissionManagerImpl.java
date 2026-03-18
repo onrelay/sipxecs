@@ -248,13 +248,13 @@ public class PermissionManagerImpl extends SipxHibernateDaoSupport<Permission> i
     }
 
     private boolean isLabelInUse(Permission permission) {
-        List<Permission> count = super.findByNamedQueryAndNamedParam("anotherPermissionWithTheSameLabel",
+        List<Object> count = super.findByNamedQueryAndNamedParam("anotherPermissionWithTheSameLabel",
                 new String[] {
                     "id", "label"
                 }, new Object[] {
                     permission.getId(), permission.getLabel()
                 },
-                Permission.class );
+                Object.class );
 
         return DataAccessUtils.intResult(count) > 0;
     }

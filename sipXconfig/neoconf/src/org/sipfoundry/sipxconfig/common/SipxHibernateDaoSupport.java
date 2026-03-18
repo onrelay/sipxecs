@@ -140,6 +140,43 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         return entity;
     }
 
+    public <S extends Object> S getEntity(Class<S> klass) {
+        try {
+            return getSessionFactory().fromTransaction(session -> {
+
+                CriteriaBuilder cb = session.getCriteriaBuilder();
+
+                CriteriaQuery<S> cq = cb.createQuery(klass);
+
+                cq.from(klass);
+
+                TypedQuery<S> query = session.createQuery(cq);
+
+                List<S> results = query.setMaxResults(1).getResultList();
+
+                return results.isEmpty() ? null : results.get(0);
+            });
+
+        } catch (IllegalStateException e) {
+            // server not ready
+            return null;
+        }
+    }
+
+    public <S extends Object> List<S> getEntities(Class<S> klass) {
+        try {
+            return getSessionFactory().fromTransaction(session -> {
+                CriteriaBuilder cb = session.getCriteriaBuilder();
+                CriteriaQuery<S> cq = cb.createQuery(klass);
+                cq.from(klass);
+                return session.createQuery(cq).getResultList();
+            });
+        } catch (IllegalStateException e) {
+            // Server not ready or session factory closed
+            return new ArrayList<S>();
+        }
+    }
+
     public <S extends Object> void saveEntity(S entity) {
 
         boolean isNew = false;
@@ -157,31 +194,46 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
     }
 
     public <S extends Object> void persistEntity(S entity) {
-
-        updateBeanValueStorage(entity);
-
+        
         getSessionFactory().inTransaction( session -> {
             
             try{ 
+                updateBeanValueStorage(entity);
+
                 session.persist(entity);
 
+                session.flush();
+
+                getDaoEventPublisher().publishSave(entity);
+
             } catch( IllegalStateException e ) {
+                throw new RuntimeException(e);
             }
         });
     }
 
     public <S extends Object> void mergeEntity(S entity) {
 
-        updateBeanValueStorage(entity);
-
         getSessionFactory().inTransaction( session -> {
             
             try {
-                S mergedEntity = session.merge(entity);
-        
-                BeanUtils.copyProperties(mergedEntity, entity);
+                updateBeanValueStorage(entity);
 
-            } catch( IllegalStateException | IllegalAccessException | InvocationTargetException e ) {
+                Object id = ((BeanWithId)entity).getId();
+                
+                S managedEntity = (S) session.find(entity.getClass(), id);
+                
+                if (managedEntity == null || managedEntity != entity ) {
+
+                    session.merge(entity);
+
+                    session.flush();
+
+                    getDaoEventPublisher().publishSave(entity);
+
+                }
+
+            } catch( IllegalStateException e ) {
                 throw new RuntimeException(e);
             }
         });
@@ -189,11 +241,11 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     public <S extends Object> void refreshEntity(S entity) {
 
-        updateBeanValueStorage(entity);
-
         getSessionFactory().inTransaction( session -> {
             
             try {
+                updateBeanValueStorage(entity);
+
                 session.refresh(entity);
             } catch( IllegalStateException e ) {
                 // server not ready
@@ -203,12 +255,13 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     public <S extends Object> void removeEntity(S entity) {
 
-        updateBeanValueStorage(entity);
-
         getSessionFactory().inTransaction( session -> {
             
             try {
+                updateBeanValueStorage(entity);
+
                 session.remove(entity);
+
             } catch( IllegalStateException e ) {
                 // server not ready
             }
@@ -219,11 +272,11 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
         for (S entity : entities) {
             
-            updateBeanValueStorage(entity);
-
             getSessionFactory().inTransaction( session -> {
                 
                 try {
+                    updateBeanValueStorage(entity);
+
                     session.remove(entity);
                                 
                 } catch( IllegalStateException e ) {
@@ -235,11 +288,11 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
     public <S extends Object> void evictEntity(S entity) {
 
-        updateBeanValueStorage(entity);
-
         getSessionFactory().inTransaction( session -> {
                 
             try {
+                updateBeanValueStorage(entity);
+
                 session.evict(entity);
             } catch( IllegalStateException e ) {
                 // server not ready
@@ -549,10 +602,6 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
             });
         }
 
-        getSessionFactory().inTransaction( session -> {
-
-            session.flush(); 
-        });
        
     }
 
@@ -561,20 +610,18 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         if( entity instanceof BeanWithSettings )  {
 
             BeanWithSettings bean = (BeanWithSettings)entity;
-            Storage origStorage = bean.getInitializeValueStorage();
-            Storage cleanStorage = clearUnsavedValueStorage(origStorage);
+            ValueStorage origStorage = bean.getInitializeValueStorage();
+            ValueStorage cleanStorage = clearEmptyValueStorage(origStorage);
             bean.setValueStorage(cleanStorage);
 
         }
     }
 
 
-    protected Storage clearUnsavedValueStorage(Storage storage) {
-        // requirement, otherwise you wouldn't be calling this function
-        ValueStorage vs = (ValueStorage) storage;
+    protected ValueStorage clearEmptyValueStorage(ValueStorage valueStorage) {
 
         // If no settings don't bother saving anything.
-        return vs != null && vs.isNew() && vs.size() == 0 ? null : vs;
+        return valueStorage != null && valueStorage.isNew() && valueStorage.size() == 0 ? null : valueStorage;
     }
 
     /**

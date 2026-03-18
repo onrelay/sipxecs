@@ -138,7 +138,7 @@ public class ScheduleApiImpl implements ScheduleApi {
             WorkingHours wHours = WorkingHoursBean.convertToWorkingHours(whBean);
             List<WorkingHours> newWorkingHours = schedule.getScheduledAttendant().getWorkingHours();
             newWorkingHours.add( wHours );
-            schedule.getScheduledAttendant().setWorkingHours(newWorkingHours);
+            schedule.getScheduledAttendant().replaceWorkingHours(newWorkingHours);
             m_forwardingContext.saveSchedule(schedule);
             return Response.ok().build();
         }
@@ -153,7 +153,7 @@ public class ScheduleApiImpl implements ScheduleApi {
         if (schedule != null && index > 0 && index < newWorkingHours.size() ) {
 
             newWorkingHours.remove( index.intValue() );
-            schedule.getScheduledAttendant().setWorkingHours(newWorkingHours);
+            schedule.getScheduledAttendant().replaceWorkingHours(newWorkingHours);
             m_forwardingContext.saveSchedule(schedule);
             return Response.ok().build();
         }

@@ -276,13 +276,13 @@ public class Nortel12x0PhoneTest extends TestCase {
         user2.setUserName("def_def");
         Set user2Aliases = new LinkedHashSet(); // use LinkedHashSet for stable ordering
         user2Aliases.add("456");
-        user2.setAliases(user2Aliases);
+        user2.replaceAliases(user2Aliases);
 
         User user3 = new User();
         user3.setUserName("xyz");
         Set user3Aliases = new LinkedHashSet(); // use LinkedHashSet for stable ordering
         user3Aliases.add("789");
-        user3.setAliases(user3Aliases);
+        user3.replaceAliases(user3Aliases);
 
         IMocksControl coreContextControl = EasyMock.createNiceControl();
         CoreContext coreContext = coreContextControl.createMock(CoreContext.class);

@@ -23,7 +23,6 @@
   </bean>
 
   <bean id="ccidSettings" class="nl.telecats.customcid.CustomCallerIdSettings" parent="settingsBean">
-    <property name="modelFilesContext" ref="modelFilesContext"/>
   </bean>
 
   <bean id="ccidProxyHooks" class="nl.telecats.customcid.CustomCallerIdProxyHook">

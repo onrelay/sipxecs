@@ -38,9 +38,9 @@ public abstract class EditSbc extends PageWithCallback implements PageBeginRende
     @Bean
     public abstract SipxValidationDelegate getValidator();
 
-    public abstract Sbc getSbc();
+    public abstract AuxSbc getSbc();
 
-    public abstract void setSbc(Sbc sbc);
+    public abstract void setSbc(AuxSbc sbc);
 
     public abstract void setSelectedSbcDevice(SbcDevice selectedSbcDevice);
 
@@ -53,33 +53,40 @@ public abstract class EditSbc extends PageWithCallback implements PageBeginRende
 
     public void pageBeginRender(PageEvent event) {
 
-        Sbc sbc = getSbc();
+        AuxSbc sbc = getSbc();
+        if( sbc == null ) {
+            sbc = new AuxSbc();
+        }
 
         Integer sbcId = getSbcId();
 
-
-        if( sbcId != null && sbc.getId() == null ) {
+        if( sbcId != null && sbc.isNew() ) {
             sbc = getSbcManager().loadSbc(sbcId);
 
             SbcDevice sbcDevice = sbc.getSbcDevice();
             if (sbcDevice != null) {
                 setSelectedSbcDevice(sbcDevice);
             }
-            setSbc(sbc);
-        }   
+        }  
+
+        setSbc(sbc);
     }
 
     public void save() {
         if (!TapestryUtils.isValid(this)) {
             return;
         }
-        Sbc sbc = getSbc();
+
+        AuxSbc sbc = getSbc();
+
         if (sbc.isEnabled() && (sbc.getAddress() == null || sbc.getPort() == 0)) {
             throw new UserException(getMessages().getMessage("error.requiredSbc"));
         }
+
         if (sbc.getRoutes().isEmpty()) {
             throw new UserException(getMessages().getMessage("error.requiredSubnet"));
         }
+
         sbc.setSbcDevice(getSelectedSbcDevice());
         getSbcManager().saveSbc(sbc);
         if (getSbcId() == null) {

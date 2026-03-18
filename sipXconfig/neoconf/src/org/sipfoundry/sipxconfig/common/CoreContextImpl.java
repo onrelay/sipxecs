@@ -725,7 +725,6 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
         else {
             mergeEntity(admin);
         }
-        getDaoEventPublisher().publishSave(admin);
     }
 
 /*    @Override
@@ -1145,7 +1144,6 @@ public abstract class CoreContextImpl extends SipxHibernateDaoSupport<User> impl
             if (specialUser == null) {
                 SpecialUser newSpecialUser = new SpecialUser(type);
                 super.mergeEntity(newSpecialUser);
-                getDaoEventPublisher().publishSave(newSpecialUser);
             }
         }
     }

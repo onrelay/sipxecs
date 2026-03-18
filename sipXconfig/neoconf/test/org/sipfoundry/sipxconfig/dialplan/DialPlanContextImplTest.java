@@ -50,7 +50,7 @@ public class DialPlanContextImplTest extends TestCase {
         DialingRule[] rules = new DialingRule[] {
             new CustomDialingRule()
         };
-        plan.setRules(Arrays.asList(rules));
+        plan.replaceRules(Arrays.asList(rules));
         assertEquals("101", manager.getVoiceMail());
 
         InternalRule irule = new InternalRule();
@@ -58,7 +58,7 @@ public class DialPlanContextImplTest extends TestCase {
         rules = new DialingRule[] {
             new CustomDialingRule(), irule
         };
-        plan.setRules(Arrays.asList(rules));
+        plan.replaceRules(Arrays.asList(rules));
         assertEquals("2000", manager.getVoiceMail());
     }
 
@@ -76,7 +76,7 @@ public class DialPlanContextImplTest extends TestCase {
             emergency
         };
         emergency.setEmergencyNumber("sos");
-        plan.setRules(Arrays.asList(rules));
+        plan.replaceRules(Arrays.asList(rules));
         assertNull(manager.getLikelyEmergencyInfo());
 
         // disabled rule
@@ -91,7 +91,7 @@ public class DialPlanContextImplTest extends TestCase {
                 return "sbc.example.org";
             }
         };
-        rules[0].setGateways(Collections.singletonList(gatewayWithSbc));
+        rules[0].replaceGateways(Collections.singletonList(gatewayWithSbc));
         assertNull(manager.getLikelyEmergencyInfo());
     }
 
@@ -105,10 +105,10 @@ public class DialPlanContextImplTest extends TestCase {
             emergency
         };
         emergency.setEmergencyNumber("sos");
-        plan.setRules(Arrays.asList(rules));
+        plan.replaceRules(Arrays.asList(rules));
         Gateway gateway = new Gateway();
         gateway.setAddress("pstn.example.org");
-        emergency.setGateways(Collections.singletonList(gateway));
+        emergency.replaceGateways(Collections.singletonList(gateway));
 
         EmergencyInfo info = manager.getLikelyEmergencyInfo();
         assertEquals("pstn.example.org", info.getAddress());

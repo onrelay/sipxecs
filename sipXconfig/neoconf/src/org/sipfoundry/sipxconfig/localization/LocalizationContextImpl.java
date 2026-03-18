@@ -113,8 +113,6 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
         localization.setRegion(regionBeanId);
         getApplicationContext().publishEvent(new RegionUpdatedEvent(this, regionBeanId));
         super.saveEntity(localization);
-        super.flush();
-        getDaoEventPublisher().publishSave(localization);
     }
 
     /**
@@ -136,10 +134,6 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
         localization.setLanguage(language);
 
         super.saveEntity(localization);
-
-        super.flush();
-        // TODO: do we really need this? It does not seem to be caught anywhere!
-        getDaoEventPublisher().publishSave(localization);
         // Copy default AutoAttendant prompts in the currently applied language
         // to AutoAttendant prompts directory.
         LOG.debug("Language updated, sending LanguageUpdatedEvent...");
@@ -161,8 +155,6 @@ public class LocalizationContextImpl extends SipxHibernateDaoSupport<Localizatio
         
         super.saveEntity(actualLocalization);
       
-        super.flush();
-        getDaoEventPublisher().publishSave(actualLocalization);
         if (updateRegion) {
             getApplicationContext().publishEvent(new RegionUpdatedEvent(this, region));            
         }        

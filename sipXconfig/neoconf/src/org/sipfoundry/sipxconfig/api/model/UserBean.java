@@ -18,6 +18,7 @@ package org.sipfoundry.sipxconfig.api.model;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.ArrayList;
 
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
@@ -52,7 +53,7 @@ public class UserBean {
     private String m_branchName;
     private UserProfileBean m_userProfile;
     private Boolean m_notified;
-    private List<GroupBean> m_groups;
+    private List<GroupBean> m_groups = new ArrayList<GroupBean>();
     private Set<String> m_permissions = new LinkedHashSet<String>();
     
     public int getId() {
@@ -91,6 +92,13 @@ public class UserBean {
         m_aliases = aliases;
     }
 
+    public void replaceAliases(Set<String> aliases) {
+        m_aliases.clear();
+        if( aliases != null ) {
+            m_aliases.addAll( aliases );
+        }
+    }
+
     @XmlElementWrapper(name = "Aliases")
     @XmlElement(name = "Alias")
     public Set<String> getAliases() {
@@ -105,6 +113,13 @@ public class UserBean {
 
 	public void setPermissions(Set<String> permissions) {
 		m_permissions = permissions;
+	}
+
+    public void replacePermissions(Set<String> permissions) {
+		m_permissions.clear();
+        if( permissions != null ) {
+            m_permissions.addAll( permissions );
+        }
 	}
 
 	public String getSipPassword() {
@@ -158,7 +173,7 @@ public class UserBean {
     public static UserBean convertUser(User user) {
         UserBean bean = new UserBean();
         bean.setId(user.getId());
-        bean.setAliases(new LinkedHashSet(user.getAliases()));
+        bean.replaceAliases(new LinkedHashSet(user.getAliases()));
         Branch branch = user.getBranch();
         if (branch != null) {
             bean.setBranchName(user.getBranch().getName());
@@ -171,8 +186,8 @@ public class UserBean {
         bean.setSipPassword(user.getSipPassword());
         bean.setUserName(user.getUserName());
         bean.setUserProfile(UserProfileBean.convertUserProfile(user.getUserProfile()));
-        bean.setGroups(GroupBean.buildGroupList(user.getGroupsAsList(), null));
-        bean.setPermissions(new LinkedHashSet(user.getUserPermissionNames()));
+        bean.replaceGroups(GroupBean.buildGroupList(user.getGroupsAsList(), null));
+        bean.replacePermissions(new LinkedHashSet(user.getUserPermissionNames()));
         return bean;
     }
 
@@ -184,5 +199,12 @@ public class UserBean {
 
     public void setGroups(List<GroupBean> groups) {
         m_groups = groups;
+    }
+
+    public void replaceGroups(List<GroupBean> groups) {
+        m_groups.clear();
+        if( groups != null ) {
+            m_groups.addAll( groups );
+        }
     }
 }

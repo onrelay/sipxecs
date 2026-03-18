@@ -7,7 +7,6 @@
   </bean>
 
   <bean id="ivrSettings" class="org.sipfoundry.sipxconfig.ivr.IvrSettings" parent="settingsBean">
-    <property name="modelFilesContext" ref="modelFilesContext"/>
     <property name="featureManager" ref="featureManager"/>
   </bean>
 

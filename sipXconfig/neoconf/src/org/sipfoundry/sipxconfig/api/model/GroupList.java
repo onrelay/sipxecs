@@ -25,23 +25,27 @@ import org.sipfoundry.sipxconfig.setting.Group;
 
 @XmlRootElement(name = "Groups")
 public class GroupList {
-    private List<GroupBean> m_groups;
+    private List<GroupBean> m_groups = new ArrayList<GroupBean>();
 
     public void setGroups(List<GroupBean> groups) {
         m_groups = groups;
     }
 
+    public void replaceGroups(List<GroupBean> groups) {
+        m_groups.clear();
+        if( groups != null ) {
+            m_groups.addAll( groups );
+        }
+    }
+
     @XmlElement(name = "Group")
     public List<GroupBean> getGroups() {
-        if (m_groups == null) {
-            m_groups = new ArrayList<GroupBean>();
-        }
         return m_groups;
     }
 
     public static GroupList convertGroupList(List<Group> groups, Map count) {
         GroupList list = new GroupList();
-        list.setGroups(GroupBean.buildGroupList(groups, count));
+        list.replaceGroups(GroupBean.buildGroupList(groups, count));
         return list;
     }
 }

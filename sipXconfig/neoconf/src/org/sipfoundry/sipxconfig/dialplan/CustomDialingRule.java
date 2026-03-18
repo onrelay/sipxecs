@@ -29,14 +29,14 @@ public class CustomDialingRule extends LocationBasedDialingRule {
     private List<String> m_permissionNames = new ArrayList<String>();
 
     public CustomDialingRule() {
-        m_dialPatterns.add(new DialPattern());
+        getDialPatterns().add(new DialPattern());
     }
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
         CustomDialingRule clone = (CustomDialingRule) super.clone();
-        clone.m_permissionNames = new ArrayList(m_permissionNames);
-        clone.m_dialPatterns = new ArrayList(m_dialPatterns);
+        clone.replacePermissionNames(m_permissionNames);
+        clone.replaceDialPatterns(getDialPatterns());
         return clone;
     }
 
@@ -44,8 +44,15 @@ public class CustomDialingRule extends LocationBasedDialingRule {
         return m_dialPatterns;
     }
 
-    public void setDialPatterns(List<DialPattern> dialPaterns) {
-        m_dialPatterns = dialPaterns;
+    public void setDialPatterns(List<DialPattern> dialPatterns) {
+        m_dialPatterns = dialPatterns;
+    }
+
+    public void replaceDialPatterns(List<DialPattern> dialPatterns) {
+        getDialPatterns().clear();
+        if( dialPatterns != null ) {
+            getDialPatterns().addAll( dialPatterns );
+        }
     }
 
     public CallPattern getCallPattern() {
@@ -58,9 +65,9 @@ public class CustomDialingRule extends LocationBasedDialingRule {
 
     @Override
     public String[] getPatterns() {
-        String[] patterns = new String[m_dialPatterns.size()];
+        String[] patterns = new String[getDialPatterns().size()];
         for (int i = 0; i < patterns.length; i++) {
-            DialPattern p = m_dialPatterns.get(i);
+            DialPattern p = getDialPatterns().get(i);
             patterns[i] = p.calculatePattern();
         }
         return patterns;
@@ -92,6 +99,31 @@ public class CustomDialingRule extends LocationBasedDialingRule {
         return transforms;
     }
 
+    public void setPermissions(List<Permission> permissions) {
+        List<String> permissionNames = getPermissionNames();
+        permissionNames.clear();
+        for (Permission permission : permissions) {
+            permissionNames.add(permission.getName());
+        }
+    }
+
+    @Override
+    public List<String> getPermissionNames() {
+        return m_permissionNames;
+    }
+
+    public void setPermissionNames(List<String> permissionNames) {
+        m_permissionNames = permissionNames;
+    }
+
+
+    public void replacePermissionNames(List<String> permissionNames) {
+        getPermissionNames().clear();
+        if( permissionNames != null ) {
+            getPermissionNames().addAll( permissionNames );
+        }
+    }
+
     @Override
     public DialingRuleType getType() {
         return DialingRuleType.CUSTOM;
@@ -104,23 +136,6 @@ public class CustomDialingRule extends LocationBasedDialingRule {
             return callTag;
         }
         return CallTag.CUST;
-    }
-
-    public void setPermissions(List<Permission> permissions) {
-        List<String> permissionNames = getPermissionNames();
-        permissionNames.clear();
-        for (Permission permission : permissions) {
-            permissionNames.add(permission.getName());
-        }
-    }
-
-    public void setPermissionNames(List<String> permissionNames) {
-        m_permissionNames = permissionNames;
-    }
-
-    @Override
-    public List<String> getPermissionNames() {
-        return m_permissionNames;
     }
 
     /**

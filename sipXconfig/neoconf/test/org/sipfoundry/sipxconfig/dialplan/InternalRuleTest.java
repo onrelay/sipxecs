@@ -65,7 +65,7 @@ public class InternalRuleTest extends TestCase {
         workingHoursItem.setEnabled(true);
         workingHoursItem.setDay(ScheduledDay.WEDNESDAY);
         workingHours.add( workingHoursItem );
-        scheduledAttendant.setWorkingHours(workingHours);
+        scheduledAttendant.replaceWorkingHours(workingHours);
         scheduledAttendant.setEnabled(true);
         m_schedule.setScheduledAttendant(scheduledAttendant);
 

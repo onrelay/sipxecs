@@ -128,7 +128,7 @@ public class DnsApi extends ServerResource {
         DnsTarget otherTarget = new DnsTarget(DnsTarget.BasicType.ALL_OTHER_REGIONS);
         otherTarget.setPercentage(100);
         other.setTargets(Collections.singletonList(otherTarget));
-        plan.setGroups(Arrays.asList(local, other));
+        plan.replaceGroups(Arrays.asList(local, other));
         return plan;
     }
 
@@ -175,10 +175,10 @@ public class DnsApi extends ServerResource {
             parser.nextToken();
             if (prop.equals("groups")) {
                 List<DnsFailoverGroup> groups = new ArrayList<DnsFailoverGroup>();
-                plan.setGroups(groups);
                 while (parser.nextToken() != JsonToken.END_ARRAY) {
                     groups.add(readGroup(parser, regionMap, locationMap));
                 }
+                plan.replaceGroups(groups);
             } else if (prop.equals(ID)) {
                 plan.setUniqueId(parser.getIntValue());
             } else if (prop.equals("name")) {

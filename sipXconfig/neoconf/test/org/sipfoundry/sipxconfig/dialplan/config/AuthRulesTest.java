@@ -378,10 +378,10 @@ public class AuthRulesTest {
         rule.setDescription("Calls to internal extensions");
         DialPattern pattern1 = new DialPattern("12", 3);
         DialPattern pattern2 = new DialPattern("13", 4);
-        rule.setDialPatterns(Arrays.asList(pattern1, pattern2));
+        rule.replaceDialPatterns(Arrays.asList(pattern1, pattern2));
         CallPattern callPattern = new CallPattern("7", CallDigits.VARIABLE_DIGITS);
         rule.setCallPattern(callPattern);
-        rule.setPermissionNames(Arrays.asList("LocalDialing"));
+        rule.replacePermissionNames(Arrays.asList("LocalDialing"));
 
         MockAuthRules authRules = new MockAuthRules();
         authRules.setLocation(TestHelper.createDefaultLocation());
@@ -404,10 +404,10 @@ public class AuthRulesTest {
         rule.setDescription("Calls to internal extensions");
         DialPattern pattern1 = new DialPattern("12", 3);
         DialPattern pattern2 = new DialPattern("13", 4);
-        rule.setDialPatterns(Arrays.asList(pattern1, pattern2));
+        rule.replaceDialPatterns(Arrays.asList(pattern1, pattern2));
         CallPattern callPattern = new CallPattern("7", CallDigits.VARIABLE_DIGITS);
         rule.setCallPattern(callPattern);
-        rule.setPermissionNames(Arrays.asList("LocalDialing"));
+        rule.replacePermissionNames(Arrays.asList("LocalDialing"));
 
         MockAuthRules authRules = new MockAuthRules();
         authRules.setLocation(TestHelper.createDefaultLocation());

@@ -24,7 +24,7 @@ public abstract class Sbc extends BeanWithId implements DeployConfigOnEdit, Syst
 
     private boolean m_enabled;
 
-    private SbcRoutes m_routes;
+    private SbcRoutes m_routes = new SbcRoutes();
 
     private SbcDevice m_sbcDevice;
 
@@ -46,6 +46,17 @@ public abstract class Sbc extends BeanWithId implements DeployConfigOnEdit, Syst
 
     public void setRoutes(SbcRoutes routes) {
         m_routes = routes;
+    }
+
+    public void replaceRoutes(SbcRoutes routes) {
+        getRoutes().getDomains().clear();
+        getRoutes().getSubnets().clear();
+        if( routes != null && routes.getDomains() != null ) {
+            getRoutes().setDomains( routes.getDomains() );
+        }
+        if( routes != null && routes.getSubnets() != null ) {
+            getRoutes().setSubnets( routes.getSubnets() );
+        }
     }
 
     public SbcDevice getSbcDevice() {
@@ -104,4 +115,6 @@ public abstract class Sbc extends BeanWithId implements DeployConfigOnEdit, Syst
     public String getConfigChangeType() {
         return Sbc.class.getSimpleName();
     }
+
+    
 }

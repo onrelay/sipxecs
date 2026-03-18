@@ -11,6 +11,7 @@ package org.sipfoundry.commons.userdb;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.ArrayList;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,8 +32,8 @@ public class User {
     private String m_voicemailTui;
     private boolean m_canRecordPrompts;
     private boolean m_canTuiChangePin;
-    private Vector<String> m_dialPatterns;
-    private Vector<String> m_aliases;
+    private Vector<String> m_dialPatterns = new Vector<String>();
+    private Vector<String> m_aliases = new Vector<String>();
     private HashMap<String, DistributionList> m_distributionLists;
     private Locale m_locale; // The locale for the UI to present to this user
     private boolean m_forwardDeleteVoicemail;
@@ -227,6 +228,13 @@ public class User {
         this.m_dialPatterns = dialPatterns;
     }
 
+    public void replaceDialPatterns(Vector<String> dialPatterns) {
+        this.m_dialPatterns.clear();
+        if( dialPatterns != null ) {
+            this.m_dialPatterns.addAll( dialPatterns );
+        }
+    }
+
     public HashMap<String, DistributionList> getDistributionLists() {
         return m_distributionLists;
     }
@@ -242,6 +250,14 @@ public class User {
     public void setAliases(Vector<String> aliases) {
         this.m_aliases = aliases;
     }
+
+    public void replaceAliases(Vector<String> aliases) {
+        this.m_aliases.clear();
+        if( aliases != null ) {
+            this.m_aliases.addAll( aliases );
+        }
+    }
+
 
     public String hashPin(String pin) {
         // pintoken is MD5 Hash of:
