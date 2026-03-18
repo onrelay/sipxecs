@@ -73,7 +73,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/gwt-dev-jakarta-2.12.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gwt-user-jakarta-2.12.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hazelcast-5.5.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-7.0.6.Final.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-core-7.2.6.Final.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-models-1.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hivemind-jakarta-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/hivemind-lib-jakarta-1.1.1.jar"/>
