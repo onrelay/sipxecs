@@ -131,195 +131,257 @@ void EntityRecord::swap(EntityRecord& entity)
     std::swap(_locRestrSbnet, entity._locRestrSbnet);
 }
 
-void EntityRecord::fillStaticUserLoc(EntityRecord::StaticUserLoc& userLoc, const bsoncxx::document::view& innerObj) {
+void EntityRecord::fillStaticUserLoc(EntityRecord::StaticUserLoc& userLoc,
+                                     const bsoncxx::document::view& innerObj)
+{
+    bsoncxx::document::element el;
 
-    bsoncxx::document::element eventElement = innerObj[EntityRecord::staticUserLocEvent_fld()];
-    if (eventElement && eventElement.type() == bsoncxx::type::k_string) {
-        userLoc.event = std::string(eventElement.get_string().value);
-    }
+    el = innerObj[EntityRecord::staticUserLocEvent_fld()];
+    if (el && el.type() == bsoncxx::type::k_string)
+        userLoc.event = std::string(el.get_string().value);
 
-    bsoncxx::document::element contactElement = innerObj[EntityRecord::staticUserLocContact_fld()];
-    if (contactElement && contactElement.type() == bsoncxx::type::k_string) {
-        userLoc.contact = std::string(contactElement.get_string().value);
-    }
+    el = innerObj[EntityRecord::staticUserLocContact_fld()];
+    if (el && el.type() == bsoncxx::type::k_string)
+        userLoc.contact = std::string(el.get_string().value);
 
-    bsoncxx::document::element fromUriElement = innerObj[EntityRecord::staticUserLocFromUri_fld()];
-    if (fromUriElement && fromUriElement.type() == bsoncxx::type::k_string) {
-        userLoc.fromUri = std::string(fromUriElement.get_string().value);
-    }
+    el = innerObj[EntityRecord::staticUserLocFromUri_fld()];
+    if (el && el.type() == bsoncxx::type::k_string)
+        userLoc.fromUri = std::string(el.get_string().value);
 
-    bsoncxx::document::element toUriElement = innerObj[EntityRecord::staticUserLocToUri_fld()];
-    if (toUriElement && toUriElement.type() == bsoncxx::type::k_string) {
-        userLoc.toUri = std::string(toUriElement.get_string().value);
-    }
+    el = innerObj[EntityRecord::staticUserLocToUri_fld()];
+    if (el && el.type() == bsoncxx::type::k_string)
+        userLoc.toUri = std::string(el.get_string().value);
 
-    bsoncxx::document::element callIdElement = innerObj[EntityRecord::staticUserLocCallId_fld()];
-    if (callIdElement && callIdElement.type() == bsoncxx::type::k_string) {
-        userLoc.callId = std::string(callIdElement.get_string().value);
-    }
-
+    el = innerObj[EntityRecord::staticUserLocCallId_fld()];
+    if (el && el.type() == bsoncxx::type::k_string)
+        userLoc.callId = std::string(el.get_string().value);
 }
-
 
 EntityRecord& EntityRecord::operator =(const bsoncxx::document::view& document)
 {
-    // Access the fields from the document
+    // ---- required ----
     _oid = std::string(document[EntityRecord::oid_fld()].get_string().value);
 
-    if (document[EntityRecord::userId_fld()])
+    // ---- simple fields ----
     {
-        _userId = std::string(document[EntityRecord::userId_fld()].get_string().value);
+        bsoncxx::document::element el;
+
+        el = document[EntityRecord::userId_fld()];
+        if (el && el.type() == bsoncxx::type::k_string)
+            _userId = std::string(el.get_string().value);
+
+        el = document[EntityRecord::identity_fld()];
+        if (el && el.type() == bsoncxx::type::k_string)
+            _identity = std::string(el.get_string().value);
+
+        el = document[EntityRecord::realm_fld()];
+        if (el && el.type() == bsoncxx::type::k_string)
+            _realm = std::string(el.get_string().value);
+
+        el = document[EntityRecord::password_fld()];
+        if (el && el.type() == bsoncxx::type::k_string)
+            _password = std::string(el.get_string().value);
+
+        el = document[EntityRecord::pin_fld()];
+        if (el && el.type() == bsoncxx::type::k_string)
+            _pin = std::string(el.get_string().value);
+
+        el = document[EntityRecord::authType_fld()];
+        if (el && el.type() == bsoncxx::type::k_string)
+            _authType = std::string(el.get_string().value);
+
+        el = document[EntityRecord::location_fld()];
+        if (el && el.type() == bsoncxx::type::k_string)
+            _location = std::string(el.get_string().value);
+
+        el = document[EntityRecord::callForwardTime_fld()];
+        if (el && el.type() == bsoncxx::type::k_int32)
+            _callForwardTime = el.get_int32().value;
+
+        el = document[EntityRecord::vmOnDnd_fld()];
+        if (el && el.type() == bsoncxx::type::k_bool)
+            _vmOnDnd = el.get_bool().value;
     }
 
-    if (document[EntityRecord::identity_fld()])
+    // ---- loc_restr_dom ----
     {
-        _identity = std::string(document[EntityRecord::identity_fld()].get_string().value);
-    }
-
-    if (document[EntityRecord::realm_fld()])
-    {
-        _realm = std::string(document[EntityRecord::realm_fld()].get_string().value);
-    }
-
-    if (document[EntityRecord::password_fld()])
-    {
-        _password = std::string(document[EntityRecord::password_fld()].get_string().value);
-    }
-
-    if (document[EntityRecord::pin_fld()])
-    {
-        _pin = std::string(document[EntityRecord::pin_fld()].get_string().value);
-    }
-
-    if (document[EntityRecord::authType_fld()])
-    {
-        _authType = std::string(document[EntityRecord::authType_fld()].get_string().value);
-    }
-
-    if (document[EntityRecord::location_fld()])
-    {
-        _location = std::string(document[EntityRecord::location_fld()].get_string().value);
-    }
-
-    if (document[EntityRecord::callForwardTime_fld()])
-    {
-        _callForwardTime = document[EntityRecord::callForwardTime_fld()].get_int32().value;
-    }
-
-    if (document[EntityRecord::vmOnDnd_fld()])
-    {
-        _vmOnDnd = document[EntityRecord::vmOnDnd_fld()].get_bool().value;
-    }
-
-    // Handling array fields like loc_restr_dom_fld
-    if (document[EntityRecord::loc_restr_dom_fld()]) {
-        bsoncxx::array::view array_elem = document[EntityRecord::loc_restr_dom_fld()].get_array();
-        _locRestrDom.clear();
-        for (bsoncxx::array::element item : array_elem) {
-            _locRestrDom.push_back(std::string(item.get_string().value));
+        bsoncxx::document::element el = document[EntityRecord::loc_restr_dom_fld()];
+        if (el && el.type() == bsoncxx::type::k_array) {
+            bsoncxx::array::view arr = el.get_array().value;
+            _locRestrDom.clear();
+            for (bsoncxx::array::view::const_iterator it = arr.begin(); it != arr.end(); ++it) {
+                if (it->type() == bsoncxx::type::k_string)
+                    _locRestrDom.push_back(std::string(it->get_string().value));
+            }
         }
     }
 
-    // Handling array fields like loc_restr_sbnet_fld
-    if (document[EntityRecord::loc_restr_sbnet_fld()]) {
-        bsoncxx::array::view array_elem = document[EntityRecord::loc_restr_sbnet_fld()].get_array();
-        _locRestrSbnet.clear();
-        for (bsoncxx::array::element item : array_elem) {
-            _locRestrSbnet.push_back(std::string(item.get_string().value));
+    // ---- loc_restr_sbnet ----
+    {
+        bsoncxx::document::element el = document[EntityRecord::loc_restr_sbnet_fld()];
+        if (el && el.type() == bsoncxx::type::k_array) {
+            bsoncxx::array::view arr = el.get_array().value;
+            _locRestrSbnet.clear();
+            for (bsoncxx::array::view::const_iterator it = arr.begin(); it != arr.end(); ++it) {
+                if (it->type() == bsoncxx::type::k_string)
+                    _locRestrSbnet.push_back(std::string(it->get_string().value));
+            }
         }
     }
 
-    // Handling embedded object like callerId_fld
-    if (document[EntityRecord::callerId_fld()]) {
-        bsoncxx::document::view caller_id_document = document[EntityRecord::callerId_fld()].get_document();
-        _callerId.id = std::string(caller_id_document[EntityRecord::callerId_fld()].get_string().value);
-        _callerId.enforcePrivacy = caller_id_document[EntityRecord::callerIdEnforcePrivacy_fld()].get_bool().value;
-        _callerId.ignoreUserCalleId = caller_id_document[EntityRecord::callerIdIgnoreUserCalleId_fld()].get_bool().value;
-        _callerId.transformExtension = caller_id_document[EntityRecord::callerIdTransformExtension_fld()].get_bool().value;
-        _callerId.extensionLength = caller_id_document[EntityRecord::callerIdExtensionLength_fld()].get_int32().value;
-        _callerId.extensionPrefix = std::string(caller_id_document[EntityRecord::callerIdExtensionPrefix_fld()].get_string().value);
-        _callerId.type = (_userId == "~~gw") ? "gateway" : "user";
-    }
+    // ---- callerId ----
+    {
+        bsoncxx::document::element el_id = document[EntityRecord::callerId_fld()];
+        if (el_id) {
+            if (el_id.type() == bsoncxx::type::k_string)
+                _callerId.id = std::string(el_id.get_string().value);
 
-    // Handling permissions (set of strings)
-    if (document[EntityRecord::permission_fld()]) {
-        bsoncxx::array::view array_elem = document[EntityRecord::permission_fld()].get_array();
-        _permissions.clear();
-        for (bsoncxx::array::element item : array_elem) {
-            _permissions.insert(std::string(item.get_string().value));
+            bsoncxx::document::element el = document[EntityRecord::callerIdEnforcePrivacy_fld()];
+            if (el && el.type() == bsoncxx::type::k_bool)
+                _callerId.enforcePrivacy = el.get_bool().value;
+
+            el = document[EntityRecord::callerIdIgnoreUserCalleId_fld()];
+            if (el && el.type() == bsoncxx::type::k_bool)
+                _callerId.ignoreUserCalleId = el.get_bool().value;
+
+            el = document[EntityRecord::callerIdTransformExtension_fld()];
+            if (el && el.type() == bsoncxx::type::k_bool)
+                _callerId.transformExtension = el.get_bool().value;
+
+            el = document[EntityRecord::callerIdExtensionLength_fld()];
+            if (el && el.type() == bsoncxx::type::k_int32)
+                _callerId.extensionLength = el.get_int32().value;
+
+            el = document[EntityRecord::callerIdExtensionPrefix_fld()];
+            if (el && el.type() == bsoncxx::type::k_string)
+                _callerId.extensionPrefix = std::string(el.get_string().value);
+
+            _callerId.type = (_userId == "~~gw") ? "gateway" : "user";
         }
     }
 
-    // Handling allowed_locations_fld
-    if (document[EntityRecord::allowed_locations_fld()]) {
-        bsoncxx::array::view array_elem = document[EntityRecord::allowed_locations_fld()].get_array();
-        _allowedLocations.clear();
-        for (bsoncxx::array::element item : array_elem) {
-            _allowedLocations.insert(std::string(item.get_string().value));
+    // ---- permissions ----
+    {
+        bsoncxx::document::element el = document[EntityRecord::permission_fld()];
+        if (el && el.type() == bsoncxx::type::k_array) {
+            bsoncxx::array::view arr = el.get_array().value;
+            _permissions.clear();
+            for (bsoncxx::array::view::const_iterator it = arr.begin(); it != arr.end(); ++it) {
+                if (it->type() == bsoncxx::type::k_string)
+                    _permissions.insert(std::string(it->get_string().value));
+            }
         }
     }
 
-    // Handling associated_locations_fld
-    if (document[EntityRecord::associated_locations_fld()]) {
-        bsoncxx::array::view array_elem = document[EntityRecord::associated_locations_fld()].get_array();
-        _associatedLocations.clear();
-        for (bsoncxx::array::element item : array_elem) {
-            _associatedLocations.insert(std::string(item.get_string().value));
+    // ---- allowedLocations ----
+    {
+        bsoncxx::document::element el = document[EntityRecord::allowed_locations_fld()];
+        if (el && el.type() == bsoncxx::type::k_array) {
+            bsoncxx::array::view arr = el.get_array().value;
+            _allowedLocations.clear();
+            for (bsoncxx::array::view::const_iterator it = arr.begin(); it != arr.end(); ++it) {
+                if (it->type() == bsoncxx::type::k_string)
+                    _allowedLocations.insert(std::string(it->get_string().value));
+            }
         }
     }
 
-    // Handling inbound_associated_locations_fld
-    if (document[EntityRecord::inbound_associated_locations_fld()]) {
-        bsoncxx::array::view array_elem = document[EntityRecord::inbound_associated_locations_fld()].get_array();
-        _inboundAssociatedLocations.clear();
-        for (bsoncxx::array::element item : array_elem) {
-            _inboundAssociatedLocations.insert(std::string(item.get_string().value));
+    // ---- associatedLocations ----
+    {
+        bsoncxx::document::element el = document[EntityRecord::associated_locations_fld()];
+        if (el && el.type() == bsoncxx::type::k_array) {
+            bsoncxx::array::view arr = el.get_array().value;
+            _associatedLocations.clear();
+            for (bsoncxx::array::view::const_iterator it = arr.begin(); it != arr.end(); ++it) {
+                if (it->type() == bsoncxx::type::k_string)
+                    _associatedLocations.insert(std::string(it->get_string().value));
+            }
         }
     }
 
-    if (document[EntityRecord::entity_fld()]) {
-        _entity = std::string(document[EntityRecord::entity_fld()].get_string().value);
-    }
-
-    if (document[EntityRecord::authc_fld()]) {
-        _authc = std::string(document[EntityRecord::authc_fld()].get_string().value);
-    }
-
-    if (document[EntityRecord::associated_location_fallback_fld()]) {
-        _associatedLocationFallback = std::string(document[EntityRecord::associated_location_fallback_fld()].get_string().value);
-    }
-
-    // Handling aliases array of embedded objects
-    if (document[EntityRecord::aliases_fld()]) {
-        bsoncxx::array::view array_elem = document[EntityRecord::aliases_fld()].get_array();
-        for (bsoncxx::array::element item : array_elem) {
-            bsoncxx::document::view inner_document = item.get_document();
-            Alias alias;
-            if (inner_document[EntityRecord::aliasesId_fld()])
-                alias.id = std::string(inner_document[EntityRecord::aliasesId_fld()].get_string().value);
-            if (inner_document[EntityRecord::aliasesContact_fld()])
-                alias.contact = std::string(inner_document[EntityRecord::aliasesContact_fld()].get_string().value);
-            if (inner_document[EntityRecord::aliasesRelation_fld()])
-                alias.relation = std::string(inner_document[EntityRecord::aliasesRelation_fld()].get_string().value);
-            _aliases.push_back(alias);
+    // ---- inboundAssociatedLocations ----
+    {
+        bsoncxx::document::element el = document[EntityRecord::inbound_associated_locations_fld()];
+        if (el && el.type() == bsoncxx::type::k_array) {
+            bsoncxx::array::view arr = el.get_array().value;
+            _inboundAssociatedLocations.clear();
+            for (bsoncxx::array::view::const_iterator it = arr.begin(); it != arr.end(); ++it) {
+                if (it->type() == bsoncxx::type::k_string)
+                    _inboundAssociatedLocations.insert(std::string(it->get_string().value));
+            }
         }
     }
 
-    // Handling staticUserLoc array of embedded objects
-    if (document[EntityRecord::staticUserLoc_fld()]) {
-        bsoncxx::array::view array_elem = document[EntityRecord::staticUserLoc_fld()].get_array();
-        for (bsoncxx::array::element item : array_elem) {
-            bsoncxx::document::view inner_document = item.get_document();
-            StaticUserLoc userLoc;
-            fillStaticUserLoc(userLoc, inner_document);
-            _staticUserLoc.push_back(userLoc);
+    // ---- simple string fields ----
+    {
+        bsoncxx::document::element el;
+
+        el = document[EntityRecord::entity_fld()];
+        if (el && el.type() == bsoncxx::type::k_string)
+            _entity = std::string(el.get_string().value);
+
+        el = document[EntityRecord::authc_fld()];
+        if (el && el.type() == bsoncxx::type::k_string)
+            _authc = std::string(el.get_string().value);
+
+        el = document[EntityRecord::associated_location_fallback_fld()];
+        if (el && el.type() == bsoncxx::type::k_string)
+            _associatedLocationFallback = std::string(el.get_string().value);
+    }
+
+    // ---- aliases ----
+    {
+        bsoncxx::document::element el = document[EntityRecord::aliases_fld()];
+        if (el && el.type() == bsoncxx::type::k_array) {
+            bsoncxx::array::view arr = el.get_array().value;
+            _aliases.clear();
+            for (bsoncxx::array::view::const_iterator it = arr.begin(); it != arr.end(); ++it) {
+                if (it->type() == bsoncxx::type::k_document) {
+                    bsoncxx::document::view inner = it->get_document().view();
+                    Alias alias;
+
+                    bsoncxx::document::element e;
+                    e = inner[EntityRecord::aliasesId_fld()];
+                    if (e && e.type() == bsoncxx::type::k_string)
+                        alias.id = std::string(e.get_string().value);
+
+                    e = inner[EntityRecord::aliasesContact_fld()];
+                    if (e && e.type() == bsoncxx::type::k_string)
+                        alias.contact = std::string(e.get_string().value);
+
+                    e = inner[EntityRecord::aliasesRelation_fld()];
+                    if (e && e.type() == bsoncxx::type::k_string)
+                        alias.relation = std::string(e.get_string().value);
+
+                    _aliases.push_back(alias);
+                }
+            }
         }
     }
-    else if (document[EntityRecord::staticUserLoc_fld()]) {
-        bsoncxx::document::view inner_document = document[EntityRecord::staticUserLoc_fld()].get_document();
-        StaticUserLoc userLoc;
-        fillStaticUserLoc(userLoc, inner_document);
-        _staticUserLoc.push_back(userLoc);
+
+    // ---- staticUserLoc ----
+    {
+        bsoncxx::document::element el = document[EntityRecord::staticUserLoc_fld()];
+        if (el) {
+            _staticUserLoc.clear();
+            if (el.type() == bsoncxx::type::k_array) {
+                bsoncxx::array::view arr = el.get_array().value;
+                for (bsoncxx::array::view::const_iterator it = arr.begin(); it != arr.end(); ++it) {
+                    if (it->type() == bsoncxx::type::k_document) {
+                        bsoncxx::document::view inner = it->get_document().view();
+                        StaticUserLoc userLoc;
+                        fillStaticUserLoc(userLoc, inner);
+                        _staticUserLoc.push_back(userLoc);
+                    }
+                }
+            }
+            else if (el.type() == bsoncxx::type::k_document) {
+                bsoncxx::document::view inner = el.get_document().view();
+                StaticUserLoc userLoc;
+                fillStaticUserLoc(userLoc, inner);
+                _staticUserLoc.push_back(userLoc);
+            }
+        }
     }
 
     return *this;

@@ -452,50 +452,80 @@ bool EntityDB::findByAliasUserId(const std::string& alias, EntityRecord& entity)
 {
     MongoDB::ReadTimer readTimer(const_cast<EntityDB&>(*this));
 
-    // Check cache for the alias first
     ExpireCacheable pCacheObj = const_cast<ExpireCache&>(_cache).get(alias);
-    if (pCacheObj) {
-        OS_LOG_DEBUG(FAC_ODBC, "EntityDB::findByAliasUserId - " << alias << " is present in namespace " << _ns << " (CACHED)");
+    if (pCacheObj)
+    {
+        OS_LOG_DEBUG(FAC_ODBC,
+            "EntityDB::findByAliasUserId - " << alias <<
+            " is present in namespace " << _ns << " (CACHED)");
         entity = *pCacheObj;
         return true;
     }
 
-    try {
+    try
+    {
         bsoncxx::builder::basic::document queryBuilder;
-        queryBuilder.append(bsoncxx::builder::basic::kvp(
-            std::string(EntityRecord::aliases_fld()),
-            bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp(
-              std::string(EntityRecord::aliasesId_fld()), alias ))));
 
-        // Create a MongoConnection instance for the current operation
+        queryBuilder.append(
+            bsoncxx::builder::basic::kvp(
+                std::string(EntityRecord::aliases_fld()),
+                bsoncxx::builder::basic::make_document(
+                    bsoncxx::builder::basic::kvp(
+                        std::string("$elemMatch"),
+                        bsoncxx::builder::basic::make_document(
+                            bsoncxx::builder::basic::kvp(
+                                std::string(EntityRecord::aliasesId_fld()),
+                                alias
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
         MongoDB::MongoConnection connection(_info);
-
         readTimer.setDBConnOK(connection.ok());
 
-        // Access the target collection
         mongocxx::collection collection = connection.collection(_ns);
 
         mongocxx::options::find findOptions;
-        findOptions.max_time(std::chrono::milliseconds(_info.getReadQueryTimeoutMs()));
+        findOptions.max_time(
+            std::chrono::milliseconds(_info.getReadQueryTimeoutMs())
+        );
 
-        // Execute the query
-        std::optional<bsoncxx::document::value> maybeResult = collection.find_one(queryBuilder.view(), findOptions);
+        std::optional<bsoncxx::document::value> maybeResult =
+            collection.find_one(queryBuilder.view(), findOptions);
 
-        if (maybeResult) {
+        if (maybeResult)
+        {
             bsoncxx::document::view result = maybeResult->view();
-            entity = result;  // Convert BSON document to EntityRecord
 
-            // Cache the entity for future use
-            const_cast<ExpireCache&>(_cache).add(alias, ExpireCacheable(new EntityRecord(entity)));
+            entity = result;
 
-            OS_LOG_DEBUG(FAC_ODBC, "EntityDB::findByAliasUserId - Found entity record for alias " << alias << " from namespace " << _ns);
+            // ---- Cache result ----
+            const_cast<ExpireCache&>(_cache).add(
+                alias,
+                ExpireCacheable(new EntityRecord(entity))
+            );
+
+            OS_LOG_DEBUG(FAC_ODBC,
+                "EntityDB::findByAliasUserId - Found entity record for alias "
+                << alias << " from namespace " << _ns);
+
             return true;
         }
-    } catch (const std::exception& e) {
-        OS_LOG_ERROR(FAC_ODBC, "EntityDB::findByAliasUserId - Error while querying MongoDB: " << e.what());
+    }
+    catch (const std::exception& e)
+    {
+        OS_LOG_ERROR(FAC_ODBC,
+            "EntityDB::findByAliasUserId - Error while querying MongoDB: "
+            << e.what());
     }
 
-    OS_LOG_INFO(FAC_ODBC, "EntityDB::findByAliasUserId - Unable to find entity record for alias " << alias << " from namespace " << _ns);
+    OS_LOG_INFO(FAC_ODBC,
+        "EntityDB::findByAliasUserId - Unable to find entity record for alias "
+        << alias << " from namespace " << _ns);
+
     return false;
 }
 
