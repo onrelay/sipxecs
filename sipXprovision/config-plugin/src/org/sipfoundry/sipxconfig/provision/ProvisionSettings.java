@@ -60,7 +60,7 @@ public class ProvisionSettings extends PersistableSettings implements DeployConf
         
         @SettingEntry(path = POLY)
         public String getPolycomDefaultVersion() {
-            return "4.0.X";
+            return "5.9.8";
         }
     }
 

@@ -33,7 +33,6 @@ public class ApplicationsConfiguration extends ProfileContext {
     public Map<String, Object> getContext() {
         Map<String, Object> context = super.getContext();
         getDevice().getSettings();
-        context.put("ver416", PolycomModel.VER_4_1_6);
 
         return context;
     }

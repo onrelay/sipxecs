@@ -18,14 +18,22 @@ import org.sipfoundry.sipxconfig.phone.PhoneModel;
  * Static differences in polycom phone models
  */
 public final class PolycomModel extends PhoneModel {
+
+    /** Firmware for Polycom RealPresence */
+    public static final DeviceVersion VER_5_4_0_RP = new DeviceVersion(PolycomPhone.BEAN_ID, "5.4.0_RP");
+    public static final DeviceVersion VER_5_4_1_RP = new DeviceVersion(PolycomPhone.BEAN_ID, "5.4.1_RP");
+    public static final DeviceVersion VER_5_4_2_RP = new DeviceVersion(PolycomPhone.BEAN_ID, "5.4.2_RP");
+    public static final DeviceVersion VER_5_4_3_RP = new DeviceVersion(PolycomPhone.BEAN_ID, "5.4.3_RP");
+    public static final DeviceVersion VER_5_4_4_RP = new DeviceVersion(PolycomPhone.BEAN_ID, "5.4.4_RP");
+    public static final DeviceVersion VER_5_4_5_RP = new DeviceVersion(PolycomPhone.BEAN_ID, "5.4.5_RP"); 
+
     /** Firmware 2.0 or beyond */
     public static final DeviceVersion VER_2_0 = new DeviceVersion(PolycomPhone.BEAN_ID, "2.0");
     public static final DeviceVersion VER_3_1_X = new DeviceVersion(PolycomPhone.BEAN_ID, "3.1.X");
     public static final DeviceVersion VER_3_2_X = new DeviceVersion(PolycomPhone.BEAN_ID, "3.2.X");
     public static final DeviceVersion VER_3_3_X = new DeviceVersion(PolycomPhone.BEAN_ID, "3.3.X");
     public static final DeviceVersion VER_4_0_X = new DeviceVersion(PolycomPhone.BEAN_ID, "4.0.X");
-    public static final DeviceVersion VER_4_1_X = new DeviceVersion(PolycomPhone.BEAN_ID, "4.1.X");
-    public static final DeviceVersion VER_4_1_0 = new DeviceVersion(PolycomPhone.BEAN_ID, "4.1.0");
+    public static final DeviceVersion VER_4_1_X = new DeviceVersion(PolycomPhone.BEAN_ID, "4.1.X");    
     public static final DeviceVersion VER_4_1_2 = new DeviceVersion(PolycomPhone.BEAN_ID, "4.1.2");
     public static final DeviceVersion VER_4_1_3 = new DeviceVersion(PolycomPhone.BEAN_ID, "4.1.3");
     public static final DeviceVersion VER_4_1_4 = new DeviceVersion(PolycomPhone.BEAN_ID, "4.1.4");
@@ -84,31 +92,32 @@ public final class PolycomModel extends PhoneModel {
     public static final DeviceVersion VER_5_9_6 = new DeviceVersion(PolycomPhone.BEAN_ID, "5.9.6");
     public static final DeviceVersion VER_5_9_7 = new DeviceVersion(PolycomPhone.BEAN_ID, "5.9.7");
     public static final DeviceVersion VER_5_9_8 = new DeviceVersion(PolycomPhone.BEAN_ID, "5.9.8");
+    public static final DeviceVersion VER_6_0_0 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.0.0");
+    public static final DeviceVersion VER_6_1_0 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.1.0");
+    public static final DeviceVersion VER_6_1_1 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.1.1");
+    public static final DeviceVersion VER_6_1_2 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.1.2");
+    public static final DeviceVersion VER_6_2_1 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.2.1");
+    public static final DeviceVersion VER_6_3_0 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.3.0");
+    public static final DeviceVersion VER_6_3_1 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.3.1");
+    public static final DeviceVersion VER_6_4_1 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.4.1");
+    public static final DeviceVersion VER_6_4_2 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.4.2");
+    public static final DeviceVersion VER_6_4_3 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.4.3");
+    public static final DeviceVersion VER_6_4_4 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.4.4");
+    public static final DeviceVersion VER_6_4_5 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.4.5");
+    public static final DeviceVersion VER_6_4_6 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.4.6");
 
-    /** Firmware for Polycom RealPresence */
-    public static final DeviceVersion VER_5_4_0_RP = new DeviceVersion(PolycomPhone.BEAN_ID, "5.4.0_RP");
-    public static final DeviceVersion VER_5_4_1_RP = new DeviceVersion(PolycomPhone.BEAN_ID, "5.4.1_RP");
-    public static final DeviceVersion VER_5_4_2_RP = new DeviceVersion(PolycomPhone.BEAN_ID, "5.4.2_RP");
-    public static final DeviceVersion VER_5_4_3_RP = new DeviceVersion(PolycomPhone.BEAN_ID, "5.4.3_RP");
-    public static final DeviceVersion VER_5_4_4_RP = new DeviceVersion(PolycomPhone.BEAN_ID, "5.4.4_RP");
-    public static final DeviceVersion VER_5_4_5_RP = new DeviceVersion(PolycomPhone.BEAN_ID, "5.4.5_RP");    
+    public static final DeviceVersion DEFAULT_VERSION = VER_5_9_8;
 
     public static final DeviceVersion[] SUPPORTED_VERSIONS = new DeviceVersion[] {
-        VER_3_1_X, 
-        VER_3_2_X, 
-        VER_4_0_X, 
-        VER_4_1_X, VER_4_1_0, VER_4_1_2, VER_4_1_3, VER_4_1_4, VER_4_1_5, VER_4_1_6, VER_4_1_7, VER_4_1_8, 
-        VER_5_0_0, VER_5_0_1, VER_5_0_2, 
-        VER_5_1_1, VER_5_1_2, VER_5_1_3,
-        VER_5_2_0, VER_5_2_1, VER_5_2_2, VER_5_2_3, VER_5_2_4, VER_5_2_5, 
-        VER_5_3_0, VER_5_3_1, VER_5_3_2,
-        VER_5_3_3, VER_5_4_0, VER_5_4_1, VER_5_4_2, VER_5_4_3, VER_5_4_4, VER_5_4_5, VER_5_4_6, 
+        VER_5_4_0_RP, VER_5_4_1_RP, VER_5_4_2_RP, VER_5_4_3_RP, VER_5_4_4_RP, VER_5_4_5_RP,
+        VER_3_1_X, VER_3_2_X, VER_4_0_X, VER_4_1_X, 
         VER_5_5_0, VER_5_5_1, VER_5_5_2, 
         VER_5_6_0, VER_5_6_1, VER_5_6_2, VER_5_6_3, VER_5_6_4, VER_5_6_5, 
         VER_5_7_0, VER_5_7_1, VER_5_7_2, VER_5_7_3, VER_5_7_4, 
         VER_5_8_0, VER_5_8_1, VER_5_8_2, VER_5_8_4, VER_5_8_5, 
         VER_5_9_0, VER_5_9_1, VER_5_9_2, VER_5_9_3, VER_5_9_4, VER_5_9_5, VER_5_9_6, VER_5_9_7, VER_5_9_8, 
-        VER_5_4_0_RP, VER_5_4_1_RP, VER_5_4_2_RP, VER_5_4_3_RP, VER_5_4_4_RP, VER_5_4_5_RP
+        VER_6_0_0, VER_6_1_0, VER_6_1_1, VER_6_1_2, VER_6_2_1, VER_6_3_0, VER_6_3_1, 
+        VER_6_4_1, VER_6_4_2, VER_6_4_3, VER_6_4_4, VER_6_4_5, VER_6_4_6,
     };
     private static final Log LOG = LogFactory.getLog(PolycomModel.class);
     private DeviceVersion m_deviceVersion;

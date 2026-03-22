@@ -1,12 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+  
   <bean id="polycomModel" parent="abstractPhoneModel" class="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel"
     abstract="true" >
     <property name="vendor" value="Polycom"/>
     <property name="restartSupported" value="true" />
   </bean>
 
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_0_RP"
+    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1_RP"
+    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2_RP"
+    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3_RP"
+    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4_RP"
+    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5_RP"
+    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
   <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_2_0"
     class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
   <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_3_1_X"
@@ -16,68 +29,6 @@
   <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"
     class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
   <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_2"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_3"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_4"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_5"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_6"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_7"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_8"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_0"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_1"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_2"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_1"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_2"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_3"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_0"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_1"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_2"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_3"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_4"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_5"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_0"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_1"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_2"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_3"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_0"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"
-    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"
     class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
   <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"
     class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
@@ -135,17 +86,31 @@
     class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
   <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"
     class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_0_RP"
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"
     class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1_RP"
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"
     class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2_RP"
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"
     class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3_RP"
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"
     class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4_RP"
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"
     class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
-  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5_RP"
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"
+    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"
+    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"
+    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"
+    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"
+    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"
+    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"
+    class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />  
+  <bean id="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"
     class="org.springframework.beans.factory.config.FieldRetrievingFactoryBean" />
 
   <bean id="polycom300" parent="polycomModel">
@@ -201,7 +166,6 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_3_2_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
@@ -258,7 +222,6 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_3_2_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
@@ -279,7 +242,6 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_3_2_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
@@ -320,7 +282,6 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_3_2_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
@@ -381,7 +342,6 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_3_2_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
@@ -405,7 +365,6 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_3_2_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
@@ -468,7 +427,6 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_3_2_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
       </list>
     </property>    
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
@@ -515,41 +473,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_3_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_3_2_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_6"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_7"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_8"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -614,7 +537,6 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_3_2_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
@@ -677,39 +599,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_6"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_7"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_8"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -790,38 +679,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_6"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_7"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_8"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -850,6 +707,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
@@ -873,12 +743,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -906,7 +770,20 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_5"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
-               <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
@@ -930,12 +807,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -964,6 +835,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
@@ -984,38 +868,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_6"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_7"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_8"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -1044,6 +896,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
@@ -1064,12 +929,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -1098,6 +957,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
@@ -1118,38 +990,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_6"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_7"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_8"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -1178,6 +1018,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
@@ -1198,12 +1051,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -1232,6 +1079,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
@@ -1252,38 +1112,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_6"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_7"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_8"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -1312,6 +1140,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
@@ -1332,12 +1173,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -1366,6 +1201,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
@@ -1386,12 +1234,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -1420,6 +1262,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
@@ -1440,12 +1295,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -1474,6 +1323,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
@@ -1494,38 +1356,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_X"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_6"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_7"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_1_8"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_0_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_1_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_2_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_3_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -1554,6 +1384,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
@@ -1574,13 +1417,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -1609,6 +1445,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
@@ -1629,13 +1478,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -1664,6 +1506,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
@@ -1684,13 +1539,6 @@
     </property>
     <property name="versions">
       <list>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_0"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_1"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_2"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_3"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_4"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_5"/>
-        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_4_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_0"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_1"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_5_2"/>
@@ -1719,8 +1567,51 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
-    <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+    <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
+  </bean>
+  <bean id="polycom" class="org.sipfoundry.sipxconfig.phone.polycom.PolycomPhone" scope="prototype"
+    parent="abstractPhone">
+    <property name="addressManager" ref="addressManager" />
+    <property name="certificateManager" ref="certificateManager" />
+  </bean>
+  <bean id="polycomFirmware" class="org.sipfoundry.sipxconfig.upload.UploadSpecification">
+    <property name="beanId" value="polycomUpload" />
+    <property name="modelFilePath" value="polycom/upload.xml" />
+    <property name="label" value="Polycom" />
+  </bean>
+  <bean id="polycomUpload" class="org.sipfoundry.sipxconfig.phone.polycom.PolycomUpload"
+    scope="prototype" parent="upload">
+    <property name="profileDir">
+      <value>${sysdir.phone}/profile/tftproot</value>
+    </property>
+  </bean>
+  <bean id="deviceFilesCleaner" class="org.sipfoundry.sipxconfig.phone.polycom.DeviceFilesCleaner">
+    <property name="uploadManager" ref="uploadManager" />
+  </bean>
+  <bean id="phonesUpdateResource" class="org.sipfoundry.sipxconfig.phone.polycom.PhoneUpdateResource" scope="prototype">
+    <property name="phoneContext" ref="phoneContext" />
+    <property name="profileManager" ref="phoneProfileManager" />
+    <property name="readable" value="true" />
+    <property name="modifiable" value="true" />
+  </bean>
+  <alias name="phonesUpdateResource" alias="/updatephone/{mac}/{version}/{model}" />
+  <bean id="migrationTask" class="org.sipfoundry.sipxconfig.phone.polycom.MigrationTask">
+    <property name="phoneContext" ref="phoneContext" />
+    <property name="profileManager" ref="phoneProfileManager" />
   </bean>
 </beans>

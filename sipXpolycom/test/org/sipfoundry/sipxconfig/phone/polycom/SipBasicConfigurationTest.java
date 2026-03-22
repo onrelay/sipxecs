@@ -220,7 +220,7 @@ public class SipBasicConfigurationTest extends PolycomXmlTestCase {
         phone.setPhoneModelSource(phoneModelSource);
         phone.setBeanId("polycomVVX500");
         phone.setModel(model);
-        phone.setDeviceVersion(PolycomModel.VER_5_0_2);
+        phone.setDeviceVersion(PolycomModel.VER_5_5_0);
         phone.setFeatureManager(featureManagerMock);
         PhoneTestDriver.supplyTestData(phone, new ArrayList<User>());
 
