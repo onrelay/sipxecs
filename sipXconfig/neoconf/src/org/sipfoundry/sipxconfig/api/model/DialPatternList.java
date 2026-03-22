@@ -24,9 +24,18 @@ import org.sipfoundry.sipxconfig.dialplan.DialPattern;
 
 @XmlRootElement(name = "DialPatterns")
 public class DialPatternList {
-    private List<DialPatternBean> m_patterns;
+    private List<DialPatternBean> m_patterns = new ArrayList<DialPatternBean>();
+
+    @XmlElement(name = "DialPatterns")
+    public List<DialPatternBean> getPatterns() {
+        return m_patterns;
+    }
 
     public void setPatterns(List<DialPatternBean> patterns) {
+        m_patterns = patterns;
+    }
+    
+    public void replacePatterns(List<DialPatternBean> patterns) {
         getPatterns().clear();
         if( patterns != null ) {
             getPatterns().addAll( patterns );
@@ -39,7 +48,7 @@ public class DialPatternList {
             patternList.add(DialPatternBean.convertPattern(pattern));
         }
         DialPatternList list = new DialPatternList();
-        list.setPatterns(patternList);
+        list.replacePatterns(patternList);
         return list;
     }
 
@@ -51,14 +60,6 @@ public class DialPatternList {
             patternList.add(pattern);
         }
         return patternList;
-    }
-
-    @XmlElement(name = "DialPatterns")
-    public List<DialPatternBean> getPatterns() {
-        if (m_patterns == null) {
-            m_patterns = new ArrayList<DialPatternBean>();
-        }
-        return m_patterns;
     }
 
 }
