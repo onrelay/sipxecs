@@ -45,11 +45,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %{_sysconfdir}/sipxpbx/polycom/*
 %{_datadir}/java/sipXecs/sipXconfig/plugins/sipXpolycom.jar
-%{_localstatedir}/sipxdata/configserver/phone/profile/tftproot/ezLogo250x116.jpg
-%{_localstatedir}/sipxdata/configserver/phone/profile/tftproot/ezLogo320x160.jpg
-%{_localstatedir}/sipxdata/configserver/phone/profile/tftproot/ezLogo320x240.jpg
-%{_localstatedir}/sipxdata/configserver/phone/profile/tftproot/ezLogo800x480.jpg
-%{_localstatedir}/sipxdata/configserver/phone/profile/tftproot/ezLogo480x272.jpg
-%{_localstatedir}/sipxdata/configserver/phone/profile/tftproot/ezLogo208x104.jpg
+
 
 

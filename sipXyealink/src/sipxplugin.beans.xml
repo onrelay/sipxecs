@@ -479,7 +479,7 @@
 <bean id="yealinkFiles" class="org.sipfoundry.sipxconfig.upload.UploadSpecification">
 	<property name="beanId" value="yealinkUpload"/>
 	<property name="modelFilePath" value="yealink/upload.xml" />
-	<property name="label" value="Yealink Phones" />
+	<property name="label" value="Yealink Phone" />
 </bean>
 
 </beans>

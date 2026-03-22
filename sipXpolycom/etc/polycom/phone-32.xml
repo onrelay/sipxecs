@@ -3039,13 +3039,13 @@
         <type>
 		  <string />
 		</type>
-        <value>ezLogo320x240.jpg</value>        
+        <value></value>        
       </setting>
       <setting name="bg.color.bm.1.name" if="polycomVVX500||polycomRealPresenceTrio">
         <type>
 		  <string />
 		</type>
-        <value>ezLogo320x240.jpg</value>        
+        <value></value>        
       </setting>
       <setting name="bg.hiRes.gray.selection" if="polycom550||polycom560||polycom650">
         <type>
@@ -3057,13 +3057,13 @@
         <type>
 		  <string />
 		</type>
-        <value>ezLogo320x160.jpg</value>        
+        <value></value>        
       </setting>
       <setting name="bg.hiRes.gray.bm.1.name" if="polycom550||polycom560||polycom650">
         <type>
 		  <string />
 		</type>
-        <value>ezLogo320x160.jpg</value>        
+        <value></value>        
       </setting>
       <setting name="bg.hiRes.gray.bm.1.adj" if="polycom550||polycom560||polycom650">
         <type>
@@ -3081,13 +3081,13 @@
         <type>
 		  <string />
 		</type>
-        <value>ezLogo320x160.jpg</value>        
+        <value></value>        
       </setting>
       <setting name="bg.hiRes.color.bm.1.name" if="polycom670">
         <type>
 		  <string />
 		</type>
-        <value>ezLogo320x160.jpg</value>        
+        <value></value>        
       </setting>
       <setting name="bg.medRes.gray.selection" if="polycom450">
         <type>
@@ -3099,13 +3099,13 @@
         <type>
 		  <string />
 		</type>
-        <value>ezLogo250x116.jpg</value>        
+        <value></value>        
       </setting>
       <setting name="bg.medRes.gray.bm.1.name" if="polycom450">
         <type>
 		  <string />
 		</type>
-        <value>ezLogo250x116.jpg</value>        
+        <value></value>        
       </setting>
   </group>
     <group name="e911" hidden="yes">

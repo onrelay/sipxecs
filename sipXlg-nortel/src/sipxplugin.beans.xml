@@ -34,6 +34,6 @@
   <bean id="lg-nortelFirmware" class="org.sipfoundry.sipxconfig.upload.UploadSpecification">
     <property name="beanId" value="upload" />
     <property name="modelFilePath" value="lg-nortel/upload.xml" />
-    <property name="label" value="LG Nortel IP Phone 68xx" />
+    <property name="label" value="LG Nortel IP Phone" />
   </bean>
 </beans>
