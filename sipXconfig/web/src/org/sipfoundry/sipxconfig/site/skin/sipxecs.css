@@ -1283,6 +1283,11 @@ form.with-sections fieldset
 	padding:2px;
 }
 
+.large-setting-label
+{
+  font-size:120%;
+}
+
 .setting-label
 {
   font-size:100%;

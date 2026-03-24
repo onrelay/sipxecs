@@ -1,11 +1,11 @@
 <form jwcid="@Form" delegate="ognl:validator">
 <fieldset>
   <p>
-   <label jwcid="@Insert" value="ognl:prompt">Profiles for selected devices will be generated.</label>
+   <label jwcid="@Insert" value="ognl:prompt" class="setting-label">Profiles for selected devices will be generated.</label>
   </p>
   <p>
     <input jwcid="restart@Checkbox" id="restart:checkbox" value="ognl:restart"/>
-    <label for="restart:checkbox">
+    <label for="restart:checkbox" class="setting-label">
       <span key="restart.label">Restart affected devices after generating profiles.</span>
     </label>
   </p>

@@ -29,10 +29,14 @@
   </div>
   <div jwcid="enabledAndLdapManagedColumnValue@Block">
     <span jwcid="@If" condition="ognl:!currentUser.enabled">
-       <span jwcid="@Insert" class="user-disabled" value="message:label.disabled" />
+      <p>
+        <span jwcid="@Insert" class="user-disabled" value="message:label.disabled" />
+      </p>
     </span>
     <span jwcid="@If" condition="ognl:currentUser.ldapManaged">
-      <span jwcid="@Insert" class="user-ldap" value="message:label.ldapManaged" />
+      <p>
+        <span jwcid="@Insert" class="user-ldap" value="message:label.ldapManaged" />
+      </p>
     </span>
   </div>
 </table>
