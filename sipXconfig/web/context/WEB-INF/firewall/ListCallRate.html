@@ -24,7 +24,8 @@
         <input jwcid="delete@Submit" id="rates:delete"
           selected="ognl:selectedRows"
           tag="ognl:allSelected"
-          value="message:button.delete" />
+          value="message:button.delete" 
+          class="small-button"/>
 	          <span jwcid="@common/Confirm"
 	            component="component:delete"
 	            prompt="message:confirm.delete"/>
@@ -33,13 +34,15 @@
           <input jwcid="moveUp@Submit" id="rates:move:up"
             selected="ognl:rowsToMoveUp"
             tag="ognl:allSelected"
-            value="message:button.moveUp" />
+            value="message:button.moveUp"
+            class="small-button" />
         </li>
         <li>
           <input jwcid="moveDown@Submit" id="rates:move:down"
             selected="ognl:rowsToMoveDown"
             tag="ognl:allSelected"
-            value="message:button.moveDown" />
+            value="message:button.moveDown"
+            class="small-button" />
         </li>
   </ul>
 </form>
