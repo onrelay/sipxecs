@@ -43,7 +43,7 @@
   <group name="fs-conf-bridge">
     <setting name="log-level" hidden="yes">
       <type refid="loglevel" />
-      <value>DEBUG</value>
+      <value>NOTICE</value>
     </setting>
     <setting name="sip-log-level" hidden="yes">
       <type>

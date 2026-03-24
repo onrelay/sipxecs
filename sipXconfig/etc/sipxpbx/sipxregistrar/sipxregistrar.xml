@@ -81,7 +81,7 @@
     </setting>  
     <setting name="SIP_REGISTRAR_LOG_LEVEL">
       <type refid="loglevel" />
-      <value>DEBUG</value>
+      <value>NOTICE</value>
     </setting>    
     <setting name="SIP_REGISTRAR_AUTHENTICATE_ALGORITHM" advanced="yes">
       <type><string/></type>
