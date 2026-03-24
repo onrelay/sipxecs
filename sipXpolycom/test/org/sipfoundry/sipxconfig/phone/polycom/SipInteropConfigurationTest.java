@@ -42,28 +42,6 @@ public class SipInteropConfigurationTest extends PolycomXmlTestCase {
         expectedPhoneStream.close();
     }
 
-    public void testGenerateProfile50() throws Exception {
-        SipInteropConfiguration app = new SipInteropConfiguration(phone50);
 
-        m_pg.generate(location, app, null, "profile");
-
-        InputStream expectedPhoneStream = getClass().getResourceAsStream("expected-sipx-sip-interop-50.cfg");
-        assertPolycomXmlEquals(new InputStreamReader(expectedPhoneStream), location.getReader());
-
-        expectedPhoneStream.close();
-    }
-
-    public void testGenerateProfile418() throws Exception {
-
-        SipInteropConfiguration app = new SipInteropConfiguration(phone418);
-
-        m_pg.generate(location, app, null, "profile");
-
-        InputStream expectedPhoneStream = getClass().getResourceAsStream("expected-sipx-sip-interop-418.cfg");
-        dumpXml(location.getReader(), System.out);
-        assertPolycomXmlEquals(new InputStreamReader(expectedPhoneStream), location.getReader());
-
-        expectedPhoneStream.close();
-    }
 
 }

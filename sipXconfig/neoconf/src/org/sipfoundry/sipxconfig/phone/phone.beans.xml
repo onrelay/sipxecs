@@ -79,6 +79,13 @@
     <property name="sleepInterval" value="5000" />
   </bean>
 
+  <bean id="abstractPhoneModel" abstract="true" class="org.sipfoundry.sipxconfig.phone.PhoneModel">
+    <property name="defaultProfileLocation" ref="tftpProfileLocation" />
+    <property name="maxLineCount" value="4" />
+    <property name="settingsFile" value="phone.xml" />
+    <property name="lineSettingsFile" value="line.xml" />
+  </bean>
+
   <bean id="abstractPhone" class="org.sipfoundry.sipxconfig.phone.Phone" scope="prototype" parent="beanWithSettings"
     abstract="true">
     <property name="phoneModelSource" ref="nakedPhoneModelSource" />
@@ -90,13 +97,6 @@
       <value>${sysdir.phone}/profile/tftproot</value>
     </property>
     <property name="featureManager" ref="featureManager" />
-  </bean>
-
-  <bean id="abstractPhoneModel" abstract="true" class="org.sipfoundry.sipxconfig.phone.PhoneModel">
-    <property name="defaultProfileLocation" ref="tftpProfileLocation" />
-    <property name="maxLineCount" value="4" />
-    <property name="settingsFile" value="phone.xml" />
-    <property name="lineSettingsFile" value="line.xml" />
   </bean>
 
   <bean id="line" class="org.sipfoundry.sipxconfig.phone.Line" scope="prototype" parent="beanWithSettings" />

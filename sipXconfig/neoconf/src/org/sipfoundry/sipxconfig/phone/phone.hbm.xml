@@ -3,7 +3,7 @@
 	"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="org.sipfoundry.sipxconfig.phone" default-lazy="false">
   <!-- P H O N E -->
-  <class name="Phone" table="phone" discriminator-value="abstractPhone">
+  <class name="Phone" table="phone" discriminator-value="abstractPhone" abstract="true">
     <id name="id" column="phone_id" type="int" unsaved-value="-1">
        <generator class="org.hibernate.id.enhanced.SequenceStyleGenerator">
         <param name="sequence_name">phone_seq</param>
@@ -12,9 +12,9 @@
     </id>
     <discriminator column="bean_id"/>
     <property name="beanId" column="bean_id" insert="false" update="false"/>
-    <property name="modelId"/>
+    <property name="modelId" column="model_id" />
     <property name="description"/>
-    <property name="serialNumber"/>
+    <property name="serialNumber" column="serial_number"/>
     <property name="deviceVersion" column="device_version_id" type="org.sipfoundry.sipxconfig.device.DeviceVersion$Type"/>
     <many-to-one cascade="all" name="valueStorage" column="value_storage_id"
       class="org.sipfoundry.sipxconfig.setting.ValueStorage"/>

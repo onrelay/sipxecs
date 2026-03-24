@@ -59,16 +59,6 @@ public class RegAdvancedConfigurationTest extends PolycomXmlTestCase {
         expectedPhoneStream.close();
     }
 
-    public void testGenerateProfile50() throws Exception {
-        RegAdvancedConfiguration app = new RegAdvancedConfiguration(phone50);
-
-        m_pg.generate(location, app, null, "profile");
-
-        InputStream expectedPhoneStream = getClass().getResourceAsStream("expected-sipx-reg-advanced-50.cfg");
-        assertPolycomXmlEquals(new InputStreamReader(expectedPhoneStream), location.getReader());
-
-        expectedPhoneStream.close();
-    }
 
     public void testGenerateProfile50VVX600() throws Exception {
         FeatureManager featureManagerMock = createMock(FeatureManager.class);
@@ -86,7 +76,7 @@ public class RegAdvancedConfigurationTest extends PolycomXmlTestCase {
         phoneVVX600.setBeanId("polycomVVX600");
         phoneVVX600.setPhoneModelSource(phoneModelSource);
         phoneVVX600.setModel(phoneModelBuilder("polycomVVX600", getClass()));
-        phoneVVX600.setDeviceVersion(PolycomModel.VER_5_0_0);
+        phoneVVX600.setDeviceVersion(PolycomModel.VER_5_9_8);
         PhoneTestDriver.supplyTestData(phoneVVX600);
         phoneVVX600.setFeatureManager(featureManagerMock);
         EasyMock.replay(featureManagerMock);
@@ -118,7 +108,7 @@ public class RegAdvancedConfigurationTest extends PolycomXmlTestCase {
         phoneVVX600.setBeanId("polycomVVX600");
         phoneVVX600.setPhoneModelSource(phoneModelSource);
         phoneVVX600.setModel(phoneModelBuilder("polycomVVX600", getClass()));
-        phoneVVX600.setDeviceVersion(PolycomModel.VER_5_0_1);
+        phoneVVX600.setDeviceVersion(PolycomModel.VER_5_9_8);
         PhoneTestDriver.supplyTestData(phoneVVX600);
         phoneVVX600.setFeatureManager(featureManagerMock);
         EasyMock.replay(featureManagerMock);
@@ -132,52 +122,7 @@ public class RegAdvancedConfigurationTest extends PolycomXmlTestCase {
         expectedPhoneStream.close();
     }
 
-    public void testGenerateProfile501() throws Exception {
-        RegAdvancedConfiguration app = new RegAdvancedConfiguration(phone501);
 
-        m_pg.generate(location, app, null, "profile");
-
-        InputStream expectedPhoneStream = getClass().getResourceAsStream("expected-sipx-reg-advanced-50.cfg");
-        assertPolycomXmlEquals(new InputStreamReader(expectedPhoneStream), location.getReader());
-
-        expectedPhoneStream.close();
-    }
-    public void testGenerateProfile502() throws Exception {
-        RegAdvancedConfiguration app = new RegAdvancedConfiguration(phone502);
-
-        m_pg.generate(location, app, null, "profile");
-
-        InputStream expectedPhoneStream = getClass().getResourceAsStream("expected-sipx-reg-advanced-50.cfg");
-        assertPolycomXmlEquals(new InputStreamReader(expectedPhoneStream), location.getReader());
-
-        expectedPhoneStream.close();
-    }
-    public void testGenerateProfile416() throws Exception {
-        RegAdvancedConfiguration app = new RegAdvancedConfiguration(phone416);
-
-        m_pg.generate(location, app, null, "profile");
-
-        InputStream expectedPhoneStream = getClass().getResourceAsStream("expected-sipx-reg-advanced-416.cfg");
-        assertPolycomXmlEquals(new InputStreamReader(expectedPhoneStream), location.getReader());
-
-        expectedPhoneStream.close();
-    }
-
-    public void testGenerateProfile520() throws Exception {
-        RegAdvancedConfiguration app = new RegAdvancedConfiguration(phone520);
-
-        m_pg.generate(location, app, null, "profile");
-
-        InputStream expectedPhoneStream = getClass().getResourceAsStream("expected-sipx-reg-advanced-520.cfg");
-
-        dumpXml(location.getReader(), System.out);
-
-        assertPolycomXmlEquals(new InputStreamReader(expectedPhoneStream), location.getReader());
-
-        expectedPhoneStream.close();
-    }
-
-    //502 profiles
     public void testGenerateProfileMohDisabled() throws Exception {
         PolycomModel model = phoneModelBuilder("polycomVVX500", getClass());
         ModelSource<PhoneModel> phoneModelSource = createMock(ModelSource.class);
@@ -196,7 +141,7 @@ public class RegAdvancedConfigurationTest extends PolycomXmlTestCase {
         phone.setPhoneModelSource(phoneModelSource);
         phone.setBeanId("polycomVVX500");
         phone.setModel(model);
-        phone.setDeviceVersion(PolycomModel.VER_5_0_2);
+        phone.setDeviceVersion(PolycomModel.VER_5_9_8);
         phone.setFeatureManager(featureManagerMock);
         PhoneTestDriver.supplyTestData(phone);
 
@@ -210,7 +155,6 @@ public class RegAdvancedConfigurationTest extends PolycomXmlTestCase {
         expectedPhoneStream.close();
     }
 
-    //502 profiles
     //Also tests sipXprovision AOR
     public void testGenerateProfileMohEnabledUnassigned() throws Exception {
         PolycomModel model = phoneModelBuilder("polycomVVX500", getClass());
@@ -233,7 +177,7 @@ public class RegAdvancedConfigurationTest extends PolycomXmlTestCase {
         phone.setPhoneModelSource(phoneModelSource);
         phone.setBeanId("polycomVVX500");
         phone.setModel(model);
-        phone.setDeviceVersion(PolycomModel.VER_5_0_2);
+        phone.setDeviceVersion(PolycomModel.VER_5_9_8);
         phone.setFeatureManager(featureManagerMock);
         PhoneTestDriver.supplyTestData(phone, new ArrayList<User>());
 

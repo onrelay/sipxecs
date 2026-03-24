@@ -42,8 +42,8 @@ public class PhoneBean {
     private String m_description;
     private String m_version;
     private ModelBean m_model;
-    private List<LineBean> m_lines = new ArrayList<LineBean>();
-    private List<GroupBean> m_groups = new ArrayList<GroupBean>();
+    private List<LineBean> m_lines;
+    private List<GroupBean> m_groups;
 
     public int getId() {
         return m_id;
@@ -90,13 +90,6 @@ public class PhoneBean {
         m_lines = lines;
     }
 
-    public void replaceLines(List<LineBean> lines) {
-        m_lines.clear();
-        if( lines != null ) {
-            m_lines.addAll( lines );
-        }
-    }
-
     @XmlElementWrapper(name = "Lines")
     @XmlElement(name = "Line")
     public List<LineBean> getLines() {
@@ -105,13 +98,6 @@ public class PhoneBean {
 
     public void setGroups(List<GroupBean> groups) {
         m_groups = groups;
-    }
-
-    public void replaceGroups(List<GroupBean> groups) {
-        m_groups.clear();
-        if( groups != null ) {
-            m_groups.addAll( groups );
-        }
     }
 
     @XmlElementWrapper(name = "Groups")
@@ -130,8 +116,8 @@ public class PhoneBean {
         }
         bean.setDescription(phone.getDescription());
         bean.setModel(ModelBean.convertModel(phoneModel));
-        bean.replaceLines(LineBean.buildLineList(phone.getLines()));
-        bean.replaceGroups(GroupBean.buildGroupList(phone.getGroupsAsList(), null));
+        bean.setLines(LineBean.buildLineList(phone.getLines()));
+        bean.setGroups(GroupBean.buildGroupList(phone.getGroupsAsList(), null));
         return bean;
     }
 
@@ -273,17 +259,10 @@ public class PhoneBean {
     @XmlRootElement(name = "Lines")
     public static class LineList {
 
-        private List<LineBean> m_lines = new ArrayList<LineBean>();
+        private List<LineBean> m_lines;
 
         public void setLines(List<LineBean> lines) {
             m_lines = lines;
-        }
-
-        public void replaceLines(List<LineBean> lines) {
-            m_lines.clear();
-            if( lines != null ) {
-                m_lines.addAll( lines );
-            }
         }
 
         @XmlElement(name = "Line")
@@ -293,7 +272,7 @@ public class PhoneBean {
 
         public static LineList convertLineList(List<Line> lines) {
             LineList list = new LineList();
-            list.replaceLines(LineBean.buildLineList(lines));
+            list.setLines(LineBean.buildLineList(lines));
             return list;
         }
     }

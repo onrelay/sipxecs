@@ -261,7 +261,6 @@ public abstract class Phone extends Device implements Replicable, SystemAuditabl
         }
     }
 
-
     public void addLine(Line line) {
         int max = getModel().getMaxLineCount();
         if (m_lines.size() >= max) {

@@ -501,6 +501,19 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_6"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_7"/>
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_0_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_1_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_2_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_0"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_3_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_1"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_2"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_3"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_4"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_5"/>
+        <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
@@ -722,7 +735,7 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
-    <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_4_0_X"/>
+    <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
   </bean>
   <bean id="polycomVVX501" parent="polycomModel">
     <property name="label" value="Polycom VVX 501" />
@@ -1582,10 +1595,10 @@
         <ref bean="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
       </list>
     </property>
-    <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_6_4_6"/>
+    <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
   </bean>
   <bean id="polycom" class="org.sipfoundry.sipxconfig.phone.polycom.PolycomPhone" scope="prototype"
-    parent="abstractPhone">
+    parent="abstractPhone" >
     <property name="addressManager" ref="addressManager" />
     <property name="certificateManager" ref="certificateManager" />
   </bean>

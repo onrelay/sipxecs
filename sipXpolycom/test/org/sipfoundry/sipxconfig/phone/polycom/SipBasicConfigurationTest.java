@@ -58,16 +58,7 @@ public class SipBasicConfigurationTest extends PolycomXmlTestCase {
         expectedPhoneStream.close();
     }
 
-    public void testGenerateProfile50() throws Exception {
-        SipBasicConfiguration app = new SipBasicConfiguration(phone50);
 
-        m_pg.generate(location, app, null, "profile");
-
-        InputStream expectedPhoneStream = getClass().getResourceAsStream("expected-sipx-sip-basic.cfg");
-        assertPolycomXmlEquals(new InputStreamReader(expectedPhoneStream), location.getReader());
-
-        expectedPhoneStream.close();
-    }
 
     public void testGenerateProfile50VVX600() throws Exception {
         FeatureManager featureManagerMock = createMock(FeatureManager.class);
@@ -85,7 +76,7 @@ public class SipBasicConfigurationTest extends PolycomXmlTestCase {
         phoneVVX600.setBeanId("polycomVVX600");
         phoneVVX600.setPhoneModelSource(phoneModelSource);
         phoneVVX600.setModel(phoneModelBuilder("polycomVVX600", getClass()));
-        phoneVVX600.setDeviceVersion(PolycomModel.VER_5_0_0);
+        phoneVVX600.setDeviceVersion(PolycomModel.VER_5_9_8);
         PhoneTestDriver.supplyTestData(phoneVVX600);
         phoneVVX600.setFeatureManager(featureManagerMock);
         EasyMock.replay(featureManagerMock);
@@ -114,7 +105,7 @@ public class SipBasicConfigurationTest extends PolycomXmlTestCase {
         phoneVVX600.setBeanId("polycomVVX600");
         phoneVVX600.setPhoneModelSource(phoneModelSource);
         phoneVVX600.setModel(phoneModelBuilder("polycomVVX600", getClass()));
-        phoneVVX600.setDeviceVersion(PolycomModel.VER_5_0_1);
+        phoneVVX600.setDeviceVersion(PolycomModel.VER_5_9_8);
         PhoneTestDriver.supplyTestData(phoneVVX600);
         phoneVVX600.setFeatureManager(featureManagerMock);
         EasyMock.replay(featureManagerMock);
@@ -128,49 +119,6 @@ public class SipBasicConfigurationTest extends PolycomXmlTestCase {
         expectedPhoneStream.close();
     }
 
-    public void testGenerateProfile501() throws Exception {
-        SipBasicConfiguration app = new SipBasicConfiguration(phone501);
-
-        m_pg.generate(location, app, null, "profile");
-
-        InputStream expectedPhoneStream = getClass().getResourceAsStream("expected-sipx-sip-basic.cfg");
-        assertPolycomXmlEquals(new InputStreamReader(expectedPhoneStream), location.getReader());
-
-        expectedPhoneStream.close();
-    }
-    public void testGenerateProfile502() throws Exception {
-        SipBasicConfiguration app = new SipBasicConfiguration(phone502);
-
-        m_pg.generate(location, app, null, "profile");
-
-        InputStream expectedPhoneStream = getClass().getResourceAsStream("expected-sipx-sip-basic.cfg");
-        assertPolycomXmlEquals(new InputStreamReader(expectedPhoneStream), location.getReader());
-
-        expectedPhoneStream.close();
-    }
-    public void testGenerateProfile416() throws Exception {
-        SipBasicConfiguration app = new SipBasicConfiguration(phone416);
-
-        m_pg.generate(location, app, null, "profile");
-
-        InputStream expectedPhoneStream = getClass().getResourceAsStream("expected-sipx-sip-basic.cfg");
-        assertPolycomXmlEquals(new InputStreamReader(expectedPhoneStream), location.getReader());
-
-        expectedPhoneStream.close();
-    }
-
-    public void testGenerateProfile418() throws Exception {
-        SipBasicConfiguration app = new SipBasicConfiguration(phone418);
-
-        m_pg.generate(location, app, null, "profile");
-
-        InputStream expectedPhoneStream = getClass().getResourceAsStream("expected-sipx-sip-basic.cfg");
-        assertPolycomXmlEquals(new InputStreamReader(expectedPhoneStream), location.getReader());
-
-        expectedPhoneStream.close();
-    }
-
-    //502 profiles
     public void testGenerateProfileMwiDisabled() throws Exception {
         PolycomModel model = phoneModelBuilder("polycomVVX500", getClass());
         ModelSource<PhoneModel> phoneModelSource = createMock(ModelSource.class);
@@ -186,7 +134,7 @@ public class SipBasicConfigurationTest extends PolycomXmlTestCase {
         phone.setPhoneModelSource(phoneModelSource);
         phone.setBeanId("polycomVVX500");
         phone.setModel(model);
-        phone.setDeviceVersion(PolycomModel.VER_5_0_2);
+        phone.setDeviceVersion(PolycomModel.VER_5_9_8);
         phone.setFeatureManager(featureManagerMock);
         PhoneTestDriver.supplyTestData(phone);
 

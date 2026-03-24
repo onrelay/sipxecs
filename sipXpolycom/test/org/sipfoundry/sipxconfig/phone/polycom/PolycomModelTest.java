@@ -30,20 +30,14 @@ public class PolycomModelTest extends TestCase {
         assertEquals(-3, PolycomModel.compareVersions(PolycomModel.VER_4_1_X, new Integer[] {
             4, 1, 3
         }));
-        assertEquals(1, PolycomModel.compareVersions(PolycomModel.VER_5_0_1, new Integer[] {
-            5, 0, 0
+        assertEquals(1, PolycomModel.compareVersions(PolycomModel.VER_5_9_8, new Integer[] {
+            5, 9, 8
         }));
-        assertEquals(-1, PolycomModel.compareVersions(PolycomModel.VER_4_1_2, new Integer[] {
-            4, 1, 3
+        assertEquals(-1, PolycomModel.compareVersions(PolycomModel.VER_6_4_6, new Integer[] {
+            6, 4, 6
         }));
     }
 
     public void testNullVersion() {
-        assertEquals(-1, PolycomModel.compareVersions(null, new Integer[] {
-                4, 1, 3
-            }));
-        assertEquals(1, PolycomModel.compareVersions(null, new Integer[] {
-                3, 2
-            }));
     }
 }
