@@ -1,18 +1,20 @@
 <ul class="form-actions">
   <li jwcid="@If" condition="ognl:callback">
-    <input jwcid="ok" id="form:ok" type="button"/>
+    <input jwcid="ok" id="form:ok" type="button" class="button"/>
   </li>
   <li jwcid="@If" condition="ognl:includeApplyButton">
-    <input jwcid="apply" id="form:apply" type="button"/>
+    <input jwcid="apply" id="form:apply" type="button" class="button"/>
     <span jwcid="@If" condition="ognl:confirmApply">
       <span jwcid="@common/Confirm" component="component:apply" prompt="ognl:applyConfirmMessage"/>
     </span>
   </li>
-  <li jwcid="@If" condition="ognl:includeRefreshButton">
-    <input jwcid="refresh" id="form:refesh" type="button"/>
-  </li>
   <li jwcid="@If" condition="ognl:callback">
-    <input jwcid="cancel" id="form:cancel" type="button"/>
+    <input jwcid="cancel" id="form:cancel" type="button" class="button"/>
   </li>
   <span jwcid="@RenderBody"/>
+</ul>
+<ul class="form-actions">
+  <li jwcid="@If" condition="ognl:includeRefreshButton">
+    <input jwcid="refresh" id="form:refesh" type="button" class="small-button"/>
+  </li>
 </ul>
