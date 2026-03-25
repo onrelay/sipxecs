@@ -47,7 +47,7 @@ fi
 
 prog=openfire
 pidfile="${OPENFIRE_PIDFILE}"
-regex="java-$prog"
+regex="^@SIPX_RUNDIR@/$prog/java-$prog"
 
 start() {
   Command="${JAVACMD} -Dlog4j.configurationFile=${OPENFIRE_LIB}/log4j2.xml -Dlog4j2.formatMsgNoLookups=true"

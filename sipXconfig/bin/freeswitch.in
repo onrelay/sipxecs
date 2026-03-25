@@ -29,7 +29,7 @@ EXEC_START_ARGS="-nc -nonat \
    $EXEC_ARGS"
 EXEC_STOP_ARGS="-stop \
    $EXEC_ARGS"
-PIDFILE=@SIPX_FSRUNDIR@/freeswitch.pid
+PIDFILE="@SIPX_FSRUNDIR@/freeswitch.pid"
 REGEX="^$EXEC"
 
 do_setlimits() {
@@ -93,9 +93,10 @@ do_audio_setup() {
 base=${0##*/}
 
 do_start() {
-  checkRunningProcessIsListening $PIDFILE $EXEC > /dev/null 2>&1
+  checkRunningProcessIsListening "$PIDFILE" "$REGEX" > /dev/null 2>&1
   RETVAL=$?
   [ $RETVAL -eq 0 ] && { echo -n "$NAME $runningError"; echo_failure; exit $ERUNNING; }
+  echo -n $"Starting $prog: "
   do_setlimits
   do_permission_check
   do_audio_setup
@@ -104,10 +105,10 @@ do_start() {
 
   if [ $# -gt 0 ]; then
     #check if process spawned
-    checkRunningProcessTimeout $PIDFILE $EXEC > /dev/null 2>&1
+    checkRunningProcessTimeout "$PIDFILE" "$REGEX" > /dev/null 2>&1
     RETVAL=$?
     [ $RETVAL -eq 0 ] || { echo_failure; exit $ESRCH; }
-    checkIfProcessIsListening $PIDFILE $EXEC > /dev/null 2>&1
+    checkIfProcessIsListening "$PIDFILE" "$REGEX" > /dev/null 2>&1
     RETVAL=$?
     [ $RETVAL -eq 0 ] || { echo_failure; exit $ENOSCKT; }
     [ $RETVAL -eq 0 ] && { echo_success; }
@@ -120,7 +121,7 @@ do_start() {
 
 do_stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans "${PIDFILE}" "${EXEC}" > /dev/null 2>&1
+  killAnyProcessOrphans "$PIDFILE" "$REGEX" > /dev/null 2>&1
   Status=$?
   [ $Status -eq 0 ] || { echo_failure; }
   [ $Status -eq 0 ] && { echo_success; }
@@ -161,7 +162,7 @@ case "$1" in
     do_asyncrestart
     ;;
   status)
-    checkRunningProcessIsListening $PIDFILE $EXEC
+    checkRunningProcessIsListening "$PIDFILE" "$REGEX"
     ;;
   *)
     echo $"Usage: $0 {start|stop|status}"

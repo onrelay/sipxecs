@@ -15,6 +15,7 @@ prog=sipXproxy
 exec="@SIPX_BINDIR@/${prog}"
 config="@SIPX_CONFDIR@/sipXproxy-config"
 pidfile="@SIPX_RUNDIR@/sipxproxy/sipxproxy.pid"
+regex="^$exec"
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 
@@ -22,10 +23,10 @@ start() {
   [ -x $exec ] || { echo -n "$execError"; echo_failure; exit $ENOEXEC; }
   [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; exit $ENOENT; }
  if [ -n "${NoFork}" ] ; then
-    killAnyProcessOrphans "${pidfile}" "${exec}"
+    killAnyProcessOrphans "${pidfile}" "${regex}"
     runuser -s /bin/bash @SIPXPBXUSER@ -c $exec
   else
-    checkRunningProcessIsListening "${pidfile}" "${exec}" > /dev/null 2>&1
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; } 
       
@@ -35,10 +36,10 @@ start() {
 
     if [ $# -gt 0 ]; then
       #check if process spawned
-      checkRunningProcessTimeout "${pidfile}" "${exec}" > /dev/null 2>&1
+      checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-      checkIfProcessIsListening "${pidfile}" "${exec}" > /dev/null 2>&1
+      checkIfProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; }
@@ -49,21 +50,9 @@ start() {
   fi
 }
 
-killtimed() {
-  # can take a while to shutdown because of relay
-  # dont wait too long as service availability is in jeopardy
-  pkill -${1:-TERM} -f "$exec"
-  timeout=10
-  while pgrep -f "$exec" >/dev/null && [ $timeout -gt 0 ]; do
-      sleep 1
-      timeout=$((timeout - 1))
-  done
-  pgrep -f "$exec" >/dev/null && pkill -KILL -f "$exec"
-}
-
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans "${pidfile}" "${exec}" > /dev/null 2>&1
+  killAnyProcessOrphans "${pidfile}" "${regex}" > /dev/null 2>&1
   Status=$?
   [ $Status -eq 0 ] && { echo_success; }
   [ $Status -eq 0 ] || { echo_failure; }
@@ -134,12 +123,12 @@ case "$1" in
     asyncrestart
     ;;
   condrestart)
-    checkRunningProcessIsListening "${pidfile}" "${exec}" > /dev/null 2>&1
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] && restart || :
     ;;
   status)
-    checkRunningProcessIsListening "${pidfile}" "${exec}"
+    checkRunningProcessIsListening "${pidfile}" "${regex}"
     Status=$?
     ;;
   configtest)

@@ -15,15 +15,15 @@ ENOTWRITABLE=8 #file not writable
 # Set up correctly depending on the distribution
 if [ -f /etc/redhat-release ]
 then
-  # Redhat
-  echo_success() { 
-    echo "OK"; 
-  }
-  echo_failure() { 
-    echo "Fail"; 
-  }
+    echo_success() {
+        echo -e "\e[32m[ OK ]\e[0m"
+    }
 
-  HTTP_DAEMON_START="@APACHE2_HTTPD@"
+    echo_failure() {
+        echo -e "\e[31m[FAIL]\e[0m"
+    }
+
+    HTTP_DAEMON_START="@APACHE2_HTTPD@"
 
 elif [ -f /etc/SuSE-release ]
 then
@@ -472,9 +472,10 @@ EOF
 ## functions for process management
 ##
 maxTimeout=5
-maxListenTimeout=20
+maxListenTimeout=10
 sleepTime=0.5
 runningError="is already running: "
+notRunningError="is not running: "
 execError="Provided file is not executable"
 invalidFileError="Invalid file"
 noPortError="No listening port found"
@@ -491,9 +492,8 @@ getRunningProcessID() {
         if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
             echo "$pid"
             return 0
-        else
-            rm -f "$pidfile" >/dev/null
         fi
+        rm -f "$pidfile" >/dev/null
     fi
 
     if [[ -n "$regex" ]]; then
@@ -506,9 +506,7 @@ getRunningProcessID() {
 
             if [ -n "$pid" ] && kill -0 "$pid" > /dev/null 2>&1; then
 
-                if [[ -n "$pidfile" ]]; then
-                    echo "$pid" > "$pidfile"
-                fi
+                echo "$pid" > "$pidfile"
                 echo "$pid"
                 return 0
             fi
@@ -602,33 +600,37 @@ killAnyProcessOrphans() {
     timeout=${3:-$maxTimeout}
 
     pid=$(getRunningProcessID "$pidfile" "$regex")
-    [ $? -ne 0 ] && return $ESRCH  
-
-    # First attempt graceful TERM
-    kill -TERM ${pid} > /dev/null 2>&1
-
-    # Wait for process to exit
-    for ((i=0; i<$timeout; i++)); do
-        getRunningProcessID ${pidfile} >/dev/null 2>&1
-        [ $? -ne 0 ] && break
-        sleep $sleepTime
-    done
-
-    getRunningProcessID "$pidfile" "$regex" >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        pid=$(getRunningProcessID "$pidfile" "$regex")
-        kill -KILL "$pid" 2>/dev/null || true
-    fi
-
-    getRunningProcessID "$pidfile" "$regex" >/dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        echo_failure;
+    if [ -z "$pid" ]; then
+        echo_failure; 
         return $ESRCH
     fi
 
-    if [ -f "$pidfile" ]; then
-        rm -f "$pidfile"  > /dev/null 2>&1
+    # First attempt graceful TERM
+    kill -TERM ${pid} > /dev/null 2>&1 && rm -f "$pidfile" > /dev/null 2>&1
+
+    # Wait for process to exit
+    for ((i=0; i<$timeout; i++)); do
+        pid=$(getRunningProcessID "$pidfile" "$regex")
+
+        if [ -z "$pid" ]; then
+            return 0
+        fi
+        sleep $sleepTime
+    done
+
+    pid=$(getRunningProcessID "$pidfile" "$regex")
+
+    if [ -n "$pid" ]; then
+        kill -KILL "$pid" 2>/dev/null && rm -f "$pidfile"  > /dev/null 2>&1
     fi
 
-    return 0
+    pid=$(getRunningProcessID "$pidfile" "$regex")
+
+    if [ -n "$pid" ]; then
+        echo_failure;
+        return $ESRCH
+    else
+        rm -f "$pidfile"  > /dev/null 2>&1
+        return 0
+    fi
 }

@@ -57,7 +57,6 @@ USAGE
 
 Daemon=true
 Status=0
-pidfile=@SIPX_RUNDIR@/sipxconfig/sipxconfig.pid
 LibDir=@SIPX_JAVADIR@/sipXconfig
 PluginDir=@SIPX_JAVADIR@/sipXconfig/plugins
 CommonsLibDir=@SIPX_JAVADIR@/sipXcommons
@@ -72,9 +71,10 @@ KeyStore=@SIPX_CONFDIR@/ssl/ssl-web.keystore
 TrustStore=@SIPX_CONFDIR@/ssl/authorities.jks
 CachingProvider=org.ehcache.jsr107.EhcacheCachingProvider
 Logger=org.apache.commons.logging.impl.Log4JLogger
-prog=sipxconfig
 waitForListenPortTime=900
-regex="java-$prog"
+prog=sipxconfig
+pidfile="@SIPX_RUNDIR@/$prog/$prog.pid"
+regex="^@SIPX_RUNDIR@/$prog/java-$prog"
 
 . /etc/rc.d/init.d/functions || exit 1
 . @SIPX_LIBEXECDIR@/sipx-utils.sh

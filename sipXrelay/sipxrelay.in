@@ -21,8 +21,8 @@
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }
 
 prog=sipxrelay
-pidfile="@SIPX_RUNDIR@/sipxrelay/sipxrelay.pid"
-regex="java-$prog"
+pidfile="@SIPX_RUNDIR@/$prog/$prog.pid"
+regex="^@SIPX_RUNDIR@/$prog/java-$prog"
 
 [ -e @SIPX_CONFDIR@/${prog}rc ] && . @SIPX_CONFDIR@/sysconfig/${prog}rc
 

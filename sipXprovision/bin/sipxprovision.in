@@ -11,9 +11,9 @@
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }
 
 prog=sipxprovision
-pidfile="@SIPX_RUNDIR@/sipxprovision/sipxprovision.pid"
-config="@SIPX_CONFDIR@/sipxprovision-config"
-regex="java-$prog"
+config="@SIPX_CONFDIR@/$prog-config"
+pidfile="@SIPX_RUNDIR@/$prog/$prog.pid"
+regex="^@SIPX_RUNDIR@/$prog/java-$prog"
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 

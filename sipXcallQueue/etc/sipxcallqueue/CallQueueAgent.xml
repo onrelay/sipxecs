@@ -25,11 +25,11 @@
 	<setting name="use-agent-defaults"><type><boolean/></type><value>0</value></setting>
 
 	<setting name="follow-call-forwarding"><type><boolean/></type><value>0</value></setting>
-	<setting name="max-no-answer"><type><integer/></type><value>1</value></setting>
+	<setting name="max-no-answer"><type><integer/></type><value>0</value></setting>
 	<setting name="wrap-up-time"><type><integer/></type><value>0</value></setting>
 	<setting name="reject-delay-time"><type><integer/></type><value>0</value></setting>
 	<setting name="busy-delay-time"><type><integer/></type><value>0</value></setting>
 	<setting name="no-answer-delay-time"><type><integer/></type><value>0</value></setting>
-	<setting name="call-timeout"><type><integer/></type><value>60</value></setting>
+	<setting name="call-timeout"><type><integer/></type><value>0</value></setting>
     </group>
 </model>

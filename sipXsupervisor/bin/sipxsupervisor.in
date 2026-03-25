@@ -15,16 +15,17 @@ exec="/usr/local/sbin/cf-serverd"
 prog=$(basename $exec)
 progname="sipxsupervisor"
 # used to tell which config is in use.
-configid=/run/sipxsupervisor-configid
-pidfolder="/run/sipxpbx/sipxsupervisor"
-pidfile="$pidfolder/sipxsupervisor.pid"
+configid=/run/${progname}-configid
+pidfolder="/run/sipxpbx/${progname}"
+pidfile="$pidfolder/${progname}.pid"
+regex="^$exec"
 
 [ -e /etc/sysconfig/sipxsupervisor ] && . /etc/sysconfig/sipxsupervisor
 
 start() {
   [ -x $exec ] || { echo -n "$execError"; echo_failure; exit $ENOEXEC; }
   [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; exit $ENOENT; }
-  checkRunningProcess "${pidfile}" "${exec}" > /dev/null 2>&1
+  checkRunningProcess "${pidfile}" "${regex}" > /dev/null 2>&1
   Status=$?
   [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
 
@@ -34,12 +35,12 @@ start() {
   Status=$?
 
   if [ $# -gt 0 ]; then
-    checkRunningProcessTimeout "${pidfile}" "${exec}" $maxTimeout > /dev/null 2>&1
+    checkRunningProcessTimeout "${pidfile}" "${regex}" $maxTimeout > /dev/null 2>&1
     Status=$?
     [ $Status -eq $ESRCH ] && { echo_failure; exit $ESRCH; }
 
     #sipxagent running
-    checkIfProcessIsListening "${pidfile}" "${exec}" > /dev/null 2>&1
+    checkIfProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
     [ $Status -eq 0 ] && { echo_success; return $Status; }
@@ -55,7 +56,7 @@ start() {
     Status=$?
 
     if [ $# -gt 0 ]; then
-      checkIfProcessIsListening "${pidfile}" "${exec}" > /dev/null 2>&1
+      checkIfProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; return 0; }
@@ -64,13 +65,13 @@ start() {
 }
 
 nofork() {
-  killAnyProcessOrphans "${pidfile}" "${exec}" 
+  killAnyProcessOrphans "${pidfile}" "${regex}" 
   $exec -v -f $config
 }
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans "${pidfile}" "${exec}" > /dev/null 2>&1
+  killAnyProcessOrphans "${pidfile}" "${regex}" > /dev/null 2>&1
   Status=$?
   [ $Status -eq 0 ] || { echo_failure; }
   [ $Status -eq 0 ] && { echo_success; }
@@ -111,11 +112,11 @@ case "$1" in
     force_reload
     ;;
   status)
-    checkRunningProcess "${pidfile}" "${exec}"
+    checkRunningProcess "${pidfile}" "${regex}"
     ;;
   # condrestart - only restarts if service *is* running
   condrestart)
-    checkRunningProcess "${pidfile}" "${exec}" > /dev/null
+    checkRunningProcess "${pidfile}" "${regex}" > /dev/null
     Status=$?
     [ $Status -eq 0 ] || restart
     ;;

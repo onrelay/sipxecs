@@ -14,8 +14,8 @@
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || exit 1
 
 prog=sipxacccode
-pidfile="@SIPX_RUNDIR@/sipxacccode/sipxacccode.pid"
-regex="java-$prog"
+pidfile="@SIPX_RUNDIR@/$prog/$prog.pid"
+regex="^@SIPX_RUNDIR@/$prog/java-$prog"
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 
@@ -40,7 +40,7 @@ start() {
     if [ -n "${NoFork}" ] ; then
       runuser -s /bin/bash @SIPXPBXUSER@ -c ${Command}
     else
-      echo -n $"Starting sipxacccode: "
+      echo -n $"Starting $prog: "
       runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command} > /dev/null 2>&1 & echo \$!" > ${pidfile}
       Status=$?
 

@@ -75,8 +75,9 @@ fi
 resolverArgs="--daemon --confdir ${ConfDir} --logdir ${LogDir}"
 Database=sipxcdr
 Today=`date`
-regex="${CallResolverMain}"
 prog="sipxcdr"
+regex="^@SIPX_RUNDIR@/$prog/ruby-$prog"
+
 
 PsqlCmd="${Psql} --tuples-only --no-align --username ${PgUser} --dbname ${Database}"
 

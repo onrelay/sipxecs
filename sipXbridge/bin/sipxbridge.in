@@ -18,8 +18,9 @@
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }
 
 prog=sipxbridge
-pidfile="@SIPX_RUNDIR@/sipxbridge/sipxbridge.pid"
-regex="java-$prog"
+pidfile="@SIPX_RUNDIR@/$prog/$prog.pid"
+regex="^@SIPX_RUNDIR@/$prog/java-$prog"
+
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 

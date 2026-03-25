@@ -25,6 +25,8 @@ progName=sipxpublisher
 exec="@SIPX_BINDIR@/${prog}"
 config="@SIPX_CONFDIR@/status-config"
 pidfile="@SIPX_RUNDIR@/sipxpublisher/sipxpublisher.pid"
+regex="^$exec"
+
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 
@@ -32,10 +34,10 @@ start() {
   [ -x $exec ] || { echo -n "$execError"; echo_failure; exit $ENOEXEC; }
   [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; exit $ENOENT; }
   if [ -n "${NoFork}" ] ; then
-    killAnyProcessOrphans "${pidfile}" "${exec}"
+    killAnyProcessOrphans "${pidfile}" "${regex}"
     runuser -s /bin/bash @SIPXPBXUSER@ -c $exec
   else
-    checkRunningProcessIsListening "${pidfile}" "${exec}" > /dev/null 2>&1
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] && { echo -n "$progName $runningError"; echo_failure; exit $ERUNNING; }
 
@@ -45,10 +47,10 @@ start() {
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningProcessTimeout "${pidfile}" "${exec}" > /dev/null 2>&1
+      checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-      checkIfProcessIsListening "${pidfile}" "${exec}" > /dev/null 2>&1
+      checkIfProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; }
@@ -62,7 +64,7 @@ start() {
 
 stop() {
   echo -n $"Stopping $prog: "
-  killAnyProcessOrphans "${pidfile}" "${exec}" > /dev/null 2>&1
+  killAnyProcessOrphans "${pidfile}" "${regex}" > /dev/null 2>&1
   Status=$?
   [ $Status -eq 0 ] || { echo_failure; }
   [ $Status -eq 0 ] && { echo_success; }
@@ -112,12 +114,12 @@ case "$1" in
     asyncrestart
     ;;
   condrestart)
-    checkRunningProcessIsListening "${pidfile}" "${exec}" > /dev/null 2>&1
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
     Status=$?
     [ $Status -eq 0 ] && restart || :
     ;;
   status)
-    checkRunningProcessIsListening "${pidfile}" "${exec}"
+    checkRunningProcessIsListening "${pidfile}" "${regex}"
     Status=$?
     ;;
   configtest)

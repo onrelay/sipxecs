@@ -91,7 +91,7 @@
 
   <bean id="callQueueExtension" class="org.sipfoundry.sipxconfig.callqueue.CallQueueExtension" scope="prototype"/>
 
-  <bean id="callQueue" class="org.sipfoundry.sipxconfig.callqueue.CallQueue" scope="prototype">
+  <bean id="callQueue" class="org.sipfoundry.sipxconfig.callqueue.CallQueue" scope="prototype" parent="callQueueExtension">
     <property name="modelFilesContext" ref="modelFilesContext"/>
     <property name="addressManager" ref="addressManager"/>
     <property name="promptsDirectory" value="${sysdir.vxml.prompts}" />

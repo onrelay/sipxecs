@@ -12,8 +12,8 @@
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || exit 1
 
 prog=sipxevent
-pidfile="@SIPX_RUNDIR@/sipxevent/sipxevent.pid"
-regex="java-$prog"
+pidfile="@SIPX_RUNDIR@/$prog/$prog.pid"
+regex="^@SIPX_RUNDIR@/$prog/java-$prog"
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 

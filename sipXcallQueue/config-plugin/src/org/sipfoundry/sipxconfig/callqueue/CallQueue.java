@@ -125,7 +125,20 @@ public class CallQueue extends CallQueueExtension implements SystemAuditable {
 
     @Override
     protected Setting loadSettings() {
-        return getModelFilesContext().loadModelFile("sipxcallqueue/CallQueue.xml");
+        Setting callQueueSettings = getModelFilesContext().loadModelFile("sipxcallqueue/CallQueue.xml");
+        callQueueSettings.acceptVisitor(new AudioDirectorySetter());
+        return callQueueSettings;
+    }
+
+    private class AudioDirectorySetter extends AbstractSettingVisitor {
+        @Override
+        public void visitSetting(Setting setting) {
+            SettingType type = setting.getType();
+            if (type instanceof FileSetting) {
+                FileSetting fileType = (FileSetting) type;
+                fileType.setDirectory(m_promptsDirectory);
+            }
+        }
     }
 
     public void copySettingsTo(CallQueue dst) {
@@ -190,33 +203,6 @@ public class CallQueue extends CallQueueExtension implements SystemAuditable {
 
     public Integer getMaxWaitTimeWithNoAgentTimeReached() {
         return (Integer) getSettingTypedValue("call-queue/max-wait-time-with-no-agent-time-reached");
-    }
-
-    @Override
-    public void setSettings(Setting settings) {
-        settings.acceptVisitor(new AudioDirectorySetter(m_promptsDirectory, "welcome-audio", "goodbye-audio", "moh-sound"));
-        super.setSettings(settings);
-    }
-
-    private class AudioDirectorySetter extends AbstractSettingVisitor {
-        private final String m_audioDirectory;
-        private final List<String> m_settingNames;
-
-        public AudioDirectorySetter(String directory, String... settingNames) {
-            m_audioDirectory = directory;
-            m_settingNames = Arrays.asList(settingNames);
-        }
-
-        @Override
-        public void visitSetting(Setting setting) {
-            SettingType type = setting.getType();
-            if (type instanceof FileSetting) {
-                if (m_settingNames.contains(setting.getName())) {
-                    FileSetting fileType = (FileSetting) type;
-                    fileType.setDirectory(m_audioDirectory);
-                }
-            }
-        }
     }
 
     @Override
