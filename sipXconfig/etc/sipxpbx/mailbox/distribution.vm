@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <distributions>
 #foreach ($list in ${lists})
-#set ($index = $velocityCount - 1)
+#set ($index = $foreach.count - 1)
 #if ($list.Extensions)
   <list>
     <index>$index</index>

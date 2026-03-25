@@ -47,7 +47,7 @@ ${setting.profileName}: $!{setting.Value}
 # -----------------------------------------
 
 #foreach ($line in $phone.lines)
-#set($line_id = $velocityCount)
+#set($line_id = $foreach.count)
 #foreach ($group in $line.Settings.Values)
 #if ($group.Name != "Not_needed")
 # == Settings for $group.Name ==

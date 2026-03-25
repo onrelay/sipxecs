@@ -1,7 +1,7 @@
 #set($serial = "$phone.SerialNumber")
 ;; Erasing Line config
 #foreach($L in [1..$phone.MaxLineCount])
-#set ($i = $velocityCount - 1)
+#set ($i = $foreach.count - 1)
 [ cfg:/phone/config/voip/sipAccount${i}.cfg,account=${i};reboot=0 ]
 account.Enable = 0
 account.UserName =
@@ -36,7 +36,7 @@ memory${MK}.PickupValue =
 [ cfg:/phone/config/vpPhone/Ext38_0000000000000${E}.cfg ]
 #foreach($EK in [0..3])
 #foreach($MK in [1..40])
-#set ($i = $EK*10 + $velocityCount - 1)
+#set ($i = $EK*10 + $foreach.count - 1)
 Key${i}.DKtype = 0
 Key${i}.Line =
 Key${i}.Type =
@@ -49,7 +49,7 @@ Key${i}.PickupValue =
 
 #end
 #foreach ($line in $phone.lines)
-#set ($i = $velocityCount - 1)
+#set ($i = $foreach.count - 1)
 [ cfg:/phone/config/voip/sipAccount${i}.cfg,account=${i};reboot=0 ]
 #foreach ($group in $line.Settings.Values)
 #if (${group.Name}=="account")
@@ -64,13 +64,13 @@ ${group.Name}.${setting.ProfileName} = $!{setting.Value}
 #end
 #if (${group.Name}=="audio")
 #foreach ($setting in $group.Values)
-#set ($a = $velocityCount - 1)
+#set ($a = $foreach.count - 1)
 #if (${setting.Value}==-1)
 ${group.Name}${a}.enable = 0
-${group.Name}${a}.priority = $velocityCount
+${group.Name}${a}.priority = $foreach.count
 #else
 ${group.Name}${a}.enable = 1
-${group.Name}${a}.priority = $velocityCount
+${group.Name}${a}.priority = $foreach.count
 ${group.Name}${a}.rtpmap = ${setting.Value}
 #if(${setting.Value}==0)
 ${group.Name}${a}.PayloadType = PCMU
@@ -98,7 +98,7 @@ ${group.Name}${a}.PayloadType = G726-40
 #if (${group.Name}=="Message")
 [ cfg:/phone/config/user.ini,reboot=1 ]
 #foreach ($setting in $group.Values)
-#set ($a = $velocityCount - 1)
+#set ($a = $foreach.count - 1)
 ${group.Name}.${setting.ProfileName}${a} = $!{setting.Value}
 #end
 
@@ -250,7 +250,7 @@ ${GroupName}.${setting.ProfileName} = $!{setting.Value}
 #end
 
 #foreach ($button in $cfg.SpeedDial)
-#set ($i = $velocityCount - 0)
+#set ($i = $foreach.count - 0)
 #if (${i}<11)
 [ cfg:/phone/config/vpPhone/vpPhone.ini,reboot=1 ]
 memory${i}.DKtype = 16

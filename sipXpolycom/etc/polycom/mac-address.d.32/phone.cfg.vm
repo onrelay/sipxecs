@@ -12,7 +12,7 @@
 <phone1>
   <reg
 #foreach ($line in ${lines})
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($reg = $line.getSetting('reg'))
 #foreach ($setting in $cfg.getRecursiveSettings($reg))
     reg.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -27,7 +27,7 @@
     <donotdisturb call.donotdisturb.perReg="$!{dndPerReg.Value}" />
     <autoOffHook
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('call').getSetting('autoOffHook'))
 #foreach ($setting in $cfg.getSettings($group))
       call.autoOffHook.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -36,7 +36,7 @@
     />
     <missedCallTracking
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('call').getSetting('missedCallTracking'))
 #foreach ($setting in $cfg.getSettings($group))
       call.missedCallTracking.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -45,7 +45,7 @@
     />
     <serverMissedCall
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('call').getSetting('serverMissedCall'))
 #foreach ($setting in $cfg.getSettings($group))
       call.serverMissedCall.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -59,7 +59,7 @@
   </call>
   <divert
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('divert'))
 #foreach ($setting in $cfg.getSettings($group))
     divert.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -68,7 +68,7 @@
   >
     <fwd
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('divert').getSetting('fwd'))
 #foreach ($setting in $cfg.getSettings($group))
       divert.fwd.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -77,7 +77,7 @@
     />
     <busy
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('divert').getSetting('busy'))
 #foreach ($setting in $cfg.getSettings($group))
       divert.busy.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -86,7 +86,7 @@
     />
     <noanswer
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('divert').getSetting('noanswer'))
 #foreach ($setting in $cfg.getSettings($group))
       divert.noanswer.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -95,7 +95,7 @@
     />
     <dnd
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('divert').getSetting('dnd'))
 #foreach ($setting in $cfg.getSettings($group))
       divert.dnd.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -107,7 +107,7 @@
 ## to control dialplans for all lines
   <dialplan
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('line-dialplan'))
 #foreach ($setting in $cfg.getSettings($group))
     dialplan.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -120,7 +120,7 @@
   >
     <digitmap
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('line-dialplan').getSetting('digitmap'))
 #foreach ($setting in $cfg.getSettings($group))
       dialplan.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -130,7 +130,7 @@
     <routing>
       <server
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('line-dialplan').getSetting('digitmap').getSetting("routing.1"))
         dialplan.${i}.routing.server.1.address="$!{group.getSetting('address').Value}"
         dialplan.${i}.routing.server.1.port="$!{group.getSetting('port').Value}"
@@ -138,9 +138,9 @@
       />
       <emergency
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #foreach ($emergencyVal in $cfg.getLineEmergencySetting($line))
-#set ($j = $velocityCount)
+#set ($j = $foreach.count)
         dialplan.${i}.routing.emergency.${j}.value="$!{emergencyVal}"
         dialplan.${i}.routing.emergency.${j}.server.1="1"
 #end
@@ -156,7 +156,7 @@
   >
     <mwi
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('msg.mwi'))
 #foreach ($setting in $cfg.getSettings($group))
       msg.mwi.${i}.${setting.ProfileName}="$!{setting.Value}"

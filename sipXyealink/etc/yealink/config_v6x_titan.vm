@@ -23,8 +23,8 @@ DKtype = %NULL%
 
 #set ($LastLine = 0)
 #foreach ($line in $phone.lines)
-#set ($LastLine = $velocityCount)
-#set ($i = $velocityCount - 1)
+#set ($LastLine = $foreach.count)
+#set ($i = $foreach.count - 1)
 #foreach ($group in $line.Settings.Values)
 #if (${group.Name}=="Message")
 [ Message ]
@@ -36,14 +36,14 @@ VoiceNumber${i} = ${setting.Value}
 #elseif (${group.Name}=="audio")
 #foreach ($setting in $group.Values)
 #if (${setting.Value} == -1 )
-#set ($p = $velocityCount - 1)
+#set ($p = $foreach.count - 1)
 [ ${group.Name}${p} ]
 path = /config/voip/sipAccount${i}.cfg
 enable = 0
 priority = ${p}
 
 #elseif (${setting.Value} != 9 )
-#set ($p = $velocityCount - 1)
+#set ($p = $foreach.count - 1)
 [ ${group.Name}${p} ]
 path = /config/voip/sipAccount${i}.cfg
 enable = 1
@@ -69,7 +69,7 @@ PayloadType = G726-40
 
 #elseif (${setting.Value} == 9 )
 #if ($phone.HasHD)
-#set ($p = $velocityCount - 1)
+#set ($p = $foreach.count - 1)
 [ ${group.Name}${p} ]
 path = /config/voip/sipAccount${i}.cfg
 enable = 1
@@ -589,7 +589,7 @@ ${setting.ProfileName} = $!{setting.Value}
 
 #if ($phone.MemoryKeyCount > 0)
 #foreach ($button in $cfg.SpeedDial)
-#set ($i = $velocityCount - 0)
+#set ($i = $foreach.count - 0)
 #if (${i}<11)
 [ memory${i} ]
 path = /config/vpPhone/vpPhone.ini

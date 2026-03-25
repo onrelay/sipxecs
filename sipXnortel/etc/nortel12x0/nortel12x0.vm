@@ -84,7 +84,7 @@
 #set ($bName = 1)
 #set ($k = 0)
 #foreach ($number in $speedDialInfo)
-#set ($i = $velocityCount - 1)
+#set ($i = $foreach.count - 1)
 #if($i == 0)
 <speedDials>
 #end
@@ -113,7 +113,7 @@
 #macro ( addPhoneBook )
 #set ($bBookPresent = 0)
 #foreach ($entry in $phoneBook)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #if($i == 1)
 <phoneBook>
 #set ($bBookPresent = 1)
@@ -170,7 +170,7 @@
 </phoneSettings>
 #set ($bAccountPresent = 0)
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #if($i == 1)
 <sipAccounts>
 #set ($bAccountPresent = 1)

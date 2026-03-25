@@ -11,7 +11,7 @@ line${i}_${s.ProfileName} $!{s.Value}
 #end
 [VOIP]
 #foreach ($line in $phone.lines)
-#set($line_id = $velocityCount)
+#set($line_id = $foreach.count)
 #set($voip = $line.Settings.getSetting('VOIP'))
 #emit_settings_by_name($voip ['name', 'authname', 'display_name', 'password', 'type'] $line_id)
 #end

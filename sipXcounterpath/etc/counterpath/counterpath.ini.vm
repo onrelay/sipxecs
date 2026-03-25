@@ -44,7 +44,7 @@ Success=1
 [SETTINGS]
 
 #foreach ($sip_account in $line_sip_settings)
-#set ($line_index = $velocityCount - 1)
+#set ($line_index = $foreach.count - 1)
 #foreach ($setting in $sip_account)
 proxies:proxy${line_index}:#generate_setting($setting)
 #end
@@ -52,7 +52,7 @@ proxies:proxy${line_index}:#generate_setting($setting)
 #end
 #set ($last_sip_line_index = $line_index)
 #foreach ($xmpp_account in $line_xmpp_settings)
-#set ($line_index = $last_sip_line_index + $velocityCount)
+#set ($line_index = $last_sip_line_index + $foreach.count)
 #foreach ($setting in $xmpp_account)
 #if ($setting.name != "configured")
 proxies:proxy${line_index}:#generate_setting($setting)

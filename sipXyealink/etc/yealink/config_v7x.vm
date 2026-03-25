@@ -111,7 +111,7 @@ ${s.ProfileName} = %NULL%
 
 # Enable configured lines
 #foreach ($line in $phone.lines)
-#set ($lastLineID = $velocityCount)
+#set ($lastLineID = $foreach.count)
 #set ($SLP = $lastLineID - 1)
 #set ($SLP = $SLP * 10)
 #set ($SLP = $SLP + 5060)

@@ -1,6 +1,6 @@
 #foreach ($button in $speeddials)
 [key]
-#set($button_id = $velocityCount)
+#set($button_id = $foreach.count)
 #set($indexno = $button_id + 1)
 index $indexno
 label $button.Label

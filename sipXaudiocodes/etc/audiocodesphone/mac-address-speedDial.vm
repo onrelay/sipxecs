@@ -4,5 +4,5 @@
 #else 
 #set($isBlf = 0)
 #end
-$velocityCount,$entry.number,$isBlf 
+$foreach.count,$entry.number,$isBlf 
 #end

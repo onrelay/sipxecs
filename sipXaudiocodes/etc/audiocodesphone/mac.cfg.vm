@@ -26,7 +26,7 @@ $prefix${s.ProfilePath}=$!{s.Value}
 #set ($codec_options = $setting.getType().getEnums().keySet())
 ## Loop through each selected codec.
 #foreach ($codec in $phone.SelectedCodecs)
-#set ($index1 = $velocityCount - 1)
+#set ($index1 = $foreach.count - 1)
 voip/codec/codec_info/$index1/ptime=20
 voip/codec/codec_info/$index1/enabled=1
 voip/codec/codec_info/$index1/name=$codec
@@ -51,7 +51,7 @@ voip/signalling/sip/use_proxy_ip_port_for_registrar=1
 #emit_groups_by_name(['regional_settings'], "voip/")
 #computeCodecSettings()
 #foreach ($line in $phone.lines)
-#set($line_id = $velocityCount)
+#set($line_id = $foreach.count)
 #foreach ($group in $line.Settings.Values)
 #foreach ($setting in $group.Values)
 #if($setting.isLeaf())

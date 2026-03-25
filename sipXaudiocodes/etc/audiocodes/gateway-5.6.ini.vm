@@ -3,7 +3,7 @@
 ## works with arrays
 #macro(emit_csv_index $array $index $setting_names)
 #foreach ($sn in $setting_names)
-#if($velocityCount > 1),#end
+#if($foreach.count > 1),#end
 #set($s=$array.getSetting("$sn[$index]"))
 #if($s && $s.Value)$s.Value#else$ignore#end
 #end
@@ -14,10 +14,10 @@
 #set($backslash = '\')
 #if($s.ProfileName && $s.ProfileName != '$ignore$' && $s.ProfileName != "CoderName")
 [$s.profileName]
-FORMAT ${s.profileName}_Index =#foreach ($name in $s.settingNames)#if ($velocityCount > 1),#end ${s.profileName}_$name#end;
+FORMAT ${s.profileName}_Index =#foreach ($name in $s.settingNames)#if ($foreach.count > 1),#end ${s.profileName}_$name#end;
 #foreach ($row in [1..$s.size])
-#set ($settingIndex = $velocityCount - 1)
-$s.profileName $settingIndex=#foreach ($name in $s.settingNames)#if ($velocityCount > 1), #end$s.getSetting($settingIndex, $name).value#end;
+#set ($settingIndex = $foreach.count - 1)
+$s.profileName $settingIndex=#foreach ($name in $s.settingNames)#if ($foreach.count > 1), #end$s.getSetting($settingIndex, $name).value#end;
 #end
 [${backslash}${s.profileName}]
 #elseif($s.ProfileName == "CoderName")
@@ -25,7 +25,7 @@ $s.profileName $settingIndex=#foreach ($name in $s.settingNames)#if ($velocityCo
 [$s.profileName]
 FORMAT CoderName_Index = CoderName_Type;
 #foreach ($codec in $codecs)
-#set ($settingIndex = $velocityCount - 1)
+#set ($settingIndex = $foreach.count - 1)
 $s.profileName $settingIndex=${codec};
 #end
 [${backslash}${s.profileName}]
@@ -71,7 +71,7 @@ TRUNKGROUPSETTINGS=1,1,255,$ignore
 [TargetOfChannel]
 FORMAT TargetOfChannel_Index = TargetOfChannel_Destination, TargetOfChannel_Type;
 #foreach ($port in $gateway.ports)
-#set($port_id = $velocityCount - 1)
+#set($port_id = $foreach.count - 1)
 #set($extension = $port.getSettingValue('Port/Extension'))
 #set($enable = $port.getSettingValue('Port/AutomaticDialing'))
 TargetOfChannel ${port_id} = ${extension}, ${enable};
@@ -81,8 +81,8 @@ TargetOfChannel ${port_id} = ${extension}, ${enable};
 #if(${gateway.ModelDefinitions.contains("digital")})
 [Trunks]
 #foreach ($port in $gateway.ports)
-#set($port_id = $velocityCount - 1)
-#set($trunk_id = $velocityCount)
+#set($port_id = $foreach.count - 1)
+#set($trunk_id = $foreach.count)
 #set($firstDefaultCLID = $port.getSettingValue('Trunk/TrunkGroup_X_FirstPhoneNumber'))
 #set($prefix = $port.getSettingValue('Trunk/Prefix'))
 #set($minChannel = $port.getSettingValue('Trunk/MinChannel'))
@@ -98,8 +98,8 @@ PSTNPREFIX=${prefix},${trunk_id},*,*,0
 #if(${gateway.ModelDefinitions.contains("fxs")})
 [Lines]
 #foreach ($line in $phone.lines)
-#set($line_id = $velocityCount - 1)
-#set($trunk_id = $velocityCount)
+#set($line_id = $foreach.count - 1)
+#set($trunk_id = $foreach.count)
 #set($settings = $line.Settings)
 #set($username = $line.getSettingValue('SIP/Authentication/Username'))
 #set($password = $line.getSettingValue('SIP/Authentication/Password'))
@@ -109,7 +109,7 @@ TRUNKGROUP=${trunk_id}-${trunk_id},${username}
 [Authentication]
 FORMAT Authentication_Index = Authentication_UserId, Authentication_UserPassword;
 #foreach ($line in $phone.lines)
-#set($line_id = $velocityCount - 1)
+#set($line_id = $foreach.count - 1)
 #set($username = $line.getSettingValue('SIP/Authentication/Username'))
 #set($password = $line.getSettingValue('SIP/Authentication/Password'))
 Authentication $line_id = $username, ${password};
@@ -119,7 +119,7 @@ Authentication $line_id = $username, ${password};
 [CallerDisplayInfo]
 FORMAT CallerDisplayInfo_Index = CallerDisplayInfo_DisplayString, CallerDisplayInfo_IsCidRestricted;
 #foreach ($line in $phone.lines)
-#set($line_id = $velocityCount - 1)
+#set($line_id = $foreach.count - 1)
 #set($display = $line.getSettingValue('CALLER_ID/Display'))
 #set($cidRestricted = $line.getSettingValue('CALLER_ID/CIDRestricted'))
 #if(!($display) || $!display == "")
@@ -132,7 +132,7 @@ CallerDisplayInfo $line_id = "${display}", $cidRestricted;
 
 #if(${gateway.ModelDefinitions.contains("digital")})
 #foreach ($portSettings in $portFlatSettings)
-#set($port_id = $velocityCount - 1)
+#set($port_id = $foreach.count - 1)
 ; Parameters for trunk: $port_id
 #foreach ($s in $portSettings)
 #if($s.ProfileName != '$ignore$')

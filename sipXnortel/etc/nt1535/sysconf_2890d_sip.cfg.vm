@@ -23,7 +23,7 @@ ${s.ProfileName} $!{s.Value}
 
 #emit_groups_by_name(['VOIP'])
 #foreach ($line in $phone.lines)
-#set($line_id = $velocityCount)
+#set($line_id = $foreach.count)
 #set ($voip = $line.Settings.getSetting("VOIP"))
 line${line_id}_proxy_address $voip.getSetting("proxy_address").Value
 line${line_id}_proxy_port $voip.getSetting("proxy_port").Value

@@ -12,7 +12,7 @@
   </se>
   <reg
 #foreach ($line in ${lines})
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($reg = $line.getSetting('reg'))
 #foreach ($setting in $cfg.getRecursiveSettings($reg))
     reg.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -26,7 +26,7 @@
     <call.donotdisturb call.donotdisturb.perReg="$!{dndPerReg.Value}" />
     <call.autoOffHook
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('call').getSetting('autoOffHook'))
 #foreach ($setting in $cfg.getSettings($group))
       call.autoOffHook.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -35,7 +35,7 @@
     />
     <call.missedCallTracking
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('call').getSetting('missedCallTracking'))
 #foreach ($setting in $cfg.getSettings($group))
       call.missedCallTracking.${i}.${setting.ProfileName}="$!{setting.Value}"
@@ -44,7 +44,7 @@
     />
     <call.serverMissedCall
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('call').getSetting('serverMissedCall'))
 #foreach ($setting in $cfg.getSettings($group))
       call.serverMissedCall.${i}.${setting.ProfileName}="$!{setting.Value}"

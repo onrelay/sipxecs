@@ -27,7 +27,7 @@ ${setting.ProfileName}=$!{setting.Value}
 
 #end
 #foreach ($line in $phone.lines)
-#set($line_index = $velocityCount - 1)
+#set($line_index = $foreach.count - 1)
 #foreach ($group in $line.Settings.Values)
 [${group.Name}_${line_index}]
 #foreach ($setting in $group.Values)
@@ -38,7 +38,7 @@ ${setting.ProfileName}=$!{setting.Value}
 #end
 ## Speed dial generation goes here
 #foreach ($button in $speeddial.buttons)
-#set($button_id = $velocityCount - 1)
+#set($button_id = $foreach.count - 1)
 [SPEED_DIAL_${button_id}]
 NUM=${button.Number}
 #if ($button.Blf)

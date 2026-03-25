@@ -3,7 +3,7 @@ $TXT
 $ speed dial phone
 #set($button_id = -1)
 #foreach ($button in $speeddial.buttons)
-#set($button_id = $velocityCount - 1)
+#set($button_id = $foreach.count - 1)
 line${button_id}Name=$button.getLabel()
 line${button_id}Url=$button.getNumber()@$phone.getPhoneContext().getPhoneDefaults().getDomainName()
 

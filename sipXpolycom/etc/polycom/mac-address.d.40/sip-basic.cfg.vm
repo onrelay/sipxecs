@@ -7,7 +7,7 @@
 <polycomConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="polycomConfig.xsd">
     <msg
 #foreach ($line in $lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #set ($group = $line.getSetting('msg.mwi'))
 #foreach ($setting in $cfg.getSettings($group))
       msg.mwi.${i}.${setting.ProfileName}="$!{setting.Value}"

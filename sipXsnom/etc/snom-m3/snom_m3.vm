@@ -17,7 +17,7 @@
 
 // Registrations
 #foreach ($line in $phone.ProfileLines)
-#set ($i = $velocityCount - 1)
+#set ($i = $foreach.count - 1)
 // Identity ${i}
 #foreach ($group in $line.Values)
 #foreach ($setting in $group.Values)

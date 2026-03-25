@@ -543,7 +543,7 @@
   <feature
 #set ($group = $cfg.EndpointSettings.getSetting('feature'))
 #foreach ($setting in $cfg.getSettings($group))
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
     feature.${i}.name="${setting.ProfileName}"
     feature.${i}.enabled="$!{setting.Value}"
 #end

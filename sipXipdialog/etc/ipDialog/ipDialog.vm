@@ -22,7 +22,7 @@
 #end
 </networkSettings>
 #foreach ($number in $speedDialNames)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #if($i == 1)
 #set ($memName1 = $number)
 #elseif($i == 2)
@@ -58,7 +58,7 @@
 #end
 #end
 #foreach ($number in $speedDialNumber)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #if($i == 1)
 #set ($memNum1 = $number)
 #elseif($i == 2)
@@ -94,7 +94,7 @@
 #end
 #end
 #foreach ($number in $speedDialPresence)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #if($i == 1)
 #set ($memPre1 = $number)
 #elseif($i == 2)

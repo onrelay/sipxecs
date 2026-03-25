@@ -6,7 +6,7 @@
 	<!-- identities -->
 #foreach ($line in $phone.ProfileLines)
 	<account>
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #foreach ($group in $line.Values)
 #foreach ($setting in $group.Values)
 		<${setting.ProfileName}>$!{setting.Value}</${setting.ProfileName}>

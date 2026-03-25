@@ -113,7 +113,7 @@
 #end
     <sipLines>
 #foreach ($line in $phone.lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #foreach ($group in $line.Settings.Values)
 ##  <${group.Name}>
       <line button="${i}">
@@ -139,7 +139,7 @@
 #end
 #end
 #foreach ($button in $phone.SpeedDialButtons)
-#set ($m = $i + $velocityCount)
+#set ($m = $i + $foreach.count)
       <line button="${m}">
 		<featureID>21</featureID>
 		<featureLabel>$!{button.Label}</featureLabel>

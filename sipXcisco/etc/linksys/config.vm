@@ -13,7 +13,7 @@
 
 #end
 #foreach ($line in $phone.lines)
-#set ($i = $velocityCount)
+#set ($i = $foreach.count)
 #foreach ($group in $line.Settings.Values)
 [${group.ProfileName}]
 #foreach ($setting in $group.Values)
