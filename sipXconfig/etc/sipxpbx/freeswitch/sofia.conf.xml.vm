@@ -17,6 +17,7 @@
     <param name="sip-port" value="$settings.getSetting('FREESWITCH_SIP_PORT').Value"/>
     <param name="dialplan" value="XML"/>
     <param name="dtmf-duration" value="100"/>
+    <param name="liberal-dtmf" value="true"/>
     <param name="codec-prefs" value="$settings.getSetting('FREESWITCH_CODECS').Value.replace('|',',')"/>
     <param name="hold-music" value="$${hold_music}"/>
     <param name="rtp-timer-name" value="soft"/>
