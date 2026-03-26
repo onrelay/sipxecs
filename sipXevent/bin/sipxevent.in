@@ -8,7 +8,6 @@
 # Contributors retain copyright to elements licensed under a Contributor Agreement.
 # Licensed to the User under the AGPL license.
 
-. /etc/rc.d/init.d/functions || exit 1
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || exit 1
 
 prog=sipxevent
@@ -21,7 +20,9 @@ regex="^@SIPX_RUNDIR@/$prog/java-$prog"
 # Start sipxevent
 start() {
   checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null
-  
+  Status=$?
+  [ $Status -eq 0 ] && { echo_running; exit $ERUNNING; }
+
   JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
   Dependencies=`@SIPX_BINDIR@/java-dep -d @SIPX_JAVADIR@/sipXcommons @event_PKGS@`
   export CLASSPATH=`echo @SIPX_CONFDIR@/sipxevent @SIPX_JAVADIR@/sipXevent/*.jar ${Dependencies} | sed -e 's/ /:/g'`  

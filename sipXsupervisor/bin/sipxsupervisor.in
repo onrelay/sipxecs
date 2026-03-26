@@ -23,6 +23,8 @@ regex="^$exec"
 [ -e /etc/sysconfig/sipxsupervisor ] && . /etc/sysconfig/sipxsupervisor
 
 start() {
+  echo -n $"Starting $prog: "
+
   [ -x $exec ] || { echo -n "$execError"; echo_failure; exit $ENOEXEC; }
   [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; exit $ENOENT; }
   checkRunningProcess "${pidfile}" "${regex}" > /dev/null 2>&1
@@ -44,6 +46,10 @@ start() {
     Status=$?
     [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
     [ $Status -eq 0 ] && { echo_success; return $Status; }
+  else
+    [ $Status -eq 0 ] && { echo_success; }
+    [ $Status -eq 0 ] || { echo_failure; }
+    return $Status
   fi
   
 

@@ -14,7 +14,6 @@
 # Declare script variables in a manner that unit test
 # (or end user I suppose) can override
 
-. /etc/rc.d/init.d/functions ||  exit $ENOENT
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }
 
 prog=sipxbridge
@@ -47,7 +46,7 @@ start() {
   else
     checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
     Status=$?
-    [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
+    [ $Status -eq 0 ] && { echo_running; exit $ERUNNING; }
 
     echo -n $"Starting $prog: "
     runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command} > /dev/null 2>&1 & echo \$!" > ${pidfile}

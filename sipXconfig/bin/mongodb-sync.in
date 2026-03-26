@@ -6,7 +6,6 @@
 # config: @SIPX_CONFDIR@/mongodb-sync.conf
 # pidfile: @SIPX_RUNDIR@/mongodb-sync.pid
 
-. /etc/rc.d/init.d/functions
 
 # Copyright (c) 2013 eZuce, Inc. All rights reserved. 
 # Contributed to SIPfoundry under a Contributor Agreement 
@@ -29,11 +28,12 @@ FREQ=15 #seconds
 # Assumes there's a local, global db which i think is a safe assumption otherwise
 # local makes little sense.
 SRC=localhost:27019
-test -f @SIPX_CONFDIR@/mongo-local.ini || (echo "@SIPX_CONFDIR@/mongo-local.ini missing"; exit 1)
+test -f @SIPX_CONFDIR@/mongo-local.ini || (echo "@SIPX_CONFDIR@/mongo-local.ini missing"; echo_failure; exit ENOENT)
 SHARD=`awk -F = '/shardId=/ {print $2}' @SIPX_CONFDIR@/mongo-local.ini`
 
 # format for modern drivers
 DEST_URL=`awk -F = '/connectionUrl=/ {print substr($0,15)}' @SIPX_CONFDIR@/mongo-client.ini`
+DEST_STR=`sed -n 's|.*connectionUrl=mongodb://\([^/]*\).*|\1|p' @SIPX_CONFDIR@/mongo-client.ini`
 
 LOG=@SIPX_LOGDIR@/mongodb-sync.log
 DB=node

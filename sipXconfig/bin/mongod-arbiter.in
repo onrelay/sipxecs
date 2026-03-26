@@ -6,13 +6,19 @@
 # processname: mongod-arbiter
 # config: /etc/mongod-arbiter.conf
 
-. /etc/rc.d/init.d/functions
+. /etc/rc.d/init.d/functions ||  exit $ENOENT    
 
 # NOTE: if you change any OPTIONS here, you get what you pay for:
 # this script assumes all options are in the config file.                                                                                                                                                                                    
-CONFIGFILE="/etc/mongod-arbiter.conf"                                                                                                                                                                                                        
-OPTIONS=" -f $CONFIGFILE"                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                             
+CONFIGFILE="/etc/mongod-arbiter.conf"   
+
+if [ -f $CONFIGFILE ]; then
+  OPTIONS=" -f $CONFIGFILE"      
+else 
+    echo "No mongod-arbiter.conf"; echo_failure;   
+    exit ENOENT                                                                                                                                                                                               
+fi
+
 mongod=${MONGOD-/usr/bin/mongod}                                                                                                                                                                                                             
                                                                                                                                                                                                                                              
 MONGO_USER=mongod                                                                                                                                                                                                                            
@@ -115,7 +121,7 @@ mongo_killproc()
 
   checkpid $pid # returns 0 only if the process exists
   local RC=$?
-  [ "$RC" -eq 0 ] && failure "${procname} shutdown" || rm -f ${pidfile}; success "${procname} shutdown"
+  [ "$RC" -eq 0 ] && failure "${procname} shutdown" || rm -f ${pidfile}; echo_success "${procname} shutdown"
   RC=$((! $RC)) # invert return code so we return 0 when process is dead.
   return $RC
 }

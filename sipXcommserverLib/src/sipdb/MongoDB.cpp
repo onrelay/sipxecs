@@ -476,13 +476,13 @@ void BaseDB::forEach(const bsoncxx::document::view& query, const std::string& ns
       }
       catch (const std::exception& e)
       {
-          OS_LOG_WARNING(FAC_SIP, "BaseDB::safeDropIndex failed for index: " << key
+          OS_LOG_INFO(FAC_SIP, "BaseDB::safeDropIndex index not found/not dropped: " << key
                           << ". " << e.what());
           ret = false;
       }
       catch (...)
       {
-          OS_LOG_WARNING(FAC_SIP, "BaseDB::safeDropIndex failed for index: " << key
+          OS_LOG_INFO(FAC_SIP, "BaseDB::safeDropIndex index not found/not dropped: " << key
                           << ". Unknown Exception");
           ret = false;
       }

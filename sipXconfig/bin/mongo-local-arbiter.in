@@ -6,12 +6,17 @@
 # processname: mongo-local-arbiter
 # config: /etc/mongo-local-arbiter.conf
 
-. /etc/rc.d/init.d/functions
+. /etc/rc.d/init.d/functions ||  exit $ENOENT    
 
 # NOTE: if you change any OPTIONS here, you get what you pay for:
 # this script assumes all options are in the config file.                                                                                                                                                                                    
-CONFIGFILE="/etc/mongo-local-arbiter.conf"                                                                                                                                                                                                        
-OPTIONS=" -f $CONFIGFILE"                                                                                                                                                                                                                    
+CONFIGFILE="/etc/mongo-local-arbiter.conf"    
+if [ -f $CONFIGFILE ]; then
+  OPTIONS=" -f $CONFIGFILE"      
+else 
+    echo "No mongod-local.conf"; echo_failure;   
+    exit ENOENT                                                                                                                                                                                               
+fi                                                                                                                                                                                          
                                                                                                                                                                                                                                              
 mongod=${MONGOD-/usr/bin/mongod}                                                                                                                                                                                                             
                                                                                                                                                                                                                                              

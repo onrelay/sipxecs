@@ -17,9 +17,15 @@
 # FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
 # details.
 
-. /etc/rc.d/init.d/functions || exit 1
-CONFIG_FILES="@SIPX_CONFDIR@/sipxtcpdumplog.properties"
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || exit 1
+
+CONFIG_FILES="@SIPX_CONFDIR@/sipxtcpdumplog.properties"
+
+if [ ! -f $CONFIG_FILES ]; then
+    echo -n "No sipxtcpdumplog.properties"; echo_failure;
+    exit 1                                                                                                                                                                                               
+fi 
+
 pidfile=@SIPX_RUNDIR@/sipxtcpdumplog/sipxtcpdumplog.pid
 . @SIPX_CONFDIR@/sipxtcpdumplog.properties
 shopt -s extglob

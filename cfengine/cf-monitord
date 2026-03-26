@@ -13,7 +13,6 @@
 #
 
 # Source function library.
-. /etc/rc.d/init.d/functions
 
 exec="/usr/local/sbin/cf-monitord"
 prog=$(basename $exec)

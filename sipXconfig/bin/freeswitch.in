@@ -93,10 +93,12 @@ do_audio_setup() {
 base=${0##*/}
 
 do_start() {
+  echo -n $"Starting $prog: "
+
   checkRunningProcessIsListening "$PIDFILE" "$REGEX" > /dev/null 2>&1
   RETVAL=$?
-  [ $RETVAL -eq 0 ] && { echo -n "$NAME $runningError"; echo_failure; exit $ERUNNING; }
-  echo -n $"Starting $prog: "
+  [ $RETVAL -eq 0 ] && { echo_running; exit $ERUNNING; }
+
   do_setlimits
   do_permission_check
   do_audio_setup

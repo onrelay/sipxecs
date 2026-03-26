@@ -4,7 +4,6 @@
 # description: sipxconfig is an administration server
 # processname: sipxconfig
 
-. /etc/rc.d/init.d/functions || exit $ENOENT
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }
 
 # Copyright (C) 2007 Pingtel Corp., certain elements licensed under a Contributor Agreement.
@@ -76,7 +75,6 @@ prog=sipxconfig
 pidfile="@SIPX_RUNDIR@/$prog/$prog.pid"
 regex="^@SIPX_RUNDIR@/$prog/java-$prog"
 
-. /etc/rc.d/init.d/functions || exit 1
 . @SIPX_LIBEXECDIR@/sipx-utils.sh
 [ -e @SIPX_CONFDIR@/sipxconfigrc ] && . @SIPX_CONFDIR@/sipxconfigrc
 
@@ -266,7 +264,7 @@ start() {
   else
     checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
     Status=$?
-    [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
+    [ $Status -eq 0 ] && { echo_running; exit $ERUNNING; }
 
     echo -n $"Starting $prog: "
     runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command} >> ${LogFile} 2>&1 & echo \$!" > ${pidfile}

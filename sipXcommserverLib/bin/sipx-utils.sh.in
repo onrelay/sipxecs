@@ -15,12 +15,19 @@ ENOTWRITABLE=8 #file not writable
 # Set up correctly depending on the distribution
 if [ -f /etc/redhat-release ]
 then
+    COL_WIDTH=40
+
     echo_success() {
-        echo -e "\e[32m[ OK ]\e[0m"
+        # \e[G moves to the start of the current line
+        printf "\e[G\e[${COL_WIDTH}C\e[1;32m[   OK   ]\e[0m\n"
     }
 
     echo_failure() {
-        echo -e "\e[31m[FAIL]\e[0m"
+        printf "\e[G\e[${COL_WIDTH}C\e[1;31m[  FAIL  ]\e[0m\n"
+    }
+
+    echo_running() {
+        printf "\e[G\e[${COL_WIDTH}C\e[1;34m[ EXISTS ]\e[0m\n"
     }
 
     HTTP_DAEMON_START="@APACHE2_HTTPD@"

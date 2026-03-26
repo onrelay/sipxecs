@@ -8,7 +8,6 @@
 # Contributors retain copyright to elements licensed under a Contributor Agreement.
 # Licensed to the User under the LGPL license.
 
-. /etc/rc.d/init.d/functions || exit $ENOENT
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }
 
 prog=sipxsqa
@@ -33,7 +32,7 @@ start() {
   else
     checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
     Status=$?
-    [ $Status -eq 0 ] && { echo -n "$prog $runningError"; echo_failure; exit $ERUNNING; }
+    [ $Status -eq 0 ] && { echo_running; exit $ERUNNING; }
 
     echo -n $"Starting $prog: "
 
