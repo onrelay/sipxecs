@@ -3,6 +3,9 @@
 ### Utility script functions common to server startup scripts
 ###
 
+PATH="/sbin:/usr/sbin:/bin:/usr/bin"
+export PATH
+
 EINCORRECTUSAGE=1 #incorrect usage
 EALREADY=2	#Operation already in progress
 ENOENT=3	#No such file or directory
