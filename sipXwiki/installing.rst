@@ -20,16 +20,14 @@ Setup sipXcom repo
       https://storage.googleapis.com/sipxecs/sipxcom/25.01/rocky-9-x86_64/sipxcom.repo
     
 
-Enable elasticsearch
+Enable additional repos
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   .. code-block:: bash
 
-    yum install -y elasticsearch
+    dnf install epel-release -y
 
-    systemctl enable elasticsearch
-
-    service elasticsearch start
+    dnf config-manager --set-enabled crb
 
 
 Install and Setup sipXcom
@@ -39,7 +37,7 @@ Install sipXcom RPMs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   .. code-block:: bash
     
-    yum install -y sipxcom
+    dnf install -y sipxcom
 
 
 Initial setup
@@ -78,7 +76,7 @@ Network Configuration
   
   .. code-block:: bash
 
-    yum update -y
+    dnf update -y
     
     reboot
 

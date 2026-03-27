@@ -106,8 +106,8 @@ SSH Root Login
 Make sure SSH port 22 on your server is firewall restricted to known IPs if you allow root login via SSH
 
 
-Install and Update Dependencies
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Update OS and Install Basic Dependencies
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Update OS: 
 
@@ -115,6 +115,7 @@ Install and Update Dependencies
 
     dnf update -y
 
+    dnf install -y wget
 
 Setup Google Could Artifact registry
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -122,8 +123,6 @@ Setup Google Could Artifact registry
 If you are NOT using a Google Cloud image, you must add and install their artifact registry plugin:
 
   .. code-block:: bash
-
-    dnf install -y wget
 
     wget -O /etc/yum.repos.d/artifact-registry-plugin.repo \
       https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
@@ -144,4 +143,4 @@ Reboot
 Build or Install
 ---------------------
 
-You are ready to follow the instructions to building_ or installing_ sipXcom.
+You are ready to follow the instructions to :ref:`building <building>` or :ref:`installing <installing>` sipXcom.
