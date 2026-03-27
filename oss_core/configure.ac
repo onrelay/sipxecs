@@ -23,9 +23,9 @@ AC_CANONICAL_HOST
 #
 # Configure package revision number
 #
-PACKAGE_REVISION=`date +%s`.`cd ${srcdir} && git rev-parse --short HEAD`
+PACKAGE_REVISION=`date +%s`
 AC_SUBST(PACKAGE_REVISION)
-AC_DEFINE_UNQUOTED([PACKAGE_REVISION], "${PACKAGE_REVISION}", [Revion number including git SHA])
+AC_DEFINE_UNQUOTED([PACKAGE_REVISION], "${PACKAGE_REVISION}", [Revision number (Unix timestamp)])
 
 m4_include([oss_core.m4])
 
