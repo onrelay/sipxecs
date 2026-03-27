@@ -40,6 +40,9 @@ public abstract class BeanWithGroups extends BeanWithSettings {
 
     public void setGroups(Set<Group> groups) {
         m_groups = groups;
+
+        BeanWithGroupsModel model = (BeanWithGroupsModel) getSettingModel();
+        model.setGroups(m_groups);
     }
 
     public void replaceGroups(Set<Group> groups) {
@@ -50,7 +53,6 @@ public abstract class BeanWithGroups extends BeanWithSettings {
         }
 
         BeanWithGroupsModel model = (BeanWithGroupsModel) getSettingModel();
-        // passed collection is not copied
         model.setGroups(m_groups);
     }
 
