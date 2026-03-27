@@ -18,7 +18,7 @@ ENOTWRITABLE=8 #file not writable
 # Set up correctly depending on the distribution
 if [ -f /etc/redhat-release ]
 then
-    COL_WIDTH=40
+    COL_WIDTH=64
 
     echo_success() {
         # \e[G moves to the start of the current line
