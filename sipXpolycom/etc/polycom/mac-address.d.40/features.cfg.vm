@@ -97,7 +97,9 @@
   />
 #if ($phone.Model.ModelId == "polycomVVX500" || $phone.Model.ModelId == "polycomVVX501" || $phone.Model.ModelId == "polycomRealPresenceTrio" || $phone.Model.ModelId == "polycomVVX410" || $phone.Model.ModelId == "polycomVVX400" || $phone.Model.ModelId == "polycomVVX411" || $phone.Model.ModelId == "polycomVVX401")
 #set ($group = $cfg.EndpointSettings.getSetting('background').getSetting('polycomVVX500bg'))
-#if($group.getSetting('enabled').Value == 1)
+#set($bgEnabled = $group.getSetting('enabled').Value)
+#set($bgFile = $group.getSetting('bm.1.name').Value)
+#if($bgEnabled == "1" && $bgFile.length() > 0)
   <bg>
     <bg.color bg.color.selection="$group.getSetting('selection').Value">
       <bg.color.bm bg.color.bm.1.em.name="$group.getSetting('bm.1.em.name').Value" bg.color.bm.1.name="$group.getSetting('bm.1.name').Value" />
@@ -106,7 +108,9 @@
 #end
 #elseif($phone.Model.ModelId == "polycomVVX300" || $phone.Model.ModelId == "polycomVVX310" || $phone.Model.ModelId == "polycomVVX301" || $phone.Model.ModelId == "polycomVVX311")
 #set ($group = $cfg.EndpointSettings.getSetting('background').getSetting('polycomVVX300bg'))
-#if($group.getSetting('enabled').Value == 1)
+#set($bgEnabled = $group.getSetting('enabled').Value)
+#set($bgFile = $group.getSetting('bm.1.name').Value)
+#if($bgEnabled == "1" && $bgFile.length() > 0)
   <bg>
     <bg.color bg.color.selection="$group.getSetting('selection').Value">
       <bg.color.bm bg.color.bm.1.em.name="$group.getSetting('bm.1.em.name').Value" bg.color.bm.1.name="$group.getSetting('bm.1.name').Value" />
@@ -115,7 +119,9 @@
 #end
 #elseif($phone.Model.ModelId == "polycomVVX600" || $phone.Model.ModelId == "polycomVVX601")
 #set ($group = $cfg.EndpointSettings.getSetting('background').getSetting('polycomVVX600bg'))
-#if($group.getSetting('enabled').Value == 1)
+#set($bgEnabled = $group.getSetting('enabled').Value)
+#set($bgFile = $group.getSetting('bm.1.name').Value)
+#if($bgEnabled == "1" && $bgFile.length() > 0)
   <bg>
     <bg.color bg.color.selection="$group.getSetting('selection').Value">
       <bg.color.bm bg.color.bm.1.em.name="$group.getSetting('bm.1.em.name').Value" bg.color.bm.1.name="$group.getSetting('bm.1.name').Value" />
@@ -124,7 +130,9 @@
 #end
 #elseif($phone.Model.ModelId == "polycomVVX1500")
 #set ($group = $cfg.EndpointSettings.getSetting('background').getSetting('polycomVVX1500bg'))
-#if($group.getSetting('enabled').Value == 1)
+#set($bgEnabled = $group.getSetting('enabled').Value)
+#set($bgFile = $group.getSetting('bm.1.name').Value)
+#if($bgEnabled == "1" && $bgFile.length() > 0)
   <bg>
     <bg.VVX_1500>
       <bg.VVX_1500.color bg.VVX_1500.color.selection="$group.getSetting('selection').Value">
@@ -135,7 +143,9 @@
 #end
 #elseif($phone.Model.ModelId == "polycom670")
 #set ($group = $cfg.EndpointSettings.getSetting('background').getSetting('polycom670bg'))
-#if($group.getSetting('enabled').Value == 1)
+#set($bgEnabled = $group.getSetting('enabled').Value)
+#set($bgFile = $group.getSetting('bm.1.name').Value)
+#if($bgEnabled == "1" && $bgFile.length() > 0)
   <bg>
     <bg.hiRes>
       <bg.hiRes.color bg.hiRes.color.selection="$group.getSetting('selection').Value">
@@ -146,7 +156,9 @@
 #end
 #elseif($phone.Model.ModelId == "polycom450")
 #set ($group = $cfg.EndpointSettings.getSetting('background').getSetting('polycom450bg'))
-#if($group.getSetting('enabled').Value == 1)
+#set($bgEnabled = $group.getSetting('enabled').Value)
+#set($bgFile = $group.getSetting('bm.1.name').Value)
+#if($bgEnabled == "1" && $bgFile.length() > 0)
   <bg>
     <bg.medRes>
       <bg.medRes.gray bg.medRes.gray.selection="$group.getSetting('selection').Value">
@@ -157,7 +169,9 @@
 #end
 #elseif($phone.Model.ModelId == "polycom550" || $phone.Model.ModelId == "polycom560" || $phone.Model.ModelId == "polycom650")
 #set ($group = $cfg.EndpointSettings.getSetting('background').getSetting('polycom550bg'))
-#if($group.getSetting('enabled').Value == 1)
+#set($bgEnabled = $group.getSetting('enabled').Value)
+#set($bgFile = $group.getSetting('bm.1.name').Value)
+#if($bgEnabled == "1" && $bgFile.length() > 0)
   <bg>
     <bg.hiRes>
       <bg.hiRes.gray bg.hiRes.gray.selection="$group.getSetting('selection').Value">
