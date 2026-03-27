@@ -14,61 +14,74 @@
   <body>
     <unique>
       <![CDATA[    
-      var refreshEnabled = true;
-      var stopOnError = ${stopOnError};  // keep dynamic value from template
+        var refreshEnabled = true;
+        var stopOnError = ${stopOnError};  // keep dynamic value from template
 
-      var refreshEventTarget = new EventTarget();
+        var refreshEventTarget = new EventTarget();
 
-      function updateRefresh(value) {
-          console.log("Updating auto refresh interval: " + value.message);
-          initRefresh("refreshForm", value.message);
-      }
+        function updateRefresh(value) {
+            console.log("Updating auto refresh interval: " + value.message);
+            initRefresh("refreshForm", value.message);
+        }
 
-      function initRefresh(formId, intervalSeconds, checkboxId = "${checkbox}", timeoutVarName = "${timeoutId}") {
-          console.log("Registering auto refresh: " + intervalSeconds);
+        function initRefresh(formId, intervalSeconds, checkboxId = "${checkbox}", timeoutVarName = "${timeoutId}") {
+            console.log("Registering auto refresh: " + intervalSeconds);
 
-          var clickFn = function() {
-              var checkbox = document.getElementById(checkboxId);
-              var form = document.getElementById(formId);
-              var errorElement = document.getElementById("user:error");
+            var clickFn = function() {
+                var checkbox = document.getElementById(checkboxId);
+                var form = document.getElementById(formId);
+                var errorElement = document.getElementById("user:error");
 
-              if (!checkbox || !form) return;
+                if (!checkbox || !form) return;
 
-              if (checkbox.checked && refreshEnabled) {
-                  if (stopOnError && errorElement) {
-                      console.log("Error on page - no refresh");
-                      checkbox.checked = false;
-                  } else {
-                      console.log("Auto-submitting form: " + formId);
-                      form.submit();
-                  }
-              }
-          };
+                if (checkbox.checked && refreshEnabled) {
+                    if (stopOnError && errorElement) {
+                        console.log("Error on page - no refresh");
+                        checkbox.checked = false;
+                    } else {
+                        refresh();
+                    }
+                }
+            };
 
-          // Clear previous interval if exists
-          if (window[timeoutVarName]) {
-              console.log('Clearing interval: ' + window[timeoutVarName]);
-              clearInterval(window[timeoutVarName]);
-              window[timeoutVarName] = 0;
-          } else {
-              console.log('Previous interval 0 or undefined');
-          }
+            // Clear previous interval if exists
+            if (window[timeoutVarName]) {
+                console.log('Clearing interval: ' + window[timeoutVarName]);
+                clearInterval(window[timeoutVarName]);
+                window[timeoutVarName] = 0;
+            } else {
+                console.log('Previous interval 0 or undefined');
+            }
 
-          // Set new interval in milliseconds
-          window[timeoutVarName] = setInterval(clickFn, intervalSeconds * 1000);
-          console.log('Setting interval: ' + window[timeoutVarName]);
-      }
+            // Set new interval in milliseconds
+            window[timeoutVarName] = setInterval(clickFn, intervalSeconds * 1000);
+            console.log('Setting interval: ' + window[timeoutVarName]);
+        }
 
-      function setRefreshInterval(newInterval) {
-          refreshEventTarget.dispatchEvent(new CustomEvent('refreshInterval', { detail: { message: newInterval } }));
-      }
+        function setRefreshInterval(newInterval) {
+            refreshEventTarget.dispatchEvent(new CustomEvent('refreshInterval', { detail: { message: newInterval } }));
+        }
 
-      // Allow other code to "subscribe" to interval changes
-      function onRefreshInterval(callback) {
-          refreshEventTarget.addEventListener('refreshInterval', function(event) {
-              callback(event.detail);
-          });
-      }
+        // Allow other code to "subscribe" to interval changes
+        function onRefreshInterval(callback) {
+            refreshEventTarget.addEventListener('refreshInterval', function(event) {
+                callback(event.detail);
+            });
+        }
+
+        function refresh() {
+            var refreshBtn = document.getElementById('refresh'); 
+            
+            if (refreshBtn) {
+                refreshBtn.click(); 
+            } else {
+                var form = document.getElementById('refreshForm');
+                if (form) {
+                    form.submit();
+                }
+            }
+        }
+
       ]]>
     </unique>
   </body>
