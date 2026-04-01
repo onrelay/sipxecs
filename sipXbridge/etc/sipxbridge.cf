@@ -67,11 +67,11 @@ bundle agent sipxbridge_logwatcher {
 bundle agent sipxbridge_running {
   vars:
     any::
-      "service_command" string => ".*\s-Dprocname=sipxbridge\s.*";
+      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxbridge/java-sipxbridge";
 
   methods:
     any::
-      "any" usebundle => find_sipxservice_by_command_regex("$(service_command)","sipxbridge_running");
+      "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxbridge_running");
     !src.sipxbridge::
       "any" usebundle => rh_systemctl_status("enable sipxbridge");
     !src.!sipxbridge::

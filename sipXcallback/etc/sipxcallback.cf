@@ -79,11 +79,11 @@ bundle agent sipxcallback_setup {
 bundle agent sipxcallback_running {
   vars:
     any::
-      "service_command" string => ".*\s-Dprocname=sipxcallback\s.*";
+      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxcallback/java-sipxcallback";
 
   methods:
     any::
-      "any" usebundle => find_sipxservice_by_command_regex("$(service_command)","sipxcallback_running");
+      "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxcallback_running");
 
   commands:
     (!sipxcallback|stop_sipxecs).sipxcallback_running::

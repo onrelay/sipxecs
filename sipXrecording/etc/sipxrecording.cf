@@ -62,10 +62,10 @@ bundle agent sipxrecording_setup {
 bundle agent sipxrecording_running {
   vars:
     any::
-      "service_command" string => ".*\s-Dprocname=sipxrecording\s.*";
+      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxrecording/java-sipxrecording";
   methods:
     any::
-      "any" usebundle => find_sipxservice_by_command_regex("$(service_command)","sipxrecording_running");
+      "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxrecording_running");
 
   commands:
 	(!sipxrecording|stop_sipxecs).sipxrecording_running::

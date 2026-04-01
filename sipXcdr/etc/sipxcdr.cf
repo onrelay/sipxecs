@@ -63,11 +63,11 @@ bundle agent sipxcdr_setup {
 bundle agent sipxcdr_running {
   vars:
     any::
-      "service_command" string => ".*\s$(sipx.SIPX_LIBDIR)/ruby/gems/[0-9.]+/gems/sipxcallresolver-[0-9.]+/lib/main.rb\s.*";
+      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxcdr/ruby-sipxcdr";
 
   methods:
     any::
-      "any" usebundle => find_sipxservice_by_command_regex("$(service_command)","sipxcdr_running");
+      "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxcdr_running");
 
   commands:
     (!sipxcdr|stop_sipxecs).sipxcdr_running::

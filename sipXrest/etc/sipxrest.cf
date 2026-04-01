@@ -48,10 +48,10 @@ bundle agent sipxrest_setup {
 bundle agent sipxrest_running {
   vars:
     any::
-      "service_command" string => ".*\s-Dprocname=sipxrest\s.*";
+      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxrest/java-sipxrest";
   methods:
     any::
-      "any" usebundle => find_sipxservice_by_command_regex("$(service_command)","sipxrest_running");
+      "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxrest_running");
 
   commands:
     (!sipxrest|stop_sipxecs).sipxrest_running::

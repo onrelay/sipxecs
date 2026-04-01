@@ -148,11 +148,11 @@ bundle edit_line sipxivr_log4j_properties_contents {
 bundle agent sipxivr_running {
   vars:
     any::
-      "service_command" string => ".*\s-Dprocname=sipxivr\s.*";
+      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxivr/java-sipxivr";
 
   methods:
     any::
-      "any" usebundle => find_sipxservice_by_command_regex("$(service_command)","sipxivr_running");
+      "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxivr_running");
     !src.sipxivr::
       "any" usebundle => rh_systemctl_status("enable sipxivr");
     !src.!sipxivr::

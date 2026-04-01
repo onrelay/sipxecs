@@ -52,10 +52,10 @@ bundle agent sipxevent_setup {
 bundle agent sipxevent_running {
   vars:
     any::
-      "service_command" string => ".*\s-Dprocname=sipxevent\s.*";
+      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxevent/java-sipxevent";
   methods:
     any::
-      "any" usebundle => find_sipxservice_by_command_regex("$(service_command)","sipxevent_running");
+      "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxevent_running");
 
   commands:
     (!sipxevent|stop_sipxecs).sipxevent_running::

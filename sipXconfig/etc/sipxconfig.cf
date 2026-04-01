@@ -50,11 +50,11 @@ bundle agent sipxconfig_logwatcher {
 bundle agent sipxconfig_running {
   vars:
     any::
-      "service_command" string => ".*\s-Dprocname=sipxconfig\s.*";
+      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxconfig/java-sipxconfig";
 
   methods:
     any::
-      "any" usebundle => find_sipxservice_by_command_regex("$(service_command)","sipxconfig_running");
+      "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxconfig_running");
     !src.(primary|admin)::
       "any" usebundle => rh_systemctl_status("disable sipxconfig");
     !src.(!primary.!admin)::
