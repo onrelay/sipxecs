@@ -237,7 +237,7 @@ function checkSELinux()
 
         sudo sed -i 's/enforcing/disabled/g' /etc/selinux/config /etc/selinux/config
 
-        echo "A reboot is required to disable SELinux. Please login as root and run sipxecs-build after the reboot to continue building."
+        echo "A reboot is required to disable SELinux. Please login as sipx user and run sipxecs-build again after the reboot to continue building."
         
         read -p "Press Enter to reboot the system now: " 
 
@@ -262,7 +262,7 @@ function addRepos()
 {
     echo "Begin addRepos()"
 
-    if [ -z "${SIPXCOM_REPO}" ]; then
+    if [ ! -f "${SIPXCOM_REPO}" ]; then
         wget -O ${SIPXCOM_REPO} \
             https://storage.googleapis.com/sipxecs/sipxcom/${VERSION}/${PLATFORM}-${ARCHITECTURE}/sipxcom.repo
     fi

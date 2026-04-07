@@ -54,6 +54,8 @@ Execute the following commands to checkout the default sipXcom repository:
 
     git clone https://github.com/onrelay/sipxecs.git
 
+    git config --global --add safe.directory /src/sipxecs
+    
 
 If you are looking to build a specific branch, specify it as follows:
 
