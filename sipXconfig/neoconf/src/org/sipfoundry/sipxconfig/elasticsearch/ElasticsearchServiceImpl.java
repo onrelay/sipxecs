@@ -107,7 +107,7 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
                 RestClient restClient = RestClient.builder(new HttpHost(fqdn, m_port, "http")).build();
                 m_client = new ElasticsearchClient(new RestClientTransport(restClient, new JacksonJsonpMapper()));
             } catch (Exception e) {
-                LOG.error("Cannot create elasticsearch client, probably elasticsearch service is not up yet: " + e.getMessage());
+                LOG.warn("Cannot create elasticsearch client, probably elasticsearch service is not up yet: " + e.getMessage());
             }
         }
         return m_client;
@@ -116,12 +116,17 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
     @Override
     public void storeDoc(String index, SearchableBean source) {
         try {
+            ElasticsearchClient client = getClient();
+            if( client == null ) {
+                LOG.warn( "storeDoc - elasticsearch client not yet ready");
+                return;
+            }
             IndexRequest<SearchableBean> request = IndexRequest.of(i -> i
                 .index(index)
                 .id(source.getId())
                 .document(source)
             );
-            getClient().index(request);
+            client.index(request);
         } catch (IOException e) {
             LOG.error("Error indexing document into index " + index, e);
         }
@@ -132,6 +137,12 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
         if (sourceList.isEmpty()) return;
 
         try {
+            ElasticsearchClient client = getClient();
+            if( client == null ) {
+                LOG.warn( "storeBulkDocs - elasticsearch client not yet ready");
+                return;
+            }
+
             BulkRequest.Builder bulkBuilder = new BulkRequest.Builder();
             for (SearchableBean bean : sourceList) {
                 bulkBuilder.operations(op -> op
@@ -143,7 +154,7 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
                 );
             }
 
-            BulkResponse bulkResponse = getClient().bulk(bulkBuilder.build());
+            BulkResponse bulkResponse = client.bulk(bulkBuilder.build());
             if (bulkResponse.errors()) {
                 String errors = bulkResponse.items().stream()
                     .filter(item -> item.error() != null)
@@ -162,9 +173,16 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
             String indexName, Object filter, int start, int size, Class<T> clazz,
             String orderBy, boolean orderAscending) {
 
-        if (!checkIndexExists(indexName)) return Collections.emptyList();
-
         try {
+
+            ElasticsearchClient client = getClient();
+            if( client == null ) {
+                LOG.warn( "searchDocs - elasticsearch client not yet ready");
+                return Collections.emptyList();
+            }
+
+            if (!checkIndexExists(indexName)) return Collections.emptyList();
+
             SearchRequest.Builder searchReq = new SearchRequest.Builder()
                 .index(indexName)
                 .from(start)
@@ -187,7 +205,7 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
                 }
             }
 
-            SearchResponse<T> response = getClient().search(searchReq.build(), clazz);
+            SearchResponse<T> response = client.search(searchReq.build(), clazz);
             return response.hits().hits().stream()
                     .map(hit -> {
                         T obj = hit.source();
@@ -207,7 +225,13 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
         if (!checkIndexExists(indexName)) return null;
 
         try {
-            GetResponse<T> response = getClient().get(g -> g
+            ElasticsearchClient client = getClient();
+            if( client == null ) {
+                LOG.warn( "searchDocById - elasticsearch client not yet ready");
+                return null;
+            }
+
+            GetResponse<T> response = client.get(g -> g
                 .index(indexName)
                 .id(id), clazz);
             if (response.found()) {
@@ -277,9 +301,16 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
 
     @Override
     public int countDocs(String indexName, Object filter) {
-        if (!checkIndexExists(indexName)) return 0;
 
         try {
+            ElasticsearchClient client = getClient();
+            if( client == null ) {
+                LOG.warn( "countDocs - elasticsearch client not yet ready");
+                return 0;
+            }
+
+            if (!checkIndexExists(indexName)) return 0;
+
             CountRequest.Builder countReq = new CountRequest.Builder().index(indexName);
             if (filter instanceof co.elastic.clients.elasticsearch._types.query_dsl.Query) {
                 countReq.query((co.elastic.clients.elasticsearch._types.query_dsl.Query) filter);
@@ -287,7 +318,7 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
                 LOG.error(FILTERING_ERROR_MESSAGE);
             }
 
-            CountResponse response = getClient().count(countReq.build());
+            CountResponse response = client.count(countReq.build());
             return (int) response.count();
         } catch (IOException e) {
             LOG.error("Error counting documents on index " + indexName, e);
@@ -297,7 +328,13 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
 
     private boolean checkIndexExists(String indexName) {
         try {
-            BooleanResponse response = getClient().indices()
+            ElasticsearchClient client = getClient();
+            if( client == null ) {
+                LOG.warn( "checkIndexExists - elasticsearch client not yet ready");
+                return false;
+            }
+
+            BooleanResponse response = client.indices()
                 .exists(ExistsRequest.of(e -> e.index(indexName)));
             return response.value();
         } catch (IOException e) {
@@ -308,14 +345,21 @@ public class ElasticsearchServiceImpl implements SearchableService, FeatureProvi
 
     @Override
     public void deleteDocs(String indexName, Object filter) {
-        if (!checkIndexExists(indexName)) return;
-
-        if (!(filter instanceof co.elastic.clients.elasticsearch._types.query_dsl.Query)) {
-            LOG.error(FILTERING_ERROR_MESSAGE);
-            return;
-        }
 
         try {
+            ElasticsearchClient client = getClient();
+            if( client == null ) {
+                LOG.warn( "checkIndexExists - elasticsearch client not yet ready");
+                return;
+            }
+
+            if (!checkIndexExists(indexName)) return;
+
+            if (!(filter instanceof co.elastic.clients.elasticsearch._types.query_dsl.Query)) {
+                LOG.error(FILTERING_ERROR_MESSAGE);
+                return;
+            }
+
             DeleteByQueryRequest req = DeleteByQueryRequest.of(d -> d
                 .index(indexName)
                 .query((co.elastic.clients.elasticsearch._types.query_dsl.Query) filter)

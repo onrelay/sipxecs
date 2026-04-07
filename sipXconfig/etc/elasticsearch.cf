@@ -16,11 +16,13 @@
 #
 bundle agent elasticsearch {
 
+  classes:
+    "elasticsearch" expression => "any";
+
   methods:
     primary::
       "any" usebundle => elasticsearch_snmp_wrapper;
       "any" usebundle => elasticsearch_config;
-      "any" usebundle => elasticsearch_index_settings;
       "any" usebundle => elasticsearch_systemctl_running;
 }
 
@@ -61,9 +63,9 @@ bundle edit_line elasticsearch_java_wrapper {
 # Allows sipXecs SNMP process-name tracking
 #
 
-PIDFILE=\"/var/run/elasticsearch/elasticsearch.pid\"
+pidfile=\"/var/run/elasticsearch/elasticsearch.pid\"
 
-JavaCmd=`/usr/bin/sipx-config --java --pidfile \"${PIDFILE}\"`
+JavaCmd=`/usr/bin/sipx-config --java --pidfile \"${pidfile}\"`
 
 exec $JavaCmd \"$@\"
 ";
@@ -194,21 +196,6 @@ bundle edit_line elasticsearch_jvm_options {
       "-Djava.net.preferIPv4Stack=true";
 }
 
-# --- apply index replica policies ---
-bundle agent elasticsearch_index_settings {
-
-  commands:
-    any::
-      "/usr/bin/curl"
-        comment => "Set auto_expand_replicas=0-1 for all existing indices",
-        args => "-s -X PUT 'http://localhost:9200/_all/_settings?preserve_existing=true' -H 'Content-Type: application/json' -d '{\"index\":{\"auto_expand_replicas\":\"0-1\"}}'";
-
-      "/usr/bin/curl"
-        comment => "Template for new indices: auto_expand_replicas=0-1",
-        args => "-s -X PUT 'http://localhost:9200/_index_template/default_template' -H 'Content-Type: application/json' -d '{\"index_patterns\":[\"*\"],\"template\":{\"settings\":{\"auto_expand_replicas\":\"0-1\"}}}'";
-}
-
-# --- systemd control ---
 bundle agent elasticsearch_systemctl_running {
   vars:
     any::
