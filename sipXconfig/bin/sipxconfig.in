@@ -63,7 +63,7 @@ LogDir=@SIPX_LOGDIR@
 LogFile=${LogDir}/sipxconfig.log
 TmpDir=@SIPX_TMPDIR@
 UserName=@SIPXPBXUSER@
-HomeDir=/home/${UserName}
+HomeDir=@SIPX_CONFDIR@
 JettyHomeDir=@SIPX_JETTY_HOME@
 JettyBaseDir=@SIPX_CONFDIR@/jetty
 KeyStore=@SIPX_CONFDIR@/ssl/ssl-web.keystore
@@ -114,7 +114,7 @@ checkVarFolders() {
 databaseCommand() {
   clearIndexLocks
 
-  JavaCmd=`@bindir@/sipx-config --java`
+  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
 
   Command="$JavaCmd \
       -Dant.library.dir=${TmpDir} \

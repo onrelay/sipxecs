@@ -25,72 +25,76 @@ bundle agent 00_ssh
 {
   vars:
     "passphrase" string => "Cfengine passphrase";
-    "userdata_no" int => getfields("$(sipx.SIPXPBXUSER):.*", "/etc/passwd", ":", "userdata");
-    "home" string => "$(userdata[6])";
-    "sshdir" string => "$(home)/.ssh";
-    "ppkdir" string => "$(home)/.cfagent/ppkeys";
-    "pvkey" string => "$(ppkdir)/localhost.priv";
-    "nopasskey" string => "$(ppkdir)/localhost.nopass.priv";
-    "key_file" string => "$(sipx.SIPX_CFDATA)/primary.ssh.pub";
+    "home"       string => "$(sipx.SIPX_CONFDIR)";
+    "sshdir"     string => "$(home)/.ssh";
+    "ppkdir"     string => "$(home)/.cfagent/ppkeys";
+    "pvkey"      string => "$(ppkdir)/localhost.priv";
+    "nopasskey"  string => "$(ppkdir)/localhost.nopass.priv";
+    "key_file"   string => "$(sipx.SIPX_CFDATA)/primary.ssh.pub";
 
   classes:
+    "pvkey_exists"   expression => fileexists("$(pvkey)");
     "missing_nopass" not => fileexists("$(nopasskey)");
-    "old_nopass" expression => isnewerthan("$(pvkey)", "$(nopasskey)");
-    "missing_pub" not => fileexists("$(key_file)");
-    "old_pub" expression => isnewerthan("$(nopasskey)", "$(key_file)");
-    "keys_ready" expression => fileexists("$(key_file)");
+    "old_nopass"     expression => isnewerthan("$(pvkey)", "$(nopasskey)");
+    
+    "nopass_ready"   expression => fileexists("$(nopasskey)");
+    "missing_pub"    not => fileexists("$(key_file)");
+    "old_pub"        expression => isnewerthan("$(nopasskey)", "$(key_file)");
+    
+    "keys_ready"     expression => returnszero("/usr/bin/test -s $(key_file)", "noshell");
 
   files:
-    # ensure .ssh directory exists
-    "$(sshdir)/."
-      create => "true",
-      perms  => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+    "$(home)/."   
+      perms => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"), 
+      create => "true";
 
-    # ensure nopass private key file path exists (will be created/updated by commands)
-    "$(nopasskey)"
-      create => "true",
-      perms  => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
+    "$(sshdir)/." 
+      perms => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"), 
+      create => "true";
+      
+    "$(ppkdir)/." 
+      perms => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"), 
+      create => "true";
 
-    # ensure public key path exists (ssh-keygen will populate)
-    "$(key_file)"
-      create => "true",
-      perms  => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
-
-  # Create/edit authorized_keys ONLY when keys_ready (i.e. key_file exists)
-  files:
     keys_ready::
       "$(sshdir)/authorized_keys"
         create => "true",
         perms  => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
         edit_line => authorized_sipx_commands;
 
-  commands:
-    # create non-passphrase private key if missing or older than source pvkey
-    primary.(missing_nopass|old_nopass)::
-      "/usr/bin/openssl"
-        comment => "Generate nopass private key",
-        args => "rsa -in $(pvkey) -passin 'pass:$(passphrase)' -out $(nopasskey)";
+    nopass_ready::
+      "$(nopasskey)"
+        perms => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
-    # generate public key from nopass private key when needed
-    primary.(missing_pub|old_pub)::
+  commands:
+    # 1. Mimic 'set_nonroot_keys' if the file is missing
+    primary.!pvkey_exists::
+      "/bin/su"
+        args => "- $(sipx.SIPXPBXUSER) -c '/usr/local/sbin/cf-key'",
+        comment => "Generate initial keys as sipx user to fix timing issue";
+
+    # 2. Convert to nopass (waits for Step 1)
+    primary.pvkey_exists.(missing_nopass|old_nopass)::
+      "/usr/bin/openssl"
+        args => "rsa -in $(pvkey) -passin 'pass:$(passphrase)' -out $(nopasskey)",
+        contain => in_shell;
+
+    # 3. Extract public key (waits for Step 2)
+    primary.nopass_ready.(missing_pub|old_pub)::
       "/usr/bin/ssh-keygen"
-        comment => "Generate public key from nopass private key",
         args => "-y -f $(nopasskey) > $(key_file)",
         contain => in_shell;
 }
 
-# edit_line bundle that is safe because it's only invoked after keys_ready:: on authorized_keys
 bundle edit_line authorized_sipx_commands
 {
   vars:
     any::
-      # read the public key; should exist when this bundle is invoked
-      "key" string => readfile("$(00_ssh.key_file)", "1000");
+      "key" string => readfile("$(00_ssh.key_file)", "2000");
 
   delete_lines:
     "^.*\\ssipx@primary$";
 
   insert_lines:
-    # do NOT include ${SSH_ORIGINAL_COMMAND} here — the wrapper should use it
     "from=\"$(sipx.master_address)\",command=\"$(sipx.SIPX_LIBEXECDIR)/sipx-allow-command\" $(key) sipx@primary";
 }

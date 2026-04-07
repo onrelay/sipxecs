@@ -1,5 +1,5 @@
 #!/bin/sh
-conf=/home/sipx/.ssh/authorized_sipx_commands
+conf=@SIPX_CONFDIR@/.ssh/authorized_sipx_commands
 if ! test -f "$conf"; then
    echo "No configured command" >&2
    exit 1

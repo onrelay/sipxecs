@@ -539,8 +539,7 @@ body contain timeout(sec) {
 bundle agent allow_ssh_command(command) {
 
   vars:
-    "userdata_no" int => getfields("$(sipx.SIPXPBXUSER):.*", "/etc/passwd", ":", "userdata");
-    "home" string => "$(userdata[6])";
+    "home" string => "$(sipx.SIPX_CONFDIR)";
     "sshdir" string => "$(home)/.ssh";
 
   files:
@@ -562,13 +561,12 @@ bundle agent allow_ssh_command(command) {
 bundle agent disallow_ssh_command(command) {
 
   vars:
-    "userdata_no" int => getfields("$(sipx.SIPXPBXUSER):.*", "/etc/passwd", ":", "userdata");
-    "home" string => "$(userdata[6])";
+    "home" string => "$(sipx.SIPX_CONFDIR)";
     "sshdir" string => "$(home)/.ssh";
 
   files:
     any::
-      "$(sshdir)/.ssh/authorized_sipx_commands"
+      "$(sshdir)/authorized_sipx_commands"
         create => "false",
         perms => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
         edit_line => delete_lines_matching("^$(command)$");
