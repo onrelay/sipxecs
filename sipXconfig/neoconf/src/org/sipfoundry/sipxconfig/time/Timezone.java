@@ -66,7 +66,6 @@ public class Timezone {
     public String getInitialTimezone() {
         String returnStr = EMPTY_STRING;
         Reader readerForTimezoneIni = getReaderForTimezoneIni();
-        boolean found = false;
         try {
             if (readerForTimezoneIni != null) {
                 BufferedReader in = new BufferedReader(readerForTimezoneIni);
@@ -76,9 +75,6 @@ public class Timezone {
             LOG.error(ERROR_MSG, e);
         } finally {
             IOUtils.closeQuietly(readerForTimezoneIni);
-        }
-        if (!found) {
-            LOG.error(ERROR_MSG);
         }
         return returnStr;
     }

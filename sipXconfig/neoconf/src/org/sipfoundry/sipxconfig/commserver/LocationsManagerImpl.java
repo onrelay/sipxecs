@@ -128,7 +128,7 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
                 throw new UserException(DUPLICATE_FQDN_OR_IP, location.getFqdn(), location.getAddress());
             }
         }
-        super.saveEntity(location);
+        super.saveEntity(location, false ); // Don't publish
     }
 
     private boolean isFqdnOrIpInUseExceptThis(Location location) {
@@ -230,7 +230,7 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
             primary.setStunAddress(m_defaultStunServer);
             primary.setStunPort(m_defaultStunPort);
             primary.setState(State.CONFIGURED);
-            saveLocation(primary);
+            saveLocation(primary); // Too early to publish save
         }
         return true;
     }

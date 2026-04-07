@@ -178,6 +178,10 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
     }
 
     public <S extends Object> void saveEntity(S entity) {
+        saveEntity( entity, true );
+    }
+
+    public <S extends Object> void saveEntity(S entity, boolean publish ) {
 
         boolean isNew = false;
 
@@ -186,14 +190,18 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
         }
 
         if( isNew ) {
-            persistEntity( entity );
+            persistEntity( entity, publish );
         }
         else {
-            mergeEntity( entity );
+            mergeEntity( entity, publish );
         }
     }
 
     public <S extends Object> void persistEntity(S entity) {
+        persistEntity( entity, true );
+    }
+
+    public <S extends Object> void persistEntity(S entity, boolean publish ) {
         
         getSessionFactory().inTransaction( session -> {
             
@@ -204,7 +212,9 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
                 session.flush();
 
-                getDaoEventPublisher().publishSave(entity);
+                if( publish ) {
+                    getDaoEventPublisher().publishSave(entity);
+                }
 
             } catch( IllegalStateException e ) {
                 throw new RuntimeException(e);
@@ -213,6 +223,11 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
     }
 
     public <S extends Object> void mergeEntity(S entity) {
+        mergeEntity( entity, true );
+    }
+
+
+    public <S extends Object> void mergeEntity(S entity, boolean publish ) {
 
         getSessionFactory().inTransaction( session -> {
             
@@ -229,7 +244,9 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
 
                     session.flush();
 
-                    getDaoEventPublisher().publishSave(entity);
+                    if( publish ) {
+                        getDaoEventPublisher().publishSave(entity);
+                    }
 
                 }
 

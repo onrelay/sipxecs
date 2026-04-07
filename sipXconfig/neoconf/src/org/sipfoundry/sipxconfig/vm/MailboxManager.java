@@ -54,7 +54,7 @@ public interface MailboxManager {
      */
     PersonalAttendant loadPersonalAttendantForUser(User user);
     /**
-     * Load a PA for a user, return null if it does not exist
+     * Retrieve a PA for a user, return null if it does not exist
      * @param user
      * @return
      */

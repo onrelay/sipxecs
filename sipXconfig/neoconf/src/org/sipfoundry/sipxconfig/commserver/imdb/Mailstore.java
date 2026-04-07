@@ -166,7 +166,7 @@ public class Mailstore extends AbstractDataSetGenerator {
         } else {
             putOnlyIfNotNull(top, PLAY_DEFAULT_VM, false);
         }
-        PersonalAttendant pa = m_mailboxManager.loadPersonalAttendantForUser(user);
+        PersonalAttendant pa = m_mailboxManager.getPersonalAttendantForUser(user);
         if (pa != null) {
             Document pao = new Document();
             if (StringUtils.isNotEmpty(user.getOperator())) {
