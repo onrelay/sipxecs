@@ -16,6 +16,8 @@ Setup sipXcom repo
   
   .. code-block:: bash
 
+    dnf install -y wget
+
     wget -O /etc/yum.repos.d/sipxcom.repo \
       https://storage.googleapis.com/sipxecs/sipxcom/25.01/rocky-9-x86_64/sipxcom.repo
     

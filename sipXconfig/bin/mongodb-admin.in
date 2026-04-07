@@ -415,7 +415,7 @@ class MongoRSAdmin:
         for stype in ['servers', 'arbiters']:
             if stype in self.model:
                 if host_port in self.model[stype]:
-                    return self.model[stype][host_port]
+                    return self.model[stype]
         raise Exception('Could not find node ' + host_port)
 
     def isLocal(self):

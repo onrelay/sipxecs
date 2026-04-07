@@ -115,8 +115,6 @@ Update OS and Install Basic Dependencies
 
     dnf update -y
 
-    dnf install -y wget
-
 Setup Google Could Artifact registry
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -124,10 +122,12 @@ If you are NOT using a Google Cloud image, you must add and install their artifa
 
   .. code-block:: bash
 
+    dnf install -y wget
+
     wget -O /etc/yum.repos.d/artifact-registry-plugin.repo \
       https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
     
-    yum install -y yum-plugin-artifact-registry
+    dnf install -y yum-plugin-artifact-registry
 
 
 Reboot

@@ -92,7 +92,7 @@ function checkInput()
             shift
             ;;
             -o=*|--install-options=*)
-            INSTALL_OPTIONS="${o#*=}"
+            INSTALL_OPTIONS="${i#*=}"
             shift
             ;;
             -b|--build)
@@ -263,6 +263,9 @@ function addRepos()
     echo "Begin addRepos()"
 
     if [ ! -f "${SIPXCOM_REPO}" ]; then
+
+        yum install -y wget
+
         wget -O ${SIPXCOM_REPO} \
             https://storage.googleapis.com/sipxecs/sipxcom/${VERSION}/${PLATFORM}-${ARCHITECTURE}/sipxcom.repo
     fi
