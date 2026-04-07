@@ -16,11 +16,14 @@ Add sipx User
 
 sipXcom must be built by a user called *sipx* with sudo privileges. 
 
-- Add the *sipx* user:
+- Add the *sipx* group andd user:
 
     .. code-block:: bash
 
-        useradd -m sipx
+        groupadd -r sipx
+
+        useradd -M -r -g sipx -d /etc/sipxpbx -s /bin/bash -c sipx sipx
+
   
 - If not on desktop docker, protect the sipx user with a password:
   

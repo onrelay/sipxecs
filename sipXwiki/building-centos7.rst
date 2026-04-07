@@ -57,7 +57,8 @@ sipXcom must be built by a user called *sipx* with sudo privileges.
 
     .. code-block:: bash
 
-        useradd -M -r -g sipx -d /etc/sipxpbx -s /bin/bash -c sipx sipx
+        useradd -m sipx
+
 
   
 - If not on desktop docker, protect the sipx user with a password:
