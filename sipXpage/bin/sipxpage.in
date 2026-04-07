@@ -21,7 +21,6 @@ start() {
   Dependencies=`@SIPX_BINDIR@/java-dep -d @SIPX_JAVADIR@/sipXcommons @page_PKGS@`
   export CLASSPATH=`echo @SIPX_JAVADIR@/sipXpage/*.jar ${Dependencies} | sed -e 's/ /:/g'`
 
-  # -Dprocname is there so cfengine can find it
   Command="$JavaCmd \
     -Dconf.dir=@SIPX_CONFDIR@ \
     -Dlog.dir=@SIPX_LOGDIR@ \

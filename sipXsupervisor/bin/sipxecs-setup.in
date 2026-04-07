@@ -760,15 +760,19 @@ update_config_access
 if !ok
   puts "sipxconfig start failed."
   exit 1
-else
-  # Wait for sipxconfig service restart to complete
-  system("systemctl restart sipxconfig") || exit(1)
-  system("systemctl is-active --quiet sipxconfig") || exit(1)
+end
 
-  puts "done."
-  net = get_network
-  if is_primary?
-    puts <<EOL
+# Wait for sipxconfig service restart to complete
+ok = run_command("/etc/init.d/sipxconfig restart")
+if !ok
+  puts "sipxconfig restart failed."
+  exit 1
+end
+
+puts "done."
+net = get_network
+if is_primary?
+  puts <<EOL
 \n
 In a few more minutes you will be able to access the administration
 interface from your web browser at the following URL:
@@ -779,4 +783,4 @@ EOL
   end
   exit 0
 end
-end
+

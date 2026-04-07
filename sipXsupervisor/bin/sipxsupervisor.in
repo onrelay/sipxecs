@@ -18,13 +18,12 @@ progname="sipxsupervisor"
 configid=/run/${progname}-configid
 pidfolder="/run/sipxpbx/${progname}"
 pidfile="$pidfolder/${progname}.pid"
+sipxagentlockfile="@SIPX_RUNDIR@/sipxsupervisor/sipxagent.lock"
 regex="^$exec"
 
 [ -e /etc/sysconfig/sipxsupervisor ] && . /etc/sysconfig/sipxsupervisor
 
 start() {
-  echo -n $"Starting $prog: "
-
   [ -x $exec ] || { echo -n "$execError"; echo_failure; exit $ENOEXEC; }
   [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; exit $ENOENT; }
   checkRunningProcess "${pidfile}" "${regex}" > /dev/null 2>&1
@@ -38,35 +37,17 @@ start() {
 
   if [ $# -gt 0 ]; then
     checkRunningProcessTimeout "${pidfile}" "${regex}" $maxTimeout > /dev/null 2>&1
-    Status=$?
-    [ $Status -eq $ESRCH ] && { echo_failure; exit $ESRCH; }
-
-    #sipxagent running
-    checkIfProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
-    Status=$?
-    [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
-    [ $Status -eq 0 ] && { echo_success; return $Status; }
-  else
-    [ $Status -eq 0 ] && { echo_success; }
-    [ $Status -eq 0 ] || { echo_failure; }
-    return $Status
   fi
-  
 
+  [ $Status -eq 0 ] || { echo_failure; exit $Status; }
+  [ $Status -eq 0 ] && { echo_success;}
+  
   #if sipxagent is not running make sure the host is pulling the last configuration on startup.
   #this applies in cases when secondary host starts after master, and master changed configuration
   #while the secondary is down. sipxagent has to be run as root because we don't want to go through
   #supervisor again
-  if [ ! -f "${pidfile}" ]; then
+  if [ ! -f $sipxagentlockfile ]; then
     runuser - root -s @SIPX_BINDIR@/sipxagent
-    Status=$?
-
-    if [ $# -gt 0 ]; then
-      checkIfProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
-      Status=$?
-      [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
-      [ $Status -eq 0 ] && { echo_success; return 0; }
-    fi
   fi
 }
 

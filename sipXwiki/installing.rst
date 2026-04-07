@@ -30,18 +30,6 @@ Enable additional repos
     dnf config-manager --set-enabled crb
 
 
-Enable elasticsearch
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  .. code-block:: bash
-
-    yum install -y elasticsearch
-
-    systemctl enable elasticsearch
-
-    service elasticsearch start
-
-
 Install and Setup sipXcom
 --------------------------
   
