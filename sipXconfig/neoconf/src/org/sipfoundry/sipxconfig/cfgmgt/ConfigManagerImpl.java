@@ -28,6 +28,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -77,7 +79,7 @@ public class ConfigManagerImpl implements AddressProvider, ConfigManager, BeanFa
     private ListableBeanFactory m_beanFactory;
     private final int m_sleepInterval = 7000;
     private final ConfigWorker m_worker = new ConfigWorker();
-    private final ConfigRequest[] m_outstandingRequest = new ConfigRequest[1];
+    private final AtomicReference<ConfigRequest> m_outstandingRequest = new AtomicReference<>();
     private ConfigAgent m_configAgent;
     private RunBundleAgent m_runAgent;
     private SipxReplicationContext m_sipxReplicationContext;
@@ -91,14 +93,14 @@ public class ConfigManagerImpl implements AddressProvider, ConfigManager, BeanFa
     // check host name with key.
     private String m_remoteCommand = "/usr/bin/ssh -o 'StrictHostKeyChecking=no' -i %s/.cfagent/ppkeys/localhost.nopass.priv %s@%s";
     private String m_remoteHostsFile = "%s/.ssh/known_hosts";
-    private boolean m_flag;
+    private AtomicBoolean m_flag = new AtomicBoolean(false);
     private SystemAuditManager m_systemAuditManager;
     private ApplicationContext m_applicationContext;
 
     @Override
-    public synchronized void configureEverywhere(Feature... features) {
+    public void configureEverywhere(Feature... features) {
         // (re)start timer
-        m_outstandingRequest[0] = ConfigRequest.merge(ConfigRequest.only(features), m_outstandingRequest[0]);
+        m_outstandingRequest.set(ConfigRequest.merge(ConfigRequest.only(features), m_outstandingRequest.get()));
         notifyWorker();
     }
 
@@ -127,21 +129,21 @@ public class ConfigManagerImpl implements AddressProvider, ConfigManager, BeanFa
     }
 
     @Override
-    public synchronized void configureAllFeaturesEverywhere() {
-        m_outstandingRequest[0] = ConfigRequest.merge(ConfigRequest.always(), m_outstandingRequest[0]);
+    public void configureAllFeaturesEverywhere() {
+        m_outstandingRequest.set(ConfigRequest.merge(ConfigRequest.always(), m_outstandingRequest.get()));
         notifyWorker();
     }
 
     @Override
-    public synchronized void configureAllFeatures(Collection<Location> locations) {
-        m_outstandingRequest[0] = ConfigRequest.merge(ConfigRequest.only(locations), m_outstandingRequest[0]);
+    public void configureAllFeatures(Collection<Location> locations) {
+        m_outstandingRequest.set(ConfigRequest.merge(ConfigRequest.only(locations), m_outstandingRequest.get()));
         notifyWorker();
     }
 
     @Override
-    public synchronized void regenerateMongo(Collection<Location> locations) {
+    public void regenerateMongo(Collection<Location> locations) {
         if (locations.contains(m_locationManager.getPrimaryLocation())) {
-            m_flag = true;
+            m_flag.set(true);
             m_sipxReplicationContext.generateAll();
         }
     }
@@ -150,20 +152,18 @@ public class ConfigManagerImpl implements AddressProvider, ConfigManager, BeanFa
     public void sendProfiles(Collection<Location> locations) {
         regenerateMongo(locations);
         configureAllFeatures(locations);
-        m_outstandingRequest[0].setSendProfiles(true);
+        m_outstandingRequest.get().setSendProfiles(true);
         for (Location location : locations) {
             m_systemAuditManager.onConfigChangeAction(location, ConfigChangeAction.SEND_PROFILE, null, null, null);
         }
     }
 
-    public synchronized boolean hasWork() {
-        return m_outstandingRequest[0] != null;
+    public boolean hasWork() {
+        return m_outstandingRequest.get() != null;
     }
 
-    public synchronized ConfigRequest getWork() {
-        ConfigRequest work = m_outstandingRequest[0];
-        m_outstandingRequest[0] = null;
-        return work;
+    public ConfigRequest getWork() {
+        return m_outstandingRequest.getAndSet(null);
     }
 
     @Override
@@ -211,7 +211,7 @@ public class ConfigManagerImpl implements AddressProvider, ConfigManager, BeanFa
     private void runProviders(ConfigRequest request, String jobLabel) {
         synchronized (m_lock) {
             try {
-                while (m_flag) {
+                while (m_flag.get()) {
                     m_lock.wait();
                 }
             } catch (InterruptedException e) {
@@ -535,7 +535,7 @@ public class ConfigManagerImpl implements AddressProvider, ConfigManager, BeanFa
     @Override
     public void onApplicationEvent(MongoGenerationFinishedEvent event) {
         synchronized (m_lock) {
-            m_flag = false;
+            m_flag.set(false);
             m_lock.notifyAll();
         }
     }

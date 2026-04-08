@@ -100,10 +100,10 @@
     <property name="maxIdleTime">
       <value>900000</value>
     </property>
-    <!-- Maximum number of Connections a pool will maintain at any given time.  Default: 15.
-      Use the default. -->
+    <!-- Maximum number of Connections a pool will maintain at any given time, 
+     standard default is 15, but we set it higher in a DB property since setup may exhaust it and lock up -->
     <property name="maxPoolSize">
-      <value>15</value>
+      <value>${sipxconfig.db.maxPoolSize:15}</value>
     </property>
     <!-- Minimum number of Connections a pool will maintain at any given time.  Default: 3.
       Use the default. -->
