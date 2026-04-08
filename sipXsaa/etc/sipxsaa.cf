@@ -100,7 +100,7 @@ bundle agent sipxsaa_running {
     sipxsaa.sipxsaa_running.(restart_sipxsaa|restart_sipxecs)::
       "$(sipx.SIPX_SERVICEDIR)/sipxsaa"
         comment => "restart sipxsaa",
-        args => "asyncrestart";
+        args => "restart";
                   
     sipxsaa.sipxsaa_running.refresh_sipxsaa::
       "/usr/bin/killall"

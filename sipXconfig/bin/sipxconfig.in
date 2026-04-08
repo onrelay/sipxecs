@@ -236,7 +236,7 @@ runTask() {
   databaseVersionCheck    
   buildCommand
   Command="$Command org.sipfoundry.sipxconfig.common.SystemTaskRunner $*"
-  runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command}"
+  runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command}" > /dev/null 2>&1
   Status=$?
 }
 

@@ -160,7 +160,7 @@ bundle agent sipxproxy_running {
     sipxproxy.sipxproxy_running.(restart_sipxproxy|restart_sipxecs|change_password|ssl_repaired)::
       "$(sipx.SIPX_SERVICEDIR)/sipxproxy"
         comment => "restart sipxproxy",
-        args => "asyncrestart";
+        args => "restart";
 
     redeploy_nat.sipxrelay::
       "$(sipx.SIPX_SERVICEDIR)/sipxrelay"

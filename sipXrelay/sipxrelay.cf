@@ -59,7 +59,7 @@ bundle agent sipxrelay_running {
     sipxrelay.sipxrelay_running.(restart_sipxrelay|restart_sipxecs)::
       "$(sipx.SIPX_SERVICEDIR)/sipxrelay"
         comment => "restart sipxrelay",
-        args => "asyncrestart";
+        args => "restart";
 
     (!sipxrelay|stop_sipxecs).sipxrelay_running::
       "$(sipx.SIPX_SERVICEDIR)/sipxrelay"
