@@ -101,9 +101,9 @@
       <value>900000</value>
     </property>
     <!-- Maximum number of Connections a pool will maintain at any given time, 
-     standard default is 15, but we set it higher in a DB property since setup may exhaust it and lock up -->
+     standard default is 15, but we set it higher since setup may exhaust it and lock up -->
     <property name="maxPoolSize">
-      <value>${sipxconfig.db.maxPoolSize:15}</value>
+      <value>50</value>
     </property>
     <!-- Minimum number of Connections a pool will maintain at any given time.  Default: 3.
       Use the default. -->
