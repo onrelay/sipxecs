@@ -164,8 +164,9 @@ public class RegionApi extends ServerResource {
     }
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         Region r = m_regionManager.getRegion(m_regionId);
         m_regionManager.deleteRegion(r);
+        return null;
     }
 }

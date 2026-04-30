@@ -15,18 +15,25 @@
     in DEBUG builds. Since Tapestry pages enforce authorization through pageValidate of their Border component,
     filterInvocationInterceptor is not added to the chain for the remaining URLs.
   -->
+
   <bean id="sipxFilterChainProxy" class="org.sipfoundry.sipxconfig.security.SipxFilterChainProxy">
     <constructor-arg name="filterChains">
       <util:list>
         <security:filter-chain pattern="/initial-config/**"
             filters="lazySecurityContextPersistenceFilter,basicAuthenticationFilter,basicExceptionTranslationFilter,filterInvocationInterceptor" />
-        <security:filter-chain pattern="/rest/private/[^/]{32}/**"
+        <security:filter-chain pattern="/rest/private/*/**"
             filters="lazySecurityContextPersistenceFilter,privateUserKeyProcessingFilter,digestExceptionTranslationFilter,filterInvocationInterceptor" />
         <security:filter-chain pattern="/rest/avatar/**"
             filters="lazySecurityContextPersistenceFilter,basicAuthenticationFilter,digestAuthenticationFilter,digestExceptionTranslationFilter,anonymousProcessingFilter,filterInvocationInterceptor" />
-        <security:filter-chain pattern="/(services|rest|api)/**"
+        <security:filter-chain pattern="/services/**"
             filters="lazySecurityContextPersistenceFilter,optionsAuthFilter,basicAuthenticationFilter,digestAuthenticationFilter,digestExceptionTranslationFilter,filterInvocationInterceptor" />
-        <security:filter-chain pattern="/(TestPage|FirstUser).html"
+        <security:filter-chain pattern="/rest/**"
+            filters="lazySecurityContextPersistenceFilter,optionsAuthFilter,basicAuthenticationFilter,digestAuthenticationFilter,digestExceptionTranslationFilter,filterInvocationInterceptor" />
+        <security:filter-chain pattern="/api/**"
+            filters="lazySecurityContextPersistenceFilter,optionsAuthFilter,basicAuthenticationFilter,digestAuthenticationFilter,digestExceptionTranslationFilter,filterInvocationInterceptor" />
+        <security:filter-chain pattern="/TestPage.html"
+            filters="securityContextPersistenceFilter" />
+        <security:filter-chain pattern="/FirstUser.html"
             filters="securityContextPersistenceFilter" />
         <security:filter-chain pattern="/**"
             filters="securityContextPersistenceFilter,authenticationProcessingFilter,loginExceptionTranslationFilter,filterInvocationInterceptor" />
@@ -35,6 +42,7 @@
     <property name="domainManager" ref="domainManager" />
     <property name="adminContext" ref="adminContextImpl" />
   </bean>
+
 
   <!-- ======================== AUTHENTICATION ======================= -->
   <bean id="authenticationManager" class="org.springframework.security.authentication.ProviderManager">
@@ -221,17 +229,20 @@
     <property name="securityMetadataSource" ref="webSecurityMetadataSource"/>
   </bean>
 
-  <security:filter-security-metadata-source request-matcher="ciRegex" id="webSecurityMetadataSource" use-expressions="false">
-    <security:intercept-url pattern="/rest/auto-attendant/.*/special" access="ROLE_ADMIN,ROLE_ATTENDANT_ADMIN"/>
-    <security:intercept-url pattern="/rest/auto-attendant/specialmode" access="ROLE_ADMIN,ROLE_ATTENDANT_ADMIN"/>
-    <security:intercept-url pattern="/rest/auto-attendant" access="ROLE_ADMIN,ROLE_ATTENDANT_ADMIN"/>
-    <security:intercept-url pattern="/rest/call/.*" access="ROLE_USER"/>
-    <security:intercept-url pattern="/(rest|api)/my/.*" access="ROLE_USER"/>
-    <security:intercept-url pattern="/rest/avatar/.*" access="ROLE_ANONYMOUS,ROLE_ADMIN,ROLE_USER"/>
-    <security:intercept-url pattern="/rest/private/.*" access="ROLE_USER"/>
-    <security:intercept-url pattern="/(services|rest|api)/.*" access="ROLE_ADMIN,ROLE_REST"/>
-    <security:intercept-url pattern="/initial-config/.*" access="ROLE_LOCATION"/>
-  </security:filter-security-metadata-source>
+<security:filter-security-metadata-source request-matcher="ant" id="webSecurityMetadataSource" use-expressions="false">
+    <security:intercept-url pattern="/sipxconfig/rest/auto-attendant/*/special" access="ROLE_ADMIN,ROLE_ATTENDANT_ADMIN"/>
+    <security:intercept-url pattern="/sipxconfig/rest/auto-attendant/specialmode/**" access="ROLE_ADMIN,ROLE_ATTENDANT_ADMIN"/>
+    <security:intercept-url pattern="/sipxconfig/rest/auto-attendant/**" access="ROLE_ADMIN,ROLE_ATTENDANT_ADMIN"/>
+    <security:intercept-url pattern="/sipxconfig/rest/call/**" access="ROLE_USER"/>
+    <security:intercept-url pattern="/sipxconfig/rest/my/**" access="ROLE_USER"/>
+    <security:intercept-url pattern="/sipxconfig/api/my/**" access="ROLE_USER"/>
+    <security:intercept-url pattern="/sipxconfig/rest/avatar/**" access="ROLE_ANONYMOUS,ROLE_ADMIN,ROLE_USER"/>
+    <security:intercept-url pattern="/sipxconfig/rest/private/**" access="ROLE_USER"/>
+    <security:intercept-url pattern="/sipxconfig/services/**" access="ROLE_ADMIN,ROLE_REST"/>
+    <security:intercept-url pattern="/sipxconfig/rest/**" access="ROLE_ADMIN,ROLE_REST"/>
+    <security:intercept-url pattern="/sipxconfig/api/**" access="ROLE_ADMIN,ROLE_REST"/>
+    <security:intercept-url pattern="/sipxconfig/initial-config/**" access="ROLE_LOCATION"/>
+</security:filter-security-metadata-source>
 
   <bean id="ldapAuthProvider" class="org.sipfoundry.sipxconfig.security.ConfigurableLdapAuthenticationProvider">
     <property name="userDetailsService" ref="sharedSecretUserDetailsService" />

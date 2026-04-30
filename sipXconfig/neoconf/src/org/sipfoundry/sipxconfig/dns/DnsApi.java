@@ -257,9 +257,10 @@ public class DnsApi extends ServerResource {
 
     // DELETE
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         DnsFailoverPlan plan = m_dnsManager.getPlan(m_planId);
         m_dnsManager.deletePlan(plan);
+        return null;
     }
 
     void writePlan(Writer json, DnsFailoverPlan plan) throws IOException {

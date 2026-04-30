@@ -96,9 +96,10 @@ public class DnsViewApi extends ServerResource {
     }
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         DnsView view = m_dnsManager.getViewById(m_viewId);
         m_dnsManager.deleteView(view);
+        return null;
     }
 
     @Post

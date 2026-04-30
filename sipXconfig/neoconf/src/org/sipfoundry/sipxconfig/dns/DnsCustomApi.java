@@ -97,9 +97,10 @@ public class DnsCustomApi extends ServerResource {
     }
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         DnsCustomRecords custom = m_dnsManager.getCustomRecordsById(m_customId);
         m_dnsManager.deleteCustomRecords(custom);
+        return null;
     }
 
     DnsCustomRecords readCustom(Reader in) throws ResourceException, IOException {

@@ -24,7 +24,7 @@ import org.apache.cxf.jaxrs.model.wadl.Description;
 @Produces({
     MediaType.APPLICATION_JSON, MediaType.TEXT_XML, MediaType.APPLICATION_XML
 })
-@Description("REST Server Management REST API")
+@Description("Management REST API")
 public interface RestServerApi extends ServiceSettingsApi {
 
 }
