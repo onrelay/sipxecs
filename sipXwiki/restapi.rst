@@ -3002,10 +3002,10 @@ Filter registrations by servers
 
 **Unsupported HTTP Method:** PUT, POST
 
-REST server
+REST API
 -----------
 
-View REST server settings
+View REST API settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Resource URI:** /restserver/settings
@@ -3023,7 +3023,7 @@ View REST server settings
 **Specific Response Codes:** N/A
 
 **HTTP Method:** GET
-  Retrieves a list of all REST server settings in the system.
+  Retrieves a list of all REST API settings in the system.
 
 **Example**::
 
@@ -3031,7 +3031,7 @@ View REST server settings
 
 **Unsupported HTTP Method:** PUT, POST, DELETE
 
-View or modify REST server settings
+View or modify REST API settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **Resource URI:** /restserver/settings/{settingPath}
@@ -3049,14 +3049,14 @@ View or modify REST server settings
 **Specific Response Codes:** N/A
 
 **HTTP Method:** GET
-  Retrieves REST server options of the specified path.
+  Retrieves REST API options of the specified path.
 
 **Example**::
 
   foo
 
 **HTTP Method:** PUT
-  Modifies REST server options for the specified path.
+  Modifies REST API options for the specified path.
 
 **Example**::
 

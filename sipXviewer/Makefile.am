@@ -6,7 +6,6 @@ include config/project.am
 	installer/README.html \
 	installer/LICENSES \
 	installer/icons/logo.png \
-	installer/icons/sipxconfig-logo.png \
 	installer/startup/sipviewer \
 	installer/startup/start-sipviewer.bat \
 	installer/tools/izpack-install.xml \

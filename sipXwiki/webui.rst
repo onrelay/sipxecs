@@ -889,7 +889,7 @@ This page allows you to enable automatic packet captures using tcpdump.
 Services
 --------
 
-The Services menu has the CDR, Conference Recording, DNS, FTP Server, Instant Messaging, Log Watcher, Media Services, MWI, My Buddy, Phone Provision, Rest Server, SAA/BLA, Service Msg Queue, RLS, SIP Proxy, SIP Registrar, SIP Trunk, SNMP, and Voicemail options.
+The Services menu has the CDR, Conference Recording, DNS, FTP Server, Instant Messaging, Log Watcher, Media Services, MWI, My Buddy, Phone Provision, Rest API, SAA/BLA, Service Msg Queue, RLS, SIP Proxy, SIP Registrar, SIP Trunk, SNMP, and Voicemail options.
 
 .. _cdr-service:
 
@@ -1191,7 +1191,7 @@ The settings tab allows fine tuning of the FTP (vsftpd) service.
 
 .. _rest-server:
 
-Rest Server
+Rest API
 ~~~~~~~~~~~
 
   .. image:: system_services_rest.png
