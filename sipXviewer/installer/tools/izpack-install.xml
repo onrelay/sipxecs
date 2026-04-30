@@ -15,10 +15,10 @@
     </variables>
     <resources>
         <res id="LicencePanel.licence" src="LICENSES/LICENSE.txt"/>
-	<res src="icons/sipxconfig-logo.png" id="Installer.image.0" />
-	<res src="icons/sipxconfig-logo.png" id="Installer.image.1" />
-	<res src="icons/sipxconfig-logo.png" id="Installer.image.2" />
-	<res src="icons/sipxconfig-logo.png" id="Installer.image.3" />
+		<res src="icons/logo.png" id="Installer.image.0" />
+		<res src="icons/logo.png" id="Installer.image.1" />
+		<res src="icons/logo.png" id="Installer.image.2" />
+		<res src="icons/logo.png" id="Installer.image.3" />
         <res src="tools/windows-izpack-shortcut.xml" id="shortcutSpec.xml" />
     </resources>
 
