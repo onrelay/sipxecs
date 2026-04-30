@@ -100,10 +100,18 @@ public class MailboxServlet extends HttpServlet {
         // only superadmin and mailbox owner can access this service
         // TODO allow all admin user to access it
 
+         LOG.info(String.format("MailboxServlet::doIt method: %s path: %s port: %d user: %s", 
+            method, 
+            pathInfo, 
+            request.getLocalPort(), 
+            user.getUserName()));
+
         if (user != null && ServletUtil.isForbidden(request, user.getUserName(), request.getLocalPort(), ivrConfig.getHttpPort())) {
+            LOG.warn("MailboxServlet::doIt - request is forbidden" );
             response.sendError(403); // Send 403 Forbidden
             return;
         }
+
 
         // delete mailbox could come only from a internal port, when user already deleted from
         // mongo
@@ -113,9 +121,11 @@ public class MailboxServlet extends HttpServlet {
                     try {
                         mailboxManager.deleteMailbox(mailboxString);
                     } catch (Exception ex) {
+                        LOG.warn("MailboxServlet::doIt - error deleting mailbox", ex );
                         response.sendError(500);
                     }
                 } else {
+                    LOG.warn("MailboxServlet::doIt - method not allowed for delete: " + method );
                     response.sendError(405);
                 }
             }
@@ -196,6 +206,7 @@ public class MailboxServlet extends HttpServlet {
                         }
 
                     } else {
+                        LOG.warn("MailboxServlet::doIt - message ID missing" );
                         response.sendError(400, "messageId missing");
                     }
                 } else if (context.equals("mwi")) {
@@ -208,6 +219,7 @@ public class MailboxServlet extends HttpServlet {
                         MailboxDetails mailbox = mailboxManager.getMailboxDetails(user.getUserName());
                         pw.write(Mwi.formatRFC3842(mailbox, accountUrl));
                     } else {
+                        LOG.warn("MailboxServlet::doIt - mwi method not allowed:  " + method );
                         response.sendError(405);
                     }
                 } else if (context.equals("uuid")) {
@@ -226,12 +238,15 @@ public class MailboxServlet extends HttpServlet {
                             try {
                                 mailboxManager.renameMailbox(user, oldMailbox);
                             } catch (Exception ex) {
+                                LOG.warn("MailboxServlet::doIt - error renaming mailbox", ex );
                                 response.sendError(500);
                             }
                         } else {
+                            LOG.warn("MailboxServlet::doIt - invalid method for rename: " + method );
                             response.sendError(405);
                         }
                     } else {
+                        LOG.warn("MailboxServlet::doIt - rename destination missing" );
                         response.sendError(400, "destination missing");
                     }
 
@@ -249,6 +264,7 @@ public class MailboxServlet extends HttpServlet {
                         listMessages(deletedMessages, "deleted", pw);
                         pw.write("</messages>");
                     } else {
+                        LOG.warn("MailboxServlet::doIt - method not allowed for messages: " + method );
                         response.sendError(405);
                     }
                 } else if (context.equals("inbox")) {
@@ -270,6 +286,7 @@ public class MailboxServlet extends HttpServlet {
                         }
                         pw.write("</messages>");
                     } else {
+                        LOG.warn("MailboxServlet::doIt - method not allowed for inbox: " + method );
                         response.sendError(405);
                     }
                 } else if (context.equals("saved")) {
@@ -291,6 +308,7 @@ public class MailboxServlet extends HttpServlet {
                         }
                         pw.write("</messages>");
                     } else {
+                        LOG.warn("MailboxServlet::doIt - method not allowed for saved: " + method );
                         response.sendError(405);
                     }
                 } else if (context.equals("deleted")) {
@@ -312,6 +330,7 @@ public class MailboxServlet extends HttpServlet {
                         }
                         pw.write("</messages>");
                     } else {
+                        LOG.warn("MailboxServlet::doIt - method not allowed for deleted: " + method );
                         response.sendError(405);
                     }
                 } else if (context.equals("conference")) {
@@ -333,6 +352,7 @@ public class MailboxServlet extends HttpServlet {
                         }
                         pw.write("</messages>");
                     } else {
+                        LOG.warn("MailboxServlet::doIt - method not allowed for conference: " + method );
                         response.sendError(405);
                     }
                 } else {

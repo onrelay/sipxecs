@@ -14,8 +14,10 @@
  import org.springframework.security.core.authority.SimpleGrantedAuthority;
  
  public enum UserRole {
-     User("ROLE_USER"), Admin("ROLE_ADMIN"),
-     AttendantAdmin("ROLE_ATTENDANT_ADMIN"), Rest("ROLE_REST");
+     User("ROLE_USER"), 
+     Admin("ROLE_ADMIN"),
+     AttendantAdmin("ROLE_ATTENDANT_ADMIN"), 
+     Rest("ROLE_REST");
  
      private String m_role;
  

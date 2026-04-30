@@ -17,24 +17,28 @@
 
 package org.sipfoundry.sipxivr.rest;
 
+import java.security.Principal;
+import java.util.Collections;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.function.Function;
+
+import javax.security.auth.Subject;
+
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.security.IdentityService;
+import org.eclipse.jetty.security.DefaultIdentityService;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.security.UserIdentity;
+import org.eclipse.jetty.security.Authenticator;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Session;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.security.Password;
+
 import org.sipfoundry.commons.security.Md5Encoder;
 import org.sipfoundry.commons.userdb.User;
 import org.sipfoundry.commons.userdb.ValidUsers;
-
-
-import java.security.Principal;
-import java.util.Collections;
-import java.util.function.Function;
-
-import javax.security.auth.Subject;
 
 public class SipxIvrUserLoginService extends AbstractLifeCycle implements LoginService {
     static final Logger LOG = Logger.getLogger("org.sipfoundry.sipxivr");
@@ -43,7 +47,16 @@ public class SipxIvrUserLoginService extends AbstractLifeCycle implements LoginS
     private String m_sharedSecret;
     private ValidUsers m_validUsers;
     private IdentityService m_identityService;
+    private Configuration m_configuration;
 
+    public SipxIvrUserLoginService() {
+        m_identityService = new DefaultIdentityService();
+        m_configuration = new Configuration( this );
+    }
+
+    public Configuration getConfiguration() {
+        return m_configuration;
+    }
 
     @Override
     public String getName() {
@@ -108,7 +121,6 @@ public class SipxIvrUserLoginService extends AbstractLifeCycle implements LoginS
         return m_identityService;
     }
 
-
     @Override
     public void setIdentityService(IdentityService identityService) {
         m_identityService = identityService;
@@ -162,5 +174,44 @@ public class SipxIvrUserLoginService extends AbstractLifeCycle implements LoginS
         }
     }
 
+    public static class Configuration implements Authenticator.Configuration {
 
+        private final SipxIvrUserLoginService m_userLoginService;
+
+        public Configuration( SipxIvrUserLoginService userLoginService ) {
+            m_userLoginService = userLoginService;
+        }
+        @Override
+        public String getRealmName() {
+            return m_userLoginService.getName(); 
+        }
+        @Override
+        public String getAuthenticationType() {
+            return "DIGEST";
+        }
+        @Override
+        public IdentityService getIdentityService() {
+            return m_userLoginService.getIdentityService();
+        }
+        @Override
+        public org.eclipse.jetty.security.LoginService getLoginService() {
+            return m_userLoginService;
+        }
+        @Override 
+        public boolean isSessionRenewedOnAuthentication() { 
+            return true; 
+        }
+        @Override 
+        public int getSessionMaxInactiveIntervalOnAuthentication() { 
+            return -1; 
+        }
+        @Override 
+        public String getParameter(String param) {
+            return null;
+        }
+        @Override 
+        public Set<String> getParameterNames() {
+            return new HashSet<String>();
+        }
+    }
 }

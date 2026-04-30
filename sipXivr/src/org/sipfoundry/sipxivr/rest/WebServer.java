@@ -7,19 +7,32 @@
  *
  */
 package org.sipfoundry.sipxivr.rest;
+
 import java.util.Map;
+import java.util.Collections;
+import java.net.InetSocketAddress;
 
 import org.apache.log4j.Logger;
 
+import jakarta.servlet.Servlet;
+
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.servlet.ServletMapping;
 import org.eclipse.jetty.ee10.servlet.security.ConstraintMapping;
 import org.eclipse.jetty.ee10.servlet.security.ConstraintSecurityHandler;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.ListableBeanFactory;
+import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 
@@ -30,6 +43,8 @@ public class WebServer implements BeanFactoryAware {
     private int m_publicHttpPort;
     private BeanFactory m_beanFactory;
     private SipxIvrUserLoginService m_userLoginService;
+    private SipXSecurityHandler m_securityHandler;
+    private DigestAuthenticator m_digestAuthenticator;
 
     public void init() {
         Map<String, RestApiBean> beans = ((ListableBeanFactory) m_beanFactory).getBeansOfType(RestApiBean.class);
@@ -40,56 +55,56 @@ public class WebServer implements BeanFactoryAware {
     }
 
     private void addServlet(String name, String pathSpec, String servletClass) {
-        m_servletHandler.addServletWithMapping(servletClass, pathSpec);
-        LOG.info(String.format("Adding Servlet %s on %s", pathSpec, servletClass));
+
+        try {
+            Class<? extends Servlet> clazz = (Class<? extends Servlet>) Class.forName(servletClass);
+
+            ServletHolder servletHolder = new ServletHolder(name, clazz);
+            m_servletHandler.addServlet(servletHolder);
+            
+            ServletMapping servletMapping = new ServletMapping();
+            servletMapping.setServletName(name);
+            servletMapping.setPathSpecs(new String[] { pathSpec });
+            m_servletHandler.addServletMapping(servletMapping);
+
+            LOG.info(String.format("Adding Servlet %s [Class: %s] on path %s", name, servletClass, pathSpec));
+            
+        } catch (ClassNotFoundException e) {
+            LOG.error("Could not find servlet class: " + servletClass, e);
+        }
     }
 
     private void start() {
         try {
             Server server = new Server();
 
-            // Internal HTTP connector
             ServerConnector internalConnector = new ServerConnector(server);
             internalConnector.setPort(m_httpPort);
             server.addConnector(internalConnector);
 
-            // Public HTTP connector
             ServerConnector publicConnector = new ServerConnector(server);
             publicConnector.setPort(m_publicHttpPort);
             server.addConnector(publicConnector);
 
-            // Servlet context
-            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-            context.setContextPath("/");
+            ServletContextHandler httpContext = new ServletContextHandler(ServletContextHandler.SESSIONS);
+            httpContext.setContextPath("/");
 
-            // Security constraint
-            Constraint digestConstraint = Constraint.from("IvrRole");
+            m_digestAuthenticator = new DigestAuthenticator();
+            m_digestAuthenticator.setLoginService(m_userLoginService);
+            m_digestAuthenticator.setConfiguration(m_userLoginService.getConfiguration());
+            m_securityHandler.setDigestAuthenticator( m_digestAuthenticator );
 
-            ConstraintMapping mapping = new ConstraintMapping();
-            mapping.setPathSpec("/*");
-            mapping.setConstraint(digestConstraint);
+            httpContext.insertHandler(m_securityHandler);
+            httpContext.setServletHandler(m_servletHandler);
 
-            // Security handler
-            ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-            securityHandler.setRealmName(m_userLoginService.getName());
-            securityHandler.setLoginService(m_userLoginService);
-            securityHandler.addConstraintMapping(mapping);
+            server.setHandler(httpContext);
 
-            // Attach servlet handler
-            securityHandler.setHandler(m_servletHandler);
-
-            // Set security handler as the context handler
-            context.setSecurityHandler(securityHandler);
-
-            server.setHandler(context);
-
-            LOG.info(String.format("Starting Jetty server on ports *:%d, *:%d", m_httpPort, m_publicHttpPort));
             server.start();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Start failed", e);
         }
     }
-
+    
     public void setServletHandler(ServletHandler handler) {
         m_servletHandler = handler;
     }
@@ -108,6 +123,10 @@ public class WebServer implements BeanFactoryAware {
 
     public void setBeanFactory(BeanFactory factory) {
         m_beanFactory = factory;
+    }
+
+    public void setSecurityHandler(SipXSecurityHandler securityHandler) {
+        m_securityHandler = securityHandler;
     }
 }
 
