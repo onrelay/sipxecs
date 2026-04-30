@@ -1619,8 +1619,6 @@
   <bean id="phonesUpdateResource" class="org.sipfoundry.sipxconfig.phone.polycom.PhoneUpdateResource" scope="prototype">
     <property name="phoneContext" ref="phoneContext" />
     <property name="profileManager" ref="phoneProfileManager" />
-    <property name="readable" value="true" />
-    <property name="modifiable" value="true" />
   </bean>
   <alias name="phonesUpdateResource" alias="/updatephone/{mac}/{version}/{model}" />
   <bean id="migrationTask" class="org.sipfoundry.sipxconfig.phone.polycom.MigrationTask">

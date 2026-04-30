@@ -220,13 +220,14 @@ public class RestRedirectorResource extends UserResource {
     }
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         String url = getRequest().getResourceRef().getIdentifier();
         String mailboxRelativeUrl = StringUtils.substringAfter(url, MAILBOX);
 
         if (!StringUtils.isEmpty(mailboxRelativeUrl)) {
             invokeIvrFallback(DELETE, MAILBOX + mailboxRelativeUrl);
         }
+        return null;
     }
 
     public interface HttpInvoker {

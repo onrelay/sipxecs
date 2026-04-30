@@ -2,7 +2,7 @@ Name: @PACKAGE@
 Version: @VERSION@
 Release: @PACKAGE_REVISION@
 
-Summary: CDR Call Log REST plugin for SipX REST Server.
+Summary: CDR Call Log REST plugin for SipX REST API.
 License: LGPL
 Group:    Productivity/Telephony/SIP/Servers
 Vendor: SIPfoundry

@@ -128,7 +128,7 @@ public class CallFwdScheduleResource extends UserResource {
     }
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         Integer id = getIdFromRequest();
         if (id != null) {
             m_forwardingContext.deleteSchedulesById(Arrays.asList(new Integer[] {
@@ -137,6 +137,7 @@ public class CallFwdScheduleResource extends UserResource {
         } else {
             throw new ResourceException(Status.CLIENT_ERROR_FORBIDDEN);
         }
+        return null;
     }
 
     private static List<ScheduleBean> toScheduleBeanList(List<Schedule> schedules) {

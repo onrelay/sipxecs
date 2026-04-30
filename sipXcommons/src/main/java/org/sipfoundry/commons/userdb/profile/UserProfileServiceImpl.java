@@ -43,6 +43,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import org.bson.Document;
+
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
@@ -81,15 +83,28 @@ public class UserProfileServiceImpl implements UserProfileService {
                 USER_PROFILE_COLLECTION);
     }    
 
+
     @Override
     public void saveUserProfile(UserProfile profile) {
-        m_template.save(profile);
+
+        Document profileDocument = new Document();
+
+        m_template.getConverter().write(profile, profileDocument);
+
+        profileDocument.put(USER_ID, profile.getUserId());
+
+        Update profileUpdate = Update.fromDocument(profileDocument);
+
+        m_template.upsert(new Query(Criteria.where(USER_ID).is(profile.getUserId())), 
+            profileUpdate, 
+            UserProfile.class, 
+            USER_PROFILE_COLLECTION);
     }
 
     @Override
     public void deleteUserProfile(UserProfile profile) {
-        m_template.remove(profile);
-        deleteAvatar(profile.getUserName());
+        m_template.remove(new Query(Criteria.where(USER_ID).is(profile.getUserId())), UserProfile.class,
+                USER_PROFILE_COLLECTION);
     }
 
     @Override

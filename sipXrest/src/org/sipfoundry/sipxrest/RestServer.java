@@ -12,8 +12,10 @@ import org.restlet.ext.servlet.ServerServlet;
 import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 
@@ -59,30 +61,28 @@ public class RestServer {
     }
 
     private static void initWebServer() throws Exception {
+
         webServer = new Server();
 
-        // Create connectors for public and internal ports
         ServerConnector publicConnector = new ServerConnector(webServer);
         publicConnector.setPort(restServerConfig.getPublicHttpPort());
-        webServer.addConnector(publicConnector);
+        publicConnector.setName("public");
 
         ServerConnector internalConnector = new ServerConnector(webServer);
         internalConnector.setPort(restServerConfig.getHttpPort());
-        webServer.addConnector(internalConnector);
+        internalConnector.setName("internal");
 
-        // Set up the servlet context
+        webServer.setConnectors(new Connector[] { publicConnector, internalConnector });
+ 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
-        context.setInitParameter("org.restlet.application", RestServerApplication.class.getName());
 
-        // Add the Restlet servlet
-        ServletHolder servletHolder = new ServletHolder(ServerServlet.class);
+        ServletHolder servletHolder = new ServletHolder("rest", ServerServlet.class);
         servletHolder.setInitParameter("org.restlet.application", RestServerApplication.class.getName());
+        
         context.addServlet(servletHolder, "/*");
 
         webServer.setHandler(context);
-
-        // Start the server
         webServer.start();
     }
 
@@ -107,36 +107,42 @@ public class RestServer {
     }
 
     public static void main(String[] args) throws Exception {
-        String configDir = System.getProperties().getProperty("conf.dir", "/etc/sipxpbx");
-        configFileName = configDir + "/sipxrest-config.xml";
+        try {
+            String configDir = System.getProperties().getProperty("conf.dir", "/etc/sipxpbx");
+            configFileName = configDir + "/sipxrest-config.xml";
 
-        if (!new File(configFileName).exists()) {
-            System.err.println("Cannot find the config file");
+            if (!new File(configFileName).exists()) {
+                System.err.println("Cannot find the config file: " + configFileName);
+                System.exit(-1);
+            }
+
+            PropertyConfigurator.configureAndWatch(configDir + "/sipxrest/log4j.properties",
+                    SipFoundryLayout.LOG4J_MONITOR_FILE_DELAY);
+
+            restServerConfig = new RestServerConfigFileParser().parse("file://" + configFileName);
+            setAppender(new SipFoundryAppender(new SipFoundryLayout(),
+                    RestServer.getRestServerConfig().getLogDirectory() + "/sipxrest.log"));
+
+            accountManager = new AccountManagerImpl();
+            sipStackBean = new SipStackBean();
+
+            restServiceFinder = new RestServiceFinder();
+            restServiceFinder.search(System.getProperty("plugin.dir"));
+
+            try {
+                UnfortunateLackOfSpringSupportFactory.initialize();
+            } catch (Exception e) {
+                logger.error("Spring support initialization failed", e);
+            }
+
+            initWebServer();
+
+            logger.debug("Web server started successfully.");
+
+        } catch (Exception e) {
+            logger.error("Critical failure during RestServer startup", e);
             System.exit(-1);
         }
-
-        PropertyConfigurator.configureAndWatch(configDir + "/sipxrest/log4j.properties",
-                SipFoundryLayout.LOG4J_MONITOR_FILE_DELAY);
-
-        restServerConfig = new RestServerConfigFileParser().parse("file://" + configFileName);
-        setAppender(new SipFoundryAppender(new SipFoundryLayout(),
-                RestServer.getRestServerConfig().getLogDirectory() + "/sipxrest.log"));
-
-        accountManager = new AccountManagerImpl();
-        sipStackBean = new SipStackBean();
-
-        restServiceFinder = new RestServiceFinder();
-        restServiceFinder.search(System.getProperty("plugin.dir"));
-
-        try {
-            UnfortunateLackOfSpringSupportFactory.initialize();
-        } catch (Exception e) {
-            logger.error(e);
-        }
-
-        initWebServer();
-
-        logger.debug("Web server started.");
     }
 
     public static SipStackBean getSipStack() {

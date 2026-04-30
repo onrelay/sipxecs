@@ -35,9 +35,17 @@ public class RestServiceFinder {
 
     public void search(String directory) throws Exception {
         logger.debug("Location to search " + directory);
+        if (directory == null) {
+            logger.warn("Plugin directory path is null; skipping plugin search");
+            return;
+        }
         File dir = new File(directory);
         logger.debug("Searching directory for plugins");
         if (dir.isFile()) {
+            return;
+        }
+        if (!dir.isDirectory()) {
+            logger.warn("Plugin directory does not exist: " + directory);
             return;
         }
 
@@ -47,6 +55,10 @@ public class RestServiceFinder {
          * interface.
          */
         File[] files = dir.listFiles(new JarFilter());
+        if (files == null) {
+            logger.warn("No files found in plugin directory or error listing files: " + directory);
+            return;
+        }
         for (File f : files) {
             logger.debug("Checking " + f.getName());
             if (f.isFile()) {

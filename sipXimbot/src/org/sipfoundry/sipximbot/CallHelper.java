@@ -145,7 +145,7 @@ public class CallHelper {
 				// same then skip the parsing until the next query is done.
 				// The size of the call context response is expected to grow
 				// as the call progresses. If it turns out it has decreases
-				// then this highlights an issue with the 3pcc REST server.
+				// then this highlights an issue with the 3pcc REST API.
 				if (urlConn.getContentLength() > m_previousResponseLength) {
 					m_previousResponseLength = urlConn.getContentLength();
 
@@ -235,7 +235,7 @@ public class CallHelper {
 				urlConn.disconnect();
 			}
 		} catch (Exception e) {
-			LOG.error("Unexpected error invoking the REST server: ", e);
+			LOG.error("Unexpected error invoking the REST API: ", e);
 
 			return CallHelperReturnCode.INVALID;
 		}

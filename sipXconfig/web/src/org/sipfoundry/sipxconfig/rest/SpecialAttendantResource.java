@@ -57,9 +57,10 @@ public class SpecialAttendantResource extends UserResource {
     }
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         m_autoAttendantManager.setAttendantSpecialMode(false, null);
         getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
+        return null;
     }
 
     public void setAutoAttendantManager(AutoAttendantManager autoAttendantManager) {

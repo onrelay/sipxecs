@@ -32,7 +32,7 @@ Prefix: %_prefix
 BuildRoot: %{_tmppath}/%name-%version-root
 
 %description
-SIPX third party call controller service. Runs in the REST server
+SIPX third party call controller service. Runs in the REST API
 as a plugin.
 
 %prep

@@ -1,5 +1,5 @@
 
-SipX REST Server
+SipX REST API
 ================
 
 This is the RESTLET based server that implements a plugin mechanism

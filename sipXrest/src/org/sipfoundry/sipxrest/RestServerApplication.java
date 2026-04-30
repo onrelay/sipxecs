@@ -6,6 +6,7 @@
 package org.sipfoundry.sipxrest;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.restlet.Application;
@@ -21,7 +22,24 @@ public class RestServerApplication extends Application {
 
     public RestServerApplication() throws Exception {
        super();
-       this.plugins = RestServer.getServiceFinder().getPluginCollection();
+       try {
+           RestServiceFinder finder = RestServer.getServiceFinder();
+           if (finder == null) {
+               logger.error("RestServiceFinder is null; no plugins will be loaded");
+               this.plugins = new ArrayList<>();
+           } else {
+               this.plugins = finder.getPluginCollection();
+               if (this.plugins == null) {
+                   logger.error("Plugin collection is null; using empty collection");
+                   this.plugins = new ArrayList<>();
+               } else {
+                   logger.info("Loaded " + this.plugins.size() + " plugins");
+               }
+           }
+       } catch (Exception e) {
+           logger.error("Error loading plugins during RestServerApplication initialization", e);
+           this.plugins = new ArrayList<>();
+       }
     }
 
     @Override
@@ -34,20 +52,27 @@ public class RestServerApplication extends Application {
                 Filter filter = null;
                 if ( restService.getMetaInf().getSecurity().equals(MetaInf.LOCAL_ONLY)) {
                     filter = new LocalOnlyFilter();
-                } if ( restService.getMetaInf().getRemoteAuthenticationMethod().equals(MetaInf.HTTP_DIGEST)) {
+                } else if ( restService.getMetaInf().getRemoteAuthenticationMethod().equals(MetaInf.HTTP_DIGEST)) {
                     filter = new DigestAuthenticationFilter(restService);
                 } else if ( restService.getMetaInf().getRemoteAuthenticationMethod().equals(MetaInf.HTTP_BASIC)) {
                    filter = new BasicAuthenticationFilter(restService);
                 }  else {
                     logger.error("Unknown remote authentication type -- rejecting the plugin");
+                    continue;
                 }
-                restService.attachContext(filter, context, router);
+                try {
+                    restService.attachContext(filter, context, router);
+                    logger.debug("Successfully attached plugin: " + restService.getClass().getName());
+                } catch (Exception pluginEx) {
+                    logger.error("Failed to attach plugin: " + restService.getClass().getName(), pluginEx);
+                }
             }
         } catch (Exception e) {
-            logger.debug("Exception thrown in search: " + e);
+            logger.error("Exception thrown during plugin loading: " + e, e);
         }
 
         router.attachDefault(RestServerDefault.class);
+        logger.debug("Successfully set up router with default handler");
         return router;
     }
 

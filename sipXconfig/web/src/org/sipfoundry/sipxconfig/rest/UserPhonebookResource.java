@@ -83,9 +83,10 @@ public class UserPhonebookResource extends UserPhonebookSearchResource {
     }
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         User user = getUser();
         getPhonebookManager().removePrivatePhonebook(user);
+        return null;
     }
 
     private String convert(Collection<PhonebookEntry> entries, PhonebookFormat fmt) {

@@ -102,7 +102,7 @@ public class UserPhonebookEntryResource extends UserResource {
     }
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         Phonebook privatePhonebook = m_phonebookManager.getPrivatePhonebook(getUser());
         if (privatePhonebook != null) {
             Collection<PhonebookEntry> entries = privatePhonebook.getEntries();
@@ -115,6 +115,7 @@ public class UserPhonebookEntryResource extends UserResource {
                 m_phonebookManager.deletePhonebookEntry(entry);
             }
         }
+        return null;
     }
 
     private void setDuplicateEntryStatus() {

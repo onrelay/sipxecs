@@ -49,8 +49,9 @@ public class LiveAttendantResource extends UserResource {
     }
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         manageLiveAttendant(false);
+        return null;
     }
 
     private void manageLiveAttendant(boolean enable) {

@@ -221,7 +221,7 @@ public class BranchesResource extends ServerResource {
     // -----------------------------
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         IntParameterInfo parameterInfo;
         Branch branch;
 
@@ -230,7 +230,7 @@ public class BranchesResource extends ServerResource {
         if (parameterInfo.getExists()) {
             if (!parameterInfo.getValid()) {
                 RestUtilities.setResponseError(getResponse(), ERROR_ID_INVALID, parameterInfo.getValueString());
-                return;
+                return null;
             }
 
             try {
@@ -238,7 +238,7 @@ public class BranchesResource extends ServerResource {
                 branch = m_branchManager.retrieveBranch(parameterInfo.getValue());
                 if (branch == null) {
                     RestUtilities.setResponseError(getResponse(), ERROR_OBJECT_NOT_FOUND, parameterInfo.getValue());
-                    return;
+                    return null;
                 }
 
                 List<Integer> branchIds = new ArrayList<Integer>();
@@ -247,15 +247,16 @@ public class BranchesResource extends ServerResource {
             } catch (Exception exception) {
                 RestUtilities.setResponseError(getResponse(), ERROR_DELETE_FAILED, parameterInfo.getValue(),
                         exception.getLocalizedMessage());
-                return;
+                return null;
             }
 
             RestUtilities.setResponse(getResponse(), SUCCESS_DELETED, parameterInfo.getValue());
-            return;
+            return null;
         }
 
         // no id string
         RestUtilities.setResponse(getResponse(), ERROR_MISSING_ID);
+        return null;
 
     }
 

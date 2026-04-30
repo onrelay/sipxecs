@@ -276,7 +276,7 @@ public class UsersResource extends ServerResource {
     // ---------------------------
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         IntParameterInfo parameterInfo;
         User user;
 
@@ -285,14 +285,14 @@ public class UsersResource extends ServerResource {
         if (parameterInfo.getExists()) {
             if (!parameterInfo.getValid()) {
                 RestUtilities.setResponseError(getResponse(), ERROR_ID_INVALID, parameterInfo.getValueString());
-                return;
+                return null;
             }
 
             try {
                 user = m_coreContext.getUser(parameterInfo.getValue());
                 if (user == null) {
                     RestUtilities.setResponseError(getResponse(), ERROR_OBJECT_NOT_FOUND, parameterInfo.getValue());
-                    return;
+                    return null;
                 }
 
                 // using deleteUser causes hibernate exception
@@ -311,15 +311,16 @@ public class UsersResource extends ServerResource {
             } catch (Exception exception) {
                 RestUtilities.setResponseError(getResponse(), ERROR_DELETE_FAILED, parameterInfo.getValue(),
                         exception.getLocalizedMessage());
-                return;
+                return null;
             }
 
             RestUtilities.setResponse(getResponse(), SUCCESS_DELETED, user.getId());
-            return;
+            return null;
         }
 
         // no id string
         RestUtilities.setResponse(getResponse(), ERROR_MISSING_ID);
+        return null;
     }
 
     // Helper functions

@@ -52,20 +52,21 @@ public class SelectSpecialAttendantResource extends UserResource {
     }
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         AutoAttendant aa = m_autoAttendantManager.getAutoAttendantBySystemName(m_attendantId);
         if (aa == null) {
             getResponse().setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-            return;
+            return null;
         }
 
         if (m_autoAttendantManager.getSpecialMode()) {
             getResponse().setStatus(Status.CLIENT_ERROR_CONFLICT);
-            return;
+            return null;
         }
 
         m_autoAttendantManager.deselectSpecial(aa);
         getResponse().setStatus(Status.SUCCESS_NO_CONTENT);
+        return null;
     }
 
     

@@ -61,7 +61,7 @@ public class PhonebookEntryResource extends ServerResource {
     }
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         PhonebookEntry pbe = m_phonebookManager.findPhonebookEntryByInternalId(m_internalId);
         if (pbe == null) {
             Integer uid = Integer.parseInt(m_internalId);
@@ -69,9 +69,10 @@ public class PhonebookEntryResource extends ServerResource {
         }
         if (pbe == null) {
             getResponse().setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-            return;
+            return null;
         }
         m_phonebookManager.deletePhonebookEntry(pbe);
+        return null;
     }
 
     @Put

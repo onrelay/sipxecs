@@ -2,7 +2,7 @@ Name: @PACKAGE@
 Version: @VERSION@
 Release: @PACKAGE_REVISION@
 
-Summary: REST Server for SipX.
+Summary: REST API for SipX.
 License: LGPL
 Group:    Productivity/Telephony/SIP/Servers
 Vendor: SIPfoundry

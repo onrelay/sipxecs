@@ -2,7 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:annotation>
 	<xs:documentation xml:lang="en">
-	   The schema for sipxrest - the sipx restlet container for UserAent + 
+	   The schema for sipxrest - the sipx restlet container for UserAgent + 
 	   HTTP patterned services that are triggered by HTTP. This configures
 	   the container. There is a per-service configuration file.
 	</xs:documentation>

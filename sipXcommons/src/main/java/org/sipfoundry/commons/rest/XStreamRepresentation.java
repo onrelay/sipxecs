@@ -130,10 +130,17 @@ public class XStreamRepresentation<T> extends OutputRepresentation {
         boolean json = MediaType.APPLICATION_JSON.isCompatible(mediaType);
 
         XStream xs = newXStreamInstance(json ? m_jsonDriverClass : m_xmlDriverClass);
+        
+        xs.addPermission(com.thoughtworks.xstream.security.NoTypePermission.NONE);
+        xs.allowTypesByWildcard(new String[] {
+            "org.sipfoundry.**",
+            "java.util.**",
+            "java.lang.**"
+        });
+
         xs.setMode(XStream.NO_REFERENCES);
         configureXStream(xs);
         if (json && m_parse) {
-            // if parsing JSON additional config is needed
             configureImplicitCollections(xs);
         }
         return xs;

@@ -226,7 +226,7 @@ public class UserGroupsResource extends ServerResource {
     // ----------------------------
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         IntParameterInfo parameterInfo;
         @SuppressWarnings("unused")
         Group userGroup;
@@ -236,7 +236,7 @@ public class UserGroupsResource extends ServerResource {
         if (parameterInfo.getExists()) {
             if (!parameterInfo.getValid()) {
                 RestUtilities.setResponseError(getResponse(), ERROR_ID_INVALID, parameterInfo.getValueString());
-                return;
+                return null;
             }
 
             // do not need object to delete, but confirm existence for error message
@@ -244,7 +244,7 @@ public class UserGroupsResource extends ServerResource {
                 userGroup = m_settingContext.getGroup(parameterInfo.getValue());
             } catch (Exception exception) {
                 RestUtilities.setResponseError(getResponse(), ERROR_OBJECT_NOT_FOUND, parameterInfo.getValue());
-                return;
+                return null;
             }
 
             try {
@@ -255,15 +255,16 @@ public class UserGroupsResource extends ServerResource {
             } catch (Exception exception) {
                 RestUtilities.setResponseError(getResponse(), ERROR_DELETE_FAILED, parameterInfo.getValue(),
                         exception.getLocalizedMessage());
-                return;
+                return null;
             }
 
             RestUtilities.setResponse(getResponse(), SUCCESS_DELETED, parameterInfo.getValue());
-            return;
+            return null;
         }
 
         // no id string
         RestUtilities.setResponse(getResponse(), ERROR_MISSING_ID);
+        return null;
     }
 
     // Helper functions

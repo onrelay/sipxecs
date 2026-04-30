@@ -221,7 +221,7 @@ public class PermissionsResource extends ServerResource {
     // ----------------------------
 
     @Delete
-    public void removeRepresentations() throws ResourceException {
+    public Representation removeRepresentations() throws ResourceException {
         StringParameterInfo parameterInfo;
         Permission permission;
 
@@ -230,29 +230,30 @@ public class PermissionsResource extends ServerResource {
         if (parameterInfo.getExists()) {
             if (!parameterInfo.getValid()) {
                 RestUtilities.setResponseError(getResponse(), ERROR_ID_INVALID, parameterInfo.getValue());
-                return;
+                return null;
             }
 
             try {
                 permission = m_permissionManager.getPermissionByName(parameterInfo.getValue());
                 if (permission == null) {
                     RestUtilities.setResponseError(getResponse(), ERROR_OBJECT_NOT_FOUND, parameterInfo.getValue());
-                    return;
+                    return null;
                 }
 
                 m_permissionManager.deleteCallPermission(permission);
             } catch (Exception exception) {
                 RestUtilities.setResponseError(getResponse(), ERROR_DELETE_FAILED, parameterInfo.getValue(),
                         exception.getLocalizedMessage());
-                return;
+                return null;
             }
 
             RestUtilities.setResponse(getResponse(), SUCCESS_DELETED, permission.getName());
-            return;
+            return null;
         }
 
         // no id string
         RestUtilities.setResponse(getResponse(), ERROR_MISSING_ID);
+        return null;
     }
 
     // Helper functions
