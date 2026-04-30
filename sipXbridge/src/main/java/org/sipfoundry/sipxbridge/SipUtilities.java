@@ -538,8 +538,8 @@ class SipUtilities {
 				.createAddress(fromUri);
 
 		FromHeader fromHeader = ProtocolObjects.headerFactory.createFromHeader(
-				fromAddress, new Long(Math.abs(new java.util.Random()
-						.nextLong())).toString());
+				fromAddress, 
+				Long.valueOf(Math.abs(new java.util.Random().nextLong())).toString());
 
 		Address toAddress = ProtocolObjects.addressFactory.createAddress(toUri);
 
@@ -663,9 +663,8 @@ class SipUtilities {
 			Address fromAddress = ProtocolObjects.addressFactory
 					.createAddress(fromUri);
 
-			FromHeader fromHeader = ProtocolObjects.headerFactory
-					.createFromHeader(fromAddress, new Long(Math
-							.abs(new java.util.Random().nextLong())).toString());
+			FromHeader fromHeader = ProtocolObjects.headerFactory.createFromHeader(fromAddress,  
+						Long.valueOf(Math.abs(new java.util.Random().nextLong())).toString());
 
 			Address toAddress = ProtocolObjects.addressFactory
 					.createAddress(toUri);
@@ -829,10 +828,11 @@ class SipUtilities {
                            fromUser, domain);
            fromHeader = ProtocolObjects.headerFactory.createFromHeader(
                    ProtocolObjects.addressFactory.createAddress(fromUri),
-				   new Long(Math.abs(new java.util.Random().nextLong())).toString());
+				   Long.valueOf(Math.abs(new java.util.Random().nextLong())).toString());
 
-			fromHeader.setTag(new Long(Math.abs(new java.util.Random()
-					.nextLong())).toString());
+			fromHeader.setTag(
+				Long.valueOf(Math.abs(new java.util.Random().nextLong())).toString());
+
 			if (!domain.equals("anonymous.invalid") && fromDisplayName != null ) {
 				// Set the from header display name.
 				fromHeader.getAddress().setDisplayName(fromDisplayName);
@@ -858,8 +858,8 @@ class SipUtilities {
 
 			requestUri.removePort();
 
-			fromHeader.setTag(new Long(Math.abs(new java.util.Random()
-					.nextLong())).toString());
+			fromHeader.setTag(
+				Long.valueOf(Math.abs(new java.util.Random().nextLong())).toString());
 
 			SipURI toUri = ProtocolObjects.addressFactory.createSipURI(toUser,
 					toDomain);

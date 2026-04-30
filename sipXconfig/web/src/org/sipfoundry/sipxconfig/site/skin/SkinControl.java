@@ -54,7 +54,7 @@ public class SkinControl implements BeanFactoryAware {
         m_assets.put("favicon.ico", pkg + "/favicon.ico");
         m_assets.put("go.png", pkg + "/go.png");
         m_assets.put("search.png", pkg + "/search.png");
-        m_assets.put("logo.png", pkg + "/sipxconfig-logo.png");
+        m_assets.put("logo.png", pkg + "/logo.png");
         m_assets.put("login.jpg", pkg + "/login.jpg");
         m_assets.put("home.png", pkg + "/home.png");
         m_assets.put("home-hover.png", pkg + "/home-hover.png");
