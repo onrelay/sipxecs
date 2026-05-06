@@ -352,15 +352,4 @@ public abstract class ManageVoicemail extends UserBasePage implements IExternalP
         return getMessages().format("prompt.installtoolbar", getMessages().getMessage("product.name.short"));
     }
 
-    public boolean isUseInternalPlayer() {
-        String browserName = getBrowserName();
-        return (contains(browserName, CHROME) && !contains(browserName, OPERA_NEW))
-                || (contains(browserName, SAFARI) && !contains(browserName, OPERA_NEW))
-                || ((contains(browserName, IE9)
-                        || contains(browserName, IE10))
-                        && !StringUtils.equals(getVoicemail().getAudioFormat(), WAV_FORMAT))
-                || ((contains(browserName, FIREFOX) || contains(browserName, OPERA_NEW)
-                        || (contains(browserName, OPERA_OLD) && contains(browserName, OPERA_OLD_VERSION_10_PLUS)))
-                        && StringUtils.equals(getVoicemail().getAudioFormat(), WAV_FORMAT));
-    }
 }

@@ -9,11 +9,6 @@
 				<div id="login-form">
 					<div id="login-logo">&nbsp;</div>
 					<div id="login-title">
-						<span jwcid="@If" condition="ognl:!supportedBrowser">
-							<div class="user-error">
-								<span jwcid="@Insert" value="ognl:messages.getMessage('browser.unsupported')" raw="true" />
-							</div>
-						</span>
 						<span key="login.title">Welcome</span>
 					</div>
 					<form method="post" action="/sipxconfig/j_spring_security_check" >
