@@ -163,7 +163,6 @@ public class AutoAttendantManagerImpl extends SipxHibernateDaoSupport<AutoAttend
         }
 
         attendant.setValueStorage(clearEmptyValueStorage(attendant.getValueStorage()));
-        super.refreshEntity(attendant);
 
         Collection<AttendantRule> attendantRules = super.loadAllEntities(AttendantRule.class);
         Collection<DialingRule> affectedRules = new ArrayList<DialingRule>();
