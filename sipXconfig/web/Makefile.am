@@ -40,12 +40,13 @@ gwt_DEPS = \
 	$(srcdir)/gwt/src \
 	$(call JavaDep,@SIPX_JAVADIR@/sipXcommons $(top_srcdir)/lib,$(gwt_PKGS))
 
-# preserved from ant port, probably true on some systems but not verified post port
-gwt_JAVACFLAGS = -Xmx512m -Xms256m
+# Define explicit memory constraints to pass directly to the runner JVM
+GWT_MEM_FLAGS = -Xmx768m -Xms256m
 
 java-gwt : $(gwt_SRC)
-	$(call JavaCommand,gwt) com.google.gwt.dev.Compiler \
+	$(call JavaCommand,gwt) $(GWT_MEM_FLAGS) com.google.gwt.dev.Compiler \
 		-style PRETTY \
+		-localWorkers 1 \
 		-war \
 		out/gwt \
 		org.sipfoundry.sipxconfig.userportal.user_phonebook_search \
