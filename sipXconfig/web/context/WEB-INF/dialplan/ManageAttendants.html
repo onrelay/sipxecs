@@ -36,12 +36,20 @@
     </table>
     <ul class="component-submit">
       <li>
-        <input jwcid="deleteButton@Submit" id="list:attendant:delete"
-          value="message:button.delete" listener="listener:deleteSelected"/>
+        <input jwcid="deleteButton@Submit" 
+          id="list:attendant:delete"
+          value="message:button.delete" 
+          listener="listener:deleteSelected"
+          class="small-button"
+          />
         <span jwcid="@common/Confirm" component="component:deleteButton" prompt="message:confirm.delete"/>
       </li>
       <li>
-        <input jwcid="dupeButton@Submit" id="list:attendant:dupe" listener="listener:dupeSelected" value="message:button.dupe"/>
+        <input jwcid="dupeButton@Submit" 
+          id="list:attendant:dupe" 
+          listener="listener:dupeSelected" 
+          value="message:button.dupe"
+          class="small-button" />
       </li>
     </ul>
   </form>
