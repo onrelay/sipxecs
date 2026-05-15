@@ -1917,3 +1917,43 @@ img.chart-image {
     display: table;
     clear: both;
 }
+
+#native-confirm-dialog {
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  padding: 40px;
+  width: 420px;
+  font-family: Arial, Verdana, Helvetica, sans-serif;
+  background-color: #fafafa;
+  color: #837e84;
+}
+#native-confirm-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(1px);
+}
+#native-confirm-dialog form {
+  margin: 0;
+  padding: 0;
+}
+#native-confirm-dialog p {
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #333333;
+}
+#native-confirm-dialog .dialog-actions {
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+#native-confirm-dialog button[value="cancel"] {
+  background-color: #ffffff;
+  border: 1px solid #d0d0d0;
+  color: #555555;
+}
+#native-confirm-dialog button[value="cancel"]:hover {
+  background-color: #f5f5f5;
+  border-color: #b5b5b5;
+}

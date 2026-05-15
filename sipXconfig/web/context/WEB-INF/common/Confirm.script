@@ -5,6 +5,8 @@
 <script>
   <input-symbol key="component" required="yes" />
   <input-symbol key="prompt" required="yes" />
+  <input-symbol key="ok" required="yes" />
+  <input-symbol key="cancel" required="yes" />
   
   <let key="button">
     document.getElementById('${component.clientId}')
@@ -12,17 +14,58 @@
   
   <body>
     <unique>
-      function attachOnClick(button, prompt) {
+    <![CDATA[
+      function getConfirmDialog() {
+        let dialog = document.getElementById('native-confirm-dialog');
+        if (!dialog) {
+          dialog = document.createElement('dialog');
+          dialog.id = 'native-confirm-dialog';
+          
+          dialog.innerHTML = `
+            <form method="dialog">
+              <p id="confirm-message"></p>
+              <div class="dialog-actions">
+                <button type="submit" value="cancel" class="button" id="confirm-cancel-button">Cancel</button>
+                <button type="submit" value="ok" class="button" id="confirm-ok-button">OK</button>
+              </div>
+            </form>
+          `;
+          document.body.appendChild(dialog);
+        }
+        return dialog;
+      }
+
+      function attachOnClick(button, prompt, ok, cancel ) {
         if (!button) return;
+        button._isConfirmed = false;
+
         button.addEventListener('click', function(event) {
-          if (!confirm(prompt)) {
-            event.preventDefault();
+          if (button._isConfirmed) {
+            button._isConfirmed = false;
+            return; 
           }
+
+          event.preventDefault();
+          const dialog = getConfirmDialog();
+          document.getElementById('confirm-message').textContent = prompt;
+          document.getElementById('confirm-ok-button').textContent = ok;
+          document.getElementById('confirm-cancel-button').textContent = cancel;
+          
+          dialog.showModal();
+
+          dialog.onclose = function() {
+            if (dialog.returnValue === 'ok') {
+              button._isConfirmed = true;
+              button.click();
+            }
+          };
         });
       }    
+    ]]>
     </unique>
   </body>
   <initialization>
-    attachOnClick(${button}, '${prompt}');
+    <!-- Use the newly generated 'final' keys here -->
+    attachOnClick(${button}, '${prompt}', '${ok}', '${cancel}');
   </initialization>
 </script>
