@@ -28,31 +28,30 @@ public class IndexManagerImpl extends SipxHibernateDaoSupport<Object> implements
      * Loads all entities to be indexed.
      */
     public void indexAll() {
-        Session session = null;
-        try {
-            LOG.info("Creating database index...");
-            m_indexer.open();
-    
-            session = getSessionFactory().openSession();
-    
-            for (int i = 0; i < m_indexedClasses.length; i++) {
-                Class<?> clazz = m_indexedClasses[i];
-                m_beanAdaptor.setIndexedClasses(new Class[] { clazz });
-    
-                @SuppressWarnings("unused")
-                List<?> entities = session.createQuery("from " + clazz.getName()).list();
-    
-                // if the indexer or bean adaptor needs to process the list, pass it here
+
+        getSessionFactory().inTransaction( session -> {
+
+            try {
+                LOG.info("Creating database index...");
+
+                m_indexer.open();
+            
+                for (int i = 0; i < m_indexedClasses.length; i++) {
+                    Class<?> clazz = m_indexedClasses[i];
+                    m_beanAdaptor.setIndexedClasses(new Class[] { clazz });
+        
+                    @SuppressWarnings("unused")
+                    List<?> entities = session.createQuery("from " + clazz.getName()).list();
+        
+                    // if the indexer or bean adaptor needs to process the list, pass it here
+                }
+            } catch (Exception e) {
+                LOG.error("Error during indexing", e);
+            } finally {
+                m_indexer.close();
+                LOG.info("Index created");
             }
-        } catch (Exception e) {
-            LOG.error("Error during indexing", e);
-        } finally {
-            m_indexer.close();
-            if (session != null) {
-                session.close();
-            }
-            LOG.info("Index created");
-        }
+        });
     }
     
 

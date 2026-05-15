@@ -18,7 +18,7 @@ public class IndexTrigger implements SetupListener {
     private IndexManager m_indexManager;
     private boolean m_enabled = true;
     private File m_indexDirectory;
-    private boolean m_setupSecondPass;
+    private boolean m_setupSecondPass = false;
 
     public void setIndexManager(IndexManager indexManager) {
         m_indexManager = indexManager;
@@ -48,6 +48,7 @@ public class IndexTrigger implements SetupListener {
             }
 
             m_indexManager.indexAll();
+            m_setupSecondPass = false;
         }
         return true;
     }
