@@ -2,6 +2,7 @@
 #
 # cf-monitord:       Starts the GNU cfengine environment daemon
 #
+# chkconfig: - 15 85
 # description:  This process maintains state information about the client
 #   machine's environment (network status, running processes, load, disk
 #   usage, etc.).  This data is made available as classes that can be used

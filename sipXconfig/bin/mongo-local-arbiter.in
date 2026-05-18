@@ -2,6 +2,7 @@
 
 # mongod - Startup script for mongod arbiter
 
+# chkconfig: 35 85 15
 # description: Mongo is a scalable, document-oriented database.
 # processname: mongo-local-arbiter
 # config: /etc/mongo-local-arbiter.conf

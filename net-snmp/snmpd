@@ -1,6 +1,7 @@
 #!/bin/bash
 # ucd-snmp init file for snmpd
 #
+# chkconfig: - 50 50
 # description: Simple Network Management Protocol (SNMP) Daemon
 #
 # processname: /usr/sbin/snmpd

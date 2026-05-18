@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # sipxecs - sipXecs services control
+# chkconfig: 35 90 10
 # description: sipxecs is a script used for control and query of the services required by sipXecs
 # processname: sipxecs
 

@@ -2,6 +2,7 @@
 #
 # sipxlogwatcher   Start and stop sipxecs logwatch based on SEC tool
 #
+# chkconfig:    35 91 80
 # description:  Simple Event Correlator script to filter log file entries
 
 . @SIPX_LIBEXECDIR@/sipx-utils.sh || { echo_failure; exit $ENOENT; }

@@ -2,6 +2,7 @@
 #
 # cf-execd         Start/Stop the cfengine client daemon.
 #
+# chkconfig: - 98 20
 # description: cf-execd is scheduler and reporter in cfengine client hosts.
 #              For more information, visit http://www.cfengine.org
 # processname: cf-execd

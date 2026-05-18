@@ -2,6 +2,7 @@
 
 # sipxacccode - Startup script for sipxacccode
 
+# chkconfig: 35 97 15
 # description: sipxacccode is Authorization Code/DISA/Account using FreeSwitch for sipX
 # processname: sipxacccode
 

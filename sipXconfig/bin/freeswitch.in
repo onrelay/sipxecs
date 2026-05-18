@@ -2,6 +2,7 @@
 #
 # freeswitch:       Starts the freeswitch Daemon
 #
+# chkconfig: 345 96 02
 # processname: freeswitch
 # description: Freeswitch fedora init script \
 # config:

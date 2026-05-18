@@ -2,6 +2,7 @@
 
 # sipxcallback - Startup script for sipxcallback
 
+# chkconfig: 35 97 15
 # description: sipxcallback is Call Back on Busy using FreeSwitch
 # processname: sipxcallback
 
