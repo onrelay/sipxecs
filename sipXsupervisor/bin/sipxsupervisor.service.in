@@ -1,7 +1,7 @@
 [Unit]
 Description=supervisor
 Documentation=https://github.com/onrelay/sipxecs
-After=network.target syslog.target named.service 
+After=network.target syslog.target
 
 [Service]
 Type=forking
