@@ -190,7 +190,7 @@
       </description>
     </setting>
 
-    <setting name="music-on-hold-supported-codecs" advanced="yes">
+    <setting name="music-on-hold-supported-codecs">
       <label>Permitted Codecs</label>
       <value>PCMU,PCMA,G722,L16</value>
       <description>
