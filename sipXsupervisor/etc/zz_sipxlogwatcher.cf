@@ -64,7 +64,7 @@ bundle agent sipxlogwatcher_running {
   vars:
     any::
       "service" string => "$(sipx.SIPX_SERVICEDIR)/sipxlogwatcher";
-      "service_command" string => "/usr/bin/perl\s+-w\s+/usr/bin/sec";
+      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxlogwatcher/perl-sipxlogwatcher";
 
   methods:
     any::

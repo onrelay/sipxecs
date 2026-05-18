@@ -1,7 +1,7 @@
 [Unit]
 Description=supervisor
 Documentation=https://github.com/onrelay/sipxecs
-After=network.target syslog.target
+After=network.target syslog.target named.service 
 
 [Service]
 Type=forking
@@ -9,8 +9,8 @@ ExecStart=@SIPX_SERVICEDIR@/sipxsupervisor start
 RemainAfterExit=true
 ExecStop=@SIPX_SERVICEDIR@/sipxsupervisor stop
 StandardOutput=journal
-PIDFile=/run/sipxpbx/sipxsupervisor/sipxsupervisor.pid
 
+KillMode=none
 
 [Install]
 WantedBy=multi-user.target

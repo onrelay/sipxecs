@@ -1,7 +1,8 @@
 [Unit]
 Description=sipxcdr
 Documentation=https://github.com/onrelay/sipxecs
-After=network.target syslog.target
+After=network.target syslog.target postgresql.service 
+Requires=postgresql.service 
 
 [Service]
 Type=oneshot

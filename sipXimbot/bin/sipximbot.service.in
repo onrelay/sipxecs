@@ -1,7 +1,8 @@
 [Unit]
 Description=sipximbot
 Documentation=https://github.com/onrelay/sipxecs
-After=network.target syslog.target
+After=network.target syslog.target named.service mongod.service
+Requires=mongod.service
 
 [Service]
 Type=forking

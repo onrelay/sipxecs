@@ -64,15 +64,18 @@ bundle server access_rules {
         "@SIPX_VARDIR@/sipxpage/music",
         "@SIPX_VARDIR@/configserver/phone/acd/audio"
      };
+
   access:
     "$(export_dirs)"
         admit => { @(sipx.allowed_addrs) },
         maproot => { @(sipx.allowed_addrs) };
 
-    roles:
-        ".*"
-	  authorize => { @(sipx.allowed_users) };
+  roles:
+    ".*"
+      authorize => { @(sipx.allowed_users) };
+}
 
+bundle agent log_access_rules {
   reports:
     linux::
       "Allowing connections from $(sipx.allowed_addrs)";

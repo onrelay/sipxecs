@@ -221,11 +221,6 @@ fi
 %preun
 # see http://fedoraproject.org/wiki/Packaging/ScriptletSnippets
 if [ $1 = 0 ]; then
-  if [ -x /etc/init.d/sipxpbx ]; then
-     initScript=sipxpbx
-  elif [ -x /etc/init.d/sipxecs ]; then
-     initScript=sipxecs
-  fi
-  /etc/init.d/${initScript} stop &>/dev/null || :
-  systemctl disable ${initScript}
+  /etc/init.d/sipxecs stop &>/dev/null || :
+  systemctl disable sipxecs
 fi

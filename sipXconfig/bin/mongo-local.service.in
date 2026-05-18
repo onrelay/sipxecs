@@ -1,7 +1,8 @@
 [Unit]
 Description=Mongo local
 Documentation=https://github.com/onrelay/sipxecs
-After=network.target syslog.target
+After=network.target syslog.target mongod.service
+Requires=mongod.service
 
 [Service]
 Type=oneshot

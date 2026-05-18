@@ -20,7 +20,7 @@ lockfile=/var/lock/subsys/$prog
 start() {
 	[ ! -f /var/cfengine/ppkeys/localhost.priv ] && /usr/sbin/cfkey
 	echo -n $"Starting $prog: "
-	$exec &
+	$exec > /dev/null 2>&1 &
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && touch $lockfile
@@ -29,7 +29,7 @@ start() {
 
 stop() {
 	echo -n $"Stopping $prog: "
-	pkill -f "$exec"
+	pkill -f "$exec" > /dev/null 2>&1
 	RETVAL=$?
 	echo
 	[ $RETVAL -eq 0 ] && rm -f $lockfile

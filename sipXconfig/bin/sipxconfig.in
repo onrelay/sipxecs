@@ -203,6 +203,10 @@ buildCommand() {
     --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED \
     --add-exports java.base/sun.security.action=ALL-UNNAMED \
     --add-exports java.base/jdk.internal.ref=ALL-UNNAMED \
+    -Dconf.dir=@SIPX_CONFDIR@ \
+    -Dtmp.dir=${TmpDir} \
+    -Duser.home=${HomeDir} \
+    -Duser.name=${UserName} \
     -Djava.io.tmpdir=${TmpDir} \
     -Djavax.cache.spi.CachingProvider=${CachingProvider} \
     -Dorg.apache.lucene.lockdir=${IndexDir} \
@@ -214,9 +218,6 @@ buildCommand() {
     -Djetty.server.Request.maxFormKeys=2000 \
     -Djetty.home=${JettyHomeDir} \
     -Djetty.base=${JettyBaseDir} \
-    -Dtmp.dir=${TmpDir} \
-    -Duser.home=${HomeDir} \
-    -Duser.name=${UserName} \
     -Dsipxconfig.db.user=@POSTGRESQL_USER@ \
     -Dpostgres-pwd.password='${password}' \
     -Djava.net.preferIPv4Stack=true \

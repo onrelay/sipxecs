@@ -1,7 +1,8 @@
 [Unit]
 Description=sipxpublisher
 Documentation=https://github.com/onrelay/sipxecs
-After=network.target syslog.target
+After=network.target syslog.target named.service postgresql.service mongod.service
+Requires=postgresql.service mongod.service
 
 [Service]
 Type=forking
