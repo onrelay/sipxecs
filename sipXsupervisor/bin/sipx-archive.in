@@ -35,6 +35,7 @@ class ArchiveBase
     @backup_tmp_dir = '@SIPX_TMPDIR@/backup'
     @restore_dir = '@SIPX_TMPDIR@/restore'
     @out = $stdout
+    @user = 'root'
     @ssh_params = "-o 'StrictHostKeyChecking=no' -i ~/.cfagent/ppkeys/localhost.nopass.priv"
     load_config_file(config) unless config == nil
     redirect_output
@@ -109,7 +110,7 @@ class Backup < ArchiveBase
       fresh_dir "#{@backup_dir}/#{@data['plan']}/#{date_dir}"
       @data['hosts'].each { |location_id, meta|
       host = meta['host']
-      if cmd("ssh #{@ssh_params} root@#{host} sipx-archive --backup-host #{location_id} < #{@config}")
+      if cmd("ssh #{@ssh_params} #{@user}@#{host} sipx-archive --backup-host #{location_id} < #{@config}")
         if meta.key?('backup')
           meta['backup'].each do |defId, command|
             #cfengine does not accept '.' characters to be sent as variable values
@@ -124,7 +125,7 @@ class Backup < ArchiveBase
               raise "Error condition. EXIT"
             end
             if File.exists?("#{@backup_tmp_dir}/#{defId}")
-              FileUtils.mv("#{@backup_tmp_dir}/#{defId}", "#{@backup_dir}/#{@data['plan']}/#{date_dir}/#{defId}")
+              FileUtils.cp("#{@backup_tmp_dir}/#{defId}", "#{@backup_dir}/#{@data['plan']}/#{date_dir}/#{defId}")
             end
           end
         end
@@ -199,7 +200,7 @@ class Restore < Backup
           end
         end
       end
-      unless cmd("ssh #{@ssh_params} root@#{host} sipx-archive --restore-host #{location_id} < #{@config}")
+      unless cmd("ssh #{@ssh_params} #{@user}@#{host} sipx-archive --restore-host #{location_id} < #{@config}")
         raise "RESTORE FAILED: Could not complete restore on host #{host}"
       end
     }

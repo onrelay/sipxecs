@@ -62,10 +62,11 @@ public class SipxFilterChainProxy extends FilterChainProxy {
         int authPort = AdminContext.HTTP_ADDRESS_AUTH.getCanonicalPort();
         int sslAuthPort = AdminContext.HTTPS_ADDRESS_AUTH.getCanonicalPort();
         int localPort = request.getLocalPort();
+        LOG.debug("Request on local port: " + localPort);
+
         if (localPort == port && request instanceof HttpServletRequest) {
             HttpServletRequest httpRequest = (HttpServletRequest) request;
             requestToFilter = new AuthorizedServletRequest(httpRequest);
-            LOG.trace("Internal request port: " + port);
         }
         if ((localPort == authPort || localPort == sslAuthPort) && request instanceof HttpServletRequest
             && response instanceof HttpServletResponse) {
@@ -115,7 +116,6 @@ public class SipxFilterChainProxy extends FilterChainProxy {
                     + "x-requested-with";
             }
             httpResponse.setHeader("Access-Control-Allow-Headers", allowedHeaders);
-            LOG.trace("Internal request authPort: " + port);
         }
         super.doFilter(requestToFilter, response, chain);
     }

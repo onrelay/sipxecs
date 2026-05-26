@@ -105,7 +105,10 @@ public class BackupApi extends ServerResource {
 
     // GET
     @Get
-    public Representation represent(Variant variant) throws ResourceException {        
+    public Representation represent(Variant variant) throws ResourceException {    
+
+        LOG.info("Backup GET received, list backups");
+    
         if (m_backupType == null) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, "Must specify type of backup /backup/{type}");
         }
@@ -201,11 +204,20 @@ public class BackupApi extends ServerResource {
      *  Backup Now: no
      */
     @Put
-    public Representation storeRepresentation(Representation entity) throws ResourceException {        
-        putOrPost(entity);
-        m_backupManager.saveBackupPlan(m_plan);
-        m_backupManager.saveSettings(m_settings);
-        return null;
+    public Representation storeRepresentation(Representation entity) throws ResourceException {  
+
+        LOG.info("Backup PUT received, update plan");
+
+        try {
+            putOrPost(entity);
+            m_backupManager.saveBackupPlan(m_plan);
+            m_backupManager.saveSettings(m_settings);
+            return null;
+        } catch (Exception e) {
+            LOG.error("Backup failed", e);
+            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
+
+        } 
     }
 
     /**
@@ -215,11 +227,13 @@ public class BackupApi extends ServerResource {
      */
     @Post
     public Representation acceptRepresentation(Representation entity) throws ResourceException {        
-        putOrPost(entity);
+
         File planFile = null;
         Writer planWtr = null;
-        String configuration = StringUtils.EMPTY;
+
         try {
+            putOrPost(entity);
+            String configuration = StringUtils.EMPTY;
             //write user selection in a dedicated temp file : archive-backup-tmp-local.yaml/archive-backup-tmp-ftp.yaml
             //we cannot use a temp file because if HA setup
             //when backup runs on many nodes, a timeout may be returned and the temp file gets silently deleted
@@ -234,19 +248,21 @@ public class BackupApi extends ServerResource {
             m_backupRunner.backup(planFile);
             //if we are here than backup finished successful
             LOG.info("Backup finished successful ");
+            return null;
+
         } catch (Exception e) {
+
             if (e instanceof BackupRunnerImpl.TimeoutException) {
-                //BackupRunnerImpl has a background timeout > foreground timeout for backup: it went background
                 LOG.info("Backup moved to background");
                 throw new ResourceException(Status.CLIENT_ERROR_REQUEST_TIMEOUT, e);
-            } else if (e instanceof BackupRunnerImpl.StdErrException) {
+            } 
+            else  {
                 LOG.error("Backup failed", e);
                 throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
             }
         } finally {
             IOUtils.closeQuietly(planWtr);
-        }
-        return null;
+        }    
     }
 
     void putOrPost(Representation entity) throws ResourceException {
@@ -260,7 +276,7 @@ public class BackupApi extends ServerResource {
             m_plan.setIncludeDeviceFiles((Boolean) m_settings.getIncludeDeviceFiles().getTypedValue());
             settingJsonReader.read(m_settings.getSettings().getSetting("ftp"), meta.get("ftpSettings"));
             settingJsonReader.read(m_settings.getSettings().getSetting("general"), meta.get("generalSettings"));
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage());
         }
     }

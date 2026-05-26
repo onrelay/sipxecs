@@ -100,8 +100,8 @@ class DnsViewEditor {
     });      
   }  
   
-  Map<String, Object> getFormData() {
-    var meta = new Map<String,Object>();
+  Map<String, dynamic> getFormData() {
+    var meta = new Map<String, dynamic>();
     meta['planId'] = safeInt((querySelector("#planId")! as SelectElement).value!);
     meta['name'] = (querySelector("#name")! as InputElement).value!;
     meta['regionId'] = safeInt((querySelector("#regionId")! as SelectElement).value!);
@@ -174,7 +174,7 @@ class DnsViewEditor {
   
   loadForm(json) {
     var data = jsonDecode(json);
-    Map<String, Object> view = data['view'];
+    Map<String, dynamic> view = data['view'];
     if (view != null) {
       (querySelector("#name")! as InputElement).value = view!['name'] as String;
       int regionId = view['regionId']! as int;

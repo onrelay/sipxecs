@@ -31,6 +31,10 @@ bundle agent 00_ssh
     "pvkey"      string => "$(ppkdir)/localhost.priv";
     "nopasskey"  string => "$(ppkdir)/localhost.nopass.priv";
     "key_file"   string => "$(sipx.SIPX_CFDATA)/primary.ssh.pub";
+    
+    "root_ppkdir"  string => "/root/.cfagent/ppkeys";
+    "root_nopass"  string => "$(root_ppkdir)/localhost.nopass.priv";
+    "root_sshdir"  string => "/root/.ssh";
 
   classes:
     "pvkey_exists"   expression => fileexists("$(pvkey)");
@@ -62,31 +66,47 @@ bundle agent 00_ssh
         perms  => mog("644", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
         edit_line => authorized_sipx_commands;
 
+      "$(root_sshdir)/."
+        create => "true",
+        perms  => mog("700", "root", "root");
+
+      "$(root_sshdir)/authorized_keys"
+        create => "true",
+        perms  => mog("600", "root", "root"),
+        edit_line => authorized_root_commands,
+        comment   => "Authorize the sipx public key for root login";
+
     nopass_ready::
       "$(nopasskey)"
         perms => mog("600", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
+      "$(root_ppkdir)/."
+        create => "true",
+        perms  => mog("700", "root", "root");
+
+      "$(root_nopass)"
+        copy_from => local_cp("$(nopasskey)"),
+        perms     => mog("600", "root", "root"),
+        comment   => "Copy nopass key to root home";
+
   commands:
-    # 1. Mimic 'set_nonroot_keys' if the file is missing
     primary.!pvkey_exists::
       "/bin/su"
         args => "- $(sipx.SIPXPBXUSER) -c '/usr/local/sbin/cf-key'",
         comment => "Generate initial keys as sipx user to fix timing issue";
 
-    # 2. Convert to nopass (waits for Step 1)
     primary.pvkey_exists.(missing_nopass|old_nopass)::
       "/usr/bin/openssl"
         args => "rsa -in $(pvkey) -passin 'pass:$(passphrase)' -out $(nopasskey)",
         contain => in_shell;
 
-    # 3. Extract public key (waits for Step 2)
     primary.nopass_ready.(missing_pub|old_pub)::
       "/usr/bin/ssh-keygen"
         args => "-y -f $(nopasskey) > $(key_file)",
         contain => in_shell;
 }
 
-bundle edit_line authorized_sipx_commands
+bundle edit_line authorized_root_commands
 {
   vars:
     any::
@@ -96,5 +116,5 @@ bundle edit_line authorized_sipx_commands
     "^.*\\ssipx@primary$";
 
   insert_lines:
-    "from=\"$(sipx.master_address)\",command=\"$(sipx.SIPX_LIBEXECDIR)/sipx-allow-command\" $(key) sipx@primary";
+    "from=\"$(sipx.master_address)\" $(key) sipx@primary";
 }

@@ -15,7 +15,7 @@ main() {
 class RegionEditor {
   late UserMessage msg;
   late ManageRegions parent;
-  Map<String, Object>? region;
+  Map<String, dynamic>? region;
   
   RegionEditor(ManageRegions parent) {
     this.parent = parent;
@@ -36,7 +36,7 @@ class RegionEditor {
     }
   }
   
-  edit(Map<String, Object> region) {
+  edit(Map<String, dynamic> region) {
     this.region = region;
     reset();
     name().value = region['name']! as String;

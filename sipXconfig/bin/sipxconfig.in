@@ -159,7 +159,7 @@ mongoUpgradeCheck() {
   then
     echo -n "mongodb upgrade detected, applying replica set configuration"
     config=`cat @SIPX_TMPDIR@/config.json`
-    mongo --eval "rs.initiate($config)" && rm -rf @SIPX_TMPDIR@/config.json
+    mongosh --eval "rs.initiate($config)" && rm -rf @SIPX_TMPDIR@/config.json
     sleep 10
     if [ -d @SIPX_TMPDIR@/profiles ]
     then

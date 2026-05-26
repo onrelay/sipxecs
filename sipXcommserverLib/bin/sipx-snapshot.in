@@ -937,19 +937,19 @@ EOF
    echo ""
    echo "======== MongoDB replica set config:"
    echo "rs.config()"
-   mongo --eval "tojson(rs.config())"
+   mongosh --eval "tojson(rs.config())"
 
    # Get mongodb rs status
    echo ""
    echo "======== MongoDB replica set status:"
    echo "rs.status()"
-   mongo --eval "tojson(rs.status())"
+   mongosh --eval "tojson(rs.status())"
 
    # Get mongodb server status
    echo ""
    echo "======== MongoDB server status:"
    echo "db.serverStatus()"
-   mongo --eval "tojson(db.serverStatus())"
+   mongosh --eval "tojson(db.serverStatus())"
 
    @SIPX_BINDIR@/mongodb-status --dump > ${Work}/mongodb-status.json
 

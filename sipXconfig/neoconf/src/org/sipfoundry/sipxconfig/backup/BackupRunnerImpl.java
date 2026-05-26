@@ -35,7 +35,7 @@ import org.springframework.util.StringUtils;
 public class BackupRunnerImpl implements BackupRunner, AlarmProvider {
     private SimpleCommandRunner m_actionRunner;
     private String m_backupScript;
-    private int m_defaultForegroundTimeout = 5000;
+    private int m_defaultForegroundTimeout = 45000;
     private int m_defaultBackgroundTimeout = 300000;
     private JobContext m_jobContext;
 

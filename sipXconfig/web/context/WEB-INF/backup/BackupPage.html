@@ -60,7 +60,7 @@ body {
                 <label class="setting-label" for="backup-limit">Number of backups to keep</label>
               </td>
               <td>    
-                <select name="backup-limit" id="backup-limit">
+                <select name="backup-limit" id="backup-limit" class="small-input" >
                   <option value="">Unlimited</option>
                   <option>1</option>
                   <option>2</option>
@@ -74,8 +74,6 @@ body {
                   <option>50</option>
                 </select>
               </td>
-              <td>            
-              </td>
             </tr>
             <tr>
               <td></td>
@@ -88,16 +86,17 @@ body {
       </fieldset>
       <ul class="form-actions">
         <li>
-          <button id="backup-now">Backup Now</button>
+          <button id="backup-now" class="small-button">Backup Now</button>
         </li>
       </ul>
+      <br/><br/>
       <fieldset>
         <legend>
           Schedule
         </legend>
         <p>
           <input type="checkbox" id="dailyScheduleEnabled"> 
-          <select name="dailyScheduledDay" id="dailyScheduledDay">
+          <select name="dailyScheduledDay" id="dailyScheduledDay" class="small-input">
             <option jwcid="@common/Message" value="0" key="dayOfWeek.0">Every day</option>
             <option jwcid="@common/Message" value="1" key="dayOfWeek.1">Sunday</option>
             <option jwcid="@common/Message" value="2" key="dayOfWeek.2">Monday</option>
@@ -107,24 +106,24 @@ body {
             <option jwcid="@common/Message" value="6" key="dayOfWeek.6">Friday</option>
             <option jwcid="@common/Message" value="7" key="dayOfWeek.7">Saturday</option>
           </select> 
-          <input type="text" id="dailyScheduledTime">
+          <input type="text" id="dailyScheduledTime" class="small-input">
         </p>
       </fieldset>
       <ul class="form-actions">
         <li>
-          <button id="apply"><span key="button.apply">Apply</span></button>
+          <button id="apply" class="small-button"><span key="button.apply">Apply</span></button>
         </li>  
-      </ul>    
+        <li>&nbsp;</li>
+      </ul>  
+      <br/><br/>
       <fieldset>
         <legend>
           <span jwcid="@common/Message" key="msg.backups">Backups</span>
         </legend>
         <p>
-          <span id="inprogress" ><img src="/sipxconfig/images/loading.gif"/>
-          <span key="label.inprogress">Operation in progress...</span>
-        </span>&nbsp;</p>
+          <span id="inprogress" ><img src="/sipxconfig/images/loading.gif"/>&nbsp;<div key="label.inprogress">Please wait ...</div></span>
+        </p>
         <ul class="component" id="backups">
-          <li>There are no backup files saved in the backup folder.</li>
         </ul>
       </fieldset>    
     </div>

@@ -30,6 +30,8 @@ bundle agent archive {
   vars:
     "plan" slist => { "ftp", "local" };
   methods:
+    "any" usebundle => archive_directory_baselines;
+
     archive::
       "archive" usebundle => allow_ssh_command("sipx-archive");
       "archive" usebundle => archive_config("$(plan)");
@@ -46,6 +48,22 @@ bundle agent archive {
       "/sbin/service"
         comment => "restart cgred",
         args => "cgred restart";
+}
+
+bundle agent archive_directory_baselines {
+  files:
+    any::
+       "$(sipx.SIPX_TMPDIR)/backup/."
+         create       => "true",
+         perms        => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
+         depth_search => recurse("inf"),
+         comment      => "Enforce sipx ownership on backup folder globally and continuously";
+
+       "$(sipx.SIPX_TMPDIR)/restore/."
+         create       => "true",
+         perms        => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
+         depth_search => recurse("inf"),
+         comment      => "Enforce sipx ownership on restore folder globally and continuously";
 }
 
 bundle agent archive_config(plan) {
@@ -163,10 +181,6 @@ bundle agent restore_collect {
 bundle agent pull_backup(defId, host) {
   files:
     archive::
-       "$(sipx.SIPX_TMPDIR)/backup/."
-       create => "true",
-       perms => mog("644","$(sipx.SIPXPBXUSER)","$(sipx.SIPXPBXGROUP)");
-
       "$(sipx.SIPX_TMPDIR)/backup/$(defId)"
        comment => "Download archive $(sipx.SIPX_TMPDIR)/backup/$(defId) from host $(host)",
        perms => mog("644","$(sipx.SIPXPBXUSER)","$(sipx.SIPXPBXGROUP)"),
@@ -176,9 +190,6 @@ bundle agent pull_backup(defId, host) {
 bundle agent pull_restore(defId) {
   files:
     archive::
-       "$(sipx.SIPX_TMPDIR)/restore/."
-       create => "true";
-
       "$(sipx.SIPX_TMPDIR)/restore/$(defId)"
        comment => "Download archive $(sipx.SIPX_TMPDIR)/restore/$(defId) from master node $(sipx.master_address)",
        perms => mog("644","$(sipx.SIPXPBXUSER)","$(sipx.SIPXPBXGROUP)"),

@@ -13,7 +13,7 @@ package org.sipfoundry.sipxconfig.rest;
 import org.apache.commons.lang3.StringUtils;
 import org.restlet.ext.spring.SpringBeanRouter;
 import org.restlet.resource.Finder;
-import org.restlet.resource.Resource;
+import org.restlet.resource.ServerResource;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
 
@@ -30,8 +30,9 @@ public class SipxSpringBeanRouter extends SpringBeanRouter {
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory factory) {
-        String[] names = isFindingInAncestors() ? BeanFactoryUtils.beanNamesForTypeIncludingAncestors(factory, Resource.class, true,
-                true) : factory.getBeanNamesForType(Resource.class, true, true);
+        String[] names = isFindingInAncestors() ? 
+                BeanFactoryUtils.beanNamesForTypeIncludingAncestors(factory, ServerResource.class, true, true) : 
+                factory.getBeanNamesForType(ServerResource.class, true, true);
 
         for (String name : names) {
             final String uri = resolveUri(name, factory);

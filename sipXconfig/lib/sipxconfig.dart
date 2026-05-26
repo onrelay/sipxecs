@@ -109,9 +109,9 @@ String getString(String rcId, [List<String>? args]) {
   return rc!;
 }
 
-Map<String,String>? strings;
+Map<String, String>? strings;
 _loadStrings() {
-  strings = new HashMap<String,String>();
+  strings = new HashMap<String, String>();
   for (var e in querySelector("#rc")!.children) {
     strings![e.attributes["key"]!] = (e as SpanElement).text!;    
   }
@@ -437,14 +437,14 @@ class UserMessage {
 }
 
 class SettingEditor {
-  Map<String,Object> settings = new Map<String,Object>();
+  Map<String, dynamic> settings = new Map<String, dynamic>();
   TableSectionElement dom;
   
   SettingEditor(TableSectionElement this.dom) {    
   }
   
-  Map<String, Object> parseForm() {
-    var meta = new Map<String, Object>();  
+  Map<String, dynamic> parseForm() {
+    var meta = new Map<String, dynamic>();  
     for (InputElement e in dom.querySelectorAll("input")) {
       if (e.type == 'checkbox') {
         var trueFalse = e.value!.split('~');
@@ -460,21 +460,21 @@ class SettingEditor {
     return meta;    
   }
   
-  Map<String, Object> getSetting(String path) {
-    Map<String, Object> setting = settings;
+  Map<String, dynamic> getSetting(String path) {
+    Map<String, dynamic> setting = settings;
     for (var segment in path.split("/") ) {
       setting = (setting[segment] as Map)['value'];  
     }    
     return setting;
   }
   
-  render(Map<String, Object> setting, [basePath = '']) {
+  render(Map<String, dynamic> setting, [basePath = '']) {
     dom.children.clear();
     visit(basePath, setting);
   }
   
-  visit(String path, Map<String, Object> setting) {
-    Map<String, String> type = setting['type'] as Map<String, String>;
+  visit(String path, Map<String, dynamic> setting) {
+    Map<String, dynamic> type = setting['type'] as Map<String, dynamic>;
     if (type == null) {
       print("ERR : Missing type");
       return;
@@ -486,42 +486,57 @@ class SettingEditor {
     }
   }
   
-  visitGroup(String path, Map<String, Object> setting) {
+  visitGroup(String path, Map<String, dynamic> setting) {
+    final String label = (setting['label'] ?? '').toString();
+    final String description = setting['description'] != null 
+        ? toStr(setting['description']) 
+        : '';
+
     var e = new Element.html('''
 <table>
   <tbody>
     <tr>
       <td colspan="2">
-        <h3>${setting['label']}</h3>
-        ${setting['description'] != null ? toStr(setting['description']!) : ""}        
+        <h3>$label</h3>
+        $description        
       </td>
     </tr>
   </tbody>
 </table>
 ''');
     dom.children.addAll(e.children.first.children);
-    (setting['value'] as Map<String, Object>).forEach((childName, child) {
-      visit("${path}${childName}/", child as Map<String, Object>);      
-    });
+
+    if (setting['value'] is Map) {
+      (setting['value'] as Map<String, dynamic>).forEach((childName, child) {
+        if (child is Map<String, dynamic>) {
+          visit("${path}${childName}/", child);      
+        }
+      });
+    }
   }
 
-  visitSetting(String path, Map<String, String> type, Map<String, Object> setting) {
+  visitSetting(String path, Map<String, dynamic> type, Map<String, dynamic> setting) {
     String html = '';
-    String? defaultValue = setting['default'] as String; 
+    
+    String? defaultValue = setting['default']?.toString(); 
+    
     switch(type['name']) {
       case 'boolean':
         var checked = (setting['value'] == type['trueValue'] ? "checked" : "");
-        defaultValue = (defaultValue == type['trueValue'] ? "checked" : "unchecked");
+        defaultValue = (defaultValue == type['trueValue']?.toString() ? "checked" : "unchecked");
         html = '''<input type="checkbox" id="${path}" value="${type['trueValue']}~${type['falseValue']}" ${checked}/>''';
         break;
+        
       case 'string':
         var inputType = 'text';
-        if (type['password'] as bool) {
+        // Safeguard the boolean check
+        if (type['password'] == true) {
           inputType = 'password';
         }
-        String value = setting['value'] != null ? setting['value']! as String: "";
-        html = '''<input type="${inputType}" maxlength="${type['maxLen']}" id="${path}" value="${value}"/>''';
+        String value = setting['value']?.toString() ?? "";
+        html = '''<input type="${inputType}" maxlength="${type['maxLen'] ?? ''}" id="${path}" value="${value}"/>''';
         break;
+        
       default:
         html = '<p>widget not implemented yet</p>';
         break;
@@ -530,14 +545,17 @@ class SettingEditor {
     String defaultHtml = "";
     if (defaultValue != null) {
       defaultHtml = "(Default : ${defaultValue})";  
-    }; 
+    }
+    
+    String label = (setting['label'] ?? '').toString();
+    String description = setting['description'] != null ? toStr(setting['description']) : "";
     
     var e = new Element.html('''
 <table>
   <tbody>
     <tr>
       <td width="25%">
-        <label class="setting-label" for="${path}">${setting['label']}</label>
+        <label class="setting-label" for="${path}">${label}</label>
       </td>
       <td>
           ${html}
@@ -549,19 +567,19 @@ class SettingEditor {
     <tr>
       <td></td>
       <td colspan="2">
-        <span class="settingDescription">${setting['description'] != null ? toStr(setting['description']!) : ""}</span>
+        <span class="settingDescription">${description}</span>
       </td>
     </tr>
   </tbody>
 </table>
 ''');
     dom.children.addAll(e.children.first.children);
-  }  
+  } 
 }
 
 /**
  * emit blank if object is blank, otherwise the string equivalent.
  */
-String toStr(Object o) {
+String toStr(dynamic o) {
   return (o == null ? '' : o.toString()); 
 }

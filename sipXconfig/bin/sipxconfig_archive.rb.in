@@ -136,12 +136,9 @@ class Restore < ArchiveBase
       raise "Restore database failed."
 
     cmd "tar -xzOf #{params[:file]} db.tar > #{@tmpdir}/db.tar" or
-      raise "Failed to extract database from archive."
-    sql_exec(@restoredb, "DROP EXTENSION plpgsql;") or
-      raise "Cannot drop extension plpgsql"     
+      raise "Failed to extract database from archive."   
     cmd "pg_restore -U #{@pguser} -d #{@restoredb} #{@tmpdir}/db.tar" or
       raise "Failed to restore database from archive."
-    sql_exec(@restoredb, "CREATE EXTENSION IF NOT EXISTS plpgsql;")      
 
     ant = "-Dsipxconfig.db.name=#{@restoredb}"
     if params.has_key?(:crack_pin)
@@ -154,16 +151,28 @@ class Restore < ArchiveBase
       raise "Failed to migrate database."
 
     if !pre_mongo      
-      cmd "tar -zxvf #{params[:file]} -C #{@tmpdir} dump" or
-        raise "Failed to extract user profiles database from archive"
-      cmd "mongo profiles --eval \"db.getCollectionNames().forEach(function(n){db[n].remove()});\""
-      cmd "mongorestore --db profiles  #{@tmpdir}/dump/profiles/" or
-        raise "Failed to restore user profiles database"
+      archive_contents = `tar -tf #{params[:file]}`.split("\n")
+      archive_has_dump = archive_contents.any? { |path| path.include?("dump/") }
+      archive_has_elastic = archive_contents.any? { |path| path.include?("elasticsearch_backup/") }
 
-      cmd "tar -zxvf #{params[:file]} -C #{@tmpdir} elasticsearch_backup" or
-        cmd "echo Failed to extract elasticsearch backup from archive"
+      if archive_has_dump
+        cmd "tar -zxvf #{params[:file]} -C #{@tmpdir} dump" or
+          raise "Failed to extract user profiles database from archive"
+        cmd "mongo profiles --eval \"db.getCollectionNames().forEach(function(n){db[n].remove()});\""
+        cmd "mongorestore --db profiles  #{@tmpdir}/dump/profiles/" or
+          raise "Failed to restore user profiles database"
+      else
+        puts "Skipping MongoDB restore: 'dump' directory not found in archive."
+      end
 
-	  restore_additional_databases()	  
+      if archive_has_elastic
+        cmd "tar -zxvf #{params[:file]} -C #{@tmpdir} elasticsearch_backup" or
+          cmd "echo Failed to extract elasticsearch backup from archive"
+      else
+        puts "Skipping Elasticsearch restore: 'elasticsearch_backup' directory not found in archive."
+      end
+
+      restore_additional_databases()	  
     else
       sql_exec(@restoredb, "insert into setup(setup_id) values ('migrate_profiles');") or
           raise "Failed to trigger user profile migration."
@@ -252,8 +261,8 @@ class Restore < ArchiveBase
     # reconfig replica set with the new hostname if hostname or domain changed
     unless new_fqdn == nil
       puts "New fqdn is: #{new_fqdn}"
-      puts "Reconfig replica set: mongo --eval \"var oldHost=\\\"#{current_fqdn}\\\", newHost=\\\"#{new_fqdn}\\\"\" #{@bindir}/master-reconfig.js"
-      cmd "mongo --eval \"var oldHost=\\\"#{current_fqdn}\\\", newHost=\\\"#{new_fqdn}\\\"\" #{@bindir}/master-reconfig.js" if params[:restart]
+      puts "Reconfig replica set: mongosh --eval \"var oldHost=\\\"#{current_fqdn}\\\", newHost=\\\"#{new_fqdn}\\\"\" --file #{@bindir}/master-reconfig.js"
+      cmd "mongosh --eval \"var oldHost=\\\"#{current_fqdn}\\\", newHost=\\\"#{new_fqdn}\\\"\" --file #{@bindir}/master-reconfig.js" if params[:restart]
     end
     FileUtils.rm_rf(["#{@tmpdir}/db.tar", "#{@tmpdir}/version", "#{@tmpdir}/dump", "#{@tmpdir}/elasticsearch_backup"])
     cmd "systemctl restart sipxconfig" if params[:restart]

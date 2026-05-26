@@ -31,8 +31,8 @@ class DnsPlanEditor {
   int uid = 0;
   List<Element> groups = [];
   Map<int,String>? targetOptions;
-  late Map<String, Object> itemPrototype;
-  late Map<String, Object> groupPrototype;
+  late Map<String, dynamic> itemPrototype;
+  late Map<String, dynamic> groupPrototype;
   int? dnsPlanId;
 
   DnsPlanEditor() {
@@ -101,17 +101,17 @@ class DnsPlanEditor {
     });
   }
 
-  Map<String, Object> getPlanByScrapingForm() {
+  Map<String, dynamic> getPlanByScrapingForm() {
     var form = querySelector("#edit-plan")!.querySelectorAll("input,select")!;
-    var plan = new Map<String, Object>();
+    var plan = new Map<String, dynamic>();
     plan['name'] = (form[0] as InputElement).value!;
-    List<Map<String, Object>> groups = [];
+    List<Map<String, dynamic>> groups = [];
     plan['groups'] = groups;
-    List<Map<String, Object>> targets = [];
-    Map<String, Object> target;
+    List<Map<String, dynamic>> targets = [];
+    Map<String, dynamic> target;
     for (HtmlElement i in form.sublist(1) as List<HtmlElement>) {
       if (i.id.startsWith("group-")) {
-        var group = new Map<String, Object>();
+        var group = new Map<String, dynamic>();
         group['targets'] = targets;
         groups.add(group);
       } else if (i.id.startsWith("percentage-")) {
@@ -123,7 +123,7 @@ class DnsPlanEditor {
         }
       } else if (i.id.startsWith("target-")) {
         SelectElement se = i as SelectElement;
-        var target = new Map<String, Object>();
+        var target = new Map<String, dynamic>();
         var targetValue = se.value!.split("-");
         target['targetType'] = targetValue[0];
         target['targetId'] = targetValue[1];
@@ -146,17 +146,17 @@ class DnsPlanEditor {
   loadForm(json) {
     var data = jsonDecode(json);
     targetOptions = data['targetCandidates'];
-    Map<String, Object> plan = data['plan']!;
+    Map<String, dynamic> plan = data['plan']!;
     (querySelector("#name")! as InputElement).value = plan['name'] as String;
-    List<Map<String, Object>> groups = plan['groups'] as List<Map<String, Object>>;
+    List<Map<String, dynamic>> groups = plan['groups'] as List<Map<String, dynamic>>;
     if (groups != null) {
-      for (Map<String, Object> group in groups!) {
+      for (Map<String, dynamic> group in groups!) {
         addGroup(group, null);
       }
     }
   }
 
-  void addGroup(Map<String, Object> group, Element? sibling) {
+  void addGroup(Map<String, dynamic> group, Element? sibling) {
     var isFirst = (groups.length == 0);
     var label = getString(isFirst ? 'label.primaryPlan' : 'label.alternativePlan');
     var removeId = "remove-${++uid}";
@@ -198,8 +198,8 @@ class DnsPlanEditor {
 
     var juggler = new PercentageJuggler();
     Element lastRow = eGroup;
-    var targets = group['targets']! as List<Map<String, Object>>;
-    for (Map<String, Object> target in targets) {
+    var targets = group['targets']! as List<Map<String, dynamic>>;
+    for (Map<String, dynamic> target in targets) {
       lastRow = addTarget(lastRow, juggler, target);
     }
   }
@@ -227,7 +227,7 @@ class DnsPlanEditor {
     }
   }
 
-  Element addTarget(Element sibling, PercentageJuggler juggler, Map<String, Object> target) {
+  Element addTarget(Element sibling, PercentageJuggler juggler, Map<String, dynamic> target) {
     bool isFirst = juggler.size() == 0;
     var percentageId = "percentage-${++uid}";
     var itemId = "item-${++uid}";

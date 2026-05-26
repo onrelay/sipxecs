@@ -17,7 +17,7 @@ function getUrlBase() {
     var pos = host.indexOf(":");
     return pos !== -1 ? host.substr(0, pos) : host;
 }
-var base_url = "http://" + getUrlBase() + "/sipxconfig/rest/my/logoutunite";
+var base_url = "http://" + getUrlBase() + "/sipxconfig/app";
 
 // Modern AJAX polling function
 function makeRequest() {
