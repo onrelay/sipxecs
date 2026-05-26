@@ -51,8 +51,7 @@ Requires: sipxtools >= %version
 
 Requires: httpd >= 2.0
 Requires: rsyslog
-# sipx-snapshot uses gdb to get backtraces and simulated core files
-# from sipXecs processes.
+Requires: php-fpm
 Requires: gdb
 %if 0%{?rhel}
 Requires: glibc-common
