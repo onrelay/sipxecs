@@ -6,7 +6,8 @@
     SpringBeanRouter finds all resources in the application context. Aliases starting from '/' are bind as routes for
     referenced resources.
   -->
-  <bean id="restletSpringBeanRouter" class="org.sipfoundry.sipxconfig.rest.SipxSpringBeanRouter" />
+  <bean id="restletSpringBeanRouter" class="org.sipfoundry.sipxconfig.rest.SipxSpringBeanRouter" >
+  </bean>
 
   <bean id="jsonMediaType" class="org.restlet.data.MediaType">
 	  <constructor-arg type="java.lang.String" value="application/json"/>
@@ -38,11 +39,11 @@
   </bean>
   <alias name="userPhonebookResource" alias="/my/search/phonebook?query={search-term}" />
 
-  <bean id="userPhonebookResourceAll" class="org.sipfoundry.sipxconfig.rest.UserPhonebookResource" parent="userPhonebookResource">
+  <bean id="userPhonebookResourceAll" class="org.sipfoundry.sipxconfig.rest.UserPhonebookResource" parent="userPhonebookResource" scope="prototype" >
   </bean>
   <alias name="userPhonebookResourceAll" alias="/my/phonebook" />
 
-  <bean id="userPagedPhonebookResource" class="org.sipfoundry.sipxconfig.rest.UserPagedPhonebookResource" parent="userPhonebookResource">
+  <bean id="userPagedPhonebookResource" class="org.sipfoundry.sipxconfig.rest.UserPagedPhonebookResource" parent="userPhonebookResource" scope="prototype" >
   </bean>
   <alias name="userPagedPhonebookResource" alias="/my/pagedphonebook?start={start-row}&amp;end={end-row}" />
 
@@ -314,7 +315,7 @@
     <property name="gatewayContext" ref="gatewayContext" />
     <property name="adminContext" ref="adminContext" />
   </bean>
-  <alias name="loginDetailsResourceWithPin" alias="/my/logindetailsunite" />
+  <alias name="loginDetailsResourceWithPin" alias="/my/logindetails" />
 
   <bean id="logoutResourceWithPin" class="org.sipfoundry.sipxconfig.rest.LoginDetailsResourceWithPin" scope="prototype">
     <property name="coreContext" ref="coreContext" />
@@ -324,7 +325,7 @@
     <property name="gatewayContext" ref="gatewayContext" />
     <property name="adminContext" ref="adminContext" />
   </bean>
-  <alias name="logoutResourceWithPin" alias="/my/logoutunite" /> 
+  <alias name="logoutResourceWithPin" alias="/my/logout" /> 
 
   <bean id="restRedirectorResource" class="org.sipfoundry.sipxconfig.rest.RestRedirectorResource" scope="prototype">
     <property name="addressManager" ref="addressManager"/>

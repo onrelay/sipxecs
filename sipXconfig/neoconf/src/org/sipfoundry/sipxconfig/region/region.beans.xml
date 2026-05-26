@@ -18,10 +18,10 @@
     <property name="modifiable" value="false" />
   </bean>
   
-  <bean id="regionApi" parent="baseRegionApi"/>
+  <bean id="regionApi" parent="baseRegionApi" scope="prototype" />
   <alias name="regionApi" alias="/region" />
   
-  <bean name="editRegionApi" parent="baseRegionApi"/>
+  <bean name="editRegionApi" parent="baseRegionApi" scope="prototype" />
   <alias name="editRegionApi" alias="/region/{id}" />
   
   <bean id="regionStrings" class="org.springframework.context.support.ResourceBundleMessageSource">

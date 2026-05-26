@@ -13,9 +13,6 @@
     <property name="target" ref="backupManagerImpl" />
   </bean>
   
-  <!-- 
-    - ezuce developers beware, openuc project overrides this and you need to update changes there too 
-    -->
   <bean id="backupSettings" class="org.sipfoundry.sipxconfig.backup.BackupSettings" parent="settingsBean">    
     <property name="localBackupPath" value="${sysdir.var}/backup/local"/>
     <property name="backupDbSettings" ref="backupDbSettings"/>
@@ -59,7 +56,7 @@
   </bean>
   
   <!-- BACKUP REST API -->
-  <bean id="backupApi" class="org.sipfoundry.sipxconfig.backup.BackupApi">
+  <bean id="backupApi" class="org.sipfoundry.sipxconfig.backup.BackupApi" scope="prototype" >
     <property name="locationsManager" ref="locationsManager"/>
     <property name="backupManager" ref="backupManager"/>
     <property name="backupRunner" ref="backupRunner"/>
@@ -69,7 +66,7 @@
 
   <alias name="backupApi" alias="/backup/{type}" />
 
-  <bean id="restoreApi" class="org.sipfoundry.sipxconfig.backup.RestoreApi">
+  <bean id="restoreApi" class="org.sipfoundry.sipxconfig.backup.RestoreApi" scope="prototype" >
     <property name="locationsManager" ref="locationsManager"/>
     <property name="backupRunner" ref="backupRunner"/>
     <property name="backupConfig" ref="backupConfig"/>
@@ -78,12 +75,12 @@
 
   <alias name="restoreApi" alias="/restore/" />
 
-  <bean id="baseUploadRestoreApi" class="org.sipfoundry.sipxconfig.backup.UploadRestoreApi">
+  <bean id="baseUploadRestoreApi" class="org.sipfoundry.sipxconfig.backup.UploadRestoreApi" scope="prototype" >
     <property name="backupManager" ref="backupManager"/>
     <property name="restoreApi" ref="restoreApi" />
   </bean>
 
-  <bean id="uploadRestoreApi" parent="baseUploadRestoreApi"/>
+  <bean id="uploadRestoreApi" parent="baseUploadRestoreApi" scope="prototype" />
   <alias name="uploadRestoreApi" alias="/uploadRestore" />
 
   <!--
@@ -91,7 +88,7 @@
     -  /restore/ URL but dart doesn't support this yet so we provide a
     - simple upload URL
     -->
-  <bean id="uploadFileRestoreApi" parent="baseUploadRestoreApi"/>
+  <bean id="uploadFileRestoreApi" parent="baseUploadRestoreApi" scope="prototype" />
   <alias name="uploadFileRestoreApi" alias="/uploadRestore/{definitionId}/" />
   
 </beans>

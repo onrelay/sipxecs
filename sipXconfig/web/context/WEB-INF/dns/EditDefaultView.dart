@@ -76,9 +76,9 @@ class DnsDefaultViewEditor {
     });      
   }  
   
-  Map<String, Object> getFormData() {
+  Map<String, dynamic> getFormData() {
     print("aaa");
-    var meta = new Map<String,Object>();
+    var meta = new Map<String, dynamic>();
     List<int> customRecordsIds = [];
     meta['customRecordsIds'] = customRecordsIds;
     SelectElement customs = querySelector("#customRecordsIds")! as SelectElement;
@@ -116,7 +116,7 @@ class DnsDefaultViewEditor {
   loadForm(json) {
     var data = jsonDecode(json);
     print('$data');
-    Map<String, Object>? view = data['view'] as Map<String, Object>;
+    Map<String, dynamic>? view = data['view'] as Map<String, dynamic>;
     List<int> customRecordsIds = [];
     if (view != null) {
       customRecordsIds = view!['customRecordsIds']! as List<int>;
