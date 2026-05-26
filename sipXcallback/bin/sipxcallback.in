@@ -112,7 +112,7 @@ case "$1" in
     [ $Status -eq 0 ] && restart || :
     ;;
   status)
-    status -p ${pidfile} sipxcallback
+    checkRunningProcessIsListening "${pidfile}" "${regex}" 
     ;;
   configtest)
     configtest
