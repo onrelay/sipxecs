@@ -4,72 +4,45 @@
 Upgrading
 ============
 
+.. note::
+If you are still using CentOS7, which is now End Of Life, please follow the :ref:`Upgrading CentOS7 <upgrading-centos7>` instructions to upgrade older sipXcom CentOS7 installations to the latest 24.01 version. 
 
-Upgrading from Legacy 21.04 to 24.01 on CentOS 7
+Upgrading from 24.01 CentOS 7 to 25.01 on Rocky Linux 9
 ----------------------------------------------------------
 
-From 24.01 the sipXcom repository has moved to a Google Cloud Artifact Registry.
+Install
+~~~~~~~~~~~~
 
-Follow the below procedure to upgrade an existing 21.04 sipXcom installation to 24.01 or later on CentOS 7.
+Follow the :ref:`installing <installing>` instructions to setup a new Rocky Linux 25.01 system.
+
+Consider carefully whether you want the new installation on the same domain with a hard switchover, 
+or e.g. if you want to gradually move users to a new domain and / or setup a load balancer with the old domain.
 
 Backup
 ~~~~~~~~~~~~
 
-Take a backup from within the sipXcom admin interface.
+Take an FTP backup from within the old CentOS7 24.01 sipXcom admin interface.
 
-If you are using cloud images we also recommend taking a complete disk snapshot before upgrading.
-
-Setup Repos
+Restore
 ~~~~~~~~~~~~
 
-- If you are NOT using a Google Cloud image, you must add and install Google's artifact registry plugin:
-
-  .. code-block:: bash
-
-    wget -O /etc/yum.repos.d/artifact-registry-plugin.repo \
-        https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
-    
-    yum install -y yum-plugin-artifact-registry
-
-- Update your sipXcom repo:
-
-  .. code-block:: bash
-
-    rm /etc/yum.repos.d/sipxecs-21.04.0-centos.repo 
-
-    wget -O /etc/yum.repos.d/sipxcom.repo \
-        https://storage.googleapis.com/sipxecs/sipxcom/24.01/centos-7-x86_64/sipxcom.repo
-
-- Since CentOS 7 is now end of life, we must use its vault for yum
-
-  .. code-block:: bash
-    
-    sed -i 's|mirror.centos.org|vault.centos.org|g' /etc/yum.repos.d/CentOS-*
-    sed -i 's|mirrorlist|#mirrorlist|g' /etc/yum.repos.d/CentOS-*
-    sed -i 's|#baseurl|baseurl|g' /etc/yum.repos.d/CentOS-*
-
-    yum clean all
+Restore from the CentOS7 FTP backup from the Rocky Linux 25.01 sipXcom admin interface.
 
 
-Upgrade sipXcom
-~~~~~~~~~~~~~~~~
+Upgrading Existing  Releases on Rocky Linux 9
+----------------------------------------------------------
 
-All sipXcom code changes are backwards compatible with 21.04, so just update your sipXcom RPMs with yum as follows:
+
+All sipXcom code changes are backwards compatible, so just update your sipXcom RPMs with dnf as follows:
 
   .. code-block:: bash
 
     service sipxecs stop
 
-    yum update -y
+    dnf clean all
 
+    dnf update -y
 
-Change active java version to 1.8:
-
-  .. code-block:: bash
-
-    alternatives --config java
-    
-    => Select java-1.8.0-openjdk.x86_64 
 
 Reboot your system:
 
@@ -78,4 +51,3 @@ Reboot your system:
     reboot
 
 Your system should come back up after reboot as normal, but you may want to regenerate profiles from the server admin page.
-
