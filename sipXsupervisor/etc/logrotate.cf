@@ -28,7 +28,7 @@ bundle agent logrotate {
 bundle edit_line logrotate_sipx {
   vars:
     fedora16_or_greater::
-      "rsyslog_service_restart" string => "$(sipx.systemctl) restart rsyslogd.service";
+      "rsyslog_service_restart" string => "$(sipx.systemctl) restart rsyslog.service";
 
     !fedora16_or_greater::
       "rsyslog_service_restart" string => "/etc/init.d/rsyslog restart";

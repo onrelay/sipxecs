@@ -71,7 +71,7 @@ $template DynaFile,\"$(sipx.SIPX_LOGDIR)/phonelog/%fromhost-ip%/phonelog.log\"
 
 bundle agent rsyslogd_systemctl_running {
   vars:
-    "service" string => "rsyslogd.service";
+    "service" string => "rsyslog.service";
 
   classes:
     # wrap w/fedora16_or_greater to avoid 
