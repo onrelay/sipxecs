@@ -148,7 +148,7 @@ bundle agent sipx_module {
     any::
       "@SIPX_CFDATA@/$(sipx.location_id)/." 
         create => "true",
-        perms  => mog("0755","$(sipx.SIPXPBXUSER)","$(sipx.SIPXPBXGROUP)");
+        perms => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"); 
 
   commands:
     any::
