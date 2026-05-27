@@ -109,20 +109,18 @@ bundle agent 00_ssh
   commands:
     primary.!pvkey_exists::
       "/bin/su"
-        args => "- $(sipx.SIPX_CONFDIR) -c '/usr/local/sbin/cf-key'",
+        args => "- $(sipx.SIPXPBXUSER) -c '/usr/local/sbin/cf-key'",
         comment => "Generate initial keys as sipx user to fix timing issue";
 
     primary.pvkey_exists.rebuild_nopass::
       "/usr/bin/openssl"
         args => "rsa -in $(pvkey) -passin 'pass:$(passphrase)' -out $(nopasskey)",
-        # FIX 1: Assign a unique handle to this command promise
         handle => "generate_nopass_key",
         contain => in_shell;
 
     primary.rebuild_pub::
       "/usr/bin/ssh-keygen"
         args => "-y -f $(nopasskey) > $(key_file)",
-        # FIX 2: Force this command to wait for the openssl handle to complete first
         depends_on => { "generate_nopass_key" },
         contain => in_shell;
 }
