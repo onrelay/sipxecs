@@ -39,22 +39,18 @@ bundle agent 00_ssh
   classes:
     "pvkey_exists"   expression => fileexists("$(pvkey)");
     
-    # Check if unencrypted key is missing, empty, or outdated
     "missing_nopass" not => fileexists("$(nopasskey)");
     "empty_nopass"   expression => returnszero("/usr/bin/test ! -s $(nopasskey)", "noshell");
     "old_nopass"     expression => isnewerthan("$(pvkey)", "$(nopasskey)");
     
-    # Combine conditions for regenerating the nopass key
     "rebuild_nopass" expression => "missing_nopass|empty_nopass|old_nopass";
 
     "nopass_ready"   expression => fileexists("$(nopasskey)");
     
-    # Check if public key file is missing, empty, or outdated
     "missing_pub"    not => fileexists("$(key_file)");
     "empty_pub"      expression => returnszero("/usr/bin/test ! -s $(key_file)", "noshell");
     "old_pub"        expression => isnewerthan("$(nopasskey)", "$(key_file)");
     
-    # Combine conditions for regenerating the public key map
     "rebuild_pub"    expression => "missing_pub|empty_pub|old_pub";
     
     "keys_ready"     expression => returnszero("/usr/bin/test -s $(key_file)", "noshell");
@@ -113,17 +109,21 @@ bundle agent 00_ssh
   commands:
     primary.!pvkey_exists::
       "/bin/su"
-        args => "- $(sipx.SIPXPBXUSER) -c '/usr/local/sbin/cf-key'",
+        args => "- $(sipx.SIPX_CONFDIR) -c '/usr/local/sbin/cf-key'",
         comment => "Generate initial keys as sipx user to fix timing issue";
 
     primary.pvkey_exists.rebuild_nopass::
       "/usr/bin/openssl"
         args => "rsa -in $(pvkey) -passin 'pass:$(passphrase)' -out $(nopasskey)",
+        # FIX 1: Assign a unique handle to this command promise
+        handle => "generate_nopass_key",
         contain => in_shell;
 
     primary.rebuild_pub::
       "/usr/bin/ssh-keygen"
         args => "-y -f $(nopasskey) > $(key_file)",
+        # FIX 2: Force this command to wait for the openssl handle to complete first
+        depends_on => { "generate_nopass_key" },
         contain => in_shell;
 }
 
