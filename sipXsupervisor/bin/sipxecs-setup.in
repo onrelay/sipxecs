@@ -26,6 +26,8 @@ $tmp_dir = "/var/sipxdata/tmp"
 $home_dir = `awk -F : '/^#{$user}:/ { print $6 }' /etc/passwd`.chomp
 $user_keydir = "#{$home_dir}/.cfagent/ppkeys"
 $root_keydir = "#{$root_cfenginedir}/ppkeys"
+$root_sshdir = "/root/.ssh"
+$user_sshdir = "#{$home_dir}/.ssh"
 $primary_dat = "#{$cfdatadir}/defaults/primary.cfdat"
 $secondary_dat = "#{$cfdatadir}/defaults/secondary.cfdat"
 $master_dat= "#{$cfdatadir}/defaults/master"
@@ -51,6 +53,66 @@ def run_command(cmd)
     puts
   end
   ok
+end
+
+def set_ssh_keys
+
+  puts "Configuring SSH keys ..."
+
+  `mkdir -p #{$root_keydir} #{$root_sshdir}`
+  `chmod 700 #{$root_sshdir} #{$root_keydir}`
+
+  if File.exist?("#{$root_keydir}/localhost.priv")
+    `rm -f #{$root_keydir}/localhost.priv #{$root_keydir}/localhost.pub`
+  end
+  
+  exit 1 unless run_command "/usr/local/sbin/cf-key"
+
+  `mkdir -p #{$user_sshdir} #{$user_keydir} #{$cfdatadir}`
+  `chown -R #{$user}:#{$group} #{$home_dir}/.cfagent #{$user_sshdir} #{$cfdatadir}`
+  `chmod 755 #{$home_dir} && chown #{$user}:#{$group} #{$home_dir}`
+  `chmod 700 #{$user_sshdir} #{$user_keydir}`
+
+  `cp #{$root_keydir}/localhost.priv #{$user_keydir}/localhost.priv`
+  `chown #{$user}:#{$group} #{$user_keydir}/localhost.priv && chmod 600 #{$user_keydir}/localhost.priv`
+
+  exit 1 unless run_command "openssl rsa -in #{$user_keydir}/localhost.priv -passin 'pass:Cfengine passphrase' -out #{$user_keydir}/localhost.nopass.priv"
+  `chmod 600 #{$user_keydir}/localhost.nopass.priv`
+  `chown #{$user}:#{$group} #{$user_keydir}/localhost.nopass.priv`
+
+  # FIX: Bypass run_command and execute with native backticks to force the shell redirect (>) to work
+  `ssh-keygen -y -f #{$user_keydir}/localhost.nopass.priv > #{$cfdatadir}/primary.ssh.pub`
+  `chown #{$user}:#{$group} #{$cfdatadir}/primary.ssh.pub`
+
+  # Fallback safety: If for some reason the file is empty, try extracting via backticks directly into memory
+  if File.exist?("#{$cfdatadir}/primary.ssh.pub") && File.size("#{$cfdatadir}/primary.ssh.pub") > 0
+    key_string = File.read("#{$cfdatadir}/primary.ssh.pub").strip
+  else
+    key_string = `ssh-keygen -y -f #{$user_keydir}/localhost.nopass.priv`.strip
+    File.write("#{$cfdatadir}/primary.ssh.pub", key_string + "\n")
+    `chown #{$user}:#{$group} #{$cfdatadir}/primary.ssh.pub`
+  end
+
+  # Write out the healthy key to the user profile
+  File.write("#{$user_sshdir}/authorized_keys", key_string + "\n")
+  `chmod 600 #{$user_sshdir}/authorized_keys`
+  `chown #{$user}:#{$group} #{$user_sshdir}/authorized_keys`
+
+  if defined?(role_settings) && role_settings && role_settings[:master_address] && !role_settings[:master_address].to_s.strip.empty?
+    authorized_address = role_settings[:master_address]
+  else
+    authorized_address = "localhost"
+  end
+
+  root_auth_line = "from=\"#{authorized_address}\" #{key_string} #{$user}@primary\n"
+  File.write("#{$root_sshdir}/authorized_keys", root_auth_line)
+  `chmod 600 #{$root_sshdir}/authorized_keys`
+  `chown root:root #{$root_sshdir}/authorized_keys`
+
+  `cp #{$user_keydir}/localhost.nopass.priv #{$root_keydir}/localhost.nopass.priv`
+  `chmod 600 #{$root_keydir}/localhost.nopass.priv`
+  `chown root:root #{$root_keydir}/localhost.nopass.priv`
+  
 end
 
 def disable_selinux
@@ -608,6 +670,11 @@ args = OptionParser.new { |opts|
     $verbose = true
   }
 
+  opts.on("--ssh-keys", "Force reset of ssh keys.") {
+    set_ssh_keys
+    exit
+  }
+
   opts.on("--reset", "Force reset of normal settings.") {
     reset
   }
@@ -682,6 +749,7 @@ args.parse!
 
 raise 'Must run as root' unless Process.uid == 0
 if __FILE__ == $0
+set_ssh_keys
 disable_selinux
 create_pid_folders
 network_settings

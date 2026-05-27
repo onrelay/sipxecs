@@ -36,7 +36,6 @@ cfinputs_DATA = \
 
 cfpluginsdir = $(SIPX_CFINPUTS)/plugin.d
 dist_cfplugins_DATA = \
-	00_ssh.cf \
 	sipxsupervisor.cf \
 	selinux.cf \
 	firewall.cf \
