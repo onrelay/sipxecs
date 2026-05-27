@@ -38,18 +38,35 @@ bundle agent 00_ssh
 
   classes:
     "pvkey_exists"   expression => fileexists("$(pvkey)");
+    
+    # FIX 1: Replaced 'not()' functional wrapper with the native '!' operator
     "missing_nopass" not => fileexists("$(nopasskey)");
+    "empty_nopass"   expression => returnszero("/usr/bin/test ! -s $(nopasskey)", "noshell");
     "old_nopass"     expression => isnewerthan("$(pvkey)", "$(nopasskey)");
     
+    # Combine conditions for regenerating the nopass key
+    "rebuild_nopass" expression => "missing_nopass|empty_nopass|old_nopass";
+
     "nopass_ready"   expression => fileexists("$(nopasskey)");
     "missing_pub"    not => fileexists("$(key_file)");
+    "empty_pub"      expression => returnszero("/usr/bin/test ! -s $(key_file)", "noshell");
     "old_pub"        expression => isnewerthan("$(nopasskey)", "$(key_file)");
+    
+    # Combine conditions for regenerating the public key map
+    "rebuild_pub"    expression => "missing_pub|empty_pub|old_pub";
     
     "keys_ready"     expression => returnszero("/usr/bin/test -s $(key_file)", "noshell");
 
   files:
     "$(home)/."   
       perms => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"), 
+      create => "true";
+
+    # FIX 2: Pre-creates and recursively assigns the .cfagent folder tree to sipx
+    # This ensures the 'su - sipx -c cf-key' command has OS permission to write subdirs
+    "$(home)/.cfagent/."
+      perms => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
+      depth_search => recurse("inf"),
       create => "true";
 
     "$(sshdir)/." 
@@ -95,12 +112,12 @@ bundle agent 00_ssh
         args => "- $(sipx.SIPXPBXUSER) -c '/usr/local/sbin/cf-key'",
         comment => "Generate initial keys as sipx user to fix timing issue";
 
-    primary.pvkey_exists.(missing_nopass|old_nopass)::
+    primary.pvkey_exists.rebuild_nopass::
       "/usr/bin/openssl"
         args => "rsa -in $(pvkey) -passin 'pass:$(passphrase)' -out $(nopasskey)",
         contain => in_shell;
 
-    primary.nopass_ready.(missing_pub|old_pub)::
+    primary.nopass_ready.rebuild_pub::
       "/usr/bin/ssh-keygen"
         args => "-y -f $(nopasskey) > $(key_file)",
         contain => in_shell;

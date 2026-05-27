@@ -53,26 +53,6 @@ def run_command(cmd)
   ok
 end
 
-def set_root_keys
-  #harmless if re-run  
-  run_command "/usr/local/sbin/cf-key"
-end
-
-def set_nonroot_keys
-  run_command "su - #{$user} sh -c '/usr/local/sbin/cf-key'"
-
-  root_pub = "#{$root_keydir}/localhost.pub"
-  md5name = `cf-key -p #{root_pub} 2>/dev/null`.strip
-  md5file = "#{$user}-#{md5name}.pub"
-
-  run_command "cp #{root_pub} #{$root_keydir}/#{md5file}"
-  run_command "chmod 600 #{$root_keydir}/#{md5file}"
-
-  run_command "cp #{root_pub} #{$user_keydir}/#{md5file}"
-  run_command "chown #{$user}:#{$group} #{$user_keydir}/#{md5file}"
-  run_command "chmod 600 #{$user_keydir}/#{md5file}"
-end
-
 def disable_selinux
   puts "Checking SELinux..."
   enforced = run_command("grep 'SELINUX=enforcing' /etc/selinux/config")
@@ -598,7 +578,6 @@ end
 def choose_role
   choose_primary_role?
   if is_primary?
-    set_nonroot_keys()
     set_primary_hostname
     set_sip_domain
   else
@@ -703,7 +682,6 @@ args.parse!
 
 raise 'Must run as root' unless Process.uid == 0
 if __FILE__ == $0
-set_root_keys()
 disable_selinux
 create_pid_folders
 network_settings
