@@ -39,7 +39,7 @@ bundle agent 00_ssh
   classes:
     "pvkey_exists"   expression => fileexists("$(pvkey)");
     
-    # FIX 1: Replaced 'not()' functional wrapper with the native '!' operator
+    # Check if unencrypted key is missing, empty, or outdated
     "missing_nopass" not => fileexists("$(nopasskey)");
     "empty_nopass"   expression => returnszero("/usr/bin/test ! -s $(nopasskey)", "noshell");
     "old_nopass"     expression => isnewerthan("$(pvkey)", "$(nopasskey)");
@@ -48,6 +48,8 @@ bundle agent 00_ssh
     "rebuild_nopass" expression => "missing_nopass|empty_nopass|old_nopass";
 
     "nopass_ready"   expression => fileexists("$(nopasskey)");
+    
+    # Check if public key file is missing, empty, or outdated
     "missing_pub"    not => fileexists("$(key_file)");
     "empty_pub"      expression => returnszero("/usr/bin/test ! -s $(key_file)", "noshell");
     "old_pub"        expression => isnewerthan("$(nopasskey)", "$(key_file)");
@@ -62,11 +64,13 @@ bundle agent 00_ssh
       perms => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"), 
       create => "true";
 
-    # FIX 2: Pre-creates and recursively assigns the .cfagent folder tree to sipx
-    # This ensures the 'su - sipx -c cf-key' command has OS permission to write subdirs
+    # Enforce parent directory ownership immediately without recursion for cf-key safety
     "$(home)/.cfagent/."
       perms => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
-      depth_search => recurse("inf"),
+      create => "true";
+
+    "$(sipx.SIPX_CFDATA)/."
+      perms => mog("755", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"),
       create => "true";
 
     "$(sshdir)/." 
@@ -117,7 +121,7 @@ bundle agent 00_ssh
         args => "rsa -in $(pvkey) -passin 'pass:$(passphrase)' -out $(nopasskey)",
         contain => in_shell;
 
-    primary.nopass_ready.rebuild_pub::
+    primary.rebuild_pub::
       "/usr/bin/ssh-keygen"
         args => "-y -f $(nopasskey) > $(key_file)",
         contain => in_shell;
