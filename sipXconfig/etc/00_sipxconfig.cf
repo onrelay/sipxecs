@@ -26,6 +26,7 @@ bundle agent 00_sipxconfig {
   "apiban_conf" expression => fileexists("$(sipx.SIPX_CONFDIR)/apiban.properties");
   methods:
     any::
+      "any" usebundle => 00_ssh;
       "any" usebundle => mongodb;
       "any" usebundle => postgres;
       "any" usebundle => sipxcommserverlib;

@@ -80,11 +80,9 @@ def set_ssh_keys
   `chmod 600 #{$user_keydir}/localhost.nopass.priv`
   `chown #{$user}:#{$group} #{$user_keydir}/localhost.nopass.priv`
 
-  # FIX: Bypass run_command and execute with native backticks to force the shell redirect (>) to work
   `ssh-keygen -y -f #{$user_keydir}/localhost.nopass.priv > #{$cfdatadir}/primary.ssh.pub`
   `chown #{$user}:#{$group} #{$cfdatadir}/primary.ssh.pub`
 
-  # Fallback safety: If for some reason the file is empty, try extracting via backticks directly into memory
   if File.exist?("#{$cfdatadir}/primary.ssh.pub") && File.size("#{$cfdatadir}/primary.ssh.pub") > 0
     key_string = File.read("#{$cfdatadir}/primary.ssh.pub").strip
   else
@@ -93,7 +91,6 @@ def set_ssh_keys
     `chown #{$user}:#{$group} #{$cfdatadir}/primary.ssh.pub`
   end
 
-  # Write out the healthy key to the user profile
   File.write("#{$user_sshdir}/authorized_keys", key_string + "\n")
   `chmod 600 #{$user_sshdir}/authorized_keys`
   `chown #{$user}:#{$group} #{$user_sshdir}/authorized_keys`

@@ -1,0 +1,53 @@
+# Copyright (c) 2013 eZuce, Inc. All rights reserved.
+# Contributed to SIPfoundry under a Contributor Agreement
+
+# This software is free software; you can redistribute it and/or modify it under
+# the terms of the Affero General Public License (AGPL) as published by the
+# Free Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+
+# This software is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+
+#
+# Configure ssh access to machines using same keys Cfengine uses for communication
+# Generally modules configure what ssh commands as root are allowed to be run 
+# on a machine by the unprivledged user 'sipx'.
+#
+# Utility methods are in sipx.cf such as
+#   allow_ssh_command
+#   disallow_ssh_command
+#
+
+bundle agent 00_ssh
+{
+  vars:
+    "home"       string => "$(sipx.SIPX_CONFDIR)";
+    "sshdir"     string => "$(home)/.ssh";
+    "ppkdir"     string => "$(home)/.cfagent/ppkeys";
+    
+    "root_sshdir"  string => "/root/.ssh";
+    "root_ppkdir"  string => "/root/.cfagent/ppkeys";
+
+  files:
+
+    "$(sshdir)/." 
+      perms => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"), 
+      create => "true";
+      
+    "$(ppkdir)/." 
+      perms => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"), 
+      create => "true";
+
+    "$(root_sshdir)/."
+        create => "true",
+        perms  => mog("700", "root", "root");
+
+    "$(root_ppkdir)/."
+        create => "true",
+        perms  => mog("700", "root", "root");
+
+}
+
