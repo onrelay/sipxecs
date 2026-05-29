@@ -34,19 +34,15 @@ bundle agent 00_ssh
   files:
 
     "$(sshdir)/." 
-      perms => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"), 
-      create => "true";
+      perms => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"); 
       
     "$(ppkdir)/." 
-      perms => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)"), 
-      create => "true";
+      perms => mog("700", "$(sipx.SIPXPBXUSER)", "$(sipx.SIPXPBXGROUP)");
 
     "$(root_sshdir)/."
-        create => "true",
         perms  => mog("700", "root", "root");
 
     "$(root_ppkdir)/."
-        create => "true",
         perms  => mog("700", "root", "root");
 
 }
