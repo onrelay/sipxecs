@@ -59,14 +59,24 @@ def set_ssh_keys
 
   puts "Configuring SSH keys ..."
 
-  `mkdir -p #{$root_keydir} #{$root_sshdir}`
-  `chmod 700 #{$root_sshdir} #{$root_keydir}`
+  `rm -f #{$user_sshdir}/* #{$user_keydir}/*`
+  `rm -f #{$root_sshdir}/* #{$root_keydir}/*`
 
-  if File.exist?("#{$root_keydir}/localhost.priv")
-    `rm -f #{$root_keydir}/localhost.priv #{$root_keydir}/localhost.pub`
-  end
-  
+  `mkdir -p #{$root_sshdir} #{$root_keydir}`
+  `chmod 700 #{$root_sshdir} #{$root_keydir}`
+ 
   exit 1 unless run_command "/usr/local/sbin/cf-key"
+
+  root_pub = "#{$root_keydir}/localhost.pub"
+  md5name = `cf-key -p #{root_pub} 2>/dev/null`.strip
+  md5file = "root-#{md5name}.pub"
+
+  run_command "cp #{root_pub} #{$root_keydir}/#{md5file}"
+  run_command "chmod 600 #{$root_keydir}/#{md5file}"
+
+  run_command "cp #{root_pub} #{$user_keydir}/#{md5file}"
+  run_command "chown #{$user}:#{$group} #{$user_keydir}/#{md5file}"
+  run_command "chmod 600 #{$user_keydir}/#{md5file}"
 
   `mkdir -p #{$user_sshdir} #{$user_keydir} #{$cfdatadir}`
   `chown -R #{$user}:#{$group} #{$home_dir}/.cfagent #{$user_sshdir} #{$cfdatadir}`
@@ -75,6 +85,9 @@ def set_ssh_keys
 
   `cp #{$root_keydir}/localhost.priv #{$user_keydir}/localhost.priv`
   `chown #{$user}:#{$group} #{$user_keydir}/localhost.priv && chmod 600 #{$user_keydir}/localhost.priv`
+
+  `cp #{$root_keydir}/localhost.pub #{$user_keydir}/localhost.pub`
+  `chown #{$user}:#{$group} #{$user_keydir}/localhost.pub && chmod 644 #{$user_keydir}/localhost.pub`
 
   exit 1 unless run_command "openssl rsa -in #{$user_keydir}/localhost.priv -passin 'pass:Cfengine passphrase' -out #{$user_keydir}/localhost.nopass.priv"
   `chmod 600 #{$user_keydir}/localhost.nopass.priv`

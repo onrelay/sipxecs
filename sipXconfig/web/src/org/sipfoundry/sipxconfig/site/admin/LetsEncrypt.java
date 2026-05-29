@@ -79,7 +79,7 @@ public abstract class LetsEncrypt extends BaseComponent implements PageBeginRend
 
         switch (status) {
             case IDLE:
-                msg = ""; break;
+                msg = getMessages().getMessage("label.idle"); break;
             case IN_PROGRESS:
                 msg = getMessages().getMessage("label.inProgress"); break;
             case SUCCESS:
@@ -101,6 +101,8 @@ public abstract class LetsEncrypt extends BaseComponent implements PageBeginRend
 
     public boolean getAutoRefresh() {
         CertificateManager mgr = getCertificateManager();
-        return (mgr.getLetsEncryptStatus() && mgr.getCertbotCommandStatus().equals(CommandExecutionStatus.IN_PROGRESS));
+        return (mgr.getLetsEncryptStatus() && 
+            (mgr.getCertbotCommandStatus().equals(CommandExecutionStatus.IDLE) || 
+             mgr.getCertbotCommandStatus().equals(CommandExecutionStatus.IN_PROGRESS) ) );
     }
 }
