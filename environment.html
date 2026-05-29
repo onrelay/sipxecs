@@ -1,0 +1,268 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Operating Environment &mdash; sipxecs 25.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=fff5bc82"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installing" href="installing.html" />
+    <link rel="prev" title="Features" href="features.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/sipxcom_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="history.html">Project History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Operating Environment</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#hardware-platform">Hardware Platform</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cloud-images">Cloud Images</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#physical-servers">Physical Servers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#docker">Docker</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#system-preparation">System Preparation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ssh-root-login">SSH Root Login</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#update-os-and-install-basic-dependencies">Update OS and Install Basic Dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#setup-google-could-artifact-registry">Setup Google Could Artifact registry</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reboot">Reboot</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#build-or-install">Build or Install</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="webui.html">Web UI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="security.html">Security</a></li>
+<li class="toctree-l1"><a class="reference internal" href="planning.html">Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monitoring.html">Monitoring</a></li>
+<li class="toctree-l1"><a class="reference internal" href="maintenance.html">Maintenance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="restapi.html">REST API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="soapapi.html">SOAP API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sipxecs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Operating Environment</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/environment.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="operating-environment">
+<span id="environment"></span><span id="index-0"></span><h1>Operating Environment<a class="headerlink" href="#operating-environment" title="Link to this heading"></a></h1>
+<p>Recent sipXcom RPMs will only install on Rocky Linux 9.x with x86_64 architecture.</p>
+<p>Both physical servers and dedicated cloud images are supported.</p>
+<p>Docker images may be used for builds, but have not been verified as an execution environment.</p>
+<section id="hardware-platform">
+<h2>Hardware Platform<a class="headerlink" href="#hardware-platform" title="Link to this heading"></a></h2>
+<section id="cloud-images">
+<h3>Cloud Images<a class="headerlink" href="#cloud-images" title="Link to this heading"></a></h3>
+<p>The sipXecs open source project is primarily built and validated on Google Cloud Compute Rocky Linux 9.x minimal images.</p>
+<p>We recommend using the <a class="reference external" href="https://console.cloud.google.com/marketplace/browse?filter=partner:Rocky%20Linux">Rocky Linix minimal image</a>.</p>
+<p>The following is a recommended image configuration:</p>
+<ul class="simple">
+<li><p>n2-standard-2</p></li>
+<li><p>Intel Cascade Lake</p></li>
+<li><p>x86/64 architecture</p></li>
+<li><p>2 vCPUs</p></li>
+<li><p>8 GB Memory</p></li>
+<li><p>50GB or larger disk</p></li>
+<li><p>VirtIO NIC type</p></li>
+</ul>
+<p>Similar configurations should be used for Rocky Linux 9.x on AWS and Microsoft Azure.</p>
+</section>
+<section id="physical-servers">
+<h3>Physical Servers<a class="headerlink" href="#physical-servers" title="Link to this heading"></a></h3>
+<p>We recommend using the <a class="reference external" href="https://download.rockylinux.org/pub/rocky/9/isos/x86_64/Rocky-9.6-x86_64-minimal.iso">Rocky Linix minimal ISO</a>.</p>
+<p>The following is a recommended hardware configuration:</p>
+<ul class="simple">
+<li><p>2x CPU/vCPU</p></li>
+<li><p>8GB RAM</p></li>
+<li><p>50GB or larger disk</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>All servers in the cluster should have a static IP address.</p></li>
+<li><p>The server(s) must have only one active NIC or IP interface.</p></li>
+<li><p>Only IPv4 is supported. Disabling IPv6 on the NIC during OS install is recommended.</p></li>
+<li><p>Review the partition sizes if automatic partitioning is used.</p></li>
+<li><p>1GB ext2 for the /boot partition with the boot flag set</p></li>
+<li><p>Set swap partition equal to the system RAM size</p></li>
+<li><p>Allocate the rest of the free space for the root (/) partition as a LVM volume, XFS formatted</p></li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If the disk is larger than 50G and you use automatic partitioning, most of the space will be allocated to /home rather than /.</p>
+</div>
+</section>
+<section id="docker">
+<h3>Docker<a class="headerlink" href="#docker" title="Link to this heading"></a></h3>
+<p>SipXecs open source project RPMs can be built on Docker images, but has not yet been debugged or validated to exectute in Docker containers.
+Contributors are of course welcome to try and suggest corresponding pull requests.</p>
+<p>To build RPMs on Docker container add the following image:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--hostname<span class="o">=</span>sipxecs<span class="w"> </span>--name<span class="w"> </span>sipxecs-rocky-linux-9<span class="w"> </span>--privileged<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--env<span class="o">=</span><span class="nv">PATH</span><span class="o">=</span>/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--runtime<span class="o">=</span>runc<span class="w"> </span>-d<span class="w"> </span>rockylinux:9
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+</section>
+<section id="system-preparation">
+<h2>System Preparation<a class="headerlink" href="#system-preparation" title="Link to this heading"></a></h2>
+<p>The following prepares the server environment for both builds and installations.</p>
+<section id="ssh-root-login">
+<h3>SSH Root Login<a class="headerlink" href="#ssh-root-login" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Log on as root via ssh:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>-s
+</pre></div>
+</div>
+</li>
+<li><p>If you want root password authentication:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>passwd
+
+vi<span class="w"> </span>/etc/ssh/sshd_config<span class="w"> </span><span class="o">=</span>&gt;
+
+<span class="w">  </span>PermitRootLogin<span class="w"> </span>yes
+
+<span class="w">  </span>PasswordAuthentication<span class="w"> </span>yes
+
+service<span class="w"> </span>sshd<span class="w"> </span>restart
+</pre></div>
+</div>
+</li>
+</ul>
+<p>Make sure SSH port 22 on your server is firewall restricted to known IPs if you allow root login via SSH</p>
+</section>
+<section id="update-os-and-install-basic-dependencies">
+<h3>Update OS and Install Basic Dependencies<a class="headerlink" href="#update-os-and-install-basic-dependencies" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Update OS:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>dnf<span class="w"> </span>update<span class="w"> </span>-y
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="setup-google-could-artifact-registry">
+<h3>Setup Google Could Artifact registry<a class="headerlink" href="#setup-google-could-artifact-registry" title="Link to this heading"></a></h3>
+<p>If you are NOT using a Google Cloud image, you must add and install their artifact registry plugin:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>dnf<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>wget
+
+wget<span class="w"> </span>-O<span class="w"> </span>/etc/yum.repos.d/artifact-registry-plugin.repo<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://storage.googleapis.com/sipxecs/artifact-registry/artifact-registry-plugin.repo
+
+dnf<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>yum-plugin-artifact-registry
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="reboot">
+<h3>Reboot<a class="headerlink" href="#reboot" title="Link to this heading"></a></h3>
+<ul>
+<li><p>Reboot system command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>reboot
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+<section id="build-or-install">
+<h2>Build or Install<a class="headerlink" href="#build-or-install" title="Link to this heading"></a></h2>
+<p>You are ready to follow the instructions to <a class="reference internal" href="building.html#building"><span class="std std-ref">building</span></a> or <a class="reference internal" href="installing.html#installing"><span class="std std-ref">installing</span></a> sipXcom.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="features.html" class="btn btn-neutral float-left" title="Features" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installing.html" class="btn btn-neutral float-right" title="Installing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

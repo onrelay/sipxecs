@@ -1,0 +1,188 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Security &mdash; sipxecs 25.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=fff5bc82"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Planning" href="planning.html" />
+    <link rel="prev" title="Web UI" href="webui.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/sipxcom_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="history.html">Project History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="environment.html">Operating Environment</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upgrading.html">Upgrading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="building.html">Building</a></li>
+<li class="toctree-l1"><a class="reference internal" href="webui.html">Web UI</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Security</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#certificates">Certificates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#secure-trunking">Secure Trunking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#secure-extensions">Secure Extensions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="planning.html">Planning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="monitoring.html">Monitoring</a></li>
+<li class="toctree-l1"><a class="reference internal" href="maintenance.html">Maintenance</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="restapi.html">REST API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="soapapi.html">SOAP API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">sipxecs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Security</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/security.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="security">
+<span id="index-0"></span><h1>Security<a class="headerlink" href="#security" title="Link to this heading"></a></h1>
+<p>sipXcom supports a secure web interface, secure trunking and secure extensions via standard HTTPS, TLS, and SRTP protocols.</p>
+<section id="certificates">
+<h2>Certificates<a class="headerlink" href="#certificates" title="Link to this heading"></a></h2>
+<p>SSL certificates for sipXcom are configured under Settings - Security - Certificates.</p>
+<p>Here you can enable a Let’s Encrypt service that automatically generates and installs a valid SSL web certificate. Let’s Encrypt certificates are authorized by the Internet Security Research Group (ISRG Root X1).
+You may also import your own web certificates.</p>
+<p>sipXcom also supports both secure signaling (TLS) and encrypted media (SRTP) for both trunks and extensions.
+If you want to use SRTP for encrypted media, you must ensure all endpoints connected to sipXcom support SRTP, or calls may fail to connect.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>The Let’s Encrypt web certificate is reused in the sipXcom built in SBC used for SIP trunking.</p></li>
+<li><p>SIP extensions use automatically generated and auto-provisioned self-signed SSL certs.</p></li>
+</ul>
+</div>
+</section>
+<section id="secure-trunking">
+<h2>Secure Trunking<a class="headerlink" href="#secure-trunking" title="Link to this heading"></a></h2>
+<p>sipXcom supports secure trunking for its built in SBC on port 5081.</p>
+<p>These are the sipXcom config changes required to enable secure trunking for both signaling (TLS) and media (SRTP):</p>
+<ul class="simple">
+<li><p>Under Gateway configuration, select TLS as transport protocol and connect to the ITSP using a security enabled port such as 5061.</p></li>
+<li><p>The remote ITSP should be configured to connect secure trunks to port 5081 on sipXcom.</p></li>
+<li><p>Under System - Services - Media Services - Server check Secure RTP if you want to encrypt all media with SRTP.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>The sipXcom SBC supports SDES type SRTP media negotiations, not DTLS as is common with WebRTC.</p></li>
+</ul>
+</div>
+<p>To test you have a valid public SSL cert on your SBC port 5081, run the following command:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>openssl<span class="w"> </span>s_client<span class="w"> </span>-connect<span class="w"> </span>&lt;sipXcom<span class="w"> </span>IP<span class="w"> </span>or<span class="w"> </span>domain&gt;:5081
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+<section id="secure-extensions">
+<h2>Secure Extensions<a class="headerlink" href="#secure-extensions" title="Link to this heading"></a></h2>
+<p>Extensions may also connect securely to sipXcom’s SIP proxy on port 5061 (default).</p>
+<ul class="simple">
+<li><p>If you autoprovision phones, make sure they are configured to use TLS as outbound proxy transport and connect to port 5061 on sipXcom.</p></li>
+<li><p>E.g. for Polycoms, under Security, select both Enable SRTP and Require SRTP</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<ul class="simple">
+<li><p>Since SIP extension certificates are self generated, IP phones using TLS must have SSL cert validity checks disabled.</p></li>
+</ul>
+</div>
+<p>To check port 5061 is enabled to receive TLS connections, you may run the following command:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>openssl<span class="w"> </span>s_client<span class="w"> </span>-connect<span class="w"> </span>&lt;sipXcom<span class="w"> </span>IP<span class="w"> </span>or<span class="w"> </span>domain&gt;:5061
+</pre></div>
+</div>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="webui.html" class="btn btn-neutral float-left" title="Web UI" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="planning.html" class="btn btn-neutral float-right" title="Planning" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
