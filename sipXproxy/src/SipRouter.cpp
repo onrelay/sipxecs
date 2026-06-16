@@ -812,7 +812,7 @@ SipRouter::handleMessage( OsMsg& eventMessage )
                     finalResponse.setResponseData(pMsg, SIP_SERVICE_UNAVAILABLE_CODE, "No Thread Available");
                     mpSipUserAgent->send(finalResponse);
 
-                    OS_LOG_ERROR(FAC_SIP, "SipRouter::handleMessage failed to create pooled thread!  Threadpool size="
+                    OS_LOG_ERROR(FAC_SIP, " failed to create pooled thread!  Threadpool size="
                       << _threadPool.threadPool().available());
 
                     delete pMsg;

@@ -110,7 +110,7 @@ void SubscribeDB::getAll(Subscriptions& subscriptions, bool preferPrimary)
 
         for(const bsoncxx::document::view& doc : cursor)
         {
-            subscriptions.emplace_back(doc);
+            subscriptions.push_back(doc);
         }
 
         OS_LOG_INFO(FAC_SIP, "SubscribeDB::getAll - Retrieved " 
@@ -539,7 +539,7 @@ void SubscribeDB::getUnexpiredSubscriptions(
 
         for(const bsoncxx::document::view& doc : cursor)
         {
-            subscriptions.emplace_back(doc);
+            subscriptions.push_back(doc);
         }
 
         OS_LOG_INFO(FAC_SIP, "SubscribeDB::getUnexpiredSubscriptions - Retrieved subscriptions for key: " << key.str());
@@ -611,8 +611,6 @@ void SubscribeDB::getUnexpiredContactsFieldsContaining(
                 }
             }
         }
-
-        OS_LOG_INFO(FAC_SIP, "SubscribeDB::getUnexpiredContactsFieldsContaining - Processed query for substring: " << substringToMatch.str());
     }
     catch (const mongocxx::exception& e)
     {

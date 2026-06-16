@@ -444,7 +444,17 @@ void SipTransactionList::removeOldTransactions(long oldTransaction,
     gcTimes.addEvent("scan done");
 #   endif   
 
-    if ( deleteCount || busyCount || numTransactions > 10000 ) // do not log 'doing nothing when nothing to do', even at debug
+    // Release the list lock now that we've completed the scan and marked
+    // transactions for deletion. Signaling and deletion must happen
+    // without holding mListMutex to avoid waking threads that will
+    // immediately contend for the same lock.
+    unlock();
+
+#   ifdef TIME_LOG
+    gcTimes.addEvent("post-scan-unlocked");
+#   endif
+
+    if ( deleteCount > 0 ) // do not log 'doing nothing when nothing to do', even at debug
     {
        Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
                      "SipTransactionList::removeOldTransactions"
@@ -453,19 +463,25 @@ void SipTransactionList::removeOldTransactions(long oldTransaction,
                      );
     }
 
-    // Delete the transactions in the array
     if (!transactionsToBeDeleted.empty())
     {
 #      ifdef TIME_LOG
        gcTimes.addEvent("start delete");
 #      endif
 
-       for(std::vector<SipTransaction*>::iterator iter = transactionsToBeDeleted.begin(); iter != transactionsToBeDeleted.end(); iter++)
-       {
-         mTransactions.removeReference(*iter);
-          delete *iter;
-       }
+        for(std::vector<SipTransaction*>::iterator iter = transactionsToBeDeleted.begin(); iter != transactionsToBeDeleted.end(); iter++)
+        {
+          (*iter)->signalAllAvailable();
+        }
 
+        for(std::vector<SipTransaction*>::iterator iter = transactionsToBeDeleted.begin(); iter != transactionsToBeDeleted.end(); iter++)
+        {
+          lock();
+          mTransactions.removeReference(*iter);
+          unlock();
+
+          delete *iter;
+        }
 #      ifdef TIME_LOG
        gcTimes.addEvent("finish delete");
 #      endif
@@ -479,8 +495,6 @@ void SipTransactionList::removeOldTransactions(long oldTransaction,
                   "%s", timeString.data()
                   );
 #   endif
-
-    unlock();
 }
 
 void SipTransactionList::stopTransactionTimers()

@@ -1808,6 +1808,12 @@ void SipUserAgent::dispatch(SipMessage* message, int messageType)
    
    if (dontDispatch)
    {
+      Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
+                    "SipUserAgent[%s]::dontDispatch with transactionCount = %d, maxTransactionCount = %d",
+                    getName().data(), 
+                    mSipTransactions.size(), 
+                    _maxTransactionCount);
+
       delete message;
       return;
    }
