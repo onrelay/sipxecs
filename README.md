@@ -1,28 +1,55 @@
-# Welcome to the sipXecs Project!
+# sipXecs (by [OnRelay](https://www.onrelay.com))
 
-sipXecs, aka sipXcom, is an advanced open soure IP based enterprise communication system originally developed by PingTel in the early 2000s. It has since then been developed and sponsored by a chain of commercial organizations such as Bluesocket, Avaya, Nortel, eZuce and CoreDial. 
+[![Release](https://shields.io)](https://github.com)
+[![License](https://shields.io)](LICENSE)
+[![Sponsor](https://shields.io)](https://github.com)
 
-sipXcom is now being further developed and maintained by [OnRelay](https://www.onrelay.com), who is using sipXcom as an integral part of its cloud based mobile business phone service. This repository is a fork from the latest stable release 21.04 at https://github.com/sipXcom/sipxecs. 
+sipXecs is a highly scalable, distributed, open-source enterprise IP communications system. Originally developed in the early 2000s, the platform has been rejuvenated by OnRelay for modern infrastructure requirements. 
 
-sipXcom documentation can be found <a target="_blank" href="https://onrelay.github.io/sipxecs">here</a>. 
-Here are documentation shortcuts for installing and building the source:
+This repository is an actively maintained fork of the original stable `21.04` release, updated to support modern Linux distributions and cloud-native environments.
 
-- <a target="_blank" href="https://onrelay.github.io/sipxecs/environment.html">Environment</a>
+---
 
-- <a target="_blank" href="https://onrelay.github.io/sipxecs/installing.html">Installing</a>
+## 🚀 Key Features in Release 25.01
 
-- <a target="_blank" href="https://onrelay.github.io/sipxecs/building.html">Building</a>
+- **Rocky Linux 9 Support:** Fully updated and compiled to run on modern, enterprise-grade Rocky Linux 9 environments.
+- **Native SIP Routing:** Pure SIP-based architecture utilizing a distributed XML-based routing engine.
+- **Centralized Management:** Web-based UI to configure, manage, and provision thousands of users and devices across multiple servers from a single dashboard.
+- **High Availability:** Built-in multi-server redundancy, branch office survivability, and distributed load balancing.
+- **Enterprise UC Suite:** Integrated voicemail, auto-attendants, conferencing, and instant messaging.
 
-- <a target="_blank" href="https://onrelay.github.io/sipxecs/upgrading.html">Upgrading</a>
+---
 
-To get help, track release progress, ask questions, suggest improvements or otherwise contribute to the sipXcom open source project, please participate in the discussion at the <a target="_blank" href="https://groups.google.com/g/sipxcom-users">sipXcom User Group</a>!
+## 🛠️ Getting Started
 
-OnRelay will endeavour to respond to issues raised at this user group as time permits. For guaranteed response times and resolutions please contact support@onrelay.net for a quote about a support contract with SLAs as described here: <a target="_blank" href="https://www.onrelay.com/service-level-agreement">OnRelay Service Level Agreement</a>.
+Comprehensive documentation is available for deployment and system management. Use the direct shortcuts below to set up your environment and installation:
 
-We also greatly appreciate any sponsor contributions, which can be setup via GitHub <a target="_blank" href="https://github.com/sponsors/onrelay">here</a>!
+* <a target="_blank" href="https://onrelay.github.io/sipxecs/environment.html">System Environment</a>
+* <a target="_blank" href="https://onrelay.github.io/sipxecs/installing.html">Installing</a>
+* <a target="_blank" href="https://onrelay.github.io/sipxecs/building.html">Building</a>
+* <a target="_blank" href="https://onrelay.github.io/sipxecs/upgrading.html">Upgrading</a>
 
+---
 
+## 🤝 Community & Support
 
+We welcome contributions, bug reports, and feedback from the community!
+
+* **Discussions & Q&A:** Join the active conversation at the [sipXcom User Group](https://groups.google.com/g/sipxcom-users). 
+* **Issue Tracking:** Please open an issue in this repository if you encounter bugs or want to suggest software enhancements.
+* **Commercial Support:** OnRelay provides guaranteed response times and Service Level Agreements (SLAs) for production environments. Contact us at `support@onrelay.net`  for a commercial quote.
+
+---
+
+## 💖 Sponsor the Project
+
+Want to support the continuous development of open-source enterprise telecom software? Consider supporting us via [GitHub Sponsors](https://github.com/sponsors/onrelay).
+
+---
+
+## 📄 License
+
+sipXecs is licensed under the GNU Lesser General Public License (LGPL) version 2.1. See the `LICENSE` file for full details.
 
 
 
