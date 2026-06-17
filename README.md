@@ -49,7 +49,7 @@ Want to support the continuous development of open-source enterprise telecom sof
 
 ## 📄 License
 
-sipXecs is licensed under the GNU Lesser General Public License (LGPL) version 2.1. See the `LICENSE` file for full details.
+sipXecs is licensed under the GNU Lesser General Public License (LGPL) version 2.1. 
 
 
 
