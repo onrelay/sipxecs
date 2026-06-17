@@ -37,7 +37,7 @@ We welcome contributions, bug reports, and feedback from the community!
 
 * **Discussions & Q&A:** Join the active conversation at the [sipXcom User Group](https://groups.google.com/g/sipxcom-users). 
 * **Issue Tracking:** Please open an issue in this repository if you encounter bugs or want to suggest software enhancements.
-* **Commercial Support:** OnRelay provides guaranteed response times and Service Level Agreements (SLAs) for production environments. Contact us at `support@onrelay.net`  for a commercial quote.
+* **Commercial Support:** OnRelay provides guaranteed response times and Service Level Agreements (SLAs) for production environments. Contact us at [support@onrelay.net](mailto://support@onrelay.net)  for a commercial quote.
 
 ---
 
