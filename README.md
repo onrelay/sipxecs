@@ -16,7 +16,7 @@ This repository is an actively maintained fork of the original stable `21.04` re
 - **Modernized Enterprise Tech Stack:** Fully re-architected and refactored from legacy dependencies to leverage modern cloud-native standards:
   - **Java Ecosystem:** Upgraded from Java 8 `javax` EE to **Java 17 & Jakarta EE 10**.
   - **Core Frameworks:** Lifted to **Spring 6.2** (from 4.0) and **Hibernate 7.2** (from 3.6) for secure, high-performance data handling.
-  - **Web & Storage Subsystems:** Migrated to **Jetty 12.1** for a lightweight embedded servlet container, paired with a massive database engine leap to **MongoDB 8.2** and PostgreSQL 42.7.
+  - **Web & Storage Subsystems:** Migrated to **Jetty 12.1** for a lightweight embedded servlet container, paired with a database engine leap to **MongoDB 8.2** and PostgreSQL 42.7.
     
 ---
 
