@@ -18,7 +18,6 @@ public class IndexTrigger implements SetupListener {
     private IndexManager m_indexManager;
     private boolean m_enabled = true;
     private File m_indexDirectory;
-    private boolean m_setupSecondPass = false;
 
     public void setIndexManager(IndexManager indexManager) {
         m_indexManager = indexManager;
@@ -38,18 +37,7 @@ public class IndexTrigger implements SetupListener {
             return true;
         }
 
-        if (!m_indexDirectory.exists()) {
-
-            // this ensures we index on 2nd pass after objects have had a chance to
-            // migrate/update/whatever before we index them
-            if (!m_setupSecondPass) {
-                m_setupSecondPass = true;
-                return false;
-            }
-
-            m_indexManager.indexAll();
-            m_setupSecondPass = false;
-        }
+        m_indexManager.indexAll();
         return true;
     }
 }

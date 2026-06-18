@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+  
   <bean id="beanAdaptor" class="org.sipfoundry.sipxconfig.search.DefaultBeanAdaptor"/>
 
   <bean id="analyzer" class="org.apache.lucene.analysis.standard.StandardAnalyzer">
@@ -15,11 +16,10 @@
     <property name="indexSource" ref="indexSource"/>
     <property name="beanAdaptor" ref="beanAdaptor"/>
   </bean>
-
-  <bean id="bulkBeanAdaptor" class="org.sipfoundry.sipxconfig.search.DefaultBeanAdaptor"/>
+  
   <bean id="bulkIndexer" class="org.sipfoundry.sipxconfig.search.BulkIndexer">
     <property name="indexSource" ref="indexSource"/>
-    <property name="beanAdaptor" ref="bulkBeanAdaptor"/>
+    <property name="beanAdaptor" ref="beanAdaptor"/>
   </bean>
 
   <bean id="searchManager" class="org.sipfoundry.sipxconfig.search.SearchManagerImpl">
@@ -28,15 +28,15 @@
     <property name="beanAdaptor" ref="beanAdaptor"/>
   </bean>
 
-  <bean id="loadIndexingInterceptor" class="org.sipfoundry.sipxconfig.search.LoadIndexingInterceptor">
-    <property name="indexer" ref="bulkIndexer"/>
+  <bean id="indexingInterceptor" class="org.sipfoundry.sipxconfig.search.IndexingInterceptor" >
+    <property name="indexer" ref="fastIndexer"/>
     <property name="beanIndexHelper" ref="beanIndexHelper"/>
   </bean>
 
-
   <bean id="indexManagerImpl" class="org.sipfoundry.sipxconfig.search.IndexManagerImpl" parent="daoSupport">
     <property name="indexer" ref="bulkIndexer"/>
-    <property name="beanAdaptor" ref="bulkBeanAdaptor"/>
+    <property name="beanAdaptor" ref="beanAdaptor"/>
+    <property name="beanIndexHelper" ref="beanIndexHelper"/>
   </bean>
 
   <bean id="indexManager" class="org.springframework.aop.framework.ProxyFactoryBean"

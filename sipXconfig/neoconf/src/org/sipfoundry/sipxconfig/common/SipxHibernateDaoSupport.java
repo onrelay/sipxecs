@@ -43,7 +43,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.metamodel.model.domain.EntityDomainType;
-import org.hibernate.persister.entity.EntityPersister;
 
 import org.sipfoundry.sipxconfig.common.event.DaoEventPublisher;
 import org.sipfoundry.sipxconfig.setting.BeanWithSettings;
@@ -264,6 +263,9 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
                 updateBeanValueStorage(entity);
 
                 session.refresh(entity);
+
+                getDaoEventPublisher().publishSave(entity);
+
             } catch( IllegalStateException e ) {
                 // server not ready
             }
@@ -278,6 +280,8 @@ public class SipxHibernateDaoSupport<T> extends DaoSupport implements DataObject
                 updateBeanValueStorage(entity);
 
                 session.remove(entity);
+
+                getDaoEventPublisher().publishAfterDelete(entity);
 
             } catch( IllegalStateException e ) {
                 // server not ready

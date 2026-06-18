@@ -346,7 +346,6 @@ public class CallQueueContextImpl extends SipxHibernateDaoSupport<Object> implem
     @Override
     public void saveCallQueueCommand(CallQueueCommand callQueueCommand) {
         saveExtension(callQueueCommand);
-        m_replicationManager.replicateEntity(callQueueCommand);
     }
 
     private CallQueueCommand loadCallQueueCommand(Integer id) { // Should not be Tested

@@ -31,24 +31,27 @@ public class FastIndexer implements Indexer {
         if (!m_beanAdaptor.documentFromBean(document, bean, id, state, fieldNames, types)) {
             return;
         }
-        if (!newInstance) {
-            internalRemoveBean(bean, id);
-        }
-        addBean(document);
+        writeBean(bean, id, document, newInstance);
     }
 
     public void removeBean(Object bean, Object id) {
         // only remove beans that are index-able
-        if (m_beanAdaptor.indexClass(new Document(), bean.getClass())) {
+        // Note: DefaultBeanAdaptor.indexClass modifies the document, so we pass a dummy if only checking
+        if (m_beanAdaptor.indexClass(new Document(), bean.getClass())) { 
             internalRemoveBean(bean, id);
         }
     }
 
-    private synchronized void addBean(Document document) {
+    private synchronized void writeBean(Object bean, Object id, Document document, boolean newInstance) {
         IndexWriter writer = null;
         try {
             writer = m_indexSource.getWriter(false);
-            writer.addDocument(document);
+            if (newInstance) {
+                writer.addDocument(document);
+            } else {
+                Term idTerm = m_beanAdaptor.getIdentityTerm(bean, id);
+                writer.updateDocument(idTerm, document);
+            }
         } catch (IOException e) {
             LOG.error(e);
         } finally {

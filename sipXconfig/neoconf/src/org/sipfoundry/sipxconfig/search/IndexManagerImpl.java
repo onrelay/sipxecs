@@ -15,6 +15,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.type.Type;
 import org.sipfoundry.sipxconfig.common.SipxHibernateDaoSupport;
 
 public class IndexManagerImpl extends SipxHibernateDaoSupport<Object> implements IndexManager {
@@ -22,6 +26,7 @@ public class IndexManagerImpl extends SipxHibernateDaoSupport<Object> implements
 
     private Indexer m_indexer;
     private BeanAdaptor m_beanAdaptor;
+    private BeanIndexHelper m_beanIndexHelper;
     private Class<?>[] m_indexedClasses;
 
     /**
@@ -38,12 +43,31 @@ public class IndexManagerImpl extends SipxHibernateDaoSupport<Object> implements
             
                 for (int i = 0; i < m_indexedClasses.length; i++) {
                     Class<?> clazz = m_indexedClasses[i];
-                    m_beanAdaptor.setIndexedClasses(new Class[] { clazz });
-        
-                    @SuppressWarnings("unused")
-                    List<?> entities = session.createQuery("from " + clazz.getName()).list();
-        
-                    // if the indexer or bean adaptor needs to process the list, pass it here
+
+                    SessionFactoryImplementor sessionFactoryImplementor = 
+                        getSessionFactory().unwrap(SessionFactoryImplementor.class);
+
+                    EntityPersister persister = 
+                        sessionFactoryImplementor.getMappingMetamodel().getEntityDescriptor(clazz);
+
+                    String[] propertyNames = persister.getPropertyNames();
+                    Type[] propertyTypes = persister.getPropertyTypes();
+
+                    // Use getResultList and specify the class for better type safety in Hibernate 6/7
+                    List<?> entities = session.createQuery("from " + clazz.getName(), clazz).getResultList();
+                    for (Object entity : entities) {
+                        Object id = persister.getIdentifier(entity, (SharedSessionContractImplementor) session);
+                        Object[] state = persister.getPropertyValues(entity);
+ 
+                        BeanIndexProperties bip = new BeanIndexProperties(entity, id, state, propertyNames, propertyTypes);
+                        if (m_beanIndexHelper != null) {
+                            m_beanIndexHelper.setupIndexProperties(bip);
+                        }
+                        m_indexer.indexBean(entity, id, bip.getState(), bip.getPropertyNames(), bip.getTypes(), true);
+                        
+                        // Evict the entity to prevent the Hibernate Session from bloating during bulk indexing
+                        session.evict(entity);
+                    }
                 }
             } catch (Exception e) {
                 LOG.error("Error during indexing", e);
@@ -57,6 +81,10 @@ public class IndexManagerImpl extends SipxHibernateDaoSupport<Object> implements
 
     public void setIndexer(Indexer indexer) {
         m_indexer = indexer;
+    }
+
+    public void setBeanIndexHelper(BeanIndexHelper beanIndexHelper) {
+        m_beanIndexHelper = beanIndexHelper;
     }
 
     /**

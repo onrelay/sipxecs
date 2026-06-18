@@ -127,7 +127,6 @@ public class BranchManagerImpl extends SipxHibernateDaoSupport<Branch>
                     for (Group group : user.getGroups()) {
                         super.refreshEntity(group);
                     }
-                    m_replicationManager.replicateEntity(user);
                 }
             }
         } catch (Exception ex) {

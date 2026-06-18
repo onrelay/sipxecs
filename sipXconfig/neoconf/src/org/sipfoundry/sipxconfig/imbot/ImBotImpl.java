@@ -89,7 +89,6 @@ public class ImBotImpl implements FeatureProvider, ImBot, ProcessProvider {
         if (settings.isNew()) {
             settings.setPaPassword(randomAlphanumeric(PASS_LENGTH));
             saveSettings(settings);
-            m_replicationManager.replicateEntity(getSettings());
         }
     }
 

@@ -175,7 +175,6 @@ public abstract class AbstractMusicOnHoldManagerImpl implements MusicOnHoldManag
     @Override
     public void saveSettings(MohSettings settings) {
         m_settingsDao.upsert(settings);
-        m_replicationManager.replicateEntity(settings);
         m_sipxReplicationContext.generateAll(DataSet.MAILSTORE);
     }
 
