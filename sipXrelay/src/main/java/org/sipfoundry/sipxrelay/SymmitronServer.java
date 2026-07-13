@@ -99,14 +99,9 @@ public class SymmitronServer implements Symmitron {
             + Math.abs(new Random().nextLong());
 
     /*
-     * True if our web server is running ( the one that handles xml rpc requests ).
-     */
-    private static boolean isWebServerRunning;
-
-    /*
      * Pointer to our web server.
      */
-    private static Server webServer;
+    private static Server webServer = null;
 
     /*
      * Local address by name.
@@ -540,16 +535,15 @@ public class SymmitronServer implements Symmitron {
         filterStrayPackets = symmitronConfig.isRejectStrayPackets();
     }
 
-
-
      public static void startWebServer() throws Exception {
-        if (!isWebServerRunning) {
-            isWebServerRunning = true;
+
+        if( webServer == null ) {
+
+            webServer = new Server();
 
             int port = symmitronConfig.getXmlRpcPort();
             String host = symmitronConfig.getLocalAddress();
-            webServer = new Server();
-
+                     
             ServerConnector connector;
 
             if (symmitronConfig.getUseHttps()) {
@@ -1439,8 +1433,10 @@ public class SymmitronServer implements Symmitron {
      */
     public static void stopXmlRpcServer() {
         try {
-            SymmitronServer.webServer.stop();
-            isWebServerRunning = false;
+            webServer.stop();
+
+            webServer = null;
+
         } catch (Exception e) {
             logger.error("request processing interrupt", e);
         }
@@ -1676,16 +1672,18 @@ public class SymmitronServer implements Symmitron {
     public static void connect() {
 
         try {
-            if( SymmitronServer.getPublicInetAddress() != null) {
+            if( getPublicInetAddress() != null) {
 
-                logger.info("Connecting with public address: " + SymmitronServer.getPublicInetAddress());
+                logger.info("Connecting with public address: " + getPublicInetAddress());
 
-                SymmitronServer.initHttpsClient();
+                initHttpsClient();
 
-                SymmitronServer.startWebServer();
+                logger.info("Starting web server");
+
+                startWebServer();
             }
         } catch (Exception ex) {
-            logger.error( "Error connecting symmitron server with public address: " + SymmitronServer.getPublicInetAddress(), ex);
+            logger.error( "Error connecting symmitron server with public address: " + getPublicInetAddress(), ex);
         }
     }
 
@@ -1721,7 +1719,7 @@ public class SymmitronServer implements Symmitron {
             } else if (command.equals("start")) {
                 start();
             } else {
-                System.err.println("unknown start option " + command);
+                logger.error("unknown start option " + command);
             }
         
            dataShuffler = new DataShuffler();
@@ -1729,9 +1727,8 @@ public class SymmitronServer implements Symmitron {
            dataShufflerThread.start();
           
 
-        } catch (Throwable th) {
-            System.err.println("Exiting main: Cause :  " + th.getMessage());
-            th.printStackTrace(System.err);
+        } catch (Exception e) {
+            logger.error("Exiting SymmitronServer.main: Cause :  " + e.getMessage(), e );
             System.exit(-1);
         }
     }

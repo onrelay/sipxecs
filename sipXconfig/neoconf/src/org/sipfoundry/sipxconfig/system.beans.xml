@@ -80,12 +80,12 @@
 
     <!-- Pre-warm the pool to completely bypass startup thread contention -->
     <property name="initialPoolSize">
-      <value>30</value>
+      <value>10</value>
     </property>
 
     <!-- Keep a healthy, permanent baseline open to absorb sudden runtime traffic spikes -->
     <property name="minPoolSize">
-      <value>30</value>
+      <value>10</value>
     </property>
 
     <!-- Provide a high ceiling so nested startup queries never experience an architectural deadlock -->
