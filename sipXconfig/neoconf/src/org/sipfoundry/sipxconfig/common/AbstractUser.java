@@ -381,7 +381,8 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
 
     /** Set the aliases from a space-delimited string */
     public void setAliasesString(String aliasesString) {
-        if (aliasesString != null) {
+        getAliases().clear();
+        if (aliasesString != null ) {
             String[] aliases = split(aliasesString);
             addAliases(aliases);
         }
