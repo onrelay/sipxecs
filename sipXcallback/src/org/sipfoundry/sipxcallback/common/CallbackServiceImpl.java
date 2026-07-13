@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.sipfoundry.commons.mongo.MongoConstants;
@@ -34,7 +36,6 @@ import org.sipfoundry.commons.userdb.ValidUsers;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.cp.IAtomicReference;
 import com.hazelcast.collection.IQueue;
 import com.hazelcast.cluster.Member;
 import com.hazelcast.cluster.Cluster;
@@ -54,6 +55,8 @@ public class CallbackServiceImpl implements CallbackService {
     private MongoTemplate m_imdbTemplate;
     private int m_expires;
     private HazelcastInstance m_hazelcastInstance;
+    private final ConcurrentHashMap<String, AtomicBoolean> m_localReferences = new ConcurrentHashMap<>();
+
 
     @Override
     public void updateCallbackInfoToMongo(CallbackLegs callbackLegs, boolean insertNewRequest)
@@ -218,11 +221,10 @@ public class CallbackServiceImpl implements CallbackService {
 
         // initiate on "primary" hazelcast instance only
         if ((hazelcastCluster.getLocalMember().equals(hazelcastMembers.iterator().next()))) {
-            IAtomicReference<Boolean> initiated = getAtomicReference(HAZELCAST_CALLBACK_QUEUE_INITIATED);
+            AtomicBoolean initiated = getAtomicReference(HAZELCAST_CALLBACK_QUEUE_INITIATED);
             // initiate the queue if needed
-            if (initiated.get() == null) {
+            if (initiated.compareAndSet(false, true)) { 
                 LOG.debug("Setting up Hazelcast callback queue.");
-                initiated.set(Boolean.valueOf(true));
                 Set<CallbackLegs> calls = setupCallbackRequest();
                 getCallbackQueue().clear();
                 getCallbackQueue().addAll(calls);
@@ -230,20 +232,26 @@ public class CallbackServiceImpl implements CallbackService {
         }
     }
 
-    @Override
-    public IAtomicReference<Boolean> getAtomicReference(String key) {
-        return m_hazelcastInstance.getCPSubsystem().getAtomicReference(key);
+    @Override    
+    public AtomicBoolean getAtomicReference(String key) {
+        return m_localReferences.computeIfAbsent(key, k -> new AtomicBoolean(false));
+    }
+
+    @Override    
+    public void removeAtomicReference(String key) {
+        m_localReferences.remove(key);
     }
 
     @Override
     public boolean isCallbackLegsFreeToProcess(CallbackLegs callbackLegs) {
-        IAtomicReference<Boolean> calleeReference = getAtomicReference(callbackLegs.getCalleeName());
-        Boolean calleeIsProcessing = calleeReference.get();
-        IAtomicReference<Boolean> callerReference = getAtomicReference(callbackLegs.getCallerName());
-        Boolean callerIsProcessing = callerReference.get();
-        // process this request ONLY if this callee is not currently beeing processed by another callback thread
-        return ((calleeReference.isNull() || calleeIsProcessing.equals(false))
-                && (callerReference.isNull() || callerIsProcessing.equals(false)));
+        AtomicBoolean calleeReference = getAtomicReference(callbackLegs.getCalleeName());
+        boolean calleeIsProcessing = calleeReference.get();
+        
+        AtomicBoolean callerReference = getAtomicReference(callbackLegs.getCallerName());
+        boolean callerIsProcessing = callerReference.get();
+        
+        // Process this request ONLY if neither the callee nor the caller is currently processing
+        return !calleeIsProcessing && !callerIsProcessing;
     }
 
 }

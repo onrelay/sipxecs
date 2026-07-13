@@ -45,19 +45,6 @@
     <constructor-arg><ref bean="fsConfig"/></constructor-arg>
   </bean>
 
-  <bean id="callbackTimer" class="org.sipfoundry.sipxcallback.CallbackTimer">
-    <property name="callbackService" ref="callbackService" />
-    <property name="callbackExecutor" ref="callbackExecutor" />
-    <property name="expires" value="${callback-duration}" />
-  </bean>
-
-  <bean id="callbackExecutor" class="org.sipfoundry.sipxcallback.CallbackExecutor">
-    <property name="callbackService" ref="callbackService" />
-    <property name="sipxchangeDomainName" value="${callback.sipxchangeDomainName}" />
-    <property name="callerPrompt" value="${conf.dir}/sipxcallback/prompts/caller.wav" />
-    <property name="requestedCallbackPrompt" value="${conf.dir}/sipxcallback/prompts/requested_a_callback.wav" />
-  </bean>
-
   <bean id="callbackServiceImpl" class="org.sipfoundry.sipxcallback.common.CallbackServiceImpl">
     <property name="imdbTemplate" ref="imdb" />
     <property name="expires" value="${callback-duration}" />
@@ -69,19 +56,44 @@
     <property name="proxyInterfaces" value="org.sipfoundry.sipxcallback.common.CallbackService" />
   </bean> 
 
-  <task:scheduled-tasks>
-    <task:scheduled ref="callbackTimer" method="run" fixed-delay="60000" initial-delay="5000" />
-  </task:scheduled-tasks>
+  <bean id="callbackExecutor" class="org.sipfoundry.sipxcallback.CallbackExecutor">
+    <property name="callbackService" ref="callbackService" />
+    <property name="sipxchangeDomainName" value="${callback.sipxchangeDomainName}" />
+    <property name="callerPrompt" value="${conf.dir}/sipxcallback/prompts/caller.wav" />
+    <property name="requestedCallbackPrompt" value="${conf.dir}/sipxcallback/prompts/requested_a_callback.wav" />
+  </bean>
+
+  <bean id="callbackTimer" class="org.sipfoundry.sipxcallback.CallbackTimer">
+    <property name="callbackService" ref="callbackService" />
+    <property name="callbackExecutor" ref="callbackExecutor" />
+    <property name="expires" value="${callback-duration}" />
+  </bean>
+
+  <bean id="nativeTimerTask" class="org.springframework.scheduling.support.MethodInvokingRunnable">
+    <property name="targetObject" ref="callbackTimer" />
+    <property name="targetMethod" value="run" />
+  </bean>
+
+  <bean id="nativeScheduler" class="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler" 
+        init-method="initialize" destroy-method="destroy">
+    <property name="poolSize" value="1" />
+  </bean>
+
+  <bean id="scheduledTaskTrigger" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+    <property name="targetObject" ref="nativeScheduler" />
+    <property name="targetMethod" value="scheduleAtFixedRate" />
+    <property name="arguments">
+      <list>
+        <ref bean="nativeTimerTask" />
+        <value type="long">60000</value> <!-- milliseconds -->
+      </list>
+    </property>
+  </bean>
 
   <bean id="hazelcastInstance" class="com.hazelcast.core.Hazelcast" factory-method="newHazelcastInstance">
     <constructor-arg>
       <bean class="com.hazelcast.config.Config">
-        <property name="groupConfig">
-          <bean class="com.hazelcast.config.GroupConfig">
-            <property name="name" value="hazelcast-sipxcallback"/>
-            <property name="password" value="hazelcast-sipxcallback"/>
-          </bean>
-        </property>
+        <property name="clusterName" value="hazelcast-sipxcallback"/>
       </bean>
     </constructor-arg>
   </bean>

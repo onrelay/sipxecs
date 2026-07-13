@@ -28,7 +28,7 @@ import org.sipfoundry.sipxcallback.common.CallbackException;
 import org.sipfoundry.sipxcallback.common.CallbackLegs;
 import org.sipfoundry.sipxcallback.common.CallbackService;
 
-import com.hazelcast.cp.IAtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CallbackExecutor {
 
@@ -68,9 +68,9 @@ public class CallbackExecutor {
         initiate(callbackLegs, fsCmdSocket);
         LOG.debug("Originating call to " + m_calleeUID);
         // mark callee and caller as processing (so as not to receive other callbacks)
-        IAtomicReference<Boolean> calleeReference = m_callbackService.getAtomicReference(m_callbackLegs.getCalleeName());
+        AtomicBoolean calleeReference = m_callbackService.getAtomicReference(m_callbackLegs.getCalleeName());
         calleeReference.set(Boolean.valueOf(true));
-        IAtomicReference<Boolean> callerReference = m_callbackService.getAtomicReference(m_callbackLegs.getCallerName());
+        AtomicBoolean callerReference = m_callbackService.getAtomicReference(m_callbackLegs.getCallerName());
         callerReference.set(Boolean.valueOf(true));
         boolean callbackSuccessful = false;
 
@@ -91,8 +91,8 @@ public class CallbackExecutor {
             return callbackSuccessful;
         } finally {
             // remove mark for callee and caller as beeing in use
-            calleeReference.destroy();
-            callerReference.destroy();
+            m_callbackService.removeAtomicReference(m_callbackLegs.getCalleeName());
+            m_callbackService.removeAtomicReference(m_callbackLegs.getCallerName());
         }
     }
 

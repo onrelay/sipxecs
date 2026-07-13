@@ -7,7 +7,7 @@
     <property name="configFile" value="${conf.dir}/mongo-client.ini" />
   </bean>
 
-  <bean id="imdb" class="org.sipfoundry.commons.mongo. ">
+  <bean id="imdb" class="org.sipfoundry.commons.mongo.MongoSpringTemplate">
     <constructor-arg ref="mongoDbFactory"/>
     <property name="dbname" value="imdb"/> 
   </bean>

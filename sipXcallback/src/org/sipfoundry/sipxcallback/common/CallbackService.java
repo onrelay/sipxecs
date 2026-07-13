@@ -17,8 +17,7 @@
 package org.sipfoundry.sipxcallback.common;
 
 import java.util.Queue;
-
-import com.hazelcast.cp.IAtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public interface CallbackService {
 
@@ -41,7 +40,13 @@ public interface CallbackService {
     /**
      * Retrieve an atomic reference
      */
-    public IAtomicReference<Boolean> getAtomicReference(String key);
+    public AtomicBoolean getAtomicReference(String key);
+
+    /**
+     * Remove an atomic reference
+     */
+    public void removeAtomicReference(String key);
+
 
     /**
      * Check if the caller or callee of this request is in use

@@ -65,8 +65,8 @@ public abstract class SipXcallbackServer {
         try {
             initSystemProperties();
             ApplicationContext context = new ClassPathXmlApplicationContext(new String[] {
-                "classpath:/org/sipfoundry/sipxcallback/system.beans.xml",
                 "classpath:/org/sipfoundry/sipxcallback/imdb.beans.xml",
+                "classpath:/org/sipfoundry/sipxcallback/system.beans.xml"
             });
             SipXcallbackServer socket = (SipXcallbackServer) context.getBean("sipxCallbackServer");
             socket.runServer();
