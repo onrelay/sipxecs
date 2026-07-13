@@ -1,7 +1,7 @@
 [Unit]
 Description=sipxcallback
 Documentation=https://github.com/onrelay/sipxecs
-After=network.target syslog.target sipxproxy.service
+After=network-online.target syslog.target sipxproxy.service
 
 [Service]
 Type=forking

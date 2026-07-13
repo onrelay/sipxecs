@@ -22,7 +22,7 @@ JavaVersions="17\."
 PythonVersions="3\."
 NodeVersions="v(16|18|20)\."
 CommonArgs=""
-PidFile=""
+Prog=""
 
 # Generic test function for any binary
 testTool()
@@ -85,19 +85,15 @@ findTool()
 # Creates symlink: /run/sipx/myapp.pid -> /run/sipx/node-myapp
 createSymlink()
 {
-    FILE_PATH="$1"
-    DIR=$(dirname "$FILE_PATH")
-    BASE=$(basename "$FILE_PATH" .pid)
     
     # Use the base name of the tool for the prefix (e.g. 'node' or 'java')
-    PREFIX=$(basename "$ToolName")
+    Prefix=$(basename "$ToolName")
     
-    SYMLINK_PATH="$DIR/${PREFIX}-${BASE}"
+    SymlinkPath="/usr/bin/${Prefix}-${Prog}"
     
-    mkdir -p "$DIR"
-    ln -sf "$ToolCommand" "$SYMLINK_PATH"
+    ln -sf "$ToolCommand" "$SymlinkPath"
     
-    ToolCommand="$SYMLINK_PATH"
+    ToolCommand="$SymlinkPath"
 }
 
 ## Main program loop
@@ -114,8 +110,8 @@ do
             ToolName="${2}"
             shift
             ;;
-        --pidfile)
-            PidFile="${2}"
+        --prog)
+            Prog="${2}"
             shift
             ;;
         *) Action=HELP ;;
@@ -131,8 +127,8 @@ if [ "$Action" = "RUN" ]; then
         exit 1
     fi
 
-    if [ -n "$PidFile" ]; then
-        createSymlink "$PidFile"
+    if [ -n "$Prog" ]; then
+        createSymlink "$Prog"
     fi
 
     echo "$ToolCommand $CommonArgs"
@@ -141,12 +137,12 @@ fi
 
 cat <<USAGE
 Usage:
-    ./sipx-config --java   [--pidfile /path/to/proc.pid]
-    ./sipx-config --perl   [--pidfile /path/to/proc.pid]
-    ./sipx-config --python [--pidfile /path/to/proc.pid]
-    ./sipx-config --ruby   [--pidfile /path/to/proc.pid]
-    ./sipx-config --node   [--pidfile /path/to/proc.pid]
-    ./sipx-config --tool /path/to/tool [--pidfile /path/to/proc.pid]
+    ./sipx-config --java   [--prog program]
+    ./sipx-config --perl   [--prog program]
+    ./sipx-config --python [--prog program]
+    ./sipx-config --ruby   [--prog program]
+    ./sipx-config --node   [--prog program]
+    ./sipx-config --tool /path/to/tool [--prog program]
 
 Options:
     --tool <path>  Use a specific binary path instead of searching PATH

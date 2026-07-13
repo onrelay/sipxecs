@@ -52,24 +52,24 @@ bundle agent sipxevent_setup {
 bundle agent sipxevent_running {
   vars:
     any::
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxevent/java-sipxevent";
+      "service_command" string => "$(sipx.SIPX_BINDIR)/java-sipxevent";
   methods:
     any::
       "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxevent_running");
 
   commands:
     (!sipxevent|stop_sipxecs).sipxevent_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxevent"
+      "$(sipx.systemctl)"
         comment => "stop sipxevent",
-        args => "stop";
+        args => "stop sipxevent";
 
     sipxevent.!sipxevent_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxevent"
+      "$(sipx.systemctl)"
         comment => "start sipxevent",
-        args => "start";
+        args => "start sipxevent";
 
     sipxevent.sipxevent_running.(restart_sipxecs|restart_sipxevent)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxevent"
+      "$(sipx.systemctl)"
         comment => "restart sipxevent",
-        args => "restart";
+        args => "restart sipxevent";
 }

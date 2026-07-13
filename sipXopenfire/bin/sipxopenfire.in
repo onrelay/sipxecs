@@ -29,7 +29,7 @@ fi
 # If log path is not set in sysconfig, set to $OPENFIRE_HOME/logs.
 [ -z "$OPENFIRE_LOGDIR" ] && OPENFIRE_LOGDIR="${OPENFIRE_HOME}/logs"
 
-JAVACMD=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
+JavaCmd=`@SIPX_BINDIR@/sipx-config --java --prog "${prog}"`
 
 # Prepare location of openfire libraries
 OPENFIRE_LIB="${OPENFIRE_HOME}/lib"
@@ -46,7 +46,7 @@ fi
 
 prog=openfire
 pidfile="${OPENFIRE_PIDFILE}"
-regex="^@SIPX_RUNDIR@/$prog/java-$prog"
+regex="^@SIPX_BINDIR@/$prog/java-$prog"
 
 start() {
   Command="${JAVACMD} -Dlog4j.configurationFile=${OPENFIRE_LIB}/log4j2.xml -Dlog4j2.formatMsgNoLookups=true"
@@ -68,7 +68,7 @@ start() {
       checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-      checkIfProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
+      checkProcessIsListeningTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; }

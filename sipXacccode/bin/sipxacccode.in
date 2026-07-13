@@ -15,7 +15,7 @@
 
 prog=sipxacccode
 pidfile="@SIPX_RUNDIR@/$prog/$prog.pid"
-regex="^@SIPX_RUNDIR@/$prog/java-$prog"
+regex="^@SIPX_BINDIR@/$prog/java-$prog"
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 
@@ -24,11 +24,12 @@ start() {
     Status=$?
     [ $Status -eq 0 ] && { echo_running; exit $ERUNNING; }
 
-    JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
+    JavaCmd=`@SIPX_BINDIR@/sipx-config --java --prog "${prog}"`
     Dependencies=`@SIPX_BINDIR@/java-dep -d @SIPX_JAVADIR@/sipXcommons @sipxacc_PKGS@`
     export CLASSPATH=`echo @SIPX_CONFDIR@/sipxacccode @SIPX_JAVADIR@/sipXacccode/*.jar ${Dependencies} | sed -e 's/ /:/g'`
 
     setJavaSslOpts
+    setJavaServiceOpts
 
     # procname is there so cfengine can find it
     Command="$JavaCmd \
@@ -36,6 +37,7 @@ start() {
       -Dlog.dir=@SIPX_LOGDIR@ \
       -Dvar.dir=@SIPX_VARDIR@ \
       $JavaSslOpts \
+      $JavaServiceOpts \
       ${SIPXACC_OPTS} \
          org.sipfoundry.sipxacccode.SipXacccode \
 	 $Args"
@@ -51,7 +53,7 @@ start() {
         checkRunningProcessTimeout "${pidfile}" "${regex}" /dev/null 2>&1
         Status=$?
         [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-        checkIfProcessIsListening "${pidfile}" "${regex}" /dev/null 2>&1
+        checkProcessIsListeningTimeout "${pidfile}" "${regex}" /dev/null 2>&1
         Status=$?
         [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
         [ $Status -eq 0 ] && { echo_success; }

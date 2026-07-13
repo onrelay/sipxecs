@@ -79,7 +79,7 @@ bundle agent sipxcallback_setup {
 bundle agent sipxcallback_running {
   vars:
     any::
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxcallback/java-sipxcallback";
+      "service_command" string => "$(sipx.SIPX_BINDIR)/java-sipxcallback";
 
   methods:
     any::
@@ -87,17 +87,17 @@ bundle agent sipxcallback_running {
 
   commands:
     (!sipxcallback|stop_sipxecs).sipxcallback_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxcallback"
+      "$(sipx.systemctl)"
         comment => "stop sipxcallback",
-        args => "stop";
+        args => "stop sipxcallback";
 
     sipxcallback.!sipxcallback_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxcallback"
+      "$(sipx.systemctl)"
         comment => "start sipxcallback",
-        args => "start";
+        args => "start sipxcallback";
 
     sipxcallback.sipxcallback_running.(restart_sipxecs|restart_sipxcallback)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxcallback"
+      "$(sipx.systemctl)"
         comment => "restart sipxcallback",
-        args => "restart";
+        args => "restart sipxcallback";
 }

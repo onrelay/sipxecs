@@ -71,10 +71,10 @@ KeyStore=@SIPX_CONFDIR@/ssl/ssl-web.keystore
 TrustStore=@SIPX_CONFDIR@/ssl/authorities.jks
 CachingProvider=org.ehcache.jsr107.EhcacheCachingProvider
 Logger=org.apache.commons.logging.impl.Log4JLogger
-waitForListenPortTime=900
+waitForListenPortTime=600
 prog=sipxconfig
 pidfile="@SIPX_RUNDIR@/$prog/$prog.pid"
-regex="^@SIPX_RUNDIR@/$prog/java-$prog"
+regex="^@SIPX_BINDIR@/$prog/java-$prog"
 
 . @SIPX_LIBEXECDIR@/sipx-utils.sh
 [ -e @SIPX_CONFDIR@/sipxconfigrc ] && . @SIPX_CONFDIR@/sipxconfigrc
@@ -115,7 +115,7 @@ checkVarFolders() {
 databaseCommand() {
   clearIndexLocks
 
-  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
+  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --prog "${prog}"`
 
   Command="$JavaCmd \
       -Dant.library.dir=${TmpDir} \
@@ -184,7 +184,7 @@ mongoUpgradeCheck() {
 
 buildCommand() {
 
-  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
+  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --prog "${prog}"`
   
   setJavaSslOpts
 
@@ -277,7 +277,7 @@ start() {
       checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-      checkIfProcessIsListening "${pidfile}" "${regex}" $waitForListenPortTime > /dev/null 2>&1
+      checkProcessIsListeningTimeout "${pidfile}" "${regex}" $waitForListenPortTime > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; }

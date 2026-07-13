@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/sh
 ###
 ### Utility script functions common to server startup scripts
 ###
@@ -6,14 +6,15 @@
 PATH="/sbin:/usr/sbin:/bin:/usr/bin"
 export PATH
 
-EINCORRECTUSAGE=1 #incorrect usage
-EALREADY=2	#Operation already in progress
-ENOENT=3	#No such file or directory
-ENOEXEC=4	#Exec format error
-ESRCH=5 	#No such process
-ERUNNING=6	#Process still running
-ENOSCKT=7	#No listening socket
-ENOTWRITABLE=8 #file not writable
+EINCORRECTUSAGE=1  # Generic error / incorrect usage (LSB default)
+EALREADY=0         # Operation already in progress (LSB dictates 0/Success for start)
+ENOENT=5           # Program is not installed / file not found (LSB standard)
+ENOEXEC=4          # Program is not executable / format error (LSB standard)
+ESRCH=7            # Program is not running / no such process (LSB standard)
+ERUNNING=0         # Process still running (LSB dictates 0/Success for start if running)
+ENOSCKT=1          # Generic application error / no listening socket (LSB safe)
+ENOTWRITABLE=1     # Generic application error / file not writable (LSB safe)
+
 
 # Set up correctly depending on the distribution
 if [ -f /etc/redhat-release ]
@@ -33,7 +34,7 @@ then
         printf "\e[G\e[${COL_WIDTH}C\e[1;34m[ EXISTS ]\e[0m\n"
     }
 
-    HTTP_DAEMON_START="@APACHE2_HTTPD@"
+    HTTP_DAEMON_START="/usr/sbin/httpd"
 
 elif [ -f /etc/SuSE-release ]
 then
@@ -51,7 +52,7 @@ then
       rc_status -v
   }
 
-  HTTP_DAEMON_START="@APACHE2_HTTPD@"
+  HTTP_DAEMON_START="/usr/sbin/httpd"
 
 elif [ -f /etc/debian_version ]
 then
@@ -65,7 +66,7 @@ then
       echo failure
   }
 
-  HTTP_DAEMON_START="start-stop-daemon --start --chuid root --exec @APACHE2_HTTPD@ --"
+  HTTP_DAEMON_START="start-stop-daemon --start --chuid root --exec /usr/sbin/httpd --"
 
 else
   # Other distros
@@ -441,7 +442,10 @@ setJavaSslOpts() {
     -Djavax.net.ssl.keyStore=@SIPX_CONFDIR@/ssl/ssl.keystore \
     -Djavax.net.ssl.keyStorePassword=$StorePassword"
 
-  local JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
+  prog=$(basename "$pidfile")
+  prog=${prog%.pid}
+
+  local JavaCmd=`@SIPX_BINDIR@/sipx-config --java --prog "${prog}"`
   X509Algorithm=`$JavaCmd \
        org.sipfoundry.commons.x509selector.X509Selector`
   JettySslOpts="\
@@ -453,6 +457,16 @@ setJavaSslOpts() {
     $TrustStoreOpts \
     $KeyStoreOpts \
     $JettySslOpts"
+}
+
+setJavaServiceOpts() {
+  JavaServiceOpts="\
+    -Xms64m \
+    -Xmx256m \
+    -XX:MetaspaceSize=64m \
+    -XX:MaxMetaspaceSize=128m \
+    -XX:+UseG1GC \
+    -XX:+UseStringDeduplication"
 }
 
 global_selinux_check () {
@@ -483,7 +497,7 @@ EOF
 ##
 maxTimeout=5
 maxListenTimeout=10
-sleepTime=0.5
+sleepTime=1
 runningError="is already running: "
 notRunningError="is not running: "
 execError="Provided file is not executable"
@@ -574,9 +588,9 @@ checkRunningProcessTimeout() {
     pidfile="$1"
     regex="$2"
 
-    timeout=${3:-$maxTimeout}
+    runningTimeout=${3:-$maxTimeout}
 
-    for ((i=0; i<$timeout; i++)); do
+    for ((i=0; i<$runningTimeout; i++)); do
         pid=$(getRunningProcessID "$pidfile" "$regex")
         [ $? -eq 0 ] && return 0
         sleep $sleepTime
@@ -585,14 +599,16 @@ checkRunningProcessTimeout() {
     return $ESRCH
 }
 
-checkIfProcessIsListening() {
+checkProcessIsListeningTimeout() {
     pidfile="$1"
     regex="$2"
 
-    timeout=${3:-$maxListenTimeout}
-    pid=$(getRunningProcessID "$pidfile" "$regex") || return $ENOSCKT
+    listenTimeout=${3:-$maxListenTimeout}
+    echo $listenTimeout
+    pid=$(getRunningProcessID "$pidfile" "$regex") || return $ESRCH
 
-    for ((i=0; i<$timeout; i++)); do
+    for ((i=0; i<$listenTimeout; i++)); do
+        echo $i
         if ss -lptn 2>/dev/null | grep -q "pid=$pid,"; then
             return 0
         fi

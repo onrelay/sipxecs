@@ -40,7 +40,7 @@ bundle agent sipxrelay_logwatcher {
 bundle agent sipxrelay_running {
   vars:
     any::
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxrelay/java-sipxrelay";
+      "service_command" string => "$(sipx.SIPX_BINDIR)/java-sipxrelay";
 
   methods:
     any::
@@ -51,20 +51,20 @@ bundle agent sipxrelay_running {
       "any" usebundle => rh_systemctl_status("disable sipxrelay");
 
   commands:
+    (!sipxrelay|stop_sipxecs).sipxrelay_running::
+      "$(sipx.systemctl)"
+        comment => "stop sipxrelay",
+        args => "stop sipxrelay";
+
     sipxrelay.!sipxrelay_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrelay"
+      "$(sipx.systemctl)"
         comment => "start sipxrelay",
-        args => "start";
+        args => "start sipxrelay";
 
     sipxrelay.sipxrelay_running.(restart_sipxrelay|restart_sipxecs)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrelay"
+      "$(sipx.systemctl)"
         comment => "restart sipxrelay",
-        args => "restart";
-
-    (!sipxrelay|stop_sipxecs).sipxrelay_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrelay"
-        comment => "stop sipxrelay",
-        args => "stop";
+        args => "restart sipxrelay";
        
   files:      
     any::  

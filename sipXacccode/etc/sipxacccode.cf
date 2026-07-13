@@ -82,7 +82,7 @@ bundle agent sipxacccode_setup {
 bundle agent sipxacccode_running {
   vars:
     any::
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxacccode/java-sipxacccode";
+      "service_command" string => "$(sipx.SIPX_BINDIR)/java-sipxacccode";
 
   methods:
     any::
@@ -90,17 +90,17 @@ bundle agent sipxacccode_running {
 
   commands:
     (!sipxacccode|stop_sipxecs).sipxacccode_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxacccode"
+      "$(sipx.systemctl)"
         comment => "stop sipxacccode",
-        args => "stop";
+        args => "stop sipxacccode";
 
     sipxacccode.!sipxacccode_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxacccode"
+      "$(sipx.systemctl)"
         comment => "start sipxacccode",
-        args => "start";
+        args => "start sipxacccode";
 
     sipxacccode.sipxacccode_running.(restart_sipxecs|restart_sipxacccode)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxacccode"
+      "$(sipx.systemctl)"
         comment => "restart sipxacccode",
-        args => "restart";
+        args => "restart sipxacccode";
 }

@@ -62,24 +62,24 @@ bundle agent sipxrecording_setup {
 bundle agent sipxrecording_running {
   vars:
     any::
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxrecording/java-sipxrecording";
+      "service_command" string => "$(sipx.SIPX_BINDIR)/java-sipxrecording";
   methods:
     any::
       "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxrecording_running");
 
   commands:
 	(!sipxrecording|stop_sipxecs).sipxrecording_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrecording"
+      "$(sipx.systemctl)"
         comment => "stop sipxrecording",
-        args => "stop";
+        args => "stop sipxrecording";
 
     sipxrecording.!sipxrecording_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrecording"
+      "$(sipx.systemctl)"
         comment => "start sipxrecording",
-        args => "start";
+        args => "start sipxrecording";
 
     sipxrecording.sipxrecording_running.(restart_sipxecs|restart_sipxrecording)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrecording"
+      "$(sipx.systemctl)"
         comment => "restart sipxrecording",
-        args => "restart";
+        args => "restart sipxrecording";
 }

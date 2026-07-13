@@ -1,7 +1,7 @@
 [Unit]
 Description=Disable Transparent Hugepages
 Documentation=https://github.com/onrelay/sipxecs
-After=network.target syslog.target postgresql.service 
+After=network-online.target syslog.target postgresql.service 
 Requires=postgresql.service 
 
 [Service]

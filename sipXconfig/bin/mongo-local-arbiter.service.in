@@ -1,7 +1,7 @@
 [Unit]
 Description=Mongo local arbiter
 Documentation=https://github.com/onrelay/sipxecs
-After=network.target mongod.service
+After=network-online.target mongod.service
 Requires=mongod.service
 
 [Service]

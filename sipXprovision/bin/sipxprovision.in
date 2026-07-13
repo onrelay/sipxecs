@@ -13,7 +13,7 @@
 prog=sipxprovision
 config="@SIPX_CONFDIR@/$prog-config"
 pidfile="@SIPX_RUNDIR@/$prog/$prog.pid"
-regex="^@SIPX_RUNDIR@/$prog/java-$prog"
+regex="^@SIPX_BINDIR@/$prog/java-$prog"
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 
@@ -35,15 +35,17 @@ configtest() {
 start() {
   [ -f $config ] || { echo -n "$invalidFileError"; echo_failure; exit $ENOENT; }
   
-  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
+  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --prog "${prog}"`
   Dependencies=`@SIPX_BINDIR@/java-dep -d @SIPX_JAVADIR@/sipXcommons @provision_PKGS@`
   export CLASSPATH=`echo @SIPX_CONFDIR@/sipxprovision @SIPX_JAVADIR@/sipXprovision/*.jar ${Dependencies} | sed -e 's/ /:/g'`  
   
   setJavaSslOpts
+  setJavaServiceOpts
   
   Command="$JavaCmd \
     $TrustStoreOpts \
     $KeyStoreOpts \
+    $JavaServiceOpts \
     ${SIPXPROVISION_OPTS} \
     -Djetty.x509.algorithm=$X509Algorithm \
     -Djetty.ssl.password=$StorePassword \
@@ -69,7 +71,7 @@ start() {
       checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-      checkIfProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
+      checkProcessIsListeningTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; }

@@ -1,7 +1,7 @@
 [Unit]
 Description=sipxbridge
 Documentation=https://github.com/onrelay/sipxecs
-After=network.target syslog.target named.service sipxproxy.service 
+After=network-online.target syslog.target named.service sipxproxy.service 
 
 [Service]
 Type=forking

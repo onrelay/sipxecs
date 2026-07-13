@@ -1,7 +1,7 @@
 [Unit]
 Description=sipxrls
 Documentation=https://github.com/onrelay/sipxecs
-After=network.target syslog.target postgresql.service mongod.service
+After=network-online.target syslog.target postgresql.service mongod.service
 Requires=postgresql.service mongod.service
 
 

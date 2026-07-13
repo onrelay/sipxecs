@@ -35,8 +35,8 @@ class ArchiveBase
     @backup_tmp_dir = '@SIPX_TMPDIR@/backup'
     @restore_dir = '@SIPX_TMPDIR@/restore'
     @out = $stdout
-    @user = 'root'
-    @ssh_params = "-o 'StrictHostKeyChecking=no' -i ~/.cfagent/ppkeys/localhost.nopass.priv"
+    @user = 'sipx'
+    @ssh_params = "-o 'StrictHostKeyChecking=no' -i /etc/sipxpbx/.cfagent/ppkeys/localhost.nopass.priv"
     load_config_file(config) unless config == nil
     redirect_output
   end

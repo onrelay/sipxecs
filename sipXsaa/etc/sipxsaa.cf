@@ -88,19 +88,19 @@ bundle agent sipxsaa_running {
 
   commands:
     (!sipxsaa|stop_sipxecs).sipxsaa_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxsaa"
+      "$(sipx.systemctl)"
         comment => "stop sipxsaa",
-        args => "stop";
+        args => "stop sipxsaa";
 
     sipxsaa.!sipxsaa_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxsaa"
+      "$(sipx.systemctl)"
         comment => "start sipxsaa",
-        args => "start";
+        args => "start sipxsaa";
 
     sipxsaa.sipxsaa_running.(restart_sipxsaa|restart_sipxecs)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxsaa"
+      "$(sipx.systemctl)"
         comment => "restart sipxsaa",
-        args => "restart";
+        args => "restart sipxsaa";
                   
     sipxsaa.sipxsaa_running.refresh_sipxsaa::
       "/usr/bin/killall"

@@ -63,8 +63,7 @@ bundle agent sipxlogwatcher_setup {
 bundle agent sipxlogwatcher_running {
   vars:
     any::
-      "service" string => "$(sipx.SIPX_SERVICEDIR)/sipxlogwatcher";
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxlogwatcher/perl-sipxlogwatcher";
+      "service_command" string => "$(sipx.SIPX_BINDIR)/perl-sipxlogwatcher";
 
   methods:
     any::
@@ -72,23 +71,23 @@ bundle agent sipxlogwatcher_running {
 
   commands:
     (!sipxlogwatcher|stop_sipxecs).sipxlogwatcher_running::
-      "$(service)"
+      "$(sipx.systemctl)"
         comment => "stop sipxlogwatcher",
-        args => "stop";
+        args => "stop sipxlogwatcher";
 
     sipxlogwatcher.!sipxlogwatcher_running.!stop_sipxecs::
-      "$(service)"
+      "$(sipx.systemctl)"
         comment => "start sipxlogwatcher",
-        args => "start";
+        args => "start sipxlogwatcher";
 
     sipxlogwatcher.sipxlogwatcher_running.reload_sipxlogwatcher.!stop_sipxecs::
-      "$(service)"
-        comment => "reload sipxlogwatcher",
-        args => "reload";
+      "$(sipx.systemctl)"
+        comment => "restart sipxlogwatcher",
+        args => "restart sipxlogwatcher";
 
     sipxlogwatcher.sipxlogwatcher_running.(restart_sipxlogwatcher|restart_sipxecs)::
-      "$(service)"
+      "$(sipx.systemctl)"
         comment => "restart sipxlogwatcher",
-        args => "restart";
+        args => "restart sipxlogwatcher";
 }
 

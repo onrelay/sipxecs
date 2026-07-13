@@ -94,7 +94,7 @@ bundle agent sipxpage_setup {
 bundle agent sipxpage_running {
   vars:
     any::
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxpage/java-sipxpage";
+      "service_command" string => "$(sipx.SIPX_BINDIR)/java-sipxpage";
 
   methods:
     any::
@@ -102,17 +102,17 @@ bundle agent sipxpage_running {
 
   commands:
     (!sipxpage|stop_sipxecs).sipxpage_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxpage"
+      "$(sipx.systemctl)"
         comment => "stop sipxpage",
-        args => "stop";
+        args => "stop sipxpage";
 
     sipxpage.!sipxpage_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxpage"
+      "$(sipx.systemctl)"
         comment => "start sipxpage",
-        args => "start";
+        args => "start sipxpage";
 
     sipxpage.sipxpage_running.(restart_sipxpage|restart_sipxecs)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxpage"
+      "$(sipx.systemctl)"
         comment => "restart sipxpage",
-        args => "restart";
+        args => "restart sipxpage";
 }

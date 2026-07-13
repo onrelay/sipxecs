@@ -50,7 +50,7 @@ start() {
       checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-      checkIfProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
+      checkProcessIsListeningTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; }

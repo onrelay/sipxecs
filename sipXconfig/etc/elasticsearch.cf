@@ -32,17 +32,17 @@ bundle agent elasticsearch_snmp_wrapper {
   files:
     any::
 
-      "/run/elasticsearch/."
-        comment => "Ensure /run/elasticsearch exists",
+      "/usr/share/elasticsearch/."
+        comment => "Ensure /usr/share/elasticsearch exists",
         create => "true",
-        perms => mog("755", "elasticsearch", "elasticsearch");
+        perms => mog("755", "root", "root");
 
-      "/run/elasticsearch/bin/."
+      "/usr/share/elasticsearch/bin/."
         comment => "Ensure bin subfolder exists for ES_JAVA_HOME",
         create => "true",
         perms => mog("755", "elasticsearch", "elasticsearch");
 
-      "/run/elasticsearch/bin/java"
+      "/usr/share/elasticsearch/bin/java"
         comment => "Wrapper to launch Elasticsearch Java via sipx-config",
         create => "true",
         perms => mog("755", "elasticsearch", "elasticsearch"),
@@ -63,9 +63,10 @@ bundle edit_line elasticsearch_java_wrapper {
 # Allows sipXecs SNMP process-name tracking
 #
 
-pidfile=\"/var/run/elasticsearch/elasticsearch.pid\"
+JavaCmd=\"/usr/share/elasticsearch/bin/java-elasticsearch\"
+    
+ln -sf /usr/bin/java \"$JavaCmd\"
 
-JavaCmd=`/usr/bin/sipx-config --java --pidfile \"${pidfile}\"`
 
 exec $JavaCmd \"$@\"
 ";
@@ -111,7 +112,7 @@ bundle edit_line elasticsearch_systemd_override {
   insert_lines:
     "[Service]
 # Use wrapper Java for SNMP tracking
-Environment=ES_JAVA_HOME=/run/elasticsearch
+Environment=ES_JAVA_HOME=/usr/share/elasticsearch
 ";
 }
 

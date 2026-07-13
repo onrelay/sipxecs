@@ -21,7 +21,7 @@ regex="java-$prog"
 start() {
   checkRunningProcess "${pidfile}" "${regex}" > /dev/null
   Args=""
-  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
+  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --prog "${prog}"`
   Dependencies=`@SIPX_BINDIR@/java-dep -d @SIPX_JAVADIR@/sipXcommons @rest_PKGS@`
   export CLASSPATH=`echo @SIPX_CONFDIR@/sipxrest @SIPX_JAVADIR@/sipXrest/*.jar @SIPX_JAVADIR@/sipXrest/plugins/*.jar ${Dependencies} | sed -e 's/ /:/g'`    
   
@@ -47,10 +47,7 @@ start() {
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningProcessTimeout "${pidfile}" "${regex}"
-      Status=$?
-      [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-      checkRunningProcess "${pidfile}" "${regex}" > /dev/null
+      checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; }

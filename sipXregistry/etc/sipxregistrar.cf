@@ -88,19 +88,19 @@ bundle agent sipxregistrar_running {
 
   commands:
     (!sipxregistrar|stop_sipxecs).sipxregistrar_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxregistrar"
+      "$(sipx.systemctl)"
         comment => "stop sipxregistrar",
-        args => "stop";
+        args => "stop sipxregistrar";
 
     sipxregistrar.!sipxregistrar_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxregistrar"
+      "$(sipx.systemctl)"
         comment => "start sipxregistrar",
-        args => "start";
+        args => "start sipxregistrar";
 
     sipxregistrar.sipxregistrar_running.(restart_sipxregistrar|restart_sipxecs)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxregistrar"
+      "$(sipx.systemctl)"
         comment => "restart sipxregistrar",
-        args => "restart";
+        args => "restart sipxregistrar";
         
     sipxregistrar.sipxregistrar_running.refresh_sipxregistrar::
       "/usr/bin/killall"

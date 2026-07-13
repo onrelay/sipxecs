@@ -88,19 +88,19 @@ bundle agent sipxrls_running {
 
   commands:
     (!sipxrls|stop_sipxecs).sipxrls_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrls"
+      "$(sipx.systemctl)"
         comment => "stop sipxrls",
-        args => "stop";
+        args => "stop sipxrls";
 
     sipxrls.!sipxrls_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrls"
+      "$(sipx.systemctl)"
         comment => "start sipxrls",
-        args => "start";
+        args => "start sipxrls";
 
     sipxrls.sipxrls_running.(restart_sipxrls|restart_sipxecs)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrls"
+      "$(sipx.systemctl)"
         comment => "restart sipxrls",
-        args => "restart";
+        args => "restart sipxrls";
                   
     sipxrls.sipxrls_running.refresh_sipxrls::
       "/usr/bin/killall"

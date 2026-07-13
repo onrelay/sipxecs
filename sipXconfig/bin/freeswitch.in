@@ -111,7 +111,7 @@ do_start() {
     checkRunningProcessTimeout "$PIDFILE" "$REGEX" > /dev/null 2>&1
     RETVAL=$?
     [ $RETVAL -eq 0 ] || { echo_failure; exit $ESRCH; }
-    checkIfProcessIsListening "$PIDFILE" "$REGEX" > /dev/null 2>&1
+    checkProcessIsListeningTimeout "$PIDFILE" "$REGEX" > /dev/null 2>&1
     RETVAL=$?
     [ $RETVAL -eq 0 ] || { echo_failure; exit $ENOSCKT; }
     [ $RETVAL -eq 0 ] && { echo_success; }

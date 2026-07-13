@@ -80,7 +80,7 @@ bundle agent sipximbot_setup {
 bundle agent sipximbot_running {
   vars:
     any::
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipximbot/java-sipximbot";
+      "service_command" string => "$(sipx.SIPX_BINDIR)/java-sipximbot";
 
   methods:
     any::
@@ -88,19 +88,19 @@ bundle agent sipximbot_running {
 
   commands:
     (!sipximbot|stop_sipxecs).sipximbot_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipximbot"
+      "$(sipx.systemctl)"
         comment => "stop sipximbot",
-        args => "stop";
+        args => "stop sipximbot";
 
     sipximbot.!sipximbot_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipximbot"
+      "$(sipx.systemctl)"
         comment => "start sipximbot",
-        args => "start";
+        args => "start sipximbot";
 
     sipximbot.sipximbot_running.(restart_sipxecs|restart_sipximbot)::
-      "$(sipx.SIPX_SERVICEDIR)/sipximbot"
+      "$(sipx.systemctl)"
         comment => "restart sipximbot",
-        args => "restart";
+        args => "restart sipximbot";
 }
 
 

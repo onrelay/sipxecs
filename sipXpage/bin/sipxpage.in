@@ -13,12 +13,12 @@
 
 prog=sipxpage
 pidfile="@SIPX_RUNDIR@/$prog/$prog.pid"
-regex="^@SIPX_RUNDIR@/$prog/java-$prog"
+regex="^@SIPX_BINDIR@/$prog/java-$prog"
 
 [ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
 
 start() {
-  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
+  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --prog "${prog}"`
   Dependencies=`@SIPX_BINDIR@/java-dep -d @SIPX_JAVADIR@/sipXcommons @page_PKGS@`
   export CLASSPATH=`echo @SIPX_JAVADIR@/sipXpage/*.jar ${Dependencies} | sed -e 's/ /:/g'`
 
@@ -45,7 +45,7 @@ start() {
       checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ESRCH;}
-      checkIfProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
+      checkProcessIsListeningTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; }

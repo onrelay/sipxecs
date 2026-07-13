@@ -49,24 +49,24 @@ bundle agent sipxprovision_setup {
 bundle agent sipxprovision_running {
   vars:
     any::
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxprovision/java-sipxprovision";
+      "service_command" string => "$(sipx.SIPX_BINDIR)/java-sipxprovision";
   methods:
     any::
       "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxprovision_running");
 
   commands:
     (!sipxprovision|stop_sipxecs).sipxprovision_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxprovision"
+      "$(sipx.systemctl)"
         comment => "stop sipxprovision",
-        args => "stop";
+        args => "stop sipxprovision";
 
     sipxprovision.!sipxprovision_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxprovision"
+      "$(sipx.systemctl)"
         comment => "start sipxprovision",
-        args => "start";
+        args => "start sipxprovision";
 
     sipxprovision.sipxprovision_running.(restart_sipxecs|restart_sipxprovision)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxprovision"
+      "$(sipx.systemctl)"
         comment => "restart sipxprovision",
-        args => "restart";
+        args => "restart sipxprovision";
 }

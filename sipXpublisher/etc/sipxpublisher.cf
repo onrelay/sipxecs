@@ -91,19 +91,19 @@ bundle agent sipxpublisher_running {
 
   commands:
     (!sipxpublisher|stop_sipxecs).sipxpublisher_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxpublisher"
+      "$(sipx.systemctl)"
         comment => "stop sipxpublisher",
-        args => "stop";
+        args => "stop sipxpublisher";
 
     sipxpublisher.!sipxpublisher_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxpublisher"
+      "$(sipx.systemctl)"
         comment => "start sipxpublisher",
-        args => "start";
+        args => "start sipxpublisher";
 
     sipxpublisher.sipxpublisher_running.(restart_sipxpublisher|restart_sipxecs)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxpublisher"
+      "$(sipx.systemctl)"
         comment => "restart sipxpublisher",
-        args => "restart";
+        args => "restart sipxpublisher";
         
     sipxpublisher.sipxpublisher_running.refresh_sipxpublisher::
       "/usr/bin/killall"

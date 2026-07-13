@@ -148,7 +148,7 @@ bundle edit_line sipxivr_log4j_properties_contents {
 bundle agent sipxivr_running {
   vars:
     any::
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxivr/java-sipxivr";
+      "service_command" string => "$(sipx.SIPX_BINDIR)/java-sipxivr";
 
   methods:
     any::
@@ -160,23 +160,23 @@ bundle agent sipxivr_running {
 
   commands:
     (!sipxivr|stop_sipxecs).sipxivr_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxivr"
+      "$(sipx.systemctl)"
         comment => "stop sipxivr",
-        args => "stop";
+        args => "stop sipxivr";
 
     sipxivr.!sipxivr_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxivr"
+      "$(sipx.systemctl)"
         comment => "start sipxivr",
-        args => "start";
+        args => "start sipxivr";
         
       "/usr/bin/setfacl"
         comment => "Executed command: setfacl -Rm d:u:freeswitch:rwX,u:freeswitch:rwX $(sipx.SIPX_IVRDATADIR)",
         args => "-Rm d:u:freeswitch:rwX,u:freeswitch:rwX $(sipx.SIPX_IVRDATADIR)";        
 
     sipxivr.sipxivr_running.(restart_sipxecs|restart_sipxivr)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxivr"
+      "$(sipx.systemctl)"
         comment => "restart sipxivr",
-        args => "restart";
+        args => "restart sipxivr";
 }
 
 # Install cron schedules for vm cleanup

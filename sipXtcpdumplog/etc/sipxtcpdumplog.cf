@@ -111,21 +111,21 @@ bundle agent sipxtcpdumplog_running {
         args => "-a";
 
     (!sipxtcpdumplog|stop_sipxecs).sipxtcpdumplog_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxtcpdumplog"
+      "$(sipx.systemctl)"
         comment => "stop sipxtcpdumplog",
-        args => "stop",
+        args => "stop sipxtcpdumplog",
         contain => su("root");
 
     sipxtcpdumplog.!sipxtcpdumplog_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxtcpdumplog"
+      "$(sipx.systemctl)"
         comment => "start sipxtcpdumplog",
-        args => "start ",
+        args => "start sipxtcpdumplog",
         contain => su("root");
 
     sipxtcpdumplog.sipxtcpdumplog_running.(restart_sipxecs|restart_sipxtcpdumplog)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxtcpdumplog"
+      "$(sipx.systemctl)"
         comment => "restart sipxtcpdumplog",
-        args => "restart",
+        args => "restart sipxtcpdumplog",
         contain => su("root");
 }
 

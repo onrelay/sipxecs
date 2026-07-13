@@ -1,6 +1,6 @@
 [Unit]
 Description=sipX Openfire XMPP Server
-After=network.target syslog.target
+After=network-online.target syslog.target
 
 [Service]
 Type=forking

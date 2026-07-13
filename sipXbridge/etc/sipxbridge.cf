@@ -67,7 +67,7 @@ bundle agent sipxbridge_logwatcher {
 bundle agent sipxbridge_running {
   vars:
     any::
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxbridge/java-sipxbridge";
+      "service_command" string => "$(sipx.SIPX_BINDIR)/java-sipxbridge";
 
   methods:
     any::
@@ -79,19 +79,19 @@ bundle agent sipxbridge_running {
 
   commands:
     (!sipxbridge|stop_sipxecs).sipxbridge_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxbridge"
+      "$(sipx.systemctl)"
         comment => "stop sipxbridge",
-        args => "stop";
+        args => "stop sipxbridge";
 
     sipxbridge.!sipxbridge_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxbridge"
+      "$(sipx.systemctl)"
         comment => "start sipxbridge",
-        args => "start";
+        args => "start sipxbridge";
 
     sipxbridge.sipxbridge_running.(restart_sipxecs|restart_sipxbridge|java_ssl_web_repaired)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxbridge"
+      "$(sipx.systemctl)"
         comment => "restart sipxbridge",
-        args => "restart";
+        args => "restart sipxbridge";
 }
 
 bundle edit_line sipxbridge_log4j_properties_contents {

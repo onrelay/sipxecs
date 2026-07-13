@@ -143,9 +143,9 @@ bundle agent sipxproxy_running {
       										 
   commands:
     (!sipxproxy|stop_sipxecs).sipxproxy_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxproxy"
+      "$(sipx.systemctl)"
         comment => "stop sipxproxy",
-        args => "stop";
+        args => "stop sipxproxy";
 
     !sipxcdr.sipxproxy.!sipxproxy_running.!stop_sipxecs::
       "$(sipx.SIPX_SERVICEDIR)/sipxcdr"
@@ -153,34 +153,34 @@ bundle agent sipxproxy_running {
         args => "setup";        
 
     sipxproxy.!sipxproxy_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxproxy"
+      "$(sipx.systemctl)"
         comment => "start sipxproxy",
-        args => "start";
+        args => "start sipxproxy";
 
     sipxproxy.sipxproxy_running.(restart_sipxproxy|restart_sipxecs|change_password|ssl_repaired)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxproxy"
+      "$(sipx.systemctl)"
         comment => "restart sipxproxy",
-        args => "restart";
+        args => "restart sipxproxy";
 
     redeploy_nat.sipxrelay::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrelay"
+      "$(sipx.systemctl)"
         comment => "redeploy NAT config - restart sipxrelay",
-        args => "restart";
+        args => "restart sipxrelay";
 
     (restart_sipxproxy_and_registrar|redeploy_nat).sipxproxy::
-      "$(sipx.SIPX_SERVICEDIR)/sipxproxy"
+      "$(sipx.systemctl)"
         comment => "dialplan or NAT config redeploy - restart sipxproxy",
-        args => "restart";
+        args => "restart sipxproxy";
 
     (restart_sipxproxy_and_registrar|redeploy_nat).sipxregistrar::
-      "$(sipx.SIPX_SERVICEDIR)/sipxregistrar"
+      "$(sipx.systemctl)"
         comment => "dialplan or NAT config redeploy -restart sipxregistrar",
-        args => "restart";
+        args => "restart sipxregistrar";
 
     redeploy_nat.sipxbridge::
-      "$(sipx.SIPX_SERVICEDIR)/sipxbridge"
+      "$(sipx.systemctl)"
         comment => "redeploy NAT config - restart sipxbridge",
-        args => "restart";
+        args => "restart sipxbridge";
 
     sipxproxy.sipxproxy_running.refresh_sipxproxy::
       "/usr/bin/killall"

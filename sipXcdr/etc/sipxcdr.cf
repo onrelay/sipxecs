@@ -63,7 +63,7 @@ bundle agent sipxcdr_setup {
 bundle agent sipxcdr_running {
   vars:
     any::
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxcdr/ruby-sipxcdr";
+      "service_command" string => "$(sipx.SIPX_BIBNDIR)/ruby-sipxcdr";
 
   methods:
     any::
@@ -71,17 +71,17 @@ bundle agent sipxcdr_running {
 
   commands:
     (!sipxcdr|stop_sipxecs).sipxcdr_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxcdr"
+      "$(sipx.systemctl)"
         comment => "stop sipxcdr",
-        args => "stop";
+        args => "stop sipxcdr";
 
     sipxcdr.!sipxcdr_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxcdr"
+      "$(sipx.systemctl)"
         comment => "start sipxcdr",
-        args => "start";
+        args => "start sipxcdr";
 
     sipxcdr.sipxcdr_running.(restart_sipxecs|restart_sipxcdr)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxcdr"
+      "$(sipx.systemctl)"
         comment => "restart sipxcdr",
-        args => "restart";
+        args => "restart sipxcdr";
 }

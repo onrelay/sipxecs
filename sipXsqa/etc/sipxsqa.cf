@@ -70,44 +70,44 @@ bundle agent sipxsqa_running {
 
   commands:
     (!sipxsqa|stop_sipxecs).sipxsqa_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxsqa"
+      "$(sipx.systemctl)"
         comment => "stop sipxsqa",
-        args => "stop";
+        args => "stop sipxsqa";
 
     sipxsqa.!sipxsqa_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxsqa"
+      "$(sipx.systemctl)"
         comment => "start sipxsqa",
-        args => "start";
+        args => "start sipxsqa";
 
     sipxsqa.sipxsqa_running.(restart_sipxsqa|restart_sipxecs)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxsqa"
+      "$(sipx.systemctl)"
         comment => "restart sipxsqa",
-        args => "restart";
+        args => "restart sipxsqa";
         
     sipxproxy.sipxsqa.restart_sipxsqa::
-      "$(sipx.SIPX_SERVICEDIR)/sipxproxy"
+      "$(sipx.systemctl)"
         comment => "restart sipxproxy",
-        args => "restart";
+        args => "restart sipxproxy";
     
     sipxopenfire.sipxsqa.restart_sipxsqa::
-      "/etc/init.d/sipxopenfire"
+      "$(sipx.systemctl)"
         comment => "restart sipxopenfire",
-        args => "restart";
+        args => "restart sipxopenfire";
         
     (homer_capture|homer_web).sipxsqa.restart_sipxsqa::  
-      "$(sipx.SIPX_SERVICEDIR)/sipxhomer"
+      "$(sipx.systemctl)"
         comment => "restart sipxhomer",
-        args => "restart";
+        args => "restart sipxhomer";
         
     sipxsss.sipxsqa.restart_sipxsqa::
-      "$(sipx.SIPX_SERVICEDIR)/sipxsss"
+      "$(sipx.systemctl)"
         comment => "restart sipxsss",
-        args => "restart";
+        args => "restart sipxsss";
         
     sipxrls.sipxsqa.restart_sipxsqa::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrls"
+      "$(sipx.systemctl)"
         comment => "restart sipxrls",
-        args => "restart";
+        args => "restart sipxrls";
                 
     sipxsqa.sipxsqa_running.refresh_sipxsqa::
       "/usr/bin/killall"

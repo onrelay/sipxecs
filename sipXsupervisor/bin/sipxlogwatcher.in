@@ -12,7 +12,7 @@ lockfile="/var/lock/subsys/sec"
 pidfile=@SIPX_RUNDIR@/sipxlogwatcher/sipxlogwatcher.pid
 rc=@SIPX_CONFDIR@/sipxlogwatcher-rc
 regex="perl-$prog"
-exec=`@SIPX_BINDIR@/sipx-config --perl --pidfile "${pidfile}"` 
+exec=`@SIPX_BINDIR@/sipx-config --perl --prog "${prog}"` 
 exec="${exec} -w /usr/bin/sec"
 
 [ -e $rc ] && . $rc

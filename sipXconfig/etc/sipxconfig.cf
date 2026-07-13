@@ -50,7 +50,7 @@ bundle agent sipxconfig_logwatcher {
 bundle agent sipxconfig_running {
   vars:
     any::
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxconfig/java-sipxconfig";
+      "service_command" string => "$(sipx.SIPX_BINDIR)/java-sipxconfig";
 
   methods:
     any::
@@ -62,19 +62,19 @@ bundle agent sipxconfig_running {
 
   commands:
     (primary|admin).!sipxconfig_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxconfig"
+      "$(sipx.systemctl)"
         comment => "start sipxconfig",
-        args => "start";
+        args => "start sipxconfig";
 
     (primary|admin).sipxconfig_running.(restart_sipxconfig|restart_sipxecs|java_authorities_repaired|change_password)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxconfig"
+      "$(sipx.systemctl)"
         comment => "restart sipxconfig",
-        args => "restart";
+        args => "restart sipxconfig";
 
     ((!primary.!admin)|stop_sipxecs).sipxconfig_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxconfig"
+      "$(sipx.systemctl)"
         comment => "stop sipxconfig",
-        args => "stop";
+        args => "stop sipxconfig";
         
   files:
     "$(sipx.SIPX_CONFDIR)/log4j.properties"

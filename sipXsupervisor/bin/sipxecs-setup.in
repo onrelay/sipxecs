@@ -72,9 +72,14 @@ def set_ssh_keys
   root_pub = "#{$root_keydir}/localhost.pub"
   md5name = `cf-key -p #{root_pub} 2>/dev/null`.strip
   md5file = "#{$user}-#{md5name}.pub"
+  root_md5file = "root-#{md5name}.pub"
 
   run_command "cp #{root_pub} #{$root_keydir}/#{md5file}"
   run_command "chmod 600 #{$root_keydir}/#{md5file}"
+
+  # Create the missing root MD5 public key entry in root_keydir
+  run_command "cp #{root_pub} #{$root_keydir}/#{root_md5file}"
+  run_command "chmod 600 #{$root_keydir}/#{root_md5file}"
 
   run_command "cp #{root_pub} #{$user_keydir}/#{md5file}"
   run_command "chown #{$user}:#{$group} #{$user_keydir}/#{md5file}"
@@ -91,9 +96,15 @@ def set_ssh_keys
   `cp #{$root_keydir}/localhost.pub #{$user_keydir}/localhost.pub`
   `chown #{$user}:#{$group} #{$user_keydir}/localhost.pub && chmod 644 #{$user_keydir}/localhost.pub`
 
+  # Generate password-less key for user
   exit 1 unless run_command "openssl rsa -in #{$user_keydir}/localhost.priv -passin 'pass:Cfengine passphrase' -out #{$user_keydir}/localhost.nopass.priv"
   `chmod 600 #{$user_keydir}/localhost.nopass.priv`
   `chown #{$user}:#{$group} #{$user_keydir}/localhost.nopass.priv`
+
+  # Generate password-less key for root
+  exit 1 unless run_command "openssl rsa -in #{$root_keydir}/localhost.priv -passin 'pass:Cfengine passphrase' -out #{$root_keydir}/localhost.nopass.priv"
+  `chmod 600 #{$root_keydir}/localhost.nopass.priv`
+  `chown root:root #{$root_keydir}/localhost.nopass.priv`
 
   `ssh-keygen -y -f #{$user_keydir}/localhost.nopass.priv > #{$cfdatadir}/primary.ssh.pub`
   `chown #{$user}:#{$group} #{$cfdatadir}/primary.ssh.pub`
@@ -106,6 +117,9 @@ def set_ssh_keys
     `chown #{$user}:#{$group} #{$cfdatadir}/primary.ssh.pub`
   end
 
+  # Generate root public key string from root's nopass key
+  root_key_string = `ssh-keygen -y -f #{$root_keydir}/localhost.nopass.priv`.strip
+
   File.write("#{$user_sshdir}/authorized_keys", key_string + "\n")
   `chmod 600 #{$user_sshdir}/authorized_keys`
   `chown #{$user}:#{$group} #{$user_sshdir}/authorized_keys`
@@ -116,14 +130,13 @@ def set_ssh_keys
     authorized_address = "localhost"
   end
 
+  # Append both user and root key blocks to root's authorized_keys file
   root_auth_line = "from=\"#{authorized_address}\" #{key_string} #{$user}@primary\n"
-  File.write("#{$root_sshdir}/authorized_keys", root_auth_line)
+  root_self_auth_line = "from=\"#{authorized_address}\" #{root_key_string} root@primary\n"
+  
+  File.write("#{$root_sshdir}/authorized_keys", root_auth_line + root_self_auth_line)
   `chmod 600 #{$root_sshdir}/authorized_keys`
   `chown root:root #{$root_sshdir}/authorized_keys`
-
-  `cp #{$user_keydir}/localhost.nopass.priv #{$root_keydir}/localhost.nopass.priv`
-  `chmod 600 #{$root_keydir}/localhost.nopass.priv`
-  `chown root:root #{$root_keydir}/localhost.nopass.priv`
   
 end
 

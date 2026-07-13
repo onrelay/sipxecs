@@ -48,26 +48,26 @@ bundle agent sipxrest_setup {
 bundle agent sipxrest_running {
   vars:
     any::
-      "service_command" string => "$(sipx.SIPX_RUNDIR)/sipxrest/java-sipxrest";
+      "service_command" string => "$(sipx.SIPX_BINDIR)/java-sipxrest";
   methods:
     any::
       "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxrest_running");
 
   commands:
     (!sipxrest|stop_sipxecs).sipxrest_running::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrest"
+      "$(sipx.systemctl)"
         comment => "stop sipxrest",
-        args => "stop";
+        args => "stop sipxrest";
 
     sipxrest.!sipxrest_running.!stop_sipxecs::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrest"
+      "$(sipx.systemctl)"
         comment => "start sipxrest",
-        args => "start";
+        args => "start sipxrest";
 
     sipxrest.sipxrest_running.(restart_sipxecs|restart_sipxrest)::
-      "$(sipx.SIPX_SERVICEDIR)/sipxrest"
+      "$(sipx.systemctl)"
         comment => "restart sipxrest",
-        args => "restart";
+        args => "restart sipxrest";
 }
 
 bundle edit_line sipxrest_log4j_properties_contents {
