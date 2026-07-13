@@ -1,5 +1,5 @@
 #!/bin/sh
 
-JavaCmd=`@SIPX_BINDIR@/sipx-config --java --pidfile "${pidfile}"`
+JavaCmd=`@SIPX_BINDIR@/sipx-config --java --prog "${prog}"`
 $JavaCmd -cp @SIPX_JAVADIR@/sipXviewer/sipviewer.jar \
     com.pingtel.sipviewer.SIPViewer "$@"
