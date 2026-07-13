@@ -5,9 +5,14 @@
     </div>
     <span class="user-error">
       <p/>
-      <p>An internal error has occurred. Click <a jwcid="logoutLink@DirectLink" listener="listener:logout"><span key="link.here">Here</span></a> to continue.</p>
+      <p>
+        An internal error has occurred. Click <a jwcid="logoutLink@DirectLink" listener="listener:logout"><span key="link.here">Here</span></a> to continue.
+        <!-- Debug-independent toggle link -->
+        <a href="#" onclick="var ex = document.getElementById('exceptionDisplay'); ex.className = ''; ex.style.display = (ex.style.display === 'block') ? 'none' : 'block'; return false;">Details ...</a>
+      </p>
     </span>
-    <div jwcid="@Any" id="exceptionDisplay" class="ognl:coreContext.debug ? '' : 'hide'">
+    <!-- Keeps your original debug class logic, but allows the 'More...' link to override it -->
+    <div jwcid="@Any" id="exceptionDisplay" class="ognl:coreContext.debug ? '' : 'hide'" style="display: none;">
       <span jwcid="@ExceptionDisplay" exceptions="ognl:exceptions"/>
       <p/>
       <span jwcid="@RequestDisplay"/>
