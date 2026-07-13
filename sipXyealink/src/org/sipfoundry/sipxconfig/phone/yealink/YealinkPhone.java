@@ -136,20 +136,6 @@ public class YealinkPhone extends Phone {
     @Override
     public void setDeviceVersion(DeviceVersion version) {
         super.setDeviceVersion(version);
-        DeviceVersion myVersion = getDeviceVersion();
-        if (myVersion == YealinkModel.VER_8X) {
-            getModel().setProfileTemplate("yealink/config_v8x.vm");
-            getModel().setSettingsFile("phone-8X.xml");
-            getModel().setLineSettingsFile("line-8X.xml");
-        } else if (myVersion == YealinkModel.VER_7X) {
-            getModel().setProfileTemplate("yealink/config_v7x.vm");
-            getModel().setSettingsFile("phone-7X.xml");
-            getModel().setLineSettingsFile("line-7X.xml");
-        } else {
-            // we need to explicitly define these here otherwise changing versions will not work
-            getModel().setSettingsFile("phone-6X.xml");
-            getModel().setLineSettingsFile("line-6X.xml");
-        }
     }
 
     public void setRegistrarSettings(RegistrarSettings rs) {
@@ -406,6 +392,22 @@ public class YealinkPhone extends Phone {
 
     @Override
     public void initialize() {
+                
+        DeviceVersion myVersion = getDeviceVersion();
+        if (myVersion == YealinkModel.VER_8X) {
+            getModel().setProfileTemplate("yealink/config_v8x.vm");
+            getModel().setSettingsFile("phone-8X.xml");
+            getModel().setLineSettingsFile("line-8X.xml");
+        } else if (myVersion == YealinkModel.VER_7X) {
+            getModel().setProfileTemplate("yealink/config_v7x.vm");
+            getModel().setSettingsFile("phone-7X.xml");
+            getModel().setLineSettingsFile("line-7X.xml");
+        } else {
+            // we need to explicitly define these here otherwise changing versions will not work
+            getModel().setSettingsFile("phone-6X.xml");
+            getModel().setLineSettingsFile("line-6X.xml");
+        }
+
         addDefaultBeanSettingHandler(new YealinkPhoneDefaults(getPhoneContext().getPhoneDefaults(), this));
         addDefaultSettingHandler(new DynamicDefaults(getPhoneContext().getSpeedDial(this)));
     }

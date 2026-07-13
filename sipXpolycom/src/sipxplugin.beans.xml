@@ -1292,7 +1292,7 @@
     </property>
     <property name="defaultVersion" ref="org.sipfoundry.sipxconfig.phone.polycom.PolycomModel.VER_5_9_8"/>
   </bean>
-    <bean id="polycomVVX450" parent="polycomModel">
+  <bean id="polycomVVX450" parent="polycomModel">
     <property name="label" value="Polycom VVX 450" />
     <property name="maxLineCount" value="12" />
     <property name="supportedFeatures">

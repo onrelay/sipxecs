@@ -103,7 +103,8 @@ public abstract class ListSbcDevices extends SipxBasePage {
         // do not delete internal SBCs
         for (Iterator<Integer> iterator = ids.iterator(); iterator.hasNext();) {
             Integer id = iterator.next();
-            if (getSbcDeviceManager().getSbcDevice(id).getModel().isInternalSbc()) {
+            if (getSbcDeviceManager().getSbcDevice(id).getModel() != null && 
+                getSbcDeviceManager().getSbcDevice(id).getModel().isInternalSbc()) {
                 printErrorMessage = true;
                 iterator.remove();
             }

@@ -58,6 +58,13 @@ public abstract class AudioCodesGateway extends Gateway {
     @Override
     public void setDeviceVersion(DeviceVersion version) {
         super.setDeviceVersion(version);
+    }
+
+    @Override
+    public void initialize() {
+
+        super.initialize();
+        
         DeviceVersion myVersion = getDeviceVersion();
 
         if (myVersion == AudioCodesModel.REL_5_0) {
@@ -83,10 +90,7 @@ public abstract class AudioCodesGateway extends Gateway {
             myVersion.addSupportedFeature(REL_5_8_OR_LATER);
             myVersion.addSupportedFeature(REL_6_0_OR_LATER);
         }
-    }
 
-    @Override
-    public void initialize() {
         AudioCodesGatewayDefaults defaults = new AudioCodesGatewayDefaults(this, getDefaults());
         addDefaultBeanSettingHandler(defaults);
         // Add the default Ip2Tel route used in both Normal and Failover mode

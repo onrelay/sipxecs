@@ -40,6 +40,11 @@ public class AudioCodesFxsGateway extends Phone {
     @Override
     public void setDeviceVersion(DeviceVersion version) {
         super.setDeviceVersion(version);
+    }
+
+    @Override
+    public void initialize() {
+        
         DeviceVersion myVersion = getDeviceVersion();
 
         if (myVersion == AudioCodesModel.REL_5_4) {
@@ -57,10 +62,7 @@ public class AudioCodesFxsGateway extends Phone {
             myVersion.addSupportedFeature(REL_5_8_OR_LATER);
             myVersion.addSupportedFeature(REL_6_0_OR_LATER);
         }
-    }
 
-    @Override
-    public void initialize() {
         DeviceDefaults dd = getPhoneContext().getPhoneDefaults();
         AudioCodesGatewayDefaults defaults = new AudioCodesGatewayDefaults(this, dd);
         addDefaultBeanSettingHandler(defaults);

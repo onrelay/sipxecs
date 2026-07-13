@@ -91,11 +91,11 @@ public class Upload extends BeanWithSettings implements SystemAuditable {
         if (m_specificationId == null) {
             throw new IllegalStateException("Model ID not set");
         }
-        if (m_specificationSource == null) {
-            throw new IllegalStateException("ModelSource not set");
+        if (m_specificationSource != null) {
+            m_specification = m_specificationSource.getModel(m_specificationId);
+            return m_specification;
         }
-        m_specification = m_specificationSource.getModel(m_specificationId);
-        return m_specification;
+        return null;
     }
 
     public String getBeanId() {

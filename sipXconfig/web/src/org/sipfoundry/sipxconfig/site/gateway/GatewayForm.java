@@ -104,9 +104,10 @@ public abstract class GatewayForm extends BaseComponent implements PageBeginRend
 
     public ObjectSelectionModel getVersions() {
         ObjectSelectionModel versions = new ObjectSelectionModel();
-        versions.setArray(getGateway().getModel().getVersions());
+        if( getGateway().getModel() != null ) {
+            versions.setArray(getGateway().getModel().getVersions());
+        }
         versions.setLabelExpression("versionId");
-
         return versions;
     }
 

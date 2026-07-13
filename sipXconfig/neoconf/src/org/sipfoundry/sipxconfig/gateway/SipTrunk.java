@@ -45,6 +45,9 @@ public class SipTrunk extends Gateway {
 
     @Override
     public void initialize() {
+
+        super.initialize();
+
         GatewayModel model = getModelId() != null ? getModel() : null;
 
         if ((model == null)

@@ -132,6 +132,9 @@ public abstract class Device extends BeanWithGroups {
     }
 
     public String getModelLabel() {
+        if( getModel() == null ) {
+            return null;
+        }
         return getModel().getLabel();
     }
 
@@ -208,7 +211,7 @@ public abstract class Device extends BeanWithGroups {
         String serialNumber = getSerialNumber();
         if (isNotBlank(serialNumber)) {
             jn.append(serialNumber);
-        } else {
+        } else if( getModel() != null ) {
             jn.append(getModel().getLabel());
         }
         return jn.toString();

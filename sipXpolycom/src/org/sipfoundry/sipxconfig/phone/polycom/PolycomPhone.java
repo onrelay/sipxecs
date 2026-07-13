@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
@@ -51,6 +52,7 @@ import org.sipfoundry.sipxconfig.speeddial.SpeedDial;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
+
 
 /**
  * Support for Polycom 300, 400, and 500 series phones and model 3000 conference phone
@@ -148,14 +150,14 @@ public class PolycomPhone extends Phone implements BeanFactoryAware {
         return "/mac-address.cfg.vm";
     }
 
-    /**
-     * Default firmware version for polycom phones. Default is 1.6 right now
-     *
-     * @param defaultVersionId 1.6 or 2.0
-     */
     @Override
     public void setDeviceVersion(DeviceVersion version) {
         super.setDeviceVersion(version);
+    }
+
+    @Override
+    public void initialize() {
+
         DeviceVersion myVersion = getDeviceVersion();
         if (getModel() instanceof PolycomModel) {
             PolycomModel polycomModel = (PolycomModel) getModel();
@@ -186,12 +188,9 @@ public class PolycomPhone extends Phone implements BeanFactoryAware {
                 "polycom_phone1_2.1.X.cfg", "polycom_sip_2.1.X.cfg"
             });
         }
-    }
 
-    @Override
-    public void initialize() {
         SpeedDial speedDial = getPhoneContext().getSpeedDial(this);
-        // TODO move this check in FeatureManagerImpl - each feature could have an overrider
+
         LocationFeature feature = Rls.FEATURE;
         if (m_beanFactory != null && m_beanFactory.containsBean(RLS_PRESENCE_OVERRIDER)) {
             feature = new LocationFeature((String) m_beanFactory.getBean(RLS_PRESENCE_OVERRIDER));

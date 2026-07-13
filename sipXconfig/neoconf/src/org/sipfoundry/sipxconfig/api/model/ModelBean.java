@@ -91,8 +91,10 @@ public class ModelBean {
 
     public static List<ModelBean> buildModelList(Collection<? extends DeviceDescriptor> deviceModels) {
         List<ModelBean> models = new LinkedList<ModelBean>();
-        for (DeviceDescriptor model : deviceModels) {
-            models.add(convertModel(model));
+        if( deviceModels != null ) {
+            for (DeviceDescriptor model : deviceModels) {
+                models.add(convertModel(model));
+            }
         }
         if (models.size() > 0) {
             return models;

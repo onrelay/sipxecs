@@ -96,11 +96,12 @@ public abstract class Phone extends Device implements Replicable, SystemAuditabl
         if (getModelId() == null) {
             throw new IllegalStateException("Model ID not set");
         }
-        if (m_modelSource == null) {
-            throw new IllegalStateException("ModelSource not set");
+        if (m_modelSource != null) {
+        
+            m_model = m_modelSource.getModel(getModelId());
+            return m_model;
         }
-        m_model = m_modelSource.getModel(getModelId());
-        return m_model;
+        return null;
     }
 
     public void setSipService(SipService sip) {
@@ -244,7 +245,7 @@ public abstract class Phone extends Device implements Replicable, SystemAuditabl
 
     public List<String> getUserNamesLines() {
         List<String> usernameLines = new ArrayList<String>();
-        for (Line line : m_lines) {
+        for (Line line : getLines() ) {
             usernameLines.add(line.getUserName());
         }
         return usernameLines;
@@ -255,19 +256,19 @@ public abstract class Phone extends Device implements Replicable, SystemAuditabl
     }
 
     public void replaceLines(List<Line> lines) {
-        m_lines.clear();
+        getLines().clear();
         if( lines != null ) {
-            m_lines.addAll( lines );
+            getLines().addAll( lines );
         }
     }
 
     public void addLine(Line line) {
         int max = getModel().getMaxLineCount();
-        if (m_lines.size() >= max) {
+        if (getLines().size() >= max) {
             throw new MaxLinesException(String.valueOf(max));
         }
         line.setPhone(this);
-        m_lines.add(line);
+        getLines().add(line);
         line.initialize();
     }
 
@@ -278,7 +279,7 @@ public abstract class Phone extends Device implements Replicable, SystemAuditabl
     }
 
     public Line getLine(int position) {
-        return m_lines.get(position);
+        return getLines().get(position);
     }
 
     public void initializeLine(@SuppressWarnings("unused") Line line) {

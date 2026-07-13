@@ -12,6 +12,11 @@ package org.sipfoundry.sipxconfig.gateway;
 import org.sipfoundry.sipxconfig.device.DeviceDescriptor;
 
 public class GatewayModel extends DeviceDescriptor {
+
+    public static final String GENERIC_BEAN_ID = "gwGeneric";
+    public static final String GENERIC_MODEL_ID = "genericGatewayStandard";
+    public static final String GENERIC_MODEL_LABEL = "Unmanaged gateway";
+
     private int m_maxPorts;
     private boolean m_dialPlanAware = true;
     private boolean m_callerIdAware = true;
@@ -25,6 +30,13 @@ public class GatewayModel extends DeviceDescriptor {
     private String[] m_portLabelSettings;
 
     private String m_portLabelFormat;
+
+    public static GatewayModel getGenericGatewayModel() {
+        GatewayModel gatewayModel = new GatewayModel( GENERIC_BEAN_ID, GENERIC_MODEL_ID );
+        gatewayModel.setSerialNumberPattern( "" );
+        gatewayModel.setLabel( GENERIC_MODEL_LABEL );
+        return gatewayModel;
+    }
 
     public GatewayModel() {
     }

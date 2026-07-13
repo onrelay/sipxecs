@@ -61,6 +61,16 @@ public class NortelPhone extends Phone {
 
     @Override
     public void initialize() {
+        
+        DeviceVersion myVersion = getDeviceVersion();
+
+        if (myVersion == NortelPhoneModel.FIRM_3_2) {
+            myVersion.addSupportedFeature(REL_3_2_OR_LATER);
+            getModel().setMaxLineCount(NortelPhoneModel.FIRMWARE32ORLATER_MAX_LINES);
+        } else {
+            getModel().setMaxLineCount(NortelPhoneModel.FIRMWARE22_MAX_LINES);
+        }
+
         DeviceDefaults phoneDefaults = getPhoneContext().getPhoneDefaults();
         Line line = new Line();
         NortelPhoneDefaults defaults = new NortelPhoneDefaults(phoneDefaults, line);
@@ -93,14 +103,6 @@ public class NortelPhone extends Phone {
     @Override
     public void setDeviceVersion(DeviceVersion version) {
         super.setDeviceVersion(version);
-        DeviceVersion myVersion = getDeviceVersion();
-
-        if (myVersion == NortelPhoneModel.FIRM_3_2) {
-            myVersion.addSupportedFeature(REL_3_2_OR_LATER);
-            getModel().setMaxLineCount(NortelPhoneModel.FIRMWARE32ORLATER_MAX_LINES);
-        } else {
-            getModel().setMaxLineCount(NortelPhoneModel.FIRMWARE22_MAX_LINES);
-        }
     }
 
     /**

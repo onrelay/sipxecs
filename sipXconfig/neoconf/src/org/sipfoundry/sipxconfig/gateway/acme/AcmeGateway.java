@@ -23,6 +23,9 @@ public class AcmeGateway extends Gateway {
 
     @Override
     public void initialize() {
+        
+        super.initialize();
+
         addDefaultBeanSettingHandler(new AcmeDefaults(getDefaults()));
     }
 

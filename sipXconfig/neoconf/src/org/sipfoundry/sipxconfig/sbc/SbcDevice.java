@@ -46,11 +46,12 @@ public class SbcDevice extends Device implements NamedObject, SystemAuditable {
         if (getModelId() == null) {
             throw new IllegalStateException("Model ID not set");
         }
-        if (m_modelSource == null) {
-            throw new IllegalStateException("ModelSource not set");
+        if (m_modelSource != null) {
+        
+            m_model = m_modelSource.getModel(getModelId());
+            return m_model;
         }
-        m_model = m_modelSource.getModel(getModelId());
-        return m_model;
+        return null;
     }
 
     

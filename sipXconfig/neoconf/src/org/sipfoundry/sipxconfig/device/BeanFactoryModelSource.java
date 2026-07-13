@@ -24,7 +24,7 @@ import org.springframework.beans.factory.ListableBeanFactory;
 public class BeanFactoryModelSource<T extends Model> implements ModelSource, BeanFactoryAware {
 
     private ListableBeanFactory m_beanFactory;
-    private Map<String, T> m_modelCache;
+    private Map<String, T> m_modelCache = new TreeMap<String, T>();
     /** T.class, but no such access at compile time */
     private Class m_class;
 
@@ -42,36 +42,27 @@ public class BeanFactoryModelSource<T extends Model> implements ModelSource, Bea
      *
      */
     public Collection<T> getModels() {
-        return Collections.unmodifiableCollection(loadModels().values());
+        m_modelCache = m_beanFactory.getBeansOfType(m_class, false, false);
+        return m_modelCache.values();
     }
 
     public void setBeanFactory(BeanFactory beanFactory) {
         m_beanFactory = (ListableBeanFactory) beanFactory;
         // invalidate cache
-        m_modelCache = null;
-    }
-
-    private Map<String, T> loadModels() {
-        if (m_modelCache != null) {
-            return m_modelCache;
-        }
-        if (m_beanFactory == null) {
-            throw new IllegalStateException("Bean factory has to be initialized");
-        }
-        String[] beanNames = m_beanFactory.getBeanNamesForType(m_class);
         m_modelCache = new TreeMap<String, T>();
-        for (String beanName : beanNames) {
-            T bean = (T) m_beanFactory.getBean(beanName);
-            m_modelCache.put(beanName, bean);
-        }
-        return m_modelCache;
     }
 
     public T getModel(String modelId) {
-        T model = loadModels().get(modelId);
+
+        T model = m_modelCache.get(modelId);
+        if( model != null ){
+            return model;
+        }
+        model = (T) m_beanFactory.getBean(modelId);
         if (model == null) {
             throw new IllegalArgumentException("No such model with id '" + modelId + "'");
         }
+        m_modelCache.put(modelId, model);
         return model;
     }
 }

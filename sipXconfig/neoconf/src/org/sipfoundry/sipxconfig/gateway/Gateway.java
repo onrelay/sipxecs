@@ -41,6 +41,7 @@ import org.sipfoundry.sipxconfig.systemaudit.SystemAuditable;
 public class Gateway extends Device implements Replicable, DeployConfigOnEdit, SystemAuditable {
     public static final String LINEID = ";sipxecs-lineid=";
     public static final String UID = "~~gw";
+
     private String m_name;
 
     private String m_address;
@@ -86,7 +87,7 @@ public class Gateway extends Device implements Replicable, DeployConfigOnEdit, S
         setGatewayModelSource(modelSource);
         setModelId(modelId);
     }
-
+ 
     @Override
     public void initialize() {
     }
@@ -205,10 +206,15 @@ public class Gateway extends Device implements Replicable, DeployConfigOnEdit, S
         if (getModelId() == null) {
             throw new IllegalStateException("Model ID not set");
         }
-        if (m_modelSource == null) {
-            throw new IllegalStateException("ModelSource not set");
+        if (getGatewayModelSource() != null) { 
+            m_model = getGatewayModelSource().getModel(getModelId());
         }
-        m_model = m_modelSource.getModel(getModelId());
+        else if( GatewayModel.GENERIC_MODEL_ID.equals( getModelId() ) ) {
+            m_model = GatewayModel.getGenericGatewayModel();
+        }
+        else {
+            throw new IllegalStateException("Model not found");
+        }
         return m_model;
     }
 
@@ -305,6 +311,10 @@ public class Gateway extends Device implements Replicable, DeployConfigOnEdit, S
 
     public void setGatewayModelSource(ModelSource<GatewayModel> modelSource) {
         m_modelSource = modelSource;
+    }
+
+    public ModelSource<GatewayModel> getGatewayModelSource() {
+        return m_modelSource;
     }
 
     public void addPort(FxoPort port) {

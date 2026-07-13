@@ -48,10 +48,16 @@ public abstract class CustomOptionModelDecorator implements IPropertySelectionMo
     }
 
     public String getRawLabel(int index) {
+        if( getModel() == null ) {
+            return null;
+        }
         return getModel().getLabel(index);
     }
 
     public String getLabel(int index) {
+        if( getModel() == null ) {
+            return null;
+        }
         String rawLabel = getModel().getLabel(index);
         if (getMessages() == null) {
             return rawLabel;
