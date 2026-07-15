@@ -34,10 +34,9 @@ public class BridgeSbcStatistics {
     }
 
     boolean isOk(BridgeSbc bridgeSbc) {
-        // Not sure what to check? process configed? running? ---Douglas
         List<ServiceStatus> stats = m_snmpManager.getServicesStatuses(bridgeSbc.getLocation());
         for (ServiceStatus status : stats) {
-            if (status.getServiceBeanId().equals("sipxbridge")
+            if (status.getServiceBeanId().contains("sipxbridge")
                     && status.getStatus().equals(ServiceStatus.Status.Running)) {
                 return true;
             }
@@ -73,8 +72,8 @@ public class BridgeSbcStatistics {
             return null;
         }
 
-        BridgeSbcRegistrationRecord[] registrationRecords = new BridgeSbcRegistrationRecord[registrationRecordMap
-                .size()];
+        BridgeSbcRegistrationRecord[] registrationRecords = 
+            new BridgeSbcRegistrationRecord[registrationRecordMap.size()];
         int i = 0;
         Set<String> keys = registrationRecordMap.keySet();
         for (String key : keys) {

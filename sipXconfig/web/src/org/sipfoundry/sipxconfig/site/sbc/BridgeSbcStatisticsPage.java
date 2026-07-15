@@ -58,6 +58,7 @@ public abstract class BridgeSbcStatisticsPage extends SipxBasePage implements Pa
     public abstract void setLocationSelectionModel(LocationSelectionModel locationSelectionModel);
 
     public void pageBeginRender(PageEvent event_) {
+        
         if (!getSbcDeviceManager().isInternalSbcEnabled()) {
             return;
         }
@@ -70,13 +71,17 @@ public abstract class BridgeSbcStatisticsPage extends SipxBasePage implements Pa
 
         BridgeSbc bridgeSbc = getSbcDeviceManager().getBridgeSbc(getLocationsManager().
                 getLocation(getCurrentLocationId()));
+            
+        if( bridgeSbc == null ) {
+            return;
+        }
 
         int callCount = 0;
         List<BridgeSbcRegistrationRecord> bridgeSbcRegistrationRecords = null;
         try {
             callCount = getBridgeSbcStatistics().getCallCount(bridgeSbc);
-            BridgeSbcRegistrationRecord[] bridgeSbcRegistrationRecordArray = getBridgeSbcStatistics().
-                getRegistrationRecords(bridgeSbc);
+            BridgeSbcRegistrationRecord[] bridgeSbcRegistrationRecordArray = 
+                getBridgeSbcStatistics().getRegistrationRecords(bridgeSbc);
             if (null != bridgeSbcRegistrationRecordArray) {
                 bridgeSbcRegistrationRecords = Arrays.asList(bridgeSbcRegistrationRecordArray);
             }
