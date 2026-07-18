@@ -50,7 +50,7 @@ public abstract class DialingRule extends BeanWithId implements NamedObject,
     private String m_name;
     private String m_description;
     private List<Gateway> m_gateways = new ArrayList<Gateway>();
-    private transient PermissionManager m_permissionManager;
+    private PermissionManager m_permissionManager;
     private Schedule m_schedule;
     private Location m_location;
 

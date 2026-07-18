@@ -24,9 +24,9 @@ import org.sipfoundry.sipxconfig.permission.Permission;
  */
 public class CustomDialingRule extends LocationBasedDialingRule {
 
-    private List<DialPattern> m_dialPatterns = new ArrayList<DialPattern>();
+    private List<DialPattern> m_dialPatterns;
     private CallPattern m_callPattern = new CallPattern();
-    private List<String> m_permissionNames = new ArrayList<String>();
+    private List<String> m_permissionNames;
 
     public CustomDialingRule() {
         getDialPatterns().add(new DialPattern());
@@ -35,12 +35,15 @@ public class CustomDialingRule extends LocationBasedDialingRule {
     @Override
     protected Object clone() throws CloneNotSupportedException {
         CustomDialingRule clone = (CustomDialingRule) super.clone();
-        clone.replacePermissionNames(m_permissionNames);
+        clone.replacePermissionNames(getPermissionNames());
         clone.replaceDialPatterns(getDialPatterns());
         return clone;
     }
 
     public List<DialPattern> getDialPatterns() {
+        if( m_dialPatterns == null ) {
+           m_dialPatterns = new ArrayList<DialPattern>();
+        }
         return m_dialPatterns;
     }
 
@@ -109,6 +112,9 @@ public class CustomDialingRule extends LocationBasedDialingRule {
 
     @Override
     public List<String> getPermissionNames() {
+        if( m_permissionNames == null ) {
+            m_permissionNames = new ArrayList<String>();
+        }
         return m_permissionNames;
     }
 

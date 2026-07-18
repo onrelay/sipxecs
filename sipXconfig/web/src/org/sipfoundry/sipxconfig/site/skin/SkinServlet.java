@@ -37,7 +37,7 @@ public class SkinServlet extends HttpServlet {
         m_skin = (SkinControl) app.getBean(SkinControl.CONTEXT_BEAN_NAME);
     }
 
-       protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getPathInfo().substring(1); // strip '/'
         IAsset asset = m_skin.getAsset(path);
         if (asset != null) {

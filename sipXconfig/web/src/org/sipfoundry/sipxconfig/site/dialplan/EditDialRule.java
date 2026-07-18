@@ -141,8 +141,8 @@ public abstract class EditDialRule extends PageWithCallback implements PageBegin
             setRuleType(rule.getType());
         } else {
             rule = getRuleType().create();
-            rule.setPermissionManager(getPermissionManager());
         }
+        rule.setPermissionManager(getPermissionManager());
         setRule(rule);
 
         // Ignore the callback passed to us for now because we're navigating

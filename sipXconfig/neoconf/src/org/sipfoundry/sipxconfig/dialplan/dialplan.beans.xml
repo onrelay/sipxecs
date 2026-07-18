@@ -45,7 +45,7 @@
     <property name="enabled" value="false" />
   </bean>
 
-  <bean id="defaultLongDistanceRule" class="org.sipfoundry.sipxconfig.dialplan.LongDistanceRule" abstract="true">
+  <bean id="defaultLongDistanceRule" class="org.sipfoundry.sipxconfig.dialplan.LongDistanceRule" abstract="true" depends-on="permissionManager">
     <property name="permissionManager" ref="permissionManager" />
     <property name="name" value="Long Distance" />
     <property name="description" value="Long distance dialing plan" />
@@ -84,11 +84,11 @@
     <property name="permissionName" value="LocalDialing" />
   </bean>
 
-  <bean id="defaultCustomRule" class="org.sipfoundry.sipxconfig.dialplan.CustomDialingRule" scope="prototype">
+  <bean id="defaultCustomRule" class="org.sipfoundry.sipxconfig.dialplan.CustomDialingRule" scope="prototype" depends-on="permissionManager" >
     <property name="permissionManager" ref="permissionManager" />
   </bean>
 
-  <bean id="siteToSiteRule" class="org.sipfoundry.sipxconfig.dialplan.SiteToSiteDialingRule" scope="prototype">
+  <bean id="siteToSiteRule" class="org.sipfoundry.sipxconfig.dialplan.SiteToSiteDialingRule" scope="prototype" depends-on="permissionManager">
     <property name="permissionManager" ref="permissionManager" />
   </bean>
 

@@ -37,6 +37,7 @@ public abstract class PatternsEditor extends BaseComponent {
 
     @Parameter(required = true)
     public abstract List<DialPattern> getPatterns();
+    public abstract void setPatterns( List<DialPattern> patterns );
 
     public abstract int getIndex();
 

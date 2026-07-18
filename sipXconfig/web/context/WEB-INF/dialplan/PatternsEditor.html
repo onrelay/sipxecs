@@ -25,7 +25,7 @@
       </select>
     </td>
     <td>
-      <span jwcid="@If" condition="ognl:patterns.size - 1 == index">
+      <span jwcid="@If" condition="ognl:size - 1 == index">
         <a jwcid="@LinkSubmit" href="#" id="pattern:add"
           selected="ognl:addPattern" tag="ognl:true">
           <span key="link.add">Add</span>
@@ -33,7 +33,7 @@
       </span>
     </td>
     <td>
-      <span jwcid="@If" condition="ognl:patterns.size > 1">
+      <span jwcid="@If" condition="ognl:size > 1">
         <a jwcid="@LinkSubmit" href="#" id="pattern:delete"
           selected="ognl:indexToRemove" tag="ognl:index">
           <span key="link.delete">Delete</span>
