@@ -597,7 +597,7 @@ bool SipRouter::preDispatch(SipMessage* pMsg)
         " RegDB Read Average: " << mpRegDb->getReadAverageSpeed() << " ms"
         " Proxy Queue Size: " << getMessageQueue()->numMsgs() << " messages"
         " User Agent Queue Size: " << mpSipUserAgent->getMessageQueue()->numMsgs() << " messages"
-        " Total Active Transactions: " <<  mpSipUserAgent->getSipTransactions().size()
+        " Total Active Transactions: " <<  mpSipUserAgent->getSipTransactionCount()
         );
       
       //if (consecutiveYields == ALARM_ON_CONSECUTIVE_YIELD)
@@ -617,7 +617,7 @@ bool SipRouter::preDispatch(SipMessage* pMsg)
         " RegDB Read Average: " << mpRegDb->getReadAverageSpeed() << " ms"
         " Proxy Queue Size: " << getMessageQueue()->numMsgs() << " messages"
         " User Agent Queue Size: " << mpSipUserAgent->getMessageQueue()->numMsgs() << " messages"
-        " Total Active Transactions: " <<  mpSipUserAgent->getSipTransactions().size()
+        " Total Active Transactions: " <<  mpSipUserAgent->getSipTransactionCount()
         );
       }
     }
@@ -678,7 +678,7 @@ SipRouter::handleCongestion(SipMessage *sipRequest, bool midDialog)
         {
             int transportMaxQueueSize = 0;
             int transportQueueSize = 0;
-            int transactionCount = mpSipUserAgent->getSipTransactions().size();
+            int transactionCount = mpSipUserAgent->getSipTransactionCount();
 
             try
             {
@@ -917,7 +917,7 @@ void SipRouter::handleRequest(SipMessage* pSipRequest)
         " RegDB Read Average: " << mpRegDb->getReadAverageSpeed() << " ms |"
         " Proxy Queue Size: " << getMessageQueue()->numMsgs() << " messages |"
         " User Agent Queue Size: " << mpSipUserAgent->getMessageQueue()->numMsgs() << " messages |"
-        " Total Active Transactions: " <<  mpSipUserAgent->getSipTransactions().size()
+        " Total Active Transactions: " <<  mpSipUserAgent->getSipTransactionCount()
         );
   }
 
@@ -2575,7 +2575,7 @@ void SipRouter::reportStatistics()
 {
   statistics::StatisticsManager::Instance().add(statistics::Data("proxy_msq_queue_size", getMessageQueue()->numMsgs()));
   statistics::StatisticsManager::Instance().add(statistics::Data("proxy_ua_queue_size", mpSipUserAgent->getMessageQueue()->numMsgs()));
-  statistics::StatisticsManager::Instance().add(statistics::Data("proxy_active_transaction_count", mpSipUserAgent->getSipTransactions().size()));
+  statistics::StatisticsManager::Instance().add(statistics::Data("proxy_active_transaction_count", mpSipUserAgent->getSipTransactionCount()));
   statistics::StatisticsManager::Instance().add(statistics::Data("proxy_avg_dispatch_speed", getAverageDispatchSpeed()));
   statistics::StatisticsManager::Instance().add(statistics::Data("proxy_avg_entity_db_read", mpEntityDb->getReadAverageSpeed()));
   statistics::StatisticsManager::Instance().add(statistics::Data("proxy_avg_regdb_read", mpRegDb->getReadAverageSpeed()));

@@ -37,7 +37,6 @@ l: 0 \n\r
 // However to be tolerant of malformed messages we allow smaller:
 #define MINIMUM_SIP_MESSAGE_SIZE 30
 #define MAX_UDP_PACKET_SIZE (1024 * 64)
-const int SHUTDOWN_WAIT_TIME = 5000;
 
 // STATIC VARIABLE INITIALIZATIONS
 
@@ -63,33 +62,8 @@ SipClientTcp::SipClientTcp(OsSocket* socket,
 
 SipClientTcp::~SipClientTcp()
 {
-  Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
-                  "SipClientTcp[%s]::~ called",
-                  mName.data());
    // Tell the associated thread to shut itself down.
-
-  if(mClientSocket)
-  {
-
-        // Close the socket to unblock the run method
-        // in case it is blocked in a waitForReadyToRead or
-        // a read on the mClientSocket.  This should also
-        // cause the run method to exit.
-        if (!mbSharedSocket)
-        {
-           Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "SipClientTcp[%s]::~ %p socket %p closing %s socket",
-                         mName.data(), this,
-                         mClientSocket, OsSocket::ipProtocolString(mSocketType));
-           mClientSocket->close();
-        }
-
-  }
-  //
-  // In a heavy load scenario, 20 ms might not be enough wait time
-  // for the thread to exit.  We increase it to 5000 since it will
-  // assert anyway.
-  //
-   waitUntilShutDown(SHUTDOWN_WAIT_TIME);
+   waitUntilShutDown();
 }
 
 /* ============================ MANIPULATORS ============================== */

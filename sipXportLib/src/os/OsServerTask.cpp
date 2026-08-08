@@ -58,7 +58,7 @@ OsServerTask::~OsServerTask()
                  mName.data(), TaskStateName(mState));
 
    waitUntilShutDown(20 * OsTime::MSECS_PER_SEC);
-   mIncomingQ.flush();    // dispose of any messages in the request queue
+   
 }
 
 /* ============================ MANIPULATORS ============================== */

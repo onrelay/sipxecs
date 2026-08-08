@@ -730,7 +730,7 @@ public:
     
     Preprocessor& preprocessor();
 
-    const SipTransactionList& getSipTransactions() const;
+    int getSipTransactionCount();
     
     void onFinalResponse(SipTransaction* pTransaction, const SipMessage& request, SipMessage& finalResponse);
     
@@ -946,9 +946,9 @@ inline int SipUserAgent::getMaxTransactionCount() const
   return _maxTransactionCount;
 }
 
-inline const SipTransactionList& SipUserAgent::getSipTransactions() const
+inline int SipUserAgent::getSipTransactionCount()
 {
-  return mSipTransactions;
+  return mSipTransactions.size();
 }
 
 inline void SipUserAgent::setPreDispatchEvaluator(const DispatchEvaluator& preDispatch)

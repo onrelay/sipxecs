@@ -336,6 +336,10 @@ public:
 
     const UtlString &getRequestUri(void) const;
 
+    SipTransaction* parentTransaction();
+
+    void unlinkParent();
+
     UtlSList& childTransactions();
 
     bool isMarkedForDeletion() const;
@@ -592,6 +596,16 @@ public:
 inline UtlSList& SipTransaction::childTransactions()
 {
   return mChildTransactions;
+}
+
+inline SipTransaction* SipTransaction::parentTransaction()
+{
+  return mpParentTransaction;
+}
+
+inline void SipTransaction::unlinkParent()
+{
+  mpParentTransaction = NULL;
 }
 
 inline bool SipTransaction::isMarkedForDeletion() const
