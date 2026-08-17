@@ -410,6 +410,12 @@ class UserMessage {
    * on close button or leaves page.
    */
   void errorConfirm(String msg) {
+
+    if (msg == null || msg.isEmpty) {
+      clearError();
+      return;
+    }
+
     message(msg, 'user-error');
     close.style.display = "";
     confirmError = true;

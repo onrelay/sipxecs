@@ -68,11 +68,13 @@ class ManageGlobal extends ManageBase {
   
   void loadTable(data) {    
     var meta = jsonDecode(data);    
-    builder.addMongoNodeSelect(meta['dbCandidates'], querySelector('#globalAddDb')!, 'NEW_DB', getString('addDatabase'));
-    builder.addMongoNodeSelect(meta['arbiterCandidates'], querySelector('#globalAddArbiter')!, 'NEW_ARBITER', getString('addArbiter'));
+    List<String> dbCandidates = (meta['dbCandidates'] as List).cast<String>();
+    List<String> arbiterCandidates = (meta['arbiterCandidates'] as List).cast<String>();
+    builder.addMongoNodeSelect(dbCandidates, querySelector('#globalAddDb')!, 'NEW_DB', getString('addDatabase'));
+    builder.addMongoNodeSelect(arbiterCandidates, querySelector('#globalAddArbiter')!, 'NEW_ARBITER', getString('addArbiter'));
     TableSectionElement tbody = querySelector("#globalTable") as TableSectionElement;
     tbody.children.clear();
-    builder.lastError(meta['lastConfigError']);    
+    builder.lastError(meta['lastConfigError']?.toString() ?? "");
     List<TableRowElement> rows = [];
     for (var type in ['databases', 'arbiters']) {
       if (meta[type] == null) {
@@ -126,13 +128,14 @@ class ManageLocal extends ManageBase {
     var meta = jsonDecode(data);
     TableSectionElement tbody = querySelector("#localTable")! as TableSectionElement;
     tbody.children.clear();
-    builder.lastError(meta['lastConfigError']);  
-    List<String> candidates = meta['dbCandidates'] as List<String>;
-    builder.addMongoNodeSelect(candidates, querySelector('#localAddDb')!, 'NEW_LOCAL', getString('addDatabase'));
-    builder.addMongoNodeSelect(meta['arbiterCandidates'], querySelector('#localAddArbiter')!, 'NEW_LOCAL_ARBITER', getString('addArbiter'));
+    builder.lastError(meta['lastConfigError']?.toString() ?? "");
+    List<String> dbCandidates = (meta['dbCandidates'] as List).cast<String>();
+    List<String> arbiterCandidates = (meta['arbiterCandidates'] as List).cast<String>();
+    builder.addMongoNodeSelect(dbCandidates, querySelector('#localAddDb')!, 'NEW_LOCAL', getString('addDatabase'));
+    builder.addMongoNodeSelect(arbiterCandidates, querySelector('#localAddArbiter')!, 'NEW_LOCAL_ARBITER', getString('addArbiter'));
     
     List shards = meta['shards'];
-    if ((shards == null || shards.length == 0) && (candidates == null || candidates.length == 0)) {
+    if ((shards == null || shards.length == 0) && (dbCandidates == null || dbCandidates.length == 0)) {
       msg.warning('''
 Only servers with regions defined can host a local database. Assign 
 regions to servers if you wish to have a local databbase
@@ -215,7 +218,8 @@ class UiBuilder {
   
   void nameColumn(Element cell, node, server, type) {
     var img = new ImageElement();
-    var src = statusImage(node['status']);
+    List<String> status = (node['status'] as List).cast<String>();
+    var src = statusImage(status);
     img.src = "${api.baseUrl()}/images/${src}";
     cell.append(img);
     String? typeText = dbType(type);   
@@ -262,7 +266,8 @@ class UiBuilder {
     });
 
     actions.children.add(new OptionElement(data: getString('options'), value: ''));
-    if (!(node['status'] as List<String>).contains('PRIMARY')) {
+    List<String> status = (node['status'] as List).cast<String>();
+    if (!status.contains('PRIMARY')) {
       actions.children.add(new OptionElement(data: getString('action.DELETE'), value: 'DELETE'));
     } else {
       actions.children.add(new OptionElement(data: getString('action.STEP_DOWN'), value: 'STEP_DOWN 60'));        
