@@ -301,23 +301,51 @@ class MongoRSAdmin:
     def cmd_SET_MEMBER_META(self):
         mModel = self.memberModel(self.host_port)
         # Tags only meta right now, should convert priority and votes to this function
-        # instead of specialized functions        
+        # instead of specialized functions   
+
+        logging.debug("mModel contents for %s: %s", self.host_port, mModel)
+     
         tags = {}
-        if 'tags' in mModel:
-            tags = mModel['tags']
+        if mModel and self.host_port in mModel:
+            node_data = mModel[self.host_port]
+            if 'tags' in node_data:
+                tags = node_data['tags']
+                
         def functor(c):
             l = c['admin']
             config = l.command({'replSetGetConfig': 1})
+            
+            logging.debug("Original replSetGetConfig raw output: %s", config)
+
             if not config and self.dryrun:
                 print('RS:%s(tags)' % self.host_port)
                 return
+                
             members = config['config']['members'] if 'config' in config else []
+            
+            logging.debug("Target host_port to match: %s", self.host_port)
+            logging.debug("Target tags to apply: %s", tags)
+            
             index = self.requireMember(members, self.host_port)
+            logging.debug("Matched member array index: %s", index)
+            
             members[index]['tags'] = tags
+            
             new_config = config['config']
             new_config['version'] = new_config.get('version', 1) + 1
-            result = l.command({'replSetReconfig': new_config})
+            
+            current_term = config.get('term', -1)
+            
+            reconfig_command = {'replSetReconfig': new_config}
+            if current_term != -1:
+                reconfig_command['term'] = current_term
+                
+            logging.debug("Sending payload to replSetReconfig: %s", reconfig_command)
+            
+            result = l.command(reconfig_command)
+            logging.debug("MongoDB execution result response: %s", result)
             self.checkErr(result)
+                
         self.mongoCommand(self.primaryRequired(), functor)
 
     def cmd_ADD_VOTE(self):
