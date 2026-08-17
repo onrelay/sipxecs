@@ -51,7 +51,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-class MongoApi extends ServerResource {
+public class MongoApi extends ServerResource {
     private static final Log LOG = LogFactory.getLog(MongoApi.class);
 
     private static final String HOST = "host";
