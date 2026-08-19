@@ -137,7 +137,7 @@ class Restore < ArchiveBase
 
     cmd "tar -xzOf #{params[:file]} db.tar > #{@tmpdir}/db.tar" or
       raise "Failed to extract database from archive."   
-    cmd "pg_restore -U #{@pguser} -d #{@restoredb} #{@tmpdir}/db.tar" or
+    cmd "pg_restore --clean --if-exists -U #{@pguser} -d #{@restoredb} #{@tmpdir}/db.tar" or
       raise "Failed to restore database from archive."
 
     ant = "-Dsipxconfig.db.name=#{@restoredb}"

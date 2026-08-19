@@ -286,7 +286,7 @@ then
 
   @SIPX_SERVICEDIR@/sipxconfig db drop createdb > /dev/null
   tar -xzvC @SIPX_TMPDIR@ $DB_TAR < $CONFIGURATION_PATH
-  cat $PATH_DB_TAR | pg_restore -U @POSTGRESQL_USER@ -d $CONFIG_DATABASE_NAME 2> /dev/null
+  cat $PATH_DB_TAR | pg_restore --clean --if-exists -U @POSTGRESQL_USER@ -d $CONFIG_DATABASE_NAME 2> /dev/null
   rm $PATH_DB_TAR
   echo "done."
 
@@ -318,7 +318,7 @@ then
   # create empty CDR database
   @SIPX_SERVICEDIR@/sipxcdr db create > /dev/null
   tar -xzvC @SIPX_TMPDIR@ $DB_CDR_TAR < $CDR_PATH
-  cat $PATH_DB_CDR_TAR | pg_restore -U @POSTGRESQL_USER@ -d $CDR_DATABASE_NAME 2> /dev/null
+  cat $PATH_DB_CDR_TAR | pg_restore --clean --if-exists -U @POSTGRESQL_USER@ -d $CDR_DATABASE_NAME 2> /dev/null
   rm $PATH_DB_CDR_TAR
   echo "done."
 fi # *** END Cdr ***

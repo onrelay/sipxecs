@@ -1070,7 +1070,7 @@
     <!-- ignore error in this task, importing database can fail if going from Postgres 7 to 8 -->
     <exec executable="/bin/sh" failonerror="false" outputproperty="eatme">
       <arg value="-c" />
-      <arg value="zcat ${pds.tar.gz} | pg_restore -U ${sipxconfig.db.user} -d PDS" />
+      <arg value="zcat ${pds.tar.gz} | pg_restore --clean --if-exists -U ${sipxconfig.db.user} -d PDS" />
     </exec>
   </target>
 

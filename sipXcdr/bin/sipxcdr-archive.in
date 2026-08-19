@@ -79,7 +79,7 @@ class Restore < ArchiveBase
       cmd "pg_restore -U #{@pguser} -d #{@restoredb} #{@tmpdir}/db.tar" or
         raise "Failed to restore database from archive."
     else
-      cmd "gzip -d -c #{params[:file]} | pg_restore -U #{@pguser} -F t -d #{@restoredb}" or
+      cmd "gzip -d -c #{params[:file]} | pg_restore --clean --if-exists -U #{@pguser} -F t -d #{@restoredb}" or
         raise "Failed to restore database from archive."
     end
     
