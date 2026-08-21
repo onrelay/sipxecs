@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="webrtcHook" class="org.sipfoundry.sipxconfig.web.plugin.WebrtcHook">
+    <property name="hookId" value="WebrtcMenu"/>
+    <property name="featureId" value="webrtc"/>
+  </bean>
+
+  <bean id="webrtcSettings" class="org.sipfoundry.sipxconfig.webrtc.WebrtcSettings" parent="settingsBean"/>
+
+  <bean id="webrtc" class="org.springframework.aop.framework.ProxyFactoryBean" parent="proxySupport">
+    <property name="target" ref="webrtcImpl"/>
+    <property name="proxyInterfaces" value="org.sipfoundry.sipxconfig.webrtc.Webrtc"/>
+  </bean>
+
+  <bean id="webrtcImpl" class="org.sipfoundry.sipxconfig.webrtc.WebrtcImpl">
+    <property name="settingsDao">
+      <bean parent="beanWithSettingsDao">
+        <property name="target">
+          <bean parent="beanWithSettingsDaoImpl">
+            <constructor-arg value="org.sipfoundry.sipxconfig.webrtc.WebrtcSettings"/>
+          </bean>
+        </property>
+      </bean>
+    </property>
+  </bean>
+
+</beans>

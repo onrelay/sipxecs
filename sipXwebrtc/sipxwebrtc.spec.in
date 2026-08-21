@@ -1,0 +1,45 @@
+Name: @PACKAGE@
+Version: @VERSION@
+Release: @PACKAGE_REVISION@
+
+Summary: sipXwebrtc WebRTC server integration for FreeSWITCH
+License: LGPL
+Group: Applications/Communications
+Vendor: SIPfoundry
+Url: http://www.sipfoundry.org
+
+%define debug_package %{nil}
+
+BuildRequires: automake
+BuildRequires: libxml2
+BuildRequires: java-17-openjdk-devel
+BuildRequires: sipxcommons >= %version
+BuildRequires: sipxconfig >= %version
+Requires: sipxconfig >= %version
+
+Source: %name-%version.tar.gz
+Prefix: %_prefix
+BuildRoot: %{_tmppath}/%name-%version-root
+
+%description
+Server-side WebRTC integration for sipXecs and FreeSWITCH.
+
+%prep
+%setup -q
+
+%build
+%configure --enable-rpmbuild @SIPX_RPM_CONFIGURE_OPTIONS@
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(644,root,root,755)
+%{_datadir}/java/sipXecs/sipXconfig/plugins/sipxwebrtc-config.jar
+
+%post

@@ -52,6 +52,7 @@ sipx_extra = \
   sipXcdrLog \
   sipXrecording \
   sipXcallQueue \
+  sipXwebrtc \
   sipXAocBilling \
   sipXtools \
   sipXcallback \
@@ -182,6 +183,7 @@ sipXpolycom_DEPS = sipXconfig
 sipXrls_DEPS = sipXsqa sipXcallLib sipXcommserverLib
 sipXsaa_DEPS = sipXsqa sipXcallLib sipXcommserverLib
 sipXcallQueue_DEPS = sipXconfig
+sipXwebrtc_DEPS = sipXconfig
 sipXAocBilling_DEPS = sipXconfig
 # sipXexample_DEPS = sipXcommserverLib sipXconfig
 sipXsss_DEPS = sipXsqa sipXcommserverLib 

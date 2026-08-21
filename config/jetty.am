@@ -7,12 +7,15 @@ jetty_PKGS = \
 	jetty-ee \
 	jetty-ee10-servlet \
 	jetty-ee10-webapp \
+	jetty-ee10-websocket-jakarta-server \
   	jetty-http \
 	jetty-io \
 	jetty-security \
 	jetty-server \
 	jetty-session \
 	jetty-util \
+	jetty-websocket-core-server \
+	jetty-websocket-core-common \
 	jetty-xml
 
 jetty_DEPS = \
