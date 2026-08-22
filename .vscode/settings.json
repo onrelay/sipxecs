@@ -1,4 +1,8 @@
 {
     "esbonio.sphinx.confDir": "",
-    "java.compile.nullAnalysis.mode": "disabled"
+    "java.compile.nullAnalysis.mode": "disabled",
+    "java.import.maven.enabled": false,
+    "java.project.referencedLibraries": [
+        "sipXcommons/lib/**/*.jar"
+    ]
 }

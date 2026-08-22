@@ -149,8 +149,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/jta.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/junit-4.8.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/junitperf-1.9.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jwebunit-core-jakarta -2.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jwebunit-htmlunit-plugin-jakarta-jakarta-2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jwebunit-core-jakarta-2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jwebunit-htmlunit-plugin-jakarta-2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jxmpp-core-1.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jxmpp-jid-1.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ldapbp.jar"/>
