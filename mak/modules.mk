@@ -58,6 +58,7 @@ sipx_extra = \
   sipXcallback \
   sipXtcpdumplog \
   sipXdashboard \
+  sipXclient \
   mod_bcg729 \
   # sipXexample
 
@@ -184,6 +185,7 @@ sipXrls_DEPS = sipXsqa sipXcallLib sipXcommserverLib
 sipXsaa_DEPS = sipXsqa sipXcallLib sipXcommserverLib
 sipXcallQueue_DEPS = sipXconfig
 sipXwebrtc_DEPS = sipXconfig
+sipXclient_DEPS = sipXconfig
 sipXAocBilling_DEPS = sipXconfig
 # sipXexample_DEPS = sipXcommserverLib sipXconfig
 sipXsss_DEPS = sipXsqa sipXcommserverLib 
