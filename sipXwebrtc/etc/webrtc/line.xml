@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE model PUBLIC "-//sipXconfig//Model specification 2.0//EN" "/etc/sipxpbx/setting.dtd"[
+<!ENTITY types SYSTEM "types.xml">
+]>
+
+<model>
+  &types;
+
+  <group name="identity">
+    <setting name="display_name">
+      <type>
+        <string/>
+      </type>
+    </setting>
+    <setting name="aor">
+      <type>
+        <string/>
+      </type>
+    </setting>
+  </group>
+
+  <group name="auth">
+    <setting name="username">
+      <type>
+        <string/>
+      </type>
+    </setting>
+    <setting name="password" advanced="yes">
+      <type>
+        <string/>
+      </type>
+    </setting>
+  </group>
+
+  <group name="registration">
+    <setting name="enabled">
+      <type refid="true-false"/>
+      <value>true</value>
+    </setting>
+    <setting name="expires_seconds">
+      <type>
+        <integer/>
+      </type>
+      <value>300</value>
+    </setting>
+  </group>
+</model>

@@ -1,0 +1,21 @@
+<type id="true-false">
+  <boolean>
+    <true>
+      <value>true</value>
+    </true>
+    <false>
+      <value>false</value>
+    </false>
+  </boolean>
+</type>
+
+<type id="transport_type">
+  <enum>
+    <option>
+      <value>wss</value>
+    </option>
+    <option>
+      <value>ws</value>
+    </option>
+  </enum>
+</type>

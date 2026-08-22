@@ -1,0 +1,19 @@
+# sipXwebrtc gateway runtime configuration
+
+# Internal SIP listener for proxy-facing traffic
+internal.sip.bind-address=0.0.0.0
+internal.sip.port=5060
+internal.sip.transport=udp
+sip.stack-path=gov.nist
+sip.stack-name=org.sipfoundry.sipxwebrtc
+
+# External WebSocket Secure listener for browser traffic
+wss.bind-address=0.0.0.0
+wss.port=7443
+
+# TLS material
+#tls.key-store=@SIPX_CONFDIR@/ssl/ssl-web.keystore
+#tls.key-store-password=changeit
+#tls.trust-store=@SIPX_CONFDIR@/ssl/authorities.jks
+#tls.trust-store-password=changeit
+#tls.key-store-type=JKS

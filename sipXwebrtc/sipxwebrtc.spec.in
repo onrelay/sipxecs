@@ -13,16 +13,19 @@ Url: http://www.sipfoundry.org
 BuildRequires: automake
 BuildRequires: libxml2
 BuildRequires: java-17-openjdk-devel
+BuildRequires: jetty
 BuildRequires: sipxcommons >= %version
 BuildRequires: sipxconfig >= %version
 Requires: sipxconfig >= %version
+Requires: sipxcommons >= %version
+Requires: jetty
 
 Source: %name-%version.tar.gz
 Prefix: %_prefix
 BuildRoot: %{_tmppath}/%name-%version-root
 
 %description
-Server-side WebRTC integration for sipXecs and FreeSWITCH.
+Server-side WebRTC integration for sipXecs.
 
 %prep
 %setup -q
@@ -40,6 +43,15 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_sysconfdir}/init.d/sipxwebrtc
+%attr(644,root,root) /usr/lib/systemd/system/sipxwebrtc.service
+%config(noreplace) %{_sysconfdir}/sipxpbx/sipxwebrtc.properties
+%{_datadir}/sipxecs/cfinputs/plugin.d/sipxwebrtc.cf
+%dir %attr(755,sipx,sipx) %{_datadir}/java/sipXecs/sipXwebrtc
+%{_datadir}/java/sipXecs/sipXwebrtc/sipXwebrtc-gateway.jar
 %{_datadir}/java/sipXecs/sipXconfig/plugins/sipxwebrtc-config.jar
 
 %post
+if systemctl is-enabled --quiet sipxwebrtc.service; then
+	systemctl reenable sipxwebrtc.service >/dev/null 2>&1 || :
+fi

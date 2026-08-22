@@ -1,0 +1,15 @@
+[Unit]
+Description=sipxwebrtc
+Documentation=https://github.com/onrelay/sipxecs
+After=network-online.target syslog.target named.service sipxproxy.service
+
+[Service]
+Type=forking
+ExecStart=@SIPX_SERVICEDIR@/sipxwebrtc start
+RemainAfterExit=true
+ExecStop=@SIPX_SERVICEDIR@/sipxwebrtc stop
+StandardOutput=journal
+PIDFile=/run/sipxpbx/sipxwebrtc/sipxwebrtc.pid
+
+[Install]
+WantedBy=multi-user.target

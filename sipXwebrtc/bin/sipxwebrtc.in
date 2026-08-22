@@ -1,0 +1,120 @@
+#!/bin/bash
+
+# sipxwebrtc - Startup script for sipxwebrtc
+
+# chkconfig: 35 98 15
+# description: sipxwebrtc is a WebRTC SIP gateway service
+# processname: sipxwebrtc
+
+. @SIPX_LIBEXECDIR@/sipx-utils.sh || exit 1
+
+prog=sipxwebrtc
+config_props="@SIPX_CONFDIR@/$prog.properties"
+pidfile="@SIPX_RUNDIR@/$prog/$prog.pid"
+regex="^@SIPX_BINDIR@/$prog/java-$prog"
+
+[ -e @SIPX_CONFDIR@/sysconfig/$prog ] && . @SIPX_CONFDIR@/sysconfig/$prog
+
+configtest() {
+  Status=0
+
+  if [ ! -f $config_props ]; then
+    echo "Missing config file '$config_props'." >&2
+    Status=1
+  fi
+
+  logfile="@SIPX_LOGDIR@/sipxwebrtc.log"
+  if [ -e $logfile -a ! -w $logfile ]
+  then
+    echo "Log file '$logfile' exists but is not writable by user '@SIPXPBXUSER@'." >&2
+    Status=1
+  fi
+}
+
+start() {
+  [ -f $config_props ] || exit 6
+
+  JavaCmd=`@SIPX_BINDIR@/sipx-config --java --prog "${prog}"`
+  Dependencies=`@SIPX_BINDIR@/java-dep -d @SIPX_JAVADIR@/sipXcommons @webrtc_PKGS@`
+  export CLASSPATH=`echo @SIPX_CONFDIR@/sipxwebrtc @SIPX_JAVADIR@/sipXwebrtc/*.jar ${Dependencies} | sed -e 's/ /:/g'`
+
+  Command="$JavaCmd \
+    ${SIPXWEBRTC_OPTS} \
+    -Dconf.dir=@SIPX_CONFDIR@ \
+    -Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger \
+    org.sipfoundry.sipxwebrtc.gateway.WebrtcGateway \
+    $config_props \
+    $Args"
+
+  if [ -n "${NoFork}" ] ; then
+    killAnyProcessOrphans "${pidfile}" "${regex}"
+    runuser -s /bin/bash @SIPXPBXUSER@ -c ${Command}
+  else
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
+    Status=$?
+    [ $Status -eq 0 ] && { echo_running; exit $ERUNNING; }
+
+    echo -n $"Starting $prog: "
+    runuser -s /bin/bash @SIPXPBXUSER@ -c "${Command} > /dev/null 2>&1 & echo \$!" > ${pidfile}
+    Status=$?
+
+    if [ $# -gt 0 ]; then
+      checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
+      Status=$?
+      [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
+      checkProcessIsListeningTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
+      Status=$?
+      [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
+      [ $Status -eq 0 ] && { echo_success; }
+    else
+      [ $Status -eq 0 ] || { echo_failure; }
+      [ $Status -eq 0 ] && { echo_success; }
+    fi
+  fi
+}
+
+stop() {
+  echo -n $"Stopping $prog: "
+  killAnyProcessOrphans "${pidfile}" "${regex}" > /dev/null 2>&1
+  Status=$?
+  [ $Status -eq 0 ] || { echo_failure; }
+  [ $Status -eq 0 ] && { echo_success; }
+}
+
+restart() {
+  stop
+  sleep 1
+  start
+}
+
+case "$1" in
+  nofork)
+    NoFork=1
+    start
+    ;;
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart|reload|force-reload)
+    restart
+    ;;
+  condrestart)
+    checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
+    Status=$?
+    [ $Status -eq 0 ] && restart || :
+    ;;
+  status)
+    checkRunningProcessIsListening "${pidfile}" "${regex}"
+    ;;
+  configtest)
+    configtest
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|status|restart|reload|force-reload|condrestart|nofork|configtest}"
+    Status=1
+esac
+
+exit $Status

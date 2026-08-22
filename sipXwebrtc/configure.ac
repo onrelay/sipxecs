@@ -15,6 +15,8 @@ AM_CONDITIONAL(IS_RPMBUILD, test x$enable_rpmbuild = xyes)
 
 AC_CONFIG_FILES([
     Makefile
+    gateway/Makefile
+    bin/Makefile
     etc/Makefile
     config-plugin/Makefile
     config-plugin/test/Makefile

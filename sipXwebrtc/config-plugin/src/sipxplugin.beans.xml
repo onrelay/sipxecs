@@ -29,4 +29,21 @@
     </property>
   </bean>
 
+  <bean id="webrtcPhoneStandard" abstract="true" parent="abstractPhoneModel">
+    <property name="beanId" value="webrtc"/>
+    <property name="label" value="SIPX WebRTC"/>
+    <property name="maxLineCount" value="1"/>
+    <property name="profileTemplate" value="webrtc/provisioning.json.vm"/>
+    <property name="vendor" value="OnRelay"/>
+    <property name="serialNumberPattern" value="[a-zA-Z0-9]+"/>
+  </bean>
+
+  <bean id="webrtcPhoneModel" class="org.sipfoundry.sipxconfig.webrtc.device.WebrtcPhoneModel"
+        parent="webrtcPhoneStandard">
+    <property name="label" value="SIPX WebRTC"/>
+  </bean>
+
+  <bean id="webrtcPhone" class="org.sipfoundry.sipxconfig.webrtc.device.WebrtcPhone"
+        scope="prototype" parent="abstractPhone"/>
+
 </beans>

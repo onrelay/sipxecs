@@ -1,0 +1,21 @@
+webrtc_PKGS = \
+	sipxcommons \
+	jain-sip-sdp \
+	log4j \
+	slf4j-api \
+	slf4j-reload4j \
+	commons-logging-jakarta \
+	httpclient5 \
+	jakarta.servlet-api \
+	jakarta.websocket-api \
+	jetty-ee10-servlet \
+	jetty-ee10-websocket-jakarta-server \
+	jetty-http \
+	jetty-io \
+	jetty-security \
+	jetty-server \
+	jetty-session \
+	jetty-util \
+	jetty-websocket-core-common \
+	jetty-websocket-core-server \
+	jetty-xml

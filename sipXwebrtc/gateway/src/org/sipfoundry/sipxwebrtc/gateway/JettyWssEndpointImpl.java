@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 
 /** Jetty-backed WSS endpoint exposed through the gateway WSS abstraction. */
 public final class JettyWssEndpointImpl implements WssEndpoint {
-    private static final Logger LOGGER = Logger.getLogger(JettyWssEndpointImpl.class);
+    private static final Logger log = Logger.getLogger(JettyWssEndpointImpl.class);
     private final String m_id;
     private final JettyWssProviderImpl m_provider;
     private Session m_session;
@@ -38,13 +38,13 @@ public final class JettyWssEndpointImpl implements WssEndpoint {
             if (m_session == null || !m_session.isOpen()) {
                 throw new IOException("WSS endpoint is not open: " + m_id);
             }
-            LOGGER.debug("Sending WSS message to " + m_id);
+            log.debug("Sending WSS message to " + m_id);
             m_session.getBasicRemote().sendText(message);
         } catch (IOException exception) {
-            LOGGER.warn("Unable to send WSS message to " + m_id, exception);
+            log.warn("Unable to send WSS message to " + m_id, exception);
             throw exception;
         } catch (Throwable exception) {
-            LOGGER.error("Unexpected WSS send failure for " + m_id, exception);
+            log.error("Unexpected WSS send failure for " + m_id, exception);
             throw new IOException("Unable to send WSS message to " + m_id, exception);
         }
     }
@@ -53,16 +53,16 @@ public final class JettyWssEndpointImpl implements WssEndpoint {
     public void close() throws IOException {
         try {
             if (m_session != null && m_session.isOpen()) {
-                LOGGER.info("Closing WSS endpoint " + m_id);
+                log.info("Closing WSS endpoint " + m_id);
                 m_session.close(new CloseReason(CloseReason.CloseCodes.NORMAL_CLOSURE, "Closed"));
             } else {
-                LOGGER.debug("WSS endpoint already closed: " + m_id);
+                log.debug("WSS endpoint already closed: " + m_id);
             }
         } catch (IOException exception) {
-            LOGGER.warn("Unable to close WSS endpoint " + m_id, exception);
+            log.warn("Unable to close WSS endpoint " + m_id, exception);
             throw exception;
         } catch (Throwable exception) {
-            LOGGER.error("Unexpected WSS close failure for " + m_id, exception);
+            log.error("Unexpected WSS close failure for " + m_id, exception);
             throw new IOException("Unable to close WSS endpoint " + m_id, exception);
         }
     }
@@ -71,10 +71,10 @@ public final class JettyWssEndpointImpl implements WssEndpoint {
     public void onOpen(Session session, EndpointConfig config) {
         try {
             m_session = session;
-            LOGGER.info("Opened WSS endpoint " + m_id);
+            log.info("Opened WSS endpoint " + m_id);
             m_provider.endpointConnected(this);
         } catch (Throwable exception) {
-            LOGGER.error("Unable to process WSS endpoint open for " + m_id, exception);
+            log.error("Unable to process WSS endpoint open for " + m_id, exception);
             throw new RuntimeException("Unable to process WSS endpoint open", exception);
         }
     }
@@ -84,7 +84,7 @@ public final class JettyWssEndpointImpl implements WssEndpoint {
         try {
             m_provider.endpointMessage(this, message);
         } catch (Throwable exception) {
-            LOGGER.error("Unable to process WSS message for " + m_id, exception);
+            log.error("Unable to process WSS message for " + m_id, exception);
             throw new RuntimeException("Unable to process WSS message", exception);
         }
     }
@@ -92,10 +92,10 @@ public final class JettyWssEndpointImpl implements WssEndpoint {
     @OnClose
     public void onClose(CloseReason reason) {
         try {
-            LOGGER.info("Closed WSS endpoint " + m_id + ": " + reason);
+            log.info("Closed WSS endpoint " + m_id + ": " + reason);
             m_provider.endpointDisconnected(this, null);
         } catch (Throwable exception) {
-            LOGGER.error("Unable to process WSS endpoint close for " + m_id, exception);
+            log.error("Unable to process WSS endpoint close for " + m_id, exception);
             throw new RuntimeException("Unable to process WSS endpoint close", exception);
         }
     }
@@ -103,10 +103,10 @@ public final class JettyWssEndpointImpl implements WssEndpoint {
     @OnError
     public void onError(Session session, Throwable exception) {
         try {
-            LOGGER.info("WSS endpoint error: " + m_id, exception);
+            log.info("WSS endpoint error: " + m_id, exception);
             m_provider.endpointDisconnected(this, new IOException("WSS endpoint failure", exception));
         } catch (Throwable callbackException) {
-            LOGGER.error("Unable to process WSS endpoint error for " + m_id, callbackException);
+            log.error("Unable to process WSS endpoint error for " + m_id, callbackException);
             throw new RuntimeException("Unable to process WSS endpoint error", callbackException);
         }
     }

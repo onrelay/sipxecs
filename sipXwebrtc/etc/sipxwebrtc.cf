@@ -1,0 +1,41 @@
+# Copyright (C) 2026 OnRelay, Inc.
+# Licensed to the User under the AGPL license.
+
+#
+# sipxwebrtc configuration and process management
+#
+bundle agent sipxwebrtc {
+  methods:
+    any::
+      "any" usebundle => sipxwebrtc_running;
+}
+
+bundle agent sipxwebrtc_running {
+  vars:
+    any::
+      "service_command" string => "$(sipx.SIPX_BINDIR)/java-sipxwebrtc";
+
+  methods:
+    any::
+      "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxwebrtc_running");
+    !src.(sipxwebrtc|webrtc)::
+      "any" usebundle => rh_systemctl_status("enable sipxwebrtc");
+    !src.!sipxwebrtc.!webrtc::
+      "any" usebundle => rh_systemctl_status("disable sipxwebrtc");
+
+  commands:
+    (!sipxwebrtc.!webrtc|stop_sipxecs).sipxwebrtc_running::
+      "$(sipx.systemctl)"
+        comment => "stop sipxwebrtc",
+        args => "stop sipxwebrtc";
+
+    (sipxwebrtc|webrtc).!sipxwebrtc_running.!stop_sipxecs::
+      "$(sipx.systemctl)"
+        comment => "start sipxwebrtc",
+        args => "start sipxwebrtc";
+
+    (sipxwebrtc|webrtc).sipxwebrtc_running.(restart_sipxecs|restart_sipxwebrtc)::
+      "$(sipx.systemctl)"
+        comment => "restart sipxwebrtc",
+        args => "restart sipxwebrtc";
+}

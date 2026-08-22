@@ -25,7 +25,7 @@ import javax.sip.SipStack;
  */
 public final class WebrtcGateway implements AutoCloseable {
     private static final String DEFAULT_CONFIG = "/etc/sipxpbx/sipxwebrtc.properties";
-    private static final Logger LOGGER = Logger.getLogger(WebrtcGateway.class.getName());
+    private static final Logger log = Logger.getLogger(WebrtcGateway.class.getName());
 
     private final Properties m_properties;
     private SipStack m_sipStack;
@@ -49,7 +49,7 @@ public final class WebrtcGateway implements AutoCloseable {
         try {
             startInternal();
         } catch (Throwable exception) {
-            LOGGER.error("Unable to start sipXwebrtc gateway", exception);
+            log.error("Unable to start sipXwebrtc gateway", exception);
             close();
             throw new RuntimeException("Unable to start sipXwebrtc gateway", exception);
         }
@@ -98,7 +98,7 @@ public final class WebrtcGateway implements AutoCloseable {
                 m_sipStack.stop();
             }
         } catch (Throwable exception) {
-            LOGGER.warn("Unable to close sipXwebrtc gateway cleanly", exception);
+            log.warn("Unable to close sipXwebrtc gateway cleanly", exception);
         }
         m_wssProvider = null;
         m_sipStack = null;

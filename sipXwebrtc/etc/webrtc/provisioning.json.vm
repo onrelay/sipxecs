@@ -1,0 +1,31 @@
+{
+  "sip": {
+    "domain": "$!phone.getSettingValue('provisioning/server_domain')",
+    "transport": "$!phone.getSettingValue('provisioning/sip_transport')",
+    "wsPath": "$!phone.getSettingValue('provisioning/sip_path')"
+  },
+  "features": {
+    "audioCalling": $!phone.getSettingValue('features/audio_calling'),
+    "videoCalling": $!phone.getSettingValue('features/video_calling'),
+    "blindTransfer": $!phone.getSettingValue('features/blind_transfer'),
+    "attendedTransfer": $!phone.getSettingValue('features/attended_transfer'),
+    "callRecording": $!phone.getSettingValue('features/call_recording'),
+    "voicemail": $!phone.getSettingValue('features/voicemail'),
+    "presence": $!phone.getSettingValue('features/presence')
+  },
+  "accounts": {
+    #if($phone.getLines() && $phone.getLines().size() > 0)
+    #set($line = $phone.getLines().entrySet().iterator().next().getValue())
+    "primary": {
+      "displayName": "$!line.getSettingValue('identity/display_name')",
+      "aor": "$!line.getSettingValue('identity/aor')",
+      "username": "$!line.getSettingValue('auth/username')",
+      "password": "$!line.getSettingValue('auth/password')",
+      "registrationEnabled": $!line.getSettingValue('registration/enabled'),
+      "registrationExpires": $!line.getSettingValue('registration/expires_seconds')
+    }
+    #else
+    "primary": null
+    #end
+  }
+}

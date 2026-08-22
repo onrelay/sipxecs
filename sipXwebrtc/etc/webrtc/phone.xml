@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE model PUBLIC "-//sipXconfig//Model specification 2.0//EN" "/etc/sipxpbx/setting.dtd"[
+<!ENTITY types SYSTEM "types.xml">
+]>
+
+<model>
+  &types;
+
+  <group name="provisioning">
+    <setting name="server_domain">
+      <type>
+        <string/>
+      </type>
+    </setting>
+    <setting name="sip_transport">
+      <type refid="transport_type"/>
+      <value>wss</value>
+    </setting>
+    <setting name="sip_path">
+      <type>
+        <string/>
+      </type>
+      <value>/</value>
+    </setting>
+  </group>
+
+  <group name="features">
+    <setting name="audio_calling">
+      <type refid="true-false"/>
+      <value>true</value>
+    </setting>
+    <setting name="video_calling">
+      <type refid="true-false"/>
+      <value>false</value>
+    </setting>
+    <setting name="blind_transfer">
+      <type refid="true-false"/>
+      <value>false</value>
+    </setting>
+    <setting name="attended_transfer">
+      <type refid="true-false"/>
+      <value>false</value>
+    </setting>
+    <setting name="call_recording">
+      <type refid="true-false"/>
+      <value>false</value>
+    </setting>
+    <setting name="voicemail">
+      <type refid="true-false"/>
+      <value>true</value>
+    </setting>
+    <setting name="presence">
+      <type refid="true-false"/>
+      <value>false</value>
+    </setting>
+  </group>
+</model>

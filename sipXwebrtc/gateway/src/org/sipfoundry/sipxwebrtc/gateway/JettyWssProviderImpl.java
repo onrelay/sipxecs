@@ -19,7 +19,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 /** Concrete WSS transport provider behind the gateway WSS abstraction. */
 public final class JettyWssProviderImpl implements WssProvider {
-    private static final Logger LOGGER = Logger.getLogger(JettyWssProviderImpl.class);
+    private static final Logger log = Logger.getLogger(JettyWssProviderImpl.class);
 
     private final String m_bindAddress;
     private final int m_port;
@@ -42,9 +42,9 @@ public final class JettyWssProviderImpl implements WssProvider {
                 throw new IllegalArgumentException("WSS listener cannot be null");
             }
             m_listener = listener;
-            LOGGER.debug("Registered WSS listener");
+            log.debug("Registered WSS listener");
         } catch (Throwable exception) {
-            LOGGER.error("Unable to register WSS listener", exception);
+            log.error("Unable to register WSS listener", exception);
             throw new RuntimeException("Unable to register WSS listener", exception);
         }
     }
@@ -56,9 +56,9 @@ public final class JettyWssProviderImpl implements WssProvider {
                 throw new IllegalArgumentException("WSS endpoint identity and endpoint are required");
             }
             m_endpoints.put(id, endpoint);
-            LOGGER.debug("Registered WSS endpoint " + id);
+            log.debug("Registered WSS endpoint " + id);
         } catch (Throwable exception) {
-            LOGGER.error("Unable to register WSS endpoint " + id, exception);
+            log.error("Unable to register WSS endpoint " + id, exception);
             throw new RuntimeException("Unable to register WSS endpoint", exception);
         }
     }
@@ -68,12 +68,12 @@ public final class JettyWssProviderImpl implements WssProvider {
         try {
             WssEndpoint endpoint = m_endpoints.get(endpointId);
             if (endpoint == null) {
-                LOGGER.warn("No WSS endpoint found for " + endpointId);
+                log.warn("No WSS endpoint found for " + endpointId);
                 return;
             }
             endpoint.send(message);
         } catch (Throwable exception) {
-            LOGGER.error("Unable to send WSS message to " + endpointId, exception);
+            log.error("Unable to send WSS message to " + endpointId, exception);
             throw new RuntimeException("Unable to send WSS message", exception);
         }
     }
@@ -81,11 +81,11 @@ public final class JettyWssProviderImpl implements WssProvider {
     @Override
     public synchronized void start() {
         if (m_started) {
-            LOGGER.debug("WSS provider is already started");
+            log.debug("WSS provider is already started");
             return;
         }
         try {
-            LOGGER.info("Starting WSS provider on " + m_bindAddress + ":" + m_port);
+            log.info("Starting WSS provider on " + m_bindAddress + ":" + m_port);
             m_server = new Server();
             SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
             sslContextFactory.setKeyStorePath(System.getProperty("javax.net.ssl.keyStore"));
@@ -103,10 +103,10 @@ public final class JettyWssProviderImpl implements WssProvider {
             configureWebSocket(context);
             m_server.start();
             m_started = true;
-            LOGGER.info("Started WSS provider on " + m_bindAddress + ":" + m_port);
+            log.info("Started WSS provider on " + m_bindAddress + ":" + m_port);
         } catch (Throwable exception) {
             close();
-            LOGGER.error("Unable to start WSS provider on " + m_bindAddress + ":" + m_port, exception);
+            log.error("Unable to start WSS provider on " + m_bindAddress + ":" + m_port, exception);
             throw new RuntimeException("Unable to start WSS provider", exception);
         }
     }
@@ -116,7 +116,7 @@ public final class JettyWssProviderImpl implements WssProvider {
         try {
             return m_started;
         } catch (Throwable exception) {
-            LOGGER.error("Unable to read WSS provider state", exception);
+            log.error("Unable to read WSS provider state", exception);
             throw new RuntimeException("Unable to read WSS provider state", exception);
         }
     }
@@ -124,7 +124,7 @@ public final class JettyWssProviderImpl implements WssProvider {
     @Override
     public synchronized void close() {
         try {
-            LOGGER.info("Stopping WSS provider");
+            log.info("Stopping WSS provider");
             m_started = false;
             if (m_server != null) {
                 m_server.stop();
@@ -134,13 +134,13 @@ public final class JettyWssProviderImpl implements WssProvider {
                 try {
                     endpoint.close();
                 } catch (Throwable exception) {
-                    LOGGER.warn("Unable to close WSS endpoint " + endpoint.getId(), exception);
+                    log.warn("Unable to close WSS endpoint " + endpoint.getId(), exception);
                 }
             }
             m_endpoints.clear();
-            LOGGER.info("Stopped WSS provider");
+            log.info("Stopped WSS provider");
         } catch (Throwable exception) {
-            LOGGER.warn("Unable to close WSS provider cleanly", exception);
+            log.warn("Unable to close WSS provider cleanly", exception);
             throw new RuntimeException("Unable to close WSS provider", exception);
         }
     }
@@ -149,7 +149,7 @@ public final class JettyWssProviderImpl implements WssProvider {
         try {
             JakartaWebSocketServletContainerInitializer.configure(context, this::configureEndpoints);
         } catch (Throwable exception) {
-            LOGGER.error("Unable to configure Jetty WebSocket support", exception);
+            log.error("Unable to configure Jetty WebSocket support", exception);
             throw new RuntimeException("Unable to configure Jetty WebSocket support", exception);
         }
     }
@@ -169,9 +169,9 @@ public final class JettyWssProviderImpl implements WssProvider {
                 })
                     .build();
             container.addEndpoint(endpointConfig);
-            LOGGER.debug("Configured SIP WebSocket endpoint at /");
+            log.debug("Configured SIP WebSocket endpoint at /");
         } catch (Throwable exception) {
-            LOGGER.error("Unable to configure SIP WebSocket endpoint", exception);
+            log.error("Unable to configure SIP WebSocket endpoint", exception);
             throw new RuntimeException("Unable to configure SIP WebSocket endpoint", exception);
         }
     }
@@ -179,20 +179,20 @@ public final class JettyWssProviderImpl implements WssProvider {
     void endpointConnected(JettyWssEndpointImpl endpoint) {
         try {
             m_endpoints.put(endpoint.getId(), endpoint);
-            LOGGER.info("WSS endpoint connected: " + endpoint.getId());
+            log.info("WSS endpoint connected: " + endpoint.getId());
             notifyConnected(endpoint.getId());
         } catch (Throwable exception) {
-            LOGGER.error("Unable to process WSS endpoint connection", exception);
+            log.error("Unable to process WSS endpoint connection", exception);
             throw new RuntimeException("Unable to process WSS endpoint connection", exception);
         }
     }
 
     void endpointMessage(JettyWssEndpointImpl endpoint, String message) {
         try {
-            LOGGER.debug("Received WSS message from " + endpoint.getId());
+            log.debug("Received WSS message from " + endpoint.getId());
             notifyMessage(endpoint.getId(), message);
         } catch (Throwable exception) {
-            LOGGER.error("Unable to process WSS message from " + endpoint.getId(), exception);
+            log.error("Unable to process WSS message from " + endpoint.getId(), exception);
             throw new RuntimeException("Unable to process WSS message", exception);
         }
     }
@@ -200,10 +200,10 @@ public final class JettyWssProviderImpl implements WssProvider {
     void endpointDisconnected(JettyWssEndpointImpl endpoint, IOException exception) {
         try {
             m_endpoints.entrySet().removeIf(entry -> entry.getValue() == endpoint);
-            LOGGER.warn("WSS endpoint disconnected: " + endpoint.getId(), exception);
+            log.warn("WSS endpoint disconnected: " + endpoint.getId(), exception);
             notifyDisconnected(endpoint.getId(), exception);
         } catch (Throwable callbackException) {
-            LOGGER.error("Unable to process WSS endpoint disconnect", callbackException);
+            log.error("Unable to process WSS endpoint disconnect", callbackException);
             throw new RuntimeException("Unable to process WSS endpoint disconnect", callbackException);
         }
     }
@@ -215,7 +215,7 @@ public final class JettyWssProviderImpl implements WssProvider {
             }
             m_listener.onMessage(endpointId, message);
         } catch (Throwable exception) {
-            LOGGER.error("Unable to notify WSS listener of a message", exception);
+            log.error("Unable to notify WSS listener of a message", exception);
             throw new RuntimeException("Unable to notify WSS listener", exception);
         }
     }
@@ -226,7 +226,7 @@ public final class JettyWssProviderImpl implements WssProvider {
                 m_listener.onDisconnected(endpointId, exception);
             }
         } catch (Throwable callbackException) {
-            LOGGER.error("Unable to notify WSS listener of disconnect", callbackException);
+            log.error("Unable to notify WSS listener of disconnect", callbackException);
             throw new RuntimeException("Unable to notify WSS listener", callbackException);
         }
     }
@@ -238,7 +238,7 @@ public final class JettyWssProviderImpl implements WssProvider {
             }
             m_listener.onConnected(endpointId);
         } catch (Throwable exception) {
-            LOGGER.error("Unable to notify WSS listener of connection", exception);
+            log.error("Unable to notify WSS listener of connection", exception);
             throw new RuntimeException("Unable to notify WSS listener", exception);
         }
     }

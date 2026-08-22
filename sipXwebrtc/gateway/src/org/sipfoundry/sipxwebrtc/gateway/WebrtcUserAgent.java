@@ -27,25 +27,30 @@ import org.apache.log4j.Logger;
  * Translates and manipulates messages between WSS and the internal SIP provider.
  */
 public final class WebrtcUserAgent implements WssListener, SipListener {
-    private static final Logger LOGGER = Logger.getLogger(WebrtcUserAgent.class);
+    private static final Logger log = Logger.getLogger(WebrtcUserAgent.class);
     private final SipProvider m_internalSipProvider;
     private final WssProvider m_wssProvider;
     private final WssSipMessageConverter m_messageConverter;
-        private final List<WebrtcMessageManipulator> m_messageManipulators =
+    private final List<WebrtcMessageManipulator> m_messageManipulators =
             new ArrayList<WebrtcMessageManipulator>();
 
-        public WebrtcUserAgent(SipProvider internalSipProvider, WssProvider wssProvider,
+    public WebrtcUserAgent(SipProvider internalSipProvider, WssProvider wssProvider,
             String internalTransport) {
+        if (internalSipProvider == null || wssProvider == null || internalTransport == null
+            || internalTransport.isEmpty()) {
+            throw new IllegalArgumentException("WebRTC user agent dependencies are required");
+        }
         m_internalSipProvider = internalSipProvider;
         m_wssProvider = wssProvider;
         m_messageConverter = new WssSipMessageConverter();
         m_messageManipulators.add(new WebrtcContactManipulator());
         m_messageManipulators.add(new WebrtcViaManipulator(internalSipProvider, internalTransport));
+        m_messageManipulators.add(new WebrtcSdpManipulator());
         try {
             m_internalSipProvider.addSipListener(this);
             m_wssProvider.addWssListener(this);
         } catch (Throwable exception) {
-            LOGGER.error("Unable to register WebRTC user agent listeners", exception);
+            log.error("Unable to register WebRTC user agent listeners", exception);
             throw new RuntimeException("Unable to register WebRTC user agent listeners", exception);
         }
     }
@@ -81,12 +86,12 @@ public final class WebrtcUserAgent implements WssListener, SipListener {
                 }
             }
             if (!(sipMessage instanceof Request)) {
-                LOGGER.debug("Ignoring non-request WSS message from " + endpointId);
+                log.debug("Ignoring non-request WSS message from " + endpointId);
                 return;
             }
             sendToInternal(sipMessage);
         } catch (Throwable exception) {
-            LOGGER.error("Unable to process WSS message from " + endpointId, exception);
+            log.error("Unable to process WSS message from " + endpointId, exception);
             throw new RuntimeException("Unable to process WSS message", exception);
         }
     }
@@ -109,7 +114,7 @@ public final class WebrtcUserAgent implements WssListener, SipListener {
         try {
             sendToWss(message);
         } catch (Throwable exception) {
-            LOGGER.error("Unable to process internal SIP message", exception);
+            log.error("Unable to process internal SIP message", exception);
             throw new RuntimeException("Unable to process internal SIP message", exception);
         }
     }
@@ -124,7 +129,7 @@ public final class WebrtcUserAgent implements WssListener, SipListener {
                 throw new IllegalArgumentException("Unsupported SIP message type");
             }
         } catch (Throwable exception) {
-            LOGGER.error("Unable to send WebRTC message to internal SIP", exception);
+            log.error("Unable to send WebRTC message to internal SIP", exception);
             throw new RuntimeException("Unable to send WebRTC message to internal SIP", exception);
         }
     }
@@ -136,7 +141,7 @@ public final class WebrtcUserAgent implements WssListener, SipListener {
                 m_wssProvider.send(endpointId, m_messageConverter.toWss(transformed));
             }
         } catch (Throwable exception) {
-            LOGGER.error("Unable to send internal SIP message to WSS", exception);
+            log.error("Unable to send internal SIP message to WSS", exception);
             throw new RuntimeException("Unable to send internal SIP message to WSS", exception);
         }
     }
@@ -171,7 +176,7 @@ public final class WebrtcUserAgent implements WssListener, SipListener {
             }
             m_wssProvider.send(endpointId, m_messageConverter.toWss(transformed));
         } catch (Throwable exception) {
-            LOGGER.error("Unable to route internal SIP message to WSS", exception);
+            log.error("Unable to route internal SIP message to WSS", exception);
             throw new RuntimeException("Unable to route internal SIP message to WSS", exception);
         }
     }
