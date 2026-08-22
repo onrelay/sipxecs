@@ -1,0 +1,9 @@
+{
+    "users" : {
+        "rootCollection" : true,
+        "encrypted": true,
+        "entity": true,
+        "templated": true,
+        "documents": ["User"]
+    }
+}

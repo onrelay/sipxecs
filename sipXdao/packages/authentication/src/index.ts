@@ -1,0 +1,6 @@
+export { AbstractAuthenticationService } from "./api/abstractAuthenticationService"
+export { AuthenticationService } from "./api/authenticationService"
+export { AuthenticationServiceFactory, authenticationServiceFactory } from "./api/authenticationServiceFactory"
+export { AuthenticatedEntity } from "./api/authenticatedEntity"
+export { AuthenticatedEntityType, AuthenticatedEntityTypes } from "./api/authenticatedEntityType"
+export { AuthenticationMethod, AuthenticationMethods } from "./api/authenticationMethod"

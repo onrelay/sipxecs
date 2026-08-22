@@ -1,0 +1,123 @@
+{
+    "defaultLogLevel": "trace",
+
+    "logLevel" : {
+
+        "application" : "trace",
+
+        "authentication" : "trace",
+
+        "billing" : "warn",
+
+        "configuration" : "warn",
+
+        "database" : "trace",
+
+        "common" : "warn",
+
+        "firebase" : "warn",
+        
+        "server" : "warn",
+
+        "messaging" : "warn",
+
+        "security" : "warn",
+
+        "storage" : "warn",
+
+        "ui" : "trace"
+    },
+    "emulator": {
+
+        "defaultLogLevel": "trace",
+
+        "logLevel" : {
+
+            "application" : "trace",
+
+            "authentication" : "trace",
+
+            "billing" : "trace",
+
+            "common" : "trace",
+    
+            "configuration" : "trace",
+
+            "database" : "trace",
+            
+            "firebase" : "trace",
+            
+            "server" : "trace",
+
+            "messaging" : "trace",
+
+            "security" : "trace",
+
+            "storage" : "trace",
+
+            "ui" : "trace"
+        }
+    },
+    "development": {
+
+        "defaultLogLevel": "debug",
+
+        "logLevel" : {
+
+            "application" : "trace",
+
+            "authentication" : "trace",
+
+            "billing" : "trace",
+
+            "common" : "info",
+    
+            "configuration" : "info",
+
+            "database" : "debug",
+            
+            "firebase" : "info",
+            
+            "server" : "info",
+
+            "messaging" : "info",
+
+            "security" : "info",
+
+            "storage" : "info",
+
+            "ui" : "trace"
+        }
+    },
+    "qa": {
+
+        "defaultLogLevel": "warn",
+
+        "logLevel" : {
+
+            "application" : "trace", 
+
+            "authentication" : "trace",
+
+            "common" : "info",
+
+            "billing" : "trace",
+
+            "configuration": "info",
+
+            "database" : "trace",
+
+            "firebase" : "info",
+            
+            "server" : "info",
+
+            "messaging" : "info",
+
+            "security" : "info",
+
+            "storage" : "info",
+
+            "ui" : "trace"
+        }
+    }
+}

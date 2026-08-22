@@ -1,0 +1,26 @@
+{
+    "clientEncryption": true,
+
+    "algorithm" : "aes-256-cbc",
+
+    "initializationVectorLength" : 16,
+
+    "encoding" : "hex",
+
+    "defaultKeyId" : "default-key",
+
+    "emulator" : {
+        "clientEncryption": true,
+        
+        "defaultKey": "0123456789abcdef0123456789abcdef"
+
+    },
+
+    "development" : {
+        "clientEncryption": true
+    },
+
+    "qa" : {
+        "clientEncryption": true 
+    }
+}

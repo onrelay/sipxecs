@@ -1,0 +1,25 @@
+{
+    "cacheReleaseSeconds" : 1800,
+
+    "useArchive" : true,
+
+    "archiveDays": 30,
+
+    "emulator": {
+        "useArchive" : true,
+
+        "archiveDays": 1
+    },
+
+    "development": {
+        "useArchive" : false,
+
+        "archiveDays": 1
+    },
+
+    "qa": {
+        "useArchive" : true,
+
+        "archiveDays": 7
+    }
+}

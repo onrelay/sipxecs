@@ -1,0 +1,67 @@
+{    
+    "title" : {
+        "en" : "Auth Registry",
+
+        "nb": "Samtykkeregisteret"
+    },
+
+    "owner" : "Healthguard Systems AS",
+
+    "adminName" : "Administrator",
+
+    "defaultLanguage" : "nb",
+
+    "webUrl": {
+        "en": "https://www.samtykkeregisteret.no",
+
+        "nb": "https://www.samtykkeregisteret.no"  
+    },
+
+    "appUrl" : "https:/app.samtykkeregisteret.no",
+
+    "supportUrl" : {
+        "en" : "mailto:support@samtykkeregisteret.no",
+
+        "nb" : "mailto:support@samtykkeregisteret.no"
+    },
+    
+    "iosApp" : "https://apps.apple.com/us/app/healthguard-systems/id1616633218",
+
+    "androidApp": "https://play.google.com/store/apps/details?id=systems.healthguard",
+
+    "apiPath": "/api", 
+
+    "privacyPolicyPath" : "/privacy-policy",
+
+    "termsOfServicePath" : "terms-and-conditions/", 
+
+    "signUpPath" : {
+        "en" : "/en/annual-subscription",
+
+        "nb" : "/nb/aarlig-abonnement"
+    },
+
+    "organizationAccountPath" : {
+       "en": "/en/account",
+
+       "nb": "/nb/min-konto"
+    },
+
+    "qa" : {
+        "webUrl": null,
+
+        "appUrl" : "https://registry-qa.web.app" 
+    },
+    "development" : {
+
+        "webUrl": null,
+
+        "appUrl": "https://registry-development.web.app" 
+    },
+    "emulator" : {
+
+        "webUrl" : null,
+
+        "appUrl" : "http://localhost:3000"
+    }
+}  

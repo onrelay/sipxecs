@@ -1,0 +1,22 @@
+{
+  "name": "@sipxdao/sipx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.14.0",
+  "dependencies": {
+    "@sipxdao/common": "workspace:*",
+    "@sipxdao/configuration": "workspace:*",
+    "@sipxdao/database": "workspace:*"
+  },
+  "devDependencies": {
+  }
+}
