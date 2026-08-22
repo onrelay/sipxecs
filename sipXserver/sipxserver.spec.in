@@ -1,0 +1,44 @@
+Name: @PACKAGE@
+Version: @VERSION@
+Release: @PACKAGE_REVISION@
+
+Summary: SIPX DAO server
+License: LGPL
+Group: Applications/Communications
+Vendor: SIPfoundry
+Url: http://www.sipfoundry.org
+BuildArch: noarch
+
+%define debug_package %{nil}
+
+BuildRequires: automake
+BuildRequires: nodejs
+BuildRequires: npm
+BuildRequires: rsync
+Requires: sipxconfig >= %version
+
+Source: %name-%version.tar.gz
+Prefix: %_prefix
+BuildRoot: %{_tmppath}/%name-%version-root
+
+%description
+TypeScript-based SIPX DAO API server built for Node.js.
+
+%prep
+%setup -q
+
+%build
+%configure --enable-rpmbuild @SIPX_RPM_CONFIGURE_OPTIONS@
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(644,root,root,755)
+%dir %attr(775,sipx,sipx) %{_localstatedir}/sipxdata/sipxserver
+%{_localstatedir}/sipxdata/sipxserver

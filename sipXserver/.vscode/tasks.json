@@ -1,0 +1,28 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Check sipXserver dependency resolution",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"install",
+				"--lockfile=false"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Compile sipXserver",
+			"type": "shell",
+			"command": "pnpm install --no-frozen-lockfile && pnpm --filter sipxserver build",
+			"args": [],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		}
+	]
+}
