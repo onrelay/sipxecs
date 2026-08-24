@@ -228,7 +228,13 @@ SipClient::~SipClient()
     // Tell the associated thread to shut itself down.
     requestShutdown();
 
-    // Do not delete the event listers, as they are not subordinate.
+   // Wait for the task to exit so that it does not
+   // reference the socket or other members after they
+   // get deleted.
+   if(isStarted() || isShuttingDown())
+   {
+      waitUntilShutDown();
+   }
 
     // Free the socket
     if(mClientSocket)
@@ -242,27 +248,12 @@ SipClient::~SipClient()
            Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "SipClient[%s]::~ %p socket %p closing %s socket",
                          mName.data(), this,
                          mClientSocket, OsSocket::ipProtocolString(mSocketType));
-           mClientSocket->close();
-        }
+                         
+            mClientSocket->close();
 
-        // Wait for the task to exit so that it does not
-        // reference the socket or other members after they
-        // get deleted.
-        if(isStarted() || isShuttingDown())
-        {
-            waitUntilShutDown();
-        }
-
-        if (!mbSharedSocket)
-        {
             delete mClientSocket;
         }
         mClientSocket = NULL;
-    }
-    else if(isStarted() || isShuttingDown())
-    {
-        // It should not get here but just in case
-        waitUntilShutDown();
     }
 }
 

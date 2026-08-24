@@ -63,8 +63,6 @@ SipClientTls::SipClientTls(OsSocket* socket,
 
 SipClientTls::~SipClientTls()
 {
-   // Tell the associated thread to shut itself down.
-   waitUntilShutDown();
 }
 
 /* ============================ MANIPULATORS ============================== */
