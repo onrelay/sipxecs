@@ -6,7 +6,7 @@ import { AbstractBasicProperty } from "./abstractBasicProperty";
 export class LongTextPropertyImpl extends AbstractBasicProperty<string> implements LongTextProperty {
 
     constructor( parent : DatabaseObject, defaultValue? : string ) {
-        super( parent, PropertyTypes.LongText as PropertyType, defaultValue );  
+        super( parent, PropertyTypes.LongText, defaultValue );  
 
     }
 

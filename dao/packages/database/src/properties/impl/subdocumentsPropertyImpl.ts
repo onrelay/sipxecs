@@ -11,7 +11,7 @@ export class SubdocumentsPropertyImpl<DerivedSubdocument extends DatabaseSubdocu
 
     constructor( parent : DatabaseObject, onNewSubdocument : () => DerivedSubdocument ) { 
         
-        super( parent, PropertyTypes.Subdocuments as PropertyType ); 
+        super( parent, PropertyTypes.Subdocuments ); 
 
         this._onNewSubdocument = onNewSubdocument; 
     } 

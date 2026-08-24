@@ -1,13 +1,12 @@
 import { Logger, Service } from "@dao/common";
 import { DatabaseFactory } from "./databaseFactory";
 import { DatabaseManager } from "./databaseManager";
-import { DatabaseAccessor } from "./databaseAccessor";
-import { AuthenticatedEntity } from "@dao/authentication";
 import { Entity } from "../../documents/spec/entity";
+import { DatabasePlatform } from "../defs/databasePlatform";
 
-export const DatabaseServiceName = "databaseService";
+export const DatabaseServiceName = "database";
 
-export const DatabaseConfigurationName = "database";
+export const DatabasesConfigurationName = "databases";
 
 export const CollectionGroupPathSuffix = "-group";
 
@@ -25,20 +24,32 @@ export const ChangesCollection = "changes";
 export const TemplatesCollection = "templates";
 
 
-
 export interface DatabaseService extends Service {
 
     init() : Promise<void>;
 
-    authenticatedEntity() : AuthenticatedEntity | undefined;
+    updateCurrentEntity( 
+        entityCollectionName : string, 
+        authId : string ) : Promise<Entity | undefined>; 
 
-    authenticatedDatabaseEntity() : Entity | undefined;
-        
-    readonly databaseFactory : DatabaseFactory;
+    setCurrentEntity( entity? : Entity) : Promise<void>;
 
-    readonly databaseManager : DatabaseManager;
+    currentEntity() : Entity | undefined;
 
-    readonly databaseAccessor : DatabaseAccessor;
+    updateCurrentEntityKeys() : Promise<void>;
 
+    clearCurrentEntityKeys() : Promise<void>;
+
+    addDatabaseFactory( databaseFactory : DatabaseFactory ) : Promise<void>;
+
+    removeDatabaseFactory(  
+        databasePlatform : DatabasePlatform, 
+        databaseName : string ) : Promise<boolean>;
+
+    databaseFactory( 
+        databasePlatform : DatabasePlatform, 
+        databaseName : string ) : DatabaseFactory | undefined;
+
+    databasePrefix( databasePlatform : DatabasePlatform, databaseName : string ) : string;
 }
 

@@ -1,14 +1,7 @@
-import { Application, Configuration, Environment, Platform, Target } from "@dao/common";
+import { AbstractApplication } from "@dao/common";
 
-export abstract class AbstractSipxApplication extends Application {
+export const SipxApplicationName = "sipx";
 
-    constructor( params: {
-        name: string,
-        environment: Environment,
-        platform: Platform,
-        target: Target,
-        configuration: Configuration
-    } ) {
-        super( params );
-    }
+export abstract class AbstractSipxApplication extends AbstractApplication {
+
 }

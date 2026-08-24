@@ -8,8 +8,8 @@ export const DatabaseTypes = {
     CollectionGroup :  "collectionGroup",
 
     Documents :       "documents"
-}
+} as const
 
-export type DatabaseType = keyof (typeof DatabaseTypes);
+export type DatabaseType = (typeof DatabaseTypes)[keyof typeof DatabaseTypes];
 
 

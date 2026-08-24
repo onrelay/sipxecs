@@ -5,20 +5,25 @@ import {
     Database,
     DatabaseDocument,
     DatabaseFilter,
+    DatabasePlatforms,
     DatabaseRecord,
     databaseServiceFactory,
     log,
     XmlDatabaseDocument,
 } from "@dao/database";
 
+export const sipxRestDatabaseName = "sipx";
+
 export class SipxRestDatabaseManager extends AbstractDatabaseManager {
 
     constructor( params: {
         baseUrl: string;
-        clientEncryption?: boolean;
     } ) {
         super( {
-            clientEncryption: params.clientEncryption ?? false,
+            clientEncryption: false,
+            useArchive: false,
+            nestedCollections: false,
+            collectionGroups: false,
             converter: new BasicDatabaseConverter(),
         } );
 
@@ -67,7 +72,7 @@ export class SipxRestDatabaseManager extends AbstractDatabaseManager {
 
         try {
             const restPath = this.restPathFromUri( uri );
-            const documentId = databaseServiceFactory!.get().databaseFactory.documentId( uri );
+            const documentId = this.databaseFactory().documentId( uri );
 
             if( !restPath || documentId == null || documentId === "new" ) {
                 log.traceOut( "readDocumentRecord()", uri, "invalid id or collection" );
@@ -157,7 +162,7 @@ export class SipxRestDatabaseManager extends AbstractDatabaseManager {
 
         try {
             const restPath = this.restPathFromUri( uri );
-            const documentId = databaseServiceFactory!.get().databaseFactory.documentId( uri );
+            const documentId = this.databaseFactory().documentId( uri );
             const xml = this.recordToXml( uri, documentRecord );
 
             const url = documentId != null
@@ -186,7 +191,7 @@ export class SipxRestDatabaseManager extends AbstractDatabaseManager {
 
         try {
             const restPath = this.restPathFromUri( uri );
-            const documentId = databaseServiceFactory!.get().databaseFactory.documentId( uri );
+            const documentId = this.databaseFactory().documentId( uri );
 
             if( !restPath || documentId == null ) {
                 throw new Error( "Missing collection or document ID for delete" );
@@ -214,7 +219,7 @@ export class SipxRestDatabaseManager extends AbstractDatabaseManager {
             const result = new Map<string, DatabaseDocument>();
 
             for( const [uri, record] of records ) {
-                const doc = await databaseServiceFactory!.get().databaseFactory.documentFromRecord( uri, record );
+                const doc = await this.databaseFactory().documentFromRecord( uri, record );
 
                 if( doc != null ) {
                     result.set( uri, doc );
@@ -257,11 +262,28 @@ export class SipxRestDatabaseManager extends AbstractDatabaseManager {
         throw new Error( "Sipx REST database monitoring is not implemented" );
     }
 
+    async clearAll() : Promise<void> {
+
+        log.traceIn("clearAll()" );
+
+        try {
+            await super.clearAll();
+
+            log.traceOut("clearAll()" );
+
+        } catch( error ) {
+
+            log.warn( "clearAll()", "Error clearing database manager", error );
+            
+            throw new Error( "Error clearing database manager: " + (error as any).message );
+        }
+    }
+
     private async parseXmlToRecord( uri: string, responseText: string ): Promise<DatabaseRecord> {
         log.traceIn( "parseXmlToRecord()", uri );
 
         try {
-            const document = databaseServiceFactory!.get().databaseFactory.newDocumentFromUri( uri );
+            const document = this.databaseFactory().newDocumentFromUri( uri );
 
             if( document == null || typeof (document as any).fromXml !== "function" ) {
                 throw new Error( "Document does not implement XmlDatabaseDocument for URI: " + uri );
@@ -310,7 +332,7 @@ export class SipxRestDatabaseManager extends AbstractDatabaseManager {
         log.traceIn( "recordToXml()", uri );
 
         try {
-            const document = databaseServiceFactory!.get().databaseFactory.newDocumentFromUri( uri );
+            const document = this.databaseFactory().newDocumentFromUri( uri );
 
             if( document == null || typeof (document as any).toXml !== "function" ) {
                 throw new Error( "Document does not implement XmlDatabaseDocument for URI: " + uri );
@@ -330,7 +352,7 @@ export class SipxRestDatabaseManager extends AbstractDatabaseManager {
     }
 
     private restPathFromUri( uri: string ): string {
-        const collectionName = databaseServiceFactory!.get().databaseFactory.collectionNameFromUri( uri );
+        const collectionName = this.databaseFactory().collectionNameFromUri( uri );
         return this.restPathFromCollectionName( collectionName );
     }
 

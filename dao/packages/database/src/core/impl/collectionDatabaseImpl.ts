@@ -13,8 +13,8 @@ import { PropertyTypes } from "../defs/propertyType";
 import { TemplatedDocument } from "../spec/templatedDocument";
 import { configurationServiceFactory } from "@dao/configuration";
 import { databaseServiceFactory } from "./databaseServiceFactory";
-import { DatabaseConfigurationName, TemplatePathKey } from "../spec/databaseService";
-import { log } from "../base/abstractDatabaseService";
+import { DatabasesConfigurationName, TemplatePathKey } from "../spec/databaseService";
+import { log } from "./genericDatabaseService";
 import { ReferenceProperty } from "../../properties/spec/referenceProperty";
 import { DocumentsProperty } from "../../properties/spec/documentsProperty";
 import { DatabaseDocumentNameKey } from "../spec/databaseDocument";
@@ -32,9 +32,14 @@ export class CollectionDatabaseImpl<DerivedDocument extends DatabaseDocument>
         owner? : DatabaseDocument,
         template? : Template<TemplatedDocument>  ) { 
         
-        super(DatabaseTypes.Collection as DatabaseType, collectionName, queryDocumentName, documentNames, owner, template );  
+        super(databaseManager,
+            DatabaseTypes.Collection, 
+            collectionName, 
+            queryDocumentName, 
+            documentNames, 
+            owner, 
+            template );  
 
-        this.databaseManager = databaseManager;
 
         this.allowRootCollection = !!allowRootCollection;
 
@@ -49,7 +54,7 @@ export class CollectionDatabaseImpl<DerivedDocument extends DatabaseDocument>
 
     newDocument( documentPath? : string ) : DerivedDocument{
 
-        return databaseServiceFactory!.get().databaseFactory.newDocument( this, documentPath ) as DerivedDocument;
+        return this.databaseManager.databaseFactory().newDocument( this, documentPath ) as DerivedDocument;
     }
 
     path() : string {
@@ -59,6 +64,9 @@ export class CollectionDatabaseImpl<DerivedDocument extends DatabaseDocument>
         if( this.owner() != null ) {
 
             path += this.owner()!.path();
+        }
+        else {
+            path += this.databaseManager.databaseFactory().databasePrefix();
         }
 
         path += "/" + this.collectionName();
@@ -280,12 +288,9 @@ export class CollectionDatabaseImpl<DerivedDocument extends DatabaseDocument>
         try {
             log.traceIn( "("+this.collectionName()+")", "deleteDocument()", databaseDocument.uri() );
 
-            const useArchive = configurationServiceFactory!.get().config( 
-                DatabaseConfigurationName, "useArchive" );
-
             await databaseDocument.onDelete();
 
-            if( !!useArchive ) {
+            if( this.databaseManager.useArchive  ) {
                 await this.databaseManager.archiveDocument( this, databaseDocument );
 
             }
@@ -381,8 +386,9 @@ export class CollectionDatabaseImpl<DerivedDocument extends DatabaseDocument>
                         movedDatabaseDocuments.set( previousCollectionDocument.path(), previousCollectionDocument );
                         
                         const nextCollectionDatabase = 
-                            databaseServiceFactory!.get().databaseFactory.collectionDatabaseFromDocumentName( 
-                            previousCollectionDocument.recordName(), movedDatabaseDocument ) as CollectionDatabase<DatabaseDocument>;
+                            this.databaseManager.databaseFactory().collectionDatabaseFromDocumentName( 
+                                previousCollectionDocument.recordName(), 
+                                movedDatabaseDocument ) as CollectionDatabase<DatabaseDocument>;
 
                         await previousCollectionDocument.move( nextCollectionDatabase );
                     }
@@ -489,7 +495,7 @@ export class CollectionDatabaseImpl<DerivedDocument extends DatabaseDocument>
                     case Observations.Create:
                     case Observations.Update:
                     {
-                        if( databaseServiceFactory!.get().databaseFactory.equalUris( objectId!, this.uri() ) ) {
+                        if( this.databaseManager.databaseFactory().equalUris( objectId!, this.uri() ) ) {
                             
                             const initialResult = object as Map<string,DerivedDocument>;
 
@@ -601,7 +607,7 @@ export class CollectionDatabaseImpl<DerivedDocument extends DatabaseDocument>
                 throw new Error( "Inconsistent cache states with database manager")
             }
 
-            this.notifyMonitor( newMonitor, Observations.Create as Observation, monitorCache );
+            this.notifyMonitor( newMonitor, Observations.Create, monitorCache );
 
             //log.traceOut("(" + this.collectionName()+ ")", "monitor()");
 
@@ -629,7 +635,7 @@ export class CollectionDatabaseImpl<DerivedDocument extends DatabaseDocument>
                 }
 
                 const cacheReleaseSeconds = +configurationServiceFactory!.get().config(
-                    DatabaseConfigurationName, "cacheReleaseSeconds")!;
+                    DatabasesConfigurationName, "cacheReleaseSeconds")!;
 
                 if (isNaN(cacheReleaseSeconds)) {
                     throw new Error("Invalid cache release timeout: " + cacheReleaseSeconds);
@@ -717,7 +723,6 @@ export class CollectionDatabaseImpl<DerivedDocument extends DatabaseDocument>
         }
     }
 
-    readonly databaseManager : DatabaseManager;
 
     readonly allowRootCollection : boolean;
 

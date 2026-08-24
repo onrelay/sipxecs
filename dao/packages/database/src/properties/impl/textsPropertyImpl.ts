@@ -1,7 +1,7 @@
 import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { GenericDatabaseDocument } from "../../core/impl/genericDatabaseDocument";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 import { DatabaseDocument } from "../../core/spec/databaseDocument";
 import { DatabaseObject } from "../../core/spec/databaseObject";
 import { TextsProperty } from "../spec/textsProperty";
@@ -11,7 +11,7 @@ import { OptionsReference } from "../../core/impl/optionsReference";
 export class TextsPropertyImpl extends AbstractDatabaseProperty<string[]> implements TextsProperty {
 
     constructor( parent : DatabaseObject ) {
-        super( parent, PropertyTypes.Texts as PropertyType );  
+        super( parent, PropertyTypes.Texts );  
 
     }
 

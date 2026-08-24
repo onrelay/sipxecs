@@ -11,8 +11,8 @@ export const DatabaseAccessTypes = {
 
     Delete :      "delete"
 
-}
+} as const
 
-export type DatabaseAccessType = keyof (typeof DatabaseAccessTypes);
+export type DatabaseAccessType = (typeof DatabaseAccessTypes)[keyof typeof DatabaseAccessTypes];
 
 

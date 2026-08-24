@@ -6,7 +6,7 @@ import { DefinitionProperty } from "../../properties/spec/definitionProperty";
 import { OwnerProperty } from "../../properties/spec/ownerProperty";
 import { OwnerPropertyImpl } from "../../properties/impl/ownerPropertyImpl";
 import { DefinitionPropertyImpl } from "../../properties/impl/definitionPropertyImpl";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 import { Change } from "../spec/change";
 import { DatabaseDocument } from "../../core/spec/databaseDocument";
 import { ReferenceProperty } from "../../properties/spec/referenceProperty";
@@ -32,7 +32,7 @@ export class ChangeImpl extends GenericDatabaseDocument implements Change {
                 ChangeTypeName, 
                 ChangeTypes );
 
-            this.changed = new MapPropertyImpl<any>( this, PropertyTypes.Map as PropertyType );
+            this.changed = new MapPropertyImpl<any>( this, PropertyTypes.Map );
 
             //log.traceInOut( "constructor()", KeysCollection ); 
 

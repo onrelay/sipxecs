@@ -6,7 +6,7 @@ import { AbstractBasicProperty } from "./abstractBasicProperty";
 export class CountryPropertyImpl extends AbstractBasicProperty<string> implements CountryProperty {
 
     constructor( parent : DatabaseObject, defaultValue? : string ) {
-        super( parent, PropertyTypes.Country as PropertyType, defaultValue );  
+        super( parent, PropertyTypes.Country, defaultValue );  
     }
 
     compareTo( other : CountryProperty ) : number {

@@ -1,4 +1,4 @@
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 import { DatabaseObject } from "../../core/spec/databaseObject";
 import { NumberProperty } from "../spec/numberProperty";
 import { PropertyTypes, PropertyType } from "../../core/defs/propertyType";
@@ -7,7 +7,7 @@ import { AbstractBasicProperty } from "./abstractBasicProperty";
 export class NumberPropertyImpl extends AbstractBasicProperty<number> implements NumberProperty {
 
     constructor( parent : DatabaseObject, defaultValue? : number, minValue? : number, maxValue? : number ) {
-        super( parent, PropertyTypes.Number as PropertyType, defaultValue ); 
+        super( parent, PropertyTypes.Number, defaultValue ); 
 
         this.minValue = minValue;
 

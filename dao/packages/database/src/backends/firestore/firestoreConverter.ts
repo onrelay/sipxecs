@@ -1,5 +1,5 @@
 import { AbstractDatabaseConverter } from "../../core/base/abstractDatabaseConverter";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 
 export class FirestoreConverter extends AbstractDatabaseConverter {
 

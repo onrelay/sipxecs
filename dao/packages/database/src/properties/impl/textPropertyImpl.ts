@@ -1,4 +1,4 @@
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 import { DatabaseDocument } from "../../core/spec/databaseDocument";
 import { DatabaseObject } from "../../core/spec/databaseObject";
 import { TextProperty } from "../spec/textProperty";
@@ -11,7 +11,7 @@ import { TextsProperty } from "../spec/textsProperty";
 export class TextPropertyImpl extends AbstractBasicProperty<string> implements TextProperty {
 
     constructor( parent : DatabaseObject, textType? : TextType, defaultValue? : string ) {
-        super( parent, PropertyTypes.Text as PropertyType, defaultValue ); 
+        super( parent, PropertyTypes.Text, defaultValue ); 
 
         this.textType = textType != null ? textType : DefaultTextType;
     }

@@ -14,7 +14,7 @@ export class GeolocationPropertyImpl
     extends DataPropertyImpl<Geolocation> implements GeolocationProperty{
 
     constructor( parent : DatabaseObject ) {
-        super( parent, PropertyTypes.Geolocation as PropertyType ); 
+        super( parent, PropertyTypes.Geolocation ); 
     }
 
     countryProperty() : CountryProperty | undefined {  

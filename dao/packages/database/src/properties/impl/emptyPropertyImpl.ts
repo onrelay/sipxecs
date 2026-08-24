@@ -9,7 +9,7 @@ export class EmptyPropertyImpl
     extends AbstractDatabaseProperty<undefined> implements EmptyProperty {
 
     constructor( parent : DatabaseObject ) {
-        super( parent, PropertyTypes.Empty as PropertyType ); 
+        super( parent, PropertyTypes.Empty ); 
     }
 
     value() : undefined {

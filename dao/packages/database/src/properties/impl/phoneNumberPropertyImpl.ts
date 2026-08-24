@@ -12,7 +12,7 @@ export const MinNationalPhoneNumberLength = 8;
 export class PhoneNumberPropertyImpl extends AbstractBasicProperty<string> implements PhoneNumberProperty {
 
     constructor( parent : DatabaseObject, countrySource? : CountryProperty, defaultValue? : string ) {
-        super( parent, PropertyTypes.PhoneNumber as PropertyType, defaultValue ); 
+        super( parent, PropertyTypes.PhoneNumber, defaultValue ); 
 
         this._countrySource = countrySource;
     }

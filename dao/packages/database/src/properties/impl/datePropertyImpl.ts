@@ -8,7 +8,7 @@ import { PropertyTypes, PropertyType } from "../../core/defs/propertyType";
 export class DatePropertyImpl extends AbstractDatabaseProperty<Date> implements DateProperty {
 
     constructor( parent : DatabaseObject, defaultDate? : Date ) {
-        super( parent, PropertyTypes.Date as PropertyType ); 
+        super( parent, PropertyTypes.Date ); 
 
         this._defaultDate = defaultDate; 
     } 

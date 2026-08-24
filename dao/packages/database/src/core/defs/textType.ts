@@ -16,8 +16,8 @@ export const TextTypes = {
     Password: "password", 
 
     Url: "url"
-}
+} as const
 
-export type TextType = keyof (typeof TextTypes);
+export type TextType = (typeof TextTypes)[keyof typeof TextTypes];
 
-export const DefaultTextType = TextTypes.Normal as TextType;
+export const DefaultTextType = TextTypes.Normal;

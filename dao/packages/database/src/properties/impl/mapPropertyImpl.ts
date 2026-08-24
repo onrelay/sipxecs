@@ -1,7 +1,7 @@
 import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { GenericDatabaseDocument } from "../../core/impl/genericDatabaseDocument";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 import { MapProperty } from "../spec/mapProperty";
 
 export class MapPropertyImpl<Data extends Object> extends AbstractDatabaseProperty<Map<string,Data>> implements MapProperty<Data> {

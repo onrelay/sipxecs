@@ -28,8 +28,8 @@ export const Comparators = {
 
     NotExists: 'notExists'
 
-}
+} as const
 
-export type Comparator = keyof (typeof Comparators);  
+export type Comparator = (typeof Comparators)[keyof typeof Comparators];  
 
-export const DefaultComparator = Comparators.Includes as Comparator;
+export const DefaultComparator = Comparators.Includes;

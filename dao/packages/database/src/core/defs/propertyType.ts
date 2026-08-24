@@ -6,7 +6,7 @@ export const BasicPropertyTypes = {
     Confirmation:           "confirmation",
     PhoneNumber:            "phoneNumber",
     Country:                "country",
-}
+} as const
 
 export const StandardPropertyTypes = { 
     Texts:                  "texts",
@@ -19,7 +19,7 @@ export const StandardPropertyTypes = {
     Links:                  "links",
     Reference:              "reference",
     References:             "references" 
-}
+} as const
 
 export const AdvancedPropertyTypes = {
     Organization:           "organization",
@@ -33,15 +33,15 @@ export const AdvancedPropertyTypes = {
     Data:                   "data",
     Map:                    "map",
     Empty:                  "empty"
-}
+} as const
 
 
 export const PropertyTypes = {
     ...BasicPropertyTypes,
     ...StandardPropertyTypes,
     ...AdvancedPropertyTypes
- }
+ } as const
 
-export type PropertyType = keyof (typeof PropertyTypes);  
+export type PropertyType = (typeof PropertyTypes)[keyof typeof PropertyTypes];  
 
 export const PropertyTypeName = "propertyType";

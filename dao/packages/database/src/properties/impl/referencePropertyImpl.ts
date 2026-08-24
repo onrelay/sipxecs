@@ -12,7 +12,7 @@ export class ReferencePropertyImpl<DerivedDocument extends DatabaseDocument>
         onSelectDatabases? : () => (Database<DerivedDocument> | undefined)[],
         reciprocalKey? : keyof DerivedDocument ) {
 
-        super( parent, PropertyTypes.Reference as PropertyType, onSelectDatabases, reciprocalKey ); 
+        super( parent, PropertyTypes.Reference, onSelectDatabases, reciprocalKey ); 
     }  
      
 }

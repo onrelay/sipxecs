@@ -1,0 +1,16 @@
+{
+    "useArchive" : false,
+    "archiveDays": 30,
+    "nestedCollections": false,
+    "collectionGroups" : false,
+    "collections": {
+        "users" : {
+            "rootCollection" : true,
+            "queryDocumentName": "user",
+            "encrypted": false,
+            "entity": true,
+            "templated": false,
+            "documents": ["User","SipxUser"]
+        }
+    }
+}

@@ -2,7 +2,7 @@ import { CollectionDatabase } from "../../core/spec/collectionDatabase";
 import { User } from "../spec/user";
 import { DefinitionProperty } from "../../properties/spec/definitionProperty";
 import { DefinitionPropertyImpl } from "../../properties/impl/definitionPropertyImpl";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 import { CountryPropertyImpl } from "../../properties/impl/countryPropertyImpl";
 import { CountryProperty } from "../../properties/spec/countryProperty";
 import { Language, LanguageName, Languages } from "@dao/common";
@@ -31,7 +31,7 @@ export abstract class AbstractUser extends AbstractEntity implements User {
             this.language = new DefinitionPropertyImpl<Language>( 
                 this, LanguageName, Languages );
 
-            this.email = new TextPropertyImpl( this, TextTypes.Email as TextType );
+            this.email = new TextPropertyImpl( this, TextTypes.Email );
 
             this.phoneNumber = new PhoneNumberPropertyImpl( this, this.country ); 
 

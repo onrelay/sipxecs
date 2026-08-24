@@ -9,7 +9,7 @@ import { DocumentProperty } from "../spec/documentProperty";
 import { PropertyType } from "../../core/defs/propertyType";
 import { DatabaseAccess } from "../../core/impl/databaseAccess";
 import { databaseServiceFactory } from "../../core/impl/databaseServiceFactory";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 
 export abstract class AbstractDocumentProperty<DerivedDocument extends DatabaseDocument> 
     extends AbstractDatabaseProperty<ReferenceHandle<DerivedDocument>> implements DocumentProperty<DerivedDocument> {
@@ -66,7 +66,7 @@ export abstract class AbstractDocumentProperty<DerivedDocument extends DatabaseD
         }
 
         const documentId = 
-            databaseServiceFactory!.get().databaseFactory.documentId( referenceHandle.uri );
+            this.databaseFactory().documentId( referenceHandle.uri );
 
         return documentId;
     }
@@ -94,7 +94,8 @@ export abstract class AbstractDocumentProperty<DerivedDocument extends DatabaseD
             }
 
             const result = 
-                databaseServiceFactory!.get().databaseFactory.newDocumentFromUri( referenceHandle.uri ) as DerivedDocument;
+                this.databaseFactory().newDocumentFromUri( 
+                    referenceHandle.uri ) as DerivedDocument;
 
             if( result == null ) {
 
@@ -139,7 +140,8 @@ export abstract class AbstractDocumentProperty<DerivedDocument extends DatabaseD
             else {
                 
                 const databaseDocument = 
-                    await databaseServiceFactory!.get().databaseFactory.documentFromUri( referenceHandle.uri ) as DerivedDocument;
+                    await this.databaseFactory().documentFromUri( 
+                        referenceHandle.uri ) as DerivedDocument;
 
                 if( databaseDocument == null ) {
 
@@ -295,7 +297,7 @@ export abstract class AbstractDocumentProperty<DerivedDocument extends DatabaseD
                     }
 
                     if( !!params?.fetch ) {
-                        await referenceHandle.fetch();
+                        await referenceHandle.load( source.databaseManager.databaseFactory() );
                     } 
                     
                     result.set( referenceHandle.uri, referenceHandle )

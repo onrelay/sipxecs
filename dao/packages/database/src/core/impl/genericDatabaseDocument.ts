@@ -15,8 +15,9 @@ import { ReferenceHandle } from "./referenceHandle";
 import { DatePropertyImpl } from "../../properties/impl/datePropertyImpl";
 import { SymbolicOwnersProperty } from "../../properties/spec/symbolicOwnersProperty";
 import { DatabaseAccess } from "./databaseAccess";
-import { log } from "../base/abstractDatabaseService";
+import { log } from "./genericDatabaseService";
 import { ChangesCollection, NewObjectId, OwnerIds } from "../spec/databaseService";
+import { DatabaseFactory, DatabasePrefixElements } from "../spec/databaseFactory";
 import { databaseServiceFactory, DatabaseServiceFactory } from "./databaseServiceFactory";
 import { Change } from "../../documents/spec/change";
 import { ReferenceProperty } from "../../properties/spec/referenceProperty";
@@ -27,6 +28,9 @@ import { ReferencePropertyImpl } from "../../properties/impl/referencePropertyIm
 import { BooleanPropertyImpl } from "../../properties/impl/booleanPropertyImpl";
 import { DatabaseDocumentNameKey } from "../spec/databaseDocument";
 import { KeysCollectionName } from "../../documents/spec/key";
+import { authorizationServiceFactory, AuthorizationTypes, NamespaceSeparator } from "@dao/authorization";
+import { GenericDatabaseFactory } from "./genericDatabaseFactory";
+import { DatabaseManager } from "../spec/databaseManager";
 
 export class GenericDatabaseDocument extends AbstractDatabaseObject implements DatabaseDocument {
 
@@ -63,7 +67,8 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
 
             if( documentPath != null ) {
 
-                const documentId = databaseServiceFactory!.get().databaseFactory.documentId( documentPath );
+                const documentId = 
+                    this.databaseFactory().documentId(  documentPath );
 
                 if( documentId == null ) {
                     throw new Error( "Invalid document path: " + documentPath );
@@ -548,7 +553,9 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
                 return undefined;
             }
 
-            const result = databaseServiceFactory!.get().databaseFactory.newDocumentFromUri( path ) as DatabaseDocument;
+            const result = 
+                this.databaseFactory().newDocumentFromUri( 
+                    path ) as DatabaseDocument;
 
             //log.traceOut( "("+this.collectionDatabase.documentName+")", "emptyOwnerDocument()", result.referenceHandle().title );
             return result;
@@ -579,7 +586,8 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             for( const path of paths ) {
 
                 const databaseDocument = 
-                    databaseServiceFactory!.get().databaseFactory.newDocumentFromUri( path ) as DatabaseDocument;
+                    this.databaseFactory().newDocumentFromUri( 
+                        path ) as DatabaseDocument;
 
                 if( databaseDocument == null ) {
                     throw new Error( "Document in owner path does not exist: " + path );
@@ -611,7 +619,9 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
                 return undefined;
             }
 
-            const result = await databaseServiceFactory!.get().databaseFactory.documentFromUri( path ) as DatabaseDocument;
+            const result = 
+                await this.databaseFactory().documentFromUri( 
+                    path ) as DatabaseDocument;
 
             //log.traceOut( "("+this.collectionDatabase.documentName+")", "ownerDocument()", result.referenceHandle() );
             return result;
@@ -642,7 +652,8 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             for( const path of paths ) {
 
                 const databaseDocument = 
-                    await databaseServiceFactory!.get().databaseFactory.documentFromUri( path ) as DatabaseDocument;
+                    await this.databaseFactory().documentFromUri( 
+                        path ) as DatabaseDocument;
 
                 if( databaseDocument == null ) {
                     throw new Error( "Document in owner path does not exist: " + path );
@@ -678,7 +689,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             if( path == null ) {
 
                 const result = 
-                    databaseServiceFactory!.get().databaseFactory.collectionDatabaseFromCollectionName( 
+                    this.databaseFactory().collectionDatabaseFromCollectionName( 
                         collectionName ) as CollectionDatabase<DatabaseDocument>;
 
                 //log.traceOut( "("+this.collectionDatabase.documentName+")", "ownerCollection()", "use root collection" );
@@ -686,7 +697,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             }
             
             const result = 
-                databaseServiceFactory!.get().databaseFactory.collectionFromUri( 
+                this.databaseFactory().collectionFromUri( 
                     path ) as CollectionDatabase<DatabaseDocument>;
 
             //log.traceOut( "("+this.collectionDatabase.documentName+")", "ownerCollection()", result.databasePath() );
@@ -717,16 +728,18 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             const pathElements = path.startsWith("/") ? 
                 path.substring(1).split("/") : path.split("/");  // remove leading "/" and split the rest
 
-            let collectionPath = "";
+            let collectionPath = 
+                this.databaseFactory().databasePrefix();
 
-            for( let i = 0; i < pathElements.length; i++ ) {
+            for( let i = DatabasePrefixElements; i < pathElements.length; i++ ) {
 
                 collectionPath += "/" + pathElements[i];
 
                 if( collectionName == null && i % 2 === 0 ) { // every even path element is a collection,
 
                     const collectionDatabase = 
-                        databaseServiceFactory!.get().databaseFactory.collectionFromUri( collectionPath ) as CollectionDatabase<DatabaseDocument>;
+                        this.databaseFactory().collectionFromUri( 
+                            collectionPath ) as CollectionDatabase<DatabaseDocument>;
 
                     //log.traceOut( "ownerCollections()", "found no collectionName", pathElements[i] );
                     result.push( collectionDatabase );   
@@ -734,7 +747,8 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
                 else if( collectionName === pathElements[i] ) {
 
                     const collectionDatabase = 
-                        databaseServiceFactory!.get().databaseFactory.collectionFromUri( collectionPath ) as CollectionDatabase<DatabaseDocument>;
+                        this.databaseFactory().collectionFromUri( 
+                            collectionPath ) as CollectionDatabase<DatabaseDocument>;
 
                     //log.traceOut( "ownerCollections()", "found with collectionName", pathElements[i] );
                     result.push( collectionDatabase );                
@@ -762,7 +776,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             if( path == null ) {
 
                 const result = 
-                    databaseServiceFactory!.get().databaseFactory.collectionGroupDatabaseFromCollectionName( 
+                    this.databaseFactory().collectionGroupDatabaseFromCollectionName( 
                         collectionName != null ? 
                             collectionName : 
                             this.collectionDatabase.collectionName()) as CollectionGroupDatabase<DatabaseDocument>;
@@ -772,7 +786,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             }
             
             const result = 
-                databaseServiceFactory!.get().databaseFactory.collectionGroupFromUri( 
+                this.databaseFactory().collectionGroupFromUri( 
                     path ) as CollectionGroupDatabase<DatabaseDocument>;
 
             //log.traceOut( "("+this.collectionDatabase.documentName+")", "ownerCollectionGroup()", result.databasePath() );
@@ -799,16 +813,17 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             const pathElements = path.startsWith("/") ? 
                 path.substring(1).split("/") : path.split("/");  // remove leading "/" and split the rest
 
-            let collectionPath = "";
+            let collectionPath = 
+                this.databaseFactory().databasePrefix();
 
-            for( let i = 0; i < pathElements.length; i++ ) {
+            for( let i = DatabasePrefixElements; i < pathElements.length; i++ ) {
 
                 collectionPath += "/" + pathElements[i];
 
                 if( collectionName == null && i % 2 === 0 ) { // every even path element is a collection,
 
                     const collectionGroupDatabase = 
-                        databaseServiceFactory!.get().databaseFactory.collectionGroupFromUri( 
+                        this.databaseFactory().collectionGroupFromUri( 
                             collectionPath ) as CollectionGroupDatabase<DatabaseDocument>;
 
                     //log.traceOut( "ownerCollectionGroups()", "found no collectionName", pathElements[i] );
@@ -817,7 +832,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
                 else if( collectionName === pathElements[i] ) {
 
                     const collectionGroupDatabase = 
-                        databaseServiceFactory!.get().databaseFactory.collectionGroupFromUri( 
+                        this.databaseFactory().collectionGroupFromUri( 
                             collectionPath ) as CollectionGroupDatabase<DatabaseDocument>;
 
                     //log.traceOut( "ownerCollectionGroups()", "found with collectionName", pathElements[i] );
@@ -869,7 +884,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
                 if( !nearestFound && !!options?.nearestIsCollectionGroup ) {
 
                     const rootCollectionGroup = 
-                        databaseServiceFactory!.get().databaseFactory.collectionGroupDatabaseFromCollectionName( 
+                        this.databaseFactory().collectionGroupDatabaseFromCollectionName( 
                             collectionName ) as CollectionGroupDatabase<DatabaseDocument>;
 
                     if( rootCollectionGroup.allowRootCollection ) {
@@ -878,7 +893,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
                 }
                 else {
                     const rootCollection =
-                        databaseServiceFactory!.get().databaseFactory.collectionDatabaseFromCollectionName(
+                        this.databaseFactory().collectionDatabaseFromCollectionName(
                             collectionName) as CollectionDatabase<DatabaseDocument>;
 
                     if (rootCollection.allowRootCollection) {
@@ -915,7 +930,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             }
 
             const rootCollection =
-                databaseServiceFactory!.get().databaseFactory.collectionDatabaseFromCollectionName(
+                this.databaseFactory().collectionDatabaseFromCollectionName(
                     collectionName) as CollectionDatabase<DatabaseDocument>;
 
             if (rootCollection.allowRootCollection) {
@@ -954,7 +969,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             }
 
             const noOwnerCollection = 
-                databaseServiceFactory!.get().databaseFactory.collectionDatabaseFromCollectionName( 
+                this.databaseFactory().collectionDatabaseFromCollectionName( 
                     collectionName ) as CollectionDatabase<DatabaseDocument>;
 
             if( noOwnerCollection.allowRootCollection ) {
@@ -988,7 +1003,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             }
 
             const rootCollectionGroup =
-                databaseServiceFactory!.get().databaseFactory.collectionGroupDatabaseFromCollectionName(
+                this.databaseFactory().collectionGroupDatabaseFromCollectionName(
                     collectionName) as CollectionGroupDatabase<DatabaseDocument>;
 
             if (rootCollectionGroup.allowRootCollection) {
@@ -1029,7 +1044,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             }
 
             const rootCollectionGroup = 
-                databaseServiceFactory!.get().databaseFactory.collectionGroupDatabaseFromCollectionName( 
+                this.databaseFactory().collectionGroupDatabaseFromCollectionName( 
                     collectionName ) as CollectionGroupDatabase<DatabaseDocument>;
 
             if( rootCollectionGroup.allowRootCollection ) {
@@ -1126,7 +1141,8 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
         log.traceIn( "("+this.collectionDatabase.collectionName()+")", "duplicate()", this );
 
         try {
-            const copy = databaseServiceFactory!.get().databaseFactory.newDocument( 
+            const copy = 
+                this.databaseFactory().newDocument( 
                     this.collectionDatabase, this.uri() ) as GenericDatabaseDocument;
             
             await copy.copyProperties( this );  // Ensures deep copy
@@ -1259,7 +1275,8 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
         try {
 
             if( objectId == null || 
-                !databaseServiceFactory!.get().databaseFactory.equalUris( objectId, this.uri() ) ) {
+                this.databaseFactory().equalUris( 
+                    objectId, this.uri() ) ) {
                     
                 log.traceOut( "onNotifyDocumentChange()", "Not for us", {objectId}, this.uri() );
                 return;
@@ -1350,7 +1367,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
                 for( const ownerDocument of ownerDocuments.values() ) { 
 
                     if( ownerDocument.properties( { 
-                        includePropertyTypes: [PropertyTypes.SymbolicOwners as PropertyType] } ).size > 0 ) {
+                        includePropertyTypes: [PropertyTypes.SymbolicOwners] } ).size > 0 ) {
 
                         await ownerDocument.read();
                     }
@@ -1614,7 +1631,17 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             return this._databaseAccess;
         }
 
-        const databaseAccess = databaseServiceFactory!.get().databaseAccessor.databaseAccess( this.uri() );   
+        const namespace = this.parent!.path()!.replaceAll( "/", NamespaceSeparator );
+        const key = this.id.value();
+
+        const databaseAccess = 
+            new DatabaseAccess( 
+                authorizationServiceFactory!.get().isAuthorized( AuthorizationTypes.List, namespace, key ),
+                authorizationServiceFactory!.get().isAuthorized( AuthorizationTypes.Create, namespace, key  ),
+                authorizationServiceFactory!.get().isAuthorized( AuthorizationTypes.Read, namespace, key ),
+                authorizationServiceFactory!.get().isAuthorized( AuthorizationTypes.Update, namespace, key ),
+                authorizationServiceFactory!.get().isAuthorized( AuthorizationTypes.Delete, namespace, key )
+            );   
 
         //log.traceInOut( "databaseAccess()", {databaseAccess} )
         return databaseAccess;
@@ -1701,7 +1728,6 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
             throw new Error( (error as any).message );
         }
     }
-
 
     readonly collectionDatabase : CollectionDatabase<DatabaseDocument>;
 

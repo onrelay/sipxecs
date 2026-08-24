@@ -11,6 +11,6 @@ export const KeyStatuses = {
 
     Destroyed: "destroyed"
 
-}
+} as const
 
-export type KeyStatus = keyof (typeof KeyStatuses);
+export type KeyStatus = (typeof KeyStatuses)[keyof typeof KeyStatuses];

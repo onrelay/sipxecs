@@ -1,5 +1,5 @@
 import { GenericDatabaseDocument } from "../../core/impl/genericDatabaseDocument";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 import { CollectionDatabase } from "../../core/spec/collectionDatabase";
 import { DatabaseProperty } from "../../core/spec/databaseProperty";
 import { databaseServiceFactory } from "../../core/impl/databaseServiceFactory";
@@ -43,7 +43,7 @@ export class TemplateImpl<Document extends TemplatedDocument> extends GenericDat
                 if( this.instanceCollectionName.value() == null ) {
                     return undefined;
                 }
-                return databaseServiceFactory!.get().databaseFactory.collectionDatabaseFromCollectionName( 
+                return this.databaseFactory().collectionDatabaseFromCollectionName( 
                     this.instanceCollectionName.value()! ) as CollectionDatabase<TemplatedDocument>;
 
             }

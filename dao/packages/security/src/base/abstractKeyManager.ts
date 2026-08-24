@@ -1,5 +1,5 @@
 import { log } from "./abstractSecurityService";
-import { KeyFormats } from "../defs/keyFormat";
+import { KeyFormat, KeyFormats } from "../defs/keyFormat";
 import { KeyManager } from "../spec/keyManager";
 import { KeyVault } from "../defs/keyVault";
 import { SymmetricKey } from "../types/symmetricKey";

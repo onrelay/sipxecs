@@ -12,7 +12,7 @@ export class SymbolicCollectionPropertyImpl<DerivedDocument extends DatabaseDocu
         onSelectDatabases? : () => (Database<DerivedDocument> | undefined)[],
         reciprocalKey? : keyof DerivedDocument ) {
 
-        super( parent, PropertyTypes.SymbolicCollection as PropertyType, onSelectDatabases, reciprocalKey ); 
+        super( parent, PropertyTypes.SymbolicCollection, onSelectDatabases, reciprocalKey ); 
     } 
 }
 

@@ -1,6 +1,8 @@
-import { Target, Targets } from "@dao/common";
-import { log } from "@dao/common/build/application/application";
+import { LoggingConfigurationName, Target, Targets } from "@dao/common";
+import { log } from "@dao/common";
 import { SipxConfigurationManager } from "@sipxdao";
+
+import loggingConfiguration from "../data/config/logging.json";
 
 export class SipxClientConfigurationManager extends SipxConfigurationManager {
 
@@ -9,6 +11,7 @@ export class SipxClientConfigurationManager extends SipxConfigurationManager {
         super( target ); 
 
         try {
+            super.load( LoggingConfigurationName, loggingConfiguration );
 
         } catch( error ) {
 

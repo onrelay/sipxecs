@@ -18,6 +18,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@dao/application": "link:../dao/packages/application",
+    "@dao/authentication": "link:../dao/packages/authentication",
     "@dao/common": "link:../dao/packages/common",
     "@dao/configuration": "link:../dao/packages/configuration",
     "@dao/database": "link:../dao/packages/database",

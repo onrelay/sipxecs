@@ -9,7 +9,7 @@ export class SubdocumentPropertyImpl<DerivedSubdocument extends DatabaseSubdocum
     extends AbstractDatabaseProperty<DerivedSubdocument> implements SubdocumentProperty<DerivedSubdocument> {
 
     constructor( parent : DatabaseObject, onNewSubdocument : () => DerivedSubdocument  ) { 
-        super( parent, PropertyTypes.Subdocument as PropertyType ); 
+        super( parent, PropertyTypes.Subdocument ); 
 
         this._onNewSubdocument = onNewSubdocument;
 

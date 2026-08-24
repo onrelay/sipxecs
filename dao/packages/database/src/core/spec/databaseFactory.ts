@@ -1,4 +1,3 @@
-import { ConfigurationManager } from "@dao/configuration";
 
 import { CollectionDatabase } from "./collectionDatabase";
 import { DatabaseDocument } from "./databaseDocument";
@@ -10,8 +9,12 @@ import { Template } from "../../documents/spec/template";
 import { TemplatedProperties } from "./templatedProperties";
 import { DatabaseManager } from "./databaseManager";
 import { TemplatedDocument } from "./templatedDocument";
+import { DatabasePlatform } from "../defs/databasePlatform";
 
 export const CollectionsConfigurationName = "collections";
+export const DocumentsConfigurationName = "documents";
+
+export const DatabasePrefixElements = 2;
 
 export interface DatabaseFactory {
 
@@ -59,6 +62,20 @@ export interface DatabaseFactory {
 
     collectionNameFromUri( url : string  ) : string | undefined;
 
+    databasePlatformFromUri( uri : string ) : DatabasePlatform | undefined;
+
+    databaseNameFromUri( uri : string ) : string | undefined;
+
+    databasePrefix() : string;
+
+    databasePrefix( databasePlatform : DatabasePlatform, databaseName : string ) : string;
+
+    databasePathFromUri( uri : string ) : string | undefined;
+
+    uriFromDatabasePath( databasePath : string, databaseManager : DatabaseManager ) : string;
+
+    uriFromCollectionName( collectionName : string, documentId : string, databaseManager : DatabaseManager ) : string;
+
     collectionPathFromUri( url : string, collectionName? : string  ) : string | undefined; 
 
     documentPathFromUri( url : string, collectionName? : string  ) : string | undefined; 
@@ -98,7 +115,9 @@ export interface DatabaseFactory {
 
     newDatabaseObserver( databaseQuery? : DatabaseQuery<DatabaseDocument> ) : DatabaseObserver<DatabaseDocument>;
 
-    readonly configurationManager : ConfigurationManager;
+    readonly databasePlatform : DatabasePlatform;
+
+    readonly databaseName : string;
 
     readonly databaseManager : DatabaseManager;
 }

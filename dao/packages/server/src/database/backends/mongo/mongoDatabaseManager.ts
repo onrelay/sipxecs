@@ -8,6 +8,7 @@ import { AbstractDatabaseManager,
     Comparators, 
     Database, 
     DatabaseDocument, 
+    DatabasePlatforms, 
     DatabaseDocumentNameKey, 
     DatabaseFilter, 
     DatabaseRecord,
@@ -30,12 +31,18 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
         uri: string,
         databaseName: string,
         clientEncryption : boolean,
-        converter : MongoConverter
+        useArchive : boolean,
+        converter : MongoConverter,
+        nestedCollections? : boolean,
+        collectionGroups? : boolean
         } ) {
 
         super( {
             clientEncryption: params.clientEncryption,
-            converter: params.converter
+            useArchive: params.useArchive,
+            converter: params.converter,
+            nestedCollections: params.nestedCollections,
+            collectionGroups: params.collectionGroups
         });
 
         //log.traceIn( "constructor()");
@@ -43,8 +50,6 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
         try {
 
             this.uri = params.uri;
-
-            this.databaseName = params.databaseName;
 
             //log.traceOut( "constructor()");
 
@@ -65,7 +70,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
 
             await client.connect(); 
 
-            this._db = client.db(this.databaseName);
+            this._db = client.db(this.databaseFactory().databaseName);
 
             //log.traceOut( "init()");
 
@@ -123,13 +128,13 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
 
         try {
 
-            const id = databaseServiceFactory!.get().databaseFactory.documentId( uri );
+            const id = this.databaseFactory().documentId( uri );
 
             if( id == null ) {
                 throw new Error( "Missing document ID in URI " + uri );
             }
 
-            const collectionName = databaseServiceFactory!.get().databaseFactory.collectionNameFromUri( uri );
+            const collectionName = this.databaseFactory().collectionNameFromUri( uri );
 
             if( collectionName == null ) {
                 throw new Error( "Missing collection name in URI " + uri  );
@@ -143,7 +148,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
                 throw new Error( "Failed to create document record with result: " + result );
             }
 
-            this.stripUri( bsonDocument );
+            this.stripUri( bsonDocument, collectionName );
 
             log.traceOut( "createDocumentRecord()");
 
@@ -161,13 +166,13 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
 
         try {
 
-            const id = databaseServiceFactory!.get().databaseFactory.documentId( uri );
+            const id = this.databaseFactory().documentId( uri );
 
             if( id == null ) {
                 throw new Error( "Missing document ID in URI " + uri );
             }
 
-            const collectionName = databaseServiceFactory!.get().databaseFactory.collectionNameFromUri( uri );
+            const collectionName = this.databaseFactory().collectionNameFromUri( uri );
 
             if( collectionName == null ) {
                 throw new Error( "Missing collection name in URI " + uri  );
@@ -180,9 +185,9 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
                 return undefined; 
             }
 
-            const [recordUri, documentRecord] = this.stripUri( bsonDocument );
+            const [recordUri, documentRecord] = this.stripUri( bsonDocument, collectionName );
 
-            if( !databaseServiceFactory!.get().databaseFactory.equalUris( uri, recordUri) ) {
+            if( !this.databaseFactory().equalUris( uri, recordUri) ) {
                 throw new Error( "Mismatch with record uri: " + recordUri );
             }
 
@@ -203,13 +208,13 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
 
         try {
 
-            const id = databaseServiceFactory!.get().databaseFactory.documentId( uri );
+            const id = this.databaseFactory().documentId( uri );
 
             if( id == null ) {
                 throw new Error( "Missing document ID in URI " + uri );
             }
 
-            const collectionName = databaseServiceFactory!.get().databaseFactory.collectionNameFromUri( uri );
+            const collectionName = this.databaseFactory().collectionNameFromUri( uri );
 
             if( collectionName == null ) {
                 throw new Error( "Missing collection name in URI " + uri  );
@@ -226,7 +231,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
                 throw new Error( "Failed to update document record with result: " + result );
             }
 
-            this.stripUri( bsonDocument );
+            this.stripUri( bsonDocument, collectionName );
 
             log.traceOut( "updateDocumentRecord()");
 
@@ -242,13 +247,13 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
         
         log.traceIn( "deleteDocumentRecord()", uri );
 
-            const id = databaseServiceFactory!.get().databaseFactory.documentId( uri );
+            const id = this.databaseFactory().documentId( uri );
 
             if( id == null ) {
                 throw new Error( "Missing document ID in URI " + uri );
             }
 
-            const collectionName = databaseServiceFactory!.get().databaseFactory.collectionNameFromUri( uri );
+            const collectionName = this.databaseFactory().collectionNameFromUri( uri );
 
             if( collectionName == null ) {
                 throw new Error( "Missing collection name in URI " + uri  );
@@ -289,7 +294,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
                 await Promise.all( bsonDocuments.map( async bsonDocument => { 
 
                     try {
-                        const [uri, documentRecord] = this.stripUri( bsonDocument );
+                        const [uri, documentRecord] = this.stripUri( bsonDocument, database.collectionName() );
 
                         result.set(uri, documentRecord);
                         
@@ -333,7 +338,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
                         const documentRecord = documentRecordEntry[1];
 
                         const databaseDocument = 
-                            await databaseServiceFactory!.get().databaseFactory.documentFromRecord( 
+                            await this.databaseFactory().documentFromRecord( 
                                 uri, documentRecord ) as DatabaseDocument;
 
                         if( databaseDocument != null ) {  
@@ -420,20 +425,20 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
 
                     if (change.operationType === 'create') {
 
-                        observation = Observations.Create as Observation;
+                        observation = Observations.Create;
 
                         bsonDocument = (change as any).fullDocument;
                     }
                     else if (change.operationType === 'update' ||
                              change.operationType === 'replace' ) {
 
-                        observation = Observations.Update as Observation;
+                        observation = Observations.Update;
 
                         bsonDocument = (change as any).fullDocument;
                     }
                     else if (change.operationType === 'delete') {
 
-                        observation = Observations.Delete as Observation;
+                        observation = Observations.Delete;
 
                         bsonDocument = (change as any).fullDocumentBeforeChange;
 
@@ -445,9 +450,9 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
 
                     let databaseRecord : DatabaseRecord;
 
-                    [uri, databaseRecord] = this.stripUri( bsonDocument );
+                    [uri, databaseRecord] = this.stripUri( bsonDocument, database.collectionName() );
 
-                    databaseDocument = await databaseServiceFactory!.get().databaseFactory.documentFromRecord(
+                    databaseDocument = await this.databaseFactory().documentFromRecord(
                         uri, databaseRecord ) as DatabaseDocument;
 
 
@@ -587,7 +592,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
 
                 if( databaseObserver?.onNotify != null ) {
                     await databaseObserver.onNotify( collectionDatabase, 
-                        Observations.Create as Observation, 
+                        Observations.Create, 
                         documentPath, 
                         databaseDocument );
                 }
@@ -628,7 +633,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
 
                     if (change.operationType === 'create') {
 
-                        observation = Observations.Create as Observation;
+                        observation = Observations.Create;
 
                         bsonDocument = (change as any).fullDocument;
                     }
@@ -637,19 +642,19 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
 
                         if( !hasInitialResult ) {
 
-                            observation = Observations.Create as Observation;
+                            observation = Observations.Create;
                             hasInitialResult = true;
 
                         }
                         else {
-                            observation = Observations.Update as Observation;
+                            observation = Observations.Update;
                         }
 
                         bsonDocument = (change as any).fullDocument;
                     }
                     else if (change.operationType === 'delete') {
 
-                        observation = Observations.Delete as Observation;
+                        observation = Observations.Delete;
 
                         bsonDocument = (change as any).fullDocumentBeforeChange;
 
@@ -661,9 +666,9 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
 
                     let databaseRecord : DatabaseRecord;
 
-                    [uri, databaseRecord] = this.stripUri( bsonDocument );
+                    [uri, databaseRecord] = this.stripUri( bsonDocument, collectionDatabase.collectionName() );
 
-                    databaseDocument = await databaseServiceFactory!.get().databaseFactory.documentFromRecord(
+                    databaseDocument = await this.databaseFactory().documentFromRecord(
                         uri, databaseRecord ) as DatabaseDocument;
 
 
@@ -770,18 +775,25 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
         }
     }
 
-        private includeUri( uri : string, documentRecord : DatabaseRecord ) : BSON.Document {
+    private includeUri( uri : string, documentRecord : DatabaseRecord ) : BSON.Document {
 
         log.traceIn( "includeUri()", uri, documentRecord );
 
         try {
             const bsonDocument = documentRecord as BSON.Document;
 
-            bsonDocument._id = new ObjectId( databaseServiceFactory!.get().databaseFactory.documentId( uri ) );
+            bsonDocument._id = new ObjectId( this.databaseFactory().documentId( uri ) );
 
-            bsonDocument._collection = databaseServiceFactory!.get().databaseFactory.collectionPathFromUri( uri );
+            // A flat database deduces the path from its collection, so it stores no path markers.
+            if( this.nestedCollections ) {
 
-            bsonDocument._query = databaseServiceFactory!.get().databaseFactory.decodeUriQuery( uri );
+                bsonDocument._collection = this.databaseFactory().collectionPathFromUri( uri );
+            }
+            else {
+                delete bsonDocument.path;
+            }
+
+            bsonDocument._query = this.databaseFactory().decodeUriQuery( uri );
 
             log.traceOut( "includeUri()", bsonDocument);
 
@@ -795,28 +807,37 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
         };
     }
 
-    private stripUri( bsonDocument : BSON.Document ) : [string,DatabaseRecord] {
+    private stripUri( bsonDocument : BSON.Document, collectionName : string ) : [string,DatabaseRecord] {
         
         log.traceIn( "stripUri()", bsonDocument );
 
         try {
-            if( bsonDocument._collection == null ) {
-                throw new Error( "Document record has no _collection field: " + bsonDocument );
-            }
-
-            let uri = bsonDocument._collection; 
-            delete bsonDocument._collection; 
-
             if( bsonDocument._id == null ) {
                 throw new Error( "Document record has no _id field: " + bsonDocument );
             }
 
-            uri += "/" + bsonDocument._id;
+            let uri : string;
+
+            if( this.nestedCollections ) {
+
+                if( bsonDocument._collection == null ) {
+                    throw new Error( "Document record has no _collection field: " + bsonDocument );
+                }
+
+                uri = bsonDocument._collection + "/" + bsonDocument._id;
+
+                delete bsonDocument._collection;
+            }
+            else {
+                uri = this.databaseFactory().uriFromCollectionName(
+                    collectionName, String( bsonDocument._id ), this );
+            }
+
             delete bsonDocument._id;
 
             if( bsonDocument._query != null ) {
 
-                uri += databaseServiceFactory!.get().databaseFactory.encodeUriQuery( bsonDocument._query );
+                uri += this.databaseFactory().encodeUriQuery( bsonDocument._query );
                 delete bsonDocument._query;
             }
 
@@ -834,6 +855,10 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
     }
 
     collectionGroupMatch( collectionGroupDatabase : CollectionGroupDatabase<DatabaseDocument> ) : BSON.Document {
+
+        if( !this.collectionGroups ) {
+            throw new Error( "Collection groups are not supported by database: " + this.databaseFactory().databaseName );
+        }
 
         let collectionGroupMatch : BSON.Document;
 
@@ -855,7 +880,9 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
 
     collectionMatch( collectionDatabase : CollectionDatabase<DatabaseDocument> ) : BSON.Document {
 
-        const collectionMatch = { $match: {
+        // A flat database holds one collection per path, so every document in it matches.
+        const collectionMatch = !this.nestedCollections ? { $match: {} } :
+            { $match: {
                     path: collectionDatabase.path()
                 }};
 
@@ -928,7 +955,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
             } 
             
             const ownerProperties = referenceDocument.properties( {
-                includePropertyTypes: [PropertyTypes.Owner as PropertyType]
+                includePropertyTypes: [PropertyTypes.Owner]
             } as PropertiesSelector ) as Map<string,OwnerProperty<DatabaseDocument>>;
 
             //log.debug( "databaseRecordMatcher()", "read parent properties", organizationProperties.size );
@@ -1039,8 +1066,6 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
     }
 
     readonly uri : string;
-
-    readonly databaseName : string;
 
     private _db : Db | undefined;
 

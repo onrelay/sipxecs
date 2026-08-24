@@ -1,24 +1,24 @@
 import { DatabaseRecord } from "../../core/types/databaseRecord";
-import { Observation, Observations } from "@dao/common";
+import { Observations } from "@dao/common";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { DatabaseDocument } from "../../core/spec/databaseDocument";
 import { DatabaseObject } from "../../core/spec/databaseObject";
 import { ReferenceHandle } from "../../core/impl/referenceHandle";
 import { OwnerProperty } from "../spec/ownerProperty";
-import { PropertyType, PropertyTypes } from "../../core/defs/propertyType";
+import { PropertyTypes } from "../../core/defs/propertyType";
 import { Database } from "../../core/spec/database";
 import { CollectionGroupDatabase } from "../../core/spec/collectionGroupDatabase";
 import { CollectionDatabase } from "../../core/spec/collectionDatabase";
 import { databaseServiceFactory } from "../../core/impl/databaseServiceFactory";
 import { IdsSuffix, IdSuffix } from "../../core/spec/databaseService";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 
 export class OwnerPropertyImpl<DerivedDocument extends DatabaseDocument> 
     extends AbstractDatabaseProperty<ReferenceHandle<DerivedDocument>> implements OwnerProperty<DerivedDocument> {
 
         constructor( parent : DatabaseObject, collectionName : string, documentName : string ) {
         
-        super( parent, PropertyTypes.Owner as PropertyType );  
+        super( parent, PropertyTypes.Owner );  
         
         //log.traceIn( "constructor()", parent.title, collectionName );
 
@@ -79,7 +79,8 @@ export class OwnerPropertyImpl<DerivedDocument extends DatabaseDocument>
         }
 
         const result = handles.has( 
-            databaseServiceFactory!.get().databaseFactory.uriToPath( uri )! );
+            this.databaseFactory().uriToPath( 
+                uri )! );
 
         //log.traceInOut( "hasDocument()", result );
         return result;
@@ -118,7 +119,8 @@ export class OwnerPropertyImpl<DerivedDocument extends DatabaseDocument>
                 }
 
                 const documentId = 
-                    databaseServiceFactory!.get().databaseFactory.documentId( handle.path );
+                    this.databaseFactory().documentId( 
+                        handle.path );
 
                 result.push( documentId! );
             })
@@ -259,7 +261,8 @@ export class OwnerPropertyImpl<DerivedDocument extends DatabaseDocument>
                 if ( databaseDocument == null) {
 
                     databaseDocument = 
-                        await databaseServiceFactory!.get().databaseFactory.documentFromUri( handle.uri ) as DerivedDocument;
+                        await this.databaseFactory().documentFromUri( 
+                            handle.uri ) as DerivedDocument;
 
                     if( databaseDocument == null ) {
 
@@ -300,7 +303,8 @@ export class OwnerPropertyImpl<DerivedDocument extends DatabaseDocument>
             }
         
             const databaseDocument = 
-                databaseServiceFactory!.get().databaseFactory.newDocumentFromUri( path ) as DerivedDocument;
+                this.databaseFactory().newDocumentFromUri( 
+                    path ) as DerivedDocument;
     
             //log.traceOut( "emptyDocument()", document );
             return databaseDocument;
@@ -333,7 +337,7 @@ export class OwnerPropertyImpl<DerivedDocument extends DatabaseDocument>
 
             if( handle.databaseDocument == null ) {
 
-                databaseDocument = await databaseServiceFactory!.get().databaseFactory.documentFromUri( 
+                databaseDocument = await this.databaseFactory().documentFromUri( 
                     handle.uri ) as DerivedDocument;
 
             }
@@ -386,7 +390,7 @@ export class OwnerPropertyImpl<DerivedDocument extends DatabaseDocument>
     
                 this.clearChanges();
 
-                super.notify( Observations.Update as Observation, referenceHandle.path, referenceHandle );
+                super.notify( Observations.Update, referenceHandle.path, referenceHandle );
 
                 log.traceOut( "setDocument()", "same path" );
                 return;
@@ -413,7 +417,9 @@ export class OwnerPropertyImpl<DerivedDocument extends DatabaseDocument>
 
                     let databaseDocument;
 
-                    if( databaseServiceFactory!.get().databaseFactory.equalUris( ownerPath, referenceHandle.path ) ) {
+                    if( this.databaseFactory().equalUris( 
+                        ownerPath, referenceHandle.path ) ) {
+
                         title = referenceHandle.referenceHandleTitle;
                     }
 
@@ -513,7 +519,7 @@ export class OwnerPropertyImpl<DerivedDocument extends DatabaseDocument>
 
                 if( thisReferenceHandle.referenceHandleTitle == null ) {
 
-                    await thisReferenceHandle.fetch();
+                    await thisReferenceHandle.load( this.databaseFactory() );
                 }
 
                 result.set( thisReferenceHandle!.path, thisReferenceHandle! );
@@ -530,10 +536,10 @@ export class OwnerPropertyImpl<DerivedDocument extends DatabaseDocument>
 
             for( const referenceHandle of referenceHandles.values() ) {
 
-                if( !databaseServiceFactory!.get().databaseFactory.equalUris( 
+                if( !this.databaseFactory().equalUris( 
                         thisReferenceHandle?.path, referenceHandle.path )) {
 
-                    await referenceHandle.fetch();
+                    await referenceHandle.load( this.databaseFactory() );
 
                     result.set( referenceHandle.path, referenceHandle );
                 }

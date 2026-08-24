@@ -12,9 +12,9 @@ export const ChangeTypes = {
 
     Deleted      : "deleted",
 
-}
+} as const
 
-export type ChangeType = keyof (typeof ChangeTypes); 
+export type ChangeType = (typeof ChangeTypes)[keyof typeof ChangeTypes]; 
 
 
 

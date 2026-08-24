@@ -11,7 +11,7 @@ export class TemplatePropertyImpl<T extends Template<TemplatedDocument>>
 
     constructor( parent : DatabaseObject ) {
 
-        super( parent, PropertyTypes.Template as PropertyType, undefined, "instances" ); 
+        super( parent, PropertyTypes.Template, undefined, "instances" ); 
     }  
      
 }

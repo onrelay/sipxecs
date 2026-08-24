@@ -20,23 +20,23 @@ export class DatabaseAccess {
         const databaseAccessTypes : DatabaseAccessType[] = [];
 
         if( this.allowList ) {
-            databaseAccessTypes.push( DatabaseAccessTypes.List as DatabaseAccessType );
+            databaseAccessTypes.push( DatabaseAccessTypes.List );
         }
 
         if( this.allowCreate ) {
-            databaseAccessTypes.push( DatabaseAccessTypes.Create as DatabaseAccessType );
+            databaseAccessTypes.push( DatabaseAccessTypes.Create );
         }
 
         if( this.allowRead ) {
-            databaseAccessTypes.push( DatabaseAccessTypes.Read as DatabaseAccessType ); 
+            databaseAccessTypes.push( DatabaseAccessTypes.Read ); 
         }
 
         if( this.allowUpdate ) {
-            databaseAccessTypes.push( DatabaseAccessTypes.Update as DatabaseAccessType );
+            databaseAccessTypes.push( DatabaseAccessTypes.Update );
         }
 
         if( this.allowDelete ) {
-            databaseAccessTypes.push( DatabaseAccessTypes.Delete as DatabaseAccessType );
+            databaseAccessTypes.push( DatabaseAccessTypes.Delete );
         }
         
         return databaseAccessTypes;
@@ -90,11 +90,11 @@ export class DatabaseAccess {
     static fromDatabaseAccessTypes( databaseAccessTypes? : DatabaseAccessType[] ) : DatabaseAccess {
         return databaseAccessTypes == null ? DatabaseAccess.allowNone() :
          new DatabaseAccess( 
-            databaseAccessTypes.includes( DatabaseAccessTypes.List as DatabaseAccessType ), 
-            databaseAccessTypes.includes( DatabaseAccessTypes.Create as DatabaseAccessType ), 
-            databaseAccessTypes.includes( DatabaseAccessTypes.Read as DatabaseAccessType ), 
-            databaseAccessTypes.includes( DatabaseAccessTypes.Update as DatabaseAccessType ), 
-            databaseAccessTypes.includes( DatabaseAccessTypes.Delete as DatabaseAccessType )            
+            databaseAccessTypes.includes( DatabaseAccessTypes.List ), 
+            databaseAccessTypes.includes( DatabaseAccessTypes.Create ), 
+            databaseAccessTypes.includes( DatabaseAccessTypes.Read ), 
+            databaseAccessTypes.includes( DatabaseAccessTypes.Update ), 
+            databaseAccessTypes.includes( DatabaseAccessTypes.Delete )            
         );
     }
 

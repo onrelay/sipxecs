@@ -10,6 +10,8 @@ import { DatabaseProperty } from "./databaseProperty";
 import { PropertiesSelector } from "../types/propertiesSelector";
 import { ReferenceHandle } from "../impl/referenceHandle";
 import { DatabaseAccess } from "../impl/databaseAccess";
+import { DatabaseManager } from "./databaseManager";
+import { DatabaseFactory } from "./databaseFactory";
 
 
 export interface DatabaseObject extends Observable {
@@ -59,6 +61,10 @@ export interface DatabaseObject extends Observable {
     ownerDocument(collectionName?: string): Promise<DatabaseDocument | undefined>;
 
     ownerDocuments( collectionName? : string ) : Promise<DatabaseDocument[] | undefined>;
+
+    databaseManager() : DatabaseManager;
+
+    databaseFactory() : DatabaseFactory;
   
     ownerCollection(collectionName?: string): CollectionDatabase<DatabaseDocument> | undefined;
 

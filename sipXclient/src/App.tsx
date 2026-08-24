@@ -1,4 +1,7 @@
+import { translate } from "@dao/common";
+
 export function App() {
+
   return (
     <main className="shell">
       <section className="card">
@@ -8,6 +11,7 @@ export function App() {
           This app is provisioned by sipXecs and will host call controls, chat-driven actions,
           and policy-aware assistant features.
         </p>
+        <button type="button">{translate("save")}</button>
       </section>
     </main>
   );

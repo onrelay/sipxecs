@@ -1,6 +1,6 @@
 import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 import { DatabaseDocument } from "../../core/spec/databaseDocument";
 import { DatabaseObject } from "../../core/spec/databaseObject";
 import { DefinitionProperty } from "../spec/definitionProperty";
@@ -16,7 +16,7 @@ export class DefinitionPropertyImpl<Definition extends string>
         definitions : {},
         defaultValue? : Definition ) {
             
-        super( parent, PropertyTypes.Definition as PropertyType );  
+        super( parent, PropertyTypes.Definition );  
 
         this.definition = definitionName;
 

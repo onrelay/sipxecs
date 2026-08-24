@@ -9,15 +9,19 @@ import { DatabaseDocumentNameKey } from "../spec/databaseDocument";
 import { TemplatePathKey } from "../spec/databaseService";
 import { DocumentsProperty } from "../../properties/spec/documentsProperty";
 import { TemplatedDocument } from "../spec/templatedDocument";
-import { log } from "../base/abstractDatabaseService";
-import { DatabaseType, DatabaseTypes } from "../defs/databaseType";
+import { log } from "./genericDatabaseService";
+import { DatabaseTypes } from "../defs/databaseType";
+import { DatabaseManager } from "../spec/databaseManager";
 
 export class DocumentsDatabaseImpl<DerivedDocument extends DatabaseDocument> 
     extends AbstractDatabase<DerivedDocument> implements DocumentsDatabase<DerivedDocument> { 
 
-    constructor( documentsProperty : DocumentsProperty<DerivedDocument>, template? : Template<TemplatedDocument>) {
+    constructor( documentsProperty : DocumentsProperty<DerivedDocument>, 
+        template? : Template<TemplatedDocument>) {
  
-        super( DatabaseTypes.Documents as DatabaseType,
+        super( 
+            documentsProperty.databaseManager(),
+            DatabaseTypes.Documents,
             documentsProperty.collectionName()!, 
             documentsProperty.queryDocumentName(), 
             documentsProperty.documentNames()!, 

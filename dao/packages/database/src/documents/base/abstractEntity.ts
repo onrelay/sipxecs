@@ -1,11 +1,11 @@
 
 import { GenericDatabaseDocument } from "../../core/impl/genericDatabaseDocument";
 import { CollectionDatabase } from "../../core/spec/collectionDatabase";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 import { CollectionProperty } from "../../properties/spec/collectionProperty";
 import { Key, KeysCollectionName } from "../spec/key";
 import { CollectionPropertyImpl } from "../../properties/impl/collectionPropertyImpl";
-import { KeyFormats, KeyStatus, KeyStatuses, KeyTypes, securityServiceFactory } from "@dao/security";
+import { KeyFormats, KeyStatuses, KeyTypes, securityServiceFactory } from "@dao/security";
 import { TextProperty } from "../../properties/spec/textProperty";
 import { TextPropertyImpl } from "../../properties/impl/textPropertyImpl";
 import { Entity } from "../spec/entity";
@@ -54,11 +54,11 @@ export abstract class AbstractEntity extends GenericDatabaseDocument implements 
 
                 entitySecret = this.keys.collection().newDocument();
 
-                entitySecret.keyType.setValue( KeyTypes.Symmetric as KeyType );
+                entitySecret.keyType.setValue( KeyTypes.Symmetric );
 
-                entitySecret.keyFormat.setValue( KeyFormats.AES256 as KeyFormat );
+                entitySecret.keyFormat.setValue( KeyFormats.AES256 );
 
-                entitySecret.keyStatus.setValue( KeyStatuses.Requested as KeyStatus );
+                entitySecret.keyStatus.setValue( KeyStatuses.Requested );
 
                 entitySecret.keyVault.setValue( securityServiceFactory!.get().keyManager?.keyVault );
             }
@@ -77,7 +77,7 @@ export abstract class AbstractEntity extends GenericDatabaseDocument implements 
     
                     if( symmetricKey != null ) {
     
-                        entitySecret.keyStatus.setValue( KeyStatuses.Enabled as KeyStatus );
+                        entitySecret.keyStatus.setValue( KeyStatuses.Enabled );
     
                         const versionNumber = Object.keys( symmetricKey.versions ).pop()!;
     

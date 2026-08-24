@@ -8,7 +8,7 @@ export class ImagePropertyImpl extends AttachmentPropertyImpl implements ImagePr
 
     constructor( parent : DatabaseObject ) {
 
-        super( parent, PropertyTypes.Image as PropertyType, MediaTypes.Image as MediaType );  
+        super( parent, PropertyTypes.Image, MediaTypes.Image );  
     }
 
 }

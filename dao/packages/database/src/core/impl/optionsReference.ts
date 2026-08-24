@@ -1,4 +1,4 @@
-import { log } from "../base/abstractDatabaseService";
+import { log } from "./genericDatabaseService";
 import { DatabaseDocument } from "../spec/databaseDocument";
 import { ReferenceProperty } from "../../properties/spec/referenceProperty";
 import { OptionsSource } from "../spec/optionsSource";

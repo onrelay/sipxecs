@@ -5,10 +5,12 @@ import { DatabaseObject } from "../spec/databaseObject";
 import { PropertyType } from "../defs/propertyType";
 import { DatabaseDocument } from "../spec/databaseDocument";
 import { DatabaseAccess } from "../impl/databaseAccess";
-import { log } from "./abstractDatabaseService";
-import { databaseServiceFactory, DatabaseServiceFactory } from "../impl/databaseServiceFactory";
+import { log } from "../impl/genericDatabaseService";
 import { AbstractDatabaseObject } from "./abstractDatabaseObject";
 import { securityServiceFactory } from "@dao/security";
+import { databaseServiceFactory } from "../impl/databaseServiceFactory";
+import { DatabaseManager } from "../spec/databaseManager";
+import { DatabaseFactory } from "../spec/databaseFactory";
 
 export abstract class AbstractDatabaseProperty<Value> extends AbstractObservable implements DatabaseProperty<Value> {
 
@@ -31,6 +33,14 @@ export abstract class AbstractDatabaseProperty<Value> extends AbstractObservable
             
             throw new Error( (error as any).message );
         }
+    }
+
+    databaseManager() : DatabaseManager  {
+          return this.parentDocument().databaseManager();
+    }
+      
+    databaseFactory() : DatabaseFactory {
+          return this.databaseManager().databaseFactory();
     }
 
     parentDocument() : DatabaseDocument {
@@ -312,7 +322,7 @@ export abstract class AbstractDatabaseProperty<Value> extends AbstractObservable
 
         try {
             if( this.encrypted() ) {
-                await securityServiceFactory!.get().updateCurrentKeys();
+                await databaseServiceFactory!.get().updateCurrentEntityKeys();
             }
 
         } catch (error) {
@@ -324,7 +334,7 @@ export abstract class AbstractDatabaseProperty<Value> extends AbstractObservable
 
         try {
             if( this.encrypted() ) {
-                await securityServiceFactory!.get().updateCurrentKeys();
+                await databaseServiceFactory!.get().updateCurrentEntityKeys();
             }
 
         } catch (error) {
@@ -336,7 +346,7 @@ export abstract class AbstractDatabaseProperty<Value> extends AbstractObservable
 
         try {
             if( this.encrypted() ) {
-                await securityServiceFactory!.get().updateCurrentKeys();
+                await databaseServiceFactory!.get().updateCurrentEntityKeys();
             }
 
         } catch (error) {
@@ -348,7 +358,7 @@ export abstract class AbstractDatabaseProperty<Value> extends AbstractObservable
 
         try {
             if( this.encrypted() ) {
-                await securityServiceFactory!.get().updateCurrentKeys();
+                await databaseServiceFactory!.get().updateCurrentEntityKeys();
             }
 
         } catch (error) {
@@ -381,7 +391,7 @@ export abstract class AbstractDatabaseProperty<Value> extends AbstractObservable
             }
 
             await newMonitor.onNotify(this,
-                Observations.Create as Observation,
+                Observations.Create,
                 this.key(),
                 this.value() );
 

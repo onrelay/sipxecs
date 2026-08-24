@@ -8,6 +8,15 @@ importers:
 
   .:
     dependencies:
+      '@dao/application':
+        specifier: link:../dao/packages/application
+        version: link:../dao/packages/application
+      '@dao/authentication':
+        specifier: link:../dao/packages/authentication
+        version: link:../dao/packages/authentication
+      '@dao/authorization':
+        specifier: link:../dao/packages/authorization
+        version: link:../dao/packages/authorization
       '@dao/client':
         specifier: link:../dao/packages/client
         version: link:../dao/packages/client
@@ -17,6 +26,9 @@ importers:
       '@dao/configuration':
         specifier: link:../dao/packages/configuration
         version: link:../dao/packages/configuration
+      '@dao/database':
+        specifier: link:../dao/packages/database
+        version: link:../dao/packages/database
       '@dao/language':
         specifier: link:../dao/packages/language
         version: link:../dao/packages/language

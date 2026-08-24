@@ -7,7 +7,7 @@ import { TemplatedProperties } from "../spec/templatedProperties";
 import { TemplatePropertyImpl } from "../../properties/impl/templatePropertyImpl";
 import { GenericDatabaseDocument } from "../impl/genericDatabaseDocument";
 import { TemplatedDocument } from "../spec/templatedDocument";
-import { log } from "./abstractDatabaseService";
+import { log } from "../impl/genericDatabaseService";
 import { ReferenceHandle } from "../impl/referenceHandle";
 
 

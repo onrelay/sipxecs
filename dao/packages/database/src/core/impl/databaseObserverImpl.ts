@@ -8,10 +8,10 @@ import { DatabaseFilter } from "../types/databaseFilter";
 import { DatabaseSortOrder } from "../types/databaseSortOrder";
 import { ReferenceHandle } from "./referenceHandle";
 import { SortOrientations } from "../defs/sortOrientation";
-import { log } from "../base/abstractDatabaseService";
+import { log } from "./genericDatabaseService";
 import { configurationServiceFactory } from "@dao/configuration";
 import { databaseServiceFactory } from "./databaseServiceFactory";
-import { DatabaseConfigurationName } from "../spec/databaseService";
+import { DatabasesConfigurationName } from "../spec/databaseService";
 
 export class DatabaseObserverImpl<DerivedDocument extends DatabaseDocument> 
     extends AbstractObservable implements DatabaseObserver<DerivedDocument> {
@@ -473,7 +473,7 @@ export class DatabaseObserverImpl<DerivedDocument extends DatabaseDocument>
 
                 this._pendingSortAndFilter = false;
 
-                await this.sortAndFilterDocuments( Observations.Update as Observation );
+                await this.sortAndFilterDocuments( Observations.Update );
 
                 //log.traceOut("update()", "Updated database filter");
                 return true;
@@ -507,7 +507,7 @@ export class DatabaseObserverImpl<DerivedDocument extends DatabaseDocument>
 
             if( newMonitor.onNotify != null ) {
 
-                await newMonitor.onNotify( this, Observations.Create as Observation );
+                await newMonitor.onNotify( this, Observations.Create );
             }
 
             //log.traceOut( "monitor()" );
@@ -531,7 +531,7 @@ export class DatabaseObserverImpl<DerivedDocument extends DatabaseDocument>
             }
 
             const cacheReleaseSeconds = +configurationServiceFactory!.get().config(
-                DatabaseConfigurationName, "cacheReleaseSeconds")!;
+                DatabasesConfigurationName, "cacheReleaseSeconds")!;
 
             if (isNaN(cacheReleaseSeconds)) {
                 throw new Error("Invalid cache release timeout: " + cacheReleaseSeconds);
@@ -707,7 +707,7 @@ export class DatabaseObserverImpl<DerivedDocument extends DatabaseDocument>
         object?: object ): Promise<void> => {
 
         try {
-            log.traceIn("onNotify()", Observations[observation], objectId);
+            log.traceIn("onNotify()", observation, objectId);
 
             let documentPath;
             let databaseDocument;
@@ -717,7 +717,7 @@ export class DatabaseObserverImpl<DerivedDocument extends DatabaseDocument>
                 case Observations.Create:
                 case Observations.Update:
                     {
-                        if (databaseServiceFactory!.get().databaseFactory.isUriDatabase(objectId!)) {
+                        if(this.defaultDatabase()!.databaseManager.databaseFactory().isUriDatabase(objectId!)) {
 
                             const initialResult = object as Map<string, DerivedDocument>;
 

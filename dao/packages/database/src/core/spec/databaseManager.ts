@@ -7,7 +7,7 @@ import { DatabaseProperty } from "./databaseProperty";
 import { DatabaseConverter } from "./databaseConverter";
 import { Database } from "./database";
 import { CollectionGroupDatabase } from "./collectionGroupDatabase";
-
+import { DatabaseFactory } from "./databaseFactory";
 
 export interface DatabaseManager {
 
@@ -123,7 +123,19 @@ export interface DatabaseManager {
 
     deleteDocumentRecord( uri : string ): Promise<boolean>; 
 
+    databaseFactory() : DatabaseFactory;
+
+    setDatabaseFactory( databaseFactory : DatabaseFactory ) : void;
+
+    clearAll() : Promise<void>;
+
     readonly converter : DatabaseConverter;
 
+    readonly nestedCollections : boolean;
+
+    readonly collectionGroups : boolean;
+
     readonly clientEncryption : boolean;
+
+    readonly useArchive : boolean;
 }

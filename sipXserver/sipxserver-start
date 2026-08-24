@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TARGET="${1:-production}"
+shift || true
+
+case "$TARGET" in
+    emulator|development|production)
+        ;;
+    *)
+        echo "Usage: $0 [emulator|development|production] [server args...]" >&2
+        exit 1
+        ;;
+esac
+
+export TARGET="$TARGET"
+export NODE_ENV="$TARGET"
+
+SERVER_DIR="$(cd "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd "$SERVER_DIR/.." && pwd)"
+
+cd "$SERVER_DIR"
+pnpm install --no-frozen-lockfile
+
+cd "$ROOT_DIR/dao"
+pnpm build
+
+cd "$ROOT_DIR/sipXdao"
+pnpm build
+
+cd "$SERVER_DIR"
+
+cleanup() {
+    if [[ -n "${SERVER_PID:-}" ]]; then
+        kill "$SERVER_PID" 2>/dev/null || true
+    fi
+}
+
+trap cleanup EXIT INT TERM
+
+if pnpm run | grep -qE '^[[:space:]]*dev'; then
+    pnpm run dev -- "$@" &
+elif pnpm run | grep -qE '^[[:space:]]*start'; then
+    pnpm run start -- "$@" &
+else
+    echo "No pnpm dev or start script found in $SERVER_DIR/package.json" >&2
+    exit 1
+fi
+
+SERVER_PID=$!
+
+wait "$SERVER_PID"

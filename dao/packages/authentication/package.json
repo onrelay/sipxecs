@@ -14,7 +14,9 @@
   "packageManager": "pnpm@10.14.0",
   "dependencies": {
     "@dao/common": "workspace:*",
-    "@dao/configuration": "workspace:*"
+    "@dao/authorization": "workspace:*",
+    "@dao/configuration": "workspace:*",
+    "@dao/database": "workspace:*"
   },
   "devDependencies": {
   }

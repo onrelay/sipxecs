@@ -3,6 +3,7 @@ export { ChangeType, ChangeTypes, ChangeTypeName } from "./core/defs/changeType"
 export { Comparator, Comparators, ComparatorName } from "./core/defs/comparator";
 export { DatabaseAccessType, DatabaseAccessTypes } from "./core/defs/databaseAccessType";
 export { DatabaseType, DatabaseTypes, DatabaseTypeName } from "./core/defs/databaseType";
+export { DatabasePlatform, DatabasePlatforms, DatabasePlatformName } from "./core/defs/databasePlatform";
 export { HttpOperation, HttpOperations, HttpOperationName } from "./core/defs/httpOperation";
 export { PropertyType, PropertyTypes, PropertyTypeName } from "./core/defs/propertyType";
 export { SortOrientation, SortOrientations } from "./core/defs/sortOrientation";
@@ -22,7 +23,6 @@ export { CollectionDatabase } from "./core/spec/collectionDatabase";
 export { CollectionGroupDatabase } from "./core/spec/collectionGroupDatabase";
 export { ConfigurationDatabaseManager } from "./core/spec/configurationDatabaseManager";
 export { Database } from "./core/spec/database";
-export { DatabaseAccessor } from "./core/spec/databaseAccessor";
 export { DatabaseConverter } from "./core/spec/databaseConverter";
 export { DatabaseDocument, ArchivedPropertyKey, DatabaseDocumentNameKey } from "./core/spec/databaseDocument";
 export { DatabaseFactory, CollectionsConfigurationName } from "./core/spec/databaseFactory";
@@ -30,7 +30,7 @@ export { DatabaseManager } from "./core/spec/databaseManager";
 export { DatabaseObject } from "./core/spec/databaseObject";
 export { DatabaseObserver } from "./core/spec/databaseObserver";
 export { DatabaseProperty } from "./core/spec/databaseProperty";
-export { DatabaseService, DatabaseConfigurationName, DatabaseServiceName, TemplatePathKey, IdSuffix, OwnerIds, TemplatesCollection } from "./core/spec/databaseService";
+export { DatabaseService, DatabasesConfigurationName, DatabaseServiceName, TemplatePathKey, IdSuffix, OwnerIds, TemplatesCollection } from "./core/spec/databaseService";
 export { DatabaseSubdocument } from "./core/spec/databaseSubdocument";
 export { DocumentsDatabase } from "./core/spec/documentsDatabase";
 export { XmlDatabaseDocument } from "./core/spec/xmlDatabaseDocument";
@@ -41,12 +41,10 @@ export { TemplatedProperties } from "./core/spec/templatedProperties";
 
 // Core Base Classes
 export { AbstractDatabase } from "./core/base/abstractDatabase";
-export { AbstractDatabaseAccessor } from "./core/base/abstractDatabaseAccessor";
 export { AbstractDatabaseConverter } from "./core/base/abstractDatabaseConverter";
 export { AbstractDatabaseManager } from "./core/base/abstractDatabaseManager";
 export { AbstractDatabaseObject, AbstractDatabaseObject as AbstractDatabaseRecord } from "./core/base/abstractDatabaseObject";
 export { AbstractDatabaseProperty } from "./core/base/abstractDatabaseProperty";
-export { AbstractDatabaseService, log } from "./core/base/abstractDatabaseService";
 export { AbstractOptionsSource } from "./core/base/abstractOptionsSource";
 export { AbstractTemplatedDocument } from "./core/base/abstractTemplatedDocument";
 
@@ -56,10 +54,12 @@ export { CollectionGroupDatabaseImpl } from "./core/impl/collectionGroupDatabase
 export { BasicDatabaseConverter } from "./core/impl/configurationConverter";
 export { ConfigurationDatabaseManagerImpl } from "./core/impl/configurationDatabaseManagerImpl";
 export { DatabaseAccess } from "./core/impl/databaseAccess";
+export { DatabaseAuthorizationManager } from "./core/impl/databaseAuthorizationManager";
 export { DatabaseObserverImpl } from "./core/impl/databaseObserverImpl";
 export { DatabaseServiceFactory, databaseServiceFactory } from "./core/impl/databaseServiceFactory";
 export { DocumentsDatabaseImpl } from "./core/impl/documentsDatabaseImpl";
 export { GenericDatabaseDocument } from "./core/impl/genericDatabaseDocument";
+export { GenericDatabaseService, log } from "./core/impl/genericDatabaseService";
 export { GenericDatabaseFactory } from "./core/impl/genericDatabaseFactory";
 export { GenericDatabaseSubdocument } from "./core/impl/genericDatabaseSubdocument";
 export { OptionsReference } from "./core/impl/optionsReference";
@@ -67,7 +67,6 @@ export { PhoneNumber } from "./core/impl/phoneNumber";
 export { PropertyDescriptorImpl } from "./core/impl/propertyDescriptorImpl";
 export { ReferenceHandle } from "./core/impl/referenceHandle";
 export { TemplatedPropertiesImpl } from "./core/impl/templatedPropertiesImpl";
-export { UnrestrictedDatabaseAccessor } from "./core/impl/unrestrictedDatabaseAccessor";
 
 // Documents Specifications, Base Classes & Implementations
 export { Address } from "./documents/spec/address";

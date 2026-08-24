@@ -1,6 +1,7 @@
 import { Service, Configuration, Language } from "@dao/common";
 import { ConfigurationManager } from "./configurationManager";
 
+export const ConfigurationServiceName = "configuration";
 
 export interface ConfigurationService extends Service, Configuration {
 

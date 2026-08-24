@@ -1,15 +1,15 @@
 import { DatabaseRecord } from "../types/databaseRecord";
-import { ConfigurationManager, configurationServiceFactory } from "@dao/configuration";
 import { DatabaseManager } from "../spec/databaseManager";
 import { CollectionGroupDatabase } from "../spec/collectionGroupDatabase";
 import { DatabaseDocument, DatabaseDocumentNameKey } from "../spec/databaseDocument";
 import { CollectionDatabase } from "../spec/collectionDatabase";
 import { CollectionGroupDatabaseImpl } from "./collectionGroupDatabaseImpl";
 import { CollectionDatabaseImpl } from "./collectionDatabaseImpl";
-import { log } from "../base/abstractDatabaseService";
+import { log } from "./genericDatabaseService";
 import { Template } from "../../documents/spec/template";
 import { TemplatedDocument } from "../spec/templatedDocument";
-import { CollectionsConfigurationName, DatabaseFactory } from "../spec/databaseFactory";
+import { CollectionsConfigurationName, DatabaseFactory, DatabasePrefixElements, DocumentsConfigurationName } from "../spec/databaseFactory";
+import { DatabasePlatform } from "../defs/databasePlatform";
 import { CollectionGroupPathSuffix, TemplatePathKey } from "../spec/databaseService";
 import { Database } from "../spec/database";
 import { PropertyTypes } from "../defs/propertyType";
@@ -25,6 +25,7 @@ import { SubdocumentPropertyImpl } from "../../properties/impl/subdocumentProper
 import { TemplatedPropertiesImpl } from "./templatedPropertiesImpl";
 import { PropertyDescriptorImpl } from "./propertyDescriptorImpl";
 import { DatabaseProperty } from "../spec/databaseProperty";
+import { databaseServiceFactory } from "./databaseServiceFactory";
 
 export class GenericDatabaseFactory implements DatabaseFactory {
 
@@ -38,18 +39,28 @@ export class GenericDatabaseFactory implements DatabaseFactory {
         GenericDatabaseFactory._onNewDocuments.set( documentName, onNewDocument );
     }
 
-    constructor( configurationManager : ConfigurationManager, databaseManager : DatabaseManager ) {
+    constructor( 
+        databasePlatform : DatabasePlatform,
+        databaseName : string,
+        databaseManager : DatabaseManager ) {
         
-        //log.traceIn( "constructor()");
+        log.traceIn( "constructor()");
 
         try {
             // Configuration data
 
-            this.configurationManager = configurationManager;
+            this.databasePlatform = databasePlatform;
+
+            this.databaseName = databaseName;
 
             this.databaseManager = databaseManager;
 
-            const collectionsConfig = configurationServiceFactory!.get().config( CollectionsConfigurationName ) as any;
+            databaseManager.setDatabaseFactory( this );
+
+            const collectionsConfig = 
+                databaseServiceFactory!.get().context.configuration.config( 
+                    databasePlatform + "." + databaseName, 
+                    CollectionsConfigurationName ) as any;
 
             for( const collectionConfigEntries of Object.entries( collectionsConfig ) ) {
 
@@ -57,7 +68,7 @@ export class GenericDatabaseFactory implements DatabaseFactory {
 
                 const collectionConfig = collectionConfigEntries[1] as any;
 
-                for( const documentName of collectionConfig.documentNames ) {
+                for( const documentName of collectionConfig[DocumentsConfigurationName] ) {
 
                     this._documentNamesToCollectionNames.set( documentName, collectionName );
                 }
@@ -68,7 +79,7 @@ export class GenericDatabaseFactory implements DatabaseFactory {
 
             }
 
-             //log.traceOut( "constructor()");
+            log.traceOut( "constructor()");
 
         } catch( error ) {
             log.warn( "constructor()", "Error initializing database service", error );
@@ -96,10 +107,46 @@ export class GenericDatabaseFactory implements DatabaseFactory {
     }
 
 
+    databasePlatformFromUri( uri : string ) : DatabasePlatform | undefined {
+
+        return this.pathElementsFromUri( uri )[0] as DatabasePlatform | undefined;
+    }
+
+    databaseNameFromUri( uri : string ) : string | undefined {
+
+        return this.pathElementsFromUri( uri )[1];
+    }
+
+    databasePrefix() : string {
+
+        return databaseServiceFactory!.get().databasePrefix( this.databasePlatform,  this.databaseName );
+    }
+
+    // The path within the database, so without the platform and database name prefix.
+    databasePathFromUri( uri : string ) : string | undefined {
+
+        const pathElements = this.pathElementsFromUri( uri );
+
+        return pathElements.length <= DatabasePrefixElements ? undefined :
+            "/" + pathElements.slice( DatabasePrefixElements ).join( "/" );
+    }
+
+    uriFromDatabasePath( databasePath : string, databaseManager : DatabaseManager ) : string {
+
+        const databasePrefix = this.databasePrefix();
+
+        return databasePath.startsWith( databasePrefix + "/" ) ? databasePath :
+            databasePrefix + databasePath;
+    }
+
+    uriFromCollectionName( collectionName : string, documentId : string, databaseManager : DatabaseManager ) : string {
+
+        return this.databasePrefix() + "/" + collectionName + "/" + documentId;
+    }
+
     documentReference( uri : string ) : any | undefined {
 
         return this.databaseManager.documentReference( uri );
-
     }
 
     documentUri( documentReference : any ) : string | undefined {
@@ -1025,7 +1072,8 @@ export class GenericDatabaseFactory implements DatabaseFactory {
                 if( collectionGroup == null ) {
 
                     const collectionConfig = 
-                        configurationServiceFactory!.get().config( CollectionsConfigurationName, collectionName ) as any;
+                        databaseServiceFactory!.get().context.configuration.config( 
+                            CollectionsConfigurationName, collectionName ) as any;
 
                     if( !collectionConfig.rootCollection ) {
                         throw new Error( "Not a root collection: " + collectionName );
@@ -1059,7 +1107,9 @@ export class GenericDatabaseFactory implements DatabaseFactory {
 
                 if( collectionGroup == null ) {
 
-                    const collectionConfig = configurationServiceFactory!.get().config( CollectionsConfigurationName, collectionName ) as any;
+                    const collectionConfig = 
+                        databaseServiceFactory!.get().context.configuration.config( 
+                            CollectionsConfigurationName, collectionName ) as any;
 
                     collectionGroup = new CollectionGroupDatabaseImpl<DatabaseDocument>(
                         this.databaseManager, 
@@ -1127,7 +1177,8 @@ export class GenericDatabaseFactory implements DatabaseFactory {
                 if( collection == null ) {
 
                     const collectionConfig = 
-                        configurationServiceFactory!.get().config( CollectionsConfigurationName, collectionName ) as any;
+                        databaseServiceFactory!.get().context.configuration.config( 
+                            CollectionsConfigurationName, collectionName ) as any;
 
                     if( !collectionConfig.rootCollection ) {
                         throw new Error( "Not a root collection: " + collectionName );
@@ -1162,7 +1213,8 @@ export class GenericDatabaseFactory implements DatabaseFactory {
                 if( collection == null ) {
 
                     const collectionConfig = 
-                        configurationServiceFactory!.get().config( CollectionsConfigurationName, collectionName ) as any;
+                        databaseServiceFactory!.get().context.configuration.config( 
+                            CollectionsConfigurationName, collectionName ) as any;
 
                     collection = new CollectionDatabaseImpl<DatabaseDocument>(
                         this.databaseManager, 
@@ -1267,7 +1319,9 @@ export class GenericDatabaseFactory implements DatabaseFactory {
         return Array.from( this._documentNamesToCollectionNames.keys() );
     }
 
-    readonly configurationManager : ConfigurationManager;
+    readonly databasePlatform : DatabasePlatform;
+
+    readonly databaseName : string;
 
     readonly databaseManager : DatabaseManager;
 

@@ -1,21 +1,19 @@
-import { AbstractService, Logger, LoggerFactory, Monitor, Observation } from "@dao/common";
-import { ConfigurationService } from "../spec/configurationService";
+import { AbstractService, Context, Logger, LoggerFactory, Monitor, Observation } from "@dao/common";
+import { ConfigurationService, ConfigurationServiceName } from "../spec/configurationService";
 import { ConfigurationManager } from "../spec/configurationManager";
 
 export let log : Logger;
 
 export class ConfigurationServiceImpl extends AbstractService implements ConfigurationService {
 
-    constructor( configurationManager : ConfigurationManager ) { 
+    constructor( context : Context ) { 
 
-        super();
+        super( context );
         //log.traceInOut("constructor()", target );
 
         try {
 
-            log = LoggerFactory.logger(this.name);
-
-            this.configurationManager = configurationManager;
+            this.configurationManager = context.configuration as ConfigurationManager;
 
         } catch (error) {
             //log.warn("constructor()", "Error constructing configuration service", error);
@@ -27,11 +25,12 @@ export class ConfigurationServiceImpl extends AbstractService implements Configu
 
     async init() : Promise<void> {
 
-        log.traceInOut("init()" );
-
         try {
+            log = LoggerFactory.logger(this.name);
 
             this.isInitialized = true;
+
+            log.traceInOut("init()" );
 
         } catch (error) {
             log.warn("init()", "Error initializing configuration service", error);
@@ -52,9 +51,9 @@ export class ConfigurationServiceImpl extends AbstractService implements Configu
         return this.configurationManager.config( configName, key, language );
     }
 
-    load( configName : string, configData : object ) : void {
+    load( configName : string, configData : object, language? : string ) : void {
 
-        this.configurationManager.load( configName, configData );
+        this.configurationManager.load( configName, configData, language );
     }
 
 
@@ -62,7 +61,7 @@ export class ConfigurationServiceImpl extends AbstractService implements Configu
 
     protected async release(observationFilter?: Observation[], objectIdsFilter?: string[]): Promise<void> {}
 
-    readonly name = "configuration";
+    readonly name = ConfigurationServiceName;
 
     readonly configurationManager: ConfigurationManager;
 

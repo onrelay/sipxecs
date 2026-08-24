@@ -1,6 +1,7 @@
 export { AbstractAuthenticationService } from "./base/abstractAuthenticationService"
-export { AuthenticationService } from "./spec/authenticationService"
+export { AuthenticationService, AuthenticationServiceName } from "./spec/authenticationService"
 export { AuthenticationServiceFactory, authenticationServiceFactory } from "./impl/authenticationServiceFactory"
 export { AuthenticatedEntity } from "./types/authenticatedEntity"
+export { AuthenticationClaim } from "./types/authenticationClaim"
 export { AuthenticatedEntityType, AuthenticatedEntityTypes } from "./defs/authenticatedEntityType"
 export { AuthenticationMethod, AuthenticationMethods } from "./defs/authenticationMethod"

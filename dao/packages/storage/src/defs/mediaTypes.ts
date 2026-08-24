@@ -8,6 +8,6 @@ export const MediaTypes = {
 
     Document    : "document"
 
-}
+} as const
 
-export type MediaType = keyof (typeof MediaTypes);
+export type MediaType = (typeof MediaTypes)[keyof typeof MediaTypes];

@@ -16,6 +16,10 @@
     "preview": "VITE_TARGET=production vite preview"
   },
   "dependencies": {
+    "@dao/application": "link:../dao/packages/application",
+    "@dao/authentication": "link:../dao/packages/authentication",
+    "@dao/authorization": "link:../dao/packages/authorization",
+    "@dao/database": "link:../dao/packages/database",
     "@dao/client": "link:../dao/packages/client",
     "@dao/common": "link:../dao/packages/common",
     "@dao/configuration": "link:../dao/packages/configuration",

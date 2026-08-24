@@ -1,5 +1,6 @@
 import {
     AbstractObservable,
+    Context,
     Environment,
     Monitor,
     Observation,
@@ -11,7 +12,7 @@ import { StorageService } from "../spec/storageService";
 
 export class StorageServiceImpl extends AbstractObservable implements StorageService {
 
-    constructor( target : Target, mediaManager : MediaManager ) {
+    constructor( context : Context, mediaManager : MediaManager ) {
 
         super();
 
@@ -19,7 +20,7 @@ export class StorageServiceImpl extends AbstractObservable implements StorageSer
 
         try {
 
-            this.target = target;
+            this.context = context;
 
             this.mediaManager = mediaManager;
 
@@ -29,8 +30,6 @@ export class StorageServiceImpl extends AbstractObservable implements StorageSer
             throw new Error( (error as any).message );
         }
     }
-
-    readonly name = "storage";
 
     async init() : Promise<void> {
 
@@ -51,9 +50,11 @@ export class StorageServiceImpl extends AbstractObservable implements StorageSer
 
     protected async release(observationFilter?: Observation[], objectIdsFilter?: string[]): Promise<void> {}
 
-    readonly target : Target;
-
     isInitialized = false;
+
+    readonly name = "storage";
+
+    readonly context : Context;
 
     readonly mediaManager : MediaManager; 
 

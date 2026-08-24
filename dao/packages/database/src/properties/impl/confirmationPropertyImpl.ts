@@ -6,7 +6,7 @@ import { BooleanPropertyImpl } from "./booleanPropertyImpl";
 export class ConfirmationPropertyImpl extends BooleanPropertyImpl implements ConfirmationProperty {
 
     constructor( parent : DatabaseObject, defaultValue? : boolean ) {
-        super( parent, PropertyTypes.Confirmation as PropertyType, defaultValue );
+        super( parent, PropertyTypes.Confirmation, defaultValue );
     }
 
     onChange( oldValue : boolean | undefined, newValue : boolean | undefined ) : boolean {

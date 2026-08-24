@@ -8,23 +8,25 @@ import { DatabaseProperty } from "../spec/databaseProperty";
 import { CollectionGroupDatabase } from "../spec/collectionGroupDatabase";
 import { Database } from "../spec/database";
 import { ReferenceHandle } from "../impl/referenceHandle";
-import { log } from "./abstractDatabaseService";
-import { databaseServiceFactory } from "../impl/databaseServiceFactory";
+import { log } from "../impl/genericDatabaseService";
 import { ChangesCollection } from "../spec/databaseService";
 import { ChangeTypes } from "../defs/changeType";
-import { User } from "../../documents/spec/user";
 import { Change, ChangeTypePropertyKey } from "../../documents/spec/change";
 import { DatabaseFilter } from "../types/databaseFilter";
-import { Comparator, Comparators } from "../defs/comparator";
+import { Comparators } from "../defs/comparator";
 import { PropertyTypes } from "../defs/propertyType";
 import { PropertiesSelector } from "../types/propertiesSelector";
 import { CollectionProperty } from "../../properties/spec/collectionProperty";
 import { DatabaseTypes } from "../defs/databaseType";
+import { DatabaseFactory } from "../spec/databaseFactory";
 
 export abstract class AbstractDatabaseManager extends AbstractObservable implements DatabaseManager {
 
     constructor( params: { 
         clientEncryption : boolean,
+        useArchive: boolean,
+        nestedCollections? : boolean,
+        collectionGroups? : boolean,
         converter : DatabaseConverter
      } ) {
 
@@ -34,7 +36,13 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
 
         try {
 
+            this.nestedCollections = params.nestedCollections ?? true;
+
+            this.collectionGroups = params.collectionGroups ?? true;
+
             this.clientEncryption = params.clientEncryption;
+
+            this.useArchive = params.useArchive;
 
             this.converter = params.converter;
 
@@ -347,7 +355,7 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
                         const documentRecord = documentRecordEntry[1];
 
                         const databaseDocument = 
-                            await databaseServiceFactory!.get().databaseFactory.documentFromRecord( 
+                            await this.databaseFactory().documentFromRecord( 
                                 documentUri, documentRecord ) as DatabaseDocument;
                         
                         if (databaseDocument == null) {    
@@ -396,7 +404,7 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
                         const rawDatabaseDocument = documentRecordEntry[1];
 
                         const databaseDocument = 
-                            await databaseServiceFactory!.get().databaseFactory.documentFromRecord( 
+                            await this.databaseFactory().documentFromRecord( 
                                 documentPath, rawDatabaseDocument ) as DatabaseDocument;
 
                         if (databaseDocument == null) {    
@@ -446,7 +454,7 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
                         const rawDatabaseDocument = documentRecordEntry[1];
 
                         const databaseDocument = 
-                            await databaseServiceFactory!.get().databaseFactory.documentFromRecord(
+                            await this.databaseFactory().documentFromRecord(
                                 documentPath, rawDatabaseDocument) as DatabaseDocument;
     
                         if (databaseDocument == null) {    
@@ -495,7 +503,7 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
                         const rawDatabaseDocument = documentRecordEntry[1];
 
                         const databaseDocument = 
-                            await databaseServiceFactory!.get().databaseFactory.documentFromRecord(
+                            await this.databaseFactory().documentFromRecord(
                                 documentPath, rawDatabaseDocument) as DatabaseDocument;
     
                         if (databaseDocument == null) {    
@@ -575,10 +583,6 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
             }
 
             databaseDocument.lastChangedAt.setValue( now );
-
-            const authenticatedDatabaseEntity = databaseServiceFactory!.get().authenticatedDatabaseEntity();
-
-            databaseDocument.lastChangedBy.setValue( authenticatedDatabaseEntity?.referenceHandle() as ReferenceHandle<User> );
 
             databaseDocument.archived.setValue( false ); 
             
@@ -671,10 +675,6 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
 
             databaseDocument.lastChangedAt.setValue( new Date() );
 
-            const authenticatedDatabaseEntity = databaseServiceFactory!.get().authenticatedDatabaseEntity();
-
-            databaseDocument.lastChangedBy.setValue( authenticatedDatabaseEntity?.referenceHandle() as ReferenceHandle<User> );
-
             databaseDocument.archived.setValue( false );
             
             documentRecord = await databaseDocument.toRecord( force );
@@ -759,10 +759,6 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
             // First store audit data in document (functions will pick them up)
             databaseDocument.lastChangedAt.setValue( new Date() );
 
-            const authenticatedDatabaseEntity =  databaseServiceFactory!.get().authenticatedDatabaseEntity();
-
-            databaseDocument.lastChangedBy.setValue( authenticatedDatabaseEntity?.referenceHandle() as ReferenceHandle<User> );
-
             databaseDocument.archived.setValue( true );
 
             databaseDocument.archivedAt.setValue( new Date() );
@@ -801,7 +797,7 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
 
                 databaseFilters.push( {
                     property: property,
-                    comparator: Comparators.Equal as Comparator,
+                    comparator: Comparators.Equal,
                     value: value
                 });
 
@@ -818,7 +814,7 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
                         const rawDatabaseDocument = documentRecordEntry[1];
 
                         const databaseDocument = 
-                            await databaseServiceFactory!.get().databaseFactory.documentFromRecord(
+                            await this.databaseFactory().documentFromRecord(
                                 documentPath, rawDatabaseDocument) as DatabaseDocument;
     
                         if (databaseDocument == null) {    
@@ -854,7 +850,7 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
             const result = new Map<string,DatabaseDocument>();
 
             const changesDatabase = 
-                databaseServiceFactory!.get().databaseFactory.collectionGroupDatabaseFromCollectionName(
+                this.databaseFactory().collectionGroupDatabaseFromCollectionName(
                     ChangesCollection
                 )!;
 
@@ -862,13 +858,13 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
 
             databaseFilters.push( {
                     property: EndDatePropertyKey,
-                    comparator: Comparators.LessThan as Comparator,
+                    comparator: Comparators.LessThan,
                     value: Date.now()
                 });
             
             databaseFilters.push( {
                     property: ChangeTypePropertyKey,
-                    comparator: Comparators.Equal as Comparator,
+                    comparator: Comparators.Equal,
                     value: ChangeTypes.Archived 
                 });
 
@@ -882,7 +878,7 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
                         const documentPath = documentRecordEntry[0];
                         const rawDatabaseDocument = documentRecordEntry[1];
 
-                        const change = await databaseServiceFactory!.get().databaseFactory.documentFromRecord( 
+                        const change = await this.databaseFactory().documentFromRecord( 
                             documentPath, rawDatabaseDocument ) as Change;
                             
                         if (change == null) {    
@@ -963,6 +959,36 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
         }
     }
 
+    databaseFactory() : DatabaseFactory {
+        return this._databaseFactory!;
+    }
+
+    setDatabaseFactory( databaseFactory : DatabaseFactory ) : void {
+        this._databaseFactory = databaseFactory;
+    }
+
+    async clearAll() : Promise<void> {
+
+        log.traceIn("clearAll()" );
+
+        try {
+
+            this._collectionGroupMonitors.clear();
+
+            this._collectionMonitors.clear();
+
+            this._documentMonitors.clear();
+
+            log.traceOut("clearAll()" );
+
+        } catch( error ) {
+
+            log.warn( "clearAll()", "Error clearing database manager", error );
+            
+            throw new Error( "Error clearing database manager: " + (error as any).message );
+        }
+    }
+
     abstract documentRecords( 
         database : Database<DatabaseDocument>, 
         databaseFilters? : DatabaseFilter[] ): Promise<Map<string,DatabaseRecord>>; 
@@ -998,14 +1024,22 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
     abstract releaseAllDocuments( 
         collectionDatabase : CollectionDatabase<DatabaseDocument> ) : Promise<void>;
 
+    private _databaseFactory? : DatabaseFactory;
+
     readonly converter : DatabaseConverter;
+
+    readonly nestedCollections : boolean;
+
+    readonly collectionGroups : boolean;
+
+    readonly clientEncryption : boolean;
+
+    readonly useArchive : boolean;
 
     protected _collectionGroupMonitors : Map<string,any> = new Map<string,any | null>();
 
     protected _collectionMonitors : Map<string,any> = new Map<string,any | null>();
 
     protected _documentMonitors : Map<string,Map<string,any>> = new Map<string,Map<string,any | null>>();
-
-    readonly clientEncryption : boolean;
 
 }

@@ -20,10 +20,12 @@ import { TextPropertyImpl } from "../../properties/impl/textPropertyImpl";
 import { AbstractDatabaseProperty } from "./abstractDatabaseProperty";
 import { DatabaseProperty } from "../spec/databaseProperty";
 import { TextProperty } from "../../properties/spec/textProperty";
-import { log } from "./abstractDatabaseService";
+import { log } from "../impl/genericDatabaseService";
 import { TemplatedDocument } from "../spec/templatedDocument";
 import { databaseServiceFactory } from "../impl/databaseServiceFactory";
 import { GenericDatabaseSubdocument } from "../impl/genericDatabaseSubdocument";
+import { DatabaseManager } from "../spec/databaseManager";
+import { DatabaseFactory } from "../spec/databaseFactory";
 
 
 export abstract class AbstractDatabaseObject extends AbstractObservable implements DatabaseObject {
@@ -271,7 +273,7 @@ export abstract class AbstractDatabaseObject extends AbstractObservable implemen
         "templatedProperties"];
 
       const excludePropertyTypes = [
-        PropertyTypes.Collection as PropertyType
+        PropertyTypes.Collection
       ];
 
       const augmentedPropertiesSelector = propertiesSelector != null ? propertiesSelector : {} as PropertiesSelector;
@@ -321,7 +323,7 @@ export abstract class AbstractDatabaseObject extends AbstractObservable implemen
                   databaseDocument.templatedProperties.compareTo( otherDatabaseDocument.templatedProperties ) !== 0 ) { 
     
                   const templatedProperties = 
-                    databaseServiceFactory!.get().databaseFactory.updateTemplatedProperties( 
+                    this.databaseFactory().updateTemplatedProperties( 
                       databaseDocument, otherTemplate, false ) as TemplatedProperties;
         
                   const otherTamplatedProperties = 
@@ -1104,6 +1106,14 @@ export abstract class AbstractDatabaseObject extends AbstractObservable implemen
 
       throw new Error( (error as any).message );
     }
+  }
+
+  databaseManager() : DatabaseManager  {
+      return this.ownerCollection()!.databaseManager;
+  }
+  
+  databaseFactory() : DatabaseFactory {
+      return this.databaseManager().databaseFactory();
   }
 
   abstract path() : string | undefined;

@@ -4,6 +4,7 @@ import {
     Database,
     DatabaseDocument,
     DatabaseFilter,
+    DatabasePlatforms,
     DatabaseRecord,
     databaseServiceFactory,
     log,
@@ -21,14 +22,18 @@ export class ClientRestDatabaseManager extends AbstractDatabaseManager {
 
     constructor( params: { 
         baseUrl: string,
-        clientEncryption : boolean
+        clientEncryption : boolean,
+        useArchive : boolean
         } ) {
 
         log.traceInOut( "constructor()", params );
 
         super({
             clientEncryption: false,
-            converter: new ClientRestDatabaseConverter(),
+            useArchive: params.useArchive,
+            nestedCollections: false,
+            collectionGroups: false,
+            converter: new ClientRestDatabaseConverter()
         });
 
         this._transport = new ClientRestDatabaseTransport( params.baseUrl );
@@ -99,7 +104,7 @@ export class ClientRestDatabaseManager extends AbstractDatabaseManager {
                 throw new Error( "Server did not return a new document record" );
             }
 
-            const newDocumentRecordId = databaseServiceFactory!.get().databaseFactory.documentId(
+            const newDocumentRecordId = this.databaseFactory().documentId(
                 record.path );
 
             if( newDocumentRecordId == null || newDocumentRecordId === "new" ) {
@@ -251,7 +256,7 @@ export class ClientRestDatabaseManager extends AbstractDatabaseManager {
         record: DatabaseRecord
     ): Promise<DatabaseDocument | undefined> {
         
-        return databaseServiceFactory!.get().databaseFactory.documentFromRecord( uri, record );
+        return this.databaseFactory().documentFromRecord( uri, record );
     }
 
     private readonly _transport: ClientRestDatabaseTransport;

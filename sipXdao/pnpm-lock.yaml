@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@dao/application':
+        specifier: link:../dao/packages/application
+        version: link:../dao/packages/application
+      '@dao/authentication':
+        specifier: link:../dao/packages/authentication
+        version: link:../dao/packages/authentication
       '@dao/common':
         specifier: link:../dao/packages/common
         version: link:../dao/packages/common

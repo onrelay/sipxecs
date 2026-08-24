@@ -1,15 +1,14 @@
-import { ServiceFactory } from "@dao/common"
+import { Context, ServiceFactory } from "@dao/common"
 import { ConfigurationService } from "../spec/configurationService";
-import { ConfigurationManager } from "../spec/configurationManager";
 import { ConfigurationServiceImpl } from "./configurationServiceImpl";
 
 export let configurationServiceFactory : ConfigurationServiceFactory | undefined;
 
 export class ConfigurationServiceFactory extends ServiceFactory<ConfigurationService> {
 
-    static create( configurationManager : ConfigurationManager ) : void {
+    static create( context : Context ) : void {
 
-        const configurationService = new ConfigurationServiceImpl( configurationManager );
+        const configurationService = new ConfigurationServiceImpl( context );
 
         configurationServiceFactory = new ConfigurationServiceFactory();
 

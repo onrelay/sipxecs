@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from "node:http";
 import { createServer, Server } from "node:https";
-import { DatabaseFilter, DatabaseManager, DatabaseRecord, databaseServiceFactory, HttpOperations, log } from "@dao/database";
+import { DatabaseFilter, DatabaseManager, DatabaseRecord, HttpOperations, log } from "@dao/database";
 import { ConfigurationManager } from "@dao/configuration";
 
 export class ServerRestDatabaseTransport {
@@ -43,15 +43,15 @@ export class ServerRestDatabaseTransport {
         log.traceIn( "getOne()", uri );
 
         try {
-            const documentId = databaseServiceFactory!.get().databaseFactory.documentId( uri );
+            const documentId = this._databaseManager.databaseFactory().documentId( uri );
 
             if( documentId === "new" ) {
-                const collectionDatabase = databaseServiceFactory!.get().databaseFactory.collectionFromUri( uri );
+                const collectionDatabase = this._databaseManager.databaseFactory().collectionFromUri( uri );
 
                 if( collectionDatabase != null ) {
                     const newId = await this._databaseManager.newDocumentRecordId( collectionDatabase );
                     const newUri = uri.replace( /\/new(\?|$)/, `/${newId}$1` );
-                    const newPath = databaseServiceFactory!.get().databaseFactory.uriToPath( newUri )!;
+                    const newPath = this._databaseManager.databaseFactory().uriToPath( newUri )!;
                     log.traceOut( "getOne()", uri, "new", newPath );
                     return { path: newPath };
                 }
@@ -70,7 +70,7 @@ export class ServerRestDatabaseTransport {
         log.traceIn( "getMany()", uri );
 
         try {
-            const database = databaseServiceFactory!.get().databaseFactory.databaseFromUri( uri );
+            const database = this._databaseManager.databaseFactory().databaseFromUri( uri );
 
             if( database == null ) {
                 throw new Error( "Invalid database URI: " + uri );
@@ -92,7 +92,7 @@ export class ServerRestDatabaseTransport {
         log.traceIn( "postQuery()", uri, databaseFilters );
 
         try {
-            const database = databaseServiceFactory!.get().databaseFactory.databaseFromUri( uri );
+            const database = this._databaseManager.databaseFactory().databaseFromUri( uri );
 
             if( database == null ) {
                 throw new Error( "Invalid database URI: " + uri );
@@ -154,7 +154,7 @@ export class ServerRestDatabaseTransport {
         log.traceIn( "handleRequest()", request.method, uri );
 
         try {
-            const isDocument = databaseServiceFactory!.get().databaseFactory.isUriDocument( uri );
+            const isDocument = this._databaseManager.databaseFactory().isUriDocument( uri );
             let result: DatabaseRecord | DatabaseRecord[] | Map<string, DatabaseRecord> | boolean | undefined;
 
             if( request.method === HttpOperations.Get ) {

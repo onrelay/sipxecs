@@ -9,9 +9,9 @@ export const AuthenticatedEntityTypes = {
 
     Service           : "service"
 
-}
+} as const
 
-export type AuthenticatedEntityType = keyof (typeof AuthenticatedEntityTypes); 
+export type AuthenticatedEntityType = (typeof AuthenticatedEntityTypes)[keyof typeof AuthenticatedEntityTypes]; 
 
 
 

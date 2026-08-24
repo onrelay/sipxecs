@@ -1,0 +1,7 @@
+export { Authorization } from "./types/authorization"
+export { AuthorizationManager } from "./spec/authorizationManager"
+export { AuthorizationService, AuthorizationServiceName } from "./spec/authorizationService"
+export { AuthorizationServiceFactory, authorizationServiceFactory } from "./impl/authorizationServiceFactory"
+export { GenericAuthorizationManager, NamespaceSeparator } from "./impl/genericAuthorizationManager"
+export { GenericAuthorizationService, log } from "./impl/genericAuthorizationService"
+export { AuthorizationType, AuthorizationTypes, AuthorizationTypeName, authorizationTypeImplies } from "./defs/authorizationType"

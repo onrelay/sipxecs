@@ -1,5 +1,6 @@
 export { ConfigurationManager } from "./spec/configurationManager"
 export { AbstractConfigurationManager } from "./base/abstractConfigurationManager"
-export { ConfigurationService } from "./spec/configurationService"
+export { ConfigurationService, ConfigurationServiceName } from "./spec/configurationService"
 export { ConfigurationServiceFactory, configurationServiceFactory } from "./impl/configurationServiceFactory"
+export { ConfigurationServiceImpl } from "./impl/configurationServiceImpl"
 export { ConfigurationTranslator } from "./impl/configurationTranslator"

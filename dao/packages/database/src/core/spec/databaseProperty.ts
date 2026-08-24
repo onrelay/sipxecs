@@ -4,6 +4,8 @@ import { PropertyType } from "../defs/propertyType";
 import { DatabaseDocument } from "./databaseDocument";
 import { DatabaseObject } from "./databaseObject";
 import { DatabaseAccess } from "../impl/databaseAccess";
+import { DatabaseManager } from "./databaseManager";
+import { DatabaseFactory } from "./databaseFactory";
 
 export interface DatabaseProperty<Value> extends Observable {
 
@@ -22,6 +24,10 @@ export interface DatabaseProperty<Value> extends Observable {
     prompt? : string; 
 
     help? : string;
+
+    databaseManager() : DatabaseManager;
+
+    databaseFactory() : DatabaseFactory;
 
     parentDocument() : DatabaseDocument; 
 

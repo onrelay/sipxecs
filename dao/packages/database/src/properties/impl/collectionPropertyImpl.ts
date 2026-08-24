@@ -8,7 +8,7 @@ import { Database } from "../../core/spec/database";
 import { CollectionDatabase } from "../../core/spec/collectionDatabase";
 import { CollectionGroupDatabase } from "../../core/spec/collectionGroupDatabase";
 import { DatabaseAccess } from "../../core/impl/databaseAccess";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 import { databaseServiceFactory } from "../../core/impl/databaseServiceFactory";
 
 export class CollectionPropertyImpl<DerivedDocument extends DatabaseDocument> 
@@ -16,7 +16,7 @@ export class CollectionPropertyImpl<DerivedDocument extends DatabaseDocument>
 
     constructor( parent : DatabaseDocument, collectionName : string, allowCollectionGroup? : boolean ) {
 
-        super( parent, PropertyTypes.Collection as PropertyType ); 
+        super( parent, PropertyTypes.Collection ); 
 
         //log.traceIn( "constructor()", parent.title, collectionName );
 
@@ -62,7 +62,7 @@ export class CollectionPropertyImpl<DerivedDocument extends DatabaseDocument>
     }
 
     collection() : CollectionDatabase<DerivedDocument> {
-        return databaseServiceFactory!.get().databaseFactory.collectionDatabaseFromCollectionName( 
+        return this.databaseFactory().collectionDatabaseFromCollectionName( 
             this.collectionName(), this.parent as DatabaseDocument ) as CollectionDatabase<DerivedDocument>;
     }
 
@@ -72,7 +72,7 @@ export class CollectionPropertyImpl<DerivedDocument extends DatabaseDocument>
             return undefined;
         }
 
-        return databaseServiceFactory!.get().databaseFactory.collectionGroupDatabaseFromCollectionName( 
+        return this.databaseFactory().collectionGroupDatabaseFromCollectionName( 
             this.collectionName(), this.parent as DatabaseDocument ) as CollectionGroupDatabase<DerivedDocument>;
     }
 

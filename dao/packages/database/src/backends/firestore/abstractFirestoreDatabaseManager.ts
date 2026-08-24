@@ -1,6 +1,7 @@
 import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { AbstractDatabaseManager } from "../../core/base/abstractDatabaseManager";
-import { log } from "../../core/base/abstractDatabaseService";
+import { DatabasePlatforms } from "../../core/defs/databasePlatform";
+import { log } from "../../core/impl/genericDatabaseService";
 import { CollectionDatabase } from "../../core/spec/collectionDatabase";
 import { CollectionGroupDatabase } from "../../core/spec/collectionGroupDatabase";
 import { Database } from "../../core/spec/database";
@@ -9,25 +10,28 @@ import { DatabaseFilter } from "../../core/types/databaseFilter";
 import { IdSuffix, OwnerIds, TemplatePathKey } from "../../core/spec/databaseService";
 import { PropertiesSelector } from "../../core/types/propertiesSelector";
 import { OwnerProperty } from "../../properties/spec/ownerProperty";
-import { PropertyType, PropertyTypes } from "../../core/defs/propertyType";
+import { PropertyTypes } from "../../core/defs/propertyType";
 import { FirestoreConverter } from "./firestoreConverter";
 import { Comparators } from "../../core/defs/comparator";
 import { DatabaseDocumentNameKey } from "../../core/spec/databaseDocument";
 import { DatabaseTypes } from "../../core/defs/databaseType";
-import { databaseServiceFactory } from "../../core/impl/databaseServiceFactory";
 
 
 export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseManager {
 
     constructor( params: { 
         clientEncryption : boolean,
+        useArchive: boolean,
         converter : FirestoreConverter,
         firebase : any
         } ) {
 
         super( {
             clientEncryption: params.clientEncryption,
-            converter: params.converter
+            useArchive: params.useArchive,
+            converter: params.converter,
+            nestedCollections: true,
+            collectionGroups: true
         });
 
         //log.traceIn( "constructor()");
@@ -66,7 +70,8 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
                     try {
                         const documentData = databaseRecord.data();
 
-                        const documentPath = documentData.path;
+                        const documentPath = documentData.path == null ? undefined :
+                            this.databaseFactory().uriFromDatabasePath( documentData.path, this );
 
                         if( documentPath == null ) {
                             log.warn( "Missing path in document: " + documentData );
@@ -74,7 +79,7 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
                         else {
 
                             const databaseDocument = 
-                                await databaseServiceFactory!.get().databaseFactory.documentFromRecord( 
+                                await this.databaseFactory().documentFromRecord( 
                                     documentPath, documentData ) as DatabaseDocument;
 
                             if( databaseDocument != null ) {  
@@ -126,13 +131,14 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
                             throw new Error("Unable to read raw document data from snapshot: " + documentRecordSnapshot);
                         } 
 
-                        const documentPath = documentRecord.path;
+                        const documentPath = documentRecord.path == null ? undefined :
+                            this.databaseFactory().uriFromDatabasePath( documentRecord.path, this );
 
                         if( documentPath == null ) {
                             throw new Error( "No path found in document data: " +  documentRecord );
                         }
 
-                        result.set(documentPath, documentRecord);
+                        result.set(documentPath, this.fromStoredRecord( documentRecord ));
                         
                     } catch (error) {
                         log.warn("Error reading document snapshot", error);
@@ -160,7 +166,7 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
             const databaseRecord = documentReference.data();
 
             //log.traceOut( "databaseRecord()", "read:", databaseDocument.referenceHandle().title);
-            return databaseRecord;
+            return this.fromStoredRecord( databaseRecord ) as any;
             
         } catch( error ) {
 
@@ -195,12 +201,37 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
     }
     
 
+    // Records are stored with database relative paths, while the dao layer always works with full paths.
+    protected toStoredRecord( documentRecord : DatabaseRecord ) : DatabaseRecord {
+
+        const path = documentRecord?.path as string | undefined;
+
+        if( path == null ) {
+            return documentRecord;
+        }
+
+        return { ...documentRecord,
+            path: this.databaseFactory().databasePathFromUri( path ) };
+    }
+
+    protected fromStoredRecord( documentRecord : DatabaseRecord ) : DatabaseRecord {
+
+        const path = documentRecord?.path as string | undefined;
+
+        if( path == null ) {
+            return documentRecord;
+        }
+
+        return { ...documentRecord,
+            path: this.databaseFactory().uriFromDatabasePath( path, this ) };
+    }
+
     async createDocumentRecord( uri : string, documentRecord : DatabaseRecord ): Promise<void> {
         
         log.traceIn( "createDocumentRecord()", uri );
 
         try {
-            await this.documentReference( uri ).set( documentRecord );
+            await this.documentReference( uri ).set( this.toStoredRecord( documentRecord ) );
 
             log.traceOut( "createDocumentRecord()", uri);
 
@@ -225,7 +256,7 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
                 return undefined;
             }
 
-            return documentRecord.data();
+            return this.fromStoredRecord( documentRecord.data() );
 
         } catch( error ) {
 
@@ -240,7 +271,7 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
         log.traceIn( "updateDocumentRecord()", uri );
 
         try {
-            await this.documentReference( uri ).set( documentRecord );
+            await this.documentReference( uri ).set( this.toStoredRecord( documentRecord ) );
 
             log.traceOut( "createDocumentRecord()", uri);
 
@@ -281,7 +312,9 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
 
     collectionReference( collectionDatabase : CollectionDatabase<DatabaseDocument> ) : any {
 
-        const rawCollectionReference = this._firebase.database().collection( collectionDatabase.path() );                
+        const path = this.databaseFactory().databasePathFromUri( collectionDatabase.path() );
+
+        const rawCollectionReference = this._firebase.database().collection( path );                
 
         return rawCollectionReference;
     }
@@ -290,7 +323,7 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
 
         //log.traceIn( "documentReference()", {uri});
 
-        const path = databaseServiceFactory!.get().databaseFactory.documentPathFromUri( uri );
+        const path = this.databaseFactory().databasePathFromUri( uri );
 
         const documentReference = this._firebase.database().doc( path ); 
 
@@ -307,7 +340,8 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
 
         //log.traceOut( "documentUri()", {databaseRecord?.path});
 
-        return databaseRecord?.path;
+        return databaseRecord?.path == null ? undefined :
+            this.databaseFactory().uriFromDatabasePath( databaseRecord.path, this );
     }
 
     protected databaseRecordQuery( database : Database<DatabaseDocument>, databaseFilters? : DatabaseFilter[] ) : any {
@@ -368,7 +402,7 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
             } 
             
             const ownerProperties = referenceDocument.properties( {
-                includePropertyTypes: [PropertyTypes.Owner as PropertyType]
+                includePropertyTypes: [PropertyTypes.Owner]
             } as PropertiesSelector ) as Map<string,OwnerProperty<DatabaseDocument>>;
 
             //log.debug( "databaseRecordQuery()", "read parent properties", organizationProperties.size );

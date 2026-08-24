@@ -8,7 +8,7 @@ export class BooleanPropertyImpl extends AbstractBasicProperty<boolean> implemen
     constructor( parent : DatabaseObject, type? : PropertyType, defaultValue? : boolean )
     {
         super( parent, type === PropertyTypes.Boolean || type === PropertyTypes.Confirmation ? type : 
-            PropertyTypes.Boolean as PropertyType, 
+            PropertyTypes.Boolean, 
             defaultValue );
 
         if( type != null && type !== PropertyTypes.Boolean && type !== PropertyTypes.Confirmation ) {

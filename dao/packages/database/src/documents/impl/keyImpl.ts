@@ -1,4 +1,4 @@
-import { InitialKeyVersion, KeyFormatName, KeyFormats, KeyStatus, KeyStatuses, KeyStatusName, KeyTypeName, KeyTypes, KeyVault, KeyVaultName, KeyVaults } from "@dao/security";
+import { InitialKeyVersion, KeyFormat, KeyFormatName, KeyFormats, KeyStatus, KeyStatuses, KeyStatusName, KeyType, KeyTypeName, KeyTypes, KeyVault, KeyVaultName, KeyVaults } from "@dao/security";
 import { GenericDatabaseDocument } from "../../core/impl/genericDatabaseDocument";
 import { CollectionDatabase } from "../../core/spec/collectionDatabase";
 import { User, UserDocumentName } from "../spec/user";
@@ -14,7 +14,7 @@ import { TextType, TextTypes } from "../../core/defs/textType";
 import { TextPropertyImpl } from "../../properties/impl/textPropertyImpl";
 import { DefinitionPropertyImpl } from "../../properties/impl/definitionPropertyImpl";
 import { NumberPropertyImpl } from "../../properties/impl/numberPropertyImpl";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 
 export class KeyImpl extends GenericDatabaseDocument implements Key {  
 
@@ -27,7 +27,7 @@ export class KeyImpl extends GenericDatabaseDocument implements Key {
 
             this.publicKey = new LongTextPropertyImpl( this ); 
 
-            this.secretKey = new TextPropertyImpl( this, TextTypes.Password as TextType ); 
+            this.secretKey = new TextPropertyImpl( this, TextTypes.Password ); 
 
             this.keyVault = new DefinitionPropertyImpl<KeyVault>( 
                 this, 

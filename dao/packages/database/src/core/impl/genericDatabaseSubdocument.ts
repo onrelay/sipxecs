@@ -9,8 +9,10 @@ import { CollectionGroupDatabase } from "../spec/collectionGroupDatabase";
 import { Database } from "../spec/database";
 import { CollectionProperty } from "../../properties/spec/collectionProperty";
 import { DatabaseAccess } from "./databaseAccess";
-import { log } from "../base/abstractDatabaseService";
+import { log } from "./genericDatabaseService";
 import { GenericDatabaseDocument } from "./genericDatabaseDocument";
+import { DatabaseManager } from "../spec/databaseManager";
+import { DatabaseFactory } from "../spec/databaseFactory";
 
 export abstract class GenericDatabaseSubdocument extends AbstractDatabaseObject implements DatabaseSubdocument {
 

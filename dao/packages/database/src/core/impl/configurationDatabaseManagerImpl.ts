@@ -1,12 +1,11 @@
 import { DatabaseRecord } from "../types/databaseRecord";
-import { ConfigurationManager } from "@dao/configuration";
 import { AbstractDatabaseManager } from "../base/abstractDatabaseManager";
-import { log } from "../base/abstractDatabaseService";
+import { log } from "./genericDatabaseService";
 import { CollectionDatabase } from "../spec/collectionDatabase";
 import { DatabaseDocument } from "../spec/databaseDocument";
 import { DatabaseAccess } from "./databaseAccess";
-import { databaseServiceFactory, DatabaseServiceFactory } from "./databaseServiceFactory";
-import { Observation, Observations } from "@dao/common";
+import { databaseServiceFactory } from "./databaseServiceFactory";
+import { Observations } from "@dao/common";
 import { Database } from "../spec/database";
 import { CollectionGroupDatabaseImpl } from "./collectionGroupDatabaseImpl";
 import { CollectionDatabaseImpl } from "./collectionDatabaseImpl";
@@ -18,13 +17,17 @@ import { DatabaseFilter } from "../types/databaseFilter";
 import { DocumentsDatabaseImpl } from "./documentsDatabaseImpl";
 import { Comparators } from "../defs/comparator";
 import { DatabaseTypes } from "../defs/databaseType";
+import { DatabasePlatforms } from "../defs/databasePlatform";
 
 export class ConfigurationDatabaseManagerImpl extends AbstractDatabaseManager implements ConfigurationDatabaseManager {
 
-    constructor( configurationManager : ConfigurationManager ) {
+    constructor() {
 
         super( { 
             clientEncryption: false,
+            useArchive: false,
+            nestedCollections: true,
+            collectionGroups: true,
             converter: new BasicDatabaseConverter() 
         } );
 
@@ -80,7 +83,7 @@ export class ConfigurationDatabaseManagerImpl extends AbstractDatabaseManager im
 
             await (collectionDatabase as CollectionDatabaseImpl<DatabaseDocument>).onNotify(
                 collectionDatabase, 
-                Observations.Create as Observation, 
+                Observations.Create, 
                 databaseDocument.uri(), 
                 databaseDocument);
 
@@ -98,7 +101,7 @@ export class ConfigurationDatabaseManagerImpl extends AbstractDatabaseManager im
 
             if( databaseDocument != null ) {
                 await (collectionDatabase as CollectionDatabaseImpl<DatabaseDocument>).onNotify(collectionDatabase, 
-                    Observations.Create as Observation, 
+                    Observations.Create, 
                     databaseDocument.uri(), 
                     databaseDocument);
             }
@@ -120,7 +123,7 @@ export class ConfigurationDatabaseManagerImpl extends AbstractDatabaseManager im
         for( const databaseDocument of databaseDocuments.values() ) {
 
             await (collectionGroupDatabase as CollectionGroupDatabaseImpl<DatabaseDocument>).onNotify(collectionGroupDatabase, 
-                Observations.Create as Observation, 
+                Observations.Create, 
                 databaseDocument.uri(), 
                 databaseDocument);
 
@@ -354,7 +357,7 @@ export class ConfigurationDatabaseManagerImpl extends AbstractDatabaseManager im
                 throw new Error( "Document path missing");
             }
 
-            const databaseDocument = await databaseServiceFactory!.get().databaseFactory.documentFromRecord( 
+            const databaseDocument = await this.databaseFactory().documentFromRecord( 
                 documentData.path, documentData ) as DatabaseDocument;
 
             if( databaseDocument == null ) {
@@ -403,7 +406,7 @@ export class ConfigurationDatabaseManagerImpl extends AbstractDatabaseManager im
     async configDocument( databaseDocumentPath: string) : Promise<DatabaseDocument | undefined> {
 
         const collectionDatabasePath =
-            databaseServiceFactory!.get().databaseFactory.collectionPathFromUri( databaseDocumentPath );
+            this.databaseFactory().collectionPathFromUri( databaseDocumentPath );
 
         if( collectionDatabasePath == null ) {
             return undefined;

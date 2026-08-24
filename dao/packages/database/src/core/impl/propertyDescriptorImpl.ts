@@ -1,6 +1,6 @@
 import { DatabaseRecord } from "../types/databaseRecord";
 import { MediaType, MediaTypeName, MediaTypes } from "@dao/storage";
-import { log } from "../base/abstractDatabaseService";
+import { log } from "./genericDatabaseService";
 import { GenericDatabaseSubdocument } from "./genericDatabaseSubdocument";
 import { DatabaseProperty } from "../spec/databaseProperty";
 import { DatabaseObject } from "../spec/databaseObject";

@@ -11,9 +11,9 @@ export const AuthenticationMethods = {
 
     Token : "token"
 
-}
+} as const
 
-export type AuthenticationMethod = keyof (typeof AuthenticationMethods); 
+export type AuthenticationMethod = (typeof AuthenticationMethods)[keyof typeof AuthenticationMethods]; 
 
 
 

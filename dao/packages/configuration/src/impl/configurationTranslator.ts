@@ -1,32 +1,46 @@
-import { log } from "@dao/common/src/application/application";
-import { Language } from "@dao/common/src/types/language";
-import { AbstractTranslator } from "@dao/common/src/translator/abstractTranslator";
+import { AbstractTranslator, Language, Languages } from "@dao/common";
 import { configurationServiceFactory } from "./configurationServiceFactory";
+import { log } from "./configurationServiceImpl";
 
+export const commonNamespace = "common";
+
+import commonEnTranslations from "../data/translations/common/common.en.json";
+import commonNbTranslations from "../data/translations/common/common.nb.json";
 
 export class ConfigurationTranslator extends AbstractTranslator { 
 
-        constructor( defaultLanguage : Language ) {
+    constructor( defaultLanguage : Language ) {
 
-        super();
-        
-        //log.traceIn( "constructor()");
-
-        try {
-            this._defaultLanguage = defaultLanguage;
-
-            //log.traceOut( "constructor()" );
-            
-        } catch( error ) {
-
-            log.warn( "Error initializing configuration database", error );
-            
-            throw new Error( (error as any).message );
-        }
+        super( commonNamespace, defaultLanguage );
     }
 
-    activeLanguage() : Language | undefined {
+    load() : void {
 
+        try {
+            super.load();
+
+            this.loadTranslations( {
+                translations: commonEnTranslations,
+                namespace: commonNamespace,
+                language: Languages.English
+            })
+
+            this.loadTranslations( {
+                translations: commonNbTranslations,
+                namespace: commonNamespace,
+                language: Languages.Norwegian
+            })
+
+        } catch( error ) {
+
+            log.warn( "Error loading configuration translator", error );
+            
+            throw new Error( "Error loading configuration translator" ); 
+        }
+    }
+    
+
+    activeLanguage() : Language | undefined {
         return this._activeLanguage;
     }
 
@@ -36,10 +50,6 @@ export class ConfigurationTranslator extends AbstractTranslator {
     }
 
 
-    defaultLanguage() : Language {
-        return this._defaultLanguage;
-    }
-
     loadTranslations( params: { 
         translations: any,
         namespace : string,
@@ -47,8 +57,8 @@ export class ConfigurationTranslator extends AbstractTranslator {
 
         try {            
             configurationServiceFactory!.get().load( 
-                params.translations!,
                 params.namespace!, 
+                params.translations!,
                 params.language );
 
         } catch (error) {
@@ -66,7 +76,8 @@ export class ConfigurationTranslator extends AbstractTranslator {
 
         try {   
 
-            if( params != null ) {
+            // only (re)load when actual translations are supplied, otherwise this is a plain lookup
+            if( params?.translations != null ) {
 
                 this.loadTranslations( {
                     translations: params.translations,
@@ -74,9 +85,13 @@ export class ConfigurationTranslator extends AbstractTranslator {
                     language: params.language
                 } );
             }
-                      
-            let translation = 
-                configurationServiceFactory!.get().config( params!.namespace!, key, params?.language );
+
+            const namespace = this.useNamespace( params?.namespace );
+
+            const language = this.useLanguage( params?.language );
+
+            const translation = 
+                configurationServiceFactory!.get().config( namespace, key, language );
 
             if( translation != null && typeof translation == "string" ) {
                 return translation;
@@ -95,6 +110,4 @@ export class ConfigurationTranslator extends AbstractTranslator {
 
 
     private _activeLanguage? : Language;
-
-    private readonly _defaultLanguage : Language;
 }

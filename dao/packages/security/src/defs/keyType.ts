@@ -6,6 +6,6 @@ export const KeyTypes = {
     Symmetric : "symmetric",
 
     Asymmetric : "asymmetric"
-}
+} as const
 
-export type KeyType = keyof (typeof KeyTypes);
+export type KeyType = (typeof KeyTypes)[keyof typeof KeyTypes];

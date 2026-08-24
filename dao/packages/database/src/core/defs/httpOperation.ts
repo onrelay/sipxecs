@@ -10,9 +10,9 @@ export const HttpOperations = {
 
     Update    : "UPDATE"
 
-}
+} as const
 
-export type HttpOperation = keyof (typeof HttpOperations); 
+export type HttpOperation = (typeof HttpOperations)[keyof typeof HttpOperations]; 
 
 
 

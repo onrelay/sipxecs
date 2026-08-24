@@ -56,7 +56,7 @@ export class ClientFirestoreDatabaseManager extends AbstractFirestoreDatabaseMan
                             const documentData = change.doc.data();
 
                             const databaseDocument =
-                                await databaseServiceFactory!.get().databaseFactory.documentFromRecord(
+                                await this.databaseFactory().documentFromRecord(
                                     documentPath, documentData ) as DatabaseDocument;
 
                             if (databaseDocument == null) {
@@ -68,15 +68,15 @@ export class ClientFirestoreDatabaseManager extends AbstractFirestoreDatabaseMan
 
                                 if (change.type === 'added') {
 
-                                    observation = Observations.Create as Observation;
+                                    observation = Observations.Create;
                                 }
                                 else if (change.type === 'modified') {
 
-                                    observation = Observations.Update as Observation;
+                                    observation = Observations.Update;
                                 }
                                 else if (change.type === 'removed') {
 
-                                    observation = Observations.Delete as Observation;
+                                    observation = Observations.Delete;
                                 }
                                 else {
                                     throw new Error("Unrecognized change type");
@@ -86,7 +86,7 @@ export class ClientFirestoreDatabaseManager extends AbstractFirestoreDatabaseMan
 
                                 result.set(databaseDocument.uri(), databaseDocument);
 
-                                if (changes.length === 1 || observation !== Observations.Create as Observation) {
+                                if (changes.length === 1 || observation !== Observations.Create) {
 
                                     if( databaseObserver?.onNotify != null ) {
 
@@ -110,7 +110,7 @@ export class ClientFirestoreDatabaseManager extends AbstractFirestoreDatabaseMan
                         if( databaseObserver?.onNotify != null ) {
                                             
                             databaseObserver.onNotify( this, 
-                                Observations.Create as Observation,
+                                Observations.Create,
                                 database.uri(),
                                 result );
                         }
@@ -236,7 +236,7 @@ export class ClientFirestoreDatabaseManager extends AbstractFirestoreDatabaseMan
                 await databaseDocument.read();
 
                 await collectionDatabase.notify( 
-                    Observations.Create as Observation, 
+                    Observations.Create, 
                     documentPath, 
                     databaseDocument );
 
@@ -259,7 +259,7 @@ export class ClientFirestoreDatabaseManager extends AbstractFirestoreDatabaseMan
                     }
 
                     const databaseDocument = 
-                        await databaseServiceFactory!.get().databaseFactory.documentFromRecord( 
+                        await this.databaseFactory().documentFromRecord( 
                             documentPath, documentData.data() ) as DatabaseDocument;
 
                     if( databaseDocument == null ) {
@@ -269,7 +269,7 @@ export class ClientFirestoreDatabaseManager extends AbstractFirestoreDatabaseMan
                     if( !hasInitialResult ) {
 
                         await collectionDatabase.notify( 
-                            Observations.Create as Observation, 
+                            Observations.Create, 
                             documentPath, 
                             databaseDocument );
 
@@ -277,7 +277,7 @@ export class ClientFirestoreDatabaseManager extends AbstractFirestoreDatabaseMan
                     }
                     else {
                         await collectionDatabase.notify( 
-                            Observations.Update as Observation, 
+                            Observations.Update, 
                             documentPath, 
                             databaseDocument );
                     }
@@ -286,7 +286,7 @@ export class ClientFirestoreDatabaseManager extends AbstractFirestoreDatabaseMan
                     log.warn( "("+collectionDatabase.collectionName()+")", "monitorDocument()", "snapshot", error );
 
                     await collectionDatabase.notify( 
-                        Observations.Delete as Observation, 
+                        Observations.Delete, 
                         documentPath, 
                         undefined );
                 } 

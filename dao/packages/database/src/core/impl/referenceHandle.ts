@@ -1,8 +1,10 @@
 import { DatabaseRecord } from "../types/databaseRecord";
 
-import { log } from "../base/abstractDatabaseService";
+import { log } from "./genericDatabaseService";
 import { DatabaseDocument } from "../spec/databaseDocument";
 import { databaseServiceFactory } from "./databaseServiceFactory";
+import { Database } from "../spec/database";
+import { DatabaseFactory } from "../spec/databaseFactory";
 
 export class ReferenceHandle<DerivedDocument extends DatabaseDocument> {
 
@@ -106,14 +108,15 @@ export class ReferenceHandle<DerivedDocument extends DatabaseDocument> {
             pathCompare;  
     }
 
-    async fetch( force? : boolean) : Promise<DerivedDocument> {
+    async load( databaseFactory : DatabaseFactory, force? : boolean) : Promise<DerivedDocument> {
 
         try {
 
             if( !!force || this.databaseDocument == null ) {
                 
                 this.databaseDocument = 
-                    await databaseServiceFactory!.get().databaseFactory.documentFromUri( this.path ) as DerivedDocument;
+                    await databaseFactory.documentFromUri( 
+                        this.path ) as DerivedDocument;
 
                 this.documentReference = this.databaseDocument.documentReference();
 

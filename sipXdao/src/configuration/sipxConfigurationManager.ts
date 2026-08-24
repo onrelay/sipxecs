@@ -1,13 +1,15 @@
-import { ApplicationConfigurationName, Environment, LoggingConfigurationName, Platform, Target, Targets } from "@dao/common";
+import { ApplicationConfigurationName } from "@dao/common";
+import { Environment, LoggingConfigurationName, Platform, Target, Targets } from "@dao/common";
 import { AbstractConfigurationManager } from "@dao/configuration";
-import { log, CollectionsConfigurationName, DatabaseConfigurationName } from "@dao/database";
+import { log, DatabasesConfigurationName } from "@dao/database";
 import { SecurityConfigurationName } from "@dao/security";
 
 import applicationConfiguration from "../data/config/application.json";
-import databaseConfiguration from "../data/config/database.json";
-import loggingConfiguration from "../data/config/logging.json";
+import databasesConfiguration from "../data/config/databases/databases.json";
 import securityConfiguration from "../data/config/security.json";
-import collectionsConfiguration from "../data/config/collections.json";
+
+import restSipxConfiguration from "../data/config/databases/rest.sipx.json";
+import mongoEntityConfiguration from "../data/config/databases/mongo.entity.json";
 
 export class SipxConfigurationManager extends AbstractConfigurationManager {
 
@@ -17,10 +19,12 @@ export class SipxConfigurationManager extends AbstractConfigurationManager {
 
         try {
             super.load( ApplicationConfigurationName, applicationConfiguration );
-            super.load( DatabaseConfigurationName, databaseConfiguration );
-            super.load( LoggingConfigurationName, loggingConfiguration );
             super.load( SecurityConfigurationName, securityConfiguration );
-            super.load( CollectionsConfigurationName, collectionsConfiguration );
+
+            super.load( DatabasesConfigurationName, databasesConfiguration );
+            super.load( "rest.sipx", restSipxConfiguration );
+            super.load( "mongo.entity", mongoEntityConfiguration );
+
 
         } catch( error ) {
 

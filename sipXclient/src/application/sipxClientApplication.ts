@@ -1,40 +1,84 @@
-import { Environment, Environments, Language, Languages, Logger, LoggerFactory, Platform, Platforms, Target, Targets, Translator } from "@dao/common";
-import { log } from "@dao/common/build/application/application";
-import { AbstractSipxApplication, SipxTranslator } from "@sipxdao";
+import { Context, Environments, log, Platforms, Target, Targets } from "@dao/common";
+import { authenticationServiceFactory, AuthenticationServiceFactory } from "@dao/authentication";
+import { configurationServiceFactory, ConfigurationServiceFactory } from "@dao/configuration";
+import { authorizationServiceFactory, AuthorizationServiceFactory, GenericAuthorizationService } from "@dao/authorization";
+import { GenericDatabaseFactory, GenericDatabaseService, DatabasePlatforms, DatabaseServiceFactory, databaseServiceFactory } from "@dao/database";
+import { SipxApplicationName, AbstractSipxApplication, SipxRestDatabaseManager, sipxRestDatabaseName, SipxTranslator } from "@sipxdao";
+import { SipxClientAuthenticationService } from "../authentication/sipxClientAuthenticationService";
 import { SipxClientConfigurationManager } from "../configuration/sipxClientConfigurationManager";
 
-export const SipxClientApplicationName = "sipxClient";
-
 const target = ( import.meta.env.VITE_TARGET ?? Targets.Production ) as Target;
+
+export const serverUrl = window.location.origin;
 
 export class SipxClientApplication extends AbstractSipxApplication {
 
     constructor() {
 
-        super( {
-            name: SipxClientApplicationName,
+        super( SipxApplicationName, {
 
-            environment: Environments.Client as Environment,
+            environment: Environments.Client,
 
-            platform: Platforms.Linux as Platform,
+            platform: Platforms.Linux,
 
             target: target,
 
-            configuration: new SipxClientConfigurationManager( target )
+            configuration: new SipxClientConfigurationManager( target ),
 
-        } );
+            translator: new SipxTranslator()
+
+        } as Context );
+
+        ConfigurationServiceFactory.create( this.context );
+
+        AuthorizationServiceFactory.create( 
+            new GenericAuthorizationService( this.context ) );
+
+        DatabaseServiceFactory.create( 
+            new GenericDatabaseService( this.context )
+        );
+
+        AuthenticationServiceFactory.create( 
+            new SipxClientAuthenticationService( this.context ) );
+
+        this.context.translator.load();
+
+        this.init();
+    }
+
+    async init(): Promise<void> {
 
         try {
+            await super.init();
 
-            this.translator = new SipxTranslator();
+            await configurationServiceFactory!.get().init();
+
+            await authorizationServiceFactory!.get().init();
+
+            await databaseServiceFactory!.get().init();
+
+            await databaseServiceFactory!.get().addDatabaseFactory(
+                new GenericDatabaseFactory(
+                    DatabasePlatforms.Rest,
+                    sipxRestDatabaseName,
+                    new SipxRestDatabaseManager( {
+                        baseUrl: serverUrl
+                    }))
+            )
+
+            await authenticationServiceFactory!.get().init();
+
+            log.traceInOut( "init()");
 
         } catch( error ) {
 
-            log.warn( "Error starting sipx client application", error );
+            log.warn( "Error initializing sipx client application", error );
             
-            throw new Error( "Error constructing config" ); 
+            throw new Error( "Error initializing sipx client application" ); 
         }
+
+        this.isInitialized = true;
     }
 
-    readonly translator : Translator;
+    isInitialized = false;
 }

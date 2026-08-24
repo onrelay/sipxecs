@@ -4,7 +4,7 @@ import { DataPropertyImpl } from "./dataPropertyImpl";
 import { DatabaseObject } from "../../core/spec/databaseObject";
 import { PropertyType } from "../../core/defs/propertyType";
 import { Monitor } from "@dao/common";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 
 const Factory = { get: () => ({ storageService: storageServiceFactory?.get() }) };
 

@@ -50,7 +50,17 @@ open_client() {
 		open -na "Google Chrome" --args "${CHROME_ARGS[@]}" "$VITE_URL"
 		echo "Chrome debugging: http://127.0.0.1:$CHROME_DEBUG_PORT"
 	else
-		open -a "Google Chrome" "$VITE_URL"
+		osascript - "$VITE_URL" <<'APPLESCRIPT'
+on run argv
+	tell application "Google Chrome"
+		if (count of windows) is 0 then
+			make new window
+		end if
+		set URL of active tab of front window to item 1 of argv
+		activate
+	end tell
+end run
+APPLESCRIPT
 	fi
 }
 

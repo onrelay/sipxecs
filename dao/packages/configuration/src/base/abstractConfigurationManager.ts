@@ -60,6 +60,10 @@ export abstract class AbstractConfigurationManager implements ConfigurationManag
                 }
             }
 
+            if( data == null ) {
+                throw new Error( "Invalid input data", configData );
+            }
+
             let targetData = data[this.target]; 
 
             if( targetData != null ) {
@@ -95,7 +99,8 @@ export abstract class AbstractConfigurationManager implements ConfigurationManag
             }
 
             if( genericData == null ) {
-                throw new Error( "Configuration item not found"); 
+                console.warn( "Configuration item not found", {key}, {language} );
+                return undefined; 
             }
 
             if( language != null && genericData[language] != null ) {
@@ -133,7 +138,7 @@ export abstract class AbstractConfigurationManager implements ConfigurationManag
 
         } catch (error) {
 
-            console.warn( "Error reading cached configuration", {configName}, {key}, {language}, error );
+            console.warn( "Error reading loaded configuration", {configName}, {key}, {language}, error );
 
             throw new Error( (error as any).message );
         }

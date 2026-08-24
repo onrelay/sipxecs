@@ -14,6 +14,21 @@ importers:
 
   packages/authentication:
     dependencies:
+      '@dao/authorization':
+        specifier: workspace:*
+        version: link:../authorization
+      '@dao/common':
+        specifier: workspace:*
+        version: link:../common
+      '@dao/configuration':
+        specifier: workspace:*
+        version: link:../configuration
+      '@dao/database':
+        specifier: workspace:*
+        version: link:../database
+
+  packages/authorization:
+    dependencies:
       '@dao/common':
         specifier: workspace:*
         version: link:../common
@@ -49,9 +64,9 @@ importers:
 
   packages/database:
     dependencies:
-      '@dao/authentication':
+      '@dao/authorization':
         specifier: workspace:*
-        version: link:../authentication
+        version: link:../authorization
       '@dao/common':
         specifier: workspace:*
         version: link:../common
@@ -67,15 +82,9 @@ importers:
 
   packages/security:
     dependencies:
-      '@dao/authentication':
-        specifier: workspace:*
-        version: link:../authentication
       '@dao/common':
         specifier: workspace:*
         version: link:../common
-      '@dao/configuration':
-        specifier: workspace:*
-        version: link:../configuration
     devDependencies:
       '@types/node':
         specifier: ^22.10.0

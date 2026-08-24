@@ -1,4 +1,4 @@
-import { KeyStatus, KeyVault } from "@dao/security";
+import { KeyFormat, KeyStatus, KeyType, KeyVault } from "@dao/security";
 import { DefinitionProperty } from "../../properties/spec/definitionProperty";
 import { LongTextProperty } from "../../properties/spec/LongTextProperty";
 import { NumberProperty } from "../../properties/spec/numberProperty";

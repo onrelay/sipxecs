@@ -1,42 +1,35 @@
-import { AbstractService, application, Environments, Logger, LoggerFactory } from "@dao/common";
-import { ConfigurationManager, configurationServiceFactory } from "@dao/configuration";
-import { authenticationServiceFactory } from "@dao/authentication";
+import { Context } from "@dao/common";
+import { AbstractService, Environment, Environments, Logger, LoggerFactory } from "@dao/common";
 import { KeyManager } from "../spec/keyManager";
 import { SecurityConfigurationName, SecurityService, SecurityServiceName } from "../spec/securityService";
 import { SymmetricCipher } from "../spec/symmetricCipher";
+import { SymmetricKey } from "../types/symmetricKey";
 
 export let log : Logger;
 
 export abstract class AbstractSecurityService extends AbstractService implements SecurityService {
 
-    constructor( configurationManager : ConfigurationManager) {
+    constructor( context : Context ) {
 
-        super();
-
-        //log.traceInOut("constructor()", target );
+        super( context );
 
         try {
-            log = LoggerFactory.logger( this.name ); 
 
-            this.configurationManager = configurationManager;
-
-            log.info("constructor()", "Application logger created", {log}); 
-        
         } catch (error) {
-            log.warn("constructor()", "Error constructing application service", error);
 
             throw new Error( (error as any).message ); 
         }
     }
 
-
     async init() : Promise<void> {
-
-        log.traceIn("init()" );
 
         try {
 
-            log.traceOut("init()" );
+            log = LoggerFactory.logger( this.name ); 
+
+            this.isInitialized = true;
+
+            log.traceInOut("init()" );
 
         } catch (error) {
             log.warn("init()", "Error initializing application service", error);
@@ -58,57 +51,55 @@ export abstract class AbstractSecurityService extends AbstractService implements
     }
 
 
-    async updateCurrentKeys() : Promise<void> {
+    async updateCurrentKeys( authId : string, defaultKey : SymmetricKey | null, key : SymmetricKey | null) : Promise<void> {
         
         try {
             //log.traceIn( "updateCurrentKeys()" );
 
-            const authenticatedEntity = authenticationServiceFactory?.get().authenticatedEntity;
-
             if( this.symmetricCipher.defaultKey() === undefined ) {
 
-                let defaultKey;
+                let useDefaultKey;
 
-                if( application!.environment === Environments.Client ) {
-                    defaultKey = authenticatedEntity?.claims.get("defaultKey");
+                if( defaultKey != null ) {
+
+                    useDefaultKey = defaultKey;
                 }
                 else {
-                    const defaultKeyId = configurationServiceFactory!.get().config(
+
+                    const defaultKeyId = this.context.configuration.config(
                         SecurityConfigurationName, "defaultKeyId")!;
     
-                    defaultKey = await this.keyManager?.symmetricKey( defaultKeyId );
+                    useDefaultKey = await this.keyManager?.symmetricKey( defaultKeyId );
                 }
 
-                this.symmetricCipher.setDefaultKey( defaultKey == null ? null : defaultKey );
+                this.symmetricCipher.setDefaultKey( useDefaultKey == null ? null : useDefaultKey );
 
-                log.debug( "updateCurrentKeys()", "updated default", defaultKey == null ? null : defaultKey.id) ;
+                log.debug( "updateCurrentKeys()", "updated default", useDefaultKey == null ? null : useDefaultKey.id) ;
             }
-
-            const authId = authenticatedEntity?.authId;
 
             //log.debug( "updateCurrentKeys()", {organizationId} );
 
             if( authId != null ) {
 
-                const key = this.symmetricCipher.key();
+                const currentKey = this.symmetricCipher.key();
 
                 //log.debug( "updateCurrentKeys()", "key", key?.id );
 
-                if( key === undefined || (key != null && key.id !== authId ) ) { 
+                if( currentKey === undefined || (currentKey != null && currentKey.id !== authId ) ) { 
 
-                    let key;
+                    let useKey;
 
-                    if( application!.environment === Environments.Client ) {
+                    if( key != null) {
 
-                        key = authenticatedEntity?.claims.get("key");
+                        useKey = key;
                     }
                     else {
-                        key = await this.keyManager?.symmetricKey( authId );
+                        useKey = await this.keyManager?.symmetricKey( authId );
                     }
 
-                    this.symmetricCipher.setKey( key == null ? null : key );
+                    this.symmetricCipher.setKey( useKey == null ? null : useKey );
 
-                    log.debug( "updateKeys()", "updated", key == null ? null : key.id ) ;
+                    log.debug( "updateKeys()", "updated", useKey == null ? null : useKey.id ) ;
                 }
             }
 
@@ -126,8 +117,6 @@ export abstract class AbstractSecurityService extends AbstractService implements
     }
 
     readonly name = SecurityServiceName;
-
-    readonly configurationManager: ConfigurationManager;
 
     readonly keyManager? : KeyManager;
 

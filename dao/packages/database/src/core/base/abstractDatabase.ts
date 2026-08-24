@@ -6,14 +6,17 @@ import { DatabaseAccess } from "../impl/databaseAccess";
 import { ReferenceHandle } from "../impl/referenceHandle";
 import { TemplatedDocument } from "../spec/templatedDocument";
 import { databaseServiceFactory } from "../impl/databaseServiceFactory";
-import { log } from "./abstractDatabaseService";
+import { log } from "../impl/genericDatabaseService";
 import { DatabaseType } from "../defs/databaseType";
+import { authorizationServiceFactory, AuthorizationTypes, NamespaceSeparator } from "@dao/authorization";
+import { DatabaseManager } from "../spec/databaseManager";
 
 
 export abstract class AbstractDatabase<DerivedDocument extends DatabaseDocument> 
     extends AbstractObservable implements Database<DerivedDocument> {
 
     constructor(
+        databaseManager : DatabaseManager,
         databaseType : DatabaseType,
         collectionName: string,
         queryDocumentName: string | undefined,
@@ -22,6 +25,8 @@ export abstract class AbstractDatabase<DerivedDocument extends DatabaseDocument>
         template? : Template<TemplatedDocument> ) {
 
         super();
+
+        this.databaseManager = databaseManager;
 
         this.databaseType = databaseType;
 
@@ -130,7 +135,7 @@ export abstract class AbstractDatabase<DerivedDocument extends DatabaseDocument>
     }
 
     protected documentCacheKeyFromUri( uri : string ) {
-        return databaseServiceFactory!.get().databaseFactory.uriToPath( uri )!;
+        return this.databaseManager.databaseFactory().uriToPath( uri )!;
     }
 
     databaseAccess() : DatabaseAccess {
@@ -139,7 +144,18 @@ export abstract class AbstractDatabase<DerivedDocument extends DatabaseDocument>
             return this._databaseAccess;
         }
 
-        return databaseServiceFactory!.get().databaseAccessor.databaseAccess( this.uri() );
+        const namespace = this.path()!.replaceAll( "/", NamespaceSeparator );
+        
+        const databaseAccess = new DatabaseAccess(
+                authorizationServiceFactory!.get().isAuthorized( AuthorizationTypes.List, namespace ),
+                authorizationServiceFactory!.get().isAuthorized( AuthorizationTypes.Create, namespace ),
+                authorizationServiceFactory!.get().isAuthorized( AuthorizationTypes.Read, namespace ),
+                authorizationServiceFactory!.get().isAuthorized( AuthorizationTypes.Update, namespace ),
+                authorizationServiceFactory!.get().isAuthorized( AuthorizationTypes.Delete, namespace )
+            );
+            
+        //log.traceInOut( "databaseAccess()", {databaseAccess} )
+        return databaseAccess;
     }
 
     setDatabaseAccess( databaseAccess : DatabaseAccess ) {
@@ -158,6 +174,8 @@ export abstract class AbstractDatabase<DerivedDocument extends DatabaseDocument>
 
     abstract document( documentPath: string ): Promise<DerivedDocument | undefined>;
 
+    readonly databaseManager : DatabaseManager;
+    
     readonly databaseType : DatabaseType;
     
     private _databaseAccess? : DatabaseAccess;

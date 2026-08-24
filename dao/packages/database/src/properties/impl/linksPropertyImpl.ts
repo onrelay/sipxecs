@@ -7,7 +7,7 @@ export class LinksPropertyImpl extends MapPropertyImpl<string> implements LinksP
 
     constructor( parent : DatabaseObject ) {
 
-        super( parent, PropertyTypes.Links as PropertyType ); 
+        super( parent, PropertyTypes.Links ); 
     }
 
     setLink( title : string, url : string ): void { 

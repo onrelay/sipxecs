@@ -1,0 +1,117 @@
+{
+    "defaultLogLevel": "trace",
+
+    "logLevel" : {
+
+        "application" : "warn",
+
+        "authentication" : "warn",
+
+        "authorization" : "warn",
+
+        "billing" : "warn",
+
+        "configuration" : "warn",
+
+        "database" : "warn",
+
+        "common" : "warn",
+        
+        "server" : "warn",
+
+        "messaging" : "warn",
+
+        "security" : "warn",
+
+        "storage" : "warn"
+    },
+    "emulator": {
+
+        "defaultLogLevel": "trace",
+
+        "logLevel" : {
+
+            "application" : "trace",
+
+            "authentication" : "trace",
+
+            "authorization" : "trace",
+
+            "billing" : "trace",
+
+            "common" : "trace",
+    
+            "configuration" : "trace",
+
+            "database" : "trace",
+                        
+            "server" : "trace",
+
+            "messaging" : "trace",
+
+            "security" : "trace",
+
+            "storage" : "trace"
+        }
+    },
+    "development": {
+
+        "defaultLogLevel": "trace",
+
+        "logLevel" : {
+
+            "application" : "trace",
+
+            "authentication" : "trace",
+
+            "authorization" : "trace",
+
+            "billing" : "trace",
+
+            "common" : "trace",
+    
+            "configuration" : "trace",
+
+            "database" : "trace",
+            
+            "firebase" : "trace",
+            
+            "server" : "trace",
+
+            "messaging" : "trace",
+
+            "security" : "trace",
+
+            "storage" : "trace"
+        }
+    },
+    "qa": {
+
+        "defaultLogLevel": "debug",
+
+        "logLevel" : {
+
+            "application" : "debug", 
+
+            "authentication" : "debug",
+
+            "authorization" : "debug",
+
+            "common" : "debug",
+
+            "billing" : "debug",
+
+            "configuration": "debug",
+
+            "database" : "debug",
+            
+            "server" : "debug",
+
+            "messaging" : "debug",
+
+            "security" : "debug",
+
+            "storage" : "debug"
+        }
+    }
+}

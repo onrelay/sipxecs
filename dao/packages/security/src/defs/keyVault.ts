@@ -6,6 +6,6 @@ export const KeyVaults = {
     Google : "google",
 
     Internal : "internal"
-}
+} as const
 
-export type KeyVault = keyof (typeof KeyVaults);
+export type KeyVault = (typeof KeyVaults)[keyof typeof KeyVaults];

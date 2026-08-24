@@ -1,4 +1,4 @@
-import { log } from "../base/abstractDatabaseService";
+import { log } from "./genericDatabaseService";
 import { GenericDatabaseSubdocument } from "./genericDatabaseSubdocument";
 import { DatabaseObject } from "../spec/databaseObject";
 import { TemplatedProperties, TemplatedPropertiesName } from "../spec/templatedProperties";

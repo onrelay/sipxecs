@@ -4,6 +4,7 @@ import { DatabaseDocument } from "./databaseDocument";
 import { ReferenceHandle } from "../impl/referenceHandle";
 import { DatabaseAccess } from "../impl/databaseAccess";
 import { DatabaseType } from "../defs/databaseType";
+import { DatabaseManager } from "./databaseManager";
 
 export interface Database<DerivedDocument extends DatabaseDocument>  extends AbstractObservable {
 
@@ -36,6 +37,8 @@ export interface Database<DerivedDocument extends DatabaseDocument>  extends Abs
     notifyMonitors( observation : Observation, databaseDocuments : Map<string,DerivedDocument> ) : Promise<void>;
 
     defaultDocumentName() : string;
+
+    readonly databaseManager : DatabaseManager;
 
     readonly databaseType : DatabaseType;
 

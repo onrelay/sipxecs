@@ -1,11 +1,13 @@
+import { Authorization } from "@dao/authorization";
 import { AuthenticatedEntityType } from "../defs/authenticatedEntityType";
 import { AuthenticationMethod } from "../defs/authenticationMethod";
+import { AuthenticationClaim } from "./authenticationClaim";
 
 export type AuthenticatedEntity = { 
 
-    scopes: string[];  
+    authorizations: Authorization[];  
 
-    claims: Map<string,any>; 
+    claims: Map<string,AuthenticationClaim>; 
 
     authenticationMethod: AuthenticationMethod;
 

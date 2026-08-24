@@ -4,7 +4,7 @@ import { AttachmentsProperty } from "../spec/attachmentsProperty";
 import { DatabaseObject } from "../../core/spec/databaseObject";
 import { PropertyType, PropertyTypes } from "../../core/defs/propertyType";
 import { Monitor } from "@dao/common";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 
 const Factory = { get: () => ({ storageService: storageServiceFactory?.get() }) };
 
@@ -12,7 +12,7 @@ export class AttachmentsPropertyImpl extends MapPropertyImpl<StorageMedia> imple
 
     constructor( parent : DatabaseObject, mediaType : MediaType ) {
 
-        super( parent, PropertyTypes.Attachments as PropertyType ); 
+        super( parent, PropertyTypes.Attachments ); 
 
         this.mediaType = mediaType; 
     }

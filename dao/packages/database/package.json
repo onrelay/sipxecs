@@ -19,8 +19,8 @@
   "license": "ISC",
   "packageManager": "pnpm@10.14.0",
   "dependencies": {
-    "@dao/authentication": "workspace:*",
     "@dao/common": "workspace:*",
+    "@dao/authorization": "workspace:*",
     "@dao/configuration": "workspace:*",
     "@dao/security": "workspace:*",
     "@dao/storage": "workspace:*"

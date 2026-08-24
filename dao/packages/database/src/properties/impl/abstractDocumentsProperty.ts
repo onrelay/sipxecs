@@ -14,7 +14,7 @@ import { Template } from "../../documents/spec/template";
 import { DatabaseAccess } from "../../core/impl/databaseAccess";
 import { databaseServiceFactory } from "../../core/impl/databaseServiceFactory";
 import { TemplatedDocument } from "../../core/spec/templatedDocument";
-import { log } from "../../core/base/abstractDatabaseService";
+import { log } from "../../core/impl/genericDatabaseService";
 import { TemplatesCollection } from "../../core/spec/databaseService";
 
 export abstract class AbstractDocumentsProperty<DerivedDocument extends DatabaseDocument> 
@@ -61,7 +61,8 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
     hasDocument( documentPath : string ) : boolean {
 
         const result = this.handles().has( 
-            databaseServiceFactory!.get().databaseFactory.uriToPath( documentPath )! ); 
+            this.databaseFactory().uriToPath( 
+                documentPath )! ); 
 
         //log.traceInOut( "hasDocument()", result );
         return result;
@@ -74,7 +75,9 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
 
             for( const handle of this.handles().values() ) {
 
-                const handleDocumentId = databaseServiceFactory!.get().databaseFactory.documentId( handle.uri )!;
+                const handleDocumentId = 
+                    this.databaseFactory().documentId( 
+                        handle.uri )!;
 
                 if( handleDocumentId === documentId ) {
                     return true;
@@ -149,7 +152,8 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
             //log.traceIn( "referenceHandle()",{documentPath} );
 
             const handle = this.handles().get(
-                databaseServiceFactory!.get().databaseFactory.uriToPath( documentPath )! );
+                this.databaseFactory().uriToPath( 
+                    documentPath )! );
 
             if (handle == null) {
                 //log.traceOut( "referenceHandles()", "not found' );
@@ -201,7 +205,9 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
             
             this.handles().forEach( handle => {
 
-                const documentId = databaseServiceFactory!.get().databaseFactory.documentId( handle.path )!;
+                const documentId = 
+                    this.databaseFactory().documentId( 
+                        handle.path )!;
 
                 result.push( documentId );
 
@@ -250,7 +256,8 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
             for( const handle of this.handles().values() ) {
             
                 const databaseDocument = 
-                    databaseServiceFactory!.get().databaseFactory.newDocumentFromUri( handle.path ) as DerivedDocument;
+                    this.databaseFactory().newDocumentFromUri( 
+                        handle.path ) as DerivedDocument;
 
                 if( databaseDocument == null ) {
 
@@ -287,7 +294,8 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
                 if ( databaseDocument == null) {
 
                     databaseDocument = 
-                        await databaseServiceFactory!.get().databaseFactory.documentFromUri( handle.path ) as DerivedDocument;
+                        await this.databaseFactory().documentFromUri( 
+                            handle.path ) as DerivedDocument;
 
                     if( databaseDocument != null ) {
 
@@ -324,7 +332,8 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
         try {
 
             let handle = this.handles().get( 
-                databaseServiceFactory!.get().databaseFactory.uriToPath( documentPath )! ) ;
+                this.databaseFactory().uriToPath( 
+                    documentPath )! ) ;
 
             if( handle == null ) {
                 //log.traceOut( "newDocument()", undefined );
@@ -332,11 +341,13 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
             }
         
             const databaseDocument = 
-                databaseServiceFactory!.get().databaseFactory.newDocumentFromUri( documentPath ) as DerivedDocument;
+                this.databaseFactory().newDocumentFromUri( 
+                    documentPath ) as DerivedDocument;
 
             if( databaseDocument == null ) {
                 this.handles().delete( 
-                    databaseServiceFactory!.get().databaseFactory.uriToPath( documentPath )! );
+                    this.databaseFactory().uriToPath( 
+                        documentPath )! );
 
                 //log.traceOut( "newDocument()", "not foune", undefined );
                 return undefined;
@@ -361,7 +372,8 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
         try {
 
             let handle = this.handles().get( 
-                databaseServiceFactory!.get().databaseFactory.uriToPath( documentPath )! ) ;
+                this.databaseFactory().uriToPath( 
+                    documentPath )! ) ;
 
             if( handle == null ) {
                 log.traceOut( "document()", undefined );
@@ -372,18 +384,21 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
             
             if( handle.databaseDocument == null ) {
 
-                databaseDocument = await databaseServiceFactory!.get().databaseFactory.documentFromUri( documentPath ) as DerivedDocument;
+                databaseDocument = 
+                    await this.databaseFactory().documentFromUri( 
+                        documentPath ) as DerivedDocument;
 
                 if( databaseDocument == null ) {
 
                     this.handles().delete( 
-                        databaseServiceFactory!.get().databaseFactory.uriToPath(documentPath )! );
+                        this.databaseFactory().uriToPath(
+                            documentPath )! );
 
                     throw new Error( "Reference not found with path: " + documentPath );
                 }
     
                 this.handles().set( 
-                    databaseServiceFactory!.get().databaseFactory.uriToPath( documentPath )!, 
+                    this.databaseFactory().uriToPath( documentPath )!, 
                     databaseDocument.referenceHandle() as ReferenceHandle<DerivedDocument> );
             }
             else {
@@ -423,7 +438,7 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
 
                 this._handles = newHandles;
 
-                super.notify( Observations.Create as Observation, referenceHandle.uri, referenceHandle );
+                super.notify( Observations.Create, referenceHandle.uri, referenceHandle );
 
                 this.updateDatabaseSubscription(); 
 
@@ -469,7 +484,7 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
 
             this._handles = newHandles;
 
-            super.notify( Observations.Create as Observation, this.parentDocument().path() + "/" + this.key(), referenceHandles );
+            super.notify( Observations.Create, this.parentDocument().path() + "/" + this.key(), referenceHandles );
 
             this.updateDatabaseSubscription();
 
@@ -494,13 +509,14 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
             const newHandles = new Map<string,ReferenceHandle<DerivedDocument>>( oldHandles );
 
             if( newHandles.delete( 
-                databaseServiceFactory!.get().databaseFactory.uriToPath( documentPath )! ) ) {
+                this.databaseFactory().uriToPath(
+                    documentPath )! ) ) {
 
                 if( this.onChange( oldHandles, newHandles ) ) {
 
                     this._handles = newHandles;
 
-                    super.notify( Observations.Delete as Observation, documentPath );
+                    super.notify( Observations.Delete, documentPath );
 
                     this.updateDatabaseSubscription();
 
@@ -534,7 +550,7 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
 
                     handles.clear();
 
-                    super.notify( Observations.Delete as Observation, this.parentDocument().path() + "/" + this.key() );
+                    super.notify( Observations.Delete, this.parentDocument().path() + "/" + this.key() );
 
                     this.updateDatabaseSubscription();
 
@@ -557,7 +573,7 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
 
             if( this.parentDocument().collectionDatabase.collectionName() === TemplatesCollection ) {
 
-                return databaseServiceFactory!.get().databaseFactory.newTemplatedDocument( 
+                return this.databaseFactory().newTemplatedDocument( 
                     this.parentDocument() as Template<TemplatedDocument> ) as DerivedDocument;
             }
 
@@ -661,7 +677,7 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
                     }
 
                     if( !!params?.fetch ) {
-                        await referenceHandle.fetch();
+                        await referenceHandle.load( source.databaseManager.databaseFactory() );
                     } 
 
                     result.set( referenceHandle.uri, referenceHandle )
@@ -758,7 +774,8 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
             const path = handle[0];
 
             if( !(other as AbstractDocumentsProperty<DerivedDocument>).handles().has( 
-                    databaseServiceFactory!.get().databaseFactory.uriToPath( path )! )  ) {
+                    this.databaseFactory().uriToPath( 
+                        path )! )  ) {
                 return 1;
             }
         }
@@ -845,7 +862,7 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
 
                 const result = await this.documents();
 
-                await newMonitor.onNotify( this, Observations.Create as Observation, this._sourceDatabase!.uri(), result  );
+                await newMonitor.onNotify( this, Observations.Create, this._sourceDatabase!.uri(), result  );
                 
             }
 
@@ -923,7 +940,8 @@ export abstract class AbstractDocumentsProperty<DerivedDocument extends Database
             switch (observation) {
                 case Observations.Create:
                     {
-                        if (databaseServiceFactory!.get().databaseFactory.isUriDatabase(objectId!)) {
+                        if (this.databaseFactory().isUriDatabase(
+                                objectId!)) {
 
                             const result = object as Map<string, DerivedDocument>;
 

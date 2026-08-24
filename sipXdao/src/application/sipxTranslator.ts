@@ -9,7 +9,6 @@ export class SipxTranslator extends ConfigurationTranslator {
         super( applicationConfiguration.defaultLanguage as Language );
 
         try {
-            // super.loadTranslations( );
 
         } catch( error ) {
 
