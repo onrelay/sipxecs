@@ -37,7 +37,6 @@ l: 0 \n\r
 // However to be tolerant of malformed messages we allow smaller:
 #define MINIMUM_SIP_MESSAGE_SIZE 30
 #define MAX_UDP_PACKET_SIZE (1024 * 64)
-const int SHUTDOWN_WAIT_TIME = 5000;
 
 // STATIC VARIABLE INITIALIZATIONS
 
@@ -63,8 +62,6 @@ SipClientTcp::SipClientTcp(OsSocket* socket,
 
 SipClientTcp::~SipClientTcp()
 {
-   // Tell the associated thread to shut itself down.
-   waitUntilShutDown(SHUTDOWN_WAIT_TIME);
 }
 
 /* ============================ MANIPULATORS ============================== */
