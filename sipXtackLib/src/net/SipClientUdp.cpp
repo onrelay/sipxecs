@@ -68,6 +68,8 @@ SipClientUdp::SipClientUdp(OsSocket* socket,
 
 SipClientUdp::~SipClientUdp()
 {
+   Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
+      "SipClientUdp::~ called");
 }
 
 /* ============================ MANIPULATORS ============================== */

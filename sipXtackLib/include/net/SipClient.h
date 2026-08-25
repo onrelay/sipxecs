@@ -84,9 +84,14 @@ public:
 
    UtlBoolean isSharedSocket( void ) const;
 
-   void touch();
-   //: Set the time when this client was last used
+   // Set the time when this client was last used
    // This is potentially used for garbage collection
+   void touch();
+
+  // Perform client shutdown: request task shutdown, wait for thread
+  // exit, and close/delete the socket.  
+  void shutdown();
+
 
 /* ============================ ACCESSORS ================================= */
 

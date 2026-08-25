@@ -63,6 +63,10 @@ SipClientTls::SipClientTls(OsSocket* socket,
 
 SipClientTls::~SipClientTls()
 {
+   Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
+            "SipClientTls::~ called");
+
+   shutdown();
 }
 
 /* ============================ MANIPULATORS ============================== */
