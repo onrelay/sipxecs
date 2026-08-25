@@ -46,6 +46,8 @@ build/
 _build
 *.class
 packages
+!dao/packages/
+!dao/packages/**
 !sipXdao/packages/
 !sipXdao/packages/**
 .packages

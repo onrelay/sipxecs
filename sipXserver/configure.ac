@@ -4,6 +4,5 @@ AM_INIT_AUTOMAKE(foreign subdir-objects tar-ustar)
 
 AC_CONFIG_FILES([
     Makefile
-    server/Makefile
 ])
 AC_OUTPUT

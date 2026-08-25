@@ -1,0 +1,23 @@
+{
+  "name": "@dao/server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.14.0",
+  "dependencies": {
+    "@dao/common": "workspace:*",
+    "@dao/configuration": "workspace:*",
+    "@dao/database": "workspace:*",
+    "mongodb": "^6.18.0"
+  },
+  "devDependencies": {
+  }
+}

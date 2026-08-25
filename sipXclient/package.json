@@ -1,0 +1,29 @@
+{
+  "name": "sipxclient",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:make": "SIPX_MAKE_BUILD=1 vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@dao/client": "link:../dao/packages/client",
+    "@dao/common": "link:../dao/packages/common",
+    "@dao/configuration": "link:../dao/packages/configuration",
+    "@dao/language": "link:../dao/packages/language",
+    "@sipxdao/sipx": "link:../sipXdao",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.2",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8"
+  }
+}

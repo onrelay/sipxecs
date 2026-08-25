@@ -1,0 +1,13 @@
+{
+  "name": "dao",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
+  "scripts": {
+    "build": "pnpm -r build",
+    "build:make": "for package in packages/*; do if [ -f \"$package/tsconfig.json\" ]; then pnpm exec tsc -p \"$package/tsconfig.json\" --outDir \"../build/dao/$(basename \"$package\")\"; fi; done",
+    "typecheck": "tsc -b packages/*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CLIENT_DIR="$(cd "$(dirname "$0")" && pwd)"
+CHROME_PROFILE="$CLIENT_DIR/.chrome-debug"
+CHROME_DEBUG_PORT="${SIPXCLIENT_CHROME_DEBUG_PORT:-9222}"
+
+cd "$CLIENT_DIR"
+pnpm install --no-frozen-lockfile
+pnpm build
+
+VITE_URL="http://127.0.0.1:5173/"
+
+open_client() {
+	if [[ "${SIPXCLIENT_ISOLATED_CHROME:-0}" == "1" ]]; then
+		CHROME_ARGS=(
+			"--remote-debugging-address=127.0.0.1"
+			"--remote-debugging-port=$CHROME_DEBUG_PORT"
+			"--user-data-dir=$CHROME_PROFILE"
+		)
+
+		if [[ "${SIPXCLIENT_OPEN_DEVTOOLS:-0}" == "1" ]]; then
+			CHROME_ARGS+=("--auto-open-devtools-for-tabs")
+		fi
+
+		open -na "Google Chrome" --args "${CHROME_ARGS[@]}" "$VITE_URL"
+		echo "Chrome debugging: http://127.0.0.1:$CHROME_DEBUG_PORT"
+	else
+		open -a "Google Chrome" "$VITE_URL"
+	fi
+}
+
+./node_modules/.bin/vite --host 127.0.0.1 --port 5173 --strictPort --debug "$@" &
+VITE_PID=$!
+
+cleanup() {
+	kill "$VITE_PID" 2>/dev/null || true
+}
+
+trap cleanup EXIT INT TERM
+
+for attempt in {1..30}; do
+	if curl --silent --fail "$VITE_URL" >/dev/null; then
+		open_client
+		break
+	fi
+	if ! kill -0 "$VITE_PID" 2>/dev/null; then
+		echo "Vite exited before starting at $VITE_URL" >&2
+		exit 1
+	fi
+	sleep 1
+done
+
+if ! curl --silent --fail "$VITE_URL" >/dev/null; then
+	echo "Vite did not become ready at $VITE_URL" >&2
+	exit 1
+fi
+
+wait "$VITE_PID"

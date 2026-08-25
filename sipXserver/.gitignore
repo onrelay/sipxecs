@@ -1,5 +1,2 @@
-build/
 node_modules/
-server/build/
-server/dist/
-server/node_modules/
+dist/

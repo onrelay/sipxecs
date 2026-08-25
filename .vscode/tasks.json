@@ -7,7 +7,7 @@
       "command": "./node_modules/.bin/vite",
       "args": ["--host", "127.0.0.1"],
       "options": {
-        "cwd": "${workspaceFolder}/sipXclient/webapp"
+        "cwd": "${workspaceFolder}/sipXclient"
       },
       "isBackground": true,
       "problemMatcher": []

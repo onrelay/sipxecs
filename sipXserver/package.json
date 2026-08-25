@@ -1,5 +1,28 @@
 {
   "name": "sipxserver",
+  "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.14.0"
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@dao/authentication": "link:../dao/packages/authentication",
+    "@dao/common": "link:../dao/packages/common",
+    "@dao/configuration": "link:../dao/packages/configuration",
+    "@dao/database": "link:../dao/packages/database",
+    "@dao/security": "link:../dao/packages/security",
+    "@dao/server": "link:../dao/packages/server",
+    "@sipxdao/sipx": "link:../sipXdao",
+    "@dao/storage": "link:../dao/packages/storage",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.2"
+  }
 }

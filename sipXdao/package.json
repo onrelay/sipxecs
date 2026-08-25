@@ -1,11 +1,20 @@
 {
-  "name": "sipxdao",
+  "name": "@sipxdao/sipx",
   "private": true,
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "type": "module",
   "packageManager": "pnpm@10.14.0",
   "scripts": {
-    "build": "pnpm -r build",
-    "build:make": "for package in packages/*; do if [ -f \"$package/tsconfig.json\" ]; then pnpm exec tsc -p \"$package/tsconfig.json\" --outDir \"../build/sipXdao/$(basename \"$package\")\"; fi; done",
-    "typecheck": "tsc -b packages/*"
+    "build": "tsc -p tsconfig.json",
+    "build:make": "pnpm exec tsc -p tsconfig.json --outDir ../build/sipXdao",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@dao/common": "link:../dao/packages/common",
+    "@dao/configuration": "link:../dao/packages/configuration",
+    "@dao/database": "link:../dao/packages/database"
   },
   "devDependencies": {
     "typescript": "^5.9.2"

@@ -1,0 +1,38 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build sipXclient locally",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"install",
+				"--no-audit",
+				"--no-fund",
+				"&&",
+				"npm",
+				"run",
+				"build"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Run sipXclient dev server",
+			"type": "shell",
+			"command": "./node_modules/.bin/vite",
+			"args": [
+				"--host",
+				"127.0.0.1"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/sipXclient"
+			},
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

@@ -1,0 +1,43 @@
+Name: @PACKAGE@
+Version: @VERSION@
+Release: @PACKAGE_REVISION@
+
+Summary: Generic TypeScript data-access libraries
+License: LGPL
+Group: Applications/Communications
+Vendor: SIPfoundry
+Url: http://www.sipfoundry.org
+BuildArch: noarch
+
+%define debug_package %{nil}
+
+BuildRequires: automake
+BuildRequires: nodejs
+BuildRequires: npm
+BuildRequires: rsync
+
+Source: %name-%version.tar.gz
+Prefix: %_prefix
+BuildRoot: %{_tmppath}/%name-%version-root
+
+%description
+Generic TypeScript data-access and API libraries.
+
+%prep
+%setup -q
+
+%build
+%configure --enable-rpmbuild @SIPX_RPM_CONFIGURE_OPTIONS@
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(644,root,root,755)
+%dir %attr(775,sipx,sipx) %{_localstatedir}/sipxdata/dao
+%{_localstatedir}/sipxdata/dao

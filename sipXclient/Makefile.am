@@ -1,11 +1,11 @@
-SUBDIRS = \
-	webapp
+BUILD_DIST = ../build/sipXclient/dist
 
-EXTRA_DIST = \
-	sipxclient.spec.in
+all-local :
+	cd $(srcdir) && pnpm install --no-frozen-lockfile
+	cd $(srcdir) && pnpm run build:make
 
-clientdir = @SIPX_VARDIR@/sipxclient
-BUILD_DIST = ../build/sipXclient/webapp/dist
+clean-local :
+	rm -rf $(BUILD_DIST) $(srcdir)/build $(srcdir)/node_modules
 
 install-data-hook :
 	$(INSTALL) -d -m 755 $(DESTDIR)$(clientdir)
