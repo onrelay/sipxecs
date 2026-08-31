@@ -221,7 +221,6 @@ SipClient::SipClient(OsSocket* socket,
 // Destructor
 SipClient::~SipClient()
 {
-
    // Delegate to shutdown() which is idempotent and may be
    // invoked earlier by derived destructors to ensure proper ordering.
    shutdown();
@@ -261,7 +260,6 @@ void SipClient::shutdown()
                       mClientSocket, OsSocket::ipProtocolString(mSocketType));
                               
             mClientSocket->close();
-
             delete mClientSocket;
          }
          mClientSocket = NULL;
@@ -440,9 +438,10 @@ long SipClient::getLastTouchedTime() const
 
 UtlBoolean SipClient::isOk()
 {
-  
-    
-   return OsServerTaskWaitable::isOk() && mClientSocket->isOk() && isNotShut();
+   return OsServerTaskWaitable::isOk() && 
+      mClientSocket != NULL &&
+      mClientSocket->isOk() && 
+      isNotShut();
 }
 
 bool SipClient::isWritable()
@@ -480,6 +479,8 @@ bool SipClient::isWritable()
         // in the next iteration because isOk() would now return false.
         //
         mClientSocket->close();
+        delete mClientSocket;
+        mClientSocket = NULL;
       }
     }
   }
@@ -565,7 +566,8 @@ UtlBoolean SipClient::isAcceptableForDestination( const UtlString& hostName, int
 
 const UtlString& SipClient::getLocalIp()
 {
-    return mClientSocket->getLocalIp();
+    return mClientSocket != NULL ? 
+      mClientSocket->getLocalIp() : mLocalHostAddress;
 }
 
 /* //////////////////////////// PROTECTED ///////////////////////////////// */
@@ -1436,13 +1438,13 @@ bool SipClient::preprocessMessage(SipMessage& msg,
 // Test whether the socket is ready to read. (Does not block.)
 UtlBoolean SipClient::isReadyToRead()
 {
-   return mClientSocket->isReadyToRead(0);
+   return mClientSocket != NULL && mClientSocket->isReadyToRead(0);
 }
 
 // Wait until the socket is ready to read (or has an error).
 UtlBoolean SipClient::waitForReadyToRead()
 {
-   return mClientSocket->isReadyToRead(-1);
+   return mClientSocket != NULL && mClientSocket->isReadyToRead(-1);
 }
 
 // Called by the thread to shut the SipClient down and signal its
