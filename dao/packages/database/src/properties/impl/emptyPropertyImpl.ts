@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { DatabaseObject } from "../../core/spec/databaseObject";
 import { EmptyProperty } from "../spec/emptyProperty";
@@ -18,9 +19,9 @@ export class EmptyPropertyImpl
     setValue( value: undefined ): void {
     }
 
-    fromRecord( data: Record<string, any>): void {}
+    fromRecord( data: DatabaseRecord): void {}
 
-    async toRecord( data: Record<string, any>, force? : boolean ) : Promise<void> {}
+    async toRecord( data: DatabaseRecord, force? : boolean ) : Promise<void> {}
 
     compareTo( other : EmptyProperty ) : number {
 

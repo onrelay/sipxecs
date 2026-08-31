@@ -1,3 +1,5 @@
+export { SipxRestDatabaseManager } from "@sipxdao";
+
 import express from 'express';
 
 const app = express();

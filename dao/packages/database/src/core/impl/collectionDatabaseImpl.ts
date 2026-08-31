@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../types/databaseRecord";
 import { Monitor, Observable, Observation, Observations } from "@dao/common";
 import { CollectionDatabase } from "../spec/collectionDatabase";
 import { DatabaseDocument } from "../spec/databaseDocument";
@@ -12,7 +13,7 @@ import { PropertyTypes } from "../defs/propertyType";
 import { TemplatedDocument } from "../spec/templatedDocument";
 import { configurationServiceFactory } from "@dao/configuration";
 import { databaseServiceFactory } from "./databaseServiceFactory";
-import { TemplatePathKey } from "../spec/databaseService";
+import { DatabaseConfigurationName, TemplatePathKey } from "../spec/databaseService";
 import { log } from "../base/abstractDatabaseService";
 import { ReferenceProperty } from "../../properties/spec/referenceProperty";
 import { DocumentsProperty } from "../../properties/spec/documentsProperty";
@@ -280,7 +281,7 @@ export class CollectionDatabaseImpl<DerivedDocument extends DatabaseDocument>
             log.traceIn( "("+this.collectionName()+")", "deleteDocument()", databaseDocument.uri() );
 
             const useArchive = configurationServiceFactory!.get().config( 
-                "database", "useArchive" );
+                DatabaseConfigurationName, "useArchive" );
 
             await databaseDocument.onDelete();
 
@@ -628,7 +629,7 @@ export class CollectionDatabaseImpl<DerivedDocument extends DatabaseDocument>
                 }
 
                 const cacheReleaseSeconds = +configurationServiceFactory!.get().config(
-                    "database", "cacheReleaseSeconds")!;
+                    DatabaseConfigurationName, "cacheReleaseSeconds")!;
 
                 if (isNaN(cacheReleaseSeconds)) {
                     throw new Error("Invalid cache release timeout: " + cacheReleaseSeconds);
@@ -695,13 +696,13 @@ export class CollectionDatabaseImpl<DerivedDocument extends DatabaseDocument>
     }
 
 
-    fromRecord( record : Record<string, any> ) : DerivedDocument {
+    fromRecord( record : DatabaseRecord ) : DerivedDocument {
 
         //log.traceIn( "("+this.collectionName()+")", "fromRecord()", data );
 
         try {
 
-            let databaseDocument = this.newDocument( record["id"] );
+            let databaseDocument = this.newDocument( record["id"] as string | undefined );
 
             databaseDocument.fromRecord( record );
     

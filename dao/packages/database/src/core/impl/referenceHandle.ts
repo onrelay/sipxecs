@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../types/databaseRecord";
 
 import { log } from "../base/abstractDatabaseService";
 import { DatabaseDocument } from "../spec/databaseDocument";
@@ -33,7 +34,7 @@ export class ReferenceHandle<DerivedDocument extends DatabaseDocument> {
         this.documentReference = handle.documentReference;
     }
 
-    toRecord() : Record<string, any> {
+    toRecord() : DatabaseRecord {
 
         const record = {
 
@@ -45,7 +46,7 @@ export class ReferenceHandle<DerivedDocument extends DatabaseDocument> {
 
             uri: this.uri
                 
-        } as Record<string, any>;
+        } as DatabaseRecord;
         
         return record
     }

@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../types/databaseRecord";
 import { ConfigurationManager } from "@dao/configuration";
 import { AbstractDatabaseManager } from "../base/abstractDatabaseManager";
 import { log } from "../base/abstractDatabaseService";
@@ -129,7 +130,7 @@ export class ConfigurationDatabaseManagerImpl extends AbstractDatabaseManager im
     async releaseCollectionGroup( collectionGroupDatabase : CollectionGroupDatabase<DatabaseDocument> ) : Promise<void> {
     }
 
-    async readDocumentRecord(uri: string): Promise<Record<string, any> | undefined> {
+    async readDocumentRecord(uri: string): Promise<DatabaseRecord | undefined> {
     
         const configDocument = await this.configDocument( uri );
 
@@ -140,7 +141,7 @@ export class ConfigurationDatabaseManagerImpl extends AbstractDatabaseManager im
         return typeof documentReference === "string" ? documentReference : undefined;
     }
 
-    async documentRecord( documentReference : any ): Promise<[string,Record<string, any>] | undefined> {
+    async documentRecord( documentReference : any ): Promise<[string,DatabaseRecord] | undefined> {
         const documentUri = this.documentUri( documentReference );
 
         if( documentUri == null ) {
@@ -170,7 +171,7 @@ export class ConfigurationDatabaseManagerImpl extends AbstractDatabaseManager im
 
     async documentRecords( 
             database : Database<DatabaseDocument>, 
-            databaseFilters? : DatabaseFilter[] ): Promise<Map<string,Record<string, any>>>  {
+            databaseFilters? : DatabaseFilter[] ): Promise<Map<string,DatabaseRecord>>  {
         
         log.traceIn( "("+database.collectionName()+")", "rawDatabaseDocuments()");
 
@@ -198,7 +199,7 @@ export class ConfigurationDatabaseManagerImpl extends AbstractDatabaseManager im
                 throw new Error( "Unrecognized database type");
             }
 
-            let result = new Map<string,Record<string, any>>;
+            let result = new Map<string,DatabaseRecord>;
 
             if( databaseMap == null ) {
 
@@ -314,11 +315,11 @@ export class ConfigurationDatabaseManagerImpl extends AbstractDatabaseManager im
         throw new Error("Config documents are read only");
     }
 
-    async createDocumentRecord(uri: string, documentRecord: Record<string, any>): Promise<void> {
+    async createDocumentRecord(uri: string, documentRecord: DatabaseRecord): Promise<void> {
         throw new Error("Config documents are read only");
     }
 
-    async updateDocumentRecord(uri: string, documentRecord: Record<string, any>): Promise<void> {
+    async updateDocumentRecord(uri: string, documentRecord: DatabaseRecord): Promise<void> {
         throw new Error("Config documents are read only");
     }
 

@@ -1,10 +1,9 @@
-import { AbstractService, application, Logger, LoggerFactory } from "@dao/common";
-import { SecurityService } from "../spec/securityService";
+import { AbstractService, application, Environments, Logger, LoggerFactory } from "@dao/common";
 import { ConfigurationManager, configurationServiceFactory } from "@dao/configuration";
-import { KeyManager } from "../spec/keyManager";
-import { SymmetricCipherImpl } from "../impl/symmetricCipherImpl";
 import { authenticationServiceFactory } from "@dao/authentication";
-import { Environments } from "@dao/common/src/application/environment";
+import { KeyManager } from "../spec/keyManager";
+import { SecurityConfigurationName, SecurityService, SecurityServiceName } from "../spec/securityService";
+import { SymmetricCipher } from "../spec/symmetricCipher";
 
 export let log : Logger;
 
@@ -75,7 +74,7 @@ export abstract class AbstractSecurityService extends AbstractService implements
                 }
                 else {
                     const defaultKeyId = configurationServiceFactory!.get().config(
-                        "security", "defaultKeyId")!;
+                        SecurityConfigurationName, "defaultKeyId")!;
     
                     defaultKey = await this.keyManager?.symmetricKey( defaultKeyId );
                 }
@@ -85,17 +84,17 @@ export abstract class AbstractSecurityService extends AbstractService implements
                 log.debug( "updateCurrentKeys()", "updated default", defaultKey == null ? null : defaultKey.id) ;
             }
 
-            const authenticationId = authenticatedEntity?.authenticationId;
+            const authId = authenticatedEntity?.authId;
 
             //log.debug( "updateCurrentKeys()", {organizationId} );
 
-            if( authenticationId != null ) {
+            if( authId != null ) {
 
                 const key = this.symmetricCipher.key();
 
                 //log.debug( "updateCurrentKeys()", "key", key?.id );
 
-                if( key === undefined || (key != null && key.id !== authenticationId ) ) { 
+                if( key === undefined || (key != null && key.id !== authId ) ) { 
 
                     let key;
 
@@ -104,7 +103,7 @@ export abstract class AbstractSecurityService extends AbstractService implements
                         key = authenticatedEntity?.claims.get("key");
                     }
                     else {
-                        key = await this.keyManager?.symmetricKey( authenticationId );
+                        key = await this.keyManager?.symmetricKey( authId );
                     }
 
                     this.symmetricCipher.setKey( key == null ? null : key );
@@ -126,14 +125,13 @@ export abstract class AbstractSecurityService extends AbstractService implements
         }
     }
 
-    readonly name = "security";
+    readonly name = SecurityServiceName;
 
     readonly configurationManager: ConfigurationManager;
 
     readonly keyManager? : KeyManager;
 
-    readonly symmetricCipher = new SymmetricCipherImpl();
+    abstract readonly symmetricCipher : SymmetricCipher;
 
 }
-
 

@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../types/databaseRecord";
 import { Language, Observable } from "@dao/common";
 import { PropertyType } from "../defs/propertyType";
 import { DatabaseDocument } from "./databaseDocument";
@@ -62,9 +63,9 @@ export interface DatabaseProperty<Value> extends Observable {
 
     validate() : Error | undefined;
 
-    fromRecord( documentRecord : Record<string, any> ) : void,
+    fromRecord( documentRecord : DatabaseRecord ) : void,
 
-    toRecord( documentRecord : Record<string, any>, force? : boolean ) : Promise<void>,
+    toRecord( documentRecord : DatabaseRecord, force? : boolean ) : Promise<void>,
 
     encrypted() : boolean
 }

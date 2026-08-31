@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../types/databaseRecord";
 import { AbstractObservable } from "@dao/common";
 import { DatabaseObject } from "../spec/databaseObject";
 import { PropertiesSelector } from "../types/propertiesSelector";
@@ -58,7 +59,7 @@ export abstract class AbstractDatabaseObject extends AbstractObservable implemen
     }
   }
 
-  fromRecord(record: Record<string, any>): void {
+  fromRecord(record: DatabaseRecord): void {
     //log.traceIn("fromRecord()", data);
 
     try {
@@ -87,11 +88,11 @@ export abstract class AbstractDatabaseObject extends AbstractObservable implemen
     }
   }
 
-  async toRecord( force? : boolean ): Promise<Record<string, any>> {
+  async toRecord( force? : boolean ): Promise<DatabaseRecord> {
     //log.traceIn("toRecord()", {force})
     try {
 
-      let record: Record<string, any> = {};
+      let record: DatabaseRecord = {};
 
       const properties = Object.values(this);
 

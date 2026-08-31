@@ -5,17 +5,22 @@
   "packageManager": "pnpm@10.14.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:make": "SIPX_MAKE_BUILD=1 vite build",
-    "preview": "vite preview"
+    "dev": "VITE_TARGET=development vite",
+    "dev:emulator": "VITE_TARGET=emulator vite",
+    "dev:development": "VITE_TARGET=development vite",
+    "dev:production": "VITE_TARGET=production vite",
+    "build": "VITE_TARGET=production vite build",
+    "build:development": "VITE_TARGET=development vite build",
+    "build:emulator": "VITE_TARGET=emulator vite build",
+    "build:make": "SIPX_MAKE_BUILD=1 VITE_TARGET=production vite build",
+    "preview": "VITE_TARGET=production vite preview"
   },
   "dependencies": {
     "@dao/client": "link:../dao/packages/client",
     "@dao/common": "link:../dao/packages/common",
     "@dao/configuration": "link:../dao/packages/configuration",
     "@dao/language": "link:../dao/packages/language",
-    "@sipxdao/sipx": "link:../sipXdao",
+    "@sipxdao": "link:../sipXdao",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

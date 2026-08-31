@@ -1,5 +1,11 @@
 import { LogLevel } from "./logLevel";
 
+export const LoggingConfigurationName = "logging";
+
+export const LogLevelConfigurationKey = "logLevel";
+
+export const DefaultLogLevelConfigurationKey = "defaultLogLevel";
+
 export interface Logger {
 
     readonly name : string,

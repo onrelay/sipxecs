@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { Observation, Observations } from "@dao/common";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { DatabaseDocument } from "../../core/spec/databaseDocument";
@@ -576,7 +577,7 @@ export class OwnerPropertyImpl<DerivedDocument extends DatabaseDocument>
     }
 
 
-    async toRecord( documentData: Record<string, any>, force? : boolean ) : Promise<void> {
+    async toRecord( documentData: DatabaseRecord, force? : boolean ) : Promise<void> {
 
         //log.traceIn( "toRecord()" );
 
@@ -617,7 +618,7 @@ export class OwnerPropertyImpl<DerivedDocument extends DatabaseDocument>
 
     }
 
-    fromRecord( documentData: Record<string, any>): void {
+    fromRecord( documentData: DatabaseRecord): void {
 
         //log.traceIn( "fromRecord()" );
 

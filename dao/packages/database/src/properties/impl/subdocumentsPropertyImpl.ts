@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { UniqueId } from "@dao/common";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { DatabaseObject } from "../../core/spec/databaseObject";
@@ -95,7 +96,7 @@ export class SubdocumentsPropertyImpl<DerivedSubdocument extends DatabaseSubdocu
         }
     }
 
-    fromRecord( documentData: Record<string, any>): void {
+    fromRecord( documentData: DatabaseRecord): void {
 
         if( this._map != null ) {
             delete this._map;
@@ -111,7 +112,7 @@ export class SubdocumentsPropertyImpl<DerivedSubdocument extends DatabaseSubdocu
 
             const key = entry[0];
 
-            const subdocumentData = entry[1] as Record<string, any>;
+            const subdocumentData = entry[1] as DatabaseRecord;
 
             const subdocument = this._onNewSubdocument();
 
@@ -125,7 +126,7 @@ export class SubdocumentsPropertyImpl<DerivedSubdocument extends DatabaseSubdocu
         }
     }
 
-    async toRecord( documentData: Record<string, any>, force? : boolean ) : Promise<void> {
+    async toRecord( documentData: DatabaseRecord, force? : boolean ) : Promise<void> {
 
         if( this._map == null || this._map.size === 0 ) {
             return;

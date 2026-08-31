@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../types/databaseRecord";
 import { MediaType, MediaTypeName, MediaTypes } from "@dao/storage";
 import { log } from "../base/abstractDatabaseService";
 import { GenericDatabaseSubdocument } from "./genericDatabaseSubdocument";
@@ -222,7 +223,7 @@ export class PropertyDescriptorImpl<Property extends DatabaseProperty<any>> exte
     }
 
 
-    fromRecord(record: Record<string, any>): void {
+    fromRecord(record: DatabaseRecord): void {
         log.traceIn("fromRecord()", record);
     
         try {

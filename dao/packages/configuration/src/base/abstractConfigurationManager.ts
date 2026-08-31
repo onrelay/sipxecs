@@ -117,9 +117,19 @@ export abstract class AbstractConfigurationManager implements ConfigurationManag
 
         try {
 
-            const configData = this._cache!.get( configName )!;
+            let configData
 
-            return this.parse( configData, key, language ); 
+            if( language != null ) {
+
+                configData = this._cache!.get( configName + "." + language );
+
+                if( configData != null ) {
+                    return this.parse( configData, key )!; 
+                }
+            } 
+
+            configData = this._cache!.get( configName )!;
+            return this.parse( configData, key, language )!; 
 
         } catch (error) {
 
@@ -129,10 +139,15 @@ export abstract class AbstractConfigurationManager implements ConfigurationManag
         }
     }
 
-    load( configName : string, configData : object ) : void {
+    load( configName : string, configData : object, language? : string ) : void {
        
         try {
-            this._cache.set( configName, configData );
+            if( language != null ) {
+                this._cache.set( configName + "." + language, configData );
+            }
+            else {
+                this._cache.set( configName, configData );
+            }
 
             // console.debug( "Added to cache:", {configName} );
 

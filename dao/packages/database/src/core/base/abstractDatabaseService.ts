@@ -1,12 +1,12 @@
 import { AbstractService, Logger, LoggerFactory, Monitor, Observable, Observation, Observations } from "@dao/common";
-import { DatabaseService } from "../spec/databaseService";
+import { DatabaseService, DatabaseServiceName } from "../spec/databaseService";
 import { databaseServiceFactory} from "../impl/databaseServiceFactory";
 import { DatabaseManager } from "../spec/databaseManager";
 import { DatabaseFactory } from "../spec/databaseFactory";
 import { DatabaseAccessor } from "../spec/databaseAccessor";
 import { ConfigurationManager } from "@dao/configuration";
-import { User } from "../../documents/spec/user";
 import { AuthenticatedEntity, authenticationServiceFactory, AuthenticationServiceFactory } from "@dao/authentication";
+import { Entity } from "../../documents/spec/entity";
 
 export let log : Logger;
 
@@ -78,9 +78,9 @@ export class AbstractDatabaseService extends AbstractService implements Database
             const authenticatedEntity = object as AuthenticatedEntity;
 
             const authenticatedDatabaseEntity = authenticatedEntity == null ? undefined :
-                await this.entityWithAuthenticationId(
+                await this.entityWithAuthId(
                     authenticatedEntity.authenticatedEntityCollectionName,
-                    authenticatedEntity.authenticationId
+                    authenticatedEntity.authId
                 );
 
             if( this._authenticatedDatabaseEntity != null && 
@@ -123,7 +123,7 @@ export class AbstractDatabaseService extends AbstractService implements Database
         try {
             log.traceIn("onNotifyAuthenticatedEntityUpdated()", Observations[observation], {objectId});
 
-            const authenticatedDatabaseEntity = object != null ? object as User : undefined;
+            const authenticatedDatabaseEntity = object != null ? object as Entity : undefined;
 
             if( this._authenticatedDatabaseEntity != null && authenticatedDatabaseEntity != null &&
                 databaseServiceFactory!.get().databaseFactory.equalUris( 
@@ -147,27 +147,27 @@ export class AbstractDatabaseService extends AbstractService implements Database
         return this._authenticatedEntity;
     }
 
-    authenticatedDatabaseEntity() : User | undefined {
+    authenticatedDatabaseEntity() : Entity | undefined {
 
         return this._authenticatedDatabaseEntity;
     }
 
 
-    protected async entityWithAuthenticationId( 
+    protected async entityWithAuthId( 
         entityCollectionName : string, 
-        authenticationId : string ) : Promise<User | undefined> {
+        authId : string ) : Promise<Entity | undefined> {
 
-        log.traceIn( "entityWithAuthenticationId()", authenticationId );
+        log.traceIn( "entityWithAuthId()", authId );
 
         const result = await this.databaseFactory.databaseManager.documentWithProperty( 
             this.databaseFactory.collectionGroupDatabaseFromCollectionName( entityCollectionName )!,
-            "authenticationId", authenticationId ) as User;
+            "authId", authId ) as Entity;
 
-        log.traceOut( "entityWithAuthenticationId()", result != null ? result.uri() : undefined  );
+        log.traceOut( "entityWithAuthId()", result != null ? result.uri() : undefined  );
         return result;
     }
 
-    readonly name = "database";
+    readonly name = DatabaseServiceName;
 
     isInitialized = false;
 
@@ -179,5 +179,5 @@ export class AbstractDatabaseService extends AbstractService implements Database
 
     private _authenticatedEntity? : AuthenticatedEntity;
 
-    private _authenticatedDatabaseEntity? : User;
+    private _authenticatedDatabaseEntity? : Entity;
 }

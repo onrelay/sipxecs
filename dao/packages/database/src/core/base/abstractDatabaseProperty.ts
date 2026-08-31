@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../types/databaseRecord";
 import { AbstractObservable, Language, Monitor, Observation, Observations } from "@dao/common";
 import { DatabaseProperty } from "../spec/databaseProperty";
 import { DatabaseObject } from "../spec/databaseObject";
@@ -7,7 +8,7 @@ import { DatabaseAccess } from "../impl/databaseAccess";
 import { log } from "./abstractDatabaseService";
 import { databaseServiceFactory, DatabaseServiceFactory } from "../impl/databaseServiceFactory";
 import { AbstractDatabaseObject } from "./abstractDatabaseObject";
-import { securityServiceFactory } from "@dao/security/src/api/securityServiceFactory";
+import { securityServiceFactory } from "@dao/security";
 
 export abstract class AbstractDatabaseProperty<Value> extends AbstractObservable implements DatabaseProperty<Value> {
 
@@ -408,9 +409,9 @@ export abstract class AbstractDatabaseProperty<Value> extends AbstractObservable
 
     abstract includesValue( value : any | undefined, matchAny? : boolean, translator? : ( value? : string ) => string | undefined ) : boolean;
 
-    abstract fromRecord( documentData : Record<string, any> ) : void; 
+    abstract fromRecord( documentData : DatabaseRecord ) : void; 
 
-    abstract toRecord( documentData : Record<string, any>, force? : boolean ) : Promise<void>;
+    abstract toRecord( documentData : DatabaseRecord, force? : boolean ) : Promise<void>;
 
     readonly type : PropertyType;
 

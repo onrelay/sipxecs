@@ -20,7 +20,7 @@ importers:
       '@dao/language':
         specifier: link:../dao/packages/language
         version: link:../dao/packages/language
-      '@sipxdao/sipx':
+      '@sipxdao':
         specifier: link:../sipXdao
         version: link:../sipXdao
       react:

@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../types/databaseRecord";
 import { Monitor, Observable, Observation } from "@dao/common";
 import { DatabaseDocument } from "../spec/databaseDocument";
 import { DateProperty } from "../../properties/spec/dateProperty";
@@ -1282,7 +1283,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
     }
 
 
-    fromRecord(record: Record<string,any>): void {
+    fromRecord(record: DatabaseRecord): void {
         //log.traceIn("fromRecord()", data);
 
         try {
@@ -1317,7 +1318,7 @@ export class GenericDatabaseDocument extends AbstractDatabaseObject implements D
         }
     }
 
-    async toRecord( force? : boolean ): Promise<Record<string, any>> {
+    async toRecord( force? : boolean ): Promise<DatabaseRecord> {
         log.traceIn("toRecord()", {force})
         try {
 

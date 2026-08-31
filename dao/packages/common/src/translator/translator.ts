@@ -1,25 +1,20 @@
 import { Language } from "../types/language";
 
-export type EntityLike = {
-  language: {
-    value(): Language | undefined;
-  };
-};
-
 export const defaultNamespace = "translation";
   
 export interface Translator  {
 
-    translations( params?: { 
-      namespace? : string, 
-      language? : Language } ) : Promise<any>,
+    loadTranslations( params: { 
+      translations : any, 
+      namespace : string,
+      language? : Language } ) : void,
 
-    exists(  key? : string, params?: { 
+    exists( key : string, params?: { 
       translations? : any, 
       namespace?: string,
       language? : Language } ) : boolean;
 
-    translate( key? : string, params?: { 
+    translate( key : string, params?: { 
       translations? : any, 
       namespace?: string,
       language? : Language } ) : string | undefined;
@@ -30,6 +25,6 @@ export interface Translator  {
 
     defaultLanguage() : Language;
 
-    language( entity? : EntityLike ) : Language;
+    useLanguage( language? : Language ) : Language;
 }
 

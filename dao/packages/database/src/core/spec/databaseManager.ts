@@ -1,3 +1,5 @@
+import { DatabaseRecord } from "../types/databaseRecord";
+import { DatabaseFilter } from "../types/databaseFilter";
 import { CollectionDatabase } from "./collectionDatabase";
 import { DatabaseDocument } from "./databaseDocument";
 import { ReferenceHandle } from "../impl/referenceHandle";
@@ -105,7 +107,21 @@ export interface DatabaseManager {
 
     expiredArchivedDocuments() : Promise<Map<string,DatabaseDocument>>;
 
-    documentRecord( documentReference : any ): Promise<[string,Record<string, any>] | undefined>;
+    documentRecords( 
+        database : Database<DatabaseDocument>, 
+        databaseFilters? : DatabaseFilter[] ): Promise<Map<string,DatabaseRecord>>; 
+
+    documentRecord( documentReference : any ): Promise<[string,DatabaseRecord] | undefined>;
+
+    newDocumentRecordId( collectionDatabase : CollectionDatabase<DatabaseDocument> ): Promise<string>; 
+    
+    createDocumentRecord( uri : string, documentRecord : DatabaseRecord ): Promise<void>; 
+
+    readDocumentRecord( uri : string ): Promise<DatabaseRecord | undefined>; 
+
+    updateDocumentRecord( uri : string, documentRecord : DatabaseRecord ): Promise<void>; 
+
+    deleteDocumentRecord( uri : string ): Promise<boolean>; 
 
     readonly converter : DatabaseConverter;
 

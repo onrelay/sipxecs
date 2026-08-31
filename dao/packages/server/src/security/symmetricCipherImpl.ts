@@ -1,9 +1,6 @@
 import * as Crypto from "node:crypto";
 import { configurationServiceFactory } from "@dao/configuration";
-import { log } from "../base/abstractSecurityService";
-import { SymmetricCipher } from "../spec/symmetricCipher";
-import { SymmetricKey } from "../types/symmetricKey";
-import { EncryptedRecord } from "../types/encryptedRecord";
+import { EncryptedRecord, log, SecurityConfigurationName, SymmetricCipher, SymmetricKey } from "@dao/security";
 
 
 
@@ -54,7 +51,7 @@ export class SymmetricCipherImpl implements SymmetricCipher {
         //log.traceIn( "newInitializationVector()")
         try {
             const initializationVectorLength = configurationServiceFactory!.get().config(
-                "security", "initializationVectorLength")!;
+                SecurityConfigurationName, "initializationVectorLength")!;
 
             let initializationVector = "";
 
@@ -83,10 +80,10 @@ export class SymmetricCipherImpl implements SymmetricCipher {
             }
 
             const algorithm = configurationServiceFactory!.get().config(
-                "security", "algorithm")!;
+                SecurityConfigurationName, "algorithm")!;
 
             const encoding = configurationServiceFactory!.get().config(
-                "security", "encoding")!; 
+                SecurityConfigurationName, "encoding")!; 
 
             const iv = this.newInitializationVector();
 
@@ -125,10 +122,10 @@ export class SymmetricCipherImpl implements SymmetricCipher {
             }
 
             const algorithm = configurationServiceFactory!.get().config(
-                "security", "algorithm")!;
+                SecurityConfigurationName, "algorithm")!;
 
             const encoding = configurationServiceFactory!.get().config(
-                "security", "encoding")!;
+                SecurityConfigurationName, "encoding")!;
 
             const encryptedData = JSON.parse( encryptedJson ) as EncryptedRecord;
 
@@ -244,5 +241,4 @@ export class SymmetricCipherImpl implements SymmetricCipher {
 
     private _encryptKeyValue? : string;
 }
-
 

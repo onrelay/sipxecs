@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { GenericDatabaseDocument } from "../../core/impl/genericDatabaseDocument";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { Database } from "../../core/spec/database";
@@ -22,7 +23,7 @@ export abstract class AbstractDocumentProperty<DerivedDocument extends DatabaseD
 
         try { 
 
-            if( reciprocalKey != null && !(parent instanceof GenericDatabaseDocument) ) {
+            if( reciprocalKey != null && parent.parent != null ) {
                 throw new Error( "Reciprocal keys can only be used for documents" );
             }
 
@@ -356,7 +357,7 @@ export abstract class AbstractDocumentProperty<DerivedDocument extends DatabaseD
     }
 
 
-    async toRecord( documentRecord: Record<string, any>, force? : boolean ) : Promise<void> {
+    async toRecord( documentRecord: DatabaseRecord, force? : boolean ) : Promise<void> {
         
         //log.traceIn( "toRecord()", this.key(), this._handle );
 
@@ -377,18 +378,25 @@ export abstract class AbstractDocumentProperty<DerivedDocument extends DatabaseD
         }
     }
 
-    fromRecord( documentRecord: Record<string, any>): void {
+    fromRecord( documentRecord: DatabaseRecord): void {
 
         //log.traceIn( "fromRecord()" );
 
         try {
             delete this._referenceHandle;
 
-            const documentReference = documentRecord[this.key()];
+            const documentReference = documentRecord[this.key()] as {
+                path?: string;
+                uri?: string;
+            };
 
             if( documentReference == null ) {
                 //log.traceIn( "fromRecord()", "empty" );
                 return;
+            }
+
+            if( documentReference.path == null || documentReference.uri == null ) {
+                throw new Error( "Invalid document reference" );
             }
 
             this._referenceHandle = new ReferenceHandle<DerivedDocument>({

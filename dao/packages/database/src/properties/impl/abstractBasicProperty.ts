@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { DatabaseObject } from "../../core/spec/databaseObject";
 import { BasicProperty } from "../spec/basicProperty";
@@ -48,19 +49,19 @@ export abstract class AbstractBasicProperty<BasicType extends string | number | 
     }
 
 
-    fromRecord( documentData: Record<string, any>): void {
+    fromRecord( documentData: DatabaseRecord): void {
 
         if( this.isEncryptedData( documentData[this.key()] ) ) {
 
             this.setEncryptedData( documentData[this.key()] );
         }
         else {
-            this._value = documentData[this.key()];
+            this._value = documentData[this.key()] as BasicType | undefined;
         }
     }
 
 
-    async toRecord( documentData: Record<string, any>, force? : boolean ) : Promise<void> {
+    async toRecord( documentData: DatabaseRecord, force? : boolean ) : Promise<void> {
 
         if( !!force ) {
             this.decryptData();

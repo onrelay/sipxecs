@@ -6,7 +6,7 @@ import { Template } from "../../documents/spec/template";
 import { AbstractDatabase } from "../base/abstractDatabase";
 import { ReferenceHandle } from "./referenceHandle";
 import { TemplatedDocument } from "../spec/templatedDocument";
-import { CollectionGroupPathSuffix, NewObjectId, TemplatePathKey } from "../spec/databaseService";
+import { CollectionGroupPathSuffix, DatabaseConfigurationName, NewObjectId, TemplatePathKey } from "../spec/databaseService";
 import { DatabaseDocumentNameKey } from "../spec/databaseDocument";
 import { databaseServiceFactory } from "./databaseServiceFactory";
 import { log } from "../base/abstractDatabaseService";
@@ -399,7 +399,7 @@ export class CollectionGroupDatabaseImpl<DerivedDocument extends DatabaseDocumen
             }
 
             const cacheReleaseSeconds = +configurationServiceFactory!.get().config(
-                "database", "cacheReleaseSeconds")!;
+                DatabaseConfigurationName, "cacheReleaseSeconds")!;
 
             if (isNaN(cacheReleaseSeconds)) {
                 throw new Error("Invalid cache release timeout: " + cacheReleaseSeconds);

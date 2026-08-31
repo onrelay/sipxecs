@@ -1,5 +1,5 @@
 import { Configuration } from "../types/configuration";
-import { Logger } from "./logger";
+import { DefaultLogLevelConfigurationKey, Logger, LoggingConfigurationName, LogLevelConfigurationKey } from "./logger";
 import { LogLevel } from "./logLevel";
 
 const initLogLevel = LogLevel.Warn as LogLevel;
@@ -28,7 +28,7 @@ export abstract class AbstractLogger implements Logger {
         if( AbstractLogger._configuration != null ) {
 
             const logLevel = AbstractLogger._configuration.config( 
-                "logging", "logLevel." + this.name )
+                LoggingConfigurationName, LogLevelConfigurationKey + "." + this.name )
     
             if( logLevel != null ) {            
                 this._logLevel = logLevel;
@@ -36,7 +36,7 @@ export abstract class AbstractLogger implements Logger {
             }
 
             const defaultLogLevel = AbstractLogger._configuration.config( 
-                "logging", "defaultLogLevel"  )
+                LoggingConfigurationName, DefaultLogLevelConfigurationKey  )
 
 
             if( defaultLogLevel != null ) {            

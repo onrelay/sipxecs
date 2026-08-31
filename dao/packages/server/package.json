@@ -16,8 +16,10 @@
     "@dao/common": "workspace:*",
     "@dao/configuration": "workspace:*",
     "@dao/database": "workspace:*",
+    "@dao/security": "workspace:*",
     "mongodb": "^6.18.0"
   },
   "devDependencies": {
+    "@types/node": "^22.10.0"
   }
 }

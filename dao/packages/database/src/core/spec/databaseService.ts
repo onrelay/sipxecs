@@ -2,8 +2,12 @@ import { Logger, Service } from "@dao/common";
 import { DatabaseFactory } from "./databaseFactory";
 import { DatabaseManager } from "./databaseManager";
 import { DatabaseAccessor } from "./databaseAccessor";
-import { User } from "../../documents/spec/user";
 import { AuthenticatedEntity } from "@dao/authentication";
+import { Entity } from "../../documents/spec/entity";
+
+export const DatabaseServiceName = "databaseService";
+
+export const DatabaseConfigurationName = "database";
 
 export const CollectionGroupPathSuffix = "-group";
 
@@ -17,6 +21,7 @@ export const IdsSuffix = "Ids";
 export const OwnerIds = "ownerIds";
 
 export const ChangesCollection = "changes";
+
 export const TemplatesCollection = "templates";
 
 
@@ -27,7 +32,7 @@ export interface DatabaseService extends Service {
 
     authenticatedEntity() : AuthenticatedEntity | undefined;
 
-    authenticatedDatabaseEntity() : User | undefined;
+    authenticatedDatabaseEntity() : Entity | undefined;
         
     readonly databaseFactory : DatabaseFactory;
 

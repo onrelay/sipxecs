@@ -7,6 +7,8 @@ import { Target } from "./target";
 import { Translator } from "../translator/translator";
 import { Configuration } from "../types/configuration";
 
+export const ApplicationConfigurationName = "application";
+
 export let application: Application | undefined;
 
 export function getApplication(): Application {

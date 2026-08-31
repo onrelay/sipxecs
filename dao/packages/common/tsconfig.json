@@ -4,5 +4,5 @@
     "rootDir": "src",
     "outDir": "build"
   },
-  "include": ["src/**/*.ts", "src/types/configuration.ts"]
+  "include": ["src/**/*.ts"]
 }

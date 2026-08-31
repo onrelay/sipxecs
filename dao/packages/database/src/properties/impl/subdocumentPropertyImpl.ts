@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { DatabaseObject } from "../../core/spec/databaseObject";
 import { DatabaseSubdocument } from "../../core/spec/databaseSubdocument";
@@ -43,7 +44,7 @@ export class SubdocumentPropertyImpl<DerivedSubdocument extends DatabaseSubdocum
         return this._subdocument;
     }
 
-    fromRecord( documentData: Record<string, any>): void {
+    fromRecord( documentData: DatabaseRecord): void {
 
         const data = documentData[this.key()];
 
@@ -51,16 +52,16 @@ export class SubdocumentPropertyImpl<DerivedSubdocument extends DatabaseSubdocum
 
             this._subdocument = this._onNewSubdocument();
 
-            this._subdocument.fromRecord( data );
+            this._subdocument.fromRecord( data as DatabaseRecord );
 
         }
         else if( this._subdocument != null  ) {
 
-            this._subdocument.fromRecord( data );
+            this._subdocument.fromRecord( data as DatabaseRecord );
         }
     }
 
-    async toRecord( documentData: Record<string, any>, force? : boolean ) : Promise<void> {
+    async toRecord( documentData: DatabaseRecord, force? : boolean ) : Promise<void> {
 
         documentData[this.key()] = await this._subdocument?.toRecord( force ); 
     }

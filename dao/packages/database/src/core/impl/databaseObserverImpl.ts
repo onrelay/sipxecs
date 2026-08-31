@@ -11,6 +11,7 @@ import { SortOrientations } from "../defs/sortOrientation";
 import { log } from "../base/abstractDatabaseService";
 import { configurationServiceFactory } from "@dao/configuration";
 import { databaseServiceFactory } from "./databaseServiceFactory";
+import { DatabaseConfigurationName } from "../spec/databaseService";
 
 export class DatabaseObserverImpl<DerivedDocument extends DatabaseDocument> 
     extends AbstractObservable implements DatabaseObserver<DerivedDocument> {
@@ -530,7 +531,7 @@ export class DatabaseObserverImpl<DerivedDocument extends DatabaseDocument>
             }
 
             const cacheReleaseSeconds = +configurationServiceFactory!.get().config(
-                "database", "cacheReleaseSeconds")!;
+                DatabaseConfigurationName, "cacheReleaseSeconds")!;
 
             if (isNaN(cacheReleaseSeconds)) {
                 throw new Error("Invalid cache release timeout: " + cacheReleaseSeconds);
@@ -805,7 +806,9 @@ export class DatabaseObserverImpl<DerivedDocument extends DatabaseDocument>
 
                         const propertyB = databaseDocumentB.property( databaseSortOrder.property )!;
 
-                        const compare = propertyA.compareTo( propertyB, translator?.translate );
+                        const compare = propertyA.compareTo( propertyB, 
+                            translator != null ? ( value? : string ) => 
+                                value != null ? translator.translate( value ) : undefined : undefined );
 
                         if( compare !== 0 ) {
 

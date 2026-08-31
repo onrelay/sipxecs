@@ -11,6 +11,8 @@ import { TemplatedProperties } from "./templatedProperties";
 import { DatabaseManager } from "./databaseManager";
 import { TemplatedDocument } from "./templatedDocument";
 
+export const CollectionsConfigurationName = "collections";
+
 export interface DatabaseFactory {
 
     documentId( uri : string ) : string | undefined;

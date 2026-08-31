@@ -15,7 +15,7 @@
     "@dao/database": "link:../dao/packages/database",
     "@dao/security": "link:../dao/packages/security",
     "@dao/server": "link:../dao/packages/server",
-    "@sipxdao/sipx": "link:../sipXdao",
+    "@sipxdao": "link:../sipXdao",
     "@dao/storage": "link:../dao/packages/storage",
     "express": "^4.21.2"
   },

@@ -1,6 +1,6 @@
-export { AbstractSecurityService } from "./base/abstractSecurityService"
+export { AbstractSecurityService, log } from "./base/abstractSecurityService"
 export { AbstractKeyManager } from "./base/abstractKeyManager"
-export { SecurityService } from "./spec/securityService"
+export { SecurityService, SecurityServiceName, SecurityConfigurationName } from "./spec/securityService"
 export { KeyManager, InitialKeyVersion } from "./spec/keyManager"
 export { SymmetricCipher } from "./spec/symmetricCipher"
 export { securityServiceFactory, SecurityServiceFactory } from "./impl/securityServiceFactory"

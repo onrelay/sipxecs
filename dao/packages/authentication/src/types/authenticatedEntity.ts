@@ -13,6 +13,6 @@ export type AuthenticatedEntity = {
 
     authenticatedEntityCollectionName : string;
 
-    authenticationId : string;
+    authId : string;
     
 };

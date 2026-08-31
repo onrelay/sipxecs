@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../types/databaseRecord";
 import { AbstractObservable, Monitor, Observation } from "@dao/common";
 import { DatabaseManager } from "../spec/databaseManager";
 import { DatabaseConverter } from "../spec/databaseConverter";
@@ -123,7 +124,7 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
 
             let storedDocumentData = await storedDocument.toRecord();
 
-            property.fromRecord( storedDocumentData[property.key() ] );
+            property.fromRecord( storedDocumentData[property.key()] as DatabaseRecord );
 
             log.traceOut( "("+collectionDatabase.collectionName()+")", "readProperty()" );
 
@@ -964,21 +965,21 @@ export abstract class AbstractDatabaseManager extends AbstractObservable impleme
 
     abstract documentRecords( 
         database : Database<DatabaseDocument>, 
-        databaseFilters? : DatabaseFilter[] ): Promise<Map<string,Record<string, any>>>; 
+        databaseFilters? : DatabaseFilter[] ): Promise<Map<string,DatabaseRecord>>; 
 
     abstract documentReference( uri : string ) : any | undefined;
 
     abstract documentUri( documentReference : any ) : string | undefined;
 
-    abstract documentRecord( documentReference : any ): Promise<[string,Record<string, any>] | undefined>;
+    abstract documentRecord( documentReference : any ): Promise<[string,DatabaseRecord] | undefined>;
 
     abstract newDocumentRecordId( collectionDatabase : CollectionDatabase<DatabaseDocument> ): Promise<string>; 
     
-    abstract createDocumentRecord( uri : string, documentRecord : Record<string, any>  ): Promise<void>; 
+    abstract createDocumentRecord( uri : string, documentRecord : DatabaseRecord  ): Promise<void>; 
 
-    abstract readDocumentRecord( uri : string ): Promise<Record<string, any> | undefined>; 
+    abstract readDocumentRecord( uri : string ): Promise<DatabaseRecord | undefined>; 
 
-    abstract updateDocumentRecord( uri : string, documentRecord : Record<string, any>  ): Promise<void>; 
+    abstract updateDocumentRecord( uri : string, documentRecord : DatabaseRecord  ): Promise<void>; 
 
     abstract deleteDocumentRecord( uri : string ): Promise<boolean>; 
 

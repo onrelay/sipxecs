@@ -92,9 +92,16 @@ importers:
       '@dao/database':
         specifier: workspace:*
         version: link:../database
+      '@dao/security':
+        specifier: workspace:*
+        version: link:../security
       mongodb:
         specifier: ^6.18.0
         version: 6.21.0
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.0
+        version: 22.20.1
 
   packages/storage:
     dependencies:

@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../types/databaseRecord";
 import { ConfigurationManager, configurationServiceFactory } from "@dao/configuration";
 import { DatabaseManager } from "../spec/databaseManager";
 import { CollectionGroupDatabase } from "../spec/collectionGroupDatabase";
@@ -8,7 +9,7 @@ import { CollectionDatabaseImpl } from "./collectionDatabaseImpl";
 import { log } from "../base/abstractDatabaseService";
 import { Template } from "../../documents/spec/template";
 import { TemplatedDocument } from "../spec/templatedDocument";
-import { DatabaseFactory } from "../spec/databaseFactory";
+import { CollectionsConfigurationName, DatabaseFactory } from "../spec/databaseFactory";
 import { CollectionGroupPathSuffix, TemplatePathKey } from "../spec/databaseService";
 import { Database } from "../spec/database";
 import { PropertyTypes } from "../defs/propertyType";
@@ -48,7 +49,7 @@ export class GenericDatabaseFactory implements DatabaseFactory {
 
             this.databaseManager = databaseManager;
 
-            const collectionsConfig = configurationServiceFactory!.get().config( "collections" ) as any;
+            const collectionsConfig = configurationServiceFactory!.get().config( CollectionsConfigurationName ) as any;
 
             for( const collectionConfigEntries of Object.entries( collectionsConfig ) ) {
 
@@ -694,7 +695,7 @@ export class GenericDatabaseFactory implements DatabaseFactory {
         }
     }
 
-    async documentFromRecord( uri: string, record: Record<string,any>): Promise<DatabaseDocument | undefined> {
+    async documentFromRecord( uri: string, record: DatabaseRecord): Promise<DatabaseDocument | undefined> {
 
         //log.traceIn("documentFromRecord()", data);
 
@@ -750,7 +751,7 @@ export class GenericDatabaseFactory implements DatabaseFactory {
 
                         if( templatedProperties != null ) {
 
-                            templatedProperties.fromRecord( record[templatedProperties.recordName()] );
+                            templatedProperties.fromRecord( record[templatedProperties.recordName()] as DatabaseRecord );
                         }
                     }
                 }
@@ -1024,7 +1025,7 @@ export class GenericDatabaseFactory implements DatabaseFactory {
                 if( collectionGroup == null ) {
 
                     const collectionConfig = 
-                        configurationServiceFactory!.get().config( "collections", collectionName ) as any;
+                        configurationServiceFactory!.get().config( CollectionsConfigurationName, collectionName ) as any;
 
                     if( !collectionConfig.rootCollection ) {
                         throw new Error( "Not a root collection: " + collectionName );
@@ -1058,7 +1059,7 @@ export class GenericDatabaseFactory implements DatabaseFactory {
 
                 if( collectionGroup == null ) {
 
-                    const collectionConfig = configurationServiceFactory!.get().config( "collections", collectionName ) as any;
+                    const collectionConfig = configurationServiceFactory!.get().config( CollectionsConfigurationName, collectionName ) as any;
 
                     collectionGroup = new CollectionGroupDatabaseImpl<DatabaseDocument>(
                         this.databaseManager, 
@@ -1126,7 +1127,7 @@ export class GenericDatabaseFactory implements DatabaseFactory {
                 if( collection == null ) {
 
                     const collectionConfig = 
-                        configurationServiceFactory!.get().config( "collections", collectionName ) as any;
+                        configurationServiceFactory!.get().config( CollectionsConfigurationName, collectionName ) as any;
 
                     if( !collectionConfig.rootCollection ) {
                         throw new Error( "Not a root collection: " + collectionName );
@@ -1161,7 +1162,7 @@ export class GenericDatabaseFactory implements DatabaseFactory {
                 if( collection == null ) {
 
                     const collectionConfig = 
-                        configurationServiceFactory!.get().config( "collections", collectionName ) as any;
+                        configurationServiceFactory!.get().config( CollectionsConfigurationName, collectionName ) as any;
 
                     collection = new CollectionDatabaseImpl<DatabaseDocument>(
                         this.databaseManager, 

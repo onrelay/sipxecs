@@ -7,6 +7,13 @@ import { CountryPropertyImpl } from "../../properties/impl/countryPropertyImpl";
 import { CountryProperty } from "../../properties/spec/countryProperty";
 import { Language, LanguageName, Languages } from "@dao/common";
 import { AbstractEntity } from "./abstractEntity";
+import { TextProperty } from "../../properties/spec/textProperty";
+import { PhoneNumberProperty } from "../../properties/spec/phoneNumberProperty";
+import { DateProperty } from "../../properties/spec/dateProperty";
+import { TextPropertyImpl } from "../../properties/impl/textPropertyImpl";
+import { TextType, TextTypes } from "../../core/defs/textType";
+import { PhoneNumberPropertyImpl } from "../../properties/impl/phoneNumberPropertyImpl";
+import { DatePropertyImpl } from "../../properties/impl/datePropertyImpl";
 
 export abstract class AbstractUser extends AbstractEntity implements User {  
 
@@ -18,10 +25,21 @@ export abstract class AbstractUser extends AbstractEntity implements User {
         super( userDocumentName, userCollection, documentPath );
 
         try {
+
             this.country = new CountryPropertyImpl( this );
             
             this.language = new DefinitionPropertyImpl<Language>( 
                 this, LanguageName, Languages );
+
+            this.email = new TextPropertyImpl( this, TextTypes.Email as TextType );
+
+            this.phoneNumber = new PhoneNumberPropertyImpl( this, this.country ); 
+
+            this.firstName = new TextPropertyImpl( this );
+
+            this.lastName = new TextPropertyImpl( this );
+
+            this.dateOfBirth = new DatePropertyImpl( this );
 
             //log.traceInOut( "constructor()", KeysCollection ); 
 
@@ -86,8 +104,19 @@ export abstract class AbstractUser extends AbstractEntity implements User {
             throw new Error( (error as any).message );
         }
     }
-    
+
     readonly country : CountryProperty;
 
-    readonly language : DefinitionProperty<Language>;    
+    readonly language : DefinitionProperty<Language>;   
+
+    readonly email : TextProperty;
+        
+    readonly phoneNumber : PhoneNumberProperty;
+    
+    readonly firstName : TextProperty;
+        
+    readonly lastName : TextProperty;
+    
+    readonly dateOfBirth : DateProperty;
+     
 }

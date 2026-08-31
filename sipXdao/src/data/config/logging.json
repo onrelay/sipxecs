@@ -3,19 +3,17 @@
 
     "logLevel" : {
 
-        "application" : "trace",
+        "application" : "warn",
 
-        "authentication" : "trace",
+        "authentication" : "warn",
 
         "billing" : "warn",
 
         "configuration" : "warn",
 
-        "database" : "trace",
+        "database" : "warn",
 
         "common" : "warn",
-
-        "firebase" : "warn",
         
         "server" : "warn",
 
@@ -44,6 +42,35 @@
             "configuration" : "trace",
 
             "database" : "trace",
+                        
+            "server" : "trace",
+
+            "messaging" : "trace",
+
+            "security" : "trace",
+
+            "storage" : "trace",
+
+            "ui" : "trace"
+        }
+    },
+    "development": {
+
+        "defaultLogLevel": "trace",
+
+        "logLevel" : {
+
+            "application" : "trace",
+
+            "authentication" : "trace",
+
+            "billing" : "trace",
+
+            "common" : "trace",
+    
+            "configuration" : "trace",
+
+            "database" : "debug",
             
             "firebase" : "trace",
             
@@ -58,66 +85,33 @@
             "ui" : "trace"
         }
     },
-    "development": {
+    "qa": {
 
         "defaultLogLevel": "debug",
 
         "logLevel" : {
 
-            "application" : "trace",
+            "application" : "debug", 
 
-            "authentication" : "trace",
+            "authentication" : "debug",
 
-            "billing" : "trace",
+            "common" : "debug",
 
-            "common" : "info",
-    
-            "configuration" : "info",
+            "billing" : "debug",
+
+            "configuration": "debug",
 
             "database" : "debug",
             
-            "firebase" : "info",
-            
-            "server" : "info",
+            "server" : "debug",
 
-            "messaging" : "info",
+            "messaging" : "debug",
 
-            "security" : "info",
+            "security" : "debug",
 
-            "storage" : "info",
+            "storage" : "debug",
 
-            "ui" : "trace"
-        }
-    },
-    "qa": {
-
-        "defaultLogLevel": "warn",
-
-        "logLevel" : {
-
-            "application" : "trace", 
-
-            "authentication" : "trace",
-
-            "common" : "info",
-
-            "billing" : "trace",
-
-            "configuration": "info",
-
-            "database" : "trace",
-
-            "firebase" : "info",
-            
-            "server" : "info",
-
-            "messaging" : "info",
-
-            "security" : "info",
-
-            "storage" : "info",
-
-            "ui" : "trace"
+            "ui" : "debug"
         }
     }
 }

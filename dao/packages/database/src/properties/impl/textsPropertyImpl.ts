@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { GenericDatabaseDocument } from "../../core/impl/genericDatabaseDocument";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { log } from "../../core/base/abstractDatabaseService";
@@ -139,7 +140,7 @@ export class TextsPropertyImpl extends AbstractDatabaseProperty<string[]> implem
         this._defaultValues = defaultValues != null ? Object.assign([], defaultValues) : undefined; 
     }
 
-    fromRecord( documentData: Record<string, any>): void {
+    fromRecord( documentData: DatabaseRecord): void {
 
         if( this.isEncryptedData( documentData[this.key()] ) ) {
 
@@ -151,7 +152,7 @@ export class TextsPropertyImpl extends AbstractDatabaseProperty<string[]> implem
         }
     }
 
-    async toRecord( documentData: Record<string, any>, force? : boolean ) : Promise<void> {
+    async toRecord( documentData: DatabaseRecord, force? : boolean ) : Promise<void> {
 
         if( !!force ) {
             this.decryptData();

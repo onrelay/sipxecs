@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { DataProperty } from "../spec/dataProperty";
 
@@ -34,7 +35,7 @@ export class DataPropertyImpl<Data extends Object> extends AbstractDatabasePrope
         }
     }
 
-    fromRecord( documentData: Record<string, any>): void {
+    fromRecord( documentData: DatabaseRecord): void {
 
         if( this.isEncryptedData( documentData[this.key()] ) ) {
 
@@ -48,7 +49,7 @@ export class DataPropertyImpl<Data extends Object> extends AbstractDatabasePrope
             }
             else if (typeof data === 'object' ) {
 
-                this._data = data;
+                this._data = data as Data;
             } 
             else if (typeof data === 'string') {
 
@@ -64,7 +65,7 @@ export class DataPropertyImpl<Data extends Object> extends AbstractDatabasePrope
         }
     }
 
-    async toRecord( documentData: Record<string, any>, force? : boolean ) : Promise<void> {
+    async toRecord( documentData: DatabaseRecord, force? : boolean ) : Promise<void> {
 
         if( !!force ) {
             this.decryptData();

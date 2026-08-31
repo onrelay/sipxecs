@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../types/databaseRecord";
 import { Observable } from "@dao/common";
 import { CollectionProperty } from "../../properties/spec/collectionProperty";
 import { TextProperty } from "../../properties/spec/textProperty";
@@ -94,9 +95,9 @@ export interface DatabaseObject extends Observable {
 
     setDatabaseAccess( databaseAccess : DatabaseAccess | undefined ) : void;
 
-    fromRecord( data : Record<string, any> ) : void,
+    fromRecord( data : DatabaseRecord ) : void,
 
-    toRecord( force? : boolean ) : Promise<Record<string, any>>, 
+    toRecord( force? : boolean ) : Promise<DatabaseRecord>, 
 
     toJson() : Promise<string>,
 

@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { GenericDatabaseDocument } from "../../core/impl/genericDatabaseDocument";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { log } from "../../core/base/abstractDatabaseService";
@@ -253,7 +254,7 @@ export class DefinitionsPropertyImpl<Definition extends string>
         return result.size === 0 ? undefined : result;  
     }
 
-    fromRecord( documentData: Record<string, any>): void {
+    fromRecord( documentData: DatabaseRecord): void {
 
         if( this.isEncryptedData( documentData[this.key()] ) ) {
 
@@ -269,6 +270,11 @@ export class DefinitionsPropertyImpl<Definition extends string>
 
             this._values = [];
             
+            if( !Array.isArray( data ) ) {
+                this._values = undefined;
+                return;
+            }
+
             data.forEach( (value : any) => {
                 if ( Object.values( this.definitions ).indexOf( value ) < 0 ) {
 
@@ -283,7 +289,7 @@ export class DefinitionsPropertyImpl<Definition extends string>
         }
     }
 
-    async toRecord( documentData: Record<string, any>, force? : boolean ) : Promise<void> {
+    async toRecord( documentData: DatabaseRecord, force? : boolean ) : Promise<void> {
 
         if( !!force ) {
             this.decryptData();

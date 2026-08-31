@@ -159,7 +159,7 @@ export abstract class AbstractPersistentState implements PersistentState {
         const authenticatedUser = authenticationServiceFactory?.get()?.authenticatedEntity;
 
         if (authenticatedUser != null) {
-            persistentStateKey += "." + authenticatedUser.authenticationId;
+            persistentStateKey += "." + authenticatedUser.authId;
         }
 
         if( key != null ) {

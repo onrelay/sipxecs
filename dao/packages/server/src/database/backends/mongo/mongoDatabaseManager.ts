@@ -10,6 +10,7 @@ import { AbstractDatabaseManager,
     DatabaseDocument, 
     DatabaseDocumentNameKey, 
     DatabaseFilter, 
+    DatabaseRecord,
     databaseServiceFactory, 
     DatabaseTypes, 
     IdSuffix, 
@@ -89,7 +90,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
         return documentReference as string;
     }
 
-    async documentRecord( documentReference : any ): Promise<[string,Record<string, any>] | undefined> {
+    async documentRecord( documentReference : any ): Promise<[string,DatabaseRecord] | undefined> {
 
         const documentRecord = await this.readDocumentRecord( documentReference as string );
 
@@ -116,7 +117,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
         };
     }
     
-    async createDocumentRecord( uri : string, documentRecord : Record<string, any> ): Promise<void> {
+    async createDocumentRecord( uri : string, documentRecord : DatabaseRecord ): Promise<void> {
         
         log.traceIn( "createDocumentRecord()", uri );
 
@@ -154,7 +155,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
         };
     }
 
-    async readDocumentRecord( uri : string ): Promise<Record<string, any> | undefined> {
+    async readDocumentRecord( uri : string ): Promise<DatabaseRecord | undefined> {
         
         //log.traceIn( "readDocumentRecord()", databaseDocumentPath);
 
@@ -196,7 +197,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
         }
     }
 
-    async updateDocumentRecord( uri : string, documentRecord : Record<string, any> ): Promise<void> {
+    async updateDocumentRecord( uri : string, documentRecord : DatabaseRecord ): Promise<void> {
         
         log.traceIn( "updateDocumentRecord()", uri );
 
@@ -266,7 +267,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
 
     async documentRecords( 
             database : Database<DatabaseDocument>, 
-            databaseFilters? : DatabaseFilter[] ): Promise<Map<string,Record<string, any>>>  {
+            databaseFilters? : DatabaseFilter[] ): Promise<Map<string,DatabaseRecord>>  {
         
         log.traceIn( "("+database.collectionName()+")", "documentRecords()");
 
@@ -276,7 +277,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
                 throw new Error( "permissionDenied" );
             }
 
-            let result = new Map<string,Record<string, any>>;
+            let result = new Map<string,DatabaseRecord>;
 
             const matches  = this.databaseRecordMatcher( database, databaseFilters );
 
@@ -442,7 +443,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
                         return;
                     }
 
-                    let databaseRecord : Record<string,any>;
+                    let databaseRecord : DatabaseRecord;
 
                     [uri, databaseRecord] = this.stripUri( bsonDocument );
 
@@ -658,7 +659,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
                         return;
                     }
 
-                    let databaseRecord : Record<string,any>;
+                    let databaseRecord : DatabaseRecord;
 
                     [uri, databaseRecord] = this.stripUri( bsonDocument );
 
@@ -769,7 +770,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
         }
     }
 
-        private includeUri( uri : string, documentRecord : Record<string,any> ) : BSON.Document {
+        private includeUri( uri : string, documentRecord : DatabaseRecord ) : BSON.Document {
 
         log.traceIn( "includeUri()", uri, documentRecord );
 
@@ -794,7 +795,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
         };
     }
 
-    private stripUri( bsonDocument : BSON.Document ) : [string,Record<string,any>] {
+    private stripUri( bsonDocument : BSON.Document ) : [string,DatabaseRecord] {
         
         log.traceIn( "stripUri()", bsonDocument );
 
@@ -819,7 +820,7 @@ export class MongoDatabaseManager extends AbstractDatabaseManager {
                 delete bsonDocument._query;
             }
 
-            const documentRecord = bsonDocument as Record<string,any>;
+            const documentRecord = bsonDocument as DatabaseRecord;
 
             log.traceOut( "stripUri()", documentRecord );
             return [uri, documentRecord];

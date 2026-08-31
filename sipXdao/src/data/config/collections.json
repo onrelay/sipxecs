@@ -1,9 +1,10 @@
 {
     "users" : {
         "rootCollection" : true,
-        "encrypted": true,
+        "queryDocumentName": "user",
+        "encrypted": false,
         "entity": true,
-        "templated": true,
-        "documents": ["User"]
+        "templated": false,
+        "documents": ["User","SipxUser"]
     }
 }

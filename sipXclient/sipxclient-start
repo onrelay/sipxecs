@@ -1,13 +1,37 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+TARGET="${1:-production}"
+shift || true
+
+case "$TARGET" in
+	emulator|development|production)
+		;;
+	*)
+		echo "Usage: $0 [emulator|development|production] [vite args...]" >&2
+		exit 1
+		;;
+esac
+
+export VITE_TARGET="$TARGET"
+
 CLIENT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CHROME_PROFILE="$CLIENT_DIR/.chrome-debug"
 CHROME_DEBUG_PORT="${SIPXCLIENT_CHROME_DEBUG_PORT:-9222}"
 
 cd "$CLIENT_DIR"
 pnpm install --no-frozen-lockfile
+
+ROOT_DIR="$(cd "$CLIENT_DIR/.." && pwd)"
+
+cd "$ROOT_DIR/dao"
 pnpm build
+
+cd "$ROOT_DIR/sipXdao"
+pnpm build
+
+cd "$CLIENT_DIR"
+VITE_TARGET="$TARGET" pnpm exec vite build
 
 VITE_URL="http://127.0.0.1:5173/"
 

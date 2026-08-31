@@ -1,5 +1,6 @@
 export { ClientFirestoreDatabaseManager } from "./database/backends/firestore/clientFirestoreDatabaseManager";
-export { ClientApiDatabaseManager } from "./database/backends/rest/clientApiDatabaseManager";
+export { ClientRestDatabaseManager } from "./database/backends/rest/clientRestDatabaseManager";
+export { ClientRestDatabaseTransport as ClientRestTransport } from "./database/backends/rest/clientRestDatabaseTransport";
 
 export { AbstractPersistentState } from "./persistentState/base/abstractPersistentState";
 export { PersistentState } from "./persistentState/spec/persistentState";

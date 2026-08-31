@@ -1,25 +1,26 @@
-import { Environment, Platform, Target } from "@dao/common";
+import { ApplicationConfigurationName, Environment, LoggingConfigurationName, Platform, Target, Targets } from "@dao/common";
 import { AbstractConfigurationManager } from "@dao/configuration";
+import { log, CollectionsConfigurationName, DatabaseConfigurationName } from "@dao/database";
+import { SecurityConfigurationName } from "@dao/security";
 
-import applicationConfiguration from "../data/config/application.json"
-import databaseConfiguration from "../data/config/database.json"
-import loggingConfiguration from "../data/config/logging.json"
-import securityConfiguration from "../data/config/security.json"
+import applicationConfiguration from "../data/config/application.json";
+import databaseConfiguration from "../data/config/database.json";
+import loggingConfiguration from "../data/config/logging.json";
+import securityConfiguration from "../data/config/security.json";
+import collectionsConfiguration from "../data/config/collections.json";
 
-import { log } from "../abstractSipxService";
+export class SipxConfigurationManager extends AbstractConfigurationManager {
 
-export class SipxConfigurationManager extends AbstractConfigurationManager  {
+    constructor( target: Target ) {
 
-    constructor() {
-
-        super(); 
+        super( target ); 
 
         try {
-
-            super.load( "application", applicationConfiguration );
-            super.load( "database", databaseConfiguration );
-            super.load( "logging", loggingConfiguration );
-            super.load( "security", securityConfiguration );
+            super.load( ApplicationConfigurationName, applicationConfiguration );
+            super.load( DatabaseConfigurationName, databaseConfiguration );
+            super.load( LoggingConfigurationName, loggingConfiguration );
+            super.load( SecurityConfigurationName, securityConfiguration );
+            super.load( CollectionsConfigurationName, collectionsConfiguration );
 
         } catch( error ) {
 

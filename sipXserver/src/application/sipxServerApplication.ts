@@ -1,5 +1,5 @@
 import { Configuration, Environment, Platform, Target } from "@dao/common";
-import { AbstractSipxApplication } from "@sipxdao/sipx";
+import { AbstractSipxApplication } from "@sipxdao";
 
 export abstract class SipxServerApplication extends AbstractSipxApplication {
 

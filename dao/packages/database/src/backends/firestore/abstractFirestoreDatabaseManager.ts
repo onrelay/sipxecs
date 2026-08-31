@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { AbstractDatabaseManager } from "../../core/base/abstractDatabaseManager";
 import { log } from "../../core/base/abstractDatabaseService";
 import { CollectionDatabase } from "../../core/spec/collectionDatabase";
@@ -100,7 +101,7 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
 
     async documentRecords( 
             database : Database<DatabaseDocument>, 
-            databaseFilters? : DatabaseFilter[] ): Promise<Map<string,Record<string, any>>>  {
+            databaseFilters? : DatabaseFilter[] ): Promise<Map<string,DatabaseRecord>>  {
         
         log.traceIn( "("+database.collectionName()+")", "rawDatabaseDocuments()");
 
@@ -110,7 +111,7 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
                 throw new Error( "permissionDenied" );
             }
 
-            let result = new Map<string,Record<string, any>>;
+            let result = new Map<string,DatabaseRecord>;
 
             const documentRecordSnapshots = (await this.databaseRecordQuery( database, databaseFilters ).get())?.docs as any[];
 
@@ -150,7 +151,7 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
         }
     }
 
-    async documentRecord( documentReference : any ): Promise<[string,Record<string, any>] | undefined> {
+    async documentRecord( documentReference : any ): Promise<[string,DatabaseRecord] | undefined> {
 
         //log.traceIn( "databaseRecord()", {databaseDocument});
 
@@ -194,7 +195,7 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
     }
     
 
-    async createDocumentRecord( uri : string, documentRecord : Record<string, any> ): Promise<void> {
+    async createDocumentRecord( uri : string, documentRecord : DatabaseRecord ): Promise<void> {
         
         log.traceIn( "createDocumentRecord()", uri );
 
@@ -211,7 +212,7 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
         };
     }
 
-    async readDocumentRecord( uri : string ): Promise<Record<string, any> | undefined> {
+    async readDocumentRecord( uri : string ): Promise<DatabaseRecord | undefined> {
         
         //log.traceIn( "readDocumentRecord()", databaseDocumentPath);
 
@@ -234,7 +235,7 @@ export abstract class AbstractFirestoreDatabaseManager extends AbstractDatabaseM
         }
     }
 
-    async updateDocumentRecord( uri : string, documentRecord : Record<string, any> ): Promise<void> {
+    async updateDocumentRecord( uri : string, documentRecord : DatabaseRecord ): Promise<void> {
         
         log.traceIn( "updateDocumentRecord()", uri );
 

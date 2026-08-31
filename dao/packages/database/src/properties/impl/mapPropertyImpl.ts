@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { GenericDatabaseDocument } from "../../core/impl/genericDatabaseDocument";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { log } from "../../core/base/abstractDatabaseService";
@@ -70,7 +71,7 @@ export class MapPropertyImpl<Data extends Object> extends AbstractDatabaseProper
  
     }
 
-    fromRecord( propertyData: Record<string, any>): void {
+    fromRecord( propertyData: DatabaseRecord): void {
 
         if( this.isEncryptedData( propertyData[this.key()] ) ) { 
 
@@ -94,7 +95,7 @@ export class MapPropertyImpl<Data extends Object> extends AbstractDatabaseProper
         }
     }
 
-    async toRecord( propertyData: Record<string, any>, force? : boolean ) : Promise<void> {
+    async toRecord( propertyData: DatabaseRecord, force? : boolean ) : Promise<void> {
 
         if( !!force ) {
             this.decryptData();

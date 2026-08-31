@@ -17,6 +17,9 @@ importers:
       '@dao/database':
         specifier: link:../dao/packages/database
         version: link:../dao/packages/database
+      '@dao/security':
+        specifier: link:../dao/packages/security
+        version: link:../dao/packages/security
     devDependencies:
       typescript:
         specifier: ^5.9.2

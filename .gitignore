@@ -61,3 +61,4 @@ build
 dist
 .turbo
 .cache
+.github/agents/sipx-dao.agent.md

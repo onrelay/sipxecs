@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { Monitor } from "@dao/common";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { DatabaseDocument } from "../../core/spec/databaseDocument";
@@ -100,9 +101,9 @@ export class CollectionPropertyImpl<DerivedDocument extends DatabaseDocument>
     }
 
 
-    fromRecord( documentData: Record<string, any>): void {}
+    fromRecord( documentData: DatabaseRecord): void {}
 
-    async toRecord( documentData: Record<string, any> ) : Promise<void> {}
+    async toRecord( documentData: DatabaseRecord ) : Promise<void> {}
 
     compareTo( other : CollectionProperty<DerivedDocument> ) : number {
         return this._collectionName.localeCompare( (other as CollectionPropertyImpl<DerivedDocument>)._collectionName );

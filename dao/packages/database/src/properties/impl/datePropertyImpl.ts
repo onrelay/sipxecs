@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { DatabaseConverter } from "../../core/spec/databaseConverter";
 import { DatabaseObject } from "../../core/spec/databaseObject";
@@ -61,7 +62,7 @@ export class DatePropertyImpl extends AbstractDatabaseProperty<Date> implements 
         this._defaultDate = defaultDate; 
     }
 
-    fromRecord( documentData: Record<string, any> ) : void {  
+    fromRecord( documentData: DatabaseRecord ) : void {  
 
         if( this.isEncryptedData( documentData[this.key()] ) ) {
 
@@ -81,7 +82,7 @@ export class DatePropertyImpl extends AbstractDatabaseProperty<Date> implements 
         }
     }
 
-    async toRecord( documentData: Record<string, any>, force? : boolean ) : Promise<void> {
+    async toRecord( documentData: DatabaseRecord, force? : boolean ) : Promise<void> {
 
         if( !!force ) {
             this.decryptData();

@@ -1,5 +1,5 @@
 {
-    "clientEncryption": true,
+    "clientEncryption": false,
 
     "algorithm" : "aes-256-cbc",
 
@@ -10,17 +10,17 @@
     "defaultKeyId" : "default-key",
 
     "emulator" : {
-        "clientEncryption": true,
+        "clientEncryption": false,
         
         "defaultKey": "0123456789abcdef0123456789abcdef"
 
     },
 
     "development" : {
-        "clientEncryption": true
+        "clientEncryption": false
     },
 
     "qa" : {
-        "clientEncryption": true 
+        "clientEncryption": false 
     }
 }

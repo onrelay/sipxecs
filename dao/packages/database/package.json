@@ -4,6 +4,12 @@
   "description": "",
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "default": "./build/index.js"
+    }
+  },
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json"

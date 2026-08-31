@@ -1,3 +1,4 @@
+import { DatabaseRecord } from "../../core/types/databaseRecord";
 import { AbstractDatabaseProperty } from "../../core/base/abstractDatabaseProperty";
 import { log } from "../../core/base/abstractDatabaseService";
 import { DatabaseDocument } from "../../core/spec/databaseDocument";
@@ -141,7 +142,7 @@ export class DefinitionPropertyImpl<Definition extends string>
         return result.size === 0 ? undefined : result;  
     }
 
-    fromRecord( documentData: Record<string, any>): void {
+    fromRecord( documentData: DatabaseRecord): void {
 
         if( this.isEncryptedData( documentData[this.key()] ) ) {
 
@@ -176,7 +177,7 @@ export class DefinitionPropertyImpl<Definition extends string>
         
     }
 
-    async toRecord( documentData: Record<string, any>, force? : boolean ) : Promise<void> {
+    async toRecord( documentData: DatabaseRecord, force? : boolean ) : Promise<void> {
 
         if( !!force ) {
             this.decryptData();
