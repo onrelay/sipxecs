@@ -53,7 +53,6 @@ OsTaskLinux::OsTaskLinux(const UtlString& name,
 // Destructor
 OsTaskLinux::~OsTaskLinux()
 {
-   waitUntilShutDown();
 }
 
 UtlBoolean OsTaskLinux::initialize(void *pArg)

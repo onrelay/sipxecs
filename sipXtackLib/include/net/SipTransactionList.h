@@ -16,6 +16,7 @@
 
 // APPLICATION INCLUDES
 #include <utl/UtlHashBag.h>
+#include <utl/UtlSList.h>
 
 #include <net/SipTransaction.h>
 
@@ -83,7 +84,7 @@ public:
     void markAvailable(SipTransaction& transaction);
     //: Marks the transaction as available
 
-    void removeOldTransactions(long oldTransaction,
+    bool removeOldTransactions(long oldTransaction,
                                long oldTcpTransaction);
     //: Remove transactions not accessed after given time
 
@@ -125,7 +126,11 @@ protected:
     //:Assignment operator
 
     UtlHashBag mTransactions;
+    UtlSList mDeleteTransactions;
+    UtlSList mSignalAllTransactions;
+
     OsMutex mListMutex;
+    
     SipUserAgent* mpSipUserAgent;
 
     //

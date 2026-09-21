@@ -11,6 +11,7 @@
 #define _OsServerTaskWaitable_h_
 
 // SYSTEM INCLUDES
+#include <atomic>
 
 // APPLICATION INCLUDES
 #include "os/OsDefs.h"
@@ -74,7 +75,12 @@ public:
     *  Return FALSE if creating the object has failed.  (That is, the pipe
     *  could not be opened.)
     */
-   UtlBoolean isOk(void) const;
+   virtual UtlBoolean isOk(void) const;
+
+   /** 
+    * Closes sockets
+    */
+   virtual void shutdown();
 
 /* //////////////////////////// PROTECTED ///////////////////////////////// */
 protected:
@@ -100,8 +106,8 @@ protected:
    // These are set to -1 if opening the pipe failed.  The OsServerTaskWaitable
    // is not usable and should be destroyed.  isOk() returns FALSE in this
    // circumstance.
-   int mPipeReadingFd;
-   int mPipeWritingFd;
+   std::atomic<int> mPipeReadingFd;
+   std::atomic<int> mPipeWritingFd;
 
 /* //////////////////////////// PRIVATE /////////////////////////////////// */
 private:

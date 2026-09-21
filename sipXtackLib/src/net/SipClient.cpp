@@ -218,51 +218,39 @@ SipClient::SipClient(OsSocket* socket,
    }
 }
 
-// Destructor
 SipClient::~SipClient()
 {
-   // Delegate to shutdown() which is idempotent and may be
-   // invoked earlier by derived destructors to ensure proper ordering.
-   shutdown();
+   if(mClientSocket)
+   {
+      if (!mbSharedSocket)
+      {
+         Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "SipClient[%s]::~ %p socket %p closing %s socket",
+                     mName.data(), 
+                     this,
+                     mClientSocket, 
+                     OsSocket::ipProtocolString(mSocketType));
+                           
+         mClientSocket->close();
+         delete mClientSocket;
+      }
+      mClientSocket = NULL;
+   }
 }
+
 
 void SipClient::shutdown()
 {
-   // Only perform shutdown once: if the task is still not shut
-   // then request shutdown and wait for thread exit.
    if (isNotShut())
    {
       Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
             "SipClient[%s]::shutdown requested",
             mName.data());
-      // Tell the associated thread to shut itself down.
+
       requestShutdown();
 
-      // Wait for the task to exit so that it does not
-      // reference the socket or other members after they
-      // get deleted.
       if(isStarted() || isShuttingDown())
       {
         waitUntilShutDown();
-      }
-
-      // Free the socket
-      if(mClientSocket)
-      {
-         // Close the socket to unblock the run method
-         // in case it is blocked in a waitForReadyToRead or
-         // a read on the mClientSocket.  This should also
-         // cause the run method to exit.
-         if (!mbSharedSocket)
-         {
-            Os::Logger::instance().log(FAC_SIP, PRI_DEBUG, "SipClient[%s]::shutdown %p socket %p closing %s socket",
-                      mName.data(), this,
-                      mClientSocket, OsSocket::ipProtocolString(mSocketType));
-                              
-            mClientSocket->close();
-            delete mClientSocket;
-         }
-         mClientSocket = NULL;
       }
    }
 }

@@ -62,6 +62,7 @@ SipProtocolServerBase::~SipProtocolServerBase()
    /* We do not seize mClientLock because the caller of a destructor has
     * to ensure single-threaded access anyway. */
    mClientList.destroyAll();
+   mDeleteClientList.destroyAll();
 
    // mServerSocketMap entries are removed rather than destroyed because
    // the keys are owned by mServerPortMap and the values are OsSocket's
@@ -85,10 +86,9 @@ UtlBoolean SipProtocolServerBase::handleMessage(OsMsg& eventMessage)
    if(msgType == OsMsg::OS_EVENT &&
       msgSubType == SipProtocolServerBase::SIP_SERVER_GC)
    {
-      // A client signals that it is closing down and so clients should
-      // be garbage-collected.
-      // Remove only clients that have shut down.
-      removeOldClients(0);
+      Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
+            "SipProtocolServerBase[%s]::handleMessage processed server close",
+            getName().data());
       messageProcessed = TRUE;
    }
 
@@ -367,6 +367,8 @@ void SipProtocolServerBase::deleteClient(SipClient* sipClient)
                     getName().data(), sipClient);
    #endif
 
+   OsLock lock(mClientLock);
+
    // Remove sipClient from mClientList (if it is on the list).
    UtlContainable* ret = mClientList.removeReference(sipClient);
 
@@ -397,9 +399,7 @@ void SipProtocolServerBase::removeOldClients(long oldTime)
    // Find the old clients in the list and shut them down
    int numClients;
    int numShutdown = 0;
-   int numDelete = 0;
    SipClient** shutdownClientArray = NULL;
-   SipClient** deleteClientArray = NULL;
 
    {
       OsLock lock(mClientLock);
@@ -419,20 +419,15 @@ void SipProtocolServerBase::removeOldClients(long oldTime)
          // opened as servers for requests from the remote side are
          // explicitly closed on this side when the final response is
          // sent.
-         if (   !client->isOk() // socket is bad or task has stopped
-             || client->getLastTouchedTime() < oldTime // idle for long enough
-            )
+         if( !client->isOk() || client->getLastTouchedTime() < oldTime ) // idle for long enough 
          {
             UtlString clientNames;
             client->getClientNames(clientNames);
          
-            // Only perform the two-step shutdown->delete sequence for
-            // connection-oriented transports (TCP/TLS). UDP clients
-            // should not be put through the shutdown array here.
             if( client->isNotShut() )
             {
                Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
-                  "SipProtocolServerBase[%s]::removeOldClients Shutting down old client %s(%p): %s",
+                  "SipProtocolServerBase[%s]::removeOldClients shutting down old client %s(%p): %s",
                   getName().data(), client->getName().data(),
                   client, clientNames.data());
 
@@ -443,22 +438,15 @@ void SipProtocolServerBase::removeOldClients(long oldTime)
                shutdownClientArray[numShutdown] = client;
                numShutdown++;
             }
-            else
+            else if( client->isShutDown() )
             {
                Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
-                  "SipProtocolServerBase[%s]::removeOldClients Deleting old client %s(%p): %s",
+                  "SipProtocolServerBase[%s]::removeOldClients deleting terminated client %s(%p): %s",
                   getName().data(), client->getName().data(),
                   client, clientNames.data());
 
                mClientList.removeReference(client);
-               // Record the client in the array so it can be deleted
-               // after we release the lock.
-               if (!deleteClientArray)
-               {
-                  deleteClientArray = new SipClient*[numClients];
-               }
-               deleteClientArray[numDelete] = client;
-               numDelete++;
+               mDeleteClientList.append( client );
             }
          }
          else
@@ -477,28 +465,45 @@ void SipProtocolServerBase::removeOldClients(long oldTime)
 
    if (numShutdown > 0 && shutdownClientArray) // get rid of lots of 'doing nothing when nothing to do' messages in the log
    {
-      Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
-                    "SipProtocolServerBase[%s]::removeOldClients shutting down %d of %d SipClients",
-                    getName().data(), numShutdown, numClients);
-
       for (int clientIndex = 0; clientIndex < numShutdown; clientIndex++)
       {
          shutdownClientArray[clientIndex]->shutdown();
       }
       delete[] shutdownClientArray;
+
+      Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
+               "SipProtocolServerBase[%s]::removeOldClients shut down %d of %d SipClients",
+               getName().data(), numShutdown, numClients);
    }
 
-   if (numDelete > 0 && deleteClientArray) // get rid of lots of 'doing nothing when nothing to do' messages in the log
+   int deletedCount = 0;
+   {
+      OsLock lock(mClientLock);
+
+      while (true)
+      {
+         SipClient* deleteClient = NULL;
+         {
+            UtlSListIterator deleteIter(mDeleteClientList);
+            if ((deleteClient = dynamic_cast<SipClient*>(deleteIter())))
+            {
+               mDeleteClientList.removeReference(deleteClient);
+            }
+            else
+            {
+               break;
+            }
+         }
+
+         delete deleteClient;
+         deletedCount++;
+      }
+   }
+   if( deletedCount > 0 )
    {
       Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
-                    "SipProtocolServerBase[%s]::removeOldClients deleting %d of %d SipClients",
-                    getName().data(), numDelete, numClients);
-
-      for (int clientIndex = 0; clientIndex < numDelete; clientIndex++)
-      {
-         delete deleteClientArray[clientIndex];
-      }
-      delete[] deleteClientArray;
+         "SipProtocolServerBase[%s]::removeOldClients deleted %d of %d SipClients",
+         getName().data(), deletedCount, numClients );
    }
 }
 

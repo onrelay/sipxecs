@@ -65,6 +65,8 @@ SipTransactionList::~SipTransactionList()
 {
     abortGarbageCollection();
     mTransactions.destroyAll();
+    mSignalAllTransactions.destroyAll();
+    mDeleteTransactions.destroyAll();
 }
 
 /* ============================ MANIPULATORS ============================== */
@@ -323,13 +325,9 @@ SipTransactionList::findTransactionFor(const SipMessage& message,
     return(transactionFound);
 }
 
-void SipTransactionList::removeOldTransactions(long oldTransaction,
+bool SipTransactionList::removeOldTransactions(long oldTransaction,
                                                long oldInviteTransaction)
 {
-    std::vector<SipTransaction*> transactionsToBeDeleted;
-    int deleteCount = 0;
-    int busyCount = 0;
-
 #   ifdef TIME_LOG
     OsTimeLog gcTimes;
     gcTimes.addEvent("start");
@@ -344,22 +342,22 @@ void SipTransactionList::removeOldTransactions(long oldTransaction,
     OsDateTime::getCurTimeSinceBoot(time);
     long bootime = time.seconds();
 
-    int numTransactions = mTransactions.entries();
-    if(numTransactions > 0)
+    if(mTransactions.entries() > 0)
     {
+        Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
+            "SipTransactionList::removeOldTransactions"
+            " checking %d active transactions",
+            mTransactions.entries()
+            );
+
         UtlHashBagIterator iterator(mTransactions);
         SipTransaction* transactionFound = NULL;
         long transTime;
 
-        transactionsToBeDeleted.reserve(numTransactions);
         // Pull all of the transactions to be deleted out of the list
         while ((transactionFound = (SipTransaction*) iterator()))
         {
-           if(transactionFound->isBusy())
-           {
-              busyCount++;
-           }
-           else if (!transactionFound->isMarkedForDeletion())
+           if(!transactionFound->isBusy() && !transactionFound->isMarkedForDeletion())
            {
             transTime = transactionFound->getTimeStamp();
 
@@ -376,18 +374,9 @@ void SipTransactionList::removeOldTransactions(long oldTransaction,
                               " removing %p",  transactionFound );
 #endif
 
-                // Put it in the pointer array
-                transactionsToBeDeleted.push_back(transactionFound);
-                deleteCount++;
-
                 transactionFound->markForDeletion();
-                
-                // Make sure the events waiting for the transaction
-                // to be available are signaled before we delete
-                // any of the transactions or we end up with
-                // incomplete transaction trees (i.e. deleted branches)
-                // :TODO: move to the actual deletion loop so we're not holding the lock? -SDL
-                transactionFound->signalAllAvailable();
+                mTransactions.removeReference(transactionFound);
+                mSignalAllTransactions.append(transactionFound);
             }
             else if (
               transactionFound->isMethod(SIP_INVITE_METHOD)
@@ -416,24 +405,22 @@ void SipTransactionList::removeOldTransactions(long oldTransaction,
                 //
                 UtlSListIterator iterator(transactionFound->childTransactions());
                 childTransaction = NULL;
-                while ((childTransaction = (SipTransaction*) iterator()))
+                                while ((childTransaction = (SipTransaction*) iterator()))
                 {
-                  if (!childTransaction->isMarkedForDeletion())
-                  {
-                    transactionsToBeDeleted.push_back(childTransaction);
-                    childTransaction->signalAllAvailable();
-                    childTransaction->markForDeletion();
-                    deleteCount++;
-                  }
+                    if (!childTransaction->isMarkedForDeletion())
+                    {
+                        childTransaction->markForDeletion();
+                        mTransactions.removeReference(childTransaction);
+                        mSignalAllTransactions.append(childTransaction);
+                    }
                 }
                 //
                 // Finally, delete the parent if it is not marked previously as
                 // a child transaction ready for deletion.
                 //
-                transactionsToBeDeleted.push_back(transactionFound);
-                deleteCount++;
-                transactionFound->signalAllAvailable();
                 transactionFound->markForDeletion();
+                mTransactions.removeReference(transactionFound);
+                mSignalAllTransactions.append(transactionFound);
               }
             }
           }
@@ -454,39 +441,91 @@ void SipTransactionList::removeOldTransactions(long oldTransaction,
     gcTimes.addEvent("post-scan-unlocked");
 #   endif
 
-    if ( deleteCount > 0 ) // do not log 'doing nothing when nothing to do', even at debug
-    {
-       Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
-                     "SipTransactionList::removeOldTransactions"
-                     " deleting %d of %d transactions (%d busy)",
-                     deleteCount , numTransactions, busyCount
-                     );
+    bool result = false;
+
+    int deleteCount = 0;
+
+    while( true )
+    {      
+        lock();
+
+        SipTransaction* deleteTransaction = NULL;
+
+        UtlSListIterator deleteIterator(mDeleteTransactions);
+
+        if ((deleteTransaction = dynamic_cast<SipTransaction*>(deleteIterator())))
+        {
+            deleteCount++;
+
+            mDeleteTransactions.removeReference(deleteTransaction);
+            
+            unlock();
+
+            delete deleteTransaction;
+        }
+        else
+        {
+            unlock();
+            break;
+        } 
     }
 
-    if (!transactionsToBeDeleted.empty())
-    {
-#      ifdef TIME_LOG
-       gcTimes.addEvent("start delete");
-#      endif
+    if( deleteCount > 0 ) {
 
-        for(std::vector<SipTransaction*>::iterator iter = transactionsToBeDeleted.begin(); iter != transactionsToBeDeleted.end(); iter++)
+        Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
+            "SipTransactionList::removeOldTransactions"
+            " deleted %d old transactions",
+            deleteCount
+            );
+
+        result = true;
+    } 
+
+    int signalAllCount = 0;
+
+    while( true )
+    {      
+        lock();
+
+        SipTransaction* signalAllTransaction = NULL;
+
+        UtlSListIterator signalAllIterator(mSignalAllTransactions);
+
+        if ((signalAllTransaction = dynamic_cast<SipTransaction*>(signalAllIterator())))
         {
-          (*iter)->signalAllAvailable();
-        }
+            signalAllCount++;
 
-        for(std::vector<SipTransaction*>::iterator iter = transactionsToBeDeleted.begin(); iter != transactionsToBeDeleted.end(); iter++)
+            mSignalAllTransactions.removeReference(signalAllTransaction);
+
+            mDeleteTransactions.append(signalAllTransaction);
+
+            signalAllTransaction->signalAllAvailable();
+
+            unlock();
+        }
+        else
         {
-          lock();
-          mTransactions.removeReference(*iter);
-          unlock();
-
-          delete *iter;
-        }
-#      ifdef TIME_LOG
-       gcTimes.addEvent("finish delete");
-#      endif
-
+            unlock();
+            break;
+        } 
     }
+
+    if( signalAllCount > 0 ) {
+
+        Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
+            "SipTransactionList::removeOldTransactions"
+            " signaled %d old transactions",
+            signalAllCount
+            );
+
+        result = true;
+    }      
+
+#if 0
+#      ifdef TIME_LOG
+         gcTimes.addEvent("finish delete");
+#      endif
+#endif
 
 #   ifdef TIME_LOG
     UtlString timeString;
@@ -495,6 +534,8 @@ void SipTransactionList::removeOldTransactions(long oldTransaction,
                   "%s", timeString.data()
                   );
 #   endif
+
+    return result;
 }
 
 void SipTransactionList::stopTransactionTimers()
@@ -849,9 +890,22 @@ void SipTransactionList::runGarbageCollection()
 
   while(!_abortGarbageCollection)
   {
-    OsTask::delay(DEFAULT_GARBAGE_COLLECTOR_INTERVAL);
-    boost::lock_guard<boost::mutex> lock(_garbageCollectionMutex);
-    mpSipUserAgent->garbageCollection();
+    try {
+        OsTask::delay(DEFAULT_GARBAGE_COLLECTOR_INTERVAL);
+        boost::lock_guard<boost::mutex> lock(_garbageCollectionMutex);
+        mpSipUserAgent->garbageCollection();
+    }
+    catch(std::exception& e)
+    {
+        Os::Logger::instance().log(FAC_SIP, PRI_WARNING, "SipTransactionList::runGarbageCollection"
+                      " error: %s",
+                      e.what());
+    }
+    catch(...)
+    {
+        Os::Logger::instance().log(FAC_SIP, PRI_WARNING, "SipTransactionList::runGarbageCollection"
+                    " uncaught error" );
+    }
   }
 }
 
