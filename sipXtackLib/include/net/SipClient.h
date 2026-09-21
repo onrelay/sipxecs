@@ -82,15 +82,15 @@ public:
    // is not usable).
    virtual void emptyBuffer(bool reportError);
 
-   UtlBoolean isSharedSocket( void ) const;
+   virtual UtlBoolean isSharedSocket( void ) const;
 
    // Set the time when this client was last used
    // This is potentially used for garbage collection
-   void touch();
+   virtual void touch();
 
   // Perform client shutdown: request task shutdown, wait for thread
   // exit, and close/delete the socket.  
-  void shutdown();
+  virtual void shutdown();
 
 
 /* ============================ ACCESSORS ================================= */
@@ -101,17 +101,17 @@ public:
 
 /* ============================ INQUIRY =================================== */
 
-    UtlBoolean isOk(void);
+    virtual UtlBoolean isOk(void);
     
-    bool isWritable();
+    virtual bool isWritable();
     // This function will send keep-alive CRLF/CRLF to check if socket is writable
     //
 
    // Used to identify if the socket associated with SIP Client is bound to the specified
    // local IP and suitable for sending to the supplied destination host and port.
-    UtlBoolean isAcceptableForDestination( const UtlString& hostName, int hostPort, const UtlString& localIp );
+    virtual UtlBoolean isAcceptableForDestination( const UtlString& hostName, int hostPort, const UtlString& localIp );
 
-    const UtlString& getLocalIp(void);
+    virtual const UtlString& getLocalIp(void);
 
     // Return the default port for the protocol of this SipClient.
     virtual int defaultPort(void) const = 0;
@@ -121,7 +121,7 @@ public:
        return SipClient::TYPE;
     };
     
-    OsSocket::IpProtocolSocketType getSocketType() const;
+    virtual OsSocket::IpProtocolSocketType getSocketType() const;
 
     static SipTransportRateLimitStrategy& rateLimit();
 
@@ -137,13 +137,13 @@ protected:
     /** Do preliminary processing of a message read from the socket:
      *  log it, clean up its data, and extract any needed source address.
      */
-    bool preprocessMessage(SipMessage& msg,
+    virtual bool preprocessMessage(SipMessage& msg,
                            const UtlString& msgText,
                            int msgLength);
     
-    bool preprocessRequestLine(SipMessage& msg);
+    virtual bool preprocessRequestLine(SipMessage& msg);
     
-    bool preprocessUriHeader(SipMessage& msg, const char* headerName);
+    virtual bool preprocessUriHeader(SipMessage& msg, const char* headerName);
 
     /// Test whether the socket is ready to read.  (Does not block.)
     UtlBoolean isReadyToRead();
@@ -153,7 +153,7 @@ protected:
     /** Called by the thread to shut the SipClient down and signal its
      *  owning server that it has done so.
      */
-    void clientStopSelf();
+    virtual void clientStopSelf();
 
     OsSocket* mClientSocket;
     OsSocket::IpProtocolSocketType mSocketType;

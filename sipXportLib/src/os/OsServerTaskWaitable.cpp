@@ -67,7 +67,7 @@ OsServerTaskWaitable::OsServerTaskWaitable(const UtlString& name,
          mPipeWritingFd = filedes[1];
          Os::Logger::instance().log(FAC_KERNEL, PRI_DEBUG,
                        "OsServerTaskWaitable::_ pipe() opened %d -> %d.  getdtablesize() = %d",
-                       mPipeWritingFd, mPipeReadingFd, fdSetSize + FD_HEADROOM);
+                       filedes[1], filedes[0], fdSetSize + FD_HEADROOM);
       }
       else
       {
@@ -93,17 +93,27 @@ OsServerTaskWaitable::OsServerTaskWaitable(const UtlString& name,
    }
 }
 
-// Destructor
 OsServerTaskWaitable::~OsServerTaskWaitable()
 {
-   if (mPipeReadingFd != -1)
+}
+
+void OsServerTaskWaitable::shutdown()
+{
+   int oldRead = mPipeReadingFd.exchange(-1);
+   int oldWrite = mPipeWritingFd.exchange(-1);
+   if (oldRead != -1)
    {
-      // Close the pipe.
-      close(mPipeReadingFd);
-      close(mPipeWritingFd);
+      close(oldRead);
       Os::Logger::instance().log(FAC_KERNEL, PRI_DEBUG,
-                    "OsServerTaskWaitable::~ closed %d -> %d",
-                    mPipeWritingFd, mPipeReadingFd);
+                  "OsServerTaskWaitable::shutdown closed read socket %d",
+                  oldRead);
+   }
+   if (oldWrite != -1 && oldWrite != oldRead)
+   {
+      close(oldWrite);
+      Os::Logger::instance().log(FAC_KERNEL, PRI_DEBUG,
+                  "OsServerTaskWaitable::shutdown closed write socket %d",
+                  oldWrite);
    }
 }
 
@@ -120,7 +130,17 @@ OsStatus OsServerTaskWaitable::postMessage(const OsMsg& rMsg, const OsTime& rTim
    // not block).
    if (res == OS_SUCCESS)
    {
-      assert(write(mPipeWritingFd, &res /* arbitrary */, 1) == 1);
+      int wfd = mPipeWritingFd.load();
+      if (wfd != -1)
+      {
+         ssize_t w = write(wfd, &res /* arbitrary */, 1);
+         if (w != 1)
+         {
+            Os::Logger::instance().log(FAC_KERNEL, PRI_ERR,
+                          "OsServerTaskWaitable::postMessage write returned %zd errno=%d",
+                          w, errno);
+         }
+      }
    }
 
    return res;
@@ -135,14 +155,14 @@ OsStatus OsServerTaskWaitable::postMessage(const OsMsg& rMsg, const OsTime& rTim
  */
 int OsServerTaskWaitable::getFd(void) const
 {
-   return mPipeReadingFd;
+   return mPipeReadingFd.load();
 }
 
 /** Return TRUE if creating the object has succeeded and it can be used.
  */
 UtlBoolean OsServerTaskWaitable::isOk(void) const
 {
-   return mPipeReadingFd != -1;
+   return mPipeReadingFd.load() != -1;
 }
 
 /* //////////////////////////// PROTECTED ///////////////////////////////// */
@@ -156,13 +176,28 @@ int OsServerTaskWaitable::run(void* pArg)
    OsMsg*    pMsg = NULL;
    OsStatus  res;
    struct pollfd fds[1];
-   fds[0].fd = mPipeReadingFd;
+   fds[0].fd = mPipeReadingFd.load();
    fds[0].events = POLLIN;
 
    do
    {
-      // Wait for the pipe to become ready to read.
-      assert(poll(&fds[0], 1, -1 /* block forever */) >= 0);
+      // Refresh fd atomically then wait for the pipe to become ready to read.
+      fds[0].fd = mPipeReadingFd.load();
+      int pret = poll(&fds[0], 1, -1 /* block forever */);
+      if (pret <= 0)
+      {
+         Os::Logger::instance().log(FAC_KERNEL, PRI_DEBUG,
+                       "OsServerTaskWaitable::run poll returned %d errno=%d",
+                       pret, errno);
+         // Invalidate and close fds atomically.
+         int oldRead = mPipeReadingFd.exchange(-1);
+         int oldWrite = mPipeWritingFd.exchange(-1);
+         if (oldRead != -1)
+            close(oldRead);
+         if (oldWrite != -1 && oldWrite != oldRead)
+            close(oldWrite);
+         break;
+      }
 
       // Check that poll finished because the pipe is ready to read.
       if ((fds[0].revents & POLLIN) != 0)
@@ -176,9 +211,39 @@ int OsServerTaskWaitable::run(void* pArg)
          for (i=0;i<numberMsgs;i++)
          {
             res = receiveMessage((OsMsg*&) pMsg, OsTime::NO_WAIT); // receive the message
-            assert(res == OS_SUCCESS);
-
-            assert(read(mPipeReadingFd, &buffer, 1) == 1); // read 1 byte from the pipe
+            if (res != OS_SUCCESS)
+            {
+               Os::Logger::instance().log(FAC_KERNEL, PRI_DEBUG,
+                             "OsServerTaskWaitable::run receiveMessage returned %d", res);
+               int oldRead = mPipeReadingFd.exchange(-1);
+               int oldWrite = mPipeWritingFd.exchange(-1);
+               if (oldRead != -1)
+                  close(oldRead);
+               if (oldWrite != -1 && oldWrite != oldRead)
+                  close(oldWrite);
+               break;
+            }
+                        
+            if( mPipeReadingFd.load() == -1 ) {
+               Os::Logger::instance().log(FAC_KERNEL, PRI_DEBUG,
+                  "OsServerTaskWaitable::run mPipeReadingFd has become invalid");
+               break;
+            }
+            
+            ssize_t r = read(mPipeReadingFd.load(), &buffer, 1); // read 1 byte from the pipe
+            if (r != 1)
+            {
+               Os::Logger::instance().log(FAC_KERNEL, PRI_DEBUG,
+                             "OsServerTaskWaitable::run read returned %zd errno=%d",
+                             r, errno);
+               int oldRead = mPipeReadingFd.exchange(-1);
+               int oldWrite = mPipeWritingFd.exchange(-1);
+               if (oldRead != -1)
+                  close(oldRead);
+               if (oldWrite != -1 && oldWrite != oldRead)
+                  close(oldWrite);
+               break;
+            }
 
             if (!handleMessage(*pMsg))                  // process the message
             {
@@ -192,7 +257,7 @@ int OsServerTaskWaitable::run(void* pArg)
          }
       }
    }
-   while (isStarted());
+   while (isStarted() && mPipeReadingFd.load() != -1);
 
    return 0;        // and then exit
 }

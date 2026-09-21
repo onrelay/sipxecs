@@ -49,15 +49,12 @@ OsServerTask::OsServerTask(const char* name,
                  mName.data(), &mIncomingQ, maxRequestQMsgs);
 }
 
-// Destructor
-// As part of destroying the task, flush all messages from the incoming
-// OsMsgQ.
+
 OsServerTask::~OsServerTask()
 {
    Os::Logger::instance().log(FAC_KERNEL, PRI_DEBUG, "OsServerTask::~ '%s' %s",
                  mName.data(), TaskStateName(mState));
 
-   waitUntilShutDown(20 * OsTime::MSECS_PER_SEC);
    
 }
 
