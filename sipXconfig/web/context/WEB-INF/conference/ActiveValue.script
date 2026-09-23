@@ -9,8 +9,8 @@
   
   <initialization>
     var compElement = document.getElementById('${compClientId}');
-    if (compElement != null && typeof compElement.startRendering === 'function') {
-        compElement.startRendering(${parameters}, '${updateCompClientId}');
+    if (compElement != null &amp;&amp; typeof compElement.startRendering === 'function') {
+      compElement.startRendering(${parameters}, '${updateCompClientId}');
     }
   </initialization>
 </script>
