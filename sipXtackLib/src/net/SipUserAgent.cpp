@@ -473,7 +473,7 @@ SipUserAgent::SipUserAgent(int sipTcpPort,
     // Record the local address.
     cacheLocalAddress();
 
-    mSipTransactions.runGarbageCollection();
+    mSipTransactions.startGarbageCollection();
     
     //
     // Start the cancel queue
