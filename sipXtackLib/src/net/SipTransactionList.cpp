@@ -50,7 +50,7 @@ mpSipUserAgent(pSipUserAgent)
   //
   // Run the garbage collector
   //
-  _pGarbageCollectionThread = 0;
+  _pGarbageCollectionThread = NULL;
   _abortGarbageCollection = false;
 }
 
@@ -879,45 +879,107 @@ UtlBoolean SipTransactionList::transactionExists(const SipTransaction* transacti
     return(foundTransaction);
 }
 
+void SipTransactionList::startGarbageCollection()
+{
+    boost::lock_guard<boost::mutex> lock(_garbageCollectionMutex);
+
+    if (_pGarbageCollectionThread == NULL)
+    {
+        _abortGarbageCollection = false;
+
+        _pGarbageCollectionThread = 
+            new boost::thread(boost::bind(&SipTransactionList::runGarbageCollection, this));
+    }
+}
 
 void SipTransactionList::runGarbageCollection()
 {
-  if (!_pGarbageCollectionThread)
-  {
-    _pGarbageCollectionThread = new boost::thread(boost::bind(&SipTransactionList::runGarbageCollection, this));
-    return;
-  }
+    boost::thread* pGarbageCollectionWorkerThread = NULL;
 
-  while(!_abortGarbageCollection)
-  {
+    while( true )
+    {
+        try {
+            OsTask::delay(DEFAULT_GARBAGE_COLLECTOR_INTERVAL);
+
+            if( isGarbageCollectionAborted() )
+            {
+                break;
+            }
+
+            if( pGarbageCollectionWorkerThread != NULL )
+            {
+                pGarbageCollectionWorkerThread->interrupt();
+
+                pGarbageCollectionWorkerThread->detach();
+
+                delete pGarbageCollectionWorkerThread;
+
+                pGarbageCollectionWorkerThread = NULL;
+            }
+        
+            pGarbageCollectionWorkerThread = new boost::thread(boost::bind(&SipTransactionList::garbageCollection, this));
+        }
+        catch(std::exception& e)
+        {
+            Os::Logger::instance().log(FAC_SIP, PRI_WARNING, "SipTransactionList::runGarbageCollection"
+                        " error: %s",
+                        e.what());
+        }
+        catch(...)
+        {
+            Os::Logger::instance().log(FAC_SIP, PRI_WARNING, "SipTransactionList::runGarbageCollection"
+                        " uncaught error" );
+        }
+    }
+
+    if( pGarbageCollectionWorkerThread != NULL )
+    {
+        pGarbageCollectionWorkerThread->interrupt();
+
+        pGarbageCollectionWorkerThread->detach();
+
+        delete pGarbageCollectionWorkerThread;
+
+        pGarbageCollectionWorkerThread = NULL;
+    }
+}
+
+void SipTransactionList::garbageCollection()
+{
     try {
-        OsTask::delay(DEFAULT_GARBAGE_COLLECTOR_INTERVAL);
-        boost::lock_guard<boost::mutex> lock(_garbageCollectionMutex);
         mpSipUserAgent->garbageCollection();
     }
     catch(std::exception& e)
     {
-        Os::Logger::instance().log(FAC_SIP, PRI_WARNING, "SipTransactionList::runGarbageCollection"
-                      " error: %s",
-                      e.what());
+        Os::Logger::instance().log(FAC_SIP, PRI_WARNING, "SipTransactionList::garbageCollection"
+                        " error: %s",
+                        e.what());
     }
     catch(...)
     {
-        Os::Logger::instance().log(FAC_SIP, PRI_WARNING, "SipTransactionList::runGarbageCollection"
+        Os::Logger::instance().log(FAC_SIP, PRI_WARNING, "SipTransactionList::garbageCollection"
                     " uncaught error" );
     }
-  }
 }
 
 void SipTransactionList::abortGarbageCollection()
 {
-  if (_pGarbageCollectionThread)
-  {
-    _abortGarbageCollection = true;
-    _pGarbageCollectionThread->join();
-    delete _pGarbageCollectionThread;
-    _pGarbageCollectionThread = 0;
-  }
+    boost::lock_guard<boost::mutex> lock(_garbageCollectionMutex);
+
+    if (_pGarbageCollectionThread != NULL)
+    {
+        _abortGarbageCollection = true;
+        _pGarbageCollectionThread->join();
+        delete _pGarbageCollectionThread;
+        _pGarbageCollectionThread = NULL;
+    }
+}
+
+bool SipTransactionList::isGarbageCollectionAborted()
+{
+    boost::lock_guard<boost::mutex> lock(_garbageCollectionMutex);
+
+    return _abortGarbageCollection;
 }
 
 /* //////////////////////////// PROTECTED ///////////////////////////////// */

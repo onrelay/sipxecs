@@ -105,12 +105,17 @@ public:
     // Returns the number of transactions in the hash bag
     //
 
-    void runGarbageCollection();
+    void startGarbageCollection();
     void abortGarbageCollection();
+    bool isGarbageCollectionAborted();
+    void runGarbageCollection();
+    void garbageCollection();
+
 /* ============================ INQUIRY =================================== */
 
 /* //////////////////////////// PROTECTED ///////////////////////////////// */
 protected:
+
     void lock();
     //: Locks the list for iteration, reading or writing
 
