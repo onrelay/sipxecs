@@ -21,6 +21,7 @@
     <binding name="usePager" value="true"/>
     <binding name="row" value="currentRow"/>
     <binding name="selections" value="selections"/>
+    <binding name="converter" value="scheduleConverter"/>
   </component>
 
   <!-- Column 2: view schedules -->

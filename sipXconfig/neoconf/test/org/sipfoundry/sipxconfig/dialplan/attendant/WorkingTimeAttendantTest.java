@@ -51,6 +51,7 @@ public class WorkingTimeAttendantTest extends TestCase {
 
     public void testInitWokingHours() {
         WorkingHours hours = new WorkingHours();
+        assertTrue(hours.isEnabled());
         assertEquals("09:00", hours.getStartTime());
         assertEquals("18:00", hours.getStopTime());
     }

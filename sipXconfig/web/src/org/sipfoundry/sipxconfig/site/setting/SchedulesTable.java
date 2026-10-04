@@ -15,9 +15,11 @@ import java.util.List;
 import org.apache.tapestry.BaseComponent;
 import org.apache.tapestry.IBinding;
 import org.apache.tapestry.annotations.InjectObject;
+import org.apache.tapestry.components.IPrimaryKeyConverter;
 import org.sipfoundry.sipxconfig.components.SelectMap;
 import org.sipfoundry.sipxconfig.components.TapestryUtils;
 import org.sipfoundry.sipxconfig.forwarding.ForwardingContext;
+import org.sipfoundry.sipxconfig.forwarding.Schedule;
 
 public abstract class SchedulesTable extends BaseComponent {
 
@@ -29,6 +31,20 @@ public abstract class SchedulesTable extends BaseComponent {
     public abstract SelectMap getSelections();
 
     public abstract void setSelections(SelectMap selections);
+
+    public IPrimaryKeyConverter getScheduleConverter() {
+        return new IPrimaryKeyConverter() {
+            @Override
+            public Object getPrimaryKey(Object value) {
+                return ((Schedule) value).getId();
+            }
+
+            @Override
+            public Object getValue(Object primaryKey) {
+                return getForwardingContext().getScheduleById((Integer) primaryKey);
+            }
+        };
+    }
 
     // set the "changed" parameter to TRUE
     private void markChanged() {

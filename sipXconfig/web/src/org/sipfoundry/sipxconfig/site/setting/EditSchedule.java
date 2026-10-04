@@ -46,9 +46,7 @@ public abstract class EditSchedule extends UserBasePage {
 
     public abstract void setFeatureId(String featureId);
 
-    @Persist
     public abstract Schedule getSchedule();
-
     public abstract void setSchedule(Schedule schedule);
 
     @Persist(value = CLIENT)
@@ -60,9 +58,7 @@ public abstract class EditSchedule extends UserBasePage {
 
     public abstract void setWorkingHour(WorkingHours workingHoursItem);
 
-    @Persist(value = CLIENT)
     public abstract List<WorkingHours> getWorkingHours();
-
     public abstract void setWorkingHours(List<WorkingHours> workingHours);
 
     public abstract int getIndex();

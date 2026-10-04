@@ -139,7 +139,7 @@
           <key column="attendant_dialing_rule_id"
               foreign-key="fk_attendant_working_hours_attendant_dialing_rule" />
           <list-index column="index" />
-          <composite-element class="org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours">
+          <composite-element class="org.sipfoundry.sipxconfig.dialplan.attendant.AttendantWorkingHours">
             <property name="start" type="org.sipfoundry.sipxconfig.common.UtcTimestampType" />
             <property name="stop"  type="org.sipfoundry.sipxconfig.common.UtcTimestampType" />
             <property name="enabled" />

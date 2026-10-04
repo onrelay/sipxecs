@@ -56,10 +56,9 @@
         <key column="schedule_id"
             foreign-key="fk_schedule_hours_schedule" />
         <index column="schedule_hours_id" />
-        <composite-element class="org.sipfoundry.sipxconfig.dialplan.attendant.WorkingHours">
+        <composite-element class="org.sipfoundry.sipxconfig.dialplan.attendant.ScheduleWorkingHours">
           <property name="start" type="org.sipfoundry.sipxconfig.common.UtcTimestampType" />
           <property name="stop"  type="org.sipfoundry.sipxconfig.common.UtcTimestampType" />
-          <property name="enabled" />
           <property name="day" type="org.sipfoundry.sipxconfig.common.ScheduledDay$UserType" />
         </composite-element>
       </list>
