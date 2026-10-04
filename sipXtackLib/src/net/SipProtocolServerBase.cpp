@@ -407,6 +407,15 @@ void SipProtocolServerBase::removeOldClients(long oldTime)
 
       numClients = mClientList.entries();
 
+      if( numClients > 0 )
+      {
+         Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
+            "SipTransactionList::removeOldClients"
+            " checking %d active SIP clients",
+            numClients
+            );
+      }
+
       UtlSListIterator iter(mClientList);
       SipClient* client;
 
