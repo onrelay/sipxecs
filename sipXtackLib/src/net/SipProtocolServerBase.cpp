@@ -410,9 +410,8 @@ void SipProtocolServerBase::removeOldClients(long oldTime)
       if( numClients > 0 )
       {
          Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
-            "SipTransactionList::removeOldClients"
-            " checking %d active SIP clients",
-            numClients
+            "SipProtocolServerBase[%s]::removeOldClients checking %d active clients",
+            getName().data(), numClients
             );
       }
 
