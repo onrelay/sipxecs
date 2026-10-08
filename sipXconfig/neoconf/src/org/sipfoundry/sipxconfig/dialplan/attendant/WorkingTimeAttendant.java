@@ -10,5 +10,8 @@
 package org.sipfoundry.sipxconfig.dialplan.attendant;
 
 public class WorkingTimeAttendant extends ScheduledAttendant {
-
+	@Override
+	protected WorkingHours createWorkingHours() {
+		return new AttendantWorkingHours();
+	}
 }

@@ -66,6 +66,23 @@ public class WorkingTimeAttendantTest extends TestCase {
         assertFalse(workingHours.get(5).isEnabled());
         assertFalse(workingHours.get(6).isEnabled());
         assertEquals(ScheduledDay.SUNDAY, workingHours.get(6).getDay());
+        assertTrue(workingHours.get(0) instanceof AttendantWorkingHours);
+    }
+
+    public void testReplaceWorkingHoursUsesMappedElementType() {
+        WorkingTimeAttendant workingTimeAttendant = new WorkingTimeAttendant();
+        List<WorkingHours> replacement = new ArrayList<WorkingHours>();
+        WorkingHours hours = new WorkingHours();
+        hours.setEnabled(true);
+        hours.setDay(ScheduledDay.THURSDAY);
+        replacement.add(hours);
+
+        workingTimeAttendant.replaceWorkingHours(replacement);
+
+        WorkingHours result = workingTimeAttendant.getWorkingHours().get(0);
+        assertTrue(result instanceof AttendantWorkingHours);
+        assertTrue(result.isEnabled());
+        assertEquals(ScheduledDay.THURSDAY, result.getDay());
     }
 
     public void testGeneralAddMinutesFromSunday() {

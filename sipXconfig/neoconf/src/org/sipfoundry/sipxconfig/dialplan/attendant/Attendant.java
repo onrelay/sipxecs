@@ -43,12 +43,16 @@ public class Attendant implements Cloneable {
         final int lastWorkingDay = Calendar.FRIDAY - Calendar.MONDAY;
         m_workingHours = new ArrayList<WorkingHours>();
         for (int i = 0; i < days; i++) {
-            WorkingHours workingHoursItem = new WorkingHours();
+            WorkingHours workingHoursItem = createWorkingHours();
             int dayOfWeek = (i + Calendar.SUNDAY) % days + 1;
             workingHoursItem.setDay(ScheduledDay.getScheduledDay(dayOfWeek));
             workingHoursItem.setEnabled(i <= lastWorkingDay);
             m_workingHours.add( workingHoursItem );
         }
+    }
+
+    protected WorkingHours createWorkingHours() {
+        return new WorkingHours();
     }
 
     public void setEnabled(boolean enabled) {
@@ -90,10 +94,19 @@ public class Attendant implements Cloneable {
     }
 
     public void replaceWorkingHours(List<WorkingHours> workingHours) {
-        m_workingHours.clear();
-        if( workingHours != null ) {
-            m_workingHours.addAll( workingHours );
+        List<WorkingHours> replacement = new ArrayList<WorkingHours>();
+        if (workingHours != null) {
+            for (WorkingHours source : workingHours) {
+                WorkingHours copy = createWorkingHours();
+                copy.setEnabled(source.isEnabled());
+                copy.setDay(source.getDay());
+                copy.setStart(source.getStart());
+                copy.setStop(source.getStop());
+                replacement.add(copy);
+            }
         }
+        m_workingHours.clear();
+        m_workingHours.addAll(replacement);
     }
 
     @Override
