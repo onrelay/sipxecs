@@ -83,6 +83,8 @@ public class RegistrationMetrics {
     public void setRegistrations(List<RegistrationItem> registrations) {
 
         getRegistrations().clear();
+        getUniqueRegistrations().clear();
+        getActiveRegistrations().clear();
 
         if( registrations != null ) {
 
@@ -97,10 +99,10 @@ public class RegistrationMetrics {
                     if( oldRegistration == null || registration.compareTo(oldRegistration) > 0 )  {
 
                         getUniqueRegistrations().put( contact, registration );
-                    }
 
-                    if( registration.timeToExpireAsSeconds(m_startTime) > 0) {
-                        getActiveRegistrations().add( registration );
+                        if( registration.timeToExpireAsSeconds(m_startTime) > 0) {
+                            getActiveRegistrations().add( registration );
+                        }
                     }
                 }
                 getRegistrations().add( registration );
