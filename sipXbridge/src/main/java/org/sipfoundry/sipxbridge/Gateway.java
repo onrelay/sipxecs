@@ -119,11 +119,6 @@ public class Gateway {
     private static String globalAddress;
 
     /*
-     * The stun port (now read from config)
-     */
-    //  private static final int STUN_PORT = 3478;
-
-    /*
      * The stun transport
      */
 

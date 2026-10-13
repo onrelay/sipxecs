@@ -79,7 +79,7 @@ public class Location extends BeanWithId implements KeepsOriginalCopy<Location>,
     private Set<String> m_failedReplications;
     private Branch m_branch;
     private boolean m_useStun = false;
-    private String m_stunAddress = "freestun.net";
+    private String m_stunAddress = "stun.cloudflare.com";
     private int m_stunPort = 3478;
     private int m_stunInterval = 60; // seconds
     private String m_publicAddress;
