@@ -1,5 +1,4 @@
 relay_PKGS = \
-	ice4j \
 	commons-beanutils-core \
 	commons-collections \
 	commons-digester \
@@ -14,10 +13,17 @@ relay_PKGS = \
 	jetty-security \
 	jetty-session \
 	jetty-util \
+	log4j \
 	slf4j-api \
 	slf4j-reload4j \
 	sipxcommons \
 	ws-commons-util \
 	xmlrpc-client \
-	xmlrpc-server
-
+	xmlrpc-server \
+	ice4j \
+	jitsi-utils \
+	jitsi-metaconfig \
+	jicoco-config \
+	kotlin-stdlib \
+	kotlin-reflect \
+	config

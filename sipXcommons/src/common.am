@@ -6,7 +6,6 @@ commons_classes = $(abspath $(top_builddir)/src/main/java/classes)
 # for example, non-spring projects wouldn't need spring deps
 commons_PKGS = \
 	dom4j \
-	ice4j \
 	log4j \
 	smack-core \
 	smack-extensions \
@@ -76,5 +75,13 @@ commons_PKGS = \
 	jackson-jakarta-rs-base \
 	mongodb-driver-core \
 	mongodb-driver-sync   \
-	bson
+	bson \
+	ice4j \
+	jitsi-utils \
+	jitsi-metaconfig \
+	jicoco-config \
+	kotlin-stdlib \
+	kotlin-reflect \
+	config
+
 

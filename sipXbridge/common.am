@@ -1,5 +1,4 @@
 bridge_PKGS = \
-	ice4j \
 	commons-beanutils-core \
 	commons-collections \
 	commons-digester \
@@ -21,6 +20,13 @@ bridge_PKGS = \
 	xmlrpc-server \
 	slf4j-api \
 	slf4j-reload4j \
+	ice4j \
+	jitsi-utils \
+	jitsi-metaconfig \
+	jicoco-config \
+	kotlin-stdlib \
+	kotlin-reflect \
+	config \
 	sipxcommons 
 
 	

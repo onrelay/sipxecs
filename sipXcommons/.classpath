@@ -28,6 +28,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/cache-api-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cglib-nodep-2.1_3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/colt-1.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/config-1.4.9.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/classmate-1.7.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils-core-1.9.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-cli-1.9.0.jar"/>
@@ -85,7 +86,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/httpcore-4.4.16.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/httpcore-nio-4.4.16.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/httpcore5-5.3.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ice4j-3.0.35.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ice4j-3.2.21.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/imap-2.0.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/iText-2.1.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jackson-annotations-2.19.2.jar"/>
@@ -136,6 +137,9 @@
 	<classpathentry exported="true" kind="lib" path="lib/jetty-xml-12.1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jfreechart-jakarta-1.0.10.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/joda-time-2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jicoco-config-1.1-183"/>
+	<classpathentry exported="true" kind="lib" path="lib/jitsi-utils-1.0-155.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jitsi-metaconfig-1.0-20.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jradius-core-1.1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jradius-dictionary-1.1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/js-1.7R4.jar"/>
@@ -150,6 +154,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/jwebunit-htmlunit-plugin-jakarta-jakarta-2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jxmpp-core-1.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jxmpp-jid-1.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/kotlin-stdlib-2.4.20.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/kotlin-reflect-2.4.20.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ldapbp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.15.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/logging-mailhandler-2.0.4.jar"/>
