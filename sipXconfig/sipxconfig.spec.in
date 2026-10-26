@@ -407,7 +407,7 @@ fi
 %triggerin -- freeswitch
 if systemctl list-unit-files | grep -q '^freeswitch\.service'; then
     systemctl disable freeswitch.service >/dev/null 2>&1 || :
-    /etc/init.d/freeswitch stop 1>/dev/null
+    systemctl stop freeswitch.service 1>/dev/null
 fi
 
 %postun

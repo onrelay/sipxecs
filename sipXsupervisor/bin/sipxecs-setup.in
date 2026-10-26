@@ -834,7 +834,7 @@ if !ok
 end
 
 # Wait for sipxconfig service restart to complete
-ok = run_command("/etc/init.d/sipxconfig restart")
+ok = run_command("systemctl restart sipxconfig")
 if !ok
   puts "sipxconfig restart failed."
   exit 1

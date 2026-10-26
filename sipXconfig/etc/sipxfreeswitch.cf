@@ -309,9 +309,8 @@ bundle agent sipxfreeswitch_running {
         args => "enable $(service)";
 
     sipxfreeswitch.sipxfreeswitch_running.reload_sipxfreeswitch::
-      "$(sipx.systemctl)"
-        comment => "reload freeswitch",
-        args => "reload $(service)";
+      "/etc/init.d/freeswitch reload"
+        comment => "reload freeswitch";
 
     sipxfreeswitch.sipxfreeswitch_running.(restart_sipxecs|restart_sipxfreeswitch|restart_mediaservice|update_sysctl_core)::
       "$(sipx.systemctl)"

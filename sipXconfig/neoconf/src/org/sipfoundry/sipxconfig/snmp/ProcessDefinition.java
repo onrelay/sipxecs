@@ -170,7 +170,7 @@ public final class ProcessDefinition {
 
     public void setSipxServiceName(String service) {
         m_service = service;
-        setServiceStartCommand(format("$(sipx.SIPX_SERVICEDIR)/%s start", service), service);
+        setServiceStartCommand(format("systemctl start %s", service), service);
     }
 
     public void setSystemctlServiceName(String service) {
