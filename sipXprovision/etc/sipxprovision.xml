@@ -255,8 +255,14 @@
       <option>
         <value>6.4.5</value>
       </option>
-       <option>
+      <option>
         <value>6.4.6</value>
+      </option>
+      <option>
+        <value>6.4.7</value>
+      </option>
+      <option>
+        <value>6.4.8</value>
       </option>
     </enum>
   </type>

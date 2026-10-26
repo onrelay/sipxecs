@@ -75,6 +75,8 @@ public final class PolycomModel extends PhoneModel {
     public static final DeviceVersion VER_6_4_4 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.4.4");
     public static final DeviceVersion VER_6_4_5 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.4.5");
     public static final DeviceVersion VER_6_4_6 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.4.6");
+    public static final DeviceVersion VER_6_4_7 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.4.7");
+    public static final DeviceVersion VER_6_4_8 = new DeviceVersion(PolycomPhone.BEAN_ID, "6.4.8");
 
     public static final DeviceVersion DEFAULT_VERSION = VER_5_9_8;
 
@@ -87,7 +89,7 @@ public final class PolycomModel extends PhoneModel {
         VER_5_8_0, VER_5_8_1, VER_5_8_2, VER_5_8_4, VER_5_8_5, 
         VER_5_9_0, VER_5_9_1, VER_5_9_2, VER_5_9_3, VER_5_9_4, VER_5_9_5, VER_5_9_6, VER_5_9_7, VER_5_9_8, 
         VER_6_0_0, VER_6_1_0, VER_6_1_1, VER_6_1_2, VER_6_2_1, VER_6_3_0, VER_6_3_1, 
-        VER_6_4_1, VER_6_4_2, VER_6_4_3, VER_6_4_4, VER_6_4_5, VER_6_4_6,
+        VER_6_4_1, VER_6_4_2, VER_6_4_3, VER_6_4_4, VER_6_4_5, VER_6_4_6, VER_6_4_7, VER_6_4_8,
     };
     private static final Log LOG = LogFactory.getLog(PolycomModel.class);
     private DeviceVersion m_deviceVersion;
