@@ -10,6 +10,7 @@
 package org.sipfoundry.sipxconfig.device;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,16 +29,17 @@ public class ProfileContext<T extends Device> {
      */
     private static final SettingFilter RECURSIVE_SETTINGS = new SettingFilter() {
         public boolean acceptSetting(Setting root_, Setting setting) {
-            boolean group = SettingSet.class.isAssignableFrom(setting.getClass());
-            return !group;
+            boolean isSettingSet = SettingSet.class.isAssignableFrom(setting.getClass());
+            return !isSettingSet;
         }
     };
 
     private static final SettingFilter SETTINGS = new SettingFilter() {
         public boolean acceptSetting(Setting root, Setting setting) {
+            boolean isSettingSet = SettingSet.class.isAssignableFrom(setting.getClass());
             boolean firstGeneration = (setting.getParent() == root);
             boolean isLeaf = setting.getValues().isEmpty();
-            return firstGeneration && isLeaf;
+            return firstGeneration && isLeaf && !isSettingSet;
         }
     };
 
@@ -72,10 +74,16 @@ public class ProfileContext<T extends Device> {
      * Velocity macro convenience method. Recursive list of all settings, ignoring groups
      */
     public Collection<Setting> getRecursiveSettings(Setting group) {
+        if (group == null) {
+            return Collections.emptyList();
+        }
         return SettingUtil.filter(RECURSIVE_SETTINGS, group);
     }
 
     public Collection<Setting> getSettings(Setting group) {
+        if (group == null) {
+            return Collections.emptyList();
+        }
         return SettingUtil.filter(SETTINGS, group);
     }
 
