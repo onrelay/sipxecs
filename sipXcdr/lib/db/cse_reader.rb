@@ -103,11 +103,14 @@ class CseReader < Dao
   end
 
   class << self
+    INTEGER_FIELDS = [:id, :event_seq, :cseq, :failure_status, :via_count].freeze
+    BOOLEAN_FIELDS = [:caller_internal].freeze
+
     def cse_from_row(row)
       cse = CallStateEvent.new
       CallStateEvent::FIELDS.each do |field|
         setter = "#{field}=".to_sym
-        cse.send(setter, row[field.to_s])
+        cse.send(setter, normalize_value(field, row[field.to_s]))
       end
       cse
     end
@@ -145,6 +148,19 @@ class CseReader < Dao
 
       sql += " WHERE #{conditions.join(' AND ')}" unless conditions.empty?
       [sql, params]
+    end
+
+    private
+
+    def normalize_value(field, value)
+      return nil if value.nil?
+      if INTEGER_FIELDS.include?(field)
+        value.to_i
+      elsif BOOLEAN_FIELDS.include?(field)
+        value == true || value == 't' || value == 'true'
+      else
+        value
+      end
     end
   end
 end
