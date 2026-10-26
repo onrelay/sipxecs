@@ -35,7 +35,9 @@
     <agent name="agent-${agent.Extension}" type="callback" contact="${agent.ContactUri}"
 #foreach($group in ${agent.settings.values})
 #foreach($setting in ${group.values})
+#if($setting.name != "type")
         ${setting.name}="$!{setting.Value}"
+#end
 #end
 #end
         />
