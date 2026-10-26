@@ -167,7 +167,6 @@ private:
       private:
          OsMutex mTimerMutex;               // mutex used to generate heartbeat;
          OsStunQueryAgent stunQueryAgent;
-         OsStunDatagramSocket mSocket;
          NatTraversalRules* mpNatTraversalRules;
          NatTraversalRules* mpNatTraversalRulesToKeepCurrent;
          UtlString mPublicIpAddressObtainedFromLastPoll;

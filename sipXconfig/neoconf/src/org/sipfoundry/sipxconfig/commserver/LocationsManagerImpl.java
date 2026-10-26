@@ -52,7 +52,7 @@ public class LocationsManagerImpl extends SipxHibernateDaoSupport<Location> impl
     private static final String DUPLICATE_FQDN_OR_IP = "&error.duplicateFqdnOrIp";
     private static final int PRIMARY_LOCATION_ID = 1;
     private AuditLogContext m_auditLogContext;
-    private String m_defaultStunServer = "stun.cloudflare.com";
+    private String m_defaultStunServer = "stun.freeswitch.org";
     private int m_defaultStunPort = 3478;
     private String m_primaryFqdn;
     private String m_primaryIp;

@@ -367,7 +367,8 @@ public class Gateway {
      */
     static void startRediscoveryTimer() {
         int rediscoveryTime = Gateway.accountManager.getBridgeConfiguration().getGlobalAddressRediscoveryPeriod();
-        TimerTask ttask = new TimerTask() {
+        final TimerTask ttask = new TimerTask() {
+
             boolean alarmSent;
 
             @Override
@@ -384,12 +385,18 @@ public class Gateway {
                         getBridgeConfiguration().getStunServerPort());
                     alarmSent = false;
                 }
+
+                if (Gateway.getGlobalAddress() != null ) {
+                    cancel();
+                }
             }
         };
 
         Gateway.discoverAddress();
 
-        Gateway.getTimer().schedule(ttask, rediscoveryTime * 1000, rediscoveryTime * 1000);
+        if( Gateway.getGlobalAddress() == null ) {
+            Gateway.getTimer().schedule(ttask, rediscoveryTime * 1000, rediscoveryTime * 1000);
+        }
     }
 
     /**

@@ -612,7 +612,6 @@ int NatTraversalRules::getStunRefreshIntervalInSecs( void ) const
 
 NatTraversalRules::StunClient::StunClient( const UtlString& stunServer, int stunPort ) :
    mTimerMutex( OsMutex::Q_FIFO ),
-   mSocket( stunPort, stunServer ),
    mpNatTraversalRulesToKeepCurrent( 0 ),
    mStunServerName( stunServer ),
    mStunServerPort( stunPort ),
@@ -643,7 +642,9 @@ bool NatTraversalRules::StunClient::getPublicIpAddress( UtlString& discoveredPub
       int  mappedPort;
       OsTime timeout( STUN_QUERY_TIMEOUT_IN_MILLISECS );
 
-      rc = stunQueryAgent.getMappedAddress( &mSocket, mappedAddress, mappedPort, 0, timeout );
+      OsStunDatagramSocket socket( 0, NULL );
+
+      rc = stunQueryAgent.getMappedAddress( &socket, mappedAddress, mappedPort, 0, timeout );
       if( rc )
       {
          discoveredPublicIpAddress = mappedAddress;
@@ -676,18 +677,15 @@ int NatTraversalRules::StunClient::run( void* runArg )
 {
    UtlString discoveredPublicIpAddress;
    OsStatus rc;
-   while( !isShuttingDown() )
+   while( !isShuttingDown() && mPublicIpAddressObtainedFromLastPoll.length() == 0 )
    {
       rc = mTimerMutex.acquire( mpNatTraversalRulesToKeepCurrent->getStunRefreshIntervalInSecs() * 1000 );
       if( rc == OS_WAIT_TIMEOUT )
       {
          if( getPublicIpAddress( discoveredPublicIpAddress ) == true )
-         {
-            if( discoveredPublicIpAddress.compareTo( mPublicIpAddressObtainedFromLastPoll ) != 0 )
-            {
-               mPublicIpAddressObtainedFromLastPoll = discoveredPublicIpAddress;
-               mpNatTraversalRulesToKeepCurrent->announceStunResolvedPublicIpAddress( discoveredPublicIpAddress );
-            }
+         {  
+            mPublicIpAddressObtainedFromLastPoll = discoveredPublicIpAddress;
+            mpNatTraversalRulesToKeepCurrent->announceStunResolvedPublicIpAddress( discoveredPublicIpAddress );
          }
       }
    }

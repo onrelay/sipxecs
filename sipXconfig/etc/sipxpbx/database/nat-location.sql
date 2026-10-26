@@ -11,7 +11,7 @@ update location
   set
     use_stun=true,
     stun_interval = 60,
-    stun_address = 'stun.cloudflare.com',
+    stun_address = 'stun.freeswitch.org',
     public_port=5060,
     start_rtp_port=30000,
     stop_rtp_port=31000;
