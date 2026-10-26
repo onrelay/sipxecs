@@ -401,11 +401,20 @@ public class MailboxServlet extends HttpServlet {
         pw.format(
                 "<message id=\"%s\" heard=\"%s\" urgent=\"%s\" folder=\"%s\" duration=\"%s\" contentlength=\"%s\" received=\"%s\" " +
                 "fromUri=\"%s\" author=\"%s\" authorExtension=\"%s\" subject=\"%s\" username=\"%s\" format=\"%s\" callerIdName=\"%s\" callerIdNumber=\"%s\"/>\n",
-                message.getMessageId(), !message.isUnHeard(), message.isUrgent(), folder,
-                descriptor.getDurationSecsLong(), StringUtils.defaultIfEmpty(descriptor.getContentLength(),
-                StringUtils.EMPTY), descriptor.getTimeStampDate().getTime(), fromUri,
-                HtmlUtils.htmlEscapeHex(authorDisplayName), HtmlUtils.htmlEscapeHex(authorExtension) ,HtmlUtils.htmlEscapeHex(descriptor.getSubject()),
-                message.getUserName(), descriptor.getAudioFormat(), HtmlUtils.htmlEscapeHex(descriptor.getCallerIdName()), descriptor.getCallerIdNumber());
+                message.getMessageId(), 
+                !message.isUnHeard(), 
+                message.isUrgent(), 
+                folder,
+                descriptor.getDurationSecsLong(), 
+                StringUtils.defaultIfEmpty(descriptor.getContentLength(), StringUtils.EMPTY), 
+                descriptor.getTimeStampDate().getTime(), 
+                fromUri,
+                HtmlUtils.htmlEscapeHex(authorDisplayName), 
+                HtmlUtils.htmlEscapeHex(authorExtension),
+                HtmlUtils.htmlEscapeHex(StringUtils.defaultIfEmpty(descriptor.getSubject(),StringUtils.EMPTY)),
+                message.getUserName(), 
+                descriptor.getAudioFormat(), 
+                HtmlUtils.htmlEscapeHex(StringUtils.defaultIfEmpty(descriptor.getCallerIdName(),StringUtils.EMPTY)),
+                StringUtils.defaultIfEmpty(descriptor.getCallerIdNumber(),StringUtils.EMPTY));
     }
-
 }
