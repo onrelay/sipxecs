@@ -155,6 +155,60 @@ Subscription& Subscription::operator=(const bsoncxx::document::view& bsonObj)
         _contact = std::string(contactElem.get_string().value);
     }
 
+    bsoncxx::document::element eventTypeKeyElem = bsonObj[Subscription::eventTypeKey_fld()];
+    if (eventTypeKeyElem && eventTypeKeyElem.type() == bsoncxx::type::k_string)
+    {
+        _eventTypeKey = std::string(eventTypeKeyElem.get_string().value);
+    }
+
+    bsoncxx::document::element eventTypeElem = bsonObj[Subscription::eventType_fld()];
+    if (eventTypeElem && eventTypeElem.type() == bsoncxx::type::k_string)
+    {
+        _eventType = std::string(eventTypeElem.get_string().value);
+    }
+
+    bsoncxx::document::element idParamElem = bsonObj[Subscription::id_fld()];
+    if (idParamElem && idParamElem.type() == bsoncxx::type::k_string)
+    {
+        _id = std::string(idParamElem.get_string().value);
+    }
+
+    bsoncxx::document::element toUriElem = bsonObj[Subscription::toUri_fld()];
+    if (toUriElem && toUriElem.type() == bsoncxx::type::k_string)
+    {
+        _toUri = std::string(toUriElem.get_string().value);
+    }
+
+    bsoncxx::document::element fromUriElem = bsonObj[Subscription::fromUri_fld()];
+    if (fromUriElem && fromUriElem.type() == bsoncxx::type::k_string)
+    {
+        _fromUri = std::string(fromUriElem.get_string().value);
+    }
+
+    bsoncxx::document::element keyElem = bsonObj[Subscription::key_fld()];
+    if (keyElem && keyElem.type() == bsoncxx::type::k_string)
+    {
+        _key = std::string(keyElem.get_string().value);
+    }
+
+    bsoncxx::document::element recordRouteElem = bsonObj[Subscription::recordRoute_fld()];
+    if (recordRouteElem && recordRouteElem.type() == bsoncxx::type::k_string)
+    {
+        _recordRoute = std::string(recordRouteElem.get_string().value);
+    }
+
+    bsoncxx::document::element acceptElem = bsonObj[Subscription::accept_fld()];
+    if (acceptElem && acceptElem.type() == bsoncxx::type::k_string)
+    {
+        _accept = std::string(acceptElem.get_string().value);
+    }
+
+    bsoncxx::document::element fileElem = bsonObj[Subscription::file_fld()];
+    if (fileElem && fileElem.type() == bsoncxx::type::k_string)
+    {
+        _file = std::string(fileElem.get_string().value);
+    }
+
     // Extract integer fields
     bsoncxx::document::element notifyCseqElem = bsonObj[Subscription::notifyCseq_fld()];
     if (notifyCseqElem && notifyCseqElem.type() == bsoncxx::type::k_int32)
@@ -166,6 +220,12 @@ Subscription& Subscription::operator=(const bsoncxx::document::view& bsonObj)
     if (subscribeCseqElem && subscribeCseqElem.type() == bsoncxx::type::k_int32)
     {
         _subscribeCseq = subscribeCseqElem.get_int32().value;
+    }
+
+    bsoncxx::document::element versionElem = bsonObj[Subscription::version_fld()];
+    if (versionElem && versionElem.type() == bsoncxx::type::k_int32)
+    {
+        _version = versionElem.get_int32().value;
     }
 
     // Extract expiration time

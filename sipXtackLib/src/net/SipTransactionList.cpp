@@ -344,11 +344,13 @@ bool SipTransactionList::removeOldTransactions(long oldTransaction,
 
     if(mTransactions.entries() > 0)
     {
+#ifdef TRANSACTION_MATCH_DEBUG
         Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
             "SipTransactionList::removeOldTransactions"
             " checking %d active transactions",
             mTransactions.entries()
             );
+#endif
 
         UtlHashBagIterator iterator(mTransactions);
         SipTransaction* transactionFound = NULL;
@@ -365,15 +367,13 @@ bool SipTransactionList::removeOldTransactions(long oldTransaction,
             if ( transTime < (  transactionFound->isMethod(SIP_INVITE_METHOD)
                               ? oldInviteTransaction
                               : oldTransaction
-                              )
-                )
+                              ) )
             {
 #ifdef TRANSACTION_MATCH_DEBUG
                 Os::Logger::instance().log(FAC_SIP, PRI_DEBUG,
                               "SipTransactionList::removeOldTransactions "
                               " removing %p",  transactionFound );
 #endif
-
                 transactionFound->markForDeletion();
                 mTransactions.removeReference(transactionFound);
                 mSignalAllTransactions.append(transactionFound);

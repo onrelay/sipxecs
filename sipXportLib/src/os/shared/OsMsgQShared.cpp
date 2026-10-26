@@ -58,8 +58,26 @@ OsMsgQShared::OsMsgQShared(const char* name,
 // Destructor
 OsMsgQShared::~OsMsgQShared()
 {
-    if (numMsgs())
-        flush();    // get rid of any messages in the queue
+    // Drain any queued messages directly. Do NOT call flush() here: it goes
+    // through doReceive()/Semaphore::wait(), a boost::condition_variable wait
+    // that is a Boost thread interruption point. A boost::thread_interrupted
+    // escaping this (implicitly noexcept) destructor calls std::terminate().
+    for (;;)
+    {
+        OsMsg* pMsg = NULL;
+
+        {
+            mutex_critic_sec_lock lock(_cs);
+            if (_queue.empty())
+                break;
+            pMsg = _queue.front();
+            _queue.pop();
+        }
+
+        if (mFlushHookFunc != NULL)
+            mFlushHookFunc(*pMsg);
+        pMsg->releaseMsg();
+    }
 
     if (_empty)
     {

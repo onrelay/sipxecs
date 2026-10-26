@@ -19,10 +19,13 @@
 #include <mongocxx/uri.hpp>
 #include <mongocxx/collection.hpp>
 #include <mongocxx/options/find.hpp>
+#include <mongocxx/result/update.hpp>
+#include <mongocxx/result/delete.hpp>
 #include <mongocxx/exception/exception.hpp>
 
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/basic/kvp.hpp>
+#include <bsoncxx/document/element.hpp>
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/types.hpp>
 
@@ -298,7 +301,7 @@ void SubscribeDB::remove(
         MongoDB::UpdateTimer updateTimer(const_cast<SubscribeDB&>(*this));
 
         // Build the query document
-        auto query = bsoncxx::builder::basic::make_document(
+        bsoncxx::document::value query = bsoncxx::builder::basic::make_document(
             bsoncxx::builder::basic::kvp(std::string(Subscription::toUri_fld()), to.str()),
             bsoncxx::builder::basic::kvp(std::string(Subscription::fromUri_fld()), from.str()),
             bsoncxx::builder::basic::kvp(std::string(Subscription::callId_fld()), callid.str()),
@@ -311,7 +314,7 @@ void SubscribeDB::remove(
         mongocxx::collection collection = connection.collection(_ns);
 
         // Perform the removal operation
-        auto result = collection.delete_many(query.view());
+        std::optional<mongocxx::result::delete_result> result = collection.delete_many(query.view());
         if (result)
         {
             OS_LOG_INFO(FAC_SIP, "SubscribeDB::remove - Removed " << result->deleted_count() << " documents.");
@@ -347,7 +350,7 @@ void SubscribeDB::removeError(
         MongoDB::UpdateTimer updateTimer(const_cast<SubscribeDB&>(*this));
 
         // Build the query document
-        auto query = bsoncxx::builder::basic::make_document(
+        bsoncxx::document::value query = bsoncxx::builder::basic::make_document(
             bsoncxx::builder::basic::kvp(std::string(Subscription::toUri_fld()), to.str()),
             bsoncxx::builder::basic::kvp(std::string(Subscription::fromUri_fld()), from.str()),
             bsoncxx::builder::basic::kvp(std::string(Subscription::callId_fld()), callid.str()));
@@ -357,7 +360,7 @@ void SubscribeDB::removeError(
         mongocxx::collection collection = connection.collection(_ns);
 
         // Perform the removal operation
-        auto result = collection.delete_many(query.view());
+        std::optional<mongocxx::result::delete_result> result = collection.delete_many(query.view());
         if (result)
         {
             OS_LOG_INFO(FAC_SIP, "SubscribeDB::removeError - Removed " << result->deleted_count() << " documents.");
@@ -601,7 +604,7 @@ void SubscribeDB::getUnexpiredContactsFieldsContaining(
 
         for(const bsoncxx::document::view& doc : cursor)
         {
-            auto contactElement = doc[Subscription::contact_fld()];
+            bsoncxx::document::element contactElement = doc[Subscription::contact_fld()];
             if (contactElement && contactElement.type() == bsoncxx::type::k_string)
             {
                 std::string contact = std::string(contactElement.get_string().value);
@@ -652,14 +655,14 @@ void SubscribeDB::updateNotifyUnexpiredSubscription(
         MongoDB::MongoConnection connection(_info);
 
         // Build the query document
-        auto query = bsoncxx::builder::basic::make_document(
+        bsoncxx::document::value query = bsoncxx::builder::basic::make_document(
             bsoncxx::builder::basic::kvp(std::string(Subscription::toUri_fld()), to.str()),
             bsoncxx::builder::basic::kvp(std::string(Subscription::callId_fld()), callid.str()),
             bsoncxx::builder::basic::kvp(std::string(Subscription::eventTypeKey_fld()), eventTypeKey.str()),
             bsoncxx::builder::basic::kvp(std::string(Subscription::id_fld()), id.str()));
 
         // Build the update document
-        auto update = bsoncxx::builder::basic::make_document(
+        bsoncxx::document::value update = bsoncxx::builder::basic::make_document(
             bsoncxx::builder::basic::kvp(std::string("$set"),
                                          bsoncxx::builder::basic::make_document(
                                              bsoncxx::builder::basic::kvp(std::string(Subscription::notifyCseq_fld()), updatedNotifyCseq),
@@ -669,16 +672,25 @@ void SubscribeDB::updateNotifyUnexpiredSubscription(
         mongocxx::collection collection = connection.collection(_ns);
 
         // Execute the update operation
-        auto result = collection.update_one(query.view(), update.view());
+        std::optional<mongocxx::result::update> result = collection.update_one(query.view(), update.view());
 
         // Log the result of the update
-        if (result && result->modified_count() > 0)
+        if (!result)
         {
-            OS_LOG_INFO(FAC_SIP, "SubscribeDB::updateNotifyUnexpiredSubscription - Successfully updated subscription.");
+            OS_LOG_WARNING(FAC_SIP, "SubscribeDB::updateNotifyUnexpiredSubscription - Update result unavailable.");
+        }
+        else if (result->modified_count() > 0)
+        {
+            OS_LOG_INFO(FAC_SIP, "SubscribeDB::updateNotifyUnexpiredSubscription - Matched subscription, "
+                << result->modified_count() << " field(s) modified.");
+        }
+        else if (result->matched_count() > 0)
+        {
+            OS_LOG_INFO(FAC_SIP, "SubscribeDB::updateNotifyUnexpiredSubscription - No change to matched subscription.");
         }
         else
         {
-            OS_LOG_WARNING(FAC_SIP, "SubscribeDB::updateNotifyUnexpiredSubscription - No matching document found to update.");
+            OS_LOG_WARNING(FAC_SIP, "SubscribeDB::updateNotifyUnexpiredSubscription - No matching subscription.");
         }
     }
     catch (const mongocxx::exception& e)
@@ -707,18 +719,18 @@ void SubscribeDB::updateToTag(
         MongoDB::MongoConnection connection(_info);
 
         // Build the query document to find records matching the `callid`
-        auto query = bsoncxx::builder::basic::make_document(
+        bsoncxx::document::value query = bsoncxx::builder::basic::make_document(
             bsoncxx::builder::basic::kvp(std::string(Subscription::callId_fld()), callid.str()));
 
         // Retrieve the collection
         mongocxx::collection collection = connection.collection(_ns);
 
         // Execute the query
-        auto cursor = collection.find(query.view());
-        for (const auto& bsonObj : cursor)
+        mongocxx::cursor cursor = collection.find(query.view());
+        for (const bsoncxx::document::view& bsonObj : cursor)
         {
             // Check for `fromUri` field
-            auto fromUriElem = bsonObj[Subscription::fromUri_fld()];
+            bsoncxx::document::element fromUriElem = bsonObj[Subscription::fromUri_fld()];
             if (fromUriElem && fromUriElem.type() == bsoncxx::type::k_string)
             {
                 std::string fromUri = std::string(fromUriElem.get_string().value);
@@ -729,7 +741,7 @@ void SubscribeDB::updateToTag(
                 if (from_uri.getFieldParameter("tag", seen_tag) && seen_tag.compareTo(fromtag) == 0)
                 {
                     // Check for `toUri` field
-                    auto toUriElem = bsonObj[Subscription::toUri_fld()];
+                    bsoncxx::document::element toUriElem = bsonObj[Subscription::toUri_fld()];
                     if (toUriElem && toUriElem.type() == bsoncxx::type::k_string)
                     {
                         std::string toUri = std::string(toUriElem.get_string().value); 
@@ -743,15 +755,15 @@ void SubscribeDB::updateToTag(
                             to_uri.toString(dummy); // Convert back to string
 
                             // Get the `_id` field
-                            auto idElem = bsonObj["_id"];
+                            bsoncxx::document::element idElem = bsonObj["_id"];
                             if (idElem && idElem.type() == bsoncxx::type::k_oid)
                             {
                                 bsoncxx::oid oid = idElem.get_oid().value;
 
                                 // Create query and update documents
-                                auto updateQuery = bsoncxx::builder::basic::make_document(
+                                bsoncxx::document::value updateQuery = bsoncxx::builder::basic::make_document(
                                     bsoncxx::builder::basic::kvp(std::string("_id"), oid));
-                                auto updateDoc = bsoncxx::builder::basic::make_document(
+                                bsoncxx::document::value updateDoc = bsoncxx::builder::basic::make_document(
                                     bsoncxx::builder::basic::kvp(std::string("$set"),
                                                                  bsoncxx::builder::basic::make_document(
                                                                      bsoncxx::builder::basic::kvp(std::string(Subscription::toUri_fld()), dummy.data()))));
