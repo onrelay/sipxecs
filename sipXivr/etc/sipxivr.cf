@@ -159,21 +159,26 @@ bundle agent sipxivr_running {
       "any" usebundle => rh_systemctl_status("disable sipxivr");
 
   commands:
-    (!sipxivr|stop_sipxecs).sipxivr_running::
+    (!sipxivr|stop_sipxecs|stop_sipxivr).sipxivr_running::
       "$(sipx.systemctl)"
         comment => "stop sipxivr",
         args => "stop sipxivr";
 
-    sipxivr.!sipxivr_running.!stop_sipxecs::
+    sipxivr.!sipxivr_running.!stop_sipxecs.!stop_sipxivr::
       "$(sipx.systemctl)"
         comment => "start sipxivr",
+        args => "start sipxivr";
+
+    sipxivr.!sipxivr_running.start_sipxivr::
+      "$(sipx.systemctl)"
+        comment => "start sipxivr after restore",
         args => "start sipxivr";
         
       "/usr/bin/setfacl"
         comment => "Executed command: setfacl -Rm d:u:freeswitch:rwX,u:freeswitch:rwX $(sipx.SIPX_IVRDATADIR)",
         args => "-Rm d:u:freeswitch:rwX,u:freeswitch:rwX $(sipx.SIPX_IVRDATADIR)";        
 
-    sipxivr.sipxivr_running.(restart_sipxecs|restart_sipxivr)::
+    sipxivr.sipxivr_running.(restart_sipxecs|restart_sipxivr|start_sipxivr)::
       "$(sipx.systemctl)"
         comment => "restart sipxivr",
         args => "restart sipxivr";

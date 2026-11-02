@@ -62,15 +62,20 @@ class Restore < ArchiveBase
     cmd "tar -tzf #{params[:file]} version" or
       raise "Verification failed. Could not determine format of #{params[:file]}"    
 
-    cmd "nohup systemctl stop sipxivr &" if params[:restart]
+    if params[:restart]
+      cmd "systemctl stop sipxivr" or
+        raise "Failed to stop sipxivr before restoring voicemail."
+    end
 
-    cmd "tar -xz --exclude=version -C #{@sipxdata}/../.. -f #{params[:file]}" or
-      raise "Failed to extract database from archive."
+    begin
+      cmd "tar -xz --exclude=version -C #{@sipxdata}/../.. -f #{params[:file]}" or
+        raise "Failed to extract database from archive."
 
-    cmd "chown @SIPXPBXUSER@:@SIPXPBXGROUP@ -R #{params[:path]}" or
-      raise "Failed to set permissions on mailstore dir."
-
-    cmd "systemctl start sipxivr" if params[:restart]
+      cmd "chown @SIPXPBXUSER@:@SIPXPBXGROUP@ -R #{params[:path]}" or
+        raise "Failed to set permissions on mailstore dir."
+    ensure
+      cmd "systemctl start sipxivr" if params[:restart]
+    end
   end
 end
 

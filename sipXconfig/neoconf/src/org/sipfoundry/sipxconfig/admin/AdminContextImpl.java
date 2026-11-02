@@ -55,7 +55,7 @@ public class AdminContextImpl extends SipxHibernateDaoSupport<Object> implements
         HTTP_ADDRESS, HTTP_ADDRESS_AUTH, HTTPS_ADDRESS_AUTH, SIPXCDR_DB_ADDRESS
     });
     private static final String BACKUP_COMMAND = "sipxconfig-archive --backup %s";
-    private static final String RESTORE_COMMAND = "sipxconfig-archive --restore %s";
+    private static final String RESTORE_COMMAND = "sipxconfig-archive --restore %s --no-service-restart";
     private LocationsManager m_locationsManager;
     private DomainManager m_domainManager;
     private BeanWithSettingsDao<AdminSettings> m_settingsDao;

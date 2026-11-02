@@ -68,6 +68,7 @@
 
   <bean id="restoreApi" class="org.sipfoundry.sipxconfig.backup.RestoreApi" scope="prototype" >
     <property name="locationsManager" ref="locationsManager"/>
+    <property name="configManager" ref="configManager"/>
     <property name="backupRunner" ref="backupRunner"/>
     <property name="backupConfig" ref="backupConfig"/>
     <property name="backupApi" ref="backupApi" />

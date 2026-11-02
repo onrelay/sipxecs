@@ -18,6 +18,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -29,8 +33,15 @@ import org.restlet.representation.Representation;
 import org.restlet.resource.ServerResource;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
+import org.sipfoundry.sipxconfig.cfgmgt.ConfigManager;
+import org.sipfoundry.sipxconfig.cfgmgt.RunRequest;
+import org.sipfoundry.sipxconfig.cdr.CdrManager;
 import org.sipfoundry.sipxconfig.commserver.Location;
 import org.sipfoundry.sipxconfig.commserver.LocationsManager;
+import org.sipfoundry.sipxconfig.feature.FeatureManager;
+import org.sipfoundry.sipxconfig.ivr.Ivr;
+import org.sipfoundry.sipxconfig.proxy.ProxyManager;
+import org.sipfoundry.sipxconfig.admin.AdminContext;
 
 public class RestoreApi extends ServerResource {
     private static final Log LOG = LogFactory.getLog(RestoreApi.class);
@@ -39,6 +50,7 @@ public class RestoreApi extends ServerResource {
     private LocationsManager m_locationsManager;
     private BackupConfig m_backupConfig;
     private BackupApi m_backupApi;
+    private ConfigManager m_configManager;
 
     /**
      * POST : Restore
@@ -55,6 +67,8 @@ public class RestoreApi extends ServerResource {
         File planFile = null;
         Writer planWtr = null;
         String configuration = StringUtils.EMPTY;
+        RestoreServices services = null;
+        boolean restartDeferred = false;
         try {
             //write user selection in a dedicated temp file : archive-backup-tmp-local.yaml/archive-backup-tmp-ftp.yaml
             //we cannot use a temp file because if HA setup
@@ -66,7 +80,15 @@ public class RestoreApi extends ServerResource {
             IOUtils.closeQuietly(planWtr);
             planWtr = null;
             configuration = FileUtils.readFileToString(planFile);
-            m_backupRunner.restore(planFile, selections);
+            services = getRestoreServices(plan, settings);
+            runServiceActions("Stop services for restore", services.m_stop);
+            try {
+                m_backupRunner.restore(planFile, selections);
+            } catch (BackupRunnerImpl.TimeoutException e) {
+                restartDeferred = true;
+                scheduleServiceStartAfterBackgroundRestore(services.m_start);
+                throw e;
+            }
             //if we are here, than restore finished successful
             LOG.info("Restore SUCCEEDED for configuration: " + configuration);
         } catch (Exception e) {
@@ -78,6 +100,115 @@ public class RestoreApi extends ServerResource {
             }
         } finally {
             IOUtils.closeQuietly(planWtr);
+            if (!restartDeferred && services != null) {
+                try {
+                    runServiceActions("Start services after restore", services.m_start);
+                } catch (RuntimeException e) {
+                    LOG.error("Failed to start services after restore", e);
+                    throw e;
+                }
+            }
+        }
+    }
+
+    private RestoreServices getRestoreServices(BackupPlan plan, BackupSettings settings) {
+        RestoreServices services = new RestoreServices();
+        Set<String> selected = plan.getDefinitionIds();
+        Set<String> restoredSingleNodeDefinitions = new LinkedHashSet<String>();
+        Collection<Location> locations = m_locationsManager.getLocationsList();
+        FeatureManager featureManager = m_backupApi.getBackupManager().getFeatureManager();
+
+        for (Location location : locations) {
+            Collection<ArchiveDefinition> definitions = m_backupApi.getBackupManager()
+                    .getArchiveDefinitions(location, plan, settings);
+            if (definitions == null) {
+                continue;
+            }
+            for (ArchiveDefinition definition : definitions) {
+                String id = definition.getId();
+                if (!selected.contains(id) || StringUtils.isBlank(definition.getRestoreCommand())) {
+                    continue;
+                }
+                if (definition.isSingleNodeRestore() && !restoredSingleNodeDefinitions.add(id)) {
+                    continue;
+                }
+
+                if (AdminContext.ARCHIVE.equals(id)) {
+                    services.addStart(location, "restart_sipxconfig");
+                } else if (Ivr.ARCHIVE.equals(id)) {
+                    services.addStop(location, "stop_sipxivr");
+                    services.addStart(location, "start_sipxivr");
+                } else if (CdrManager.ARCHIVE.equals(id)) {
+                    services.addStop(location, "stop_sipxcdr");
+                    services.addStart(location, "start_sipxcdr");
+                    for (Location proxyLocation : locations) {
+                        if (featureManager.isFeatureEnabled(ProxyManager.FEATURE, proxyLocation)) {
+                            services.addStop(proxyLocation, "stop_sipxproxy");
+                            services.addStart(proxyLocation, "start_sipxproxy");
+                        }
+                    }
+                }
+            }
+        }
+        return services;
+    }
+
+    private void runServiceActions(String label, Map<Location, Set<String>> actions) {
+        for (Map.Entry<Location, Set<String>> entry : actions.entrySet()) {
+            RunRequest request = new RunRequest(label, java.util.Collections.singleton(entry.getKey()));
+            request.setDefines(entry.getValue().toArray(new String[entry.getValue().size()]));
+            m_configManager.run(request);
+        }
+    }
+
+    private void scheduleServiceStartAfterBackgroundRestore(final Map<Location, Set<String>> actions) {
+        Thread restartThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean interrupted = false;
+                try {
+                    while (m_backupRunner.isInProgress()) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            interrupted = true;
+                        }
+                    }
+                } finally {
+                    try {
+                        runServiceActions("Start services after background restore", actions);
+                    } catch (RuntimeException e) {
+                        LOG.error("Failed to start services after background restore", e);
+                    }
+                    if (interrupted) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+            }
+        }, "restore-service-restart");
+        restartThread.setDaemon(true);
+        restartThread.start();
+    }
+
+    private static class RestoreServices {
+        private final Map<Location, Set<String>> m_stop = new LinkedHashMap<Location, Set<String>>();
+        private final Map<Location, Set<String>> m_start = new LinkedHashMap<Location, Set<String>>();
+
+        void addStop(Location location, String className) {
+            add(m_stop, location, className);
+        }
+
+        void addStart(Location location, String className) {
+            add(m_start, location, className);
+        }
+
+        private void add(Map<Location, Set<String>> actions, Location location, String className) {
+            Set<String> classes = actions.get(location);
+            if (classes == null) {
+                classes = new LinkedHashSet<String>();
+                actions.put(location, classes);
+            }
+            classes.add(className);
         }
     }
 
@@ -95,5 +226,9 @@ public class RestoreApi extends ServerResource {
 
     public void setBackupApi(BackupApi backupApi) {
         m_backupApi = backupApi;
+    }
+
+    public void setConfigManager(ConfigManager configManager) {
+        m_configManager = configManager;
     }
 }

@@ -70,17 +70,22 @@ bundle agent sipxcdr_running {
       "any" usebundle => find_sipxservice_by_command("$(service_command)","sipxcdr_running");
 
   commands:
-    (!sipxcdr|stop_sipxecs).sipxcdr_running::
+    (!sipxcdr|stop_sipxecs|stop_sipxcdr).sipxcdr_running::
       "$(sipx.systemctl)"
         comment => "stop sipxcdr",
         args => "stop sipxcdr";
 
-    sipxcdr.!sipxcdr_running.!stop_sipxecs::
+    sipxcdr.!sipxcdr_running.!stop_sipxecs.!stop_sipxcdr.!start_sipxcdr::
       "$(sipx.systemctl)"
         comment => "start sipxcdr",
         args => "start sipxcdr";
 
-    sipxcdr.sipxcdr_running.(restart_sipxecs|restart_sipxcdr)::
+    sipxcdr.!sipxcdr_running.start_sipxcdr::
+      "$(sipx.systemctl)"
+        comment => "start sipxcdr after restore",
+        args => "start sipxcdr";
+
+    sipxcdr.sipxcdr_running.(restart_sipxecs|restart_sipxcdr|start_sipxcdr)::
       "$(sipx.systemctl)"
         comment => "restart sipxcdr",
         args => "restart sipxcdr";

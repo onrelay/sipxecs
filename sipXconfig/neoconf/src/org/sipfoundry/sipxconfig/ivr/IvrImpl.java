@@ -281,7 +281,7 @@ public class IvrImpl implements FeatureProvider, AddressProvider, Ivr, ProcessPr
         String vmPath = getSettings().getVoicemailPath();
         vmPath = (vmPath == null ? "" : ",".concat(vmPath));
         ArchiveDefinition def = new ArchiveDefinition(ARCHIVE, m_archiveScript + " --backup %s".concat(vmPath),
-            m_archiveScript + " --restore %s".concat(vmPath));
+            m_archiveScript + " --restore %s".concat(vmPath) + " --no-restart");
         def.setBackupHost(getBackupHost());
         return Collections.singleton(def);
     }

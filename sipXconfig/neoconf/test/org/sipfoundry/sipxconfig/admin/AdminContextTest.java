@@ -58,7 +58,7 @@ public class AdminContextTest {
         Location primary = new Location("one.example.org", "1.1.1.1");
         primary.setPrimary(true);
         ArchiveDefinition def = impl.getArchiveDefinitions(mgr, primary, plan, settings).iterator().next();
-        String base = "sipxconfig-archive --restore %s --tmp-dir /var/sipxdata/tmp";
+        String base = "sipxconfig-archive --restore %s --no-service-restart --tmp-dir /var/sipxdata/tmp";
         String baseBackup = "sipxconfig-archive --backup %s --tmp-dir /var/sipxdata/tmp";
         assertEquals(base, def.getRestoreCommand());
         assertEquals(baseBackup, def.getBackupCommand());

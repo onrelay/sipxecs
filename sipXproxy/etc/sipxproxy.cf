@@ -144,7 +144,7 @@ bundle agent sipxproxy_running {
       										 "sipxproxy"); 
       										 
   commands:
-    (!sipxproxy|stop_sipxecs).sipxproxy_running::
+    (!sipxproxy|stop_sipxecs|stop_sipxproxy).sipxproxy_running::
       "$(sipx.systemctl)"
         comment => "stop sipxproxy",
         args => "stop sipxproxy";
@@ -154,12 +154,17 @@ bundle agent sipxproxy_running {
         comment => "Setup SIPXCDR database used by sipXproxy to insert call_state_events",
         args => "setup";        
 
-    sipxproxy.!sipxproxy_running.!stop_sipxecs::
+    sipxproxy.!sipxproxy_running.!stop_sipxecs.!stop_sipxproxy.!start_sipxproxy::
       "$(sipx.systemctl)"
         comment => "start sipxproxy",
         args => "start sipxproxy";
 
-    sipxproxy.sipxproxy_running.(restart_sipxproxy|restart_sipxecs|change_password|ssl_repaired)::
+    sipxproxy.!sipxproxy_running.start_sipxproxy::
+      "$(sipx.systemctl)"
+        comment => "start sipxproxy after restore",
+        args => "start sipxproxy";
+
+    sipxproxy.sipxproxy_running.(restart_sipxproxy|restart_sipxecs|start_sipxproxy|change_password|ssl_repaired)::
       "$(sipx.systemctl)"
         comment => "restart sipxproxy",
         args => "restart sipxproxy";

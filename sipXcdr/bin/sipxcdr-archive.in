@@ -84,7 +84,7 @@ class Restore < ArchiveBase
     end
     
     unless params[:dryrun]
-      sql_exec("postgres", "select pg_terminate_backend(pid) from pg_stat_activity where datname='sipxcdr';") if params[:restart]
+      sql_exec("postgres", "select pg_terminate_backend(pid) from pg_stat_activity where datname='sipxcdr';")
       cmd "nohup systemctl stop sipxcdr &" if params[:restart]
       cmd "nohup systemctl stop sipxproxy &" if params[:restart]
       cmd "dropdb -U #{@pguser} #{@db}"
