@@ -11,6 +11,7 @@ ivr_PKGS = \
 	iText \
 	jaudiotagger \
 	jakarta.mail \
+	jakarta.activation \
 	jakarta.servlet \
 	jakarta.servlet-api \
 	jakarta.activation-api \
