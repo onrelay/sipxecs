@@ -1,6 +1,6 @@
 # sipXecs (by [OnRelay](https://www.onrelay.com))
 
-sipXecs is a highly scalable, distributed, open-source enterprise IP communications system. Originally developed in the early 2000s, the platform has been rejuvenated by OnRelay for modern infrastructure requirements. 
+sipXecs is a highly scalable, distributed, open-source enterprise IP communications system. The sipXecs project has since 2023 been rejuvenated and refactored by OnRelay for modern cloud infrastructure requirements. 
 
 This repository is an actively maintained fork of the original stable `21.04` release, updated to support modern Linux distributions and cloud-native environments.
 
