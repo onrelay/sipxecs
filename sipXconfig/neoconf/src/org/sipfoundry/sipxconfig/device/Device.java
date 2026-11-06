@@ -167,7 +167,9 @@ public abstract class Device extends BeanWithGroups {
     }
 
     public void removeProfiles(ProfileLocation location) {
-        location.removeProfile(getProfileFilename());
+        if( location != null ) {
+            location.removeProfile(getProfileFilename());
+        }
     }
 
     public void setBeanId(String beanId) {
