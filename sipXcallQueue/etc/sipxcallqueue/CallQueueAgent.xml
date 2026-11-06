@@ -30,6 +30,6 @@
 	<setting name="reject-delay-time"><type><integer/></type><value>0</value></setting>
 	<setting name="busy-delay-time"><type><integer/></type><value>0</value></setting>
 	<setting name="no-answer-delay-time"><type><integer/></type><value>0</value></setting>
-	<setting name="call-timeout"><type><integer/></type><value>0</value></setting>
+	<setting name="call-timeout"><type><integer/></type><value>30</value></setting>
     </group>
 </model>
