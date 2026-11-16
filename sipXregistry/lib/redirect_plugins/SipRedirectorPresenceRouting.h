@@ -16,10 +16,8 @@
 // APPLICATION INCLUDES
 #include "filereader/RefreshingFileReader.h"
 #include "registry/RedirectPlugin.h"
-#include "registry/RedirectPlugin.h"
-#include "os/OsTimer.h"
 #include "os/OsMutex.h"
-#include "net/XmlRpcMethod.h"
+#include "sipdb/MongoDB.h"
 
 // DEFINES
 // MACROS
@@ -43,9 +41,6 @@ protected:
 private:
    UtlHashMap mUserVmOnDndPreferences;
    OsMutex    mMutex;
-#if 0
-   OsStatus parseDocument( TiXmlDocument* pDoc );
-#endif
    OsStatus parseDocument();
 };
 
@@ -68,26 +63,31 @@ private:
    UtlString mUnifiedPresence;
 };
 
-class UnifiedPresenceContainer
+/**
+ * Reads unified presence state from the shared imdb.unifiedPresence mongo
+ * collection. The collection is maintained by the sipXopenfire presence
+ * plugin, which owns the XMPP related fields of each document; other
+ * components may contribute additional fields (for example sipState).
+ * Documents are keyed by the SIP identity (user@domain).
+ */
+class UnifiedPresenceDB : public MongoDB::BaseDB
 {
 public:
-   static UnifiedPresenceContainer* pInstance;
-   static UnifiedPresenceContainer* getInstance( void );
-   void insert( UtlString* pAor, UnifiedPresence* pUnifiedPresence ); // if entry already exists, it is updated
-   const UnifiedPresence* lookup( UtlString* pAor );
-   void reset( void );
+   static const std::string NS;
 
-private:
-   UnifiedPresenceContainer();
-   UtlHashMap mUnifiedPresences;
-   OsMutex    mMutex;
+   UnifiedPresenceDB(const MongoDB::ConnectionInfo& info) :
+      MongoDB::BaseDB(info, NS)
+   {
+   }
+
+   bool findByIdentity(const std::string& identity, UnifiedPresence& presence) const;
 };
 
 /**
  * SipRedirectorPresenceRouting is a class whose object adds or removes contacts
  * based on the presence state of the called users.
  */
-class SipRedirectorPresenceRouting : public RedirectPlugin, OsNotification
+class SipRedirectorPresenceRouting : public RedirectPlugin
 {
   public:
 
@@ -122,49 +122,22 @@ class SipRedirectorPresenceRouting : public RedirectPlugin, OsNotification
 
    virtual const UtlString& name( void ) const;
 
-   // OsNotification virtual method implementation
-   virtual OsStatus signal(intptr_t eventData);
-
    static const UtlString& getLocalDomainName( void );
-
-   static void basicAuthCreds(std::string& creds, const char *user, const char *sharedSecret);
 
   protected:
 
    // String to use in place of class name in log messages:
    // "[instance] class".
    UtlString mLogName;
-   UtlString mRealm;
    UtlString mSipDomain;
    UtlBoolean mbForwardToVmOnBusy;
-   Url mOpenFirePresenceServerUrl;
-   Url mLocalPresenceMonitorServerUrl;
-   UtlHashMap mUnifiedPresences;
-   OsTimer mPingTimer;
-   bool mbRegisteredWithOpenfire;
-   std::string mXmlApcApiCreds;
 
   private:
    void addContactToContactList( const UtlString& target, const Url& requestUri, const SipMessage& message, ContactList& contactList );
    void removeNonVoicemailContacts( ContactList& contactList );
-   OsStatus startPresenceMonitorXmlRpcServer( void );
-   OsStatus registerPresenceMonitorServerWithOpenfire(void );
-   OsStatus pingOpenfire( void );
    static UtlString  sLocalDomain;
-   UtlString mOpenfireInstanceHandle;
-   PresenceRoutingUserPreferences mUserPrefs;   
-};
-
-class UnifiedPresenceChangedMethod : public XmlRpcMethod
-{
-public:
-      static XmlRpcMethod* get();
-      virtual bool execute(const HttpRequestContext& requestContext,
-                           UtlSList& params,
-                           void* userData,
-                           XmlRpcResponse& response,
-                           ExecutionStatus& status);
+   UnifiedPresenceDB* mpPresenceDb;
+   PresenceRoutingUserPreferences mUserPrefs;
 };
 
 #endif // SIPREDIRECTORPRESENCEROUTING_H
-
