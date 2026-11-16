@@ -7,7 +7,6 @@ EXTRA_DIST = $(initd_SCRIPTS:=.in) \
 
 confdir = @SIPX_LIBEXECDIR@
 conf_DATA = \
-	openfire-config \
 	openfire-config-functions
 
 $(conf_DATA) : % : %.in Makefile

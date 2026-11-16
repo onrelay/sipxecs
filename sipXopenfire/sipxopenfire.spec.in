@@ -56,7 +56,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,sipx,sipx,755)
-%attr(755,root,root) %{_libexecdir}/sipXecs/openfire-config
 %attr(755,root,root) %{_libexecdir}/sipXecs/openfire-config-functions
 %{_datadir}/sipxecs/cfinputs/plugin.d/sipxopenfire.cf
 %{_datadir}/sipxecs/cfinputs/plugin.d/lib/*.cf
@@ -86,3 +85,7 @@ alternatives --set java java-17-openjdk.x86_64
 if [ -f /etc/init.d/openfire ]; then
     chmod -x /etc/init.d/openfire
 fi
+# Remove remnants of the legacy hazelcast openfire plugin, dropped in favor
+# of the hazelcast library from sipXcommons (linked into openfire lib by
+# openfire-config-functions at service start)
+rm -rf @OPENFIRE_HOME@/plugins/hazelcast @OPENFIRE_HOME@/plugins/hazelcast.jar

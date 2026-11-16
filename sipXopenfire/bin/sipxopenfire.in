@@ -14,6 +14,9 @@
 
 . /etc/sysconfig/openfire || exit $ENOENT
 
+. @SIPX_LIBEXECDIR@/openfire-config-functions || { echo_failure; exit $ENOENT; }
+
+
 # If openfire user is not set in sysconfig, set to daemon.
 [ -z "$OPENFIRE_USER" ] && OPENFIRE_USER="daemon"
 
@@ -25,17 +28,21 @@ if [ -z "$OPENFIRE_HOME" -o ! -d "$OPENFIRE_HOME" ]; then
     echo "Please specify the Openfire installation location as variable OPENFIRE_HOME"
     exit 1
 fi
-
-# If log path is not set in sysconfig, set to $OPENFIRE_HOME/logs.
-[ -z "$OPENFIRE_LOGDIR" ] && OPENFIRE_LOGDIR="${OPENFIRE_HOME}/logs"
-
-JavaCmd=`@SIPX_BINDIR@/sipx-config --java --prog "${prog}"`
+prog=openfire
+pidfile="${OPENFIRE_PIDFILE}"
+regex="^@SIPX_BINDIR@/$prog/java-$prog"
 
 # Prepare location of openfire libraries
 OPENFIRE_LIB="${OPENFIRE_HOME}/lib"
 
+# If log path is not set in sysconfig, set to $OPENFIRE_HOME/logs.
+[ -z "$OPENFIRE_LOGDIR" ] && OPENFIRE_LOGDIR="${OPENFIRE_HOME}/logs"
+
 # Prepare openfire command line
-OPENFIRE_OPTS="${OPENFIRE_OPTS} -DopenfireHome=${OPENFIRE_HOME} -Dopenfire.lib.dir=${OPENFIRE_LIB}"
+OPENFIRE_OPTS="${OPENFIRE_OPTS} -DopenfireHome=${OPENFIRE_HOME}"
+OPENFIRE_OPTS="${OPENFIRE_OPTS} -Dopenfire.lib.dir=${OPENFIRE_LIB}"
+OPENFIRE_OPTS="${OPENFIRE_OPTS} -Dlog4j.configurationFile=${OPENFIRE_LIB}/log4j2.xml"
+OPENFIRE_OPTS="${OPENFIRE_OPTS} -Dlog4j2.formatMsgNoLookups=true"
 
 # Prepare local java class path
 if [ -z "$LOCALCLASSPATH" ]; then
@@ -44,16 +51,18 @@ else
 	LOCALCLASSPATH="${OPENFIRE_LIB}/startup.jar:${LOCALCLASSPATH}"
 fi
 
-prog=openfire
-pidfile="${OPENFIRE_PIDFILE}"
-regex="^@SIPX_BINDIR@/$prog/java-$prog"
+JavaCmd=`@SIPX_BINDIR@/sipx-config --java --prog "${prog}"`
 
 start() {
-  Command="${JAVACMD} -Dlog4j.configurationFile=${OPENFIRE_LIB}/log4j2.xml -Dlog4j2.formatMsgNoLookups=true"
+  setupCheck
+  refreshPlugins
+  refreshProviders
+
+  Command="${JavaCmd} -server ${OPENFIRE_OPTS} -classpath ${LOCALCLASSPATH} -jar ${OPENFIRE_LIB}/startup.jar"
 
   if [ -n "${NoFork}" ] ; then
     killAnyProcessOrphans "${pidfile}" "${regex}"
-    runuser -s /bin/bash ${OPENFIRE_USER} -c ${Command}
+    runuser -s /bin/bash ${OPENFIRE_USER} -c "${Command}"
   else
     checkRunningProcessIsListening "${pidfile}" "${regex}" > /dev/null 2>&1
     Status=$?
@@ -65,10 +74,10 @@ start() {
 
     if [ $# -gt 0 ]; then
       #check if process was spawned
-      checkRunningProcessTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
+      checkRunningProcessTimeout "${pidfile}" "${regex}" 30 > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ESRCH; }
-      checkProcessIsListeningTimeout "${pidfile}" "${regex}" > /dev/null 2>&1
+      checkProcessIsListeningTimeout "${pidfile}" "${regex}" 120 > /dev/null 2>&1
       Status=$?
       [ $Status -eq 0 ] || { echo_failure; exit $ENOSCKT; }
       [ $Status -eq 0 ] && { echo_success; }

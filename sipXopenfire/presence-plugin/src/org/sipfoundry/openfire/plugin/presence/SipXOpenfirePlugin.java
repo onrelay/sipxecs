@@ -513,6 +513,7 @@ public class SipXOpenfirePlugin implements Plugin, Component {
     public void destroyPlugin() {
         log.debug("DestroyPlugin");
         isInitialized = false;
+        PresenceUnifier.getInstance().shutdown();
         if (accountsParser != null) {
             AccountsParser.stopScanner();
         }

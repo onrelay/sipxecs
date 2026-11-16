@@ -26,6 +26,15 @@ refreshPlugins() {
    	   rm -rf ${OPENFIRE_HOME}/plugins/${PLUGIN}
        ln -s ${PLUGIN_PATH} ${OPENFIRE_HOME}/plugins
    done 
+
+   # Remove extracted plugin directories whose jar is gone, e.g. plugins
+   # dropped by an upgrade. Openfire skips this cleanup for plugins that
+   # never loaded. The admin console plugin has no jar by design.
+   find ${OPENFIRE_HOME}/plugins -mindepth 1 -maxdepth 1 -type d 2> /dev/null | while read PLUGIN_DIR; do
+       PLUGIN=$(basename ${PLUGIN_DIR})
+       [ "${PLUGIN}" = "admin" ] && continue
+       [ -e ${OPENFIRE_HOME}/plugins/${PLUGIN}.jar ] || rm -rf ${PLUGIN_DIR}
+   done
 }
 
 refreshProviders() {

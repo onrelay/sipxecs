@@ -36,15 +36,13 @@ import org.sipfoundry.sipxconfig.setting.SettingEntry;
 
 public class ImSettings extends PersistableSettings implements DeployConfigOnEdit {
 
-    private static final String ENABLE_PRESENCE = "settings/enable-presence";
-
     @Override
     protected Setting loadSettings() {
         return null;
     }
 
     public boolean isPresenceEnabled() {
-        return (Boolean) getSettingTypedValue(ENABLE_PRESENCE);
+        return false;
     }
 
     @Override

@@ -75,10 +75,6 @@
       <type refid="nonRootPort" />
       <value>5077</value>
     </setting>  
-    <setting name="_SIP_REGISTRAR_PRESENCE_PORT" advanced="yes">
-      <type refid="nonRootPort" />
-      <value>9096</value>
-    </setting>  
     <setting name="SIP_REGISTRAR_LOG_LEVEL">
       <type refid="loglevel" />
       <value>NOTICE</value>

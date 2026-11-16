@@ -1,7 +1,0 @@
-. @SIPX_LIBEXECDIR@/openfire-config-functions
-
-if [ "$1" = "start" ] || [ "$1" = "restart" ]; then
-  setupCheck
-  refreshPlugins
-  refreshProviders
-fi

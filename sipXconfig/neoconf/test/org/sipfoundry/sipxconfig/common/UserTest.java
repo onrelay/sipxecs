@@ -472,6 +472,14 @@ public class UserTest extends TestCase {
         // make sure 0 is ignored as possible extension
         user.addAlias("0");
         assertEquals("01", user.getExtension(false));
+
+        // E.164 addresses with a leading + are considered numeric
+        user.setUserName("+12345556677");
+        assertTrue(user.hasNumericUsername());
+        assertEquals("+12345556677", user.getExtension(true));
+        assertFalse(User.isNumeric("+"));
+        assertFalse(User.isNumeric("+0"));
+        assertFalse(User.isNumeric("++12345"));
     }
 
     public void testGetSite() {

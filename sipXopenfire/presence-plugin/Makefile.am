@@ -7,7 +7,6 @@ SUBDIRS = \
 
 EXTRA_DIST = \
 	plugin.xml \
-	web \
 	$(test_SRC) \
 	config.properties.in
 
@@ -30,7 +29,6 @@ $(presence_JAR) :
 	mkdir lib
 	cp $(presence_FILES) lib
 	jar -cf $@ \
-	  -C $(srcdir) web \
 	  -C $(srcdir) plugin.xml \
 	  lib 
 

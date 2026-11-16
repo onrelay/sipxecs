@@ -160,7 +160,6 @@ bundle edit_line openfire_config_contents {
     any::
       "SIP_DOMAIN_NAME=$(sipx.domain)";
       "FQDN=$(sipx.host).$(sipx.net_domain)";
-      "source $(sipx.SIPX_LIBEXECDIR)/openfire-config $1";
 }
 
 bundle edit_line openfire_properties {
@@ -186,6 +185,13 @@ bundle edit_line sipxopenfire_sipx_properties {
 }
 
 bundle agent sipxopenfire_running {
+  vars:
+    any::
+      "service" string => "sipxopenfire";
+
+  classes:
+    "sipxopenfire_running" expression => returnszero("$(sipx.systemctl) is-active $(service)","noshell");
+
   methods:
     !src.sipxopenfire::
       "any" usebundle => rh_systemctl_status("enable sipxopenfire");

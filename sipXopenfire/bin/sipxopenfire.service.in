@@ -9,7 +9,8 @@ EnvironmentFile=-/etc/sysconfig/openfire
 ExecStart=/etc/init.d/sipxopenfire start
 ExecStop=/etc/init.d/sipxopenfire stop
 ExecReload=/etc/init.d/sipxopenfire restart
-PIDFile=/var/run/openfire.pid
+PIDFile=/run/openfire.pid
+TimeoutStartSec=240
 
 [Install]
 WantedBy=multi-user.target

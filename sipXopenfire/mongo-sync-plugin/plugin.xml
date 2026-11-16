@@ -10,7 +10,6 @@
 
     <version>1.0</version>
     <date>04/11/2013</date>
-    <parentPlugin>hazelcast</parentPlugin>
     <url>http://www.sipfoundry.org</url>
     <minServerVersion>3.8.1</minServerVersion>
     <licenseType>agpl</licenseType>

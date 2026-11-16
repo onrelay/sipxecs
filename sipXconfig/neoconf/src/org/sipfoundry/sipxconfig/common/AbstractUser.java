@@ -116,7 +116,8 @@ public abstract class AbstractUser extends BeanWithGroups implements SystemAudit
     public static final String SUPERADMIN = "superadmin";
 
     // "0" cannot be used as valid extension - it's hardcoded in login.vxml
-    private static final Pattern PATTERN_NUMERIC = Pattern.compile("([1-9]\\d*)|(0\\d+)");
+    // An optional leading "+" is allowed to support E.164 formatted addresses
+    private static final Pattern PATTERN_NUMERIC = Pattern.compile("\\+?(([1-9]\\d*)|(0\\d+))");
 
     private PermissionManager m_permissionManager;
     private DomainManager m_domainManager;

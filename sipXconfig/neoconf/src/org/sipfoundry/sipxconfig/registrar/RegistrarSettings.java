@@ -59,10 +59,6 @@ public class RegistrarSettings extends PersistableSettings implements DeployConf
         return (Integer) getSettingTypedValue("registrar-config/SIP_REGISTRAR_REG_EVENT_PORT");
     }
 
-    public int getPresencePort() {
-        return (Integer) getSettingTypedValue("registrar-config/_SIP_REGISTRAR_PRESENCE_PORT");
-    }
-
     public boolean isEarlyAliasResolutionEnabled() {
         return (Boolean) getSettingTypedValue("registrar-config/SIP_REGISTRAR_EARLY_ALIAS_RESOLUTION");
     }

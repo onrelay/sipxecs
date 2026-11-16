@@ -106,7 +106,9 @@ synchserver_PKGS = \
 
 provider_PKGS_RT = \
 	$(provider_PKGS) \
+	hazelcast \
 	xmlrpc-server \
+	commons-lang \
 	commons-collections \
 	commons-beanutils-core \
 	commons-io \
@@ -129,7 +131,16 @@ provider_PKGS_RT = \
 	jradius-core \
 	jradius-dictionary \
 	commons-pool \
-	gnu-crypto
+	gnu-crypto \
+	spring-aop \
+	jakarta.xml.bind-api \
+	jakarta.activation-api \
+	angus-activation \
+	jaxb-core \
+	jaxb-impl \
+	jaxb-runtime \
+	aopalliance \
+	spring-aop
 
 sipxvcard_JAVAROOT = $(abspath $(top_builddir)/vcard-provider/classes)
 vcardsynchserver_JAVAROOT = $(abspath $(top_builddir)/vcard-synchserver)

@@ -23,6 +23,5 @@ AC_CONFIG_FILES([
   ws-plugin/Makefile
   mongo-lib/Makefile
   mongo-sync-plugin/Makefile
-  openfire-plugins/Makefile
 ])
 AC_OUTPUT
