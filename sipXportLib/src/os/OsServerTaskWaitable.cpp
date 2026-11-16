@@ -76,7 +76,7 @@ OsServerTaskWaitable::OsServerTaskWaitable(const UtlString& name,
          close(filedes[1]);
          mPipeReadingFd = -1;
          mPipeWritingFd = -1;
-         Os::Logger::instance().log(FAC_KERNEL, PRI_ERR,
+         Os::Logger::instance().log(FAC_KERNEL, PRI_CRIT,
                        "OsServerTaskWaitable::_ "
                        "pipe() returned %d -> %d, which exceeds fdSetSize = %d",
                        filedes[1], filedes[0], fdSetSize);
@@ -86,7 +86,7 @@ OsServerTaskWaitable::OsServerTaskWaitable(const UtlString& name,
    {
       mPipeReadingFd = -1;
       mPipeWritingFd = -1;
-      Os::Logger::instance().log(FAC_KERNEL, PRI_ERR,
+      Os::Logger::instance().log(FAC_KERNEL, PRI_CRIT,
                     "OsServerTaskWaitable::_ "
                     "pipe() returned %d, errno = %d, getdtablesize() = %d",
                     ret, errno, fdSetSize + FD_HEADROOM);
@@ -95,6 +95,7 @@ OsServerTaskWaitable::OsServerTaskWaitable(const UtlString& name,
 
 OsServerTaskWaitable::~OsServerTaskWaitable()
 {
+   OsServerTaskWaitable::shutdown();
 }
 
 void OsServerTaskWaitable::shutdown()

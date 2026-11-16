@@ -252,6 +252,8 @@ void SipClient::shutdown()
       {
         waitUntilShutDown();
       }
+
+      OsServerTaskWaitable::shutdown();
    }
 }
 
