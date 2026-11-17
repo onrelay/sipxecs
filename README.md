@@ -31,13 +31,24 @@ Comprehensive documentation is available for deployment and system management. U
 
 ---
 
-## 🤝 Community & Support
+## 🤝 Community
 
 We welcome contributions, bug reports, and feedback from the community!
 
 * **Discussions & Q&A:** Join the active conversation at the [sipXcom User Group](https://groups.google.com/g/sipxcom-users). 
 * **Issue Tracking:** Please open an issue in this repository if you encounter bugs or want to suggest software enhancements.
-* **Commercial Support:** OnRelay provides guaranteed response times and Service Level Agreements (SLAs) for production environments. Contact us at [support@onrelay.net](mailto://support@onrelay.net)  for a commercial quote.
+
+---
+
+## 💖 SLA Support
+
+OnRelay provides guaranteed response times and Service Level Agreements (SLAs) for production environments.
+
+* <a target="_blank" href="https://sipx.onrelay.com">SIPX Home Page</a>
+* <a target="_blank" href="https://sipx.onrelay.com/features">Features</a>
+* <a target="_blank" href="https://sipx.onrelay.com/pricing">Support Plans</a>
+* <a target="_blank" href="https://sipx.onrelay.com/sla-support">SLA</a>
+* <a target="_blank" href="https://onrelay.com/contact-us">Inquiries</a>
 
 ---
 
