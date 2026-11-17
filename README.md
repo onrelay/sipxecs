@@ -44,11 +44,11 @@ We welcome contributions, bug reports, and feedback from the community!
 
 OnRelay provides guaranteed response times and Service Level Agreements (SLAs) for production environments.
 
-* <a target="_blank" href="https://sipx.onrelay.com">SIPX Home Page</a>
-* <a target="_blank" href="https://sipx.onrelay.com/features">Features</a>
-* <a target="_blank" href="https://sipx.onrelay.com/pricing">Support Plans</a>
-* <a target="_blank" href="https://sipx.onrelay.com/sla-support">SLA</a>
-* <a target="_blank" href="https://onrelay.com/contact-us">Inquiries</a>
+* **SIPX Home Page:** Explore SLA support model, prices and SLAs [here](https://sipx.onrelay.com).
+* **Features:** sipXecs features compared to Asterisk and Free PBX [here](https://sipx.onrelay.com/features).
+* **Pricing:** Support plans and pricing options [here](https://sipx.onrelay.com/pricing).
+* **SLA:** Service Level Agreements for software support [here](https://sipx.onrelay.com/pricing).
+* **Inquiries:** Contact OnRelay for SLA support inquiries [here](https://onrelay.com/contact-us).
 
 ---
 
