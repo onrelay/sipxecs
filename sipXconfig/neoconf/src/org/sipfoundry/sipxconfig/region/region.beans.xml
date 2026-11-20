@@ -15,7 +15,6 @@
   <bean id="baseRegionApi" class="org.sipfoundry.sipxconfig.region.RegionApi" abstract="true" scope="prototype">
     <property name="regionManager" ref="regionManager"/>
     <property name="locationsManager" ref="locationsManager"/>
-    <property name="modifiable" value="false" />
   </bean>
   
   <bean id="regionApi" parent="baseRegionApi" scope="prototype" />

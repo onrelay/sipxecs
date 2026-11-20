@@ -162,7 +162,7 @@ class Tabs {
     this.ids = ids.toList(growable: false);
     for (String id in this.ids) {
       var linkId = "#${id}-tab-link";
-      AnchorElement link = root.querySelector(linkId) as AnchorElement;
+      AnchorElement? link = root.querySelector(linkId) as AnchorElement?;
       if (link == null) {
         print("ERROR: Cannot find tab link ${linkId}");
         continue;
@@ -203,7 +203,7 @@ class Tabs {
   
   showTabContent(String selectedId) {
     for (String id in this.ids) {
-      Element tabContent = querySelector("#${id}")!;
+      Element? tabContent = querySelector("#${id}");
       if (tabContent == null) {
         print("ERROR: Cannot find tab ${id}");
       } else {
@@ -335,7 +335,10 @@ class DataLoader {
   }
 
   static bool checkResponse(UserMessage msg, HttpRequest request, [bool confirmErrors = false]) {
-    if (request.status == 200) {
+    int status = request.status ?? 0;
+    // Any 2xx code is a success, e.g. Restlet 2.x returns 204 No Content for
+    // operations that have no response body where Restlet 1.x returned 200.
+    if (status >= 200 && status < 300) {
       return true;
     }
     String? userError;
@@ -588,4 +591,19 @@ class SettingEditor {
  */
 String toStr(dynamic o) {
   return (o == null ? '' : o.toString()); 
+}
+
+/**
+ * Makes a multiple select toggle option selection on plain click, like a
+ * checkbox list, instead of requiring control or command clicks.
+ */
+void enableClickToggle(SelectElement select) {
+  select.onMouseDown.listen((MouseEvent event) {
+    var target = event.target;
+    if (target is OptionElement) {
+      event.preventDefault();
+      target.selected = !target.selected;
+      select.dispatchEvent(new Event('change'));
+    }
+  });
 }

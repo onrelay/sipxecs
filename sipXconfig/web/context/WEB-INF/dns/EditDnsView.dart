@@ -122,8 +122,8 @@ class DnsViewEditor {
     return meta;
   }
   
-  int safeInt(String value) {
-    return value == null || value == "" ? 0 : int.parse(value);
+  int? safeInt(String value) {
+    return value == "" ? null : int.parse(value);
   }
   
   load() {
@@ -132,7 +132,7 @@ class DnsViewEditor {
     loader.load(url);
   }
   
-  loadRegionCandidates(Map<String, String> regionOptions, int regionId) {
+  loadRegionCandidates(Map<String, String> regionOptions, int? regionId) {
     SelectElement select = querySelector("#regionId")! as SelectElement;
     regionOptions.forEach((id, value) {
       bool selected = (int.parse(id) == regionId);
@@ -140,7 +140,7 @@ class DnsViewEditor {
     });
   }
   
-  loadPlanOptions(Map<String, String> planOptions, int planId) {
+  loadPlanOptions(Map<String, String> planOptions, int? planId) {
     SelectElement select = querySelector("#planId")! as SelectElement;
     planOptions.forEach((id, value) {
       bool selected = (int.parse(id) == planId);
@@ -148,7 +148,7 @@ class DnsViewEditor {
     });
   }
   
-  loadCustomRecords(Map<String, String> customRecordsOptions, List<int> customRecordsIds) {
+  loadCustomRecords(Map<String, String> customRecordsOptions, List<int>? customRecordsIds) {
     if (customRecordsOptions.length == 0) {
       // If there are no custom record sets defined, don't bother showing list. It's disconcerting
       // to show select box where there's nothing to select
@@ -156,13 +156,14 @@ class DnsViewEditor {
       return;
     }
     SelectElement select = querySelector("#customRecordsIds")! as SelectElement;
+    enableClickToggle(select);
     customRecordsOptions.forEach((id, value) {
       bool selected = (customRecordsIds != null && customRecordsIds.contains(int.parse(id)));
       select.append(new OptionElement(data: value, value: id, selected : selected));
     });    
   }
   
-  loadExcluded(List<String> excluded) {
+  loadExcluded(List<String>? excluded) {
     if (excluded == null || excluded.length == 0) {
       return;
     }
@@ -174,19 +175,22 @@ class DnsViewEditor {
   
   loadForm(json) {
     var data = jsonDecode(json);
-    Map<String, dynamic> view = data['view'];
+    Map<String, dynamic>? view = (data['view'] as Map?)?.cast<String, dynamic>();
+    int? regionId;
+    int? planId;
+    List<int>? customRecordsIds;
+    List<String>? excluded;
     if (view != null) {
-      (querySelector("#name")! as InputElement).value = view!['name'] as String;
-      int regionId = view['regionId']! as int;
-      int planId = view['planId']! as int;
-      List<int> customRecordsIds = view['customRecordsIds']! as List<int>;
-      List<String> excluded = view['excluded']! as List<String>;
-
-      loadRegionCandidates(data['regionCandidates'], regionId);
-      loadPlanOptions(data['planCandidates'], planId);
-      loadCustomRecords(data['customRecordsCandidates'], customRecordsIds);
-      loadExcluded(excluded);
-      loadPreview();
+      (querySelector("#name")! as InputElement).value = view['name'] as String;
+      regionId = view['regionId'] as int?;
+      planId = view['planId'] as int?;
+      customRecordsIds = (view['customRecordsIds'] as List?)?.cast<int>();
+      excluded = (view['excluded'] as List?)?.cast<String>();
     }
+    loadRegionCandidates((data['regionCandidates'] as Map).cast<String, String>(), regionId);
+    loadPlanOptions((data['planCandidates'] as Map).cast<String, String>(), planId);
+    loadCustomRecords((data['customRecordsCandidates'] as Map).cast<String, String>(), customRecordsIds);
+    loadExcluded(excluded);
+    loadPreview();
   }  
 }

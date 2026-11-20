@@ -30,7 +30,7 @@ class DnsPlanEditor {
   late DataLoader loader;
   int uid = 0;
   List<Element> groups = [];
-  Map<int,String>? targetOptions;
+  Map<String, dynamic>? targetOptions;
   late Map<String, dynamic> itemPrototype;
   late Map<String, dynamic> groupPrototype;
   int? dnsPlanId;
@@ -109,7 +109,7 @@ class DnsPlanEditor {
     plan['groups'] = groups;
     List<Map<String, dynamic>> targets = [];
     Map<String, dynamic> target;
-    for (HtmlElement i in form.sublist(1) as List<HtmlElement>) {
+    for (HtmlElement i in form.sublist(1).cast<HtmlElement>()) {
       if (i.id.startsWith("group-")) {
         var group = new Map<String, dynamic>();
         group['targets'] = targets;
@@ -145,12 +145,12 @@ class DnsPlanEditor {
 
   loadForm(json) {
     var data = jsonDecode(json);
-    targetOptions = data['targetCandidates'];
-    Map<String, dynamic> plan = data['plan']!;
-    (querySelector("#name")! as InputElement).value = plan['name'] as String;
-    List<Map<String, dynamic>> groups = plan['groups'] as List<Map<String, dynamic>>;
+    targetOptions = (data['targetCandidates'] as Map).cast<String, dynamic>();
+    Map<String, dynamic> plan = (data['plan'] as Map).cast<String, dynamic>();
+    (querySelector("#name")! as InputElement).value = plan['name'] as String?;
+    List? groups = plan['groups'] as List?;
     if (groups != null) {
-      for (Map<String, dynamic> group in groups!) {
+      for (Map<String, dynamic> group in groups.cast<Map<String, dynamic>>()) {
         addGroup(group, null);
       }
     }
@@ -198,7 +198,7 @@ class DnsPlanEditor {
 
     var juggler = new PercentageJuggler();
     Element lastRow = eGroup;
-    var targets = group['targets']! as List<Map<String, dynamic>>;
+    var targets = (group['targets'] as List).cast<Map<String, dynamic>>();
     for (Map<String, dynamic> target in targets) {
       lastRow = addTarget(lastRow, juggler, target);
     }
@@ -272,7 +272,7 @@ class DnsPlanEditor {
     return eItem;
   }
 
-  addTargetOptions(Element select, Map<int,String> options, String currentValue, String currentTargetType, String targetType) {
+  addTargetOptions(Element select, Map<String, dynamic> options, String currentValue, String currentTargetType, String targetType) {
     options.forEach((targetId, targetValue) {
       var label = (targetType == 'BASIC' ? getString('select.${targetId}') : targetValue);
       if (targetValue is Map) {
@@ -280,7 +280,7 @@ class DnsPlanEditor {
         separator.label = label;
         select.append(separator);
         // RECURSIVE !
-        addTargetOptions(separator, (targetValue as Map<int,String>), currentValue, currentTargetType, targetType);
+        addTargetOptions(separator, targetValue.cast<String, dynamic>(), currentValue, currentTargetType, targetId);
       } else {
         var selected = (currentValue == targetId) && (currentTargetType == targetType);
         var optionId = "${targetType}-${targetId}";

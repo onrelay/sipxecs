@@ -39,8 +39,8 @@ class RegionEditor {
   edit(Map<String, dynamic> region) {
     this.region = region;
     reset();
-    name().value = region['name']! as String;
-    List<String> addresses = region['addresses']! as List<String>;
+    name().value = region['name'] as String?;
+    List<String>? addresses = (region['addresses'] as List?)?.cast<String>();
     if (addresses != null && addresses.length > 0) {
       ipaddr0().value = addresses[0];
       for (int i = 1; i < addresses.length; i++) {
@@ -176,8 +176,9 @@ class ManageRegions {
   void reload([event]) {
     if (event != null) {
       HttpRequest req = event.target; 
-      if (req.status != 200) {
-        if( req.responseText != null ) {
+      int status = req.status ?? 0;
+      if (status < 200 || status >= 300) {
+        if( req.responseText != null && req.responseText!.isNotEmpty ) {
           var err = jsonDecode(req.responseText!);
           msg.error(err['error']); 
         }           

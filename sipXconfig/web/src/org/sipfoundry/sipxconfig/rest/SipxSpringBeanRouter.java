@@ -43,14 +43,24 @@ public class SipxSpringBeanRouter extends SpringBeanRouter {
     }
 
     protected void attachFinder(String uri, Finder finder) {
-        attach(uri, finder);
+        attachWithTrailingSlashVariant(uri, finder);
         if (uri.startsWith(MY_PREFIX)) {
             String privateUri = StringUtils.replaceOnce(uri, MY_PREFIX, "/private/{puk}");
-            attach(privateUri, finder);
+            attachWithTrailingSlashVariant(privateUri, finder);
         }
         if (uri.startsWith(MY_CALL_PREFIX)) {
             String privateUri = StringUtils.replaceOnce(uri, MY_CALL_PREFIX, "/call");
-            attach(privateUri, finder);
+            attachWithTrailingSlashVariant(privateUri, finder);
+        }
+    }
+
+    private void attachWithTrailingSlashVariant(String uri, Finder finder) {
+        attach(uri, finder);
+        // Legacy web clients (Dart UI) request many REST URIs with a trailing slash.
+        // Restlet 1.x tolerated this but Restlet 2.x templates match exactly, so
+        // attach a trailing-slash variant of each route as well.
+        if (!uri.endsWith("/") && uri.indexOf('?') < 0) {
+            attach(uri + "/", finder);
         }
     }
 }

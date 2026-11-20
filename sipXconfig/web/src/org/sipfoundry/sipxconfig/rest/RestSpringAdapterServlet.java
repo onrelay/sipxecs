@@ -22,9 +22,17 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.restlet.Application;
+import org.restlet.Context;
+import org.restlet.Request;
+import org.restlet.Response;
 import org.restlet.routing.Router;
+import org.restlet.data.Language;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.service.StatusService;
 import org.sipfoundry.sipxconfig.common.UserException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
@@ -53,8 +61,22 @@ public class RestSpringAdapterServlet extends HttpServlet {
         ApplicationContext app = getRequiredWebApplicationContext(servletContext);
         m_adapter = new ServletAdapter(servletContext);
         Router router = (Router) app.getBean("restletSpringBeanRouter", Router.class);
-        m_adapter.setNext(router);
         m_messageSource = (MessageSource) app.getBean("globalMessageSource");
+        // Restlet 2.x consumes exceptions inside ServerResource.doCatch and never propagates
+        // them to this servlet, unlike Restlet 1.x where the catch blocks in service() turned
+        // UserExceptions into localized JSON errors. doCatch delegates status and entity
+        // creation to the enclosing Application's StatusService, so wrap the router in an
+        // Application whose StatusService restores the original behavior.
+        Application restletApplication = new Application();
+        restletApplication.setContext(new Context());
+        restletApplication.setInboundRoot(router);
+        restletApplication.setStatusService(new UserErrorStatusService());
+        try {
+            restletApplication.start();
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
+        m_adapter.setNext(restletApplication);
     }
 
     @Override
@@ -107,5 +129,60 @@ public class RestSpringAdapterServlet extends HttpServlet {
         String json = String.format("{\"error\":\"%s\",\"type\":\"%s\"} ", msg, e.getClass().getName());
         res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         res.getWriter().append(json);
+    }
+
+    static UserException findUserException(Throwable throwable) {
+        for (Throwable cause = throwable; cause != null; cause = cause.getCause()) {
+            if (cause instanceof UserException) {
+                return (UserException) cause;
+            }
+        }
+        return null;
+    }
+
+    static Locale localeFromRequest(Request request) {
+        if (request != null && !request.getClientInfo().getAcceptedLanguages().isEmpty()) {
+            Language language = request.getClientInfo().getAcceptedLanguages().get(0).getMetadata();
+            return Locale.forLanguageTag(language.getName());
+        }
+        return Locale.getDefault();
+    }
+
+    static String jsonEscape(String value) {
+        return value.replace("\\", "\\\\").replace("\"", "\\\"");
+    }
+
+    /**
+     * Turns errors caught by Restlet into the same localized JSON bodies the Restlet 1.x era
+     * servlet catch blocks produced, so web clients can keep displaying friendly messages.
+     */
+    private class UserErrorStatusService extends StatusService {
+        @Override
+        public Status toStatus(Throwable throwable, Request request, Response response) {
+            if (findUserException(throwable) != null) {
+                return new Status(Status.CLIENT_ERROR_BAD_REQUEST, throwable);
+            }
+            return super.toStatus(throwable, request, response);
+        }
+
+        @Override
+        public Representation toRepresentation(Status status, Request request, Response response) {
+            Throwable throwable = status.getThrowable();
+            UserException userException = findUserException(throwable);
+            String message;
+            if (userException != null) {
+                message = l8n(userException.getMessage(), userException.getRawParams(),
+                        localeFromRequest(request));
+            } else {
+                message = status.getDescription();
+            }
+            if (message == null || message.isEmpty()) {
+                message = status.toString();
+            }
+            Throwable reported = (userException != null ? userException : throwable);
+            String type = (reported == null ? status.getClass().getName() : reported.getClass().getName());
+            String json = String.format("{\"error\":\"%s\",\"type\":\"%s\"} ", jsonEscape(message), type);
+            return new StringRepresentation(json, MediaType.APPLICATION_JSON);
+        }
     }
 }

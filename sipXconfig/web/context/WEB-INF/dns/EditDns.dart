@@ -66,7 +66,7 @@ class Failover {
     tbody.children.clear();
     var meta = jsonDecode(data);
     for (var plan in meta) {
-      List views = plan['views'];
+      List? views = plan['views'] as List?;
       String viewsHtml = (views == null ? '' : views.join(', '));
       var e = new Element.html('''
 <table>
@@ -206,7 +206,7 @@ class Custom {
     tbody.children.clear();
     var meta = jsonDecode(data);
     for (var custom in meta) {
-      List views = custom['views'];
+      List? views = custom['views'] as List?;
       String viewsHtml = (views == null ? '' : views.join(', '));
       var e = new Element.html('''
 <table>

@@ -98,7 +98,7 @@ class DnsDefaultViewEditor {
     loader.load(url);
   }
   
-  loadCustomRecords(Map<String, String> customRecordsOptions, List<int> customRecordsIds) {
+  loadCustomRecords(Map<String, String> customRecordsOptions, List<int>? customRecordsIds) {
     if (customRecordsOptions.length == 0) {
       // If there are no custom record sets defined, don't bother showing list. It's disconcerting
       // to show select box where there's nothing to select
@@ -106,6 +106,7 @@ class DnsDefaultViewEditor {
       return;
     }
     SelectElement select = querySelector("#customRecordsIds")! as SelectElement;
+    enableClickToggle(select);
     customRecordsOptions.forEach((id, value) {
       bool selected = (customRecordsIds != null && customRecordsIds.contains(int.parse(id)));
       select.append(new OptionElement(data: value, value: id, selected : selected));
@@ -116,12 +117,12 @@ class DnsDefaultViewEditor {
   loadForm(json) {
     var data = jsonDecode(json);
     print('$data');
-    Map<String, dynamic>? view = data['view'] as Map<String, dynamic>;
-    List<int> customRecordsIds = [];
+    Map<String, dynamic>? view = (data['view'] as Map?)?.cast<String, dynamic>();
+    List<int>? customRecordsIds;
     if (view != null) {
-      customRecordsIds = view!['customRecordsIds']! as List<int>;
+      customRecordsIds = (view['customRecordsIds'] as List?)?.cast<int>();
     }
-    loadCustomRecords(data['customRecordsCandidates'], customRecordsIds);
+    loadCustomRecords((data['customRecordsCandidates'] as Map).cast<String, String>(), customRecordsIds);
     loadPreview();
   }  
 }

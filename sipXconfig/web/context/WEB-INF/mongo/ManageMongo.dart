@@ -134,7 +134,7 @@ class ManageLocal extends ManageBase {
     builder.addMongoNodeSelect(dbCandidates, querySelector('#localAddDb')!, 'NEW_LOCAL', getString('addDatabase'));
     builder.addMongoNodeSelect(arbiterCandidates, querySelector('#localAddArbiter')!, 'NEW_LOCAL_ARBITER', getString('addArbiter'));
     
-    List shards = meta['shards'];
+    List? shards = meta['shards'] as List?;
     if ((shards == null || shards.length == 0) && (dbCandidates == null || dbCandidates.length == 0)) {
       msg.warning('''
 Only servers with regions defined can host a local database. Assign 
@@ -145,7 +145,7 @@ regions to servers if you wish to have a local databbase
     }      
       
     List<TableRowElement> rows = [];
-    for (var shard in shards) {
+    for (var shard in shards ?? []) {
       num count = 0;
       for (var type in ['databases', 'arbiters']) {
         if (shard[type] != null) {
