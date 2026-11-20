@@ -6,6 +6,8 @@
 Building
 ============
 
+If you are still using CentOS7, which is now End Of Life, please follow the :ref:`Building CentOS7 <building-centos7>` instructions to build sipXcom.
+
 Setup Environment
 -----------------
 
@@ -16,7 +18,7 @@ Add sipx User
 
 sipXcom must be built by a user called *sipx* with sudo privileges. 
 
-- Add the *sipx* group andd user:
+- Add the *sipx* group and user:
 
     .. code-block:: bash
 
@@ -70,7 +72,7 @@ If you are looking to build a specific branch, specify it as follows:
 Build sipXcom
 -----------------------
 
-To build sipXcom from source, execute the master build script from the root scr folder as the sipx user with sudo privileges:
+To build sipXcom from source, execute the master build script from the root src folder as the sipx user with sudo privileges:
 
   .. code-block:: bash
 
@@ -90,7 +92,7 @@ To build all the sipX* RPMs from source, just add the --rpm option to the sipxec
 
     sudo ./sipxecs-build --configure --build --rpm
 
-The resulting RPMs are e.g. found in the build/repo/CentOS_7/x86_64 folder for CentOS 7.
+The resulting RPMs are e.g. found in the build/repo/Rocky_9/x86_64 folder for Rocky Linux 9.
 
 To also install the RPMs locally, add the '--install' option:
 
@@ -120,13 +122,13 @@ The sipxecs-build script has the following additional options:
 
         **-b | --build**: Include this option to compile and build from source
 
-        **-p | --platform**: OS platform of sipxcom RPM to configure/build/install, e.g. rocky-7=9 (default), centos-7
+        **-p | --platform**: OS platform of sipxcom RPM to configure/build/install, e.g. rocky-9 (auto-detected from the OS), centos-7
 
         **-a | --architecture**: Hardware architecture of sipxcom RPM to build, e.g. x86_64 (default)
 
         **-s | --subproject**: subproject to build or sipx for building all RPMs, e.g. sipx (default), sipXconfig, sipXproxy
 
-        **-v | --version**: sipXcom cersion to build, e.g 25.01 (default)
+        **-v | --version**: sipXcom version to build, e.g 25.01 (default)
 
         **-r | --rpm**: Include this option if building rpms
 

@@ -1,8 +1,10 @@
-.. index:: upgrading
+.. index:: upgrading-centos7
 
-============
-Upgrading
-============
+.. _upgrading-centos7:
+
+==========================
+Upgrading CentOS 7 (EOL)
+==========================
 
 
 Upgrading from Legacy 21.04 to 24.01 on CentOS 7

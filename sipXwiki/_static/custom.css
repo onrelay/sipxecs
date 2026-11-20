@@ -1,0 +1,38 @@
+/* Match the sipXconfig web app skin: white header with the blue logo,
+   and the app's blue (#55829b) as accent color. See
+   sipXconfig/web/src/org/sipfoundry/sipxconfig/site/skin/sipxecs.css */
+
+/* White header behind the logo (sidebar top) */
+.wy-side-nav-search {
+    background-color: #ffffff;
+}
+.wy-side-nav-search > a img.logo {
+    max-width: 150px;
+}
+.wy-side-nav-search > div.version {
+    color: #55829b;
+}
+.wy-side-nav-search input[type="text"] {
+    border-color: #55829b;
+}
+
+/* Mobile top bar */
+.wy-nav-top {
+    background-color: #55829b;
+}
+
+/* Links and accents in app blue */
+a,
+.rst-content a,
+.wy-menu-vertical a:active {
+    color: #55829b;
+}
+a:hover,
+.rst-content a:hover {
+    color: #3a6075;
+}
+.wy-menu-vertical a:active,
+.wy-menu-vertical li.toctree-l1.current > a {
+    background-color: #55829b;
+    color: #ffffff;
+}

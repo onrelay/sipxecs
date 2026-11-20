@@ -13,17 +13,25 @@ sipXcom Documentation
    installing
    upgrading
    building   
-   setup
+   setupscript
    webui
+   customization
    security
    planning
    troubleshooting
    monitoring
    maintenance
    faq
-   howto   apiref :hidden:
+   howto
+   apiref
    restapi
-   soapapi
+
+.. toctree::
+   :hidden:
+
+   installing-centos7
+   upgrading-centos7
+   building-centos7
 
 Indices and tables
 ==================
