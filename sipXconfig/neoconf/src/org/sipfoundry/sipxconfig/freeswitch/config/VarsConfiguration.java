@@ -38,6 +38,7 @@ public class VarsConfiguration extends AbstractFreeswitchConfiguration {
         VelocityContext context = new VelocityContext();
         context.put("freeswitchDomain", getFsDomain(location));
         context.put("secureRtp", settings.isSecureRtpEnabled());
+        context.put("bridgeGenerateComfortNoise", settings.isBridgeGenerateComfortNoiseEnabled());
         write(writer, context);
     }
 

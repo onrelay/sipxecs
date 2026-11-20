@@ -35,6 +35,8 @@ public class FreeswitchSettings extends SettingsWithLocation implements DeployCo
     private static final String FREESWITCH_SIP_PORT = "freeswitch-config/FREESWITCH_SIP_PORT";
     private static final String FREESWITCH_CODECS = "freeswitch-config/FREESWITCH_CODECS";
     private static final String FREESWITCH_SECURE_RTP = "freeswitch-config/FREESWITCH_SECURE_RTP";
+    private static final String FREESWITCH_BRIDGE_GENERATE_COMFORT_NOISE =
+        "freeswitch-config/FREESWITCH_BRIDGE_GENERATE_COMFORT_NOISE";
     private static final String FREESWITCH_BLIND_TRANSFER = "freeswitch-config/FREESWITCH_BLIND_TRANSFER";
     private static final String FREESWITCH_SIMPLIFY = "freeswitch-config/FREESWITCH_SIMPLIFY";
     private static final String FREESWITCH_MAX_FORWARDS = "freeswitch-config/FREESWITCH_MAX_FORWARDS";
@@ -62,6 +64,10 @@ public class FreeswitchSettings extends SettingsWithLocation implements DeployCo
 
     public boolean isSecureRtpEnabled() {
         return (Boolean) getSettingTypedValue(FREESWITCH_SECURE_RTP);
+    }
+
+    public boolean isBridgeGenerateComfortNoiseEnabled() {
+        return (Boolean) getSettingTypedValue(FREESWITCH_BRIDGE_GENERATE_COMFORT_NOISE);
     }
 
     public boolean isBlindTransferEnabled() {

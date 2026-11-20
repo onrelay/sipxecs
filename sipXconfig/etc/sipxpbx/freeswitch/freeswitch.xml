@@ -99,6 +99,12 @@
       </type>
       <value>0</value>
     </setting>
+    <setting name="FREESWITCH_BRIDGE_GENERATE_COMFORT_NOISE">
+      <type>
+        <boolean/>
+      </type>
+      <value>0</value>
+    </setting>
     <setting name="FREESWITCH_BLIND_TRANSFER">
       <type>
         <boolean/>

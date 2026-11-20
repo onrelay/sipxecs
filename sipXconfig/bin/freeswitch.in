@@ -24,7 +24,7 @@ EXEC_ARGS="\
   -log @SIPX_FSLOGDIR@ \
   -run @SIPX_FSRUNDIR@ \
   -htdocs @SIPX_FSCONFDIR@/sipxpbx/conf/htdoc"
-EXEC_START_ARGS="-nc -nonat \
+EXEC_START_ARGS="-ncwait -nonat \
   -u $FS_USER \
   -g $FS_GROUP \
    $EXEC_ARGS"
@@ -103,7 +103,9 @@ do_start() {
   do_setlimits
   do_permission_check
   do_audio_setup
-  $EXEC $EXEC_START_ARGS > /dev/null 2>&1 & echo \$! > ${PIDFILE}
+  # With -ncwait freeswitch backgrounds itself, writes its own pidfile in the
+  # run directory, and this command only returns once the system is ready
+  $EXEC $EXEC_START_ARGS > /dev/null 2>&1
   RETVAL=$?
 
   if [ $# -gt 0 ]; then

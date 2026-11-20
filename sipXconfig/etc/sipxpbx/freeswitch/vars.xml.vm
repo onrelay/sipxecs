@@ -220,4 +220,7 @@
   <!-- Secure RTP ("false" (default), "true"). NOTE: Enforces secure RTP if set to true -->
   <X-PRE-PROCESS cmd="set" data="rtp_secure_media=${secureRtp}"/>
 
+  <!-- Generate comfort noise on bridged calls ("false" (default), "true") -->
+  <X-PRE-PROCESS cmd="set" data="bridge_generate_comfort_noise=${bridgeGenerateComfortNoise}"/>
+
 </include>

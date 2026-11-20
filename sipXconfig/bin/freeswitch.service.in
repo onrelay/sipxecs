@@ -9,7 +9,7 @@ ExecStart=@SIPX_SERVICEDIR@/freeswitch start
 RemainAfterExit=true
 ExecStop=@SIPX_SERVICEDIR@/freeswitch stop
 StandardOutput=journal
-PIDFile=@SIPX_FSRUNDIR@/freeswitch.pid
+PIDFile=/run/freeswitch/freeswitch.pid
 
 [Install]
 WantedBy=multi-user.target
