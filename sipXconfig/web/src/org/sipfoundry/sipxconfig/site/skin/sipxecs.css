@@ -242,6 +242,18 @@ select[disabled]
   cursor: not-allowed;
 }
 
+/**
+ * Multi-select list boxes should render as native lists, not dropdowns:
+ * no chevron, no dropdown padding.
+ */
+select[multiple] 
+{
+  appearance: auto;
+  background-image: none;
+  padding: 6px;
+  cursor: default;
+}
+
 /* Style select dropdown options */
 select option 
 {
@@ -258,6 +270,28 @@ select option:hover
 }
 
 select option:checked 
+{
+  background-color: #55829b;
+  background-image: linear-gradient(#55829b, #55829b);
+  color: #ffffff;
+}
+
+/**
+ * Multi-select list items: keep hover subtle so it cannot be confused
+ * with the selected state.
+ */
+select[multiple] option 
+{
+  padding: 6px 10px;
+}
+
+select[multiple] option:hover 
+{
+  background-color: #eef3f6;
+  color: #333333;
+}
+
+select[multiple] option:checked 
 {
   background-color: #55829b;
   background-image: linear-gradient(#55829b, #55829b);

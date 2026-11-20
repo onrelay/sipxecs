@@ -6,4 +6,5 @@
     <Set name="extractWAR">true</Set>
     <Set name="tempDirectory"><SystemProperty name="jetty.tmp.dir"/>/sipxconfig</Set>
     <Set name="crossContextDispatchSupported">true</Set>
+    <Set name="extraClasspath"><SystemProperty name="jetty.conf.dir"/></Set>
 </Configure>
